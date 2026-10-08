@@ -1,0 +1,1 @@
+{"case":"Prepared Trust worker metadata inspection","code":"42501","message":"permission denied for schema creator","effect":"Refused because the original Trust worker lacked creator schema and ledger visibility. Pending source now grants only schema usage and version/checksum metadata reads; prior database left unchanged."}

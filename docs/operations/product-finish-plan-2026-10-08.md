@@ -63,6 +63,12 @@ now passes the real expired-verification → sign-in → identical artifact jour
 Original provider/read authority and saved-comparison artifact invalidation remain next.
 
 
+The [saved comparison artifact source](../../artifacts/pr-review/2026-10-08/comparison-artifact-lifecycle/README.md)
+now has isolated original-scope capture, withdrawal/expiry, deferred completion
+and physical removal evidence. It remains unregistered/uncomposed. Durable
+unfinished-attempt and sealed-orphan recovery, full graph review and actual
+producer/consumer operation remain prerequisites. No milestone is closed.
+
 ## Refreshed starting point
 
 - Continuation branch: `codex/shadow-evidence-lifetime-20261008`, retaining

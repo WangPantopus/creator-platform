@@ -1,0 +1,40 @@
+{
+  "kind": "isolated synthetic SQL and filesystem operation; no producer activation or fan choice",
+  "results": [
+    {
+      "case": "unheld capture and direct provenance reads refused",
+      "pass": true
+    },
+    {
+      "case": "original Conversation source, EOF, COMMIT, exact seal and completed download fence",
+      "pass": true,
+      "rows": 6
+    },
+    {
+      "case": "source withdrawal denies saved download and durable purge removes exact files",
+      "pass": true
+    },
+    {
+      "case": "withdrawal after source COMMIT before seal retains purge work and refuses ACK",
+      "pass": true
+    },
+    {
+      "case": "original Agent source and stored derived-result artifact follow withdrawal",
+      "pass": true,
+      "rows": 39
+    },
+    {
+      "case": "actual elapsed source expiry denies reads and physically purges without clock edits",
+      "pass": true
+    },
+    {
+      "case": "withdrawal cannot commit through a held source capture; retry then revokes it",
+      "pass": true
+    },
+    {
+      "case": "null fields and manifest replacement refused",
+      "pass": true
+    }
+  ],
+  "observedAt": "2026-10-08T13:51:33.877Z"
+}

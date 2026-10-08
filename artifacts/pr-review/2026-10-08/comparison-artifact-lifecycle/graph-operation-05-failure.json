@@ -1,0 +1,1 @@
+{"case":"Agent source review harness portal","code":"42501","message":"Actual fixed source portal required","effect":"Original Agent EOF guard correctly refused the harness portal; transaction rolled back. Earlier Conversation receipts and all rows preserved."}

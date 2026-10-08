@@ -1,5 +1,26 @@
 # Session handoff — October 8, 2026
 
+## Active continuation — saved comparison artifact lifecycle
+
+Continue on `codex/comparison-artifact-lifecycle-20261008` in the same637b
+checkout. PR[#340](https://github.com/WangPantopus/creator-platform/pull/340)
+and stacked PR[#341](https://github.com/WangPantopus/creator-platform/pull/341)
+are open; refresh exact-head checks before merge, and retarget341 to main after340.
+The [saved-artifact increment](../../artifacts/pr-review/2026-10-08/comparison-artifact-lifecycle/README.md)
+has pending source plus actual isolated SQL/filesystem evidence for source-bound
+capture, withdrawal denial, COMMIT refusal and physical removal. Original EOF
+and task authority remain required. Failed review attempts are preserved.
+The prepared owner refuses registration; no app host consumes it yet.
+
+Next add durable unfinished-attempt and sealed-orphan recovery before composing
+this owner. Then complete original comparison read/provider admission, actual
+separate consent/sanitization, consumer publication fences and real revision13
+upgrade. Carry all ten milestones in the full finish plan forward.
+Current app hosts remain backend compiled5e5cd3abf on57304 and web3119. Original
+creator export61e07c91 and all18 generations/69 usage records are untouched;
+both owned native devices remain stopped with their state preserved.
+
+
 ## Active continuation — privacy download recovery
 
 Comparison/privacy milestone PR [#340](https://github.com/WangPantopus/creator-platform/pull/340)

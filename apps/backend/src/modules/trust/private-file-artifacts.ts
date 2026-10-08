@@ -266,6 +266,88 @@ export class PrivateFileArtifacts implements PrivacyArtifactStore {
     const loaded = await this.load(artifact, binding, signal);
     await loaded.file.close();
   }
+  /** Exact, idempotent storage cleanup for a separately authorized revocation.
+   * Expiry is deliberately not an admission condition: a revoked/expired file
+   * still needs removal. Missing files can be an earlier interrupted cleanup;
+   * every surviving file must match the original manifest before any unlink.
+   * The lifecycle owner, not this method, fences downloads and acknowledges its
+   * durable purge task. Already-open readers need that owner's current check. */
+  async remove(
+    artifact: PrivacyArtifact,
+    binding: ArtifactBinding,
+    signal: AbortSignal,
+  ): Promise<void> {
+    const expected = PrivacyArtifact.parse(artifact);
+    if (
+      expected.jobId !== binding.jobId ||
+      expected.accountId !== binding.accountId ||
+      expected.domain !== binding.domain
+    )
+      throw new DomainError(
+        "export_artifact_unavailable",
+        "This export artifact is unavailable.",
+        404,
+      );
+    signal.throwIfAborted();
+    await this.root();
+    const metadata = join(this.directory, `${expected.reference}.json`);
+    const binary = join(this.directory, `${expected.reference}.bin`);
+    const existing = async (path: string) =>
+      open(path, constants.O_RDONLY | constants.O_NOFOLLOW).catch((error) => {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+        return undefined;
+      });
+    const meta = await existing(metadata);
+    if (meta) {
+      try {
+        const stat = await meta.stat();
+        if (
+          !stat.isFile() ||
+          stat.size > 4096 ||
+          (stat.mode & 0o077) !== 0 ||
+          stat.uid !== process.getuid?.()
+        )
+          throw new Error("export_artifact_invalid");
+        const actual = PrivacyArtifact.parse(
+          JSON.parse(await meta.readFile("utf8")),
+        );
+        if (JSON.stringify(actual) !== JSON.stringify(expected))
+          throw new Error("export_artifact_invalid");
+      } finally {
+        await meta.close();
+      }
+    }
+    const file = await existing(binary);
+    if (file) {
+      try {
+        const stat = await file.stat();
+        if (
+          !stat.isFile() ||
+          stat.size !== expected.bytes ||
+          (stat.mode & 0o077) !== 0 ||
+          stat.uid !== process.getuid?.()
+        )
+          throw new Error("export_artifact_invalid");
+        await this.checksum(file, expected, signal);
+      } finally {
+        await file.close();
+      }
+    }
+    signal.throwIfAborted();
+    // Settle both owned paths after the first unlink, even if cancellation
+    // arrives meanwhile. Binary first leaves retryable metadata after a crash.
+    for (const path of [binary, metadata])
+      await unlink(path).catch((error) => {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+      });
+    const directory = await open(this.directory, "r");
+    try {
+      await directory.sync();
+    } finally {
+      await directory.close();
+    }
+    signal.throwIfAborted();
+  }
   /** Bounded expiry of this store's own sealed artifacts and abandoned attempts.
    * Receipts/tombstones are in PostgreSQL and are never touched by this sweep. */
   async sweep() {
