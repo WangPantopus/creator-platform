@@ -14,6 +14,11 @@ import {
   generationOutputRepairSource,
   registeredGenerationOutputProfile,
 } from "../src/db/generation-output-profile.js";
+import partialRecoveryReview from "../../../infra/migrations/reviews/20261007-partial-generation-recovery.json" with { type: "json" };
+import recoveryReview from "../../../infra/migrations/reviews/20261007-generation-recovery.json" with { type: "json" };
+import { registeredGenerationRecoveryProfile } from "../src/db/generation-recovery-profile.js";
+import publicAIReview from "../../../infra/migrations/reviews/20261007-public-ai.json" with { type: "json" };
+import { registeredPublicAIProfile } from "../src/db/public-ai-profile.js";
 import generationReview from "../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
 
 if (!process.env.DATABASE_MIGRATION_URL)
@@ -77,6 +82,35 @@ try {
     throw new Error(
       "Output registry requires the exact complete Content and output graph.",
     );
+  const publicVersions = new Set(
+    publicAIReview.sources.map((source) => source.version),
+  );
+  const publicAI = registry.migrations.some((source) =>
+    publicVersions.has(source.version),
+  );
+  if (publicAI && (!output || !(await registeredPublicAIProfile())))
+    throw new Error(
+      "Public AI registry requires both exact sources and its complete predecessor.",
+    );
+  const recovery = registry.migrations.some(
+    (source) => source.version === recoveryReview.source.version,
+  );
+  if (recovery && (!publicAI || !(await registeredGenerationRecoveryProfile())))
+    throw new Error(
+      "Recovery registry requires its complete reviewed predecessor.",
+    );
+  const partialRecovery = registry.migrations.some(
+    (source) => source.version === partialRecoveryReview.source.version,
+  );
+  if (
+    partialRecovery &&
+    (!recovery ||
+      (await registeredGenerationRecoveryProfile())?.source.version !==
+        partialRecoveryReview.source.version)
+  )
+    throw new Error(
+      "Partial-output recovery registry requires its complete reviewed predecessor.",
+    );
   const registeredFiles = registry.migrations
     .filter(
       (file) =>
@@ -129,6 +163,33 @@ try {
     throw new Error(
       "Unregistered output repair or incomplete predecessor; no per-file repair was attempted.",
     );
+  const installedPublic = applied.filter((row) =>
+    publicVersions.has(row.version),
+  ).length;
+  if (
+    installedPublic &&
+    (!publicAI || !installedOutput || installedPublic !== publicVersions.size)
+  )
+    throw new Error(
+      "Partial public AI activation or incomplete predecessor; no repair was attempted.",
+    );
+  const installedRecovery = applied.some(
+    (row) => row.version === recoveryReview.source.version,
+  );
+  if (
+    installedRecovery &&
+    (!recovery || installedPublic !== publicVersions.size)
+  )
+    throw new Error(
+      "Incomplete terminal recovery activation; no repair was attempted.",
+    );
+  const installedPartialRecovery = applied.some(
+    (row) => row.version === partialRecoveryReview.source.version,
+  );
+  if (installedPartialRecovery && (!partialRecovery || !installedRecovery))
+    throw new Error(
+      "Incomplete partial-output recovery activation; no repair was attempted.",
+    );
   // Fresh databases still bootstrap the exact canonical61. The complete new
   // wave is only installed atomically by activate-wave after private backup,
   // separate restore and closed-admission checks. Registered code alone cannot
@@ -138,7 +199,11 @@ try {
       (installedGeneration || !generationVersions.has(source.version)) &&
       (installedContent || source.version !== contentPrivacySource.version) &&
       (installedOutput ||
-        source.version !== generationOutputRepairSource.version),
+        source.version !== generationOutputRepairSource.version) &&
+      (installedPublic || !publicVersions.has(source.version)) &&
+      (installedRecovery || source.version !== recoveryReview.source.version) &&
+      (installedPartialRecovery ||
+        source.version !== partialRecoveryReview.source.version),
   );
   const historical = localLegacy
     ? new Set<string>()
@@ -161,6 +226,7 @@ try {
     domain: rows.some((r) => r.version === "0103_w8_domain_privacy_task_fence"),
     canonicalBeforeGeneration: generation && !installedGeneration,
     generationBeforeContent: installedGeneration > 0 && !installedContent,
+    outputBeforePublic: installedOutput && !installedPublic,
   });
   const hasWave = files.some(
     (file) => file.version === "0062_w6_creator_media_worker",
@@ -183,11 +249,17 @@ try {
       if (installedGeneration)
         await assertGenerationWaveRoleSafety(
           client,
-          installedOutput
-            ? "generation-output"
-            : installedContent
-              ? "content-privacy"
-              : undefined,
+          installedPartialRecovery
+            ? "partial-generation-recovery"
+            : installedRecovery
+              ? "generation-recovery"
+              : installedPublic
+                ? "public-ai"
+                : installedOutput
+                  ? "generation-output"
+                  : installedContent
+                    ? "content-privacy"
+                    : undefined,
         );
       else await assertWaveRoleSafety(client, installedRoles(applied));
       if (continuation)
@@ -277,11 +349,17 @@ try {
       if (installedGeneration)
         await assertGenerationWaveRoleSafety(
           client,
-          installedOutput
-            ? "generation-output"
-            : installedContent
-              ? "content-privacy"
-              : undefined,
+          installedPartialRecovery
+            ? "partial-generation-recovery"
+            : installedRecovery
+              ? "generation-recovery"
+              : installedPublic
+                ? "public-ai"
+                : installedOutput
+                  ? "generation-output"
+                  : installedContent
+                    ? "content-privacy"
+                    : undefined,
         );
       else await assertWaveRoleSafety(client, installedRoles(files));
       if (continuation)

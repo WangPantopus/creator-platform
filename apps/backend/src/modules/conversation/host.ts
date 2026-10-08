@@ -7,6 +7,9 @@ import type { BackendRuntime } from "../../integration.js";
 import { invariant } from "../../core/errors.js";
 import type { ThreadScope } from "../access/scope.js";
 import { createAgentDomain } from "../agent/integration.js";
+import { agentPublicProjection } from "../agent/growth-adapter.js";
+import { PublicAIIdentityAuthority } from "../identity/public-ai-scope.js";
+import { registeredPublicAIProfile } from "../../db/public-ai-profile.js";
 import { modelFromEnvironment } from "../agent/model.js";
 import {
   GENERATION_JOURNAL_MIGRATION,
@@ -78,7 +81,7 @@ export type ConversationHostProducers = {
   generation?: Pick<
     Parameters<typeof prepareGenerationWorker>[0],
     "workerPool" | "custody" | "signal"
-  >;
+  > & { isRunning?: () => boolean };
   /** W8: actual feedback notice/consent/expiry; no development substitute. */
   feedbackAuthority?: ReplyFeedbackAuthority;
   /** W8: approved minimal account-level intro-offer use and retention. */
@@ -487,6 +490,33 @@ export async function composeConversationHost(
           journal,
         })
       : undefined;
+  // The public directory consumes bounded licensed metadata from the same
+  // original Agent graph. This development policy authorizes only configured
+  // fictional creators; it never becomes verified provider approval.
+  let publicCreatorAI;
+  if (ready && developmentPolicy && policy) {
+    const publicReview = await registeredPublicAIProfile();
+    invariant(
+      publicReview && runtime.holdPublicCreatorNegativeAuthority,
+      "public_ai_unconfigured",
+      "The reviewed public metadata and current denial authorities are required.",
+    );
+    const publicIdentity = await PublicAIIdentityAuthority.create({
+      pool: runtime.pool,
+      migration: publicReview.sources[0]!,
+      assertAllowed: runtime.holdPublicCreatorNegativeAuthority,
+    });
+    const currentPolicy = developmentPolicy;
+    publicCreatorAI = agentPublicProjection(agent.service, publicIdentity, {
+      async current(client, scope, facts) {
+        await publicIdentity.authorizeInTransaction(scope, client, facts);
+        return (
+          currentPolicy.isFor(runtime.pool, policy) &&
+          currentPolicy.allowsAccounts(facts.creatorAccountId)
+        );
+      },
+    });
+  }
   if (worker && commerce?.allowance)
     acceptance = PreparedGenerationAcceptance.prepare({
       worker,
@@ -494,6 +524,7 @@ export async function composeConversationHost(
       access: runtime.access,
       agent,
       allowance: commerce.allowance,
+      isRunning: producers.generation?.isRunning,
     });
   const generation =
     acceptance && commerce?.generationCostReconciliation
@@ -552,13 +583,16 @@ export async function composeConversationHost(
     process.stdout.write(
       available
         ? "Fan generation: available (development configuration; unreviewed policy; fictional accounts only).\n"
-        : `Fan generation: unavailable; missing ${missing.join(", ") || "configured runtime"}.\n`,
+        : worker && producers.generation?.isRunning
+          ? "Fan generation: prepared; waiting for owned worker startup.\n"
+          : `Fan generation: unavailable; missing ${missing.join(", ") || "configured runtime"}.\n`,
     );
   return {
     commerce,
     conversation,
     agent,
     generationWorker: worker,
+    publicCreatorAI,
     privacy: {
       ...(producers.provenancePurge
         ? { provenancePurgePreparation: producers.provenancePurge }
@@ -575,7 +609,12 @@ export async function composeConversationHost(
           }
         : {}),
     },
-    fanGeneration: { available, missing },
+    fanGeneration: {
+      get available() {
+        return conversation.feature.capabilities().generationAvailable;
+      },
+      missing,
+    },
     close(): Promise<void> {
       closing ??= (async () => {
         // Stop admissions synchronously, then retain the actual ingestion

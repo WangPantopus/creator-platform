@@ -40,6 +40,7 @@ import type {
 import { prepareTrustReplyReviewer } from "./modules/trust/reply-review.js";
 import { InteractiveCallControl } from "./modules/session/interactive-control.js";
 import { AccountCallMetadata } from "./modules/session/account-call-metadata.js";
+import { createDevelopmentGenerationHost } from "./workers/generation-host.js";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
@@ -59,7 +60,7 @@ const features: {
   conversationPrivacy?: ConversationPrivacyOwnerPorts;
   agentPrivacy?: AgentPrivacyOwnerPorts;
   commerce?: import("./modules/commerce/service.js").CommerceService;
-  start: (() => void)[];
+  start: ((onFailure: () => void) => void)[];
 } = { growth: null, start: [] };
 if (config.identityAdapter === "development" && !config.identitySessionKey)
   throw new Error(
@@ -189,6 +190,12 @@ try {
                   }
                 : {};
             const usageAccounting = await runtime.prepareUsageAccounting?.();
+            const generationHost = await createDevelopmentGenerationHost(
+              runtime,
+              config,
+              usageAccounting,
+            );
+            if (generationHost) onClose(() => generationHost.close());
             const conversationPrivacy =
               usageAccounting &&
               mediaHost &&
@@ -198,6 +205,9 @@ try {
                 : undefined;
             const host = await composeConversationHost(runtime, config, {
               ...licensing,
+              ...(generationHost
+                ? { generation: generationHost.producers }
+                : {}),
               ...(feedback
                 ? {
                     feedbackAuthority: feedback.replyFeedbackAuthority,
@@ -229,6 +239,10 @@ try {
                 : {}),
             });
             onClose(() => host.close());
+            if (generationHost)
+              features.start.push((onFailure) =>
+                generationHost.start(host.generationWorker, onFailure),
+              );
             const { commerce, conversation, agent } = host;
             const approvalMigration =
               await registeredCommerceApprovalMigration();
@@ -252,6 +266,9 @@ try {
             features.growth = await configureGrowthForBackend({
               ...runtime,
               pool: growthAPIPool ?? runtime.pool,
+              ...(host.publicCreatorAI
+                ? { publicCreatorAI: host.publicCreatorAI }
+                : {}),
               postEntryReader: {
                 current(input) {
                   if (!postEntryReader)
@@ -427,21 +444,11 @@ try {
   }
   throw error;
 }
-features.growth?.start();
-for (const start of features.start) start();
 const server = configured?.server ?? createServer(createApp(config));
-server.listen(
-  {
-    port: config.port,
-    ...(config.identityAdapter === "development" ? { host: "127.0.0.1" } : {}),
-  },
-  () =>
-    process.stdout.write(
-      `Interactive API listening on ${config.port}; identity mode ${config.identityAdapter ?? "unconfigured"}.\n`,
-    ),
-);
 let shutdownInFlight: Promise<void> | undefined;
-const shutdown = () => {
+let fatalShutdown = false;
+const shutdown = (fatal = false) => {
+  fatalShutdown ||= fatal;
   // Shell, watcher and OS signals can overlap. One shared cleanup must own
   // every worker/pool so a second signal cannot interrupt the first drain.
   shutdownInFlight ??= (async () => {
@@ -462,8 +469,37 @@ const shutdown = () => {
           ),
     );
     await close("Growth API pool", () => growthAPIPool?.end());
-    process.exit(failed ? 1 : 0);
+    process.exit(failed || fatalShutdown ? 1 : 0);
   })();
 };
-process.on("SIGTERM", shutdown);
-process.on("SIGINT", shutdown);
+process.on("SIGTERM", () => shutdown());
+process.on("SIGINT", () => shutdown());
+server.on("error", () => {
+  console.error("Interactive API listener failed.");
+  shutdown(true);
+});
+try {
+  features.growth?.start();
+  for (const start of features.start)
+    start(() => {
+      console.error(
+        "Generation worker stopped unexpectedly; closing admissions and draining the host.",
+      );
+      shutdown(true);
+    });
+  server.listen(
+    {
+      port: config.port,
+      ...(config.identityAdapter === "development"
+        ? { host: "127.0.0.1" }
+        : {}),
+    },
+    () =>
+      process.stdout.write(
+        `Interactive API listening on ${config.port}; identity mode ${config.identityAdapter ?? "unconfigured"}.\n`,
+      ),
+  );
+} catch {
+  console.error("Application worker startup failed.");
+  shutdown(true);
+}

@@ -1,0 +1,533 @@
+{
+  "schemaVersion": 1,
+  "id": "20261007-public-ai",
+  "baseline": [
+    {
+      "version": "0001_foundation",
+      "path": "apps/backend/migrations/0001_foundation.sql",
+      "checksum": "1ccd0d6a99e11865850cd40f27d9446035e7d769d9b47f4f6d5c80776274117b"
+    },
+    {
+      "version": "0002_w1_identity",
+      "path": "apps/backend/migrations/0002_w1_identity.sql",
+      "checksum": "5aa91502d511375eb7a43e0f226f3e1aeeee896981b7ea4b6faf1aa5bee97f82"
+    },
+    {
+      "version": "0003_w2_agent",
+      "path": "apps/backend/src/modules/agent/migrations/0003_w2_agent.sql",
+      "checksum": "73996996033babd30c919a9f06822f352270987630e96c588ae5f6fe73aef510"
+    },
+    {
+      "version": "0004_commerce",
+      "path": "apps/backend/src/modules/commerce/schema.sql",
+      "checksum": "5a4aaeb45cc02d53a72d3c4e1558609e9dbf52b2f15b94d7f228d308813c76cc"
+    },
+    {
+      "version": "0006_w6_media_sessions",
+      "path": "apps/backend/src/modules/media/schema.sql",
+      "checksum": "0206427e525c5569c7f1753b92d39556bfe56ca0c1df61932213514da681a427"
+    },
+    {
+      "version": "0007_growth",
+      "path": "apps/backend/migrations/0007_growth.sql",
+      "checksum": "1ead3fb1b0c213c253bc2170e67467bf945821c9d6a9bb7d3b700b39d7d75c42"
+    },
+    {
+      "version": "0008_trust_operations",
+      "path": "apps/backend/migrations/0008_trust_operations.sql",
+      "checksum": "f88465f4d15dfb19176893789429aef648a0b16fed3403c4dd27a0ffbcf5b50c"
+    },
+    {
+      "version": "0010_w8_operational_guardrails",
+      "path": "apps/backend/migrations/0010_w8_operational_guardrails.sql",
+      "checksum": "5b7be49722ccaf787b1b0f1df17aaea48b5b29b6539a62e55d40328a153dd0b8"
+    },
+    {
+      "version": "0011_growth_retention",
+      "path": "apps/backend/migrations/0011_growth_retention.sql",
+      "checksum": "69478a0f75d4c91f61d74d5f3416e8c07077fffcbe7978325fc7131fb847f79c"
+    },
+    {
+      "version": "0012_w8_crisis_event_rls",
+      "path": "apps/backend/migrations/0012_w8_crisis_event_rls.sql",
+      "checksum": "1f60f00ac0457c506296a818de81af473c2aa8e057d5355a387a3fcc55b7cbd1"
+    },
+    {
+      "version": "0013_w2_agent_extensions",
+      "path": "infra/migrations/history/0013_w2_agent_extensions.sql",
+      "checksum": "7fc5995956d2e407475f815a2a707737c225cce0346643b8fd6b345d972fe59c"
+    },
+    {
+      "version": "0015_w4_reliability",
+      "path": "infra/migrations/history/0015_w4_reliability.sql",
+      "checksum": "5a94d77858838e26c94c6df559b01034d9cd48b94fd1530ebe937ab9840a89b4"
+    },
+    {
+      "version": "0016_w4_disclosure",
+      "path": "infra/migrations/history/0016_w4_disclosure.sql",
+      "checksum": "927291027eb0ad9942679b188f5e3f2cd74c1767d1b30aab7284f86de114fc89"
+    },
+    {
+      "version": "0017_growth_delivery",
+      "path": "apps/backend/migrations/0014_growth_delivery.sql",
+      "checksum": "9a0623260bebbda477f95a81e692b8cc39d991891e282c5cf144963efafaf33b"
+    },
+    {
+      "version": "0018_growth_activation",
+      "path": "apps/backend/migrations/0015_growth_activation.sql",
+      "checksum": "615ce7b38c2d894dc54767953dc5c0d1e9b17aa9c77d5867cd1b1619a850e509"
+    },
+    {
+      "version": "0019_w2_shadow_jobs",
+      "path": "infra/migrations/history/0019_w2_shadow_jobs.sql",
+      "checksum": "1f8e6e5ef1aa11859e3d972fb87273bec9fe233b4b406f51bc02df922d75158b"
+    },
+    {
+      "version": "0020_w2_purge_tombstone",
+      "path": "infra/migrations/history/0020_w2_purge_tombstone.sql",
+      "checksum": "419dd13b87d853363cfa3fee934f1916d78423dd0a6bdd88abcf4f1853d540ca"
+    },
+    {
+      "version": "0021_w4_lifecycle",
+      "path": "apps/backend/src/modules/commerce/schema-lifecycle.sql",
+      "checksum": "5c6d0225bd8180341877b6881214f035af89a8377d6265c1223dfa6d82a5a965"
+    },
+    {
+      "version": "0022_w4_lineage",
+      "path": "infra/migrations/history/0022_w4_lineage.sql",
+      "checksum": "03705311adf220a1658ec5b1cc2e3d661a3b5a8367664bd3204b51c4d3bba698"
+    },
+    {
+      "version": "0023_w8_action_recovery",
+      "path": "apps/backend/migrations/0023_w8_action_recovery.sql",
+      "checksum": "4c2ec5cee7e66d7a6178b87271c21a4b060fe34e9e6a587ddaf9ebe39852a720"
+    },
+    {
+      "version": "0024_growth_insight_versions",
+      "path": "apps/backend/migrations/0016_growth_insight_versions.sql",
+      "checksum": "bfbc1d4380037e7accd313ba06e720b31dd5af9cdfc94157e7bebd7c246efea4"
+    },
+    {
+      "version": "0025_growth_closed_windows",
+      "path": "apps/backend/migrations/0017_growth_closed_windows.sql",
+      "checksum": "a52750f6db6ff8f114f67ee14cf5966da5d936f7fccc06e714c0a9c2b08c182d"
+    },
+    {
+      "version": "0026_growth_window_backfill",
+      "path": "apps/backend/migrations/0018_growth_window_backfill.sql",
+      "checksum": "63e50cb371ac650c31a0a05310de6e7ddc6db09643e0670d573e93f4f62d5466"
+    },
+    {
+      "version": "0027_w8_privacy_ownership",
+      "path": "apps/backend/migrations/0027_w8_privacy_ownership.sql",
+      "checksum": "de8587672985d79c480bafb41961041be9390f565b3612ca14285d87d2319028"
+    },
+    {
+      "version": "0028_w4_membership_history",
+      "path": "apps/backend/src/modules/commerce/schema-membership-history.sql",
+      "checksum": "b8af45b7fa1804e5127bc0a49287fca0bad80be7eb84bf86a3afc4f85f2a880c"
+    },
+    {
+      "version": "0029_w4_recovery_fencing",
+      "path": "apps/backend/src/modules/commerce/schema-recovery-fencing.sql",
+      "checksum": "b7b8a04af277d9be7877c691e1f1eeeeffbcfb440ba74b519a14206d7fc4ead9"
+    },
+    {
+      "version": "0030_w4_spending_notices",
+      "path": "apps/backend/src/modules/commerce/schema-spending-notices.sql",
+      "checksum": "ac608681416e8a5388ec3e966b68bae7fe0e77553b0eb4dd16cf0941c12e2dcd"
+    },
+    {
+      "version": "0031_w4_purchase_history",
+      "path": "apps/backend/src/modules/commerce/schema-purchase-history.sql",
+      "checksum": "72d14f4065cad72a5a836daa724c816abd79557078f5f0602bd9a39e64c00a6e"
+    },
+    {
+      "version": "0032_growth_continuation",
+      "path": "apps/backend/migrations/0032_growth_continuation.sql",
+      "checksum": "669a9d73446a6ec932dcf70a3bf257a6f07b7033cee56ea88fcfe5ac7d27eb61"
+    },
+    {
+      "version": "0033_growth_prompt_claims",
+      "path": "apps/backend/migrations/0033_growth_prompt_claims.sql",
+      "checksum": "d693befce3bbfe6fb5fa9077acf238f16d22b41e5604a82be0deb96378bfbca9"
+    },
+    {
+      "version": "0034_growth_erasure_fence",
+      "path": "apps/backend/migrations/0034_growth_erasure_fence.sql",
+      "checksum": "24e5eb660d23d181f13847734d4007851c36bd4ff74c8d1a064b748cb16c050b"
+    },
+    {
+      "version": "0035_w5_content",
+      "path": "apps/backend/src/modules/content/schema.sql",
+      "checksum": "b5a35c0c215f2af54458e90719198615b1635c19b14a18d49fed56179648c46d"
+    },
+    {
+      "version": "0036_w5_content_reconciliation",
+      "path": "apps/backend/src/modules/content/schema-reconciliation.sql",
+      "checksum": "20fd7bcb347de8e8fe77796bdf42770b991dca2450b79204208000017fb1bba5"
+    },
+    {
+      "version": "0037_w5_studio_drafts",
+      "path": "apps/backend/src/modules/studio/schema.sql",
+      "checksum": "d75aa07e2ba0dbad93dbb32992105943b7fa663fc37802ce49e31ec8a0b153cd"
+    },
+    {
+      "version": "0038_w5_content_consent",
+      "path": "apps/backend/src/modules/content/schema-consent-history.sql",
+      "checksum": "eeb8556af2eb0ca0250b12810cd09ff70a74d7e89c4889295793200651b9e86a"
+    },
+    {
+      "version": "0039_w5_content_thread_privacy",
+      "path": "apps/backend/src/modules/content/schema-thread-privacy.sql",
+      "checksum": "74f55cd1ce181a3ed735300894c99f5fdcbb892233c7293214bb5f10e4b9caa6"
+    },
+    {
+      "version": "0040_w5_content_fan_effects",
+      "path": "apps/backend/src/modules/content/schema-fan-effects.sql",
+      "checksum": "57597036d29742bb1983e94ea91b7cee929bc893def7757bfaaacf3a06c6ddc9"
+    },
+    {
+      "version": "0041_w3_conversations",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_conversations.sql",
+      "checksum": "2c6f20f0a1152952ad9f864fbe3cd73efd40e182de3b8d93b64ecf0c89604456"
+    },
+    {
+      "version": "0042_w3_wellbeing",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_wellbeing.sql",
+      "checksum": "1f57a65084256d08ab906f9f15d2da893a8c0665dd34589cd9417decbb838a0a"
+    },
+    {
+      "version": "0043_w8_relationship_backfill",
+      "path": "apps/backend/migrations/0043_w8_relationship_backfill.sql",
+      "checksum": "503a6e637f790491b060066cd9d5b0dd84d5e5b737d476c1f325204c4e87f8f6"
+    },
+    {
+      "version": "0044_w4_personal_approval",
+      "path": "apps/backend/src/modules/commerce/schema-approval.sql",
+      "checksum": "4480936ea99adbc954f1e3444673772922c49e6dab8b9cce9351cf6d61c493fb"
+    },
+    {
+      "version": "0045_w5_reply_review",
+      "path": "apps/backend/src/modules/content/schema-reply-review.sql",
+      "checksum": "636763eac2f10091d0291007bd9252b80ccc5631b3930f19804a82ec064a6b06"
+    },
+    {
+      "version": "0046_w6_call_availability",
+      "path": "apps/backend/src/modules/session/availability.sql",
+      "checksum": "47ec148a2821617aadba66264b12e55bf1a1219e597b2f906b5ec0683b4e9097"
+    },
+    {
+      "version": "0047_w6_creator_media",
+      "path": "apps/backend/src/modules/media/creator-scope.sql",
+      "checksum": "3e76219129199d177d7a9667de8623bb0d1d4bd6dfa25a99f10bbbf88b1139db"
+    },
+    {
+      "version": "0049_w4_generation_cost_settlement",
+      "path": "apps/backend/src/modules/commerce/schema-generation-cost-settlement.sql",
+      "checksum": "00f4c2cc2962a0e9f14b0ba0ad57f23823fcc811042e8d6b8b9c6dc5394daffc"
+    },
+    {
+      "version": "0050_w3_account_relationship_index",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_account_index.sql",
+      "checksum": "189e19e001182efe6b28f4eed8c1633abf0945a9592b2209c950ac8de01e86e1"
+    },
+    {
+      "version": "0051_w5_media_publication",
+      "path": "apps/backend/src/modules/content/schema-media-publication.sql",
+      "checksum": "f35526f24275d7b34bbbed7c12b98e3b1fd1d32b0c69b426d13370df0ca86e2e"
+    },
+    {
+      "version": "0053_w8_runtime_denial_projection",
+      "path": "apps/backend/migrations/0053_w8_runtime_denial_projection.sql",
+      "checksum": "4da2e2b56f51f70e39336c6c7d26646e1732703f2e3f39c35f700ff959237185"
+    },
+    {
+      "version": "0054_w4_pass_purchase_effects",
+      "path": "apps/backend/src/modules/commerce/schema-pass-purchase-effects.sql",
+      "checksum": "d6ead22cd6115df960dbe612b1de4a9473d2717a040cb66c6ba473da580827ca"
+    },
+    {
+      "version": "0055_w4_pass_pool_effects",
+      "path": "apps/backend/src/modules/commerce/schema-pass-pool-effects.sql",
+      "checksum": "26be8430c4301b7eda9060c94e9034b7afa5fd57a9ad5bec128f26ac2aefa4ca"
+    },
+    {
+      "version": "0056_w3_correction_feedback_lineage",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_message_lineage.sql",
+      "checksum": "1044700d59b9dbb2d2b36d890496de0be6fb3d53c4409504f3c7693906866c35"
+    },
+    {
+      "version": "0057_w3_feedback_consent",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_feedback_consent.sql",
+      "checksum": "08cb6f37c12ca3131b2e307a237569aa4d104fc627566e619a39fa18a1814d11"
+    },
+    {
+      "version": "0058_w3_correction_signature",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_correction_signature.sql",
+      "checksum": "5c94b94a7287a5c4a149da454117c30be40367034b9930ac11e168e5b6a4b3e0"
+    },
+    {
+      "version": "0059_w3_recording_association",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_recording_association.sql",
+      "checksum": "b61d50d7f85c0ef468e00a8d2d6b737b4d405a9349810c552f7d9df7f527c42e"
+    },
+    {
+      "version": "0060_w8_composed_signed_message",
+      "path": "apps/backend/migrations/0060_w8_composed_signed_message.sql",
+      "checksum": "43067f9a36218e49e84bc3597e466e73b2d288c12a446e2628e655a281dddecc"
+    },
+    {
+      "version": "0061_w4_payout_custody",
+      "path": "apps/backend/src/modules/commerce/schema-payout-custody.sql",
+      "checksum": "a2453c00868cd7a6fcaf30a1121884a73daa4942a2ac8b7214504d19285c1efd"
+    },
+    {
+      "version": "0062_w6_creator_media_worker",
+      "path": "apps/backend/src/modules/media/worker-scope.sql",
+      "checksum": "abf169bb75c9bdc8aff771ac1d929f6a09a7211e6340b84b36d5700daa38a82a"
+    },
+    {
+      "version": "0074_w8_content_runtime_denial",
+      "path": "apps/backend/migrations/0074_w8_content_runtime_denial.sql",
+      "checksum": "61866894c579039cfc2bf11522edeaf46fa03bd51761cca3791ab3471fb9b2f3"
+    },
+    {
+      "version": "0082_w8_interactive_denial_try_fence",
+      "path": "apps/backend/migrations/0082_w8_interactive_denial_try_fence.sql",
+      "checksum": "3742b1e6b7f367ca626176615c5362ecf002fe5fcc5a96ea941d35a4708e8686"
+    },
+    {
+      "version": "0087_w8_privacy_task_commit_fence",
+      "path": "apps/backend/migrations/0087_w8_privacy_task_commit_fence.sql",
+      "checksum": "33e619bfdea66355e1d8d2b90ed2d0389f21ae024fda63e1b984c99aede847ef"
+    },
+    {
+      "version": "0103_w8_domain_privacy_task_fence",
+      "path": "apps/backend/migrations/0103_w8_domain_privacy_task_fence.sql",
+      "checksum": "040771e88c1cea0720519a2c162cd02319229d9c67171966fc98bc6a3476c15d"
+    },
+    {
+      "version": "0157_w4_public_packet_read",
+      "path": "apps/backend/src/modules/commerce/schema-public-packet-read.sql",
+      "checksum": "0b11d09a2dcd11cbbe715d1dccf90185270e277fea7ce6f8eabe27a36e30d4b8"
+    },
+    {
+      "version": "0159_w1_generation_worker_scope",
+      "path": "apps/backend/src/modules/identity/schema-generation-scope.sql",
+      "checksum": "7de41bf10228219d69480e302bac7d69626d8d848d8276bb1fe54e49112a5627"
+    },
+    {
+      "version": "0163_w2_usage_lineage",
+      "path": "apps/backend/src/modules/agent/migrations/0048_w2_usage_lineage.sql",
+      "checksum": "16dddc80bebe32979f822104d8f411e0f545b4e212da6dc147c72f959e660f17"
+    },
+    {
+      "version": "0165_w2_usage_retention_expiry",
+      "path": "apps/backend/src/modules/agent/migrations/0067_w2_usage_retention_expiry.sql",
+      "checksum": "1c118f5ec90a5a3f3578e056af14d5e56b1379464977c4a79bd6c2b62be7f17e"
+    },
+    {
+      "version": "0167_w1_signature_read_fence",
+      "path": "apps/backend/src/modules/identity/schema-signature-read-fence.sql",
+      "checksum": "157640de84f22d6d638d788dfe04314fd193efaed80a829f288bec7cbcb815b5"
+    },
+    {
+      "version": "0177_w8_generation_worker_denial",
+      "path": "apps/backend/migrations/0093_w8_generation_worker_denial.sql",
+      "checksum": "d47b5916b0ac0c3cc33bd7d50bfdb663f39a9218dcff0b97d3a9dce7b6acc44c"
+    },
+    {
+      "version": "0179_w3_generation_purpose_consumers",
+      "path": "apps/backend/src/modules/conversation/migrations/0095_w3_generation_purpose_consumers.sql",
+      "checksum": "9449f7f9254aa1c9c77713b1683d5c85076b357f13e573882ee5d2d03d1715e0"
+    },
+    {
+      "version": "0180_w2_generation_input_consumers",
+      "path": "apps/backend/src/modules/agent/migrations/0096_w2_generation_input_consumers.sql",
+      "checksum": "25f89ddba69beed4dd780cd23a64eabb9b7481e2dcb5f192b167299a732b2c34"
+    },
+    {
+      "version": "0181_w2_generation_attempt_admission",
+      "path": "apps/backend/src/modules/agent/migrations/0097_w2_generation_attempt_admission.sql",
+      "checksum": "eab8c8e07b8a1e6ba4384f5300560bd46853bf98509faade5a1b555e130c75ee"
+    },
+    {
+      "version": "0182_w4_generation_allowance_audience",
+      "path": "apps/backend/src/modules/commerce/schema-generation-audience-renumbered.sql",
+      "checksum": "98f9373fbf2403e05f6f26a4223a94779d3280fefa89f2ab2c6f30fbbef796be"
+    },
+    {
+      "version": "0183_w1_generation_terminal_scope",
+      "path": "apps/backend/src/modules/identity/schema-generation-terminal.sql",
+      "checksum": "fadbf62a3ddf06142c3a6ad30313503f9bebe7b6d64f67f8ba01ff13ce2398c7"
+    },
+    {
+      "version": "0184_w8_generation_terminal_denial",
+      "path": "apps/backend/migrations/0100_w8_generation_terminal_denial.sql",
+      "checksum": "393920665d8860ee53ee6ef740ba0ad4a6921aceddcbf33f6419727e846532af"
+    },
+    {
+      "version": "0186_w5_generation_content_origin",
+      "path": "apps/backend/src/modules/content/schema-generation-origin.sql",
+      "checksum": "2f1c4b30133a0c8707b16b15c1e42a9daf539cb5edeeb48ad6a835352a4f444d"
+    },
+    {
+      "version": "0187_w2_generation_retrieval_context",
+      "path": "apps/backend/src/modules/agent/migrations/0104_w2_generation_retrieval_context.sql",
+      "checksum": "bf9d9c35b3f0bb8c18518bd06b4459d16d421f4da4a6ad0ba06f8319acc89747"
+    },
+    {
+      "version": "0188_w2_generation_terminal_journal",
+      "path": "apps/backend/src/modules/agent/migrations/0105_w2_generation_terminal_journal.sql",
+      "checksum": "7ab8974d065b1b9e5befa2ded26c6978876957fab0eee80b9632825bbac98477"
+    },
+    {
+      "version": "0189_w4_generation_terminal_settlement",
+      "path": "apps/backend/src/modules/commerce/schema-generation-terminal-settlement.sql",
+      "checksum": "a6e386de7506035d6bc0d10da644cb8ee2620824217b9c2c61a9a34cb7fa4fc9"
+    },
+    {
+      "version": "0196_w2_privacy_export_snapshot",
+      "path": "apps/backend/src/modules/agent/migrations/0113_w2_privacy_export_snapshot.sql",
+      "checksum": "f0b86d507bcb7ad194c680f93487f582354f711ca91f3deffb01843c263ea65a"
+    },
+    {
+      "version": "0203_w3_terminal_only_finalization",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_terminal_only_finalization.sql",
+      "checksum": "8de1897f2e70f763382984459274eb7616ad7149b457811fffd90fb8b7df2e8c"
+    },
+    {
+      "version": "0209_w8_all_scope_privacy_ownership",
+      "path": "apps/backend/migrations/0209_w8_all_scope_privacy_ownership.sql",
+      "checksum": "6fa4006cb8c2f6901c7006595d08196573daef33f06aa6cec866a546ffcd2f01"
+    },
+    {
+      "version": "0210_w2_generation_guardrail_event",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_generation_guardrail_event.sql",
+      "checksum": "0c0fc7fee7182f3e77695222e51cce910268f7844437a5e974f68af5927a3382"
+    },
+    {
+      "version": "0211_w2_generation_agent_metadata",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_generation_agent_metadata.sql",
+      "checksum": "4bbcd9a24b622ee63525da6f20eaf21f84eb9c2d4d538a9122d8184347a76b4f"
+    },
+    {
+      "version": "0212_w3_generation_worker_output",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_worker_output.sql",
+      "checksum": "76ee832c45e5dc422a8128afdc162a354fc54b7df4f611fb6186cdf3bd094df8"
+    },
+    {
+      "version": "0214_w8_original_privacy_family",
+      "path": "apps/backend/migrations/0214_w8_original_privacy_family.sql",
+      "checksum": "fcb8f6174d48ed89b9a06d8a51ac4f0c5dd4288950f2d18b351825d9d81dd793"
+    },
+    {
+      "version": "0215_w4_generation_safety_terminal_settlement",
+      "path": "apps/backend/src/modules/commerce/schema-generation-safety-terminal-settlement.sql",
+      "checksum": "5aba1bffa300a811630f66e8577d29801694a54b6f06de610f7f78a7184d9a24"
+    },
+    {
+      "version": "0216_w1_generation_output_cursor",
+      "path": "apps/backend/src/modules/identity/schema-generation-output-cursor.sql",
+      "checksum": "a4f01c5f1eb1e19d79437b17cce872def1366965ba27c8c46b0d5f9bb73da436"
+    },
+    {
+      "version": "0217_w3_generation_provenance_purge",
+      "path": "apps/backend/migrations/0217_w3_generation_provenance_purge.sql",
+      "checksum": "f2318d7a49151544796e105fe62990dc43af6fe67e49fae253b7578a0c01684e"
+    },
+    {
+      "version": "0218_w1_generation_terminal_discovery",
+      "path": "apps/backend/src/modules/identity/schema-generation-terminal-discovery.sql",
+      "checksum": "83a56963f6c37e05b0850fa6a0e97475282fbfa3e90d1372f86bea701622e7bc"
+    },
+    {
+      "version": "0221_w3_generation_context_profile_bound",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_generation_context_profile_bound.sql",
+      "checksum": "b0fe4643e110a4a6b752ae44847543c7cb8897bdd2a56c2daa58574b9c58536e"
+    },
+    {
+      "version": "0222_w4_generation_audience_profile_fence",
+      "path": "apps/backend/src/modules/commerce/schema-generation-audience-profile-fence.sql",
+      "checksum": "11d3d327f22082166d85f17179fe7a8cf94bcd9161714c8055b07537ff639e9d"
+    },
+    {
+      "version": "0223_w2_generation_profile_bound",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_generation_profile_bound.sql",
+      "checksum": "5b2571d4cc115fa8250351d2904126dcd8a09ff229807f6780ad819de4d21de0"
+    },
+    {
+      "version": "0224_w5_generation_origin_profile_fence",
+      "path": "apps/backend/src/modules/content/schema-generation-origin-profile-fence.sql",
+      "checksum": "09d3df2f3549d0267dce2fe049789e575b1c8f212ee887d2d5396f110bafc047"
+    },
+    {
+      "version": "0226_w1_generation_lifecycle",
+      "path": "apps/backend/src/modules/identity/schema-generation-lifecycle.sql",
+      "checksum": "9eba74f6ae86c52eddde1acc4f7780a5c98762a86681920e11edfec15cd070a8"
+    },
+    {
+      "version": "0227_w1_generation_terminal_page",
+      "path": "apps/backend/src/modules/identity/schema-generation-terminal-page.sql",
+      "checksum": "8632008a15ba322f6caa3b7a393635851c9d7ea18dcd6ad7f175361d4281149c"
+    },
+    {
+      "version": "0228_w4_generation_settlement_clock",
+      "path": "apps/backend/src/modules/commerce/schema-generation-settlement-clock.sql",
+      "checksum": "542b271ee29a5fdede8eaa77620301854026831955b717229cb055bda5bf4296"
+    },
+    {
+      "version": "0229_w2_accounting_retention_integrity",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_accounting_retention_integrity.sql",
+      "checksum": "d5a3067868f232f5fda69b11b6f57e642c2913061108edae4943010fe3457c89"
+    },
+    {
+      "version": "0230_w8_usage_expiry_tasks",
+      "path": "apps/backend/migrations/0230_w8_usage_expiry_tasks.sql",
+      "checksum": "2e30ef05d54352d37f37deb9a33ddc22cd9fad64d71ad98d6f69f99ff394a72e"
+    },
+    {
+      "version": "0231_w2_account_detached_usage",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_account_detached_usage.sql",
+      "checksum": "d19aa583d71250c85bdbce97c5d2c168dbb683009451de594f4434574c16874f"
+    },
+    {
+      "version": "0232_w8_conversation_accounting_boundary",
+      "path": "apps/backend/migrations/0232_w8_conversation_accounting_boundary.sql",
+      "checksum": "2be4dc0bc2f74d01d506985f7dac31c49c6a7a567f19b2126025396949111643"
+    },
+    {
+      "version": "0233_w3_privacy_cursor_export",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_privacy_cursor_export_ordered.sql",
+      "checksum": "99ad0ce10da98954d08b3fe31dedce0ef93be4c3be7e1aeecf3995059e41eb08"
+    },
+    {
+      "version": "0198_w5_content_privacy_export",
+      "path": "apps/backend/src/modules/content/schema-content-privacy-export.sql",
+      "checksum": "faff9c4be7b6f27601032756a6be845d656969d81f15e89ad10611e639a83ff8"
+    },
+    {
+      "version": "0234_w3_generation_first_visible_read",
+      "path": "apps/backend/src/modules/conversation/migrations/pending_w3_generation_first_visible_read.sql",
+      "checksum": "27f7cda8ceed6fbe80035d45c4cb6b8376470d9041a3407f558a879ce2d993b4"
+    }
+  ],
+  "wave": [
+    {
+      "version": "0235_w1_public_ai_metadata_scope",
+      "path": "apps/backend/src/modules/identity/schema-public-ai-scope.sql",
+      "checksum": "0325048ec855877e59430423850ec72360610a96328aaaef903139f512aa0606"
+    },
+    {
+      "version": "0236_w8_public_creator_denial",
+      "path": "apps/backend/migrations/0086_w8_public_creator_denial.sql",
+      "checksum": "876e5a0636e9010f3349b57ecc6ff71b42f316cc7210d8b80bac9be4955efe8c"
+    }
+  ],
+  "outOfOrderException": {
+    "adoption": "w5-20260930",
+    "alreadyApplied": "0045_w5_reply_review",
+    "pending": "0044_w4_personal_approval"
+  }
+}

@@ -16,6 +16,14 @@ export class IngestionWorker {
     if (this.active || signal.aborted) return;
     this.active = true;
     try {
+      if (
+        !(await this.repository.ingestionPending(
+          scope,
+          this.model?.embeddingModel ?? null,
+        ))
+      )
+        return;
+      signal.throwIfAborted();
       const job = await this.repository.transaction(scope, async (client) => {
         if (this.model) {
           const changed = await client.query(

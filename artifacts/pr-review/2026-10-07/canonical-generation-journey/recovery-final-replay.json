@@ -1,0 +1,105 @@
+{
+  "revision": "3ce87724-plus-reviewed-recovery-working-tree",
+  "before": {
+    "ledgerSha256": "f5a88e48e0fef2628d02d1d8e9eb48acf224724b564a6ac5db3cba810dada4e7",
+    "schemaSha256": "cbea77a889edcb70e0aadf4a969e55f360fdacf38e7c54efc65d2ff2326db98a",
+    "rolesSha256": "36626fe0905b3a40751fdbe4dede122ba8c5a29a30edeb53aa94d1b282d0254b",
+    "securitySha256": "71e690bf2040baa4896b230310a32c14ba9ceb63be86dfc52d7dceab40433bd4",
+    "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+    "dataSha256": "45fb49b8ed4354fffae4d90b26a238fe80a34ad67b66144817a98ce54726a7bb",
+    "ledgerRows": 105,
+    "businessRows": 1129,
+    "businessTables": 178,
+    "privacyJobs": [
+      {
+        "kind": "delete",
+        "state": "retry",
+        "count": 1
+      }
+    ],
+    "closed": {
+      "closed": true,
+      "alone": true
+    }
+  },
+  "after": {
+    "ledgerSha256": "f5a88e48e0fef2628d02d1d8e9eb48acf224724b564a6ac5db3cba810dada4e7",
+    "schemaSha256": "cbea77a889edcb70e0aadf4a969e55f360fdacf38e7c54efc65d2ff2326db98a",
+    "rolesSha256": "36626fe0905b3a40751fdbe4dede122ba8c5a29a30edeb53aa94d1b282d0254b",
+    "securitySha256": "71e690bf2040baa4896b230310a32c14ba9ceb63be86dfc52d7dceab40433bd4",
+    "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+    "dataSha256": "45fb49b8ed4354fffae4d90b26a238fe80a34ad67b66144817a98ce54726a7bb",
+    "ledgerRows": 105,
+    "businessRows": 1129,
+    "businessTables": 178,
+    "privacyJobs": [
+      {
+        "kind": "delete",
+        "state": "retry",
+        "count": 1
+      }
+    ],
+    "closed": {
+      "closed": true,
+      "alone": true
+    }
+  },
+  "result": {
+    "wave": "20261007-generation-recovery",
+    "applied": [],
+    "priorLedgerRows": 105,
+    "ledgerRows": 105,
+    "priorHistoryPreserved": true,
+    "originalDataPreserved": true,
+    "originalRows": 1129,
+    "originalTables": 178,
+    "oldRolesPreserved": true,
+    "originalSequencesPreserved": true,
+    "originalSequences": 1,
+    "verifiedBackupSecurity": true,
+    "securityRecords": 17013,
+    "afterSecuritySha256": "71e690bf2040baa4896b230310a32c14ba9ceb63be86dfc52d7dceab40433bd4",
+    "roleSafety": {
+      "original": {
+        "checkedRoles": 3,
+        "pinnedFunctions": 13,
+        "directCapabilities": 155,
+        "publicCapabilities": 361,
+        "pinnedPublicFunctions": 26
+      },
+      "purposeRoles": 30
+    },
+    "privacyRoleSafety": {
+      "checkedPrivatePurposes": 2,
+      "administratorSelectedCatalogueReview": true
+    },
+    "afterSchemaSha256": "cbea77a889edcb70e0aadf4a969e55f360fdacf38e7c54efc65d2ff2326db98a",
+    "trafficClosed": true,
+    "releaseReady": false
+  },
+  "ordinaryRunnerAppliedNothing": true,
+  "backupSha256": "56cd3d0bd3a4580b05805b52ba74d9e3381d85060df6e919c3e372ef69040ff9",
+  "independentRestore": {
+    "database": "creator_generation_journey29_20261007",
+    "ledgerSha256": "f5a88e48e0fef2628d02d1d8e9eb48acf224724b564a6ac5db3cba810dada4e7",
+    "schemaSha256": "cbea77a889edcb70e0aadf4a969e55f360fdacf38e7c54efc65d2ff2326db98a",
+    "rolesSha256": "36626fe0905b3a40751fdbe4dede122ba8c5a29a30edeb53aa94d1b282d0254b",
+    "securitySha256": "71e690bf2040baa4896b230310a32c14ba9ceb63be86dfc52d7dceab40433bd4",
+    "sequenceSha256": "f8972cca80cce94d0073109accf305795e50315aade9cd9dbb0b18a50dc6ed71",
+    "dataSha256": "45fb49b8ed4354fffae4d90b26a238fe80a34ad67b66144817a98ce54726a7bb",
+    "ledgerRows": 105,
+    "businessRows": 1129,
+    "businessTables": 178,
+    "privacyJobs": [
+      {
+        "kind": "delete",
+        "state": "retry",
+        "count": 1
+      }
+    ],
+    "closed": {
+      "closed": true,
+      "alone": true
+    }
+  }
+}

@@ -199,9 +199,10 @@ export class PreparedGenerationAgentMetadata {
     return value;
   }
 
-  /** Reuse the licensed facts already issued by this metadata read on the
-   * same genuine held purpose. Revalidate the original object before release;
-   * another client, copied metadata or a later purpose cannot reuse it. */
+  /** Reuse the licensed facts already checked at both ends of this metadata
+   * read. This accessor checks the genuine current purpose, not another full
+   * input read. The caller's final metadata bookend still rereads and compares
+   * the complete facts and audience before provider admission or output. */
   async factsInTransaction(
     client: PoolClient,
     scope: GenerationTaskScope,
@@ -215,7 +216,8 @@ export class PreparedGenerationAgentMetadata {
       "generation_metadata_required",
       "Use the original metadata issued for this held client and purpose.",
     );
-    await this.inputs.authorizeInTransaction(binding.facts, scope, client);
+    this.identity.originalSignalInTransaction(scope, client)?.throwIfAborted();
+    await this.identity.authorizeInTransaction(scope, client);
     return binding.facts;
   }
 

@@ -817,7 +817,9 @@ export function CreatorAI({
       try {
         const response = await request("/api/studio/ai/comparisons", {
           cache: "no-store",
-          headers: expectedActor ? { "X-Studio-Actor": expectedActor } : {},
+          headers: {
+            "X-Studio-Actor": `${state.actorAccountId}:${state.creator.id}`,
+          },
         });
         if (response.ok) {
           const result = (await response.json()) as typeof comparisons;
@@ -841,7 +843,7 @@ export function CreatorAI({
         "You’re offline. Your input is saved; reconnect before continuing.",
       );
     const expectedActor = actorKey.current;
-    if (!expectedActor)
+    if (!expectedActor || !state)
       throw new Error("Reload Studio with your current creator session.");
     const identity = expectedActor + path + JSON.stringify(body ?? {});
     const key = pendingKeys.current.get(identity) ?? crypto.randomUUID();
@@ -851,7 +853,9 @@ export function CreatorAI({
       headers: {
         "Content-Type": "application/json",
         "Idempotency-Key": key,
-        "X-Studio-Actor": expectedActor,
+        // The BFF checks account/creator; the independent captured session
+        // header and local actor key retain this view's session lifetime.
+        "X-Studio-Actor": `${state.actorAccountId}:${state.creator.id}`,
       },
       ...(body ? { body: JSON.stringify(body) } : {}),
     });

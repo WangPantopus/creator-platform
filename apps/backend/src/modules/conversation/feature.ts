@@ -54,7 +54,7 @@ export class ConversationFeature {
     readonly conversations: ConversationService,
     readonly memory: MemoryService,
     policy?: ProviderPolicy,
-    readonly generationAvailable = false,
+    private readonly configuredGenerationAvailable = false,
     readonly afterAcceptance?: (scope: ThreadScope) => void,
     readonly tickets?: ConversationSocketTickets,
     readonly citation?: (scope: ThreadScope, id: string) => Promise<unknown>,
@@ -79,6 +79,7 @@ export class ConversationFeature {
     readonly recordings?: ConversationRecordings,
     readonly offlineIssuer?: ConversationOfflineIssuer,
     private readonly developmentPolicy?: DevelopmentConversationPolicy,
+    private readonly generationRunning?: () => boolean,
   ) {
     this.policy = policy ? ProviderPolicySchema.parse(policy) : null;
     invariant(
@@ -88,6 +89,11 @@ export class ConversationFeature {
           developmentPolicy.isFor(db.pool, this.policy)),
       "synthetic_policy_authority_required",
       "The development policy requires its actual configured conversation host.",
+    );
+  }
+  get generationAvailable(): boolean {
+    return (
+      this.configuredGenerationAvailable && (this.generationRunning?.() ?? true)
     );
   }
   policyAvailable(subject?: Actor | ThreadScope): boolean {

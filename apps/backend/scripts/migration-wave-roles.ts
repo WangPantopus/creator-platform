@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import type { PoolClient } from "pg";
 import generationReview from "../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
 import generationDenial from "../../../infra/migrations/reviews/20261007-generation-denial-roles.json" with { type: "json" };
+import publicAIReview from "../../../infra/migrations/reviews/20261007-public-ai.json" with { type: "json" };
 import { canonical, repositoryRoot, sha256 } from "./migration-custody.js";
 
 export class WaveRoleSafetyError extends Error {}
@@ -86,6 +87,7 @@ export async function assertWaveRoleSafety(
     /** Closed full39-source denial/PUBLIC-trigger operator review only; not
      * runtime activation or safety qualification of all generation purposes. */
     generationDenial?: boolean;
+    publicAI?: boolean;
   },
 ) {
   const fail = (role: string): never => {
@@ -196,6 +198,7 @@ export async function assertWaveRoleSafety(
         : installed.interactive,
     ),
     ...(installed.generationDenial ? generationDenial.functions : []),
+    ...(installed.publicAI ? [publicAIReview.denialFunction] : []),
   ].filter((f) =>
     f.owner === "creator_trust_denial" ? installed.trust : installed.media,
   );

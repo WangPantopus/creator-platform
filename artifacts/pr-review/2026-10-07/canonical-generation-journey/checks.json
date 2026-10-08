@@ -1,0 +1,24 @@
+{
+  "backendBuild": "passed",
+  "webProductionBuild": "passed",
+  "webTypecheck": "passed",
+  "scopedLint": "passed",
+  "existingBackendTests": {
+    "passed": 17,
+    "files": [
+      "tests/contracts.test.ts",
+      "tests/generation-worker-lifetime.test.ts"
+    ]
+  },
+  "migrationCurrentWaveReplay": "0238 current wave at106: passed, applied0, all6digests unchanged",
+  "hostedCI": "Read current PR head; local checks do not certify hosted CI or production readiness.",
+  "fullFormatCheck": "passed after final SQL cancellation change",
+  "sqlCancellationProbes": "real PostgreSQL cooperative cancellation during/between reads preserves original reason; statement timeout and distinct callback failures remain failures",
+  "partialActiveShutdown": "compiled final build SIGTERM exit0 after browser-visible output; five provider records unchanged after original-lease recovery; full60-unit unknown hold retained",
+  "operatedSourceSha256": {
+    "apps/backend/src/modules/commerce/schema-generation-partial-unknown-terminal.sql": "3db102bef52be7b51aa2caa6b2574eae568b47059ce275160d57b62009d01011",
+    "apps/backend/src/modules/identity/generation-transaction.ts": "eacbd89afbe14b1b6a81a6efda0bc3b5fed1c4b32c1e788bde8115599487d1c4",
+    "apps/backend/src/modules/identity/generation-scope.ts": "2029fbece0e4e55a1ffea2e02d10c9b2d007190c6595835a274834a369e50215",
+    "apps/backend/dist/server.mjs": "1bed65746181552cf643c96086a0f467b8434368e6c26d96dc8687ca387daa2b"
+  }
+}

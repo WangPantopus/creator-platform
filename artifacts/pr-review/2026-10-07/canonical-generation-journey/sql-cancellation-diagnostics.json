@@ -1,0 +1,78 @@
+{
+  "scope": "Real PostgreSQL transaction cleanup probes, no business data or provider calls. These diagnose cancellation semantics, not user-journey acceptance.",
+  "before": [
+    {
+      "phase": "between-queries",
+      "sameOriginalReason": false,
+      "failure": {
+        "name": "Error",
+        "code": "generation_rollback_unavailable",
+        "message": "The original generation transaction could not settle safely.",
+        "cause": {
+          "name": "AggregateError",
+          "message": "Original generation and settlement failures.",
+          "errors": [
+            {
+              "name": "AbortError",
+              "code": 20,
+              "message": "This operation was aborted"
+            },
+            {
+              "name": "AbortError",
+              "code": 20,
+              "message": "This operation was aborted"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "phase": "during-read",
+      "sameOriginalReason": false,
+      "failure": {
+        "name": "error",
+        "code": "57014",
+        "message": "canceling statement due to user request"
+      }
+    }
+  ],
+  "after": [
+    {
+      "phase": "between-queries",
+      "sameOriginalReason": true,
+      "failure": {
+        "name": "AbortError",
+        "code": 20,
+        "message": "This operation was aborted"
+      }
+    },
+    {
+      "phase": "during-read",
+      "sameOriginalReason": true,
+      "failure": {
+        "name": "AbortError",
+        "code": 20,
+        "message": "This operation was aborted"
+      }
+    }
+  ],
+  "negativeCases": [
+    {
+      "phase": "statement-timeout",
+      "sameOriginalReason": false,
+      "failure": {
+        "name": "error",
+        "code": "57014",
+        "message": "canceling statement due to statement timeout"
+      }
+    },
+    {
+      "phase": "unrelated-after-abort",
+      "sameOriginalReason": false,
+      "failure": {
+        "name": "Error",
+        "message": "Distinct callback failure"
+      }
+    }
+  ]
+}

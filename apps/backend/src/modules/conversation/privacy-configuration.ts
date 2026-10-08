@@ -2,6 +2,7 @@ import review from "../../../../../infra/migrations/reviews/20261007-conversatio
 import { invariant } from "../../core/errors.js";
 import { registeredContentPrivacyProfile } from "../../db/content-privacy-profile.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
+import { registeredPublicAIProfile } from "../../db/public-ai-profile.js";
 import type { ConversationPrivacyOwnerPorts } from "../trust/privacy-consumers.js";
 
 type Review = Readonly<{
@@ -62,6 +63,24 @@ export async function registeredConversationPrivacyReview(
     "conversation_privacy_unconfigured",
     "Both exact reviewed Conversation privacy sources are required.",
   );
+  const publicAI = await registeredPublicAIProfile(signal);
+  if (publicAI) {
+    const base = profiles.content!;
+    return Object.freeze({
+      cursor: Object.freeze({
+        ...base.cursor,
+        catalogueChecksum: publicAI.conversationCursorCatalogueChecksum,
+      }),
+      provenancePurge: Object.freeze({
+        custody: Object.freeze({
+          ...base.provenancePurge.custody,
+          catalogueChecksum: publicAI.provenancePurgeCatalogueChecksum,
+          incomingApiCatalogueChecksum:
+            publicAI.provenancePurgeIncomingCatalogueChecksum,
+        }),
+      }),
+    });
+  }
   return profiles[
     (await registeredContentPrivacyProfile(signal)) ? "content" : "generation"
   ];

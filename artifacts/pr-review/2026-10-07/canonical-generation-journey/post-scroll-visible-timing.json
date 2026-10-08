@@ -1,0 +1,131 @@
+{
+  "scope": "Single actual mobile browser observation after the follow-scroll correction. Development Next server and real designated provider. This is not p95/p99 or production acceptance.",
+  "generationId": "7c8cc2cf-88b5-4c1f-8d1a-d121229668ff",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "requestStartedAtUnixMilliseconds": 1791430791043.514,
+  "httpStatus": 200,
+  "acknowledgementMs": 2555.133,
+  "firstFullyVisibleSentenceMs": 27562.486,
+  "terminalDOMMs": 32618.486,
+  "observation": {
+    "firstDOM": {
+      "article": {
+        "bottom": 609,
+        "height": 246,
+        "left": 16,
+        "right": 374,
+        "top": 363,
+        "width": 358
+      },
+      "articleId": "message-93a72a33-5213-40b1-ae37-d8b7a17dfbb8",
+      "at": 1791430818606,
+      "footer": {
+        "bottom": 844,
+        "height": 197,
+        "left": 0,
+        "right": 390,
+        "top": 647,
+        "width": 390
+      },
+      "height": 844,
+      "scrollWidth": 390,
+      "text": "Yes, for even drying and to help reduce cracking, you should cover your freshly thrown clay mug loosely with plastic as it dries.",
+      "textRect": {
+        "bottom": 485.5,
+        "height": 85.5,
+        "left": 31,
+        "right": 316.078125,
+        "top": 400,
+        "width": 285.078125
+      },
+      "width": 390
+    },
+    "firstVisible": {
+      "article": {
+        "bottom": 609,
+        "height": 246,
+        "left": 16,
+        "right": 374,
+        "top": 363,
+        "width": 358
+      },
+      "articleId": "message-93a72a33-5213-40b1-ae37-d8b7a17dfbb8",
+      "at": 1791430818606,
+      "footer": {
+        "bottom": 844,
+        "height": 197,
+        "left": 0,
+        "right": 390,
+        "top": 647,
+        "width": 390
+      },
+      "height": 844,
+      "scrollWidth": 390,
+      "text": "Yes, for even drying and to help reduce cracking, you should cover your freshly thrown clay mug loosely with plastic as it dries.",
+      "textRect": {
+        "bottom": 485.5,
+        "height": 85.5,
+        "left": 31,
+        "right": 316.078125,
+        "top": 400,
+        "width": 285.078125
+      },
+      "width": 390
+    },
+    "startedAt": 1791430790811,
+    "terminal": {
+      "article": {
+        "bottom": 631,
+        "height": 246,
+        "left": 16,
+        "right": 374,
+        "top": 385,
+        "width": 358
+      },
+      "articleId": "message-93a72a33-5213-40b1-ae37-d8b7a17dfbb8",
+      "at": 1791430823662,
+      "footer": {
+        "bottom": 844,
+        "height": 197,
+        "left": 0,
+        "right": 390,
+        "top": 647,
+        "width": 390
+      },
+      "height": 844,
+      "scrollWidth": 390,
+      "text": "Yes, for even drying and to help reduce cracking, you should cover your freshly thrown clay mug loosely with plastic as it dries.",
+      "textRect": {
+        "bottom": 507.5,
+        "height": 85.5,
+        "left": 31,
+        "right": 303.390625,
+        "top": 422,
+        "width": 272.390625
+      },
+      "width": 390
+    }
+  },
+  "providerCostMicros": 2584,
+  "settledUnits": 3,
+  "generation": {
+    "id": "7c8cc2cf-88b5-4c1f-8d1a-d121229668ff",
+    "state": "delivered",
+    "accepted_at": "2026-10-08T03:39:53.531Z",
+    "first_visible_at": "2026-10-08T03:40:16.514Z",
+    "completed_at": "2026-10-08T03:40:20.523Z",
+    "lease_until": null,
+    "last_sequence": 1,
+    "failure_code": null,
+    "message_id": "93a72a33-5213-40b1-ae37-d8b7a17dfbb8",
+    "delivery_state": "delivered",
+    "text": "Yes, for even drying and to help reduce cracking, you should cover your freshly thrown clay mug loosely with plastic as it dries.",
+    "citations": [
+      "dc738322-c504-4ff8-8987-6b4a26ab7e06"
+    ]
+  },
+  "sloAccepted": false
+}

@@ -1,5 +1,6 @@
 import { catalogueQuery } from "../../core/catalogue-query.js";
 import { randomUUID } from "node:crypto";
+import { setTimeout as delay } from "node:timers/promises";
 import type { Pool, PoolClient } from "pg";
 import { z } from "zod";
 import { canonical } from "../../core/canonical.js";
@@ -10,7 +11,16 @@ import {
   generationOutputCursorSignature,
 } from "./generation-output-cursor.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
-import { assertGenerationLifecycleCatalogue } from "./generation-lifecycle.js";
+import {
+  generationRecoverySource,
+  generationPartialRecoverySource,
+} from "../../db/generation-recovery-profile.js";
+import {
+  assertGenerationLifecycleRows,
+  generationLifecycleCatalogueQuery,
+  generationLifecycleSource,
+  type GenerationLifecycleCatalogueRow,
+} from "./generation-lifecycle.js";
 import { generationTerminalPageSource } from "./generation-terminal-page.js";
 import { assertThreadScope, type ThreadScope } from "../access/scope.js";
 import { assertCurrentSession, requestAuthority } from "./request-authority.js";
@@ -88,6 +98,26 @@ const terminalContracts = [
     checksum:
       "8de1897f2e70f763382984459274eb7616ad7149b457811fffd90fb8b7df2e8c",
     signatures: ["creator.generation_terminal_output(uuid,uuid)"],
+  },
+  {
+    owner: "creator_w4_generation_safety_terminal",
+    originalScopeBridge: false,
+    version: generationRecoverySource.version,
+    checksum: generationRecoverySource.checksum,
+    signatures: [
+      "creator.generation_settle_typed_original_allowance(uuid,uuid)",
+      "creator.generation_typed_original_allowance_receipt(uuid,uuid)",
+    ],
+  },
+  {
+    owner: "creator_w4_generation_safety_terminal",
+    originalScopeBridge: false,
+    version: generationPartialRecoverySource.version,
+    checksum: generationPartialRecoverySource.checksum,
+    signatures: [
+      "creator.generation_settle_typed_original_allowance(uuid,uuid)",
+      "creator.generation_typed_original_allowance_receipt(uuid,uuid)",
+    ],
   },
   {
     owner: "creator_generation_terminal_discovery",
@@ -245,22 +275,30 @@ async function assertGenerationCatalogue(
   query: Pick<Pool, "query">,
   input: GenerationCatalogue,
 ): Promise<void> {
-  await assertGenerationLifecycleCatalogue(query);
+  const lifecycle = await registeredMigration(generationLifecycleSource);
+  if (!lifecycle) throw new Error("Generation lifecycle source is absent");
   const consumers = [...input.consumers, ...input.terminalConsumers];
-  const installed = (
-    await catalogueQuery<{ installed: boolean }>(
+  // One fresh statement checks the same lifecycle, role, ledger, function,
+  // ACL and consumer predicates. Only the prepared plan is reused. Combining
+  // these reads avoids hundreds of network round trips per bounded purpose.
+  const result = (
+    await catalogueQuery<{
+      installed: boolean;
+      ready: boolean;
+      lifecycleReady: boolean;
+      lifecycle: GenerationLifecycleCatalogueRow[];
+      proofs: {
+        signature: string;
+        ready: boolean;
+        definitionChecksum: string;
+      }[];
+    }>(
       query,
-      `SELECT session_user='creator_generation_worker' AND current_user=session_user
+      `WITH installed AS (SELECT session_user='creator_generation_worker' AND current_user=session_user
        AND to_regclass('creator.generation_worker_scope') IS NOT NULL
        AND to_regprocedure('creator.begin_generation_scope(uuid,uuid)') IS NOT NULL
-       AND to_regprocedure('creator_trust.generation_worker_denial(uuid)') IS NOT NULL AS installed`,
-    )
-  ).rows[0]?.installed;
-  if (installed !== true) throw new Error("Generation authority is absent");
-  const ready = (
-    await catalogueQuery<{ ready: boolean }>(
-      query,
-      `SELECT
+       AND to_regprocedure('creator_trust.generation_worker_denial(uuid)') IS NOT NULL AS installed),
+       authority AS (SELECT
        (SELECT count(*)=2 FROM creator.schema_migration
         WHERE (version=$1 AND checksum=$2) OR (version=$3 AND checksum=$4))
        AND (SELECT count(*)=2 FROM pg_roles r
@@ -342,27 +380,8 @@ async function assertGenerationCatalogue(
        AND has_function_privilege(current_user,to_regprocedure('creator.claim_generation_task(uuid,uuid)'),'EXECUTE')
        AND has_function_privilege(current_user,to_regprocedure('creator.begin_generation_scope(uuid,uuid)'),'EXECUTE')
        AND has_function_privilege(current_user,to_regprocedure('creator.generation_scope_matches(uuid,uuid)'),'EXECUTE')
-       AND has_function_privilege(current_user,to_regprocedure('creator.end_generation_scope()'),'EXECUTE') AS ready`,
-      [
-        input.migration.version,
-        input.migration.checksum,
-        input.denialMigration.version,
-        input.denialMigration.checksum,
-        JSON.stringify(consumers),
-      ],
-    )
-  ).rows[0]?.ready;
-  if (ready !== true) throw new Error("Generation authority is not reviewed");
-  // Read every expected executable in one current statement. No receipt is
-  // cached and every authorization bookend still checks the full catalogue.
-  const proofs = (
-    await catalogueQuery<{
-      signature: string;
-      ready: boolean;
-      definitionChecksum: string;
-    }>(
-      query,
-      `SELECT c.signature,
+       AND has_function_privilege(current_user,to_regprocedure('creator.end_generation_scope()'),'EXECUTE') AS ready),
+       consumer_proofs AS (SELECT c.signature,
          session_user='creator_generation_worker' AND current_user=session_user
          AND EXISTS(SELECT FROM creator.schema_migration WHERE version=c.version AND checksum=c.checksum)
          AND p.prokind='f' AND p.prosecdef AND p.provolatile IN('s','v')
@@ -385,11 +404,22 @@ async function assertGenerationCatalogue(
          AND (c.terminal_match::boolean IS NULL OR has_function_privilege(c.owner,
           to_regprocedure('creator.generation_terminal_matches(uuid,uuid,boolean)'),'EXECUTE')=c.terminal_match::boolean)
          AS ready,pg_catalog.encode(pg_catalog.sha256(pg_catalog.convert_to(pg_get_functiondef(p.oid),'UTF8')),'hex') AS "definitionChecksum"
-         FROM jsonb_to_recordset($1::jsonb) AS c(signature text,version text,checksum text,
+         FROM jsonb_to_recordset($6::jsonb) AS c(signature text,version text,checksum text,
           owner text,dependency text,original_scope_bridge boolean,terminal_match boolean)
          JOIN pg_proc p ON p.oid=to_regprocedure(c.signature)
-         JOIN pg_roles r ON r.oid=p.proowner JOIN pg_language l ON l.oid=p.prolang`,
+         JOIN pg_roles r ON r.oid=p.proowner JOIN pg_language l ON l.oid=p.prolang),
+       lifecycle AS (${generationLifecycleCatalogueQuery})
+       SELECT installed.installed,authority.ready,
+        EXISTS(SELECT FROM creator.schema_migration WHERE version=$7 AND checksum=$8) AS "lifecycleReady",
+        coalesce((SELECT jsonb_agg(to_jsonb(lifecycle)) FROM lifecycle),'[]'::jsonb) AS lifecycle,
+        coalesce((SELECT jsonb_agg(to_jsonb(consumer_proofs)) FROM consumer_proofs),'[]'::jsonb) AS proofs
+       FROM installed CROSS JOIN authority`,
       [
+        input.migration.version,
+        input.migration.checksum,
+        input.denialMigration.version,
+        input.denialMigration.checksum,
+        JSON.stringify(consumers),
         JSON.stringify(
           consumers.map((consumer) => ({
             signature: consumer.signature,
@@ -413,9 +443,19 @@ async function assertGenerationCatalogue(
                 : null,
           })),
         ),
+        lifecycle.version,
+        lifecycle.checksum,
       ],
     )
-  ).rows;
+  ).rows[0];
+  if (
+    result?.installed !== true ||
+    result.ready !== true ||
+    result.lifecycleReady !== true
+  )
+    throw new Error("Generation authority is not reviewed");
+  assertGenerationLifecycleRows(result.lifecycle);
+  const proofs = result.proofs;
   if (proofs.length !== consumers.length)
     throw new Error("Generation consumer executable differs from its review");
   for (const consumer of consumers) {
@@ -631,8 +671,9 @@ export class GenerationIdentityAuthority {
   async assertCatalogueInTransaction(client: PoolClient): Promise<void> {
     this.assertWorker();
     // Refuse an implicit statement transaction; this is a caller-held proof.
-    await client.query("SAVEPOINT w1_generation_catalogue");
-    await client.query("RELEASE SAVEPOINT w1_generation_catalogue");
+    await client.query(
+      "SAVEPOINT w1_generation_catalogue; RELEASE SAVEPOINT w1_generation_catalogue",
+    );
     try {
       await assertGenerationCatalogue(client, this.configuration.catalogue);
     } catch (cause) {
@@ -788,73 +829,110 @@ export class GenerationIdentityAuthority {
   ): Promise<T> {
     this.assertWorker();
     const task = Object.freeze(taskSchema.parse(input));
-    let scope: GenerationTaskScope | undefined;
-    let held: GenerationScopeBinding | undefined;
-    try {
-      return await generationTransaction(this.pool, signal, async (client) => {
-        try {
-          await this.begin(client);
-          await this.configuration.assertAllowed(client, task);
-          const raw = (
-            await client.query<{ proof: unknown }>(
-              "SELECT creator.begin_generation_scope($1,$2) AS proof",
-              [task.generationId, task.workerToken],
-            )
-          ).rows[0]?.proof;
-          const proof = z
-            .strictObject({ nonce: z.uuid(), task: taskSchema })
-            .parse(raw);
-          // Only the job's own sequence may advance between purpose transactions.
-          // W3 still supplies its exact expected cursor at each business fence.
-          const { lastSequence: originalSequence, ...originalIntent } = task;
-          const { lastSequence: currentSequence, ...currentIntent } =
-            proof.task;
-          invariant(
-            canonical(originalIntent) === canonical(currentIntent) &&
-              currentSequence >= originalSequence,
-            "generation_task_changed",
-            "The generation task ended or changed.",
-          );
-          scope = Object.freeze({
-            ...proof.task,
-            [generationBrand]: true as const,
-            kind: "generation" as const,
-          });
-          const binding = z
-            .strictObject({
-              transaction: z.string().regex(/^[0-9]+$/u),
-              pid: z.int().positive(),
-            })
-            .parse(
-              (
-                await client.query(
-                  "SELECT pg_current_xact_id()::text AS transaction,pg_backend_pid() AS pid",
+    // Retry only contention while opening the purpose, after its original
+    // transaction has rolled back and released. The business callback/provider
+    // admission is never replayed, and the original worker lease is unchanged.
+    for (let opening = 0; ; opening++) {
+      let entered = false;
+      let scope: GenerationTaskScope | undefined;
+      let held: GenerationScopeBinding | undefined;
+      try {
+        return await generationTransaction(
+          this.pool,
+          signal,
+          async (client) => {
+            try {
+              await this.begin(client);
+              await this.configuration.assertAllowed(client, task);
+              const raw = (
+                await client.query<{ proof: unknown }>(
+                  "SELECT creator.begin_generation_scope($1,$2) AS proof",
+                  [task.generationId, task.workerToken],
                 )
-              ).rows[0],
-            );
-          held = {
-            client,
-            nonce: proof.nonce,
-            ...binding,
-            signal,
-            current: scope,
-          };
-          this.issued.set(scope, held);
-          await this.authorizeInTransaction(scope, client);
-          const value = await work(client, scope);
-          await this.configuration.assertAllowed(client, held.current);
-          await this.authorizeInTransaction(held.current, client);
-          await client.query("SELECT creator.end_generation_scope()");
-          this.issued.delete(held.current);
-          await this.assertCatalogueInTransaction(client);
-          return value;
-        } finally {
-          if (scope) this.issued.delete(scope);
-          if (held) this.issued.delete(held.current);
+              ).rows[0]?.proof;
+              const proof = z
+                .strictObject({ nonce: z.uuid(), task: taskSchema })
+                .parse(raw);
+              // Only the job's own sequence may advance between purpose transactions.
+              // W3 still supplies its exact expected cursor at each business fence.
+              const { lastSequence: originalSequence, ...originalIntent } =
+                task;
+              const { lastSequence: currentSequence, ...currentIntent } =
+                proof.task;
+              invariant(
+                canonical(originalIntent) === canonical(currentIntent) &&
+                  currentSequence >= originalSequence,
+                "generation_task_changed",
+                "The generation task ended or changed.",
+              );
+              scope = Object.freeze({
+                ...proof.task,
+                [generationBrand]: true as const,
+                kind: "generation" as const,
+              });
+              const binding = z
+                .strictObject({
+                  transaction: z.string().regex(/^[0-9]+$/u),
+                  pid: z.int().positive(),
+                })
+                .parse(
+                  (
+                    await client.query(
+                      "SELECT pg_current_xact_id()::text AS transaction,pg_backend_pid() AS pid",
+                    )
+                  ).rows[0],
+                );
+              held = {
+                client,
+                nonce: proof.nonce,
+                ...binding,
+                signal,
+                current: scope,
+              };
+              this.issued.set(scope, held);
+              await this.authorizeInTransaction(scope, client);
+              entered = true;
+              const value = await work(client, scope);
+              await this.configuration.assertAllowed(client, held.current);
+              await this.authorizeInTransaction(held.current, client);
+              await client.query("SELECT creator.end_generation_scope()");
+              this.issued.delete(held.current);
+              await this.assertCatalogueInTransaction(client);
+              return value;
+            } finally {
+              if (scope) this.issued.delete(scope);
+              if (held) this.issued.delete(held.current);
+            }
+          },
+        );
+      } catch (error) {
+        if (
+          !entered &&
+          opening < 4 &&
+          error &&
+          typeof error === "object" &&
+          "code" in error &&
+          error.code === "55P03" &&
+          Date.now() + 150 < Date.parse(task.leaseUntil)
+        ) {
+          try {
+            await delay(150, undefined, { signal });
+          } catch (cause) {
+            // Node's timer wraps the original reason. This wait starts only
+            // after the failed opening transaction has fully released.
+            if (
+              signal?.aborted &&
+              cause instanceof Error &&
+              cause.name === "AbortError" &&
+              cause.cause === signal.reason
+            )
+              throw signal.reason;
+            throw cause;
+          }
+          continue;
         }
-      });
-    } catch (error) {
-      return this.failure(error);
+        return this.failure(error);
+      }
     }
   }
 

@@ -1,0 +1,48 @@
+{
+  "report": [
+    {
+      "incoming": false,
+      "accepted": {
+        "original": {
+          "checkedRoles": 3,
+          "pinnedFunctions": 13,
+          "directCapabilities": 155,
+          "publicCapabilities": 361,
+          "pinnedPublicFunctions": 26
+        },
+        "purposeRoles": 30
+      },
+      "rejected": [
+        "private_source_body",
+        "private_rule_configuration",
+        "worker_read_of_public_scope",
+        "disabled_cleanup",
+        "missing_metadata_ledger",
+        "missing_denial_ledger"
+      ],
+      "originalDigestsRestored": true
+    },
+    {
+      "incoming": true,
+      "accepted": {
+        "original": {
+          "checkedRoles": 3,
+          "pinnedFunctions": 13,
+          "directCapabilities": 155,
+          "publicCapabilities": 361,
+          "pinnedPublicFunctions": 26
+        },
+        "purposeRoles": 30
+      },
+      "rejected": [
+        "private_source_body",
+        "private_rule_configuration",
+        "worker_read_of_public_scope",
+        "disabled_cleanup",
+        "missing_metadata_ledger",
+        "missing_denial_ledger"
+      ],
+      "originalDigestsRestored": true
+    }
+  ]
+}

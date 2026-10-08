@@ -1,0 +1,22 @@
+{
+  "comparison": "HEAD W1 fixed SQL expressions versus combined current SQL; consumer placeholder changes from $1 to $6 only",
+  "checks": [
+    {
+      "predicateSet": "installation",
+      "sha256": "3e5103b26c7da27239a3f66735afcbfd6321b46ce1c62d6a1f032e193f4954f2",
+      "preserved": true
+    },
+    {
+      "predicateSet": "authority",
+      "sha256": "bc82c722898ab5eec0e070a1ca3b1e797a69ce52b6ba561b72d52efa84abf607",
+      "preserved": true
+    },
+    {
+      "predicateSet": "consumers",
+      "sha256": "093c4948ecaa78a0dd9f0b0c6e9a14d32f9c0eea53155ffb61ea2d75b0e20453",
+      "preserved": true
+    }
+  ],
+  "resultCaching": false,
+  "deadlinesExtended": false
+}

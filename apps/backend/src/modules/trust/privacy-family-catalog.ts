@@ -2,6 +2,7 @@ import type { PoolClient, QueryConfig, QueryResultRow } from "pg";
 import generationPrivacyReview from "../../../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
 import contentPrivacyReview from "../../../../../infra/migrations/reviews/20261007-content-privacy.json" with { type: "json" };
 import { registeredContentPrivacyProfile } from "../../db/content-privacy-profile.js";
+import { registeredPublicAIProfile } from "../../db/public-ai-profile.js";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError } from "../../core/errors.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
@@ -401,6 +402,9 @@ export async function originalPrivacyFamilyRegisteredExtension(
     const contentProfile = composed
       ? await registeredContentPrivacyProfile(signal)
       : undefined;
+    const publicProfile = contentProfile
+      ? await registeredPublicAIProfile(signal)
+      : undefined;
     if (composed) {
       for (const dependency of generationPrivacyReview.sources) {
         const migration = await registeredMigration(dependency);
@@ -409,7 +413,10 @@ export async function originalPrivacyFamilyRegisteredExtension(
           unavailable();
         migrations.push(migration);
       }
-      if (contentProfile) migrations.push(contentProfile.source);
+      if (contentProfile) {
+        migrations.push(contentProfile.source);
+        if (publicProfile) migrations.push(...publicProfile.sources);
+      }
     } else if (purger) {
       for (const dependency of provenanceSources) {
         const migration =
@@ -434,7 +441,14 @@ export async function originalPrivacyFamilyRegisteredExtension(
         unavailable();
     }
     if (composed) {
-      if (contentProfile)
+      if (publicProfile) {
+        await assertOriginalPrivacyFamilyCaller(client, signal);
+        await assertPurposeCatalogue(
+          client,
+          publicProfile.originalFamilyProfiles.map((profile) => profile.sha256),
+          signal,
+        );
+      } else if (contentProfile)
         await assertOriginalPrivacyFamilyContentCatalog(client, signal);
       else await assertOriginalPrivacyFamilyGenerationCatalog(client, signal);
     } else {
