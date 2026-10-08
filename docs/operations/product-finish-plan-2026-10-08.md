@@ -9,6 +9,16 @@ The product is substantially implemented and remains incomplete.
 
 ## Continuing execution
 
+The [original held comparison feed increment](../../artifacts/pr-review/2026-10-08/comparison-held-feed/README.md)
+adds a finite SQL read/COMMIT scope and same-transaction source checks for
+collection, each provider admission, replay, display and publication. Eight
+isolated SQL and four actual consumer-class operations pass with synthetic
+fixtures. Seven pending sources still need complete combined catalogue/restore
+and legacy-export review, executable allocation and original host composition.
+Actual consent, sanitization and cross-platform upgrade acceptance remain open.
+PR344's separate main workflow passed. PR345 merged at `60f415b65` after all
+eleven exact-head checks passed; refresh its separate main run.
+
 The [comparison provider/writer increment](../../artifacts/pr-review/2026-10-08/comparison-purpose-admission/README.md)
 adds original fan admission, purpose/source-bound accounting receipts, finite
 development notice and original write/COMMIT checks. Nine isolated SQL cases

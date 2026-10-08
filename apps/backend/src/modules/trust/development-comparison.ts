@@ -23,6 +23,12 @@ import type {
 } from "../conversation/comparison-consent.js";
 import type { ComparisonUseAuthority } from "../conversation/comparison-samples.js";
 import {
+  comparisonReaderSource,
+  type ComparisonCreatorReadAuthority,
+} from "../conversation/comparison-feed.js";
+import type { CreatorScope } from "../agent/repository.js";
+import { assertCurrentSession } from "../identity/request-authority.js";
+import {
   comparisonArtifactSource,
   comparisonAttemptSource,
   comparisonArtifactPrivacySource,
@@ -39,6 +45,7 @@ const sources = [
   comparisonAttemptSource,
   comparisonArtifactPrivacySource,
   comparisonWriterSource,
+  comparisonReaderSource,
 ] as const;
 const beginsAt = "2026-10-08T00:00:00.000Z";
 const endsAt = "2026-11-01T00:00:00.000Z";
@@ -60,6 +67,7 @@ export async function createDevelopmentComparisonAuthority(input: {
   | Readonly<{
       consent: ComparisonConsentAuthority;
       use: ComparisonUseAuthority;
+      creatorRead: ComparisonCreatorReadAuthority;
       close: () => void;
     }>
   | undefined
@@ -81,6 +89,7 @@ export async function createDevelopmentComparisonAuthority(input: {
     runtime.database.threadScopeInTransactionAvailable &&
     typeof runtime.assertRestoredInTransaction === "function" &&
     typeof runtime.assertScopeAllowedInTransaction === "function" &&
+    typeof runtime.assertCreatorAllowedInTransaction === "function" &&
     developmentPolicy instanceof DevelopmentConversationPolicy &&
     developmentPolicy.isFor(runtime.pool, policy) &&
     contentHash(input.policy) === policyHash;
@@ -200,9 +209,54 @@ export async function createDevelopmentComparisonAuthority(input: {
         return comparison;
       }),
   });
+  const creatorRead: ComparisonCreatorReadAuthority = Object.freeze({
+    current: async (scope: CreatorScope, client: PoolClient) => {
+      const request = requestAuthority.getStore();
+      invariant(
+        configured() &&
+          scope.development &&
+          request?.actor?.adultEligible === true &&
+          request.actor.accountId === scope.accountId &&
+          request.accountId === scope.accountId &&
+          developmentPolicy.allowsAccounts(scope.accountId),
+        "comparison_creator_required",
+        "Use the current fictional creator account for comparisons.",
+      );
+      await assertCurrentSession(client, scope.accountId);
+      await runtime.assertRestoredInTransaction!(client);
+      await runtime.assertCreatorAllowedInTransaction!(
+        request.actor,
+        scope.creatorId,
+        client,
+      );
+      for (const source of sources)
+        await assertRegisteredMigration(client, source);
+      await input.assertPrepared(client);
+      const row = (
+        await client.query<{ available: boolean }>(
+          `SELECT
+        clock_timestamp()>=$1::timestamptz AND clock_timestamp()<$2::timestamptz
+        AND transaction_timestamp()>=$1::timestamptz AND transaction_timestamp()<$2::timestamptz
+        AND current_user='creator_runtime' AND session_user=current_user
+        AND nullif(current_setting('app.account_id',true),'')=$3
+        AND nullif(current_setting('app.creator_id',true),'')=$4
+        AND EXISTS(SELECT FROM creator.creator_profile WHERE id=$4::uuid AND account_id=$3::uuid
+          AND verification='verified' AND NOT recovery_required) AS available`,
+          [beginsAt, endsAt, scope.accountId, scope.creatorId],
+        )
+      ).rows[0];
+      invariant(
+        row?.available === true,
+        "comparison_policy_changed",
+        "The current comparison notice is unavailable. Refresh the comparison.",
+      );
+      return comparison;
+    },
+  });
   return Object.freeze({
     consent,
     use,
+    creatorRead,
     close: () => {
       closed = true;
     },

@@ -1,0 +1,36 @@
+{
+  "kind": "isolated synthetic source review; not registry activation",
+  "database": "creator_comparison_artifact14_20261008",
+  "sourceSchemaSha256": "911ddd7ba831232970186d42d8aa5083c06f3478e59f9aae58d99ad02929be54",
+  "applied": [
+    {
+      "label": "w3_comparison_samples",
+      "sha256": "49b4fbcf308833c2ff0ede97fad20926ea98eabe8a9d2a1abb279a55662c3a4d"
+    },
+    {
+      "label": "w3_comparison_privacy",
+      "sha256": "81d9ebedb8346808b32e560ffbd6246f89443423bc267d02f89f6e84465b5bc0"
+    },
+    {
+      "label": "comparison_export_artifacts",
+      "sha256": "c1e1dfdb83fe002fbc060c1e0737811a24d39967e12a7a840164f22091c5d0ed"
+    },
+    {
+      "label": "comparison_export_attempts",
+      "sha256": "f99563564a82d3ba6145b82760e177ae91b2c1fd0538a4c4187b0cae5de28380"
+    },
+    {
+      "label": "comparison_export_privacy",
+      "sha256": "3633aace4fec87335582f8cb85b3cd1b87a4d03d526427612821769970eb3e01"
+    },
+    {
+      "label": "w3_comparison_writer",
+      "sha256": "3737f852cd56c5864e85ca8d890439bc25af021559fc2fb6670c5685055b55da"
+    },
+    {
+      "label": "w3_comparison_reader",
+      "sha256": "b37d7188c2d458bd90e880101e63728e6a79349cb52a8b7f7aebda4ff9cb5e9d"
+    }
+  ],
+  "observedAt": "2026-10-08T16:39:44.565Z"
+}

@@ -1,6 +1,7 @@
 import type { Pool, PoolClient } from "pg";
 import { DomainError, invariant } from "../../core/errors.js";
 import { contentHash } from "../../core/canonical.js";
+import { ContentHeldClient } from "../content/held-client-cleanup.js";
 import type { PreparedGenerationJournal } from "./generation-journal.js";
 import { agentPrivacyQueryTimeout } from "./privacy-transaction.js";
 import {
@@ -33,11 +34,43 @@ export type Workspace = {
 };
 export class AgentRepository {
   private storageReady: Promise<void> | undefined;
+  private readonly heldCreators = new WeakMap<
+    PoolClient,
+    {
+      scope: CreatorScope;
+      request: ReturnType<typeof requestAuthority.getStore>;
+      finalizer?: () => Promise<void>;
+    }
+  >();
   constructor(
     readonly pool: Pool,
     readonly usageJournal?: PreparedGenerationJournal,
   ) {
     usageJournal?.assertPool(pool);
+  }
+  /** Lifecycle binding only. Actual source/purpose permission still belongs
+   * to its original owner on this exact transaction and request. */
+  assertHeldCreator(scope: CreatorScope, client: PoolClient) {
+    const held = this.heldCreators.get(client);
+    invariant(
+      held?.scope === scope && held.request === requestAuthority.getStore(),
+      "held_creator_required",
+      "Use the original current creator transaction.",
+    );
+  }
+  finalizeHeldCreatorBeforeCommit(
+    scope: CreatorScope,
+    client: PoolClient,
+    finalizer: () => Promise<void>,
+  ) {
+    this.assertHeldCreator(scope, client);
+    const held = this.heldCreators.get(client)!;
+    invariant(
+      !held.finalizer && typeof finalizer === "function",
+      "held_creator_finalizer_conflict",
+      "Finish this creator transaction through its original final gate.",
+    );
+    held.finalizer = finalizer;
   }
   /** A restored schema can retain its data while losing grants or RLS. Check
    * W2's actual storage before any creator transaction, including shared hosts. */
@@ -155,11 +188,15 @@ export class AgentRepository {
       creator: { id: string; name: string; verification: string },
     ) => Promise<T>,
     allowDeleted = false,
+    signal?: AbortSignal,
   ): Promise<T> {
+    signal?.throwIfAborted();
     await this.assertRuntimeRole();
     const client = await this.pool.connect();
+    const held = new ContentHeldClient(client, signal, this.pool);
+    let failure: unknown;
     try {
-      await client.query("BEGIN");
+      await held.begin();
       await client.query(
         "SELECT set_config('app.creator_id',$1,true),set_config('app.account_id',$2,true)",
         [scope.creatorId, scope.accountId],
@@ -219,14 +256,21 @@ export class AgentRepository {
         "ai_deleted",
         "This AI has been deleted.",
       );
+      this.heldCreators.set(client, {
+        scope,
+        request: requestAuthority.getStore(),
+      });
       const value = await work(client, row.rows[0], result.rows[0]);
-      await client.query("COMMIT");
+      const finalizer = this.heldCreators.get(client)?.finalizer;
+      if (finalizer) await finalizer();
+      await held.commit();
       return value;
     } catch (e) {
-      await client.query("ROLLBACK");
+      failure = e;
       throw e;
     } finally {
-      client.release();
+      this.heldCreators.delete(client);
+      await held.settle(failure);
     }
   }
   async command<T>(

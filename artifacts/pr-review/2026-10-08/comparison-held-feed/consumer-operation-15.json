@@ -1,0 +1,24 @@
+{
+  "kind": "actual Agent classes and PostgreSQL, synthetic identity/provider fixtures; not configured app qualification",
+  "observedAt": "2026-10-08T16:43:45.792Z",
+  "database": "creator_comparison_artifact15_20261008",
+  "results": [
+    {
+      "case": "actual AgentRepository and ShadowReplay collect original SQL cohort and erase read scope at COMMIT",
+      "result": "passed"
+    },
+    {
+      "case": "concurrent withdrawal cannot overtake original read/write; retry removes source and cache",
+      "result": "passed",
+      "contention": "55P03"
+    },
+    {
+      "case": "elapsed source expiry rolls back actual collection without cached text",
+      "result": "passed"
+    },
+    {
+      "case": "actual cancellation settles original Agent SQL source",
+      "result": "passed"
+    }
+  ]
+}
