@@ -116,6 +116,11 @@ at 744-822).
   Maya directly.") also shows when the `dependency` pattern catches a distressed fan, which
   INV-21 forbids, and it arrives after about 27 s.
 - Measure the fallback rate on the creator's own FAQ set; no rate exists today.
+- Revision discipline: `hardBlock` is shared by revisions 12 to 14, and a published version
+  binds the revision in its fingerprint (`modules/agent/pipeline.ts`, `PIPELINE_REVISION`
+  and `AgentPipeline.fingerprint`). Changing the patterns in place would change what a
+  published version does under an unchanged fingerprint, so these fixes ship as the next
+  revision, with the provider switch, and the earlier revisions keep their behavior.
 
 **Publishing.** Any version after the first needs a feed, at least one fan-derived sample
 under 7 days old, a passing replay bound to the draft, live version and samples, and a
@@ -201,7 +206,7 @@ expire without the worker). Tests exist for T-01, 03, 04, 11, 18, 23, 24 (allowa
 
 | # | Defect | Smallest fix | Size |
 | --- | --- | --- | --- |
-| 1 | No scheduler or webhook ingress: `CommerceRecoveryWorker` is never constructed, `reconcileDeadlines` runs only from it, and no webhook route is mounted in `server.ts` (only the W4 development host mounts it, `modules/commerce/development-server.ts:107`). Expiry, late-delivery auto-refund (INV-16), capacity release and crash recovery happen only when a user taps | Implement the work index, start the worker, mount the inbox with an insert-only pool; stopgap: expire lazily on reads | M to L (stopgap S) |
+| 1 | No scheduler or webhook ingress: `CommerceRecoveryWorker` is never constructed, `reconcileDeadlines` runs only from it, and no webhook route is mounted in `server.ts` (only the W4 development host mounts it, `modules/commerce/development-server.ts:107`). Expiry, late-delivery auto-refund (INV-16), capacity release and crash recovery happen only when a user taps | Implement the work index, start the worker, mount the inbox with an insert-only pool; stopgap: expire lazily on reads. The worker takes a `CommerceWorkIndex` that the identity or operations adapter must issue (`modules/payments/inbox.ts`) and no implementation exists, so the scheduler follows the adapter work | M to L (stopgap S) |
 | 2 | `decide` refuses a decline after `decision_at` (`modules/commerce/service.ts:1539`); `deliver` refuses after due (`:2054`) | Allow decline; expire on read | S |
 | 3 | Stripe code has never touched Stripe (`docs/workstreams/status/W4.md:282`); no backend tests for packets or capacity | One scripted test-mode run (hold, accept, decline, 3DS, refund); fake-provider tests for T-10, 16, 24, 29 | S plus M |
 | 4 | Accept, reply and deliver is three screens and two passkey ceremonies | Auto-deliver on `send-draft` when one open written commitment exists (S); later a composite signed act (founder review of INV-22) | S, then M |

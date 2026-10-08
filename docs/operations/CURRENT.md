@@ -32,7 +32,8 @@ Next, in order:
 
 ## Needed from the founder
 
-- The Pantopus sign-in contract (Q01), or a decision to start with an interim sign-in.
+- The Pantopus sign-in contract (Q01), or a decision to start with an interim sign-in; see
+  the [identity contract](pantopus-identity-contract.md).
 - The final domain and relying-party ID (Q09).
 - Apple Developer and Google Play accounts, and at least one iPhone and one Android phone.
 - Stripe test-mode keys and the account topology (Q03).

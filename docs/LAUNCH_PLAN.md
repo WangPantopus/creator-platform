@@ -156,8 +156,12 @@ L two weeks or more.
   the first attempt (smoke test), and the documents agree.
 
 **Step 1: a real host on real phones (blocks everything real).**
-- Compose the production backend (`server.ts`) with an injected identity adapter, production
-  configuration and the workers: generation, publication, commerce recovery, growth. M.
+- Compose the production backend with an injected identity adapter, production configuration
+  and the workers: generation, publication, commerce recovery, growth. M. `server.ts` is the
+  development composition root; production hosts are meant to inject genuine identity, W8
+  denials and provider dependencies into the same `createConfiguredBackend` seam. So this is a
+  second composition root that needs those adapters, not a flag, and it waits on the
+  [identity contract](operations/pantopus-identity-contract.md).
 - Real sign-in: the Pantopus adapter (Q01) or an agreed interim; release sign-in on both
   phones. L external, M each.
 - Domain and relying-party ID (Q09), then associated domains, app links and passkeys on
@@ -175,6 +179,9 @@ L two weeks or more.
   classifier off the path before acknowledgement.
 - Guard: word boundaries and subject anchors, offset-based verification, normalization,
   failure sub-codes, a distress-safe fallback, and the price rule (founder call, INV-21).
+  These change engine behavior, and a published version binds the engine revision in its
+  fingerprint, so they ship as the next revision together with the provider switch, with
+  revisions 12 to 14 left as they are, not as an edit to revision 14.
 - Publishing: the FAQ-set check replaces the fan-sample gate.
 - Citations that survive re-ingestion.
 - Entry: creator page content, invite with the creator's note, share image, link to app else
@@ -197,7 +204,9 @@ L two weeks or more.
 **Step 4: honest money (moment 4).**
 - Scheduler and webhooks (expiry, auto-refund, capacity release); decline after the deadline;
   one scripted Stripe test-mode run (hold, accept, decline, 3DS, refund) and the money tests;
-  deliver automatically when the reply is sent; the eligibility field; a minimum price.
+  deliver automatically when the reply is sent; the eligibility field; a minimum price. The
+  scheduler needs a `CommerceWorkIndex` that the identity or operations adapter issues (the
+  recovery worker takes one and none is implemented), so it follows the adapter work in step 1.
 - Phone entry for paid requests per Q04 (section 6).
 - *Exit:* request, accept, signed reply and receipt, and a decline and an expiry that cost
   nothing, run twice including 3DS.
@@ -258,7 +267,8 @@ Still to confirm:
 Inputs only the founder can supply:
 
 1. The Pantopus sign-in contract (Q01), or a decision to launch the pilot with an interim
-   sign-in.
+   sign-in. What is needed, and four decisions, are in the
+   [identity contract](operations/pantopus-identity-contract.md).
 2. The final domain and relying-party ID (Q09). Passkeys and universal links depend on it.
 3. Apple Developer and Google Play accounts, TestFlight and closed testing, and at least one
    physical iPhone and one Android phone (Q10, Q11).
