@@ -166,7 +166,7 @@ private struct W3ThreadScreen: View {
                     W3ComparisonChoice(client: model.client, root: model.root, messageId: question.id)
                 }.padding(16) }.foregroundStyle(qColor("ink", scheme)).background(qColor("ground", scheme)).presentationDragIndicator(.visible)
             }
-            .sheet(isPresented: $privacy) { W3PrivacyScreen(client: model.client, root: model.root, session: session) }
+            .sheet(isPresented: $privacy) { W3PrivacyScreen(client: model.client, root: model.root, session: session, onBack: { privacy = false }) }
             .sheet(item: $source) { passage in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original source").qText("data-sm"); Text(passage.title).qText("display-md"); Text(passage.text).qText("body").textSelection(.enabled) }.padding(16) } }
             .sheet(item: $originalReply) { original in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original AI reply · version \(original.version)").qText("data-sm"); Text(original.text).qText("body").textSelection(.enabled) }.padding(16) } }
             .alert("Source unavailable", isPresented: Binding(get: { !sourceFailure.isEmpty }, set: { if !$0 { sourceFailure = "" } })) { SwiftUI.Button("Close") { sourceFailure = "" } } message: { Text(sourceFailure) }
