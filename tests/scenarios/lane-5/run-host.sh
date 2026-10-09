@@ -3,12 +3,12 @@
 # database built by setup.sh. Run from the repository root.
 set -eu
 KEY_FILE="${TMPDIR:-/tmp}/qelvora-lane5-session-key"
-[ -f "$KEY_FILE" ] || node -e \
+[ -s "$KEY_FILE" ] || node -e \
   "process.stdout.write(require('crypto').randomBytes(32).toString('base64'))" \
   >"$KEY_FILE"
 chmod 600 "$KEY_FILE"
 GROWTH_KEY_FILE="${TMPDIR:-/tmp}/qelvora-lane5-growth-key"
-[ -f "$GROWTH_KEY_FILE" ] || node -e \
+[ -s "$GROWTH_KEY_FILE" ] || node -e \
   "process.stdout.write(require('crypto').randomBytes(32).toString('hex'))" \
   >"$GROWTH_KEY_FILE"
 chmod 600 "$GROWTH_KEY_FILE"

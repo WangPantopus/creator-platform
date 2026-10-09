@@ -1,16 +1,18 @@
 # Lane 5: Presence and reach status
 
 Updated: 2026-10-08, by the lane 5 session
-Working on: first round only. WP 5.1 (Note and reaction delivery, contract C4) is
-`lane-5/c4-thread-presence`. WP 5.2a (Note and reaction notices) is
-`lane-5/note-reaction-notices`, stacked on it. 5.2b needs a decision (below).
+Working on: round 2. #365 (WP 5.1) is merged; #366 (WP 5.2a) is retargeted to main and I merge
+it when its checks finish (founder's instruction). This branch, `lane-5/delivery-queue`, queues one
+creator's deliveries and retries a failed one. The mute fix (`lane-5/note-mute-read`, a small
+migration) is stacked on it; owner notice snapshots (option A) follow.
 Done: contract C4 ([details](lane-5-c4-note-reaction-delivery.md)); the thread-presence read
 `GET /v1/content/{creatorId}/presence`; the creator-session fan-out of Note and reaction notices
-with 500-recipient chunking; the notification owner for both; scenario host and scripts.
-Next: after "Next for lane 5": 5.2b once the authority choice is made, then 5.6, 5.7, 5.8, 5.4,
-5.5, 5.9, 5.10, and 5.3 on a fake gateway.
-Blocked on: the founder's choice in [the authority decision pack](lane-5-notification-owner-authority.md)
-for answers, request status and commitment due. 5.3 needs Apple and Google credentials.
+with 500-recipient chunking, one creator's deliveries queued, and a failed delivery retried by the
+same session; the notification owner for both; scenario host and scripts.
+Next: option A (the founder's choice for answers, request status and commitment due), then 5.6,
+5.7, 5.8, 5.4, 5.5, 5.9, 5.10, and 5.3 on a fake gateway.
+Blocked on: nothing for my side of option A. Answers and request status will not fire until lanes 3
+and 4 add their one call (tickets). 5.3 needs Apple and Google credentials.
 
 ## Scenarios (database on 56450, host on 56451, fake push gateway on 56453)
 
@@ -18,18 +20,19 @@ Re-run (from the repository root, with node on PATH): `sh tests/scenarios/lane-5
 then `sh tests/scenarios/lane-5/run-all.sh`. It resets the database and restarts the host before
 each script; pass script names to run only some. `e5-4-known-gaps` is not in the default list.
 
-| Script                  | Rows                                                                                                                                                                          | Result (2026-10-08)                 |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| `e5-1-audience`         | E5.1 ★ who sees a Note: member, outsider, signed out, blocked, restricted, deleted, no thread, leaves, joins, tiers, mute, unknown creator                                    | 13 of 13 pass                       |
-| `e5-1-lifecycle`        | E5.1 ★ duplicate publish, edit, delete, wrong person, hostile text, paging and bad input                                                                                      | 6 of 6 pass                         |
-| `e5-1-scale`            | E5.1 ★ 600 members and 20 outsiders; latency                                                                                                                                  | 2 of 2 pass                         |
-| `e5-2-reactions`        | E5.2 ★ react, privacy between fans, duplicate, race, pending reply, wrong person, deleted reply                                                                               | 7 pass, 1 not run (no undo exists)  |
-| `e5-4-note-notices`     | E5.3 ★ and E5.4 Notes: recipients, in-app list, push honesty, once per cause, silent edit, join and leave, blocked after the notice, failure and retry, withdrawn before send | 8 of 8 pass                         |
-| `e5-4-reaction-notices` | E5.2 ★ and E5.3 ★ reactions: who is told, push wording and privacy, once, withdrawn reply, denied fan                                                                         | 5 of 5 pass                         |
-| `e5-4-chunks`           | E5.1 ★ and E5.4: 600 recipients become events of 500 and 100, one notice each                                                                                                 | 2 of 2 pass                         |
-| `e5-4-scheduled`        | E5.4: scheduled Note, early run, racing runs                                                                                                                                  | 2 of 2 pass                         |
-| `e5-3-quiet-hours`      | E5.3 ★ quiet hours read in each fan's own time zone; held push released later (DST edges not run: need a clock fake)                                                          | 2 of 2 pass                         |
-| `e5-4-known-gaps`       | a muted fan is still pushed; a reaction push survives a withdrawn reply                                                                                                       | 0 of 2 pass (known, decisions 5, 6) |
+| Script                  | Rows                                                                                                                                                                                                                                      | Result (2026-10-08)                 |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| `e5-1-audience`         | E5.1 ★ who sees a Note: member, outsider, signed out, blocked, restricted, deleted, no thread, leaves, joins, tiers, mute, unknown creator                                                                                                | 13 of 13 pass                       |
+| `e5-1-lifecycle`        | E5.1 ★ duplicate publish, edit, delete, wrong person, hostile text, paging and bad input                                                                                                                                                  | 6 of 6 pass                         |
+| `e5-1-scale`            | E5.1 ★ 600 members and 20 outsiders; latency; reads keep working while five Notes are delivered to 600 members at once                                                                                                                    | 3 of 3 pass                         |
+| `e5-2-reactions`        | E5.2 ★ react, privacy between fans, duplicate, race, pending reply, wrong person, deleted reply                                                                                                                                           | 7 pass, 1 not run (no undo exists)  |
+| `e5-4-note-notices`     | E5.3 ★ and E5.4 Notes: recipients, in-app list, push honesty, once per cause, silent edit, join and leave, blocked after the notice, failure and retry, withdrawn before send                                                             | 8 of 8 pass                         |
+| `e5-4-reaction-notices` | E5.2 ★ and E5.3 ★ reactions: who is told, push wording and privacy, once, withdrawn reply, denied fan                                                                                                                                     | 5 of 5 pass                         |
+| `e5-4-chunks`           | E5.1 ★ and E5.4: 600 recipients become events of 500 and 100, one notice each                                                                                                                                                             | 2 of 2 pass                         |
+| `e5-4-self-retry`       | E5.4: the denial check is missing while a Note is published; nobody is told; once it is back the creator's session retries by itself and tells the audience once; a failure that never clears stops after three retries (takes 3 minutes) | 2 of 2 pass                         |
+| `e5-4-scheduled`        | E5.4: scheduled Note, early run, racing runs                                                                                                                                                                                              | 2 of 2 pass                         |
+| `e5-3-quiet-hours`      | E5.3 ★ quiet hours read in each fan's own time zone; held push released later (DST edges not run: need a clock fake)                                                                                                                      | 2 of 2 pass                         |
+| `e5-4-known-gaps`       | a muted fan is still pushed; a reaction push survives a withdrawn reply                                                                                                                                                                   | 0 of 2 pass (known, decisions 5, 6) |
 
 ## Wiring for the integrator (WP 5.2a)
 
@@ -44,7 +47,13 @@ destination: "/notifications" }) })` (from `growth/owners.js` and `content/notic
 3. After `contentHost.bindContent(content.content)`:
    `late.content = contentNoticeOwner({ pool: runtime.pool, content: content.content })`.
 4. Nothing for the trigger: `contentFeature` now drains the creator's pending effects after a
-   publish, a reaction and a scheduled run, in her own session.
+   publish, a reaction and a scheduled run, in her own session. One creator's deliveries run one
+   after the other (a burst of publishes would otherwise start overlapping fan-outs that starve
+   the connection pool her fans read through). There is no background worker for this yet, so a
+   Note or reaction effect that failed for a passing reason (a lock timeout, a restart, the
+   denial check briefly missing) is retried by the same session when its backoff is due, at
+   most three times; after that the Studio's effects run finishes it. When a real worker with
+   creator authority exists it should replace the in-session retry.
 
 Until WP 5.3 gives growth a `DeliveryProvider`, a fan who turned push on has a delivery that
 fails and retries to `dead`; fans with push off (the default) are unaffected.

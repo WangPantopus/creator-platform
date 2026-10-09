@@ -112,14 +112,48 @@ export function contentFeature(service: ContentService): FeatureRegistration {
   const presence = new ThreadPresence(service);
   /** WP 5.2: once the creator has her answer, finish her pending downstream
    * work (tell a Note's audience, tell a reacted-to fan) in the same session.
-   * Never fails her request: anything that cannot finish stays pending, and the
-   * Studio's effects run retries it. */
-  const deliver = async (actor: Actor, creatorId: string) => {
-    try {
-      await service.drainEffects(actor, creatorId);
-    } catch {
-      /* pending effects are retried by the Studio's effects run */
-    }
+   * Never fails her request: anything that cannot finish stays pending. One
+   * creator's runs queue behind each other so a burst of publishes cannot start
+   * a burst of overlapping fan-outs that starve the connection pool the fans read
+   * through. There is no background worker yet, so a Note or reaction effect that
+   * failed for a passing reason (a lock timeout, a restart) is tried again by
+   * this same session when its backoff is due, at most three times; after that
+   * the Studio's effects run retries it. */
+  const queued = new Map<string, Promise<void>>();
+  const deliver = (actor: Actor, creatorId: string, attempt = 0) => {
+    const run = (queued.get(creatorId) ?? Promise.resolve()).then(async () => {
+      try {
+        await service.drainEffects(actor, creatorId);
+      } catch {
+        /* pending effects are retried below or by the Studio's effects run */
+      }
+      if (attempt >= 3) return;
+      try {
+        const waitSeconds = await service.transaction(
+          actor,
+          creatorId,
+          async (client) =>
+            (
+              await client.query<{ wait: number | null }>(
+                "SELECT extract(epoch FROM (min(next_at)-now()))::float AS wait FROM creator.content_effect WHERE creator_id=$1 AND state<>'done' AND type IN('published','reaction')",
+                [creatorId],
+              )
+            ).rows[0]?.wait ?? null,
+        );
+        if (waitSeconds !== null)
+          setTimeout(
+            () => void deliver(actor, creatorId, attempt + 1),
+            Math.min(60_000, Math.max(1_000, waitSeconds * 1000 + 500)),
+          ).unref();
+      } catch {
+        /* the Studio's effects run still retries it */
+      }
+    });
+    queued.set(creatorId, run);
+    void run.finally(() => {
+      if (queued.get(creatorId) === run) queued.delete(creatorId);
+    });
+    return run;
   };
   return {
     name: "content",
