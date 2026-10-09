@@ -69,9 +69,22 @@ public final class FanSession: ObservableObject {
     @Published public private(set) var session: APISession?
     @Published public private(set) var hasSavedCredential = false
     @Published public private(set) var checkingSession: Bool
+    // Back (work package 7.2). The screens you moved through, newest last, and the tab you are in.
+    // Paths only. See NavigationParents for the rules.
+    @Published public private(set) var history: [NavigationEntry] = []
+    @Published public private(set) var tab: FanTab
+    private enum Move { case push, replace }
+    private var move = Move.push
+    public var canGoBack: Bool { !localBackSteps.isEmpty || !history.isEmpty || NavigationParents.parent(of: destination) != nil }
+    // A screen with a step of its own (a sheet it has open) registers it here, so Back closes that first.
+    @Published private var localBackSteps: [(id: UUID, close: () -> Void)] = []
+    public func holdBack(_ id: UUID, close: @escaping () -> Void) { releaseBack(id); localBackSteps.append((id, close)) }
+    public func releaseBack(_ id: UUID) { localBackSteps.removeAll { $0.id == id } }
     @Published public var destination: String {
         didSet {
+            let mode = move; move = .push
             if destination != oldValue {
+                track(from: oldValue, to: destination, mode)
                 destinationGeneration &+= 1
                 navigationRestoreAllowed = false
                 persistDestination()
@@ -100,7 +113,9 @@ public final class FanSession: ObservableObject {
     private var navigationRestoreAllowed: Bool
     private var navigationRevision = 0
     public init(baseURL: URL?, destination: String = "/home") {
-        self.destination = ApplicationDestination.isPermitted(destination) ? destination : "/home"
+        let start = ApplicationDestination.isPermitted(destination) ? destination : "/home"
+        self.destination = start
+        tab = NavigationParents.tab(of: start)
         navigationRestoreAllowed = destination == "/home"
         self.baseURL = baseURL
         checkingSession = baseURL != nil
@@ -135,6 +150,7 @@ public final class FanSession: ObservableObject {
                   session?.sessionId == account.sessionId else { return }
             navigationInitialized = true
             if navigationRestoreAllowed, navigation == destinationGeneration, let saved {
+                move = .replace
                 destination = saved
             }
             navigationRestoreAllowed = false
@@ -212,7 +228,7 @@ public final class FanSession: ObservableObject {
             arrival = ArrivalContext(source: "You came from " + page.creator.name + "'s page", title: page.creator.name + " · " + page.creator.category, creatorName: page.creator.name)
         } catch { /* Do not invent creator identity when the public projection is unavailable. */ }
     }
-    public func removeArrival() { arrival = nil; removedArrivalFor = destination.components(separatedBy: "?")[0]; destination = removedArrivalFor! }
+    public func removeArrival() { arrival = nil; removedArrivalFor = destination.components(separatedBy: "?")[0]; move = .replace; destination = removedArrivalFor! }
     public func refresh() async {
         guard !rotatingCredential, !refreshingSession, !purgingPrivateState, !Task.isCancelled else { return }
         guard let baseURL, api != nil else { checkingSession = false; return }
@@ -378,7 +394,7 @@ public final class FanSession: ObservableObject {
         guard !purgingPrivateState else { return false }
         purgingPrivateState = true; localPurgeFailed = true
         defer { purgingPrivateState = false }
-        generation += 1; confirmedCredential = nil; session = nil; hasSavedCredential = false; checkingSession = false; actors = []; choosingDevelopmentActor = false; error = ""
+        generation += 1; confirmedCredential = nil; session = nil; hasSavedCredential = false; checkingSession = false; actors = []; choosingDevelopmentActor = false; error = ""; history = []
         navigationInitialized = false; navigationRestoreAllowed = false
         finishValidationWaiters()
         URLCache.shared.removeAllCachedResponses()
@@ -409,7 +425,7 @@ public final class FanSession: ObservableObject {
             })
             let target = try await client.notificationDestination(id: id, expectedSession: capture.credential)
             guard await capture.isCurrent() else { return false }
-            open(target)
+            replace(target, arrival: true)
             return true
         } catch let failure as GrowthRequestFailure {
             guard await capture.isCurrent() else { return false }
@@ -422,7 +438,33 @@ public final class FanSession: ObservableObject {
         }
     }
     #endif
-    public func open(_ target: String) { guard ApplicationDestination.isPermitted(target) else { error = "This link is unavailable. Open the object from the app."; return }; navigationRestoreAllowed = false; removedArrivalFor = nil; destination = target; persistDestination() }
+    /// Go forward. A link or a push (`arrival`) says which tab it belongs to; a route that only forwards replaces itself.
+    public func open(_ target: String, arrival: Bool = false) { go(target, NavigationParents.isTransient(destination) ? .replace : .push, arrival) }
+    /// Go forward without leaving this screen on the trail, so Back never returns to it.
+    public func replace(_ target: String, arrival: Bool = false) { go(target, .replace, arrival) }
+    private func go(_ target: String, _ mode: Move, _ arrival: Bool) {
+        guard ApplicationDestination.isPermitted(target) else { error = "This link is unavailable. Open the object from the app."; return }
+        navigationRestoreAllowed = false; removedArrivalFor = nil; move = mode
+        destination = target
+        if arrival, !NavigationParents.isRoot(target) { tab = NavigationParents.tab(of: target) }
+        persistDestination()
+    }
+    private func track(from old: String, to next: String, _ mode: Move) {
+        if NavigationParents.isRoot(next) { history = []; tab = NavigationParents.tab(of: next) }
+        else if mode == .push { history = Array((history + [NavigationEntry(path: old, tab: tab)]).suffix(NavigationParents.limit)) }
+    }
+    /// Where Back goes from here, so a control that names its destination can say so truthfully.
+    public var backTarget: String? { history.last?.path ?? NavigationParents.parent(of: destination) }
+    /// One step back: the last screen you were on, or else the screen this one belongs under.
+    @discardableResult public func back() -> Bool {
+        if let step = localBackSteps.last { step.close(); return true }
+        let last = history.last
+        guard let target = last ?? NavigationParents.parent(of: destination).map({ NavigationEntry(path: $0, tab: NavigationParents.tab(of: $0)) }) else { return false }
+        if last != nil { history.removeLast() }
+        removedArrivalFor = nil; tab = target.tab; move = .replace
+        destination = target.path
+        return true
+    }
     static func message(_ error: Error) -> String { if let failure = error as? CreatorAPIError, let result = try? JSONDecoder().decode(APIError.self, from: failure.body) { return result.error.message }; return "This action could not complete. Reconnect and try again." }
 }
 
@@ -515,11 +557,19 @@ public struct FanAppShell: View {
                     } else if model.destination == "/onboarding/handle" { NativeHandleForm(model: model).id((model.session?.accountId ?? "") + (model.session?.sessionId ?? "")) }
                     else if let feature { feature.screen(model).id((model.session?.accountId ?? "") + (model.session?.sessionId ?? "") + model.destination + destinationDelivery.uuidString) }
                     else { EmptyState(title: "This destination is not connected yet", body: "Your account and arrival context are kept. Return to your account or try again when this feature is available.") { Button("Your account", variant: .secondary) { model.destination = "/you" } }.frame(maxHeight: .infinity) }
-                    if !isConversation { TabBar(active: tab) { model.destination = "/" + $0.rawValue.lowercased() }.layoutPriority(1) }
+                    if !isConversation { TabBar(active: model.tab) { model.destination = "/" + $0.rawValue.lowercased() }.layoutPriority(1) }
                 }
             }
         }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }.foregroundStyle(qColor("ink", scheme)).background(qColor("ground", scheme))
+            // A swipe in from the left edge goes back, like Android's Back gesture. A simultaneous
+            // gesture, so it never takes a tap or a scroll from the screen under it.
+            .simultaneousGesture(DragGesture(minimumDistance: 24).onEnded { value in
+                guard backAvailable, value.startLocation.x < 24, value.translation.width > 70, abs(value.translation.height) < 60 else { return }
+                model.back()
+            })
+            // VoiceOver's escape gesture (a two-finger Z) goes back too.
+            .accessibilityAction(.escape) { if backAvailable { model.back() } }
             .task(id: scenePhase) {
                 guard scenePhase == .active else { return }
                 #if DEBUG
@@ -550,7 +600,7 @@ public struct FanAppShell: View {
                 let associationHost = Bundle.main.object(forInfoDictionaryKey: "CreatorLinkHost") as? String
                 guard (components.scheme == "qelvora" && components.host == "app" && components.port == nil) || (components.scheme == "https" && associationHost != nil && components.host == associationHost && (components.port == nil || components.port == 443)) else { model.error = "This link does not belong to this app."; return }
                 let target = components.percentEncodedPath + (components.percentEncodedQuery.map { "?" + $0 } ?? "")
-                model.open(target)
+                model.open(target, arrival: true)
                 if ApplicationDestination.isPermitted(target) { destinationDelivery = UUID() }
             }
     }
@@ -576,16 +626,12 @@ public struct FanAppShell: View {
             }
         }
     }
-    private var isConversation: Bool { model.destination.components(separatedBy: "?")[0].hasPrefix("/threads/") }
-    private var tab: FanTab {
-        let path = model.destination.components(separatedBy: "?")[0]
-        if path.hasPrefix("/identity/") || path == "/support" || path.hasPrefix("/support/") || path == "/notifications/settings" || path == "/studio/impact" || path == "/commerce/spending" || StudioTeamFeature.matches(path) { return .you }
-        if path.hasPrefix("/commerce/") { return .requests }
-        return FanTab.allCases.first { tab in
-            let root = "/" + tab.rawValue.lowercased()
-            return path == root || path.hasPrefix(root + "/")
-        } ?? .home
+    /// Back only when there is a screen to go back to that the person can see.
+    private var backAvailable: Bool {
+        model.canGoBack && !model.choosingDevelopmentActor
+            && (model.session != nil || features.contains { $0.matches(model.destination) && $0.allowsSignedOut(model.destination) })
     }
+    private var isConversation: Bool { model.destination.components(separatedBy: "?")[0].hasPrefix("/threads/") }
 }
 
 struct NativeHandleForm: View {
@@ -599,7 +645,7 @@ struct NativeHandleForm: View {
                 VStack(alignment: .leading, spacing: 0) {
                     VStack(alignment: .leading, spacing: 24) {
                         HStack {
-                            SwiftUI.Button { model.destination = "/you" } label: { QelvoraGlyph(name: "back", size: 22).frame(width: 44, height: 44) }.buttonStyle(.plain).accessibilityLabel("Back")
+                            SwiftUI.Button { model.back() } label: { QelvoraGlyph(name: "back", size: 22).frame(width: 44, height: 44) }.buttonStyle(.plain).accessibilityLabel("Back")
                             Spacer(); Text(model.session?.mode == .development ? "DEVELOPMENT SIGN-IN" : "SIGNED IN WITH PANTOPUS").qText("data-sm")
                         }
                         Text("How creators will know you").qText("display-lg").accessibilityAddTraits(.isHeader)

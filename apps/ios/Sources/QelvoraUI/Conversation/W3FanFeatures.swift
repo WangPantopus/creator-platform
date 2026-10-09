@@ -34,7 +34,7 @@ private struct W3ConversationDestination: View {
             if ApplicationDestination.isPermitted(session.destination),
                let creatorId = query.first(where: { $0.name == "creatorId" })?.value,
                let fanId = query.first(where: { $0.name == "fanId" })?.value {
-                W3PrivacyScreen(client: W3ConversationClient(baseURL: baseURL, expectedAccountId: session.session?.accountId), root: creatorId + "/" + fanId, session: session, onBack: { session.open("/you") })
+                W3PrivacyScreen(client: W3ConversationClient(baseURL: baseURL, expectedAccountId: session.session?.accountId), root: creatorId + "/" + fanId, session: session, onBack: { session.back() })
             } else { W3AccountScreen(accountId: session.session?.accountId ?? "signed-out", baseURL: baseURL, session: session) }
         }
         else { Notice(title: "Conversation unavailable", children: "Reconnect to open this conversation from your account.") }
@@ -46,6 +46,7 @@ private struct W3ThreadScreen: View {
     @StateObject private var model: W3ThreadModel
     @ObservedObject var session: FanSession
     @State private var privacy = false
+    @State private var backStep = UUID()
     @State private var comparisonQuestion: W3Message?
     @State private var comparisonsAvailable = false
     @State private var source: W3Passage?
@@ -61,7 +62,7 @@ private struct W3ThreadScreen: View {
     var body: some View {
         VStack(spacing: 0) {
             if let page = model.page {
-                ThreadHeader(name: page.creatorName, subtitle: "Official AI", live: !model.offline && page.control == .human_active, onBack: { session.open("/you") }, onAbout: { privacy = true })
+                ThreadHeader(name: page.creatorName, subtitle: "Official AI", live: !model.offline && page.control == .human_active, onBack: { session.back() }, onAbout: { privacy = true })
                 IdentityStrip(state: page.control == .human_active ? .human : page.control == .ai_active ? .ai : .paused, name: page.creatorName)
                 ScrollViewReader { proxy in
                     ScrollView {
@@ -139,7 +140,10 @@ private struct W3ThreadScreen: View {
                 if value != .active { source = nil; originalReply = nil; comparisonQuestion = nil; sourceFailure = "" }
                 model.setActive(value == .active && !privacy && source == nil && originalReply == nil && comparisonQuestion == nil)
             }
-            .onChange(of: privacy) { _, value in model.setActive(scenePhase == .active && !value && source == nil && originalReply == nil && comparisonQuestion == nil) }
+            .onChange(of: privacy) { _, value in
+                if value { session.holdBack(backStep) { privacy = false } } else { session.releaseBack(backStep) }
+                model.setActive(scenePhase == .active && !value && source == nil && originalReply == nil && comparisonQuestion == nil) }
+            .onDisappear { session.releaseBack(backStep) }
             .onChange(of: source != nil) { _, value in model.setActive(scenePhase == .active && !privacy && !value && originalReply == nil && comparisonQuestion == nil) }
             .onChange(of: originalReply != nil || comparisonQuestion != nil) { _, value in model.setActive(scenePhase == .active && !privacy && source == nil && !value) }
             .task(id: "\(scenePhase)-\(privacy)-\(source != nil)-\(originalReply != nil || comparisonQuestion != nil)-\(model.page != nil)") {
@@ -270,7 +274,7 @@ private struct W3FirstConversation: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     HStack {
-                        SwiftUI.Button { session.open("/creators/" + handle) } label: {
+                        SwiftUI.Button { session.back() } label: {
                             QelvoraGlyph(name: "back", size: 22, color: qColor("ink", scheme))
                                 .frame(width: 44, height: 44)
                         }.buttonStyle(.plain).accessibilityLabel("Back")
@@ -317,7 +321,7 @@ private struct W3FirstConversation: View {
                     Spacer(minLength: 0)
                     VStack(spacing: 10) {
                         Button("Start with \(creator?.name ?? "the creator")'s AI", variant: .ai, size: .lg, block: true, disabled: busy || scenePhase != .active || session.checkingSession || session.session?.sessionId != originalSessionId || session.destination != destination || creator == nil || contextPending || caps?.generationAvailable != true || caps?.consentAvailable != true) { Task { await begin() } }
-                        Button("Not now", variant: .quiet, block: true) { session.open("/creators/" + handle) }
+                        Button("Not now", variant: .quiet, block: true) { session.back() }
                     }
                 }.frame(maxWidth: .infinity, minHeight: max(0, geometry.size.height - 52), alignment: .topLeading)
                     .padding(.horizontal, 16).padding(.top, 16).padding(.bottom, 36)
@@ -385,7 +389,7 @@ private struct W3FirstConversation: View {
                 body: APIConversationBeginConversation(creatorId: creator.id, policyVersion: policy.version, accessNoticeAccepted: .init(), idempotencyKey: key))
             guard !Task.isCancelled, scenePhase == .active, await capture.isCurrent(),
                   page.creatorId == creator.id, UUID(uuidString: page.fanId) != nil else { return }
-            session.open("/threads/" + page.creatorId + "/" + page.fanId)
+            session.replace("/threads/" + page.creatorId + "/" + page.fanId)
         } catch {
             guard !Task.isCancelled, scenePhase == .active, await capture.isCurrent() else { return }
             failure = "Reconnect to try again. No message was sent."
@@ -406,7 +410,7 @@ private struct W3PrivacyScreen: View {
     private var name: String { page?.creatorName ?? "this creator" }
     var body: some View {
         ScrollView { VStack(alignment: .leading, spacing: 28) {
-            if let onBack { Button("Back to You", variant: .quiet, action: onBack) }
+            if let onBack { Button("Back", variant: .quiet, action: onBack) }
             Text("Me and privacy").qText("title")
             if !failure.isEmpty { Notice(tone: .error, title: "Privacy status", children: failure); Button("Try again", variant: .secondary, disabled: busy) { Task { await refresh() } } }
             Text("What \(name)'s AI remembers").qText("display-md")

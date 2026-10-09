@@ -98,7 +98,7 @@ private fun GrowthHomeHeader(onNotifications: () -> Unit) {
 
 /** W1 registers this fan feature and owns auth, deep-link resolution and permission prompts. */
 @Composable
-fun GrowthFanFeature(baseUrl: String?, token: () -> String? = { null }, destination: String = "/discover", onSignIn: (String) -> Unit = {}, onNavigate: ((String) -> Unit)? = null) {
+fun GrowthFanFeature(baseUrl: String?, token: () -> String? = { null }, destination: String = "/discover", onSignIn: (String) -> Unit = {}, onNavigate: ((String) -> Unit)? = null, onBack: (() -> Unit)? = null, backTarget: String? = null) {
     var route by remember(destination) { mutableStateOf(destination) }
     fun navigate(target: String) { if(onNavigate != null) onNavigate(target) else route = target }
     var query by remember { mutableStateOf("") }
@@ -291,7 +291,7 @@ fun GrowthFanFeature(baseUrl: String?, token: () -> String? = { null }, destinat
                             }
                         }
                         if(route.contains("/posts/")) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                            IconButton("back", QelvoraCopy.text("growthBackToSPage", mapOf("name" to name)), ink) {navigate("/creators/$handle")}
+                            IconButton("back", if(onBack == null || backTarget == "/creators/$handle") QelvoraCopy.text("growthBackToSPage", mapOf("name" to name)) else QelvoraCopy.text("back"), ink) {if(onBack != null) onBack() else navigate("/creators/$handle")}
                             Avatar(name.take(1))
                             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {BasicText(name, style = qText("body-strong").copy(color = ink));BasicText(QelvoraCopy.text("growthPostPublic"), style = qText("data-sm").copy(color = qColor("ink-muted")))}
                         }

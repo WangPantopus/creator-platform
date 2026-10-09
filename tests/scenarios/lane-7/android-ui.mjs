@@ -6,7 +6,7 @@
 import { execFileSync } from "node:child_process";
 
 const SERIAL = process.env.LANE7_ANDROID ?? "emulator-5574";
-const adb = (...args) =>
+export const adb = (...args) =>
   execFileSync("adb", ["-s", SERIAL, ...args], {
     encoding: "utf8",
     maxBuffer: 32 << 20,
@@ -84,6 +84,41 @@ export async function tap(label, timeoutMs = 8000) {
   adb("shell", "input", "tap", String(node.x), String(node.y));
   return node;
 }
+/** The window that has focus: the app, or the launcher once Back has left the app. */
+export const focused = () =>
+  /mCurrentFocus=Window\{\S+ \S+ ([^/}\s]+)/u.exec(
+    adb("shell", "dumpsys", "window"),
+  )?.[1] ?? "";
+/** Opens a link as another app would, with the app running or not. */
+export const openLink = (url) =>
+  adb(
+    "shell",
+    "am",
+    "start",
+    "-a",
+    "android.intent.action.VIEW",
+    "-d",
+    `'${url}'`,
+    "com.pantopus.qelvora",
+  );
+/** The back gesture: a swipe in from the left edge. */
+export const edgeSwipe = () =>
+  adb("shell", "input", "swipe", "2", "1200", "500", "1200", "250");
+/** Sends the app to the background, as the Home button does. */
+export const home = () => key("HOME");
+/** Lets the system reclaim a background app, as it does when memory is short. */
+export const reclaim = () => adb("shell", "am", "kill", "com.pantopus.qelvora");
+/** Brings the app back from the launcher, as a tap on its icon does. */
+export const resume = () =>
+  adb(
+    "shell",
+    "monkey",
+    "-p",
+    "com.pantopus.qelvora",
+    "-c",
+    "android.intent.category.LAUNCHER",
+    "1",
+  );
 export const tapAt = (x, y) =>
   adb("shell", "input", "tap", String(x), String(y));
 export const key = (name) =>
