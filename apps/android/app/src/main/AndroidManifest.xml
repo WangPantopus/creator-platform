@@ -10,7 +10,12 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+    <!-- The LiveKit library declares screen sharing. This product never shares a
+         screen, and the mediaProjection foreground service type needs its own
+         Play declaration and demonstration, so drop what the library adds. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" tools:node="remove" />
     <application android:name=".ui.GrowthApplication" android:label="@string/app_name" android:theme="@style/QelvoraTheme" android:allowBackup="false" android:supportsRtl="true">
+        <service android:name="io.livekit.android.room.track.screencapture.ScreenCaptureService" tools:node="remove" />
         <!-- No Firebase initialization, installation registration or analytics
              occurs without approved configuration, a session and permission. -->
         <provider android:name="com.google.firebase.provider.FirebaseInitProvider" android:authorities="${applicationId}.firebaseinitprovider" tools:node="remove" />
