@@ -250,26 +250,31 @@ try {
     process.exit(2);
   psql("DROP TABLE IF EXISTS creator.e29_trial");
   // The product allows an account five data requests an hour. The run needs two
-  // exports from each of two fans (before and after, and during the fault).
+  // exports from one account (before and after) and one or two from another
+  // (during the fault), so it takes the two development accounts with most room:
+  // fan one, fan two or the creator Maya (her export completes the same domains).
   const used = (account) =>
     Number(
       psql(
         `SELECT count(*) FROM creator_trust.privacy_job WHERE account_id='${account}' AND created_at>now()-interval '1 hour'`,
       ).trim(),
     );
-  const [one, two] = [used(ACTORS.fanOne), used(ACTORS.fanTwo)];
+  const accounts = [
+    ["fan one", ACTORS.fanOne],
+    ["fan two", ACTORS.fanTwo],
+    ["Maya", ACTORS.maya],
+  ]
+    .map(([name, id]) => ({ name, id, used: used(id) }))
+    .sort((a, b) => a.used - b.used);
   if (
     !step(
-      "preconditions: both fans have room for two more data requests this hour",
-      one <= 3 && two <= 3,
-      `fan one has made ${one}, fan two ${two} in the last hour (the limit is 5); wait and re-run`,
+      "preconditions: two accounts have room for two more data requests this hour",
+      accounts[1].used <= 3,
+      `requests in the last hour (the limit is 5): ${accounts.map((a) => `${a.name} ${a.used}`).join(", ")}; wait and re-run if fewer than two have room`,
     )
   )
     process.exit(2);
-  const exporters =
-    one <= two
-      ? { steady: ACTORS.fanOne, stale: ACTORS.fanTwo }
-      : { steady: ACTORS.fanTwo, stale: ACTORS.fanOne };
+  const exporters = { steady: accounts[0].id, stale: accounts[1].id };
 
   process.stdout.write("\n-- baseline: pins match, export completes --\n");
   const baseline = pins("check");
@@ -311,10 +316,14 @@ try {
       allStuck(refused.tasks),
     shown(refused, "after"),
   );
-  const refusedMessage = await messageAsFanTwo();
+  // The usage-expiry worker re-checks its catalogue about once a minute, so the
+  // first message can still land before it notices. That reply never settles
+  // (generation is stopped), so the second waits it out and meets the refusal.
+  let refusedMessage = await messageAsFanTwo();
+  if (refusedMessage === "accepted") refusedMessage = await messageAsFanTwo();
   advise(
-    "the running backend stops accepting fan messages until it is restarted",
-    refusedMessage !== "accepted",
+    "the running backend refuses fan messages (403 privacy_consumers_unregistered) until it is restarted",
+    /privacy_consumers_unregistered/u.test(refusedMessage),
     refusedMessage,
   );
   const log = stack("logs", "backend", "-n", "600").out;

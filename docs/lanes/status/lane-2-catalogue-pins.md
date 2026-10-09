@@ -20,12 +20,13 @@ forgot, a way to see what a migration changed before accepting new fingerprints,
 All on a real PostgreSQL 17 stack built from nothing by `infra/local/stack.mjs`, with one empty unrelated table
 added by hand to stand in for a migration (a registered migration that adds a relation has the same effect).
 
-| Question                                         | Answer                                                                                                                                                                                                                                                                        |
-| ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Does the tool compute what the product computes? | Yes. On the freshly built database **45 of 45 pin groups (50 pinned digests) reproduce exactly**, so the tool is validated against the reviewers' own values before it is trusted to write any                                                                                |
-| What does one new table do?                      | **0 of 45 pin groups match.** Export: commerce, content, identity and media are blocked (`privacy_original_family_unavailable`), trust retries. The reply worker reports `generation_terminal_discovery_unconfigured`, so AI replies stop too. See the scenario results below |
-| Does a restart fix it?                           | No. A backend started against that database with the committed pins **does not start**: `comparison_artifact_custody_changed`                                                                                                                                                 |
-| Does regenerating fix it?                        | See the scenario results below                                                                                                                                                                                                                                                |
+| Question                                         | Answer                                                                                                                                                                                                                                        |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Does the tool compute what the product computes? | Yes. On the freshly built database **45 of 45 pin groups (50 pinned digests) reproduce exactly**, so the tool is validated against the reviewers' own values before it is trusted to write any                                                |
+| What does one new table do?                      | **0 of 45 pin groups match.** Export: commerce, content, identity and media are blocked (`privacy_original_family_unavailable`), trust retries. The reply worker reports `generation_terminal_discovery_unconfigured`, so AI replies stop too |
+| Does the running backend notice?                 | Yes, within about a minute (the usage-expiry worker idles 60 s between checks): every fan message then gets **403 `privacy_consumers_unregistered`** until the backend is restarted                                                           |
+| Does a restart fix it?                           | No. A backend started against that database with the committed pins **does not start**: `comparison_artifact_custody_changed` ("Current comparison artifact custody must match independent review.")                                          |
+| Does regenerating fix it?                        | Yes. `write` changes exactly one tracked file, 45 lines; after a restart the five export domains that can complete here complete again in about 20 to 30 seconds, and fan messages are accepted                                               |
 
 ## The procedure when a migration adds, removes or changes a relation
 
@@ -64,7 +65,7 @@ Two things to know before merging a migration:
 | Command                           | What it does                                                                                                                                                                                   |
 | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `check`                           | Recomputes every pinned digest and compares. Exit 0 if all match, 1 if any differ or any pin is unknown to the tool, 3 if the database is unreachable or not at the state the review describes |
-| `snapshot --out FILE`             | Writes what every purpose role reaches, relation by relation, and which pinned alternative each group matched (about 0.3 MB). Keep it outside git                                              |
+| `snapshot --out FILE`             | Writes what every purpose role reaches, relation by relation, and which pinned alternative each group matched (under 1 MB). Keep it outside git                                                |
 | `diff --base FILE`                | Says which relations came and went, which purpose roles' reach changed, and which pin groups changed                                                                                           |
 | `write [--base FILE] [--dry-run]` | Puts the live digests into the review file. Refuses if a pin cannot be recomputed or if it cannot tell which alternative to replace (`--variant LABEL` decides)                                |
 
@@ -100,9 +101,34 @@ None of these are caused by a migration.
    needs the recording-association adapter (the schema has the column, `server.ts` does not compose the adapter),
    `growth` needs `--growth`, and `agent` retries until conversation completes. PR #351 is a separate fix for the agent
    export.
-3. **A catalogue mismatch latches the running backend.** After the table was added and removed again without a
-   restart, fan messages were refused (403 `privacy_consumers_unregistered`) until the stack was rebuilt.
-   `usage-accounting-host.ts` keeps `failed` and `invalidated` flags that nothing clears.
+3. **A catalogue mismatch latches the running backend.** Within about a minute of the table appearing, fan messages are
+   refused (403 `privacy_consumers_unregistered`) and stay refused even if the table is dropped again, until the
+   backend restarts (E2.9 shows both). `usage-accounting-host.ts` keeps `failed` and `invalidated` flags that nothing
+   clears.
+
+## Scenario results (E2.9 ★)
+
+`node infra/local/stack.mjs up --lane 2 --no-web --no-smoke`, then
+`node tests/scenarios/lane-2/e2-9-catalogue-regeneration.mjs` (about 4 to 5 minutes). It edits one tracked file and
+restores it byte for byte, restarts the stack's backend, and refuses to start if that file already differs from the
+committed one. **19 of 19 steps pass** in the last full run of the final script:
+
+1. Preconditions: the backend answers; two of fan one, fan two and Maya have room under the product's limit of 5 data
+   requests per account per hour.
+2. Baseline: `check` reproduces 45 of 45; an export completes commerce, content, identity, media and trust; `snapshot`.
+3. One table is added: `check` fails loudly (0 of 45, exit 1); the export is refused in those five domains; the running
+   backend refuses fan messages (403 `privacy_consumers_unregistered`); the reply worker reports generation
+   unconfigured; `diff` says 2 relations added (the table and its key), no purpose role's reach changed.
+4. A restart alone does not repair it: the backend refuses to start.
+5. `write --base`: exactly one tracked file changes, +45 −45; `check` passes; the backend restarts; the export completes
+   the five domains again.
+6. Put back: the file is byte for byte the committed one; with the committed pins and the new table `check` fails again
+   (a forgotten regeneration is caught); the table is dropped, the backend restarted, `check` passes, a fan's message is
+   accepted again.
+
+Earlier full runs found and fixed three defects in the scenario itself (it dropped the table before checking the
+forgotten-regeneration case; it spent the product's 5-requests-an-hour limit on one fan; an immediate message probe
+raced the expiry worker). Not shown: delete (see below) and the other three export domains.
 
 ## Recommendation: make the pins ignore relations a role cannot reach
 
