@@ -4,6 +4,8 @@ import { contentFeature, contentSignedSubjects } from "./registration.js";
 import { ContentSources } from "./sources.js";
 import { contentPublicProjection } from "../growth/content.js";
 import { createCommercePublicationPermission } from "../commerce/publication.js";
+import type { GrowthRelay } from "../growth/relay.js";
+import { contentNoticeProducer } from "./notices.js";
 export {
   createCurrentContentPostEntryReader,
   type CurrentContentPostEntryReader,
@@ -116,6 +118,10 @@ export function composeContentHost(input: {
     read: NonNullable<ContentDependencies["publicPacketRead"]>;
   };
   assertScopeAllowedInTransaction?: import("../access/scope.js").ScopeRestrictionInTransaction;
+  /** WP 5.2: tell a Note's audience and a reacted-to fan. The relay is the
+   * configured Growth runtime's; the notices are queued from the creator's own
+   * session when the publish or reaction effect is drained. */
+  notices?: { relay: Pick<GrowthRelay, "enqueueRecipients" | "hasAudience"> };
 }) {
   if (input.publicationSource)
     assertCommercePublicationSource(input.publicationSource, input.pool);
@@ -140,6 +146,7 @@ export function composeContentHost(input: {
   let content: ContentService | null = null;
   let sources: ContentSources | null = null;
   let projection: ReturnType<typeof contentPublicProjection> | null = null;
+  let notices: ReturnType<typeof contentNoticeProducer> | null = null;
   const unavailable = () => {
     throw new DomainError(
       "content_producer_unconfigured",
@@ -155,7 +162,11 @@ export function composeContentHost(input: {
       : {}),
     ...(input.tenure ? createContentTenureHost(input.tenure) : {}),
     ...(input.creatorTenure
-      ? createContentCreatorTenureHost(input.creatorTenure)
+      ? {
+          ...createContentCreatorTenureHost(input.creatorTenure),
+          holdCreatorFanNegative:
+            input.creatorTenure.holdCreatorFanNegativeAuthority,
+        }
       : {}),
     ...(input.publicationSource
       ? { publicationSource: input.publicationSource }
@@ -212,6 +223,11 @@ export function composeContentHost(input: {
         }
       : {}),
     effect: async (actor, effect) => {
+      // A Note's audience and a reaction's fan are told from this session.
+      if (notices) {
+        const told = await notices(actor, effect);
+        if (told) return told;
+      }
       if (effect.type === "source_candidate")
         return sources ? sources.candidate(actor, effect) : unavailable();
       if (effect.type === "source_revoke") {
@@ -256,6 +272,11 @@ export function composeContentHost(input: {
           "Content composition must retain its configured producers and denial authority.",
         );
       content = service;
+      if (input.notices)
+        notices = contentNoticeProducer({
+          content: service,
+          relay: input.notices.relay,
+        });
       if (input.sources)
         sources = new ContentSources(
           service,

@@ -9,6 +9,8 @@ import {
   publicationCommand,
   reactionCommand,
 } from "./service.js";
+import type { Actor } from "../identity/adapter.js";
+import { ThreadPresence } from "./thread-presence.js";
 import { invariant } from "../../core/errors.js";
 
 export function contentSignedSubjects(
@@ -107,6 +109,52 @@ export function contentSignedSubjects(
   };
 }
 export function contentFeature(service: ContentService): FeatureRegistration {
+  const presence = new ThreadPresence(service);
+  /** WP 5.2: once the creator has her answer, finish her pending downstream
+   * work (tell a Note's audience, tell a reacted-to fan) in the same session.
+   * Never fails her request: anything that cannot finish stays pending. One
+   * creator's runs queue behind each other so a burst of publishes cannot start
+   * a burst of overlapping fan-outs that starve the connection pool the fans read
+   * through. There is no background worker yet, so a Note or reaction effect that
+   * failed for a passing reason (a lock timeout, a restart) is tried again by
+   * this same session when its backoff is due, at most three times; after that
+   * the Studio's effects run retries it. */
+  const queued = new Map<string, Promise<void>>();
+  const deliver = (actor: Actor, creatorId: string, attempt = 0) => {
+    const run = (queued.get(creatorId) ?? Promise.resolve()).then(async () => {
+      try {
+        await service.drainEffects(actor, creatorId);
+      } catch {
+        /* pending effects are retried below or by the Studio's effects run */
+      }
+      if (attempt >= 3) return;
+      try {
+        const waitSeconds = await service.transaction(
+          actor,
+          creatorId,
+          async (client) =>
+            (
+              await client.query<{ wait: number | null }>(
+                "SELECT extract(epoch FROM (min(next_at)-now()))::float AS wait FROM creator.content_effect WHERE creator_id=$1 AND state<>'done' AND type IN('published','reaction')",
+                [creatorId],
+              )
+            ).rows[0]?.wait ?? null,
+        );
+        if (waitSeconds !== null)
+          setTimeout(
+            () => void deliver(actor, creatorId, attempt + 1),
+            Math.min(60_000, Math.max(1_000, waitSeconds * 1000 + 500)),
+          ).unref();
+      } catch {
+        /* the Studio's effects run still retries it */
+      }
+    });
+    queued.set(creatorId, run);
+    void run.finally(() => {
+      if (queued.get(creatorId) === run) queued.delete(creatorId);
+    });
+    return run;
+  };
   return {
     name: "content",
     path: "/v1/content",
@@ -120,6 +168,16 @@ export function contentFeature(service: ContentService): FeatureRegistration {
       router.get("/:creatorId", async (req, res) =>
         res.json(
           await service.list(
+            await actorFor(req),
+            z.uuid().parse(req.params.creatorId),
+            req.query,
+          ),
+        ),
+      );
+      // C4: the Notes and reactions this fan sees in their thread.
+      router.get("/:creatorId/presence", async (req, res) =>
+        res.json(
+          await presence.read(
             await actorFor(req),
             z.uuid().parse(req.params.creatorId),
             req.query,
@@ -206,10 +264,10 @@ export function contentFeature(service: ContentService): FeatureRegistration {
         );
       });
       router.post("/:creatorId/replies/:id/reaction", async (req, res) => {
-        const p = ids(req);
-        res.json(
-          await service.react(await actorFor(req), p.creatorId, p.id, req.body),
-        );
+        const p = ids(req),
+          actor = await actorFor(req);
+        res.json(await service.react(actor, p.creatorId, p.id, req.body));
+        await deliver(actor, p.creatorId);
       });
       router.post("/:creatorId/replies/:id/withdraw", async (req, res) => {
         const p = ids(req);
@@ -273,14 +331,12 @@ export function contentFeature(service: ContentService): FeatureRegistration {
           ),
         ),
       );
-      router.post("/:creatorId/studio/scheduled/run", async (req, res) =>
-        res.json(
-          await service.runScheduled(
-            await actorFor(req),
-            z.uuid().parse(req.params.creatorId),
-          ),
-        ),
-      );
+      router.post("/:creatorId/studio/scheduled/run", async (req, res) => {
+        const actor = await actorFor(req),
+          creatorId = z.uuid().parse(req.params.creatorId);
+        res.json(await service.runScheduled(actor, creatorId));
+        await deliver(actor, creatorId);
+      });
       router.post("/:creatorId/studio/effects/run", async (req, res) =>
         res.json(
           await service.drainEffects(
@@ -304,15 +360,10 @@ export function contentFeature(service: ContentService): FeatureRegistration {
         res.json(await service.review(await actorFor(req), p.creatorId, p.id));
       });
       router.post("/:creatorId/:id/publish", async (req, res) => {
-        const p = ids(req);
-        res.json(
-          await service.publish(
-            await actorFor(req),
-            p.creatorId,
-            p.id,
-            req.body,
-          ),
-        );
+        const p = ids(req),
+          actor = await actorFor(req);
+        res.json(await service.publish(actor, p.creatorId, p.id, req.body));
+        await deliver(actor, p.creatorId);
       });
       router.post("/:creatorId/:id/team-publish", async (req, res) => {
         const p = ids(req);
