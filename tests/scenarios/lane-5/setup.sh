@@ -33,9 +33,26 @@ if ! docker exec "$NAME" psql -U postgres -Atc \
     W8_LEGACY_ROOT_MIGRATIONS=false \
     node --import tsx apps/backend/scripts/migrate-trust.ts | tail -3
 fi
+# Migration 0089 (the creator/fan denial a Note's fan-out asks) ships in a later
+# wave the stock trust runtime needs; this host needs only that one function.
+if ! docker exec "$NAME" psql -U postgres -d "$BASE" -Atc \
+  "select to_regprocedure('creator_trust.creator_fan_denial(uuid,uuid)') is not null" | grep -q t; then
+  docker exec -i "$NAME" psql -U postgres -d "$BASE" -v ON_ERROR_STOP=1 \
+    <apps/backend/migrations/0089_w8_creator_fan_denial.sql >/dev/null
+fi
 for role in creator_runtime growth_runtime growth_worker \
   creator_trust_runtime creator_trust_worker; do
   docker exec "$NAME" psql -U postgres -d "$BASE" \
     -c "ALTER ROLE $role PASSWORD '$PW'" >/dev/null
 done
+# The Growth API pool is one login role that inherits exactly creator_runtime and
+# growth_runtime and owns nothing (apps/backend/src/db/growth-api-pool.ts).
+docker exec -i "$NAME" psql -U postgres -d "$BASE" >/dev/null <<SQL
+DO \$\$ BEGIN
+  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='growth_api') THEN
+    CREATE ROLE growth_api LOGIN INHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS PASSWORD '$PW';
+    GRANT creator_runtime, growth_runtime TO growth_api;
+  END IF;
+END \$\$;
+SQL
 sh "$(dirname "$0")/reset.sh"

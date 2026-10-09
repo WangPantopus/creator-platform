@@ -9,6 +9,7 @@ import {
   publicationCommand,
   reactionCommand,
 } from "./service.js";
+import type { Actor } from "../identity/adapter.js";
 import { ThreadPresence } from "./thread-presence.js";
 import { invariant } from "../../core/errors.js";
 
@@ -109,6 +110,17 @@ export function contentSignedSubjects(
 }
 export function contentFeature(service: ContentService): FeatureRegistration {
   const presence = new ThreadPresence(service);
+  /** WP 5.2: once the creator has her answer, finish her pending downstream
+   * work (tell a Note's audience, tell a reacted-to fan) in the same session.
+   * Never fails her request: anything that cannot finish stays pending, and the
+   * Studio's effects run retries it. */
+  const deliver = async (actor: Actor, creatorId: string) => {
+    try {
+      await service.drainEffects(actor, creatorId);
+    } catch {
+      /* pending effects are retried by the Studio's effects run */
+    }
+  };
   return {
     name: "content",
     path: "/v1/content",
@@ -218,10 +230,10 @@ export function contentFeature(service: ContentService): FeatureRegistration {
         );
       });
       router.post("/:creatorId/replies/:id/reaction", async (req, res) => {
-        const p = ids(req);
-        res.json(
-          await service.react(await actorFor(req), p.creatorId, p.id, req.body),
-        );
+        const p = ids(req),
+          actor = await actorFor(req);
+        res.json(await service.react(actor, p.creatorId, p.id, req.body));
+        await deliver(actor, p.creatorId);
       });
       router.post("/:creatorId/replies/:id/withdraw", async (req, res) => {
         const p = ids(req);
@@ -285,14 +297,12 @@ export function contentFeature(service: ContentService): FeatureRegistration {
           ),
         ),
       );
-      router.post("/:creatorId/studio/scheduled/run", async (req, res) =>
-        res.json(
-          await service.runScheduled(
-            await actorFor(req),
-            z.uuid().parse(req.params.creatorId),
-          ),
-        ),
-      );
+      router.post("/:creatorId/studio/scheduled/run", async (req, res) => {
+        const actor = await actorFor(req),
+          creatorId = z.uuid().parse(req.params.creatorId);
+        res.json(await service.runScheduled(actor, creatorId));
+        await deliver(actor, creatorId);
+      });
       router.post("/:creatorId/studio/effects/run", async (req, res) =>
         res.json(
           await service.drainEffects(
@@ -316,15 +326,10 @@ export function contentFeature(service: ContentService): FeatureRegistration {
         res.json(await service.review(await actorFor(req), p.creatorId, p.id));
       });
       router.post("/:creatorId/:id/publish", async (req, res) => {
-        const p = ids(req);
-        res.json(
-          await service.publish(
-            await actorFor(req),
-            p.creatorId,
-            p.id,
-            req.body,
-          ),
-        );
+        const p = ids(req),
+          actor = await actorFor(req);
+        res.json(await service.publish(actor, p.creatorId, p.id, req.body));
+        await deliver(actor, p.creatorId);
       });
       router.post("/:creatorId/:id/team-publish", async (req, res) => {
         const p = ids(req);

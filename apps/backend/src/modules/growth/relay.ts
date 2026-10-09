@@ -1,5 +1,5 @@
 import { copy } from "@qelvora/copy";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { z } from "zod";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError } from "../../core/errors.js";
@@ -18,6 +18,12 @@ export const Producer = z.enum([
   "trust",
 ]);
 export type GrowthProducer = z.infer<typeof Producer>;
+
+/** A UUID derived from a key, so an owner can name the same event again. */
+export function stableUuid(key: string) {
+  const hex = createHash("sha256").update(key).digest("hex");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-a${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
+}
 
 /** A producer owns scope, recipients and mapping. Never expose these callbacks to HTTP. */
 export interface GrowthEventSource {
@@ -134,6 +140,129 @@ export class GrowthRelay {
           );
         return { queued: true, inserted: Boolean(inserted.rowCount) };
       },
+    );
+  }
+
+  /** Queue one event for a whole audience, in chunks of at most 500 recipients
+   * (the envelope's cap). Safe to call again after a crash, from two requests at
+   * once, or after the audience changed: each chunk is its own short
+   * transaction (the erasure fence takes one lock per recipient), serialized per
+   * subject, and queues only recipients no earlier chunk of this subject holds.
+   * Chunk ids are derived from their recipients, so replaying a chunk is a
+   * no-op. Returns how many recipients were newly queued. */
+  async enqueueRecipients(
+    producer: GrowthProducer,
+    input: {
+      type: Exclude<GrowthEvent["type"], "spending_reminder">;
+      creatorId: string;
+      aggregateId: string;
+      aggregateVersion: number;
+      causationId: string;
+      correlationId: string;
+      occurredAt: string;
+      recipients: readonly { accountId: string; role: "fan" | "creator" }[];
+    },
+  ) {
+    const owner = Producer.parse(producer);
+    z.uuid().parse(input.creatorId);
+    z.uuid().parse(input.aggregateId);
+    const wanted = [
+      ...new Map(
+        input.recipients.map((r) => [`${r.role}:${r.accountId}`, r]),
+      ).values(),
+    ].sort((a, b) => (a.accountId < b.accountId ? -1 : 1));
+    let queued = 0;
+    // Recipients this call has already dealt with, queued or erased, so a chunk
+    // that stores nothing still lets the next pass move on.
+    const handled = new Set<string>();
+    for (let guard = 0; guard < 1000; guard++) {
+      const progressed = await this.service.db.transaction(
+        this.service.db.worker,
+        async (client) => {
+          await client.query(
+            "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+            [`growth.audience:${input.type}:${input.aggregateId}`],
+          );
+          const held = new Set(
+            (
+              await client.query<{ key: string }>(
+                `SELECT (r->>'role')||':'||(r->>'accountId') AS key
+                 FROM growth.producer_relay p, jsonb_array_elements(p.envelope->'recipients') r
+                 WHERE p.producer=$1 AND p.creator_id=$2
+                 AND p.envelope->>'type'=$3 AND p.envelope->>'aggregateId'=$4`,
+                [owner, input.creatorId, input.type, input.aggregateId],
+              )
+            ).rows.map((row) => row.key),
+          );
+          const next = wanted
+            .filter((r) => {
+              const key = `${r.role}:${r.accountId}`;
+              return !held.has(key) && !handled.has(key);
+            })
+            .slice(0, 500);
+          if (!next.length) return false;
+          for (const r of next) handled.add(`${r.role}:${r.accountId}`);
+          const event = EventEnvelope.parse({
+            id: stableUuid(
+              `growth.audience:${input.type}:${input.aggregateId}:${next
+                .map((r) => `${r.role}:${r.accountId}`)
+                .join(",")}`,
+            ),
+            schemaVersion: 1,
+            type: input.type,
+            creatorId: input.creatorId,
+            aggregateId: input.aggregateId,
+            aggregateVersion: input.aggregateVersion,
+            causationId: input.causationId,
+            correlationId: input.correlationId,
+            occurredAt: input.occurredAt,
+            recipients: next,
+          });
+          const retained = await this.service.erasure.event(client, event);
+          if (!retained) return true;
+          const inserted = await client.query(
+            "INSERT INTO growth.producer_relay(id,producer,creator_id,envelope,envelope_hash) VALUES($1,$2,$3,$4,$5) ON CONFLICT DO NOTHING",
+            [
+              event.id,
+              owner,
+              input.creatorId,
+              retained,
+              contentHash({ producer: owner, event: retained }),
+            ],
+          );
+          queued += inserted.rowCount ? retained.recipients.length : 0;
+          return true;
+        },
+      );
+      if (!progressed) return { queued };
+    }
+    throw new DomainError(
+      "audience_too_large",
+      copy.growthTheServiceIsUnavailablePleaseTryAgain,
+      503,
+    );
+  }
+
+  /** Has anything been queued for this subject yet? Lets an owner treat a later
+   * edit as silent without keeping its own record. */
+  async hasAudience(
+    producer: GrowthProducer,
+    creatorId: string,
+    type: GrowthEvent["type"],
+    aggregateId: string,
+  ) {
+    return (
+      (
+        await this.service.db.worker.query(
+          "SELECT 1 FROM growth.producer_relay WHERE producer=$1 AND creator_id=$2 AND envelope->>'type'=$3 AND envelope->>'aggregateId'=$4 LIMIT 1",
+          [
+            Producer.parse(producer),
+            z.uuid().parse(creatorId),
+            type,
+            z.uuid().parse(aggregateId),
+          ],
+        )
+      ).rowCount === 1
     );
   }
 

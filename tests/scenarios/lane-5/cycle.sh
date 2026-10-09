@@ -6,10 +6,15 @@ set -eu
 ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 cd "$ROOT"
 pkill -f 'tests/scenarios/lane-5/host.mts' 2>/dev/null || true
+# A graceful stop drains the growth worker, which can take several seconds.
 tries=0
 while pgrep -f 'tests/scenarios/lane-5/host.mts' >/dev/null; do
   tries=$((tries + 1))
-  [ "$tries" -gt 200 ] && { echo "host did not stop" >&2; exit 1; }
+  if [ "$tries" -gt 150 ]; then
+    pkill -9 -f 'tests/scenarios/lane-5/host.mts' 2>/dev/null || true
+    break
+  fi
+  sleep 0.2
 done
 sh tests/scenarios/lane-5/reset.sh
 LOG="${TMPDIR:-/tmp}/qelvora-lane5-host.log"
