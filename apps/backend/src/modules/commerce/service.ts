@@ -2880,7 +2880,15 @@ export class CommerceService {
         );
         if (p.state === "releasing") {
           await this.releaseCapacity(client, p);
-          await this.ledger(client, p, "release", effect.provider_key);
+          // A release undoes a hold. A request that never held (3-D Secure
+          // abandoned, or withdrawn before it authorized) has nothing to undo, so
+          // the ledger must not show money released that was never held.
+          const held = await client.query(
+            "SELECT 1 FROM creator.commerce_ledger WHERE packet_id=$1 AND kind='hold' AND cause=$2",
+            [p.id, `${p.id}:authorize:${p.authorization_attempt}`],
+          );
+          if (held.rowCount)
+            await this.ledger(client, p, "release", effect.provider_key);
           await client.query(
             "UPDATE creator.commerce_packet SET state=$2,payment_state='released',version=version+1,updated_at=now() WHERE id=$1",
             [p.id, p.terminal_target],

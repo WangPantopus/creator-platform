@@ -1546,23 +1546,45 @@ describeMoney("commerce money path: deadlines, crashes, races", () => {
     });
 
     // DEFECT-3 (ledger accuracy): a release for a hold that never existed.
+    // Fixed in "FIX: do not book a release for a hold that never existed".
     // Releasing a request that never had a hold (3-D Secure abandoned, or withdrawn
-    // before authorizing) writes a `release` ledger entry for the full price with no
+    // before authorizing) wrote a `release` ledger entry for the full price with no
     // matching `hold`.
-    it.fails(
-      "DEFECT-3: the ledger must not show a release for a hold that never existed",
-      async () => {
+    it.each([
+      {
+        how: "withdrawn",
+        run: (w: World, id: string) => w.withdraw(w.fan, id),
+      },
+      {
+        how: "expired",
+        run: async (w: World, id: string) => {
+          await w.setAuthPendingUntil(id, -60);
+          await w.service.reconcileDeadlines(w.fan.actor);
+        },
+      },
+    ])(
+      "INV-16: a 3-D Secure request that is $how books no release, because it never held",
+      async ({ run }) => {
         const world = await fixture.newWorld({ weeklyLimit: 1 });
         const view = await world.submit(world.fan, {
           paymentMethodId: "pm_cardAuthRequired",
         });
-        await world.withdraw(world.fan, view.packet.id);
-        const kinds = await world.ledgerKinds(view.packet.id);
-        expect(kinds.includes("release") && !kinds.includes("hold")).toBe(
-          false,
+        await run(world, view.packet.id);
+        expect(world.provider.intent(view.packet.intent_ref!).status).toBe(
+          "canceled",
         );
+        expect(await world.ledger(view.packet.id)).toEqual([]);
+        expect(await world.capacity()).toMatchObject({ reserved: 0 });
+        await world.assertConserved();
       },
     );
+
+    it("INV-16: a request that did hold books exactly one hold and one release", async () => {
+      const world = await fixture.newWorld({ weeklyLimit: 1 });
+      const { packet } = await world.submitted();
+      await world.withdraw(world.fan, packet.id);
+      expect(await world.ledgerKinds(packet.id)).toEqual(["hold", "release"]);
+    });
 
     // DEFECT-4 (aggregate version): polling a request that waits for 3-D Secure.
     // reconcile() rewrites it with version+1 each time although nothing changed, so
