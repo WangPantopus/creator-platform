@@ -162,8 +162,11 @@ L two weeks or more.
   denials and provider dependencies into the same `createConfiguredBackend` seam. So this is a
   second composition root that needs those adapters, not a flag, and it waits on the
   [identity contract](operations/pantopus-identity-contract.md).
-- Real sign-in: the Pantopus adapter (Q01) or an agreed interim; release sign-in on both
-  phones. L external, M each.
+- Real sign-in. Pantopus is not an OAuth provider and has no verified 18+ signal (research of
+  2026-10-08; see the [identity contract](operations/pantopus-identity-contract.md)). The
+  recommendation *(to confirm)* is a Qelvora-owned sign-in as a second adapter for the pilot,
+  with its own 18+ approach, and a Pantopus connect flow later; then release sign-in on both
+  phones. L, then M each.
 - Domain and relying-party ID (Q09), then associated domains, app links and passkeys on
   devices; push credentials.
 - Store requirements: iOS app icon, privacy manifest, entitlements and trimmed background
@@ -257,18 +260,19 @@ Decided on 2026-10-08 (recommendations confirmed):
 
 Still to confirm:
 
-1. **Voice notes.** Written replies first; voice later (section 4).
-2. **Launch-quality bars** in section 5.
-3. **Calls only the founder can make.** Whether an AI reply may state a price from the
+1. **Pilot sign-in and 18+.** The recommendation and seven questions in the
+   [identity contract](operations/pantopus-identity-contract.md).
+2. **Voice notes.** Written replies first; voice later (section 4).
+3. **Launch-quality bars** in section 5.
+4. **Calls only the founder can make.** Whether an AI reply may state a price from the
    creator's own materials (INV-21); taking the model safety check off the path before
    acknowledgement; a single signed act for accept and deliver (INV-22); formalizing Q13 and
    Q14, which the working documents already treat as decided.
 
 Inputs only the founder can supply:
 
-1. The Pantopus sign-in contract (Q01), or a decision to launch the pilot with an interim
-   sign-in. What is needed, and four decisions, are in the
-   [identity contract](operations/pantopus-identity-contract.md).
+1. The Q01 decisions in the [identity contract](operations/pantopus-identity-contract.md):
+   the sign-in option for the pilot, what defines 18+, and which account id Qelvora receives.
 2. The final domain and relying-party ID (Q09). Passkeys and universal links depend on it.
 3. Apple Developer and Google Play accounts, TestFlight and closed testing, and at least one
    physical iPhone and one Android phone (Q10, Q11).

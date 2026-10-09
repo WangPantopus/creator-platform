@@ -1,44 +1,61 @@
 # Current state
 
-Written 2026-10-08, after the launch review. Update this file at the end of every work
-session; it replaces the long handoffs as the place to start. Approvals come from the
-founder in the chat, never from a file.
+Written 2026-10-08. Update this file at the end of every work session; it replaces the long
+handoffs as the place to start and is meant to answer two questions: what is being worked on
+right now, and what remains. Approvals come from the founder in the chat, never from a file.
 
 ## Where things stand
 
-- Main was at `95abce43c` when this was written. No pull requests were open: #351, #352 and
-  #353 (comparison export reference, creator upgrade evidence, view lifetime) merged the same
-  day.
-- Only the development host runs the product. A non-development backend serves health and
-  nothing else, and no Pantopus identity adapter exists (Q01).
+- Only the development host runs the product. A non-development backend serves only health,
+  the OpenAPI document and identity capabilities, and no production identity adapter exists.
+- **Pantopus is not an OAuth provider and has no verified 18+ signal** (researched 2026-10-08),
+  so sign-in is a bigger piece of work than client registration. Options and seven decisions:
+  [identity contract](pantopus-identity-contract.md).
 - Comparison is installed and off: leave `TRUST_DEVELOPMENT_COMPARISON_POLICY` unset. Its
   migrations stay because export and delete are composed from them.
 - The development scenario (fictional Maya, synthetic OpenAI configuration) is
   development-only and not a production approval.
+- A JDK 17 and XcodeGen are installed on the founder's Mac under `~/.local/tooling` (checksums
+  verified), so Android and iOS build here. On current main, Android assemble, unit tests,
+  Paparazzi verification and Lint pass, and the iOS app builds with its privacy manifest in
+  the bundle.
 
-## Plan
+## In flight
+
+- **Money tests** (background agent, own worktree): a Postgres-backed harness with a fake
+  payment provider, covering capture only after a signed accept, late decline, expiry, refund,
+  capacity under concurrency and idempotency. Result: a pull request, with any defects found.
+- **Main's CI** for the merged work: the macOS jobs run slowly on one runner, and every merge
+  to main cancels the run in progress. Merges are therefore batched.
+- **Open pull request:** Android Lint fixes. A docs update (this file and the identity
+  contract) is open with it.
+- **Waiting on the founder:** the Q01 decisions below.
+
+## Plan to completion
 
 [LAUNCH_PLAN](../LAUNCH_PLAN.md) sets scope and order: five moments, phone apps first, the
-share card in, everything else planned for later. The evidence behind it, with file
-references and sizes, is the [launch review](launch-review-2026-10-08.md).
+share card in, everything else planned for later. The evidence is the
+[launch review](launch-review-2026-10-08.md).
 
-Next, in order:
-
-1. Finish step 0: withdraw-only mode with retry for comparison, an overdue-purge alert and a
-   short runbook; then stop comparison work.
-2. Step 1: a production host with a real identity adapter, and phone builds that can sign in.
-   Blocked on the inputs below.
-3. Steps 2 to 5 in parallel once step 1 has a host.
+| Step | Work | State | Waiting on |
+| --- | --- | --- | --- |
+| 0 | Clear the deck | Merges, docs and evidence policy done. Comparison withdraw-only mode, overdue-purge alert and runbook not started (they do not affect launch while the flag is off) | nothing |
+| 1 | A real host on real phones | Store hygiene started (privacy manifest, Android fixes). Sign-in, production composition, domain, push, store accounts not started | Q01 decisions, accounts, domain |
+| 2 | First answer: speed, guard, FAQ publish check, entry links, provider switch | Not started. The guard fixes ship with the provider switch as the next engine revision | provider and embedding decision |
+| 3 | Remembered, and the person shows up | Fans can read members and tier Notes (not operated). Memory wiring, Note and reaction delivery, push not started | Touch ID ceremony to operate |
+| 4 | Honest money | Late decline merged; tests in flight. Scheduler needs a work index from the identity or operations adapter; Stripe run needs keys | Stripe test keys, step 1 adapter |
+| 5 | The creator's five minutes | Not started | step 1 |
+| 6 | Share card, measurement, ops, release readiness | Not started | counsel, pilot creators |
 
 ## Needed from the founder
 
-- The Pantopus sign-in contract (Q01), or a decision to start with an interim sign-in; see
-  the [identity contract](pantopus-identity-contract.md).
+- The Q01 decisions in the [identity contract](pantopus-identity-contract.md): the pilot
+  sign-in option, what defines 18+, and which account id Qelvora receives.
 - The final domain and relying-party ID (Q09).
 - Apple Developer and Google Play accounts, and at least one iPhone and one Android phone.
 - Stripe test-mode keys and the account topology (Q03).
 - A Touch ID ceremony for the development creator and the creator verification approval.
-- Counsel on paid replies in the apps (Q04).
+- Counsel on paid replies in the apps (Q04) and on the 18+ method.
 - Three to five pilot creators and a named reviewer for Note replies and safety cases.
 
 ## Dates
@@ -57,6 +74,8 @@ Next, in order:
   catalogue checksums (inferred, [review](launch-review-2026-10-08.md) section 3): export and
   delete would refuse to run until the catalogues are regenerated and reviewed.
 - Heavy native builds run one at a time under `scripts/with-heavy-build-lock.mjs`.
+- Merging to main cancels main's run in progress (`cancel-in-progress`), and the macOS jobs
+  take an hour or more, so batch merges.
 - Evidence: at most 1 MB per pull request and 300 KB per file under `artifacts/`: a README, a
   manifest (path, sha256, bytes) and at most five screenshots that carry a decision. Raw logs,
   bundles and patches stay outside git. Never commit home paths or environment-file locations.
