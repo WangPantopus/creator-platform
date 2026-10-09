@@ -17,26 +17,34 @@ const [a, b] = [await load(before), await load(after)];
 const problems = [];
 const same = (x, y) => JSON.stringify(x) === JSON.stringify(y);
 // Reads that start together have no fixed order, and whether the page cancels a read before its
-// answer lands is a race, so reads compare as a sorted set with "aborted" counted as answered.
+// answer lands is a race, so reads compare as a sorted list with "aborted" counted as answered.
+// In the first shot of a step they compare as a set: while a page loads, how often a read repeats
+// depends on how long the load took (a 4-second refresh can land in it), not on the code. Repeats
+// are covered by the later shots, where time is paused, and by the polling cadence.
 // Writes (anything but GET) compare in order, exactly.
-const splitCalls = (list) => {
+const splitCalls = (list, first) => {
   const line = (e) =>
     JSON.stringify({ ...e, status: e.status === "aborted" ? 200 : e.status });
+  const reads = list
+    .filter((e) => e.call.startsWith("GET "))
+    .map(line)
+    .sort();
   return {
-    reads: list
-      .filter((e) => e.call.startsWith("GET "))
-      .map(line)
-      .sort(),
+    reads: first ? [...new Set(reads)] : reads,
     writes: list.filter((e) => !e.call.startsWith("GET ")).map(line),
   };
 };
-const sameCalls = (x, y) => same(splitCalls(x), splitCalls(y));
-const callDiff = (x, y) => {
-  const [p, q] = [splitCalls(x), splitCalls(y)];
+const sameCalls = (x, y, first) =>
+  same(splitCalls(x, first), splitCalls(y, first));
+const callDiff = (x, y, first) => {
+  const [p, q] = [splitCalls(x, first), splitCalls(y, first)];
   const writes = firstDiff(p.writes, q.writes);
   if (writes) return `a write ${writes}`;
   const only = (m, n) => m.reads.filter((r) => !n.reads.includes(r));
-  return `a read: ${only(p, q)[0] ?? "(none)"} <> ${only(q, p)[0] ?? "(none)"}`;
+  const [a, b] = [only(p, q)[0], only(q, p)[0]];
+  if (!a && !b)
+    return `a read repeated a different number of times (${p.reads.length} <> ${q.reads.length} reads)`;
+  return `a read: ${a ?? "(none)"} <> ${b ?? "(none)"}`;
 };
 const firstDiff = (x, y) => {
   const n = Math.max(x.length, y.length);
@@ -44,9 +52,10 @@ const firstDiff = (x, y) => {
     if (!same(x[i], y[i]))
       return `#${i}: ${JSON.stringify(x[i])} <> ${JSON.stringify(y[i])}`;
 };
-// Pixels may differ by at most 4/255 in at most 64 places before a shot counts as changed. The existing
+// Pixels may differ by at most 8/255 in at most 64 places before a shot counts as changed. The existing
 // visual suite allows 64 pixels at 2/255 for Chromium rounding native control corners (tests/visual/README.md);
-// the same code shows up to 3/255 on the native search box, so the level here is 4.
+// identical code shows up to 6/255 at the corners of native selects and search boxes, so the level here is 8.
+// A changed word, colour or position moves hundreds of pixels by far more than that.
 async function pixels(shot) {
   const [p, q] = (
     await Promise.all([
@@ -71,7 +80,7 @@ async function pixels(shot) {
     );
   }
   const text = `${count} pixels differ, by at most ${max}/255`;
-  if (count <= 64 && max <= 4) return { noise: text };
+  if (count <= 64 && max <= 8) return { noise: text };
   await writeFile(`${after}/diff-${shot.png}`, PNG.sync.write(diff));
   return { problem: `${text} (diff-${shot.png})` };
 }
@@ -97,9 +106,9 @@ for (const shot of a.shots) {
     if (problem) problems.push(`${shot.key}: screenshot ${problem}`);
     else noisy.push(`${shot.key}: ${noise}`);
   }
-  if (!sameCalls(shot.requests, other.requests))
+  if (!sameCalls(shot.requests, other.requests, shot.first))
     problems.push(
-      `${shot.key}: /api calls differ at ${callDiff(shot.requests, other.requests)}`,
+      `${shot.key}: /api calls differ at ${callDiff(shot.requests, other.requests, shot.first)}`,
     );
   if (!same(shot.console, other.console))
     problems.push(
@@ -111,7 +120,7 @@ for (const shot of a.shots) {
     );
   if (
     exact &&
-    sameCalls(shot.requests, other.requests) &&
+    sameCalls(shot.requests, other.requests, shot.first) &&
     same(shot.tabs, other.tabs) &&
     same(shot.console, other.console)
   )
@@ -136,7 +145,7 @@ console.log(
 );
 if (noisy.length)
   console.log(
-    `${noisy.length} shot(s) equal within rendering tolerance (at most 64 pixels, at most 4/255):\n  ${noisy.join("\n  ")}`,
+    `${noisy.length} shot(s) equal within rendering tolerance (at most 64 pixels, at most 8/255):\n  ${noisy.join("\n  ")}`,
   );
 for (const p of problems) console.log(`DIFF ${p}`);
 console.log(
