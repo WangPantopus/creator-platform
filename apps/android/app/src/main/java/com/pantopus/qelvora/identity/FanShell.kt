@@ -444,7 +444,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
         appliedReturn = returnTo; appliedDelivery = destinationDelivery
     }
     LaunchedEffect(model.destination) { model.loadArrival() }
-    LaunchedEffect(model, foreground) { if (foreground) { model.refresh(); while (true) { delay(4000); if (!model.choosingActor && !model.busy && (model.session != null || model.hasSavedCredential)) model.refresh() } } }
+    LaunchedEffect(model, foreground) { if (foreground) { model.refresh(); HarnessLaunch.signInIfRequested(context, model); while (true) { delay(4000); if (!model.choosingActor && !model.busy && (model.session != null || model.hasSavedCredential)) model.refresh() } } }
     LaunchedEffect(model.session?.sessionId, model.checkingSession, foreground) {
         if (foreground && !model.checkingSession) GrowthPush.refresh(context)
     }
