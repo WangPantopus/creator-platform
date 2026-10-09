@@ -2355,6 +2355,121 @@ enum class APIThanksCommandTargetKind {
 }
 
 @Serializable
+data class APIThreadPresenceAudience(
+  val `kind`: APIThreadPresenceAudienceKind,
+  val `label`: String,
+  val `glyph`: APIThreadPresenceAudienceGlyph
+)
+
+@Serializable
+enum class APIThreadPresenceAudienceKind {
+  @SerialName("followers") FOLLOWERS,
+  @SerialName("members") MEMBERS,
+  @SerialName("tiers") TIERS,
+  @SerialName("groups") GROUPS
+}
+
+@Serializable
+enum class APIThreadPresenceAudienceGlyph {
+  @SerialName("broadcast") BROADCAST
+}
+
+typealias APIThreadPresenceCursor = String
+
+typealias APIThreadPresenceItem = JsonElement
+
+@Serializable
+data class APIThreadPresenceNote(
+  val `authorKind`: APIThreadPresenceNoteAuthorKind,
+  val `id`: String,
+  val `version`: Long,
+  val `creatorId`: String,
+  val `creatorName`: String,
+  val `authorLabel`: String,
+  val `glyph`: APIThreadPresenceNoteGlyph,
+  val `audience`: APIThreadPresenceNoteAudience,
+  val `text`: String,
+  val `signedActId`: String,
+  val `occurredAt`: String
+)
+
+@Serializable
+enum class APIThreadPresenceNoteAuthorKind {
+  @SerialName("human_broadcast") HUMAN_BROADCAST
+}
+
+@Serializable
+enum class APIThreadPresenceNoteGlyph {
+  @SerialName("broadcast") BROADCAST
+}
+
+@Serializable
+data class APIThreadPresenceNoteAudience(
+  val `kind`: APIThreadPresenceNoteAudienceKind,
+  val `label`: String,
+  val `glyph`: APIThreadPresenceNoteAudienceGlyph
+)
+
+@Serializable
+enum class APIThreadPresenceNoteAudienceKind {
+  @SerialName("followers") FOLLOWERS,
+  @SerialName("members") MEMBERS,
+  @SerialName("tiers") TIERS,
+  @SerialName("groups") GROUPS
+}
+
+@Serializable
+enum class APIThreadPresenceNoteAudienceGlyph {
+  @SerialName("broadcast") BROADCAST
+}
+
+@Serializable
+data class APIThreadPresencePage(
+  val `items`: List<JsonElement>,
+  @Required
+  val `nextBefore`: String? = null,
+  val `serverTime`: String
+)
+
+@Serializable
+data class APIThreadPresenceQuery(
+  val `limit`: Long,
+  val `before`: String? = null
+)
+
+@Serializable
+data class APIThreadPresenceReaction(
+  val `authorKind`: APIThreadPresenceReactionAuthorKind,
+  val `id`: String,
+  val `creatorId`: String,
+  val `creatorName`: String,
+  val `authorLabel`: String,
+  val `glyph`: APIThreadPresenceReactionGlyph,
+  val `reaction`: APIThreadPresenceReactionReaction,
+  val `replyId`: String,
+  val `noteId`: String,
+  val `signedActId`: String,
+  val `occurredAt`: String
+)
+
+@Serializable
+enum class APIThreadPresenceReactionAuthorKind {
+  @SerialName("human_reaction") HUMAN_REACTION
+}
+
+@Serializable
+enum class APIThreadPresenceReactionGlyph {
+  @SerialName("heart") HEART
+}
+
+@Serializable
+enum class APIThreadPresenceReactionReaction {
+  @SerialName("heart") HEART,
+  @SerialName("thanks") THANKS,
+  @SerialName("helpful") HELPFUL
+}
+
+@Serializable
 data class APIStudioInvite(
   val `handle`: String,
   val `roles`: List<APIStudioInviteRolesItem>
@@ -5405,6 +5520,121 @@ data class APIContentThanksCommand(
 enum class APIContentThanksCommandTargetKind {
   @SerialName("content") CONTENT,
   @SerialName("message") MESSAGE
+}
+
+@Serializable
+data class APIContentThreadPresenceAudience(
+  val `kind`: APIContentThreadPresenceAudienceKind,
+  val `label`: String,
+  val `glyph`: APIContentThreadPresenceAudienceGlyph
+)
+
+@Serializable
+enum class APIContentThreadPresenceAudienceKind {
+  @SerialName("followers") FOLLOWERS,
+  @SerialName("members") MEMBERS,
+  @SerialName("tiers") TIERS,
+  @SerialName("groups") GROUPS
+}
+
+@Serializable
+enum class APIContentThreadPresenceAudienceGlyph {
+  @SerialName("broadcast") BROADCAST
+}
+
+typealias APIContentThreadPresenceCursor = String
+
+typealias APIContentThreadPresenceItem = JsonElement
+
+@Serializable
+data class APIContentThreadPresenceNote(
+  val `authorKind`: APIContentThreadPresenceNoteAuthorKind,
+  val `id`: String,
+  val `version`: Long,
+  val `creatorId`: String,
+  val `creatorName`: String,
+  val `authorLabel`: String,
+  val `glyph`: APIContentThreadPresenceNoteGlyph,
+  val `audience`: APIContentThreadPresenceNoteAudience,
+  val `text`: String,
+  val `signedActId`: String,
+  val `occurredAt`: String
+)
+
+@Serializable
+enum class APIContentThreadPresenceNoteAuthorKind {
+  @SerialName("human_broadcast") HUMAN_BROADCAST
+}
+
+@Serializable
+enum class APIContentThreadPresenceNoteGlyph {
+  @SerialName("broadcast") BROADCAST
+}
+
+@Serializable
+data class APIContentThreadPresenceNoteAudience(
+  val `kind`: APIContentThreadPresenceNoteAudienceKind,
+  val `label`: String,
+  val `glyph`: APIContentThreadPresenceNoteAudienceGlyph
+)
+
+@Serializable
+enum class APIContentThreadPresenceNoteAudienceKind {
+  @SerialName("followers") FOLLOWERS,
+  @SerialName("members") MEMBERS,
+  @SerialName("tiers") TIERS,
+  @SerialName("groups") GROUPS
+}
+
+@Serializable
+enum class APIContentThreadPresenceNoteAudienceGlyph {
+  @SerialName("broadcast") BROADCAST
+}
+
+@Serializable
+data class APIContentThreadPresencePage(
+  val `items`: List<JsonElement>,
+  @Required
+  val `nextBefore`: String? = null,
+  val `serverTime`: String
+)
+
+@Serializable
+data class APIContentThreadPresenceQuery(
+  val `limit`: Long,
+  val `before`: String? = null
+)
+
+@Serializable
+data class APIContentThreadPresenceReaction(
+  val `authorKind`: APIContentThreadPresenceReactionAuthorKind,
+  val `id`: String,
+  val `creatorId`: String,
+  val `creatorName`: String,
+  val `authorLabel`: String,
+  val `glyph`: APIContentThreadPresenceReactionGlyph,
+  val `reaction`: APIContentThreadPresenceReactionReaction,
+  val `replyId`: String,
+  val `noteId`: String,
+  val `signedActId`: String,
+  val `occurredAt`: String
+)
+
+@Serializable
+enum class APIContentThreadPresenceReactionAuthorKind {
+  @SerialName("human_reaction") HUMAN_REACTION
+}
+
+@Serializable
+enum class APIContentThreadPresenceReactionGlyph {
+  @SerialName("heart") HEART
+}
+
+@Serializable
+enum class APIContentThreadPresenceReactionReaction {
+  @SerialName("heart") HEART,
+  @SerialName("thanks") THANKS,
+  @SerialName("helpful") HELPFUL
 }
 
 @Serializable

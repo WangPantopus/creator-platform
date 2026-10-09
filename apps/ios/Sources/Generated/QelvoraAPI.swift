@@ -4515,6 +4515,167 @@ public enum APIThanksCommandTargetKind: String, Codable, Sendable {
   case `message` = "message"
 }
 
+public struct APIThreadPresenceAudience: Codable, Sendable {
+  public let `kind`: APIThreadPresenceAudienceKind
+  public let `label`: String
+  public let `glyph`: APIThreadPresenceAudienceGlyph
+  public init(kind: APIThreadPresenceAudienceKind, label: String, glyph: APIThreadPresenceAudienceGlyph) {
+    self.kind = kind
+    self.label = label
+    self.glyph = glyph
+  }
+}
+
+public enum APIThreadPresenceAudienceKind: String, Codable, Sendable {
+  case `followers` = "followers"
+  case `members` = "members"
+  case `tiers` = "tiers"
+  case `groups` = "groups"
+}
+
+public enum APIThreadPresenceAudienceGlyph: String, Codable, Sendable {
+  case `broadcast` = "broadcast"
+}
+
+public typealias APIThreadPresenceCursor = String
+
+public typealias APIThreadPresenceItem = APIJSONValue
+
+public struct APIThreadPresenceNote: Codable, Sendable {
+  public let `authorKind`: APIThreadPresenceNoteAuthorKind
+  public let `id`: String
+  public let `version`: Int
+  public let `creatorId`: String
+  public let `creatorName`: String
+  public let `authorLabel`: String
+  public let `glyph`: APIThreadPresenceNoteGlyph
+  public let `audience`: APIThreadPresenceNoteAudience
+  public let `text`: String
+  public let `signedActId`: String
+  public let `occurredAt`: String
+  public init(authorKind: APIThreadPresenceNoteAuthorKind, id: String, version: Int, creatorId: String, creatorName: String, authorLabel: String, glyph: APIThreadPresenceNoteGlyph, audience: APIThreadPresenceNoteAudience, text: String, signedActId: String, occurredAt: String) {
+    self.authorKind = authorKind
+    self.id = id
+    self.version = version
+    self.creatorId = creatorId
+    self.creatorName = creatorName
+    self.authorLabel = authorLabel
+    self.glyph = glyph
+    self.audience = audience
+    self.text = text
+    self.signedActId = signedActId
+    self.occurredAt = occurredAt
+  }
+}
+
+public enum APIThreadPresenceNoteAuthorKind: String, Codable, Sendable {
+  case `human_broadcast` = "human_broadcast"
+}
+
+public enum APIThreadPresenceNoteGlyph: String, Codable, Sendable {
+  case `broadcast` = "broadcast"
+}
+
+public struct APIThreadPresenceNoteAudience: Codable, Sendable {
+  public let `kind`: APIThreadPresenceNoteAudienceKind
+  public let `label`: String
+  public let `glyph`: APIThreadPresenceNoteAudienceGlyph
+  public init(kind: APIThreadPresenceNoteAudienceKind, label: String, glyph: APIThreadPresenceNoteAudienceGlyph) {
+    self.kind = kind
+    self.label = label
+    self.glyph = glyph
+  }
+}
+
+public enum APIThreadPresenceNoteAudienceKind: String, Codable, Sendable {
+  case `followers` = "followers"
+  case `members` = "members"
+  case `tiers` = "tiers"
+  case `groups` = "groups"
+}
+
+public enum APIThreadPresenceNoteAudienceGlyph: String, Codable, Sendable {
+  case `broadcast` = "broadcast"
+}
+
+public struct APIThreadPresencePage: Codable, Sendable {
+  public let `items`: [APIJSONValue]
+  public let `nextBefore`: String?
+  public let `serverTime`: String
+  public init(items: [APIJSONValue], nextBefore: String? = nil, serverTime: String) {
+    self.items = items
+    self.nextBefore = nextBefore
+    self.serverTime = serverTime
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `items`
+    case `nextBefore`
+    case `serverTime`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.items = try container.decode([APIJSONValue].self, forKey: .items)
+    self.nextBefore = try container.decode(String?.self, forKey: .nextBefore)
+    self.serverTime = try container.decode(String.self, forKey: .serverTime)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(items, forKey: .items)
+    try container.encode(nextBefore, forKey: .nextBefore)
+    try container.encode(serverTime, forKey: .serverTime)
+  }
+}
+
+public struct APIThreadPresenceQuery: Codable, Sendable {
+  public let `limit`: Int
+  public let `before`: String?
+  public init(limit: Int, before: String? = nil) {
+    self.limit = limit
+    self.before = before
+  }
+}
+
+public struct APIThreadPresenceReaction: Codable, Sendable {
+  public let `authorKind`: APIThreadPresenceReactionAuthorKind
+  public let `id`: String
+  public let `creatorId`: String
+  public let `creatorName`: String
+  public let `authorLabel`: String
+  public let `glyph`: APIThreadPresenceReactionGlyph
+  public let `reaction`: APIThreadPresenceReactionReaction
+  public let `replyId`: String
+  public let `noteId`: String
+  public let `signedActId`: String
+  public let `occurredAt`: String
+  public init(authorKind: APIThreadPresenceReactionAuthorKind, id: String, creatorId: String, creatorName: String, authorLabel: String, glyph: APIThreadPresenceReactionGlyph, reaction: APIThreadPresenceReactionReaction, replyId: String, noteId: String, signedActId: String, occurredAt: String) {
+    self.authorKind = authorKind
+    self.id = id
+    self.creatorId = creatorId
+    self.creatorName = creatorName
+    self.authorLabel = authorLabel
+    self.glyph = glyph
+    self.reaction = reaction
+    self.replyId = replyId
+    self.noteId = noteId
+    self.signedActId = signedActId
+    self.occurredAt = occurredAt
+  }
+}
+
+public enum APIThreadPresenceReactionAuthorKind: String, Codable, Sendable {
+  case `human_reaction` = "human_reaction"
+}
+
+public enum APIThreadPresenceReactionGlyph: String, Codable, Sendable {
+  case `heart` = "heart"
+}
+
+public enum APIThreadPresenceReactionReaction: String, Codable, Sendable {
+  case `heart` = "heart"
+  case `thanks` = "thanks"
+  case `helpful` = "helpful"
+}
+
 public struct APIStudioInvite: Codable, Sendable {
   public let `handle`: String
   public let `roles`: [APIStudioInviteRolesItem]
@@ -10292,6 +10453,167 @@ public struct APIContentThanksCommand: Codable, Sendable {
 public enum APIContentThanksCommandTargetKind: String, Codable, Sendable {
   case `content` = "content"
   case `message` = "message"
+}
+
+public struct APIContentThreadPresenceAudience: Codable, Sendable {
+  public let `kind`: APIContentThreadPresenceAudienceKind
+  public let `label`: String
+  public let `glyph`: APIContentThreadPresenceAudienceGlyph
+  public init(kind: APIContentThreadPresenceAudienceKind, label: String, glyph: APIContentThreadPresenceAudienceGlyph) {
+    self.kind = kind
+    self.label = label
+    self.glyph = glyph
+  }
+}
+
+public enum APIContentThreadPresenceAudienceKind: String, Codable, Sendable {
+  case `followers` = "followers"
+  case `members` = "members"
+  case `tiers` = "tiers"
+  case `groups` = "groups"
+}
+
+public enum APIContentThreadPresenceAudienceGlyph: String, Codable, Sendable {
+  case `broadcast` = "broadcast"
+}
+
+public typealias APIContentThreadPresenceCursor = String
+
+public typealias APIContentThreadPresenceItem = APIJSONValue
+
+public struct APIContentThreadPresenceNote: Codable, Sendable {
+  public let `authorKind`: APIContentThreadPresenceNoteAuthorKind
+  public let `id`: String
+  public let `version`: Int
+  public let `creatorId`: String
+  public let `creatorName`: String
+  public let `authorLabel`: String
+  public let `glyph`: APIContentThreadPresenceNoteGlyph
+  public let `audience`: APIContentThreadPresenceNoteAudience
+  public let `text`: String
+  public let `signedActId`: String
+  public let `occurredAt`: String
+  public init(authorKind: APIContentThreadPresenceNoteAuthorKind, id: String, version: Int, creatorId: String, creatorName: String, authorLabel: String, glyph: APIContentThreadPresenceNoteGlyph, audience: APIContentThreadPresenceNoteAudience, text: String, signedActId: String, occurredAt: String) {
+    self.authorKind = authorKind
+    self.id = id
+    self.version = version
+    self.creatorId = creatorId
+    self.creatorName = creatorName
+    self.authorLabel = authorLabel
+    self.glyph = glyph
+    self.audience = audience
+    self.text = text
+    self.signedActId = signedActId
+    self.occurredAt = occurredAt
+  }
+}
+
+public enum APIContentThreadPresenceNoteAuthorKind: String, Codable, Sendable {
+  case `human_broadcast` = "human_broadcast"
+}
+
+public enum APIContentThreadPresenceNoteGlyph: String, Codable, Sendable {
+  case `broadcast` = "broadcast"
+}
+
+public struct APIContentThreadPresenceNoteAudience: Codable, Sendable {
+  public let `kind`: APIContentThreadPresenceNoteAudienceKind
+  public let `label`: String
+  public let `glyph`: APIContentThreadPresenceNoteAudienceGlyph
+  public init(kind: APIContentThreadPresenceNoteAudienceKind, label: String, glyph: APIContentThreadPresenceNoteAudienceGlyph) {
+    self.kind = kind
+    self.label = label
+    self.glyph = glyph
+  }
+}
+
+public enum APIContentThreadPresenceNoteAudienceKind: String, Codable, Sendable {
+  case `followers` = "followers"
+  case `members` = "members"
+  case `tiers` = "tiers"
+  case `groups` = "groups"
+}
+
+public enum APIContentThreadPresenceNoteAudienceGlyph: String, Codable, Sendable {
+  case `broadcast` = "broadcast"
+}
+
+public struct APIContentThreadPresencePage: Codable, Sendable {
+  public let `items`: [APIJSONValue]
+  public let `nextBefore`: String?
+  public let `serverTime`: String
+  public init(items: [APIJSONValue], nextBefore: String? = nil, serverTime: String) {
+    self.items = items
+    self.nextBefore = nextBefore
+    self.serverTime = serverTime
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `items`
+    case `nextBefore`
+    case `serverTime`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.items = try container.decode([APIJSONValue].self, forKey: .items)
+    self.nextBefore = try container.decode(String?.self, forKey: .nextBefore)
+    self.serverTime = try container.decode(String.self, forKey: .serverTime)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(items, forKey: .items)
+    try container.encode(nextBefore, forKey: .nextBefore)
+    try container.encode(serverTime, forKey: .serverTime)
+  }
+}
+
+public struct APIContentThreadPresenceQuery: Codable, Sendable {
+  public let `limit`: Int
+  public let `before`: String?
+  public init(limit: Int, before: String? = nil) {
+    self.limit = limit
+    self.before = before
+  }
+}
+
+public struct APIContentThreadPresenceReaction: Codable, Sendable {
+  public let `authorKind`: APIContentThreadPresenceReactionAuthorKind
+  public let `id`: String
+  public let `creatorId`: String
+  public let `creatorName`: String
+  public let `authorLabel`: String
+  public let `glyph`: APIContentThreadPresenceReactionGlyph
+  public let `reaction`: APIContentThreadPresenceReactionReaction
+  public let `replyId`: String
+  public let `noteId`: String
+  public let `signedActId`: String
+  public let `occurredAt`: String
+  public init(authorKind: APIContentThreadPresenceReactionAuthorKind, id: String, creatorId: String, creatorName: String, authorLabel: String, glyph: APIContentThreadPresenceReactionGlyph, reaction: APIContentThreadPresenceReactionReaction, replyId: String, noteId: String, signedActId: String, occurredAt: String) {
+    self.authorKind = authorKind
+    self.id = id
+    self.creatorId = creatorId
+    self.creatorName = creatorName
+    self.authorLabel = authorLabel
+    self.glyph = glyph
+    self.reaction = reaction
+    self.replyId = replyId
+    self.noteId = noteId
+    self.signedActId = signedActId
+    self.occurredAt = occurredAt
+  }
+}
+
+public enum APIContentThreadPresenceReactionAuthorKind: String, Codable, Sendable {
+  case `human_reaction` = "human_reaction"
+}
+
+public enum APIContentThreadPresenceReactionGlyph: String, Codable, Sendable {
+  case `heart` = "heart"
+}
+
+public enum APIContentThreadPresenceReactionReaction: String, Codable, Sendable {
+  case `heart` = "heart"
+  case `thanks` = "thanks"
+  case `helpful` = "helpful"
 }
 
 public struct APIStudioContentVersionCommand: Codable, Sendable {
