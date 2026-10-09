@@ -17,7 +17,15 @@ if ! docker ps -a --format '{{.Names}}' | grep -qx "$NAME"; then
     pgvector/pgvector:pg17 >/dev/null
 fi
 docker start "$NAME" >/dev/null 2>&1 || true
-until docker exec "$NAME" pg_isready -U postgres >/dev/null 2>&1; do :; done
+# A new container answers pg_isready during its init phase and then restarts, so
+# wait for the image's own "init process complete" line as well.
+tries=0
+until docker logs "$NAME" 2>&1 | grep -q "PostgreSQL init process complete" &&
+  docker exec "$NAME" pg_isready -U postgres >/dev/null 2>&1; do
+  tries=$((tries + 1))
+  [ "$tries" -gt 300 ] && { echo "database did not become ready" >&2; exit 1; }
+  sleep 0.5
+done
 if ! docker exec "$NAME" psql -U postgres -Atc \
   "select 1 from pg_database where datname='$BASE'" | grep -q 1; then
   docker exec "$NAME" psql -U postgres -c "CREATE DATABASE $BASE" >/dev/null
