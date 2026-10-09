@@ -7,7 +7,7 @@ set -u
 ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 cd "$ROOT"
 if [ "$#" -gt 0 ]; then SCRIPTS="$*"; else
-  SCRIPTS="e5-1-audience e5-1-lifecycle e5-1-scale e5-2-reactions e5-4-note-notices e5-4-reaction-notices e5-4-chunks e5-4-self-retry e5-4-scheduled e5-3-quiet-hours"
+  SCRIPTS="e5-1-audience e5-1-lifecycle e5-1-scale e5-2-reactions e5-4-note-notices e5-4-reaction-notices e5-4-chunks e5-4-mute-function e5-4-self-retry e5-4-scheduled e5-3-quiet-hours"
 fi
 status=0
 for name in $SCRIPTS; do
