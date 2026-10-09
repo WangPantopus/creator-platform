@@ -1,6 +1,6 @@
 # Current state
 
-Written 2026-10-08. Update this file at the end of every work session; it replaces the long
+Written 2026-10-08, updated 2026-10-09. Update this file at the end of every work session; it replaces the long
 handoffs as the place to start and is meant to answer two questions: what is being worked on
 right now, and what remains. Approvals come from the founder in the chat, never from a file.
 
@@ -22,14 +22,18 @@ right now, and what remains. Approvals come from the founder in the chat, never 
 
 ## In flight
 
-- **Money tests** (background agent, own worktree): a Postgres-backed harness with a fake
-  payment provider, covering capture only after a signed accept, late decline, expiry, refund,
-  capacity under concurrency and idempotency. Result: a pull request, with any defects found.
+- **The seven lanes** are approved and their briefing pack is on main
+  ([docs/lanes](../lanes/README.md): charter, working agreement, contracts, coverage, one brief
+  and one prompt per lane). The founder starts seven sessions by hand with the prompts in
+  `docs/lanes/prompts/`. Each works alone (no subagents), posts a plan, then works one pull
+  request at a time and proves it with end-to-end scenarios, edge cases included (no new unit
+  tests). The integrator reviews, re-runs the scenario scripts and merges in batches. Each lane's
+  state is in `docs/lanes/status/lane-N.md`.
 - **Main's CI** for the merged work: the macOS jobs run slowly on one runner, and every merge
   to main cancels the run in progress. Merges are therefore batched.
-- **Open pull request:** Android Lint fixes. A docs update (this file and the identity
-  contract) is open with it.
-- **Waiting on the founder:** the Q01 decisions below.
+- **Done today:** the money tests (100, five defects found and fixed), Android Lint fixes, the
+  Pantopus identity research, and option A for the apps.
+- **Waiting on the founder:** the Q01 decisions below, then hosting and domain.
 
 ## Plan to completion
 
@@ -43,8 +47,8 @@ share card in, everything else planned for later. The evidence is the
 | 1 | A real host on real phones | Store hygiene started (privacy manifest, Android fixes). Sign-in, production composition, domain, push, store accounts not started | Q01 decisions, accounts, domain |
 | 2 | First answer: speed, guard, FAQ publish check, entry links, provider switch | Not started. The guard fixes ship with the provider switch as the next engine revision | provider and embedding decision |
 | 3 | Remembered, and the person shows up | Fans can read members and tier Notes (not operated). Memory wiring, Note and reaction delivery, push not started | Touch ID ceremony to operate |
-| 4 | Honest money | Late decline merged; tests in flight. Scheduler needs a work index from the identity or operations adapter; Stripe run needs keys | Stripe test keys, step 1 adapter |
-| 5 | The creator's five minutes | Not started | step 1 |
+| 4 | Honest money | Late decline merged; 100 money tests merged and five defects fixed. Scheduler needs a work index from the identity or operations adapter; Stripe run needs keys | Stripe test keys, step 1 adapter |
+| 5 | The creator's five minutes | Not started. Web Studio on phones for the pilot (option A); native Studio app after the pilot | step 1 |
 | 6 | Share card, measurement, ops, release readiness | Not started | counsel, pilot creators |
 
 ## Needed from the founder
@@ -68,6 +72,8 @@ share card in, everything else planned for later. The evidence is the
 
 ## Rules that still hold
 
+- The lanes: no subagents, no new unit tests, end-to-end scenarios with edge cases, never merge
+  ([working agreement](../lanes/01-working-agreement.md)).
 - Never reset used databases or devices, rewrite publication fingerprints or applied SQL,
   invent consent, advance clocks, or settle unknown financial costs without receipts.
 - `infra/migrations.json` is edited only by W8. Expect a new migration to change the pinned
