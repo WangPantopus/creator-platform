@@ -367,6 +367,44 @@ describeMoney("commerce money path: capture only after an accept", () => {
       expect(accepted.packet.payment_state).toBe("captured");
     });
 
+    it("INV-16: a fan who answers a question after the authorization is nearly lapsed must re-authorize; the request then lapses and releases", async () => {
+      const world = await fixture.newWorld({ weeklyLimit: 1 });
+      const { packet } = await world.submitted();
+      await world.decide(packet.id, {
+        action: "more_info",
+        text: "Which clay body?",
+      });
+      const signedActId = await world.signAccept(packet.id);
+      // While the question waits, the card hold reaches its last hours. The
+      // decision window of a pending question ends six hours before the hold does.
+      await world.setHoldExpiry(packet.id, 3 * 3600);
+      await world.setDecisionAt(packet.id, -3 * 3600);
+
+      await expect(
+        world.service.moreInfo(world.fan.actor, packet.id, {
+          version: (await world.packetRow(packet.id)).version,
+          idempotencyKey: world.key("info"),
+          text: "Stoneware, cone 6.",
+        }),
+      ).rejects.toMatchObject({ code: "reauthorization_required" });
+      await expect(
+        world.decide(packet.id, { action: "reply_myself", signedActId }),
+      ).rejects.toMatchObject({ code: "decision_expired" });
+      expect(await world.consumed(signedActId)).toBe(false);
+      await expectNothingCaptured(world, packet.id);
+
+      expect(await world.service.reconcileDeadlines(world.fan.actor)).toEqual({
+        processing: 1,
+      });
+      expect(await world.packetRow(packet.id)).toMatchObject({
+        state: "expired",
+        payment_state: "released",
+      });
+      expect(world.provider.openHolds()).toBe(0);
+      expect(await world.capacity()).toMatchObject({ used: 0, reserved: 0 });
+      await expectNothingCaptured(world, packet.id);
+    });
+
     it.each([
       { action: "decline" as const, reason: "decline" },
       { action: "ai_answer" as const, reason: "ai_answer" },

@@ -901,6 +901,51 @@ describeMoney("commerce money path: deadlines, crashes, races", () => {
       await world.submitted();
     });
 
+    it("INV-10: offer edits racing submissions never overbook or deadlock", async () => {
+      const world = await fixture.newWorld({ fans: 6, weeklyLimit: 3 });
+      const failures: unknown[] = [];
+      const attempt = (work: () => Promise<unknown>) =>
+        work().catch((error: unknown) => failures.push(error));
+      const edit = (weeklyLimit: number) =>
+        world.service.saveMode(
+          world.creator.actor,
+          world.creator.id,
+          world.mode.id,
+          {
+            title: "Written reply",
+            kind: "written_reply",
+            amount: world.price,
+            publicAmount: null,
+            currency: "USD",
+            decisionHours: 48,
+            deliveryHours: 72,
+            durationSeconds: null,
+            weeklyLimit,
+            shareable: false,
+            state: "offered",
+            version: world.mode.version,
+            idempotencyKey: world.key("mode"),
+          },
+        );
+      await Promise.all([
+        ...world.fans.map((fan) => attempt(() => world.submit(fan))),
+        attempt(() => edit(4)),
+        attempt(() => edit(2)),
+        attempt(() => edit(5)),
+      ]);
+      // Whatever lost a race lost with a business answer, never a database fault.
+      for (const failure of failures) {
+        const error = failure as { code?: string; message?: string };
+        expect(String(error.code)).not.toMatch(/^(40P01|40001|55P03|57014)$/u);
+        expect(String(error.message)).not.toMatch(/deadlock|lock timeout/iu);
+      }
+      const capacity = await world.capacity();
+      expect(capacity.used + capacity.reserved).toBeLessThanOrEqual(
+        capacity.capacity_limit,
+      );
+      await world.assertConserved();
+    });
+
     it("INV-16: a mixed storm of decisions, withdrawals, expiry and reconciliation never deadlocks and always conserves", async () => {
       const world = await fixture.newWorld({ fans: 6, weeklyLimit: 6 });
       const packets: string[] = [];
@@ -1204,6 +1249,22 @@ describeMoney("commerce money path: deadlines, crashes, races", () => {
       await world.assertConserved();
     });
 
+    it("T-28: money moved at the processor outside the system is detected, not hidden", async () => {
+      const world = await fixture.newWorld({ weeklyLimit: 2 });
+      const id = await accepted(world);
+      const intentId = (await world.packetRow(id)).intent_ref!;
+      // A refund made by hand from the processor's own dashboard.
+      await world.provider.refund(intentId, 1000, "dashboard-refund-by-hand");
+      await expect(
+        world.service.reconcile(world.fan.actor, id),
+      ).rejects.toMatchObject({ code: "ledger_reconciliation_required" });
+      // Our books were not rewritten to match, and nothing else moved.
+      expect(await world.ledgerKinds(id)).toEqual(["hold", "capture"]);
+      expect(world.provider.refundedTotal(id)).toBe(1000);
+      expect(world.provider.realCalls("capture")).toHaveLength(1);
+      await expect(world.assertConserved()).rejects.toThrow(/ledger refunded/u);
+    });
+
     it("T-28: a missing notification is covered by polling the current state", async () => {
       const world = await fixture.newWorld({ weeklyLimit: 2 });
       const { packet } = await world.submitted();
@@ -1258,6 +1319,35 @@ describeMoney("commerce money path: deadlines, crashes, races", () => {
         "capture",
       ]);
       expect(await world.capacity()).toMatchObject({ used: 1, reserved: 0 });
+      await world.assertConserved();
+    });
+
+    it("INV-18: two re-authorizations of the same request place one new hold", async () => {
+      const world = await fixture.newWorld({ weeklyLimit: 1 });
+      const declined = await world.submit(world.fan, {
+        paymentMethodId: "pm_cardDeclined",
+      });
+      const version = declined.packet.version;
+      const reauthorize = (label: string) =>
+        world.service.reauthorize(world.fan.actor, declined.packet.id, {
+          version,
+          idempotencyKey: world.key(label),
+          paymentMethodId: "pm_cardVisa",
+        });
+      const settled = await Promise.allSettled([
+        reauthorize("reauth-a"),
+        reauthorize("reauth-b"),
+      ]);
+      expect(settled.filter((r) => r.status === "fulfilled")).toHaveLength(1);
+      const lost = settled.find(
+        (r): r is PromiseRejectedResult => r.status === "rejected",
+      );
+      expect(lost?.reason).toMatchObject({ code: "stale_request" });
+      // One declined attempt and one good hold reached the processor, no more.
+      expect(world.provider.realCalls("authorize")).toHaveLength(2);
+      expect(world.provider.openHolds()).toBe(1);
+      expect(await world.capacity()).toMatchObject({ reserved: 1, used: 0 });
+      expect(await world.ledgerKinds(declined.packet.id)).toEqual(["hold"]);
       await world.assertConserved();
     });
 
