@@ -10,6 +10,10 @@ Blocked on: the founder's hosting choice (road, provider, region, domain, monthl
 
 Read this section first, then the four notes it links. Do not redo anything marked done.
 
+**Where these notes live:** on the tip branch `lane-2/hosting-options` until the integrator merges the stack, so a new
+session starts with `git fetch origin` and reads them from that branch (`git switch lane-2/hosting-options`, or
+`git show origin/lane-2/hosting-options:docs/lanes/status/lane-2.md`). The same pointer is in the project memory.
+
 ### The pull requests (stacked; merge in this order; the integrator retargets each base after the one below merges)
 
 | Order | Pull request                                                      | Branch (base)                                          | What                                                                                                   | Note                                                    |
@@ -18,6 +22,9 @@ Read this section first, then the four notes it links. Do not redo anything mark
 | 2     | [#370](https://github.com/WangPantopus/creator-platform/pull/370) | `lane-2/production-root` (`lane-2/stack-from-scratch`) | WP 2.2: the production host, three states (open, closed, refused), proposed contract C2                | [lane-2-production-root.md](lane-2-production-root.md)  |
 | 3     | [#377](https://github.com/WangPantopus/creator-platform/pull/377) | `lane-2/catalogue-pins` (`lane-2/production-root`)     | WP 2.9: the catalogue pin tool (`check`, `snapshot`, `diff`, `write`), scenario E2.9                   | [lane-2-catalogue-pins.md](lane-2-catalogue-pins.md)    |
 | 4     | [#378](https://github.com/WangPantopus/creator-platform/pull/378) | `lane-2/hosting-options` (`lane-2/catalogue-pins`)     | WP 2.3: hosting options with monthly cost. Documents only                                              | [lane-2-hosting-options.md](lane-2-hosting-options.md)  |
+
+Checks and comments when this was written (2026-10-09, about 01:00 PDT; read them again, they change): #367 11 of 11
+checks pass; #370 9 pass and 2 were still running; #377 and #378 had just opened; no review comment on any of the four.
 
 The founder also has a private one-page version of the hosting options: https://claude.ai/artifact/QwDJv6WYbo8bdpaKCHUqkB
 (it has the same numbers as the note; update it, same file path, if the note's numbers change).
