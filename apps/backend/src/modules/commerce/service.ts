@@ -78,6 +78,7 @@ type PacketRow = {
   submitted_at: Date | null;
   accepted_at: Date | null;
   accepted_action: string | null;
+  accepted_act_id: string | null;
   terminal_target: string | null;
   proposed_mode: Record<string, unknown> | null;
   authorization_attempt: number;
@@ -2491,6 +2492,26 @@ export class CommerceService {
             })));
         await this.applyIntent(actor, effect, intent);
       } else {
+        if (effect.operation === "capture") {
+          // INV-16 in depth. decide() is the only writer of a capture effect, but
+          // neither the database nor this executor checked it, so a stray or
+          // replayed row would have captured real money for a request nobody
+          // accepted. A capture needs a request that is accepting (or already
+          // accepted) with the creator's consumed signed act.
+          const { packet } = await this.packetRecord(actor, effect.packet_id);
+          if (
+            !["accepting", "accepted"].includes(packet.state) ||
+            !packet.accepted_act_id
+          ) {
+            await this.account(actor, (client) =>
+              client.query(
+                "UPDATE creator.commerce_effect SET state='failed',error_code='capture_without_acceptance',lease_until=NULL,updated_at=now() WHERE id=$1 AND attempt=$2 AND state='processing'",
+                [effect.id, effect.attempt],
+              ),
+            );
+            return;
+          }
+        }
         let intentId = effect.request.intentId;
         if (!intentId) {
           const { packet } = await this.packet(actor, effect.packet_id);

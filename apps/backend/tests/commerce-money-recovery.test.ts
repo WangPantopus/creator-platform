@@ -1461,38 +1461,47 @@ describeMoney("commerce money path: deadlines, crashes, races", () => {
     // test in place. DEFECT-1b is database-level and has no FIX: commit.
 
     // DEFECT-1 (INV-16, defence in depth): a capture for a request nobody accepted.
-    // runEffect trusts any `capture` effect row. The only guard against capturing a
-    // request nobody accepted is that decide() is the only code that writes such a
-    // row; neither the executor nor the database checks. A stray row (a bug, a bad
-    // replay, a hand edit) captures real money.
-    it.fails(
-      "DEFECT-1: a capture effect for a request that was never accepted must not capture",
-      async () => {
-        const world = await fixture.newWorld();
-        const { packet } = await world.submitted();
-        const row = await world.packetRow(packet.id);
-        const effect = await world.admin.query<{ id: string }>(
-          `INSERT INTO creator.commerce_effect(creator_id,fan_id,packet_id,operation,provider_key,request)
+    // Fixed in "FIX: refuse a capture for a request nobody accepted". runEffect used
+    // to trust any `capture` effect row. The only guard against capturing a request
+    // nobody accepted was that decide() is the only code that writes such a row;
+    // neither the executor nor the database checked. A stray row (a bug, a bad
+    // replay, a hand edit) captured real money while the request stayed
+    // `submitted`, with no accepted act, no ledger entry and no refund path.
+    it("INV-16: a capture effect for a request that was never accepted must not capture", async () => {
+      const world = await fixture.newWorld();
+      const { packet } = await world.submitted();
+      const row = await world.packetRow(packet.id);
+      const effect = await world.admin.query<{ id: string }>(
+        `INSERT INTO creator.commerce_effect(creator_id,fan_id,packet_id,operation,provider_key,request)
          VALUES($1,$2,$3,'capture',$4,$5) RETURNING id`,
-          [
-            row.creator_id,
-            row.fan_id,
-            row.id,
-            `${row.id}:capture:1`,
-            JSON.stringify({
-              intentId: row.intent_ref,
-              amount: world.price,
-              currency: "USD",
-            }),
-          ],
-        );
-        await world.service.runEffect(world.fan.actor, effect.rows[0]!.id);
-        // Currently the processor captures the full price while the request is
-        // still `submitted` with no accepted act, no ledger entry and no refund path.
-        expect(world.provider.capturedTotal()).toBe(0);
-        await world.assertConserved({ settled: false });
-      },
-    );
+        [
+          row.creator_id,
+          row.fan_id,
+          row.id,
+          `${row.id}:capture:1`,
+          JSON.stringify({
+            intentId: row.intent_ref,
+            amount: world.price,
+            currency: "USD",
+          }),
+        ],
+      );
+      await world.service.runEffect(world.fan.actor, effect.rows[0]!.id);
+      expect(world.provider.capturedTotal()).toBe(0);
+      expect(world.provider.realCalls("capture")).toHaveLength(0);
+      expect((await world.effects(packet.id)).at(-1)).toMatchObject({
+        operation: "capture",
+        state: "failed",
+        error_code: "capture_without_acceptance",
+      });
+      // The request is untouched: still waiting for the creator, hold intact.
+      expect(await world.packetRow(packet.id)).toMatchObject({
+        state: "submitted",
+        payment_state: "requires_capture",
+      });
+      expect(world.provider.openHolds()).toBe(1);
+      await world.assertConserved();
+    });
 
     // DEFECT-2 (INV-16 release on expiry): a hold with too short a capture window.
     // When the processor's hold has a capture window the service cannot use (under
