@@ -4,9 +4,18 @@ Updated: 2026-10-08, by the lane 6 session (round 1: WP 6.1 only)
 
 Working on: WP 6.1, splitting `apps/web/features/studio/Studio.tsx` (4,795 lines) into feature
 modules with no behavior change. One pull request per area, each branch cut from the one before
-because every area needs the shared layer first. Order, bottom up:
-`lane-6/studio-split-harness` (the proof, no source change), `-shared`, `-thanks-more`, `-team`,
-`-notes`, `-library`, `-requests`, `-threads`, `-shell`.
+because every area needs the shared layer first, so merge them bottom up. A box is ticked in the
+pull request that does the work.
+
+- [x] `lane-6/studio-split-harness`: the proof (E6.1 harness and runbook), no source change
+- [x] `lane-6/studio-split-shared`: types, formatting helpers, `useAction` and `Feedback`, `Modal`
+- [ ] `lane-6/studio-split-thanks-more`: Thanks and More
+- [ ] `lane-6/studio-split-team`: Team
+- [ ] `lane-6/studio-split-notes`: Notes and Compose
+- [ ] `lane-6/studio-split-library`: Publish (the library)
+- [ ] `lane-6/studio-split-requests`: Requests and PacketDetail
+- [ ] `lane-6/studio-split-threads`: Threads and CorrectionForm
+- [ ] `lane-6/studio-split-shell`: navigation helpers and the requests count; `Studio.tsx` is the shell
 
 Done: nothing merged. Open pull requests are listed in the round 1 report.
 
