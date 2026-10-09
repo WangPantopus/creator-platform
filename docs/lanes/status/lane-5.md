@@ -1,23 +1,41 @@
 # Lane 5: Presence and reach status
 
-Updated: 2026-10-09, by the lane 5 session (handoff)
-Working on: nothing is running; this is a handoff. **Resume from
-[lane-5-handoff.md](lane-5-handoff.md)**, which says exactly where every branch, pull request,
-decision and resource stands. #365 (WP 5.1) and #366 (WP 5.2a) are merged (`e28759a77`,
-`169b5d94f`). Open: #372 (`lane-5/delivery-queue`, targets main, no migration) and #373
-(`lane-5/note-mute-read`, stacked on #372, a small migration). Pushed with no pull request:
-`lane-5/notice-snapshots` (option A, a second small migration; the working agreement allows one
-migration pull request at a time, so it waits for #373 unless the founder says otherwise).
+Updated: 2026-10-09, resumed lane 5 session
+Working on: opening `lane-5/notice-snapshots` for review against main, then applying the
+prepared WP 5.6 public-page work on a fresh branch from current main. **Resume from [lane-5-handoff.md](lane-5-handoff.md)**.
+#365, #366, #372 and #373 are merged. #373 merged into `lane-5/delivery-queue`
+(`41b7ae922`), then #372 brought both into main (`c0b4ac0f0`). All listed checks on
+#372 and #373 passed when checked once at resume. No retargeting is needed for a closed PR.
+`origin/main` has been merged into the shared notice-snapshots branch without rewriting history.
+The one-migration-PR hold is clear because #373 merged; registration of its SQL is still an
+integrator ticket. Notice snapshots will be the next migration PR.
 Done: contract C4 ([details](lane-5-c4-note-reaction-delivery.md)); the thread-presence read
 `GET /v1/content/{creatorId}/presence`; the creator-session fan-out of Note and reaction notices
 with 500-recipient chunking, one creator's deliveries queued, and a failed delivery retried by the
 same session; the notification owner for both; muted members left out; **owner notice records for
 answers, request status, offers, call reminders and commitments (option A) with export and
 erasure**; scenario host and scripts.
-Next: 5.6 (public creator page; needs the founder's decision on where creators write their
-biography, see the handoff), then 5.7, 5.8, 5.4, 5.5, 5.9, 5.10, and 5.3 on a fake gateway.
+Next: 5.6 (public creator page; Q2 default: growth owns the profile fields and lane 6 the form),
+then 5.7, 5.8, 5.4, 5.5, 5.9, 5.10, and 5.3 on a fake gateway.
 Blocked on: the founder's answers (handoff, "Decisions waiting"); lanes 3 and 4 each adding their
 one call (tickets) before answers and request status fire; Apple and Google credentials for 5.3.
+
+## Resumed verification (2026-10-09)
+
+The complete default scenario run passed again: 12 scripts, 69 steps, no failures; reaction
+undo is the one case not run, as agreed for the pilot. Existing backend suites: 9 files,
+157 of 157 passed in 364.19 s; T-11 took 264.06 s. Seven typecheck tasks passed (six cached),
+changed-source eslint passed, and the status files pass formatting. No new notice defect was
+found. The real owners, providers, devices and UI listed below remain not run for this change.
+
+Load was 42 at resume and peaked around 104 during scale; backend checks ran at roughly
+24 to 29. Scale: 600 members reached, 20 outsiders excluded; settled reads p50 2128 ms,
+p95 2464 ms; all 60 reads during five concurrent deliveries returned 200 (p50 2077 ms,
+p95 2399 ms). These are local measurements with fake identity.
+
+Re-run using the toolchain in the handoff: `sh tests/scenarios/lane-5/setup.sh`, then
+`sh tests/scenarios/lane-5/run-all.sh`. The backend suites used the same disposable container:
+`CREATOR_TEST_DATABASE_URL=postgresql://postgres:foundation-test-only@127.0.0.1:56450/creator_foundation pnpm --filter @qelvora/backend test`.
 
 ## Scenarios (database on 56450, host on 56451, fake push gateway on 56453)
 

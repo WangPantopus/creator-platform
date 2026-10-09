@@ -1,12 +1,44 @@
 # Lane 5 handoff (2026-10-09)
 
+## Resume update (2026-10-09)
+
+The founder directed this session to continue in its isolated Codex worktree after the
+path check stopped it. Work remains single-agent. The original handoff below records the
+earlier results; it is not evidence of checks run in this resumed session.
+
+- #372 and #373 are now merged, with every listed CI check passing at the one resume check.
+  #373 merged into the delivery branch (`41b7ae922`); #372 brought both into main
+  (`c0b4ac0f0`). Neither closed PR needs retargeting. No CI fix was needed.
+- Main has been merged into `lane-5/notice-snapshots`, without rewriting shared history.
+  Its migration PR may now open under Q1's default. SQL registration still belongs to the
+  integrator; it is not implied by merging #373.
+- Dependencies were installed from the existing offline store. Docker was started; its
+  PostgreSQL image was already present. The lane 5 disposable database has been recreated.
+- The resumed scenario run passed: 12 scripts, 69 steps, 0 failures, 1 not run (reaction
+  undo is excluded from the pilot). Existing backend suites: 9 files, 157 of 157 passed
+  in 364.19 s; T-11 took 264.06 s of its 300 s limit. Seven typecheck tasks passed
+  (six reused their cache); changed-source eslint and status-file formatting passed.
+  Machine load was 42 on arrival, 86 to 104 during scale, and roughly 24 to 29 during
+  backend checks. Settled reads: p50 2128 ms / p95 2464 ms. All 60 reads during five
+  concurrent deliveries returned 200: p50 2077 ms / p95 2399 ms.
+- Q2 has no new answer: use its recorded default, a growth-owned profile table and endpoint
+  with lane 6 owning the form, and keep its migration behind notice snapshots. The cache,
+  contract note and rendering work can proceed independently from current main.
+- The lane 2 stack is now on main (#367). Use it for the public-page work and report any
+  missing production-host wiring as a ticket; do not edit `server.ts` or `integration.ts`.
+
+The notice branch is ready for review against main. No notice implementation changed in
+this resume: main was merged forward and the evidence was refreshed. Scenario hosts have
+stopped. The disposable database will be removed before starting the lane 2 stack for WP 5.6.
+Public-page drafts are prepared but are not part of this branch. No new unit tests were written.
+
 For the next lane 5 session. Read this after [docs/lanes/README.md](../README.md) and before
 touching anything. It is written so you can resume without redoing work, without guessing, and
 without leaving gaps. The standing rules are in [the lane 5 prompt](../prompts/lane-5.md) and
 [the working agreement](../01-working-agreement.md); this file records only what changed and
 where things stand. The shorter, always-current summary is [lane-5.md](lane-5.md).
 
-## 1. Where everything stands
+## 1. Original handoff state (superseded by the resume update above)
 
 Nothing is running. All containers, hosts and background jobs from the last session were shut
 down (section 8). Everything below is committed and pushed.
