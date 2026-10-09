@@ -98,6 +98,10 @@ export function createHandler(world, router) {
         "Content-Type": "application/json; charset=utf-8",
         "Cache-Control": "no-store",
         "X-Request-Id": requestId,
+        // The emulator reaches this server through an adb tunnel that does not pass
+        // on Node's idle close: a reused connection then fails with "unexpected end
+        // of stream". One request per connection keeps both apps honest.
+        Connection: "close",
       });
       res.end(text);
     };
