@@ -286,7 +286,7 @@ Shut down: the scenario host (56451), the push gateway recorder (56453, part of 
 background job and monitor, and the containers `qelvora-lane5-db` (56450) and `qelvora-lane5-test`
 (56452), which were **removed together with their data volumes**: recreate them with section 4. The local temporary branch
 `tmp/lane5-combined-tested` was deleted. Nothing else of mine runs: no browser tabs, no simulator,
-no scheduled tasks. The worktree is left checked out on `lane-5/notice-snapshots` with a clean tree. Temporary key files and logs in `$TMPDIR` (`qelvora-lane5-*`) were removed.
+no scheduled tasks. The worktree is left on a detached HEAD at the tip of `lane-5/notice-snapshots` with a clean tree, so that branch can be checked out in any worktree. Temporary key files and logs in `$TMPDIR` (`qelvora-lane5-*`) were removed.
 
 ## 9. Draft pull request description for `lane-5/notice-snapshots`
 
