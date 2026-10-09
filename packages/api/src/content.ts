@@ -385,6 +385,80 @@ export const ContentScheduledResult = z.strictObject({
 export const ContentEffectsResult = z.strictObject({
   processed: z.int().nonnegative(),
 });
+
+/** C4 v1: Note and reaction delivery. How a creator's Note and reaction appear
+ * in one fan's thread. Domain Model: a Note is stored once and rendered into
+ * each eligible fan's thread at read time. Items are therefore built for the
+ * fan who is asking, from the Note and the creator's signed reaction, and are
+ * never stored thread messages. No item carries another fan's text (INV-24).
+ * `authorLabel` is the exact line a client shows beside the glyph; clients do
+ * not assemble it. Both kinds are signed human acts (INV-22): `signedActId`
+ * opens the verification page. */
+export const ThreadPresenceAudience = z.strictObject({
+  kind: z.enum(["followers", "members", "tiers", "groups"]),
+  /** The audience, always named (INV-24): "all members", "Kiln Club members". */
+  label: z.string().min(1).max(200),
+  glyph: z.literal("broadcast"),
+});
+export const ThreadPresenceNote = z.strictObject({
+  authorKind: z.literal("human_broadcast"),
+  /** The Note id. */
+  id: z.uuid(),
+  version: z.int().positive(),
+  creatorId: z.uuid(),
+  creatorName: z.string().min(1).max(80),
+  /** "Maya · to Kiln Club members". */
+  authorLabel: z.string().min(1).max(300),
+  glyph: z.literal("broadcast"),
+  audience: ThreadPresenceAudience,
+  /** The Note text with the creator's name token resolved for this fan. */
+  text: z.string().max(20000),
+  signedActId: z.uuid(),
+  occurredAt: z.iso.datetime({ offset: true }),
+});
+export const ThreadPresenceReaction = z.strictObject({
+  authorKind: z.literal("human_reaction"),
+  /** The reply id; a reply has at most one reaction. */
+  id: z.uuid(),
+  creatorId: z.uuid(),
+  creatorName: z.string().min(1).max(80),
+  /** "Maya reacted to your reply". */
+  authorLabel: z.string().min(1).max(300),
+  glyph: z.literal("heart"),
+  reaction: z.enum(["heart", "thanks", "helpful"]),
+  /** The fan's own reply this reaction answers. */
+  replyId: z.uuid(),
+  /** The Note the reply was written to. */
+  noteId: z.uuid(),
+  signedActId: z.uuid(),
+  occurredAt: z.iso.datetime({ offset: true }),
+});
+export const ThreadPresenceItem = z.discriminatedUnion("authorKind", [
+  ThreadPresenceNote,
+  ThreadPresenceReaction,
+]);
+/** "<UTC instant to the microsecond>~<item id>". Opaque to clients: pass back
+ * exactly what a page returned. The id breaks ties between items published in
+ * the same instant (a scheduled batch shares one timestamp). */
+export const ThreadPresenceCursor = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z~[0-9a-f-]{36}$/u);
+export const ThreadPresenceQuery = z.strictObject({
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+  /** Return only items strictly older than this cursor. */
+  before: ThreadPresenceCursor.optional(),
+});
+export const ThreadPresencePage = z.strictObject({
+  /** Oldest first, like the messages of a thread. Merge with them by time.
+   * A page can hold fewer than `limit` items, even none, and still have older
+   * pages: items the fan is not eligible for are never counted or shown. */
+  items: z.array(ThreadPresenceItem).max(50),
+  /** Pass as `before` for the next older page; null when there is none. */
+  nextBefore: ThreadPresenceCursor.nullable(),
+  serverTime: z.iso.datetime({ offset: true }),
+});
+export type ThreadPresenceItem = z.infer<typeof ThreadPresenceItem>;
+export type ThreadPresencePage = z.infer<typeof ThreadPresencePage>;
 export type ContentView = z.infer<typeof ContentView>;
 export type PrivateNoteReply = z.infer<typeof PrivateNoteReply>;
 export type NoteReplyPolicy = z.infer<typeof NoteReplyPolicy>;

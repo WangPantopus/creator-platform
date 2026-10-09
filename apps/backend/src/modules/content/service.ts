@@ -81,7 +81,7 @@ export interface ContentPublicationMedia {
   ): Promise<void>;
 }
 
-type Index = {
+export type Index = {
   id: string;
   creator_id: string;
   version: number;
@@ -617,7 +617,7 @@ export class ContentService {
       ).rowCount === 1
     );
   }
-  private async requireOrdinaryRead(
+  async requireOrdinaryRead(
     client: PoolClient,
     creatorId: string,
     contentId: string,
@@ -679,11 +679,7 @@ export class ContentService {
       (await this.packetEligible(client, actor, row))
     );
   }
-  private async eligibleBeforePacket(
-    client: PoolClient,
-    actor: Actor,
-    row: Index,
-  ) {
+  async eligibleBeforePacket(client: PoolClient, actor: Actor, row: Index) {
     await this.requireOrdinaryRead(client, row.creator_id, row.id, row.version);
     const creator = (
       await client.query(
@@ -725,11 +721,7 @@ export class ContentService {
       audience: row.audience,
     };
   }
-  private async preparePacketPositive(
-    client: PoolClient,
-    actor: Actor,
-    row: Index,
-  ) {
+  async preparePacketPositive(client: PoolClient, actor: Actor, row: Index) {
     return (
       !row.packet_id ||
       (await this.dependencies.preparePublicPacketReadPositive?.(
@@ -739,7 +731,7 @@ export class ContentService {
       )) === true
     );
   }
-  private async packetEligible(client: PoolClient, actor: Actor, row: Index) {
+  async packetEligible(client: PoolClient, actor: Actor, row: Index) {
     return (
       !row.packet_id ||
       (await this.dependencies.publicPacketRead?.(

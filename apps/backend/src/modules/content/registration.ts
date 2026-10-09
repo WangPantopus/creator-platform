@@ -9,6 +9,7 @@ import {
   publicationCommand,
   reactionCommand,
 } from "./service.js";
+import { ThreadPresence } from "./thread-presence.js";
 import { invariant } from "../../core/errors.js";
 
 export function contentSignedSubjects(
@@ -107,6 +108,7 @@ export function contentSignedSubjects(
   };
 }
 export function contentFeature(service: ContentService): FeatureRegistration {
+  const presence = new ThreadPresence(service);
   return {
     name: "content",
     path: "/v1/content",
@@ -120,6 +122,16 @@ export function contentFeature(service: ContentService): FeatureRegistration {
       router.get("/:creatorId", async (req, res) =>
         res.json(
           await service.list(
+            await actorFor(req),
+            z.uuid().parse(req.params.creatorId),
+            req.query,
+          ),
+        ),
+      );
+      // C4: the Notes and reactions this fan sees in their thread.
+      router.get("/:creatorId/presence", async (req, res) =>
+        res.json(
+          await presence.read(
             await actorFor(req),
             z.uuid().parse(req.params.creatorId),
             req.query,
