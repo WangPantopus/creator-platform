@@ -1,0 +1,17 @@
+[
+  {
+    "path": "artifacts/lane-7/7-1-home.png",
+    "sha256": "f814b0cd7134a651c3dd5f44ad47c4b893a34365ad80c3314cf49b2f672a02c2",
+    "bytes": 125127
+  },
+  {
+    "path": "artifacts/lane-7/7-1-largest-text.png",
+    "sha256": "c68e8e750a06447b71f94c7a15949ee598ed0c9aa5695199047ad38d45ce39d5",
+    "bytes": 150754
+  },
+  {
+    "path": "artifacts/lane-7/7-1-night.png",
+    "sha256": "083e80b7b724634adcd68b2633ee79730e5bb44986a4e732057eeeaf8b0930f1",
+    "bytes": 132504
+  }
+]
