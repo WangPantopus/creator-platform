@@ -147,7 +147,8 @@ gateway (WP 7.7), the release sign-in contract C1 (WP 7.5).
 ```
 pnpm exec tsx tests/scenarios/lane-7/harness/check-contract.mjs      # the fake against the real contracts (starts its own harness)
 node tests/scenarios/lane-7/e7-1-signin.mjs [ios|android]            # H1 to H12
-node tests/scenarios/lane-7/e7-1-states.mjs [ios|android]            # S1 to S6, L1 to L5
+node tests/scenarios/lane-7/e7-1-states.mjs [ios|android]            # S1 to S8, E1, L1 to L5
+node tests/scenarios/lane-7/e7-1-first-conversation.mjs [ios|android] # F1 to F2 (Android taps; iOS up to the consent screen)
 node tests/scenarios/lane-7/baseline-requests.mjs [ios|android] 60   # requests a minute with a thread open (WP 7.8 baseline)
 ```
 
