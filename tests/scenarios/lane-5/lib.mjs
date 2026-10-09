@@ -449,3 +449,58 @@ export async function react(
       ),
   };
 }
+
+// ------------------------------------------------ notifications and push
+
+const GATEWAY = process.env.LANE5_GATEWAY ?? "http://127.0.0.1:56453";
+/** A fan's notification list, as the app shows it. */
+export async function inbox(fan) {
+  const r = await http("GET", "/v1/growth/notifications", fan.token);
+  if (r.status !== 200)
+    throw new Error(`inbox ${r.status} ${JSON.stringify(r.body)}`);
+  return r.body.notifications;
+}
+/** The full preference document; push is off unless a fan turns it on. */
+export async function setPreferences(fan, overrides = {}) {
+  const r = await http("PUT", "/v1/growth/preferences", fan.token, {
+    push: true,
+    email: false,
+    hideSensitive: true,
+    quietStart: null,
+    quietEnd: null,
+    timeZone: "UTC",
+    mutedCreators: [],
+    disabledPushTypes: [],
+    disabledEmailTypes: [],
+    ...overrides,
+  });
+  if (r.status !== 200)
+    throw new Error(`preferences ${r.status} ${JSON.stringify(r.body)}`);
+}
+/** What the fake push gateway (standing in for APNs and FCM) received. */
+export async function pushes() {
+  return (await fetch(`${GATEWAY}/sent`)).json();
+}
+export const clearPushes = () => fetch(`${GATEWAY}/sent`, { method: "DELETE" });
+export const gateway = (state) =>
+  fetch(`${GATEWAY}/${state}`, { method: "PUT" });
+/** The creator's pending downstream work, run on demand (the Studio's button). */
+export const runEffects = (creator) =>
+  http(
+    "POST",
+    `/v1/content/${creator.id}/studio/effects/run`,
+    creator.token,
+    {},
+  );
+/** Poll until the check returns something truthy, or fail with the reason. */
+export async function waitFor(label, check, timeoutMs = 20000) {
+  const until = Date.now() + timeoutMs;
+  let last;
+  while (Date.now() < until) {
+    last = await check();
+    if (last) return last;
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+  throw new Error(`timed out waiting for ${label}`);
+}
+export const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

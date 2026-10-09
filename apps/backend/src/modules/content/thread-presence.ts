@@ -106,28 +106,13 @@ export class ThreadPresence {
        ORDER BY published_at DESC,id DESC LIMIT $4`,
       [creatorId, before?.at ?? null, before?.id ?? null, limit + 1],
     );
-    const reactions = await client.query<{
-      id: string;
-      at: string;
-      note_id: string;
-      kind: "heart" | "thanks" | "helpful";
-      signed_act_id: string;
-    }>(
-      `SELECT r.id,${microseconds("re.created_at")} AS at,r.content_id AS note_id,re.kind,re.signed_act_id
-       FROM creator.content_reaction re
-       JOIN creator.content_reply r ON r.id=re.reply_id AND r.creator_id=$1 AND r.withdrawn_at IS NULL
-       JOIN creator.content_reply_review m ON m.reply_id=r.id AND m.creator_id=r.creator_id
-         AND m.reply_version=r.version AND m.state='allowed' AND m.withdrawn_at IS NULL
-       JOIN creator.fan_profile f ON f.id=r.fan_id AND f.account_id=$2
-       WHERE ($3::timestamptz IS NULL OR (re.created_at,r.id)<($3::timestamptz,$4::uuid))
-       ORDER BY re.created_at DESC,r.id DESC LIMIT $5`,
-      [
-        creatorId,
-        actor.accountId,
-        before?.at ?? null,
-        before?.id ?? null,
-        limit + 1,
-      ],
+    const reactions = await this.reactionRows(
+      client,
+      creatorId,
+      actor.accountId,
+      before,
+      limit + 1,
+      null,
     );
     type Candidate =
       | { kind: "note"; id: string; at: string }
@@ -141,7 +126,7 @@ export class ThreadPresence {
         };
     const candidates: Candidate[] = [
       ...notes.rows.map((row) => ({ kind: "note" as const, ...row })),
-      ...reactions.rows.map((row) => ({
+      ...reactions.map((row) => ({
         kind: "reaction" as const,
         id: row.id,
         at: row.at,
@@ -154,6 +139,73 @@ export class ThreadPresence {
       a.at === b.at ? (a.id < b.id ? 1 : -1) : a.at < b.at ? 1 : -1,
     );
     return { candidates, creatorName: creator.display_name };
+  }
+
+  /** The asking fan's own reactions, newest first: the reply must still exist,
+   * be allowed by review and belong to this fan. One query for the page and for
+   * the single-item check, so the two cannot disagree. */
+  private async reactionRows(
+    client: PoolClient,
+    creatorId: string,
+    accountId: string,
+    before: { at: string; id: string } | null,
+    limit: number,
+    replyId: string | null,
+  ) {
+    return (
+      await client.query<{
+        id: string;
+        at: string;
+        note_id: string;
+        kind: "heart" | "thanks" | "helpful";
+        signed_act_id: string;
+      }>(
+        `SELECT r.id,${microseconds("re.created_at")} AS at,r.content_id AS note_id,re.kind,re.signed_act_id
+         FROM creator.content_reaction re
+         JOIN creator.content_reply r ON r.id=re.reply_id AND r.creator_id=$1 AND r.withdrawn_at IS NULL
+         JOIN creator.content_reply_review m ON m.reply_id=r.id AND m.creator_id=r.creator_id
+           AND m.reply_version=r.version AND m.state='allowed' AND m.withdrawn_at IS NULL
+         JOIN creator.fan_profile f ON f.id=r.fan_id AND f.account_id=$2
+         WHERE ($3::timestamptz IS NULL OR (re.created_at,r.id)<($3::timestamptz,$4::uuid))
+         AND ($6::uuid IS NULL OR r.id=$6)
+         ORDER BY re.created_at DESC,r.id DESC LIMIT $5`,
+        [
+          creatorId,
+          accountId,
+          before?.at ?? null,
+          before?.id ?? null,
+          limit,
+          replyId,
+        ],
+      )
+    ).rows;
+  }
+
+  /** The strict check for one Note, as the asking fan: the exact item `read`
+   * would show right now, or null. The notification list uses it so a row can
+   * never promise what the thread would refuse. */
+  async noteFor(actor: Actor, creatorId: string, noteId: string) {
+    await this.content.dependencies.prepareAudienceRequest?.(actor, creatorId);
+    const notes = await this.eligibleNotes(actor, creatorId, [noteId]);
+    const note = notes.get(noteId);
+    return note?.authorKind === "human_broadcast" ? note : null;
+  }
+
+  /** The strict check for one reaction, as the fan whose reply it answers. */
+  async reactionFor(actor: Actor, creatorId: string, replyId: string) {
+    return this.content.transaction(actor, creatorId, async (client) => {
+      const row = (
+        await this.reactionRows(
+          client,
+          creatorId,
+          actor.accountId,
+          null,
+          1,
+          replyId,
+        )
+      )[0];
+      return row ?? null;
+    });
   }
 
   /** The exact guard sequence of `ContentService.list` for a fan: every bounded

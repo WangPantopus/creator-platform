@@ -96,25 +96,50 @@ reply** (INV-24); this contract has no field that could.
 
 ## Notifications (the same two kinds, WP 5.2)
 
-The growth engine's event types are `note` and `reaction`
-(`modules/growth/contracts.ts`). Payload rules, enforced by `present()` in
-`modules/growth/notifications.ts`:
+The growth engine's event types are `note` and `reaction` (`modules/growth/contracts.ts`).
 
-- sender: `noteAudience` ("Maya · to Kiln Club members") or `reaction`
-  ("Maya reacted to your reply"); the audience is always present.
-- push says nothing a lock screen should not show: the preview is
-  `growthHiddenUpdate` unless the fan turned "hide sensitive" off, and never contains
-  any fan's text. A push says "Maya replied" only for `human_creator` and
-  `human_call`; Notes and reactions never do.
-- destination: the creator's thread, `/creators/{handle}/chat`.
+**Who is told, and when.** From the creator's own session, as soon as her publish, her
+reaction or a scheduled run answers her (`contentFeature` then drains her pending effects;
+the Studio's `POST /v1/content/{creatorId}/studio/effects/run` retries anything that could
+not finish):
 
-The producers, the recipient rule and the worker-side currency check are described
-with WP 5.2.
+- a **Note** tells every current member of the Note's audience (members, or the named
+  tiers) except a fan W8 denies (blocked, restricted, deleted), once per Note, in events of
+  at most 500 recipients. Later publications of the same Note (edits) tell no one.
+  Followers and group Notes tell no one yet (see below).
+- a **reaction** tells the one fan whose reply it answers, unless W8 denies that fan or the
+  reply was withdrawn.
+
+**What the notice says**, built by `present()` in `modules/growth/notifications.ts`:
+
+|                    | Note                                                                                                    | Reaction                                  |
+| ------------------ | ------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| sender             | "Maya · to Kiln Club members" (`noteAudience`, audience always present)                                 | "Maya reacted to your reply" (`reaction`) |
+| preview in the app | the Note's opening words, up to 240 characters, only when the fan is checked as eligible at that moment | the generic update line                   |
+| preview in a push  | the generic update line (`growthHiddenUpdate`), never any Note text                                     | same                                      |
+| destination        | `/creators/{handle}/chat`                                                                               | same                                      |
+| authorship         | `human`                                                                                                 | `human`                                   |
+
+A push says "Maya replied" only for `human_creator` and `human_call`; these two never do.
+Push is off until the fan turns it on, and a fan's own muted creators and disabled types
+apply. **No notice or push ever carries any fan's reply text.**
+
+**What is checked, and where.** The fan's notification list asks the thread's own guards
+(`ThreadPresence.noteFor` / `reactionFor`) as that fan, so a row can never promise what the
+thread would refuse; a fan who has left, been blocked or withdrawn the reply does not see the
+row. The growth worker has no fan session and may read nothing outside `growth` (and no
+worker scope issuer exists), so at send time it checks only what the content module
+publishes about itself: the Note is still published at this version, the creator is still
+verified. A Note withdrawn before its push is sent is never pushed. The fan was checked when
+the notice was queued, and meets the strict check on every tap.
 
 ## Not in this contract (decided later)
 
-Followers and group Notes render the same way, but followers are unreadable until the
-reserved follow migration lands (`canonicalCoreContentFollows` is unavailable), and
-group Notes need the original-recipient reader. Voice and photo Notes carry no media
-here yet. There is no way to undo a reaction (the table is insert-only and no route
-exists); see the decisions in the lane 5 status file.
+Followers and group Notes render the same way in the thread, but followers are unreadable
+until the reserved follow migration lands (`canonicalCoreContentFollows` is unavailable), and
+group Notes need the original-recipient reader; neither sends a notice yet. Voice and photo
+Notes carry no media here yet. There is no way to undo a reaction (the table is insert-only
+and no route exists). Two known gaps in who is pushed: a fan who muted a creator's Notes in
+the content module is still pushed (the mute is private to the fan and unreadable from the
+creator's session), and a reaction push can still go out after the fan withdrew the reply.
+Both are held in `tests/scenarios/lane-5/e5-4-known-gaps.mjs`; see the status file.

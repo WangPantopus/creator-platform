@@ -152,6 +152,14 @@ export interface ContentDependencies {
     actor: Actor,
     creatorId: string,
   ) => Promise<NoteReplyPolicy>;
+  /** W8's exact creator/fan negative on this held client: resolves when the pair
+   * is not denied, throws `scope_revoked` when it is, and `scope_denial_unavailable`
+   * when the answer is unknown. Notice fan-out needs it; absent, fan-out fails closed. */
+  holdCreatorFanNegative?: (
+    client: PoolClient,
+    actor: Actor,
+    tuple: { creatorId: string; fanId: string },
+  ) => Promise<void>;
   /** Current producer state only. Missing adapters fail closed for their path. */
   follows?: (
     client: PoolClient,
