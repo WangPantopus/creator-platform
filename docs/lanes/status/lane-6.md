@@ -1,61 +1,61 @@
 # Lane 6: Creator Studio (web) status
 
-Updated: 2026-10-09, by the continuing lane 6 session
+Updated: 2026-10-09, by the continuing lane 6 session.
+
+Working on: WP 6.1 only. The split preserves behavior; one pull request per area.
+`Studio.tsx` is now 2,383 lines after Prettier (originally 4,795).
+The extraction tool's printed count is its buffer before the final formatting pass; the counts
+in this status and the pull requests are measured from saved files.
 
 Resume correction: GitHub marks #368, #371, #374, #375 and #376 merged, but only #368
 reached `main`. The later pull requests merged into already-closed parent branches. The founder
-approved `lane-6/studio-split-recovery` against `main` to recover that reviewed stack, with the
-five remaining area pull requests stacked above it. The founder also approved the current
-Codex worktree location. No other worktree was changed.
+approved the recovery PR #382 (`lane-6/studio-split-recovery`) against `main`, with
+the five remaining area pull requests stacked above it. The recovery branch includes
+`origin/main` at `c0b4ac0f0`. The founder also approved this Codex worktree location.
+No other worktree was changed. CI is not polled and auto-merge is not enabled.
 
-**To continue, read `docs/lanes/status/lane-6-split-recipe.md` first.** It has the exact state, the
-commands, the traps and what not to redo. Round 1 is WP 6.1 only; do not start another work package
-until the founder sends "Next for lane 6".
+The integrator must ensure each area's commits actually reach `main`: merging a child into
+an already-closed parent pull request does not do that. Retarget each child to `main` before
+merging it after its parent. No pull request was merged by this session.
 
-Working on: WP 6.1, splitting `apps/web/features/studio/Studio.tsx` (4,795 lines) into feature
-modules with no behavior change. One pull request per area, each branch cut from the one before
-because every area needs the shared layer first. The recovery branch includes `origin/main`
-at `c0b4ac0f0`. The integrator must ensure that every area's commits reach `main`; merging a
-child into a previously closed parent pull request does not do that. CI is not polled.
+Done before handoff:
 
-- [x] #368 `lane-6/studio-split-harness`: the proof (E6.1 harness and runbook), no source change
-- [x] #371 `lane-6/studio-split-shared`: types, formatting helpers, `useAction` and `Feedback`, `Modal`
-- [x] #374 `lane-6/studio-split-thanks-more`: Thanks and More
-- [x] #375 `lane-6/studio-split-team`: Team
-- [x] #376 `lane-6/studio-split-handoff`: the recipe, the extraction tool and plan, the description generator, a move check that ignores formatting; no source change
-- [ ] `lane-6/studio-split-notes`: Notes and Compose
+- [x] #368: E6.1 harness and runbook (in `main`)
+- [x] #371: shared types, helpers, action hook and modal (recovered)
+- [x] #374: Thanks and More (recovered)
+- [x] #375: Team (recovered)
+- [x] #376: extraction recipe and tooling (recovered)
+
+This session:
+
+- [x] `lane-6/studio-split-notes`: Notes and Compose
 - [ ] `lane-6/studio-split-library`: Publish (the library)
 - [ ] `lane-6/studio-split-requests`: Requests and PacketDetail
 - [ ] `lane-6/studio-split-threads`: Threads and CorrectionForm
-- [ ] `lane-6/studio-split-shell`: navigation helpers and the requests count; `Studio.tsx` is the shell
+- [ ] `lane-6/studio-split-shell`: navigation helpers and the requests count
 
-Done: the first five rows above. `Studio.tsx` is 3,747 lines on the handoff tip (408 after the last
-area). The five remaining areas were dry-run on the Team tip: the extraction tool's output was
-identical to a hand-made version that passes typecheck, ESLint, Prettier, the move check and a
-production build. Only their browser runs remain.
+Done: Notes and Compose. Static checks, the declaration move
+check, the full browser comparison, all 7 workspace typechecks (zero cached tasks), and the
+production build passed for each checked area above.
 
-Next: the five unchecked rows, in order, then the round 1 report, then stop. After that the founder
-starts the next package with "Next for lane 6". Candidates, in the brief's order: WP 6.2 (Today and
-the Note composer), 6.9 (replace the 4-second polling), 6.3 (reactions), 6.4 (queue), 6.5 (accept and
-send, needs contract C3 from lane 4).
+Next: Publish (the library); Requests and PacketDetail; Threads and CorrectionForm; navigation helpers and the requests count; then the one-time main refresh and final proof.
+Do not begin WP 6.2 or any other package until the founder sends "Next for lane 6".
 
-Blocked on: nothing for round 1. WP 6.5 waits for contract C3 (lane 4), WP 6.8 for lane 5's web
-push, WP 6.10 and 6.11 for lanes 1 and 3.
+Blocked on: nothing for round 1. Later packages retain their existing contract dependencies.
 
 Scenarios:
 
-- E6.1 (star row), against the stand-in backend, golden = today's code: #371 pass (earlier harness
-  commit, covered again by the Team run), #374 pass (81 of 82 identical, one within tolerance),
-  #375 pass (82 of 82 identical). The extraction tool replay: pass. The move check controls (an edited
-  token, string and comment, a deleted declaration; a re-wrapped signature must not fail): pass. The
-  notes, library, requests, threads and shell runs: not run.
-  Re-run: `docs/lanes/status/lane-6-e6-1-runbook.md`.
-- E6.2 to E6.13: not run (outside round 1).
-- This session's golden at `45fcee40f`: captured 82 shots, 636 API calls and 1,090 Tab stops;
-  Chrome 154.0.8037.98. No harness changes. An optional second baseline run was not run.
-- Not run in this round: a real backend on PostgreSQL (deferred by the founder's WP 6.1
-  recipe even though lane 2's stack is now on `main`), `tests/visual`
-  (needs a Chromium download; it does not render Studio), the harness against a production build.
+- Golden at `45fcee40f`: 82 shots, 636 API calls, 1,090 Tab stops; Chrome 154.0.8037.98.
+  Real web app and Chrome at 390 px, Light and Night. Fakes: schema-checked HTTP backend and
+  browser clock. This compares HTTP writes and reads; no database state was checked.
+- Notes and Compose: 82 shots, 81 identical in pixels, calls, console and Tab order; 636 /api calls and 1090 Tab stops compared; chrome 154.0.8037.98 1 shot(s) equal within rendering tolerance (at most 64 pixels, at most 8/255): night/requests-empty/empty: 12 pixels differ, by at most 1/255 PASS: identical
+- First Notes attempt failed in `tests/scenarios/lane-6/e6-1-page.mjs:11`:
+  `clock.pauseAt: Error: Cannot fast-forward to the past` on Light empty Notes.
+  The complete rerun used unchanged source and harness and passed. No tolerance was changed.
+- E6.2–E6.13, real backend/PostgreSQL, actual passkey signatures, voice/photo recording,
+  production-browser capture, `tests/visual`, and the optional second baseline: not run.
+  The real backend remains deferred by the WP 6.1 recipe even though lane 2's stack is on main.
+- Re-run commands and limitations: `docs/lanes/status/lane-6-e6-1-runbook.md`.
 
 Ports and containers: 56462 (web, `next dev`), 56463 (stand-in API). No containers.
 
