@@ -18,18 +18,18 @@ Re-run (from the repository root, with node on PATH): `sh tests/scenarios/lane-5
 then `sh tests/scenarios/lane-5/run-all.sh`. It resets the database and restarts the host before
 each script; pass script names to run only some. `e5-4-known-gaps` is not in the default list.
 
-| Script                  | Rows                                                                                                                                                | Result (2026-10-08)                 |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| `e5-1-audience`         | E5.1 ★ who sees a Note: member, outsider, signed out, blocked, restricted, deleted, no thread, leaves, joins, tiers, mute, unknown creator          | 13 of 13 pass                       |
-| `e5-1-lifecycle`        | E5.1 ★ duplicate publish, edit, delete, wrong person, hostile text, paging and bad input                                                            | 6 of 6 pass                         |
-| `e5-1-scale`            | E5.1 ★ 600 members and 20 outsiders; latency                                                                                                        | 2 of 2 pass                         |
-| `e5-2-reactions`        | E5.2 ★ react, privacy between fans, duplicate, race, pending reply, wrong person, deleted reply                                                     | 7 pass, 1 not run (no undo exists)  |
-| `e5-4-note-notices`     | E5.3 ★ and E5.4 Notes: recipients, in-app list, push honesty, once per cause, silent edit, join and leave, failure and retry, withdrawn before send | 7 of 7 pass                         |
-| `e5-4-reaction-notices` | E5.2 ★ and E5.3 ★ reactions: who is told, push wording and privacy, once, withdrawn reply, denied fan                                               | 5 of 5 pass                         |
-| `e5-4-chunks`           | E5.1 ★ and E5.4: 600 recipients become events of 500 and 100, one notice each                                                                       | 2 of 2 pass                         |
-| `e5-4-scheduled`        | E5.4: scheduled Note, early run, racing runs                                                                                                        | 2 of 2 pass                         |
-| `e5-3-quiet-hours`      | E5.3 ★ quiet hours read in each fan's own time zone; held push released later (DST edges not run: need a clock fake)                                | 2 of 2 pass                         |
-| `e5-4-known-gaps`       | a muted fan is still pushed; a reaction push survives a withdrawn reply                                                                             | 0 of 2 pass (known, decisions 5, 6) |
+| Script                  | Rows                                                                                                                                                                          | Result (2026-10-08)                 |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| `e5-1-audience`         | E5.1 ★ who sees a Note: member, outsider, signed out, blocked, restricted, deleted, no thread, leaves, joins, tiers, mute, unknown creator                                    | 13 of 13 pass                       |
+| `e5-1-lifecycle`        | E5.1 ★ duplicate publish, edit, delete, wrong person, hostile text, paging and bad input                                                                                      | 6 of 6 pass                         |
+| `e5-1-scale`            | E5.1 ★ 600 members and 20 outsiders; latency                                                                                                                                  | 2 of 2 pass                         |
+| `e5-2-reactions`        | E5.2 ★ react, privacy between fans, duplicate, race, pending reply, wrong person, deleted reply                                                                               | 7 pass, 1 not run (no undo exists)  |
+| `e5-4-note-notices`     | E5.3 ★ and E5.4 Notes: recipients, in-app list, push honesty, once per cause, silent edit, join and leave, blocked after the notice, failure and retry, withdrawn before send | 8 of 8 pass                         |
+| `e5-4-reaction-notices` | E5.2 ★ and E5.3 ★ reactions: who is told, push wording and privacy, once, withdrawn reply, denied fan                                                                         | 5 of 5 pass                         |
+| `e5-4-chunks`           | E5.1 ★ and E5.4: 600 recipients become events of 500 and 100, one notice each                                                                                                 | 2 of 2 pass                         |
+| `e5-4-scheduled`        | E5.4: scheduled Note, early run, racing runs                                                                                                                                  | 2 of 2 pass                         |
+| `e5-3-quiet-hours`      | E5.3 ★ quiet hours read in each fan's own time zone; held push released later (DST edges not run: need a clock fake)                                                          | 2 of 2 pass                         |
+| `e5-4-known-gaps`       | a muted fan is still pushed; a reaction push survives a withdrawn reply                                                                                                       | 0 of 2 pass (known, decisions 5, 6) |
 
 ## Wiring for the integrator (WP 5.2a)
 
