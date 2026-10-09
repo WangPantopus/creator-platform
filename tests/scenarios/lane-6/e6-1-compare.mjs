@@ -44,8 +44,9 @@ const firstDiff = (x, y) => {
     if (!same(x[i], y[i]))
       return `#${i}: ${JSON.stringify(x[i])} <> ${JSON.stringify(y[i])}`;
 };
-// Pixels may differ by at most 2/255 in at most 64 places before a shot counts as changed: the
-// bound the existing visual suite uses for Chromium rounding native control corners (tests/visual/README.md).
+// Pixels may differ by at most 4/255 in at most 64 places before a shot counts as changed. The existing
+// visual suite allows 64 pixels at 2/255 for Chromium rounding native control corners (tests/visual/README.md);
+// the same code shows up to 3/255 on the native search box, so the level here is 4.
 async function pixels(shot) {
   const [p, q] = (
     await Promise.all([
@@ -70,7 +71,7 @@ async function pixels(shot) {
     );
   }
   const text = `${count} pixels differ, by at most ${max}/255`;
-  if (count <= 64 && max <= 2) return { noise: text };
+  if (count <= 64 && max <= 4) return { noise: text };
   await writeFile(`${after}/diff-${shot.png}`, PNG.sync.write(diff));
   return { problem: `${text} (diff-${shot.png})` };
 }
@@ -135,7 +136,7 @@ console.log(
 );
 if (noisy.length)
   console.log(
-    `${noisy.length} shot(s) equal within rendering tolerance (at most 64 pixels, at most 2/255):\n  ${noisy.join("\n  ")}`,
+    `${noisy.length} shot(s) equal within rendering tolerance (at most 64 pixels, at most 4/255):\n  ${noisy.join("\n  ")}`,
   );
 for (const p of problems) console.log(`DIFF ${p}`);
 console.log(

@@ -31,7 +31,7 @@ async function shoot(page, theme, step, shot, state, result) {
   const png = await page.screenshot({
     fullPage: true,
     animations: "disabled",
-    caret: "initial",
+    caret: "hide", // a blinking caret is a different pixel run to run
   });
   await writeFile(`${out}/${file}`, png);
   const requests = state.entries.splice(0).map((e) => ({ ...e }));
