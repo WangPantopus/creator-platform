@@ -61,8 +61,9 @@ polling calls over 20 seconds of page time on Notes, one second at a time.
 
 `e6-1-compare.mjs` fails on any of these:
 
-- a screenshot that differs by more than 2/255 in more than 64 pixels (the bound the existing
-  visual suite uses for Chromium rounding corners; shots inside it are listed, not hidden);
+- a screenshot that differs by more than 4/255 in more than 64 pixels. The existing visual suite
+  allows 64 pixels at 2/255 for Chromium rounding corners; the native search box shows 3/255 on
+  identical code, so the level here is 4. Shots inside the bound are listed, not hidden;
 - a write (any call that is not a GET) that differs, or arrives in a different order;
 - a read that is missing, extra or different. Reads that start together have no fixed order, and
   whether the page cancels a read before its answer lands is a race, so reads compare as a sorted
@@ -81,4 +82,5 @@ identical text (a leading `export` is ignored), and reports where each one went.
   Chrome runs without a GPU (`--disable-gpu`) so pixels repeat from run to run; make both runs on
   one machine.
 - Next's development "Issues" badge is hidden in the screenshots; it is not part of the product.
+- The text caret is hidden in the screenshots; a blinking caret is a different pixel run to run.
 - The dev server runs React in strict mode, which runs effects twice; both sides do the same.
