@@ -10,7 +10,6 @@ import {
   type ReactNode,
   type ReactElement,
   type AnchorHTMLAttributes,
-  type RefObject,
 } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -60,139 +59,18 @@ import { ConversationCorrectionMessageSchema } from "../../../../packages/api/sr
 import { configureStudioRequests, StudioFailure, studioRequest } from "./api";
 import "./studio.css";
 import { useIdentityRequest } from "../identity/session-boundary";
-
-type Creator = {
-  id: string;
-  display_name: string;
-  handle: string;
-  verification: string;
-  owned: boolean;
-  roles: string[];
-  memberHandle: string | null;
-  viewerAccountId: string;
-};
-type Page<T> = { items: T[]; nextCursor: string | null };
-type QueueItem = {
-  id: string;
-  fan_id: string;
-  handle: string;
-  version: number;
-  state: string;
-  payment_state: string;
-  decision_at: string;
-  deadline: string;
-  commitment_id: string | null;
-  commitment_state: string | null;
-  commitment_version: number;
-  due_at: string | null;
-  snapshot: {
-    title: string;
-    mode: string;
-    amount: number;
-    currency: string;
-    shareable: boolean;
-  };
-  disclosure: {
-    summary?: string;
-    identity?: "handle" | "shared_intro";
-    wholeThread?: boolean;
-    attachmentIds?: string[];
-    attachments?: unknown[];
-    messages?: { text: string }[];
-  };
-};
-type Queue = Page<QueueItem> & {
-  capacity: {
-    title: string;
-    weekly_limit: number;
-    used: number;
-    reserved: number;
-  }[];
-  serverTime: string;
-  requests: number;
-};
-type Packet = {
-  groupModes: {
-    id: string;
-    title: string;
-    kind: string;
-    amount: string;
-    currency: string;
-    version: number;
-  }[];
-  packet: QueueItem & {
-    thread_id: string;
-    creator_id: string;
-    hold_expires_at: string;
-    accepted_at: string | null;
-    proposed_mode: unknown;
-  };
-  commitment: {
-    id: string;
-    version: number;
-    state: string;
-    due_at: string;
-  } | null;
-  ledger: { kind: string; amount: number; currency: string; cause: string }[];
-  share: unknown;
-};
-const key = () => crypto.randomUUID();
-const contentStateLabel = (state: string) =>
-  ({
-    draft: "Draft",
-    scheduled: "Scheduled",
-    published: "Published",
-    media_pending: "Media processing",
-    unpublished: "Unpublished",
-    archived: "Archived",
-    withdrawn: "Withdrawn",
-  })[state] ?? "Status unavailable";
-const packetStateLabel = (state: string) =>
-  ({
-    draft: "Draft",
-    submitting: "Submitting",
-    submitted: "Waiting for your decision",
-    more_info: "Waiting for more information",
-    offer_pending: "Waiting for the fan’s decision",
-    accepting: "Confirming acceptance",
-    accepted: "Accepted",
-    releasing: "Closing request",
-    declined: "Passed on this one",
-    expired: "Decision time passed",
-    withdrawn: "Withdrawn",
-  })[state] ?? "Request status unavailable";
-const paymentStateLabel = (state: string) =>
-  ({
-    authorization_pending: "Checking payment hold",
-    requires_action: "Fan payment confirmation needed",
-    requires_capture: "Payment held · not charged",
-    unknown: "Checking payment status",
-    capturing: "Confirming charge",
-    captured: "Charged",
-    releasing: "Releasing payment hold",
-    released: "Payment hold released",
-    refund_pending: "Refund in progress",
-    refunded: "Refunded",
-    failed: "Payment could not complete",
-  })[state] ?? "Payment status unavailable";
-const speakerLabel = (control: string, name: string) =>
-  ({
-    ai_active: `${name}’s AI`,
-    human_active: name,
-    ai_paused: `${name}’s AI is paused`,
-    closed: "Conversation closed",
-  })[control] ?? "Current speaker unavailable";
-const time = (value: string | null) =>
-  value
-    ? new Intl.DateTimeFormat(undefined, {
-        dateStyle: "medium",
-        timeStyle: "short",
-      }).format(new Date(value))
-    : "—";
-const money = (amount: number, currency: string) =>
-  new Intl.NumberFormat(undefined, { style: "currency", currency }).format(
-    amount / 100,
-  );
+import type { Creator, Packet, Page, Queue } from "./shared/types";
+import {
+  contentStateLabel,
+  key,
+  money,
+  packetStateLabel,
+  paymentStateLabel,
+  speakerLabel,
+  time,
+} from "./shared/format";
+import { Feedback, useAction } from "./shared/action";
+import { Modal } from "./shared/Modal";
 
 function words(node: ReactNode): string {
   return Children.toArray(node)
@@ -708,48 +586,6 @@ export function Studio({
     </>
   );
 }
-function useAction() {
-  const [busy, setBusy] = useState(false),
-    [error, setError] = useState(""),
-    [notice, setNotice] = useState("");
-  const pending = useRef(false);
-  const run = async (work: () => Promise<void>) => {
-    if (pending.current) return;
-    pending.current = true;
-    setBusy(true);
-    setError("");
-    setNotice("");
-    try {
-      await work();
-    } catch (f) {
-      setError(
-        f instanceof Error ? f.message : "This action could not complete.",
-      );
-    } finally {
-      pending.current = false;
-      setBusy(false);
-    }
-  };
-  return { busy, error, notice, setNotice, run };
-}
-function Feedback({ action }: { action: ReturnType<typeof useAction> }) {
-  return (
-    <>
-      {action.error && (
-        <div>
-          <Notice tone="error" title="Action status">
-            {action.error}
-          </Notice>
-        </div>
-      )}
-      {action.notice && (
-        <p role="status" className="qv-help">
-          {action.notice}
-        </p>
-      )}
-    </>
-  );
-}
 function Notes({ creator }: { creator: Creator }) {
   const canReviewReplies = creator.owned || creator.roles.includes("triage");
   const [notes, setNotes] = useState<Page<ContentView>>({
@@ -1115,83 +951,6 @@ function Notes({ creator }: { creator: Creator }) {
         )}
       </div>
     </section>
-  );
-}
-function Modal({
-  title,
-  onClose,
-  children,
-  closeDisabled = false,
-  restoreFocusTo,
-}: {
-  title: string;
-  onClose: () => void;
-  children: ReactNode;
-  closeDisabled?: boolean;
-  restoreFocusTo?: RefObject<HTMLElement | null>;
-}) {
-  const ref = useRef<HTMLDialogElement>(null);
-  useEffect(() => {
-    // An async save may disable the trigger before this modal mounts, moving
-    // focus to body. Preserve the explicit media trigger in that case.
-    const restore =
-      restoreFocusTo?.current ?? (document.activeElement as HTMLElement | null);
-    const dialog = ref.current;
-    if (!dialog) return;
-    let resumeFocus: HTMLElement | null = null;
-    // A modal is in the top layer: hiding an ancestor alone is insufficient.
-    // Close it while authority is suspended, retaining its mounted editor.
-    const syncVisibility = () => {
-      if (dialog.closest("[hidden], [inert]")) {
-        if (dialog.open) {
-          if (dialog.contains(document.activeElement))
-            resumeFocus = document.activeElement as HTMLElement;
-          dialog.close();
-        }
-      } else if (!dialog.open) {
-        dialog.showModal();
-        if (resumeFocus?.isConnected) resumeFocus.focus();
-      }
-    };
-    const observer = new MutationObserver(syncVisibility);
-    for (
-      let ancestor = dialog.parentElement;
-      ancestor;
-      ancestor = ancestor.parentElement
-    )
-      observer.observe(ancestor, {
-        attributes: true,
-        attributeFilter: ["hidden", "inert"],
-      });
-    syncVisibility();
-    return () => {
-      observer.disconnect();
-      dialog.close();
-      restore?.focus();
-    };
-  }, [restoreFocusTo]);
-  return (
-    <dialog
-      ref={ref}
-      className="qv w5-dialog"
-      aria-label={title}
-      onCancel={(event) => {
-        event.preventDefault();
-        if (!closeDisabled) onClose();
-      }}
-    >
-      <div className="w5-row">
-        <h2>{title}</h2>
-        <button
-          className="qv-btn qv-btn--quiet"
-          disabled={closeDisabled}
-          onClick={onClose}
-        >
-          Close
-        </button>
-      </div>
-      {children}
-    </dialog>
   );
 }
 const emptyBody = (kind: ContentBody["kind"] = "note"): ContentBody => ({
