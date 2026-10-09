@@ -7,16 +7,16 @@ the founder sends "Next for lane 6".
 
 ## 1. Where things stand
 
-Nothing is merged. Four pull requests are open and one more (the handoff) sits on top. Each branch is
+Nothing is merged. Five pull requests are open, with #376 (the handoff) on top. Each branch is
 cut from the one before because every area needs the shared layer, so they merge **bottom up**.
 
-| Pull request             | Branch (base)                              | What it holds                                                                                                                                                                           |
-| ------------------------ | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| #368                     | `lane-6/studio-split-harness` (`main`)     | The E6.1 proof: `tests/scenarios/lane-6/` (stand-in backend, capture, compare, move check, runner), the runbook and the status file. No product source change. Harness tip `45fcee40f`. |
-| #371                     | `lane-6/studio-split-shared` (harness)     | `shared/`: `types.ts`, `format.ts`, `action.tsx` (`useAction`, `Feedback`), `Modal.tsx`                                                                                                 |
-| #374                     | `lane-6/studio-split-thanks-more` (shared) | `thanks/ThanksFeed.tsx`, `more/More.tsx`                                                                                                                                                |
-| #375                     | `lane-6/studio-split-team` (thanks-more)   | `team/Team.tsx`                                                                                                                                                                         |
-| the handoff pull request | `lane-6/studio-split-handoff` (team)       | This recipe, the extraction tool and its plan, the description generator, a move check that ignores formatting. No product source change.                                               |
+| Pull request | Branch (base)                              | What it holds                                                                                                                                                                           |
+| ------------ | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #368         | `lane-6/studio-split-harness` (`main`)     | The E6.1 proof: `tests/scenarios/lane-6/` (stand-in backend, capture, compare, move check, runner), the runbook and the status file. No product source change. Harness tip `45fcee40f`. |
+| #371         | `lane-6/studio-split-shared` (harness)     | `shared/`: `types.ts`, `format.ts`, `action.tsx` (`useAction`, `Feedback`), `Modal.tsx`                                                                                                 |
+| #374         | `lane-6/studio-split-thanks-more` (shared) | `thanks/ThanksFeed.tsx`, `more/More.tsx`                                                                                                                                                |
+| #375         | `lane-6/studio-split-team` (thanks-more)   | `team/Team.tsx`                                                                                                                                                                         |
+| #376         | `lane-6/studio-split-handoff` (team)       | This recipe, the extraction tool and its plan, the description generator, a move check that ignores formatting. No product source change.                                               |
 
 Still to do, none started (their branches do not exist yet), each cut from the one before:
 `lane-6/studio-split-notes`, `-library`, `-requests`, `-threads`, `-shell`, in that order. The
@@ -41,7 +41,7 @@ must merge bottom up; the proof runs against a stand-in for the backend, not a r
 
 The stack is unmerged, so start from its tip, not from `origin/main`. First check whether anything
 has merged: `gh pr list --state all --limit 200 --json number,title,state,headRefName --jq '.[] | select(.headRefName|startswith("lane-6/"))'`.
-If #368, #371, #374, #375 and the handoff pull request are all still open, start here. If some have
+If #368, #371, #374, #375 and #376 are all still open, start here. If some have
 merged, branch from `origin/main` plus whatever is still open, and say so in your first message.
 
 ```
@@ -109,7 +109,7 @@ Config template (`before_label` is always "today's code (the tip of the harness 
 
 ```json
 {
-  "prev_pr": 375,
+  "prev_pr": 376,
   "prev_branch": "lane-6/studio-split-handoff",
   "what": "Moves ... out of `apps/web/features/studio/Studio.tsx`, unchanged. `Studio.tsx` goes from N to M lines and imports them.",
   "why": "Fifth area in the stack. ...",
@@ -121,8 +121,8 @@ Config template (`before_label` is always "today's code (the tip of the harness 
 }
 ```
 
-The handoff pull request sits between Team and Notes in the stack, so the Notes description says
-`prev_pr` = the handoff pull request's number and `prev_branch` = `lane-6/studio-split-handoff`.
+For the notes pull request, `prev_pr` is 376 and `prev_branch` is `lane-6/studio-split-handoff`; each
+later area uses the previous area's pull request number and branch.
 
 ## 3. The five areas (from the plan in `tests/scenarios/lane-6/e6-1-split-plan.mjs`)
 

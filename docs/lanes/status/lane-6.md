@@ -15,7 +15,7 @@ pending (not polled).
 - [x] #371 `lane-6/studio-split-shared`: types, formatting helpers, `useAction` and `Feedback`, `Modal`
 - [x] #374 `lane-6/studio-split-thanks-more`: Thanks and More
 - [x] #375 `lane-6/studio-split-team`: Team
-- [x] `lane-6/studio-split-handoff`: the recipe, the extraction tool and plan, the description generator, a move check that ignores formatting; no source change
+- [x] #376 `lane-6/studio-split-handoff`: the recipe, the extraction tool and plan, the description generator, a move check that ignores formatting; no source change
 - [ ] `lane-6/studio-split-notes`: Notes and Compose
 - [ ] `lane-6/studio-split-library`: Publish (the library)
 - [ ] `lane-6/studio-split-requests`: Requests and PacketDetail
