@@ -12,6 +12,8 @@
 //   node infra/local/stack.mjs reset  --lane 2     down, then up: a stack rebuilt from nothing
 //   node infra/local/stack.mjs stop   --lane 2     stop everything, keep the data
 //   node infra/local/stack.mjs down   --lane 2     remove everything this stack created
+//   node infra/local/stack.mjs catalogues check|snapshot|diff|write --lane 2 [tool options]
+//                                                  the reviewed catalogue pins (WP 2.9)
 //
 // Lane N owns ports 564N0 to 564N9 and containers named qelvora-laneN-*;
 // --base-port moves the range and --lane may be a label such as 3a.
@@ -1268,14 +1270,45 @@ async function env(plan) {
   say(`QELVORA_FAKE_MODEL_URL=http://127.0.0.1:${plan.ports.model}`);
 }
 
-const help = `Usage: node infra/local/stack.mjs <up|status|smoke|env|logs|stop|down|reset> --lane N [options]
+const help = `Usage: node infra/local/stack.mjs <up|status|smoke|env|logs|stop|down|reset|catalogues> --lane N [options]
   --lane N        lane number (ports 564N0-564N9) or a label such as 3a with --base-port
   --base-port P   first of ten ports (default 56400 + N*10)
   up options      --db-only  --growth  --no-web  --no-ai  --no-smoke  --ack-only  --require-reply  --env KEY=VALUE  --web-env KEY=VALUE
   down options    --keep-data
-  logs            logs backend|web|model [-n 80]`;
+  logs            logs backend|web|model [-n 80]
+  catalogues      check | snapshot --out F | diff --base F | write [--base F] [--dry-run] [--variant L]
+                  the reviewed catalogue pins against this stack's database (docs/lanes/status/lane-2-catalogue-pins.md)`;
+
+// ---------------------------------------------------- the reviewed catalogue pins
+/** Everything but --lane and --base-port belongs to the tool; its exit code is ours. */
+async function catalogues(rest) {
+  const own = [];
+  const forwarded = [];
+  for (let at = 0; at < rest.length; at += 1)
+    if (rest[at] === "--lane" || rest[at] === "--base-port")
+      own.push(rest[at], rest[(at += 1)]);
+    else forwarded.push(rest[at]);
+  const plan = planFor(parse(["catalogues", ...own]).options);
+  return new Promise((done) => {
+    const child = spawn(
+      process.execPath,
+      [
+        "--import",
+        "tsx",
+        "src/operations/catalogues/catalogue-pins.ts",
+        ...forwarded,
+        "--database-url",
+        adminUrl(plan),
+      ],
+      { cwd: join(root, "apps/backend"), stdio: "inherit" },
+    );
+    child.on("close", (code) => done(code ?? 3));
+  });
+}
 
 async function main() {
+  if (process.argv[2] === "catalogues")
+    process.exit(await catalogues(process.argv.slice(3)));
   const { command, options } = parse(process.argv.slice(2));
   if (command === "help" || command === "--help") return say(help);
   const plan = planFor(options);
