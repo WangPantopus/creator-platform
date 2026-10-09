@@ -10,7 +10,7 @@ pull request that does the work.
 - [x] `lane-6/studio-split-harness`: the proof (E6.1 harness and runbook), no source change
 - [x] `lane-6/studio-split-shared`: types, formatting helpers, `useAction` and `Feedback`, `Modal`
 - [x] `lane-6/studio-split-thanks-more`: Thanks and More
-- [ ] `lane-6/studio-split-team`: Team
+- [x] `lane-6/studio-split-team`: Team
 - [ ] `lane-6/studio-split-notes`: Notes and Compose
 - [ ] `lane-6/studio-split-library`: Publish (the library)
 - [ ] `lane-6/studio-split-requests`: Requests and PacketDetail
