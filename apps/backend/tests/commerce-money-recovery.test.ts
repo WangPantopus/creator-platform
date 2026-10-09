@@ -1504,28 +1504,46 @@ describeMoney("commerce money path: deadlines, crashes, races", () => {
     });
 
     // DEFECT-2 (INV-16 release on expiry): a hold with too short a capture window.
-    // When the processor's hold has a capture window the service cannot use (under
-    // six hours, or unreported), applyIntent throws after recording the intent, the
-    // transaction rolls back, and the service forgets a live hold it can then never
-    // release. The request sticks in submitting/releasing until the hold lapses at
-    // the processor.
-    it.fails(
-      "DEFECT-2: a hold whose capture window is too short to use must be released, not left live",
-      async () => {
-        const provider = new FakePaymentProvider({
-          captureWindowMs: 5 * 3600_000,
-        });
-        const world = await fixture.newWorld({ weeklyLimit: 1, provider });
-        const view = await world.submit();
-        expect(view.packet.state).not.toBe("submitted");
-        await world.setAuthPendingUntil(view.packet.id, -60);
-        await world.makeEffectsDue(view.packet.id);
-        await world.service.reconcileDeadlines(world.fan.actor);
-        await world.service.reconcile(world.fan.actor, view.packet.id);
-        expect(provider.openHolds()).toBe(0);
-        expect(await world.capacity()).toMatchObject({ reserved: 0 });
-      },
-    );
+    // Fixed in "FIX: release a hold whose capture window is too short to use". A
+    // hold with under six hours left (or no reported window) can never be accepted.
+    // applyIntent refused it by throwing, which rolled back the intent reference, so
+    // the live hold was forgotten and could not be released: the request stuck in
+    // submitting/releasing, the slot stayed reserved and the cardholder's funds
+    // stayed held until the hold lapsed.
+    it("INV-16: a hold whose capture window is too short to use is canceled and the request can be retried", async () => {
+      const provider = new FakePaymentProvider({
+        captureWindowMs: 5 * 3600_000,
+      });
+      const world = await fixture.newWorld({ weeklyLimit: 1, provider });
+      const view = await world.submit();
+      expect(view.packet).toMatchObject({
+        state: "draft",
+        payment_state: "released",
+      });
+      expect(provider.openHolds()).toBe(0);
+      expect(provider.mutations()).toEqual(["authorize", "release"]);
+      expect(await world.capacity()).toMatchObject({ reserved: 0, used: 0 });
+      // Nothing was held, so nothing is booked as held.
+      expect(await world.ledgerKinds(view.packet.id)).toEqual([]);
+      // Settling again repeats nothing, and a normal hold can follow.
+      await world.service.reconcile(world.fan.actor, view.packet.id);
+      expect(provider.realCalls("release")).toHaveLength(1);
+      provider.captureWindowMs = 7 * 24 * 3600_000;
+      const retried = await world.service.reauthorize(
+        world.fan.actor,
+        view.packet.id,
+        {
+          version: (await world.packetRow(view.packet.id)).version,
+          idempotencyKey: world.key("reauth"),
+          paymentMethodId: "pm_cardVisa",
+        },
+      );
+      expect(retried.packet).toMatchObject({
+        state: "submitted",
+        payment_state: "requires_capture",
+      });
+      await world.assertConserved();
+    });
 
     // DEFECT-3 (ledger accuracy): a release for a hold that never existed.
     // Releasing a request that never had a hold (3-D Secure abandoned, or withdrawn

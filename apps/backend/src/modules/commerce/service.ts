@@ -2480,7 +2480,7 @@ export class CommerceService {
           "operator_reconciliation_required",
           "The original authorization needs provider reconciliation; no new hold is attempted.",
         );
-        const intent = packet.intent_ref
+        let intent = packet.intent_ref
           ? await this.provider.fetchIntent(packet.intent_ref)
           : (recovered ??
             (await this.provider.authorize({
@@ -2490,6 +2490,22 @@ export class CommerceService {
               paymentMethodId: effect.request.paymentMethodId!,
               key: effect.provider_key,
             })));
+        // A hold whose capture window is under the six hour margin, or not
+        // reported, can never be accepted. applyIntent refuses it by throwing, which
+        // rolls back the intent reference, so the live hold would be forgotten and
+        // could not be released. Cancel it now, while the reference is known, and
+        // settle the canceled hold like any other failed authorization.
+        if (
+          intent.status === "requires_capture" &&
+          !(
+            intent.captureBefore &&
+            intent.captureBefore.getTime() - 6 * 3600000 > Date.now()
+          )
+        )
+          intent = await this.provider.release(
+            intent.id,
+            `${effect.provider_key}:unusable`,
+          );
         await this.applyIntent(actor, effect, intent);
       } else {
         if (effect.operation === "capture") {
