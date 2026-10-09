@@ -30,7 +30,7 @@ are met.
 | Decision | Detail |
 | --- | --- |
 | Pilot cut line | The launch is slice 1 of the [architecture build sequence](source/System_Architecture.md) (section 12) plus the share card below. Everything else is in section 4. All ten finish-plan milestones stay in scope; this only orders them (section 9). |
-| Phone apps first | The native iOS and Android apps are the primary launch surface for fans. Web stays supported: it must deliver the first answer from a creator's link with no install, and it carries the configuration screens (My AI, Offers, Earnings, Team, License). Creators' daily work was decided native on 2026-10-02 in [DECISIONS](workstreams/DECISIONS.md), but the review found it unbuilt (L per platform). Decided 2026-10-08: Notes and reactions are native at launch; requests and accept open the phone-width web Studio first, with native right after (section 8, step 5). |
+| Phone apps first | The native iOS and Android apps are the primary launch surface for fans. Web stays supported: it must deliver the first answer from a creator's link with no install, and it carries the configuration screens (My AI, Offers, Earnings, Team, License). Creators' daily work was decided native on 2026-10-02 in [DECISIONS](workstreams/DECISIONS.md), but the review found it unbuilt (L per platform). Decided 2026-10-09 (option A): the pilot's native app is the fan app; creators use the Studio in the phone browser (installable, passkey signing); a separate native Qelvora Studio app follows after the pilot, Notes and reactions first. This replaces the 2026-10-08 plan to make Notes and reactions native at launch (section 8, step 5). |
 | Share card is in | A minimal card: a signed written reply, with its public verification page, as an image and a link. The fan chooses how their handle appears, and either side can revoke it (D-15). Pulled forward from slice 3. |
 | Model provider | The Anthropic API is the intended production provider. Development continues on the existing synthetic OpenAI configuration, which is development-only and not a production approval. Decided 2026-10-08: switch before the first real creator publishes, as one engine revision, with the embedding provider chosen first (section 8, step 2, and the provider notes below). |
 | Comparison scope freeze | Comparison stays installed and off. Done means: merge #351, #352 and #353 in order; a withdraw-only mode with retry; one native withdrawal exercised; SQL-level checks on a disposable database; a runbook; an overdue-purge alert; and a creator-authored FAQ set that replaces the fan-sample publish gate. Parked: sanitizer corpus, production authority, object store, per-fan limits. The wave cannot be removed, because export and delete are composed from it. Confirmed 2026-10-08. |
@@ -217,8 +217,9 @@ L two weeks or more.
 **Step 5: the creator's five minutes (moment 5).**
 - Flow first, on every platform: accept and send in two taps and one signature; queue rule
   cards and a draft-ready flag; Note and reaction without extra steps.
-- Native: Notes and reactions (the daily habit) in the apps; requests and accept open the
-  phone-width web Studio until native follows.
+- Creators use the web Studio on their phones during the pilot (option A). The native Qelvora
+  Studio app follows after the pilot proves the daily loop, with Notes and reactions first. If
+  pilot creators miss Notes because of the web friction, it moves earlier.
 - *Exit:* the founder, as Maya, completes a day's five minutes on a phone in under five.
 
 **Step 6: share card, measurement and release readiness.**
@@ -248,9 +249,9 @@ L two weeks or more.
 
 Decided on 2026-10-08 (recommendations confirmed):
 
-1. **Native creator Studio.** Notes and reactions native at launch; requests and accept on the
-   phone-width web Studio first, native right after. Fix the tap count and the two ceremonies
-   either way.
+1. **Native creator Studio (option A, 2026-10-09).** The pilot's native app is the fan app.
+   Creators use the web Studio on their phones; a separate native Qelvora Studio app follows
+   after the pilot. Fix the tap count and the two ceremonies either way.
 2. **Comparison done.** The definition in section 2.
 3. **Anthropic timing.** Before the first real creator publishes, as one engine revision, with
    the embedding provider chosen first.

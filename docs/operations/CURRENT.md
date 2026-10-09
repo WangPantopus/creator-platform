@@ -22,14 +22,15 @@ right now, and what remains. Approvals come from the founder in the chat, never 
 
 ## In flight
 
-- **Money tests** (background agent, own worktree): a Postgres-backed harness with a fake
-  payment provider, covering capture only after a signed accept, late decline, expiry, refund,
-  capacity under concurrency and idempotency. Result: a pull request, with any defects found.
+- **The seven lanes** are approved ([docs/lanes](../lanes/README.md)). The briefing pack
+  (charter, working agreement, contracts, coverage, one brief per lane) is in review. After the
+  founder approves it, each lane starts with a plan-only read-back, then works one pull request at
+  a time; the integrator merges in batches.
 - **Main's CI** for the merged work: the macOS jobs run slowly on one runner, and every merge
   to main cancels the run in progress. Merges are therefore batched.
-- **Open pull request:** Android Lint fixes. A docs update (this file and the identity
-  contract) is open with it.
-- **Waiting on the founder:** the Q01 decisions below.
+- **Done today:** the money tests (100, five defects found and fixed), Android Lint fixes, the
+  Pantopus identity research, and option A for the apps.
+- **Waiting on the founder:** the Q01 decisions below, then hosting and domain.
 
 ## Plan to completion
 
@@ -43,8 +44,8 @@ share card in, everything else planned for later. The evidence is the
 | 1 | A real host on real phones | Store hygiene started (privacy manifest, Android fixes). Sign-in, production composition, domain, push, store accounts not started | Q01 decisions, accounts, domain |
 | 2 | First answer: speed, guard, FAQ publish check, entry links, provider switch | Not started. The guard fixes ship with the provider switch as the next engine revision | provider and embedding decision |
 | 3 | Remembered, and the person shows up | Fans can read members and tier Notes (not operated). Memory wiring, Note and reaction delivery, push not started | Touch ID ceremony to operate |
-| 4 | Honest money | Late decline merged; tests in flight. Scheduler needs a work index from the identity or operations adapter; Stripe run needs keys | Stripe test keys, step 1 adapter |
-| 5 | The creator's five minutes | Not started | step 1 |
+| 4 | Honest money | Late decline merged; 100 money tests merged and five defects fixed. Scheduler needs a work index from the identity or operations adapter; Stripe run needs keys | Stripe test keys, step 1 adapter |
+| 5 | The creator's five minutes | Not started. Web Studio on phones for the pilot (option A); native Studio app after the pilot | step 1 |
 | 6 | Share card, measurement, ops, release readiness | Not started | counsel, pilot creators |
 
 ## Needed from the founder

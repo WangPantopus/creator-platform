@@ -7,7 +7,7 @@ personal attention.
 
 ## Start every session here
 
-For the order of work, read the [launch plan](docs/LAUNCH_PLAN.md); for the current state, [docs/operations/CURRENT.md](docs/operations/CURRENT.md). The older handoffs and the [project checkpoint](docs/operations/project-continuation-2026-10-07.md) are history. Refresh the Git/GitHub observations before resuming.
+For the order of work, read the [launch plan](docs/LAUNCH_PLAN.md); for the current state, [docs/operations/CURRENT.md](docs/operations/CURRENT.md). The older handoffs and the [project checkpoint](docs/operations/project-continuation-2026-10-07.md) are history. Refresh the Git/GitHub observations before resuming. If you are working on one of the seven lanes, start at [docs/lanes/README.md](docs/lanes/README.md).
 
 1. Read [docs/BRIEF.md](docs/BRIEF.md): the condensed product, identity system,
    screen inventory, copy system, decision log and open questions.
