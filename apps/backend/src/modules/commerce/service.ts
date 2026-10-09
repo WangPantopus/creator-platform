@@ -2632,6 +2632,19 @@ export class CommerceService {
         }
       }
     } catch (error) {
+      // A 4xx on an authorization means the processor refused the request itself (a
+      // payment method that is invalid, detached or already used). Nothing was held,
+      // but without an intent there is nothing to release either, so the request
+      // used to stay in submitting with its slot reserved for the rest of the week.
+      // That is concluded only when the processor confirms it holds nothing for this
+      // key; a hold it does have is applied, and any doubt keeps the unknown path.
+      if (
+        effect.operation === "authorize" &&
+        error instanceof DomainError &&
+        error.code === "provider_rejected" &&
+        (await this.settleRejectedAuthorization(actor, effect))
+      )
+        return;
       await this.account(actor, async (client) => {
         // Reconciliation takes packet before effect everywhere else. Keep that
         // order on failure too, so a returning provider result cannot deadlock
@@ -2688,6 +2701,61 @@ export class CommerceService {
         }
       }
     }
+  }
+  /** True when a rejected authorization was final and the request is settled.
+   * Only a processor that can confirm it holds nothing for this key may say so. */
+  private async settleRejectedAuthorization(actor: Actor, effect: EffectRow) {
+    try {
+      if (!this.provider?.recoverAuthorization) return false;
+      const { packet } = await this.packetRecord(actor, effect.packet_id);
+      if (packet.intent_ref) return false;
+      const held = await this.provider.recoverAuthorization({
+        packetId: effect.packet_id,
+        amount: effect.request.amount,
+        currency: effect.request.currency,
+        paymentMethodId: effect.request.paymentMethodId!,
+        key: effect.provider_key,
+      });
+      if (held) await this.applyIntent(actor, effect, held);
+      else await this.failRejectedAuthorization(actor, effect);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /** The processor refused an authorization and holds nothing for its key. Settle
+   * the request like a declined card: the slot returns and the fan can try another
+   * payment method. A request that was already being released closes in its
+   * terminal state, and its release, which has no hold to cancel, is finished. */
+  private async failRejectedAuthorization(actor: Actor, effect: EffectRow) {
+    await this.account(actor, async (client) => {
+      const p = await this.lockPacket(client, effect.packet_id);
+      await this.fenceEffect(client, effect);
+      await client.query(
+        "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true)",
+        [p.creator_id, p.fan_id],
+      );
+      if (
+        effect.provider_key ===
+          `${p.id}:authorize:${p.authorization_attempt}` &&
+        !p.intent_ref &&
+        ["submitting", "releasing"].includes(p.state)
+      ) {
+        await this.releaseCapacity(client, p);
+        await client.query(
+          "UPDATE creator.commerce_packet SET state=$2,payment_state='failed',version=version+1,updated_at=now() WHERE id=$1",
+          [p.id, p.state === "releasing" ? p.terminal_target : "draft"],
+        );
+        await client.query(
+          "UPDATE creator.commerce_effect SET state='done',error_code='authorization_rejected',lease_until=NULL,updated_at=now() WHERE packet_id=$1 AND operation='release' AND state<>'done'",
+          [p.id],
+        );
+      }
+      await client.query(
+        "UPDATE creator.commerce_effect SET state='failed',error_code='authorization_rejected',lease_until=NULL,updated_at=now() WHERE id=$1",
+        [effect.id],
+      );
+    });
   }
   private async fenceEffect(client: PoolClient, effect: EffectRow) {
     const own = await client.query(

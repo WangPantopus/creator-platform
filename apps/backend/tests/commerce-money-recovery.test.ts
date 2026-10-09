@@ -1611,41 +1611,129 @@ describeMoney("commerce money path: deadlines, crashes, races", () => {
     });
 
     // DEFECT-5 (INV-10 capacity, INV-16 release): an authorization rejected outright.
-    // When the processor refuses an authorization (HTTP 4xx: a payment method id that
-    // is invalid, detached or already used), nothing was held, yet the request stays
-    // submitting/unknown, its release has no intent to cancel, and every retry is
-    // refused again. The slot stays reserved: the creator is "fully booked" for the
-    // week with no request, and a fan with no spending limit can do this to any
-    // creator's whole weekly capacity with made-up payment method ids.
-    it.fails(
-      "DEFECT-5: a payment method the processor rejects outright must not keep a slot reserved forever",
-      async () => {
-        const world = await fixture.newWorld({ fans: 2, weeklyLimit: 1 });
-        world.provider.inject("authorize", {
-          phase: "before",
-          throws: "rejected",
-          times: 1000,
-          match: (call) => call.paymentMethodId === "pm_cardRejectedOutright",
-        });
-        const rejected = await world.submit(world.fans[0], {
-          paymentMethodId: "pm_cardRejectedOutright",
-        });
-        // Thirty minutes pass and a worker keeps reconciling.
-        await world.setAuthPendingUntil(rejected.packet.id, -60);
-        for (let round = 0; round < 3; round++) {
-          await world.makeEffectsDue(rejected.packet.id);
-          await world.service.reconcileDeadlines(world.fans[0]!.actor);
-          await world.service.reconcile(
-            world.fans[0]!.actor,
-            rejected.packet.id,
-          );
-        }
-        // Nothing was ever held, so the slot has to come back and be bookable.
-        expect(world.provider.openHolds()).toBe(0);
-        expect(await world.capacity()).toMatchObject({ reserved: 0 });
-        await world.submitted(world.fans[1]);
-      },
-    );
+    // Fixed in "FIX: settle an authorization the processor rejects outright". When
+    // the processor refused an authorization (HTTP 4xx: a payment method id that is
+    // invalid, detached or already used), nothing was held, yet the request stayed
+    // submitting/unknown, its release had no intent to cancel, and every retry was
+    // refused again. The slot stayed reserved: the creator was "fully booked" for
+    // the week with no request, and a fan with no spending limit could do that to
+    // any creator's whole weekly capacity with made-up payment method ids.
+    const rejectOutright = (world: World, paymentMethodId: string) =>
+      world.provider.inject("authorize", {
+        phase: "before",
+        throws: "rejected",
+        times: 1000,
+        match: (call) => call.paymentMethodId === paymentMethodId,
+      });
+
+    it("INV-10: a rejected authorization settles like a declined card, and the slot is bookable at once", async () => {
+      const world = await fixture.newWorld({ fans: 2, weeklyLimit: 1 });
+      rejectOutright(world, "pm_cardRejectedOutright");
+      const rejected = await world.submit(world.fans[0], {
+        paymentMethodId: "pm_cardRejectedOutright",
+      });
+      expect(rejected.packet).toMatchObject({
+        state: "draft",
+        payment_state: "failed",
+      });
+      expect(await world.capacity()).toMatchObject({ reserved: 0, used: 0 });
+      expect(world.provider.openHolds()).toBe(0);
+      expect(await world.ledger(rejected.packet.id)).toEqual([]);
+      expect((await world.effects(rejected.packet.id))[0]).toMatchObject({
+        operation: "authorize",
+        state: "failed",
+        error_code: "authorization_rejected",
+      });
+      // Another fan can book the creator's only slot, and once it is free the
+      // first fan starts a new request with a working card. (The dead draft has
+      // no authorization to re-authorize, so it is simply left behind.)
+      const taken = (await world.submitted(world.fans[1])).packet;
+      await expect(world.submit(world.fans[0])).rejects.toMatchObject({
+        code: "capacity_full",
+      });
+      await world.decline(taken.id);
+      const fresh = await world.submitted(world.fans[0]);
+      expect(fresh.packet.id).not.toBe(rejected.packet.id);
+      // Reconciling later changes nothing.
+      for (let round = 0; round < 3; round++) {
+        await world.makeEffectsDue(rejected.packet.id);
+        await world.service.reconcile(world.fans[0]!.actor, rejected.packet.id);
+      }
+      await world.assertConserved();
+    });
+
+    it("INV-10: a creator's whole capacity cannot be taken with payment method ids that never work", async () => {
+      const world = await fixture.newWorld({
+        fans: 2,
+        weeklyLimit: 3,
+        limit: null,
+      });
+      rejectOutright(world, "pm_cardMadeUp");
+      for (let attempt = 0; attempt < 6; attempt++)
+        await world.submit(world.fans[0], { paymentMethodId: "pm_cardMadeUp" });
+      expect(await world.capacity()).toMatchObject({ reserved: 0, used: 0 });
+      await world.submitted(world.fans[1]);
+      await world.assertConserved();
+    });
+
+    it("INV-16: a withdrawal that races a rejected authorization closes the request as withdrawn", async () => {
+      const world = await fixture.newWorld({ weeklyLimit: 1 });
+      const gate = world.provider.pause("authorize", "before");
+      rejectOutright(world, "pm_cardRejectedOutright");
+      const submitting = world.submit(world.fan, {
+        paymentMethodId: "pm_cardRejectedOutright",
+      });
+      await gate.arrived;
+      const [id] = await packetIds(world);
+      await world.withdraw(world.fan, id!);
+      gate.open();
+      await submitting;
+      expect(await world.packetRow(id!)).toMatchObject({
+        state: "withdrawn",
+        payment_state: "failed",
+      });
+      expect(await world.capacity()).toMatchObject({ reserved: 0 });
+      // Its release had no hold to cancel and does not stay pending.
+      expect(
+        (await world.effects(id!)).filter((e) => e.state !== "done"),
+      ).toMatchObject([{ operation: "authorize", state: "failed" }]);
+      await world.assertConserved();
+    });
+
+    it("INV-16: a hold the processor did place is never forgotten because its reply was a 4xx", async () => {
+      const world = await fixture.newWorld({ weeklyLimit: 1 });
+      // The processor created the hold but the answer reached us as a rejection.
+      world.provider.inject("authorize", {
+        phase: "after",
+        throws: "rejected",
+      });
+      const view = await world.submit();
+      expect(view.packet).toMatchObject({
+        state: "submitted",
+        payment_state: "requires_capture",
+      });
+      expect(world.provider.realCalls("authorize")).toHaveLength(1);
+      expect(world.provider.openHolds()).toBe(1);
+      expect(await world.ledgerKinds(view.packet.id)).toEqual(["hold"]);
+      expect(await world.capacity()).toMatchObject({ reserved: 1 });
+      await world.assertConserved();
+    });
+
+    it("INV-16: without a way to confirm that nothing was held, a rejection is not assumed final", async () => {
+      const provider = new FakePaymentProvider({ recovery: false });
+      const world = await fixture.newWorld({ weeklyLimit: 1, provider });
+      rejectOutright(world, "pm_cardRejectedOutright");
+      const view = await world.submit(world.fan, {
+        paymentMethodId: "pm_cardRejectedOutright",
+      });
+      // The cautious path: unknown, slot kept, for a person or a later retry.
+      expect(view.packet).toMatchObject({
+        state: "submitting",
+        payment_state: "unknown",
+      });
+      expect(await world.capacity()).toMatchObject({ reserved: 1 });
+      await world.assertConserved({ settled: false });
+    });
 
     // GAP (database level), the other half of DEFECT-1. The accepted_act_id check
     // (commerce_packet_check1) protects the `accepted` state only: neither the
