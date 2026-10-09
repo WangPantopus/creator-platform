@@ -73,6 +73,58 @@ for (const p of L.platforms(process.argv[2])) {
     L.screenshot(p, `state-${t.n}`);
   }
 
+  // The switches the harness gives a scenario: the model off, an unreviewed
+  // provider policy, a server error. Each is put back before the next.
+  let since = await mark();
+  await L.harness("POST", "/__harness/flags", { generationAvailable: false });
+  L.launch(p, "--to", open(1));
+  let seven = await L.waitForText(
+    p,
+    /AI messaging is not connected yet/u,
+    15000,
+  );
+  L.step(
+    p,
+    "S7 the model switched off: the composer says AI messaging is not connected",
+    seven.ok,
+  );
+  await L.harness("POST", "/__harness/flags", { generationAvailable: true });
+
+  await L.harness("POST", "/__harness/flags", { policyVerified: false });
+  await L.harness("POST", "/__harness/sessions", { action: "revoke" });
+  L.launch(p, "--reset", "--actor", "priya", "--to", "/creators/lenapark/chat");
+  seven = await L.waitForText(p, /Unreviewed development policy/u, 15000);
+  L.step(
+    p,
+    "S8 an unreviewed provider policy: the first-conversation screen says so",
+    seven.ok,
+  );
+  await L.harness("POST", "/__harness/flags", { policyVerified: true });
+
+  await L.harness("POST", "/__harness/sessions", { action: "revoke" });
+  await L.harness("POST", "/__harness/faults", {
+    rules: [{ match: "^/v1/growth/home$", status: 503 }],
+  });
+  since = await mark();
+  L.launch(p, "--reset", "--actor", "devon", "--to", "/home");
+  seven = await L.waitForText(
+    p,
+    /The service is unavailable\. Reconnect and try again\./u,
+    15000,
+  );
+  await L.harness("POST", "/__harness/faults", { rules: [] });
+  const failed = L.seen(await L.log(since, p), {
+    path: /growth\/home/u,
+    status: 503,
+  }).length;
+  L.launch(p, "--to", "/home");
+  const back = await L.waitForText(p, /Your people/u, 15000);
+  L.step(
+    p,
+    "E1 a server error on Home: said so with the server's words, and Home loads again once it clears",
+    seven.ok && failed > 0 && back.ok,
+  );
+
   // Live delivery into an open thread (Maya's).
   L.launch(p, "--to", open(1));
   await L.waitForText(p, /Maya/u);

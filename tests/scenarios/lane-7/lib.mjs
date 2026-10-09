@@ -107,13 +107,17 @@ export function screenshot(platform, name) {
   );
   return file;
 }
+/** A sentence that wraps across two lines on screen still matches. */
+const matches = (pattern, text) =>
+  pattern.test(text) || pattern.test(text.replaceAll(/\s*\n\s*/gu, " "));
+
 /** Waits until the screen says something that matches, or returns the last text. */
 export async function waitForText(platform, pattern, timeoutMs = 12000) {
   const until = Date.now() + timeoutMs;
   let text = "";
   do {
     text = screenText(platform, "wait");
-    if (pattern.test(text)) return { ok: true, text };
+    if (matches(pattern, text)) return { ok: true, text };
     await sleep(1000);
   } while (Date.now() < until);
   return { ok: false, text };
@@ -124,7 +128,7 @@ export async function waitForAbsent(platform, pattern, timeoutMs = 15000) {
   let text = "";
   do {
     text = screenText(platform, "wait");
-    if (!pattern.test(text)) return { ok: true, text };
+    if (!matches(pattern, text)) return { ok: true, text };
     await sleep(1000);
   } while (Date.now() < until);
   return { ok: false, text };

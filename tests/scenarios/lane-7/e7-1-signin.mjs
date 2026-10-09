@@ -146,6 +146,16 @@ for (const p of L.platforms(process.argv[2])) {
       .join(" | "),
   );
 
+  since = await mark();
+  L.launch(p, "--reset", "--actor", "new fan", "--to", "/home");
+  entries = await waitLog(since, { path: /identity\/session/u, status: 200 });
+  screen = await L.waitForText(p, /How creators will know you/u);
+  L.step(
+    p,
+    "H9 a new fan with no handle is asked for one before Home",
+    screen.ok && !L.seen(await log(since), { path: /growth\/home/u }).length,
+  );
+
   await fresh();
   L.launch(p, "--reset", "--actor", "devon", "--to", "/home");
   await L.waitForText(p, home);
@@ -165,7 +175,7 @@ for (const p of L.platforms(process.argv[2])) {
   screen = await L.waitForText(p, home);
   L.step(
     p,
-    "H9 an expired session is refreshed in place: same session, still signed in",
+    "H10 an expired session is refreshed in place: same session, still signed in",
     L.seen(entries, { path: /refresh/u, status: 200 }).length === 1 &&
       after.length === 1 &&
       after[0].id === original?.id &&
@@ -185,7 +195,7 @@ for (const p of L.platforms(process.argv[2])) {
   screen = await L.waitForText(p, /Continue with Pantopus/u, 15000);
   L.step(
     p,
-    "H10 a revoked session signs the person out and says why",
+    "H11 a revoked session signs the person out and says why",
     L.seen(entries, { path: /refresh/u, status: 401 }).length >= 1 &&
       screen.ok &&
       /session ended/iu.test(screen.text),
@@ -210,7 +220,7 @@ for (const p of L.platforms(process.argv[2])) {
   );
   L.step(
     p,
-    "H11 the network drops mid-session: says so, keeps the screen, recovers when it returns",
+    "H12 the network drops mid-session: says so, keeps the screen, recovers when it returns",
     screen.ok && /Your people/u.test(screen.text) && recovered.ok,
   );
 }

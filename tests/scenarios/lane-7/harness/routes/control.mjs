@@ -77,7 +77,12 @@ export function register(router) {
     const routes = {};
     let total = 0;
     for (const e of world.log) {
-      if (Date.parse(e.at) < from || e.path.startsWith("/__harness/")) continue;
+      if (
+        Date.parse(e.at) < from ||
+        e.path.startsWith("/__harness/") ||
+        (query.client && e.client !== query.client)
+      )
+        continue;
       const key = `${e.method} ${shape(e.path)}`;
       routes[key] = (routes[key] ?? 0) + 1;
       total += 1;
