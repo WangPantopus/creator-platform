@@ -32,6 +32,12 @@ Evidence so far: every area pull request compared 82 shots (41 screens and dialo
 all 82 shots, pixel for pixel. #371 was compared with an earlier harness commit (its description
 says so); the Team build contains #371's code and passed the final harness, so it is covered again.
 
+`origin/main` has moved since the stack was cut (it was `b6e0f426a`; lane 5 merged #365 and #366, 8
+commits). Nothing it changed touches Studio, the identity layer, `ui-web`, copy or lane 6's files; the
+one dependency of the harness that changed is `packages/api/src/content.ts`, which gained 74 lines (the
+stand-in checks its answers against those schemas). The stack is deliberately **not** merged up to
+`main` yet: do that once, at the end (section 6), with a fresh golden.
+
 Decisions the founder has not yet confirmed (none blocks the work): areas become folders
 (`notes/`, `team/`, ...) with `shared/` for what several share, although other `features/*` folders
 are flat; the stacked branches deviate from "cut from the latest `origin/main`", so the integrator
@@ -74,8 +80,9 @@ the previous branch).
 
 **Then, for each area in this order: notes, library, requests, threads, shell.**
 
-1. `git switch -c lane-6/studio-split-<area> <the previous branch>` (for notes the previous branch is
-   `lane-6/studio-split-handoff`), then `git branch --unset-upstream`. Push only by explicit name.
+1. `git switch -c lane-6/studio-split-<area> <the previous branch>`, then `git branch --unset-upstream`.
+   Push only by explicit name. The chain of previous branches is: `lane-6/studio-split-handoff` →
+   `-notes` → `-library` → `-requests` → `-threads` → `-shell` (each area is cut from the one to its left).
 2. `node tests/scenarios/lane-6/e6-1-extract.mjs <area>`. It copies the declarations byte for byte,
    writes the new modules with their imports, imports them in `Studio.tsx`, removes the imports
    `Studio.tsx` no longer uses, runs Prettier, and must end with `eslint: clean`. The numbers in the
@@ -172,16 +179,33 @@ formatting for that reason and still fails on any changed token, string or comme
 
 ## 5. Not done, and not to be redone
 
-Not started: the notes, library, requests, threads and shell pull requests (section 2), and every
-other work package. Done and verified, do not redo: the harness, the shared layer, Thanks and More,
-Team, the tooling in this pull request. The real-backend run is not done: repeat the star scenarios on
-lane 2's one-command stack once it is on `main` (the capture takes `--web` and `--api`).
+Not started: the five pull requests in section 2, and every other work package. Done and verified, do
+not redo: the harness, the shared layer, Thanks and More, Team, and the tooling in #376. Not done by
+anyone: a run against a real backend. Lane 2's one-command stack (`infra/local/stack.mjs`, its pull
+request #367) was still open when this was written; once it is on `main`, repeating the star scenarios
+on it is a follow-up for WP 6.2 onward, not a round 1 requirement (the capture takes `--web` and
+`--api`).
 
 ## 6. Ending round 1
 
-When the shell pull request is open, post the final report in the working agreement's format (under
-600 words: pull requests opened and what each does, scenarios run with results, what was not run,
-defects found with `file:line`, decisions needed, tickets, and the exact commands to re-run), end with
-the three lines `Working on:`, `Waiting on:`, `Next:`, and stop. Clean up first: stop your servers,
-delete `.next-lane6` and `.next-lane6-build` under `apps/web`, delete your scratch outputs, and make
-sure every branch is pushed and the tree is clean.
+When the shell pull request is open, do these in order:
+
+1. **Bring the stack up to date with `main`, once.** `git fetch origin`; then for each branch from
+   the bottom to the top (`harness`, `shared`, `thanks-more`, `team`, `handoff`, `notes`, `library`,
+   `requests`, `threads`, `shell`): `git switch <branch>`, `git merge --no-edit <the branch below it>`
+   (for `harness` merge `origin/main`), `git push origin <branch>`. Never rebase. If the lockfile changed,
+   run `pnpm install --frozen-lockfile --offline` before the next gate. Conflicts are not
+   expected (each branch changes only its own files and `Studio.tsx`); if the stand-in API refuses to
+   start because `packages/api` changed under it, fix the fixtures in the harness branch and merge forward.
+2. **Re-prove the whole stack on that base.** Make a new golden from the merged harness tip
+   (`git switch --detach origin/lane-6/studio-split-harness`, `e6-1-run.mjs --out "$SCRATCH/golden-merged"`),
+   then run the harness on the top branch (`shell`) and compare: it must print `PASS`. Run the
+   typecheck and production build gates on the top branch too. Say in the report that this covers every
+   area at once, and update the golden instructions in section 2 only if you changed the harness.
+3. Update `docs/lanes/status/lane-6.md` (tick the boxes, name the pull request numbers).
+4. Post the final report in the working agreement's format (under 600 words: pull requests opened and
+   what each does, scenarios run with results, what was not run, defects found with `file:line`,
+   decisions needed, tickets, and the exact commands to re-run), and end with the three lines
+   `Working on:`, `Waiting on:`, `Next:`. Then stop.
+5. Clean up: stop your servers, delete `.next-lane6` and `.next-lane6-build` under `apps/web`, delete your
+   scratch outputs, and make sure every branch is pushed and the tree is clean.
