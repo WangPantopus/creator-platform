@@ -69,11 +69,13 @@ else if (command === "stop") {
     // so both apps use one address (http://127.0.0.1:56473).
     adb("reverse", `tcp:${PORT}`, `tcp:${PORT}`);
     adb("shell", "am", "force-stop", BUNDLE);
+    // adb joins its arguments and the device shell splits them again: quote each value.
+    const quote = (value) => `'${value.replaceAll("'", `'\\''`)}'`;
     const extras = [
       ...(reset ? ["--ez", "harness_reset", "true"] : []),
-      ...(actor ? ["--es", "harness_actor", actor] : []),
-      ...(to ? ["--es", "return_to", to] : []),
-      ...(appearance ? ["--es", "appearance", appearance] : []),
+      ...(actor ? ["--es", "harness_actor", quote(actor)] : []),
+      ...(to ? ["--es", "return_to", quote(to)] : []),
+      ...(appearance ? ["--es", "appearance", quote(appearance)] : []),
     ];
     console.log(
       adb(

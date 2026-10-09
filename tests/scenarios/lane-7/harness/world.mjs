@@ -396,7 +396,8 @@ export function addMessage(world, thread, authorKind, text, extra = {}) {
   if (message.deliveryState !== "generating")
     frame(
       thread,
-      message.deliveryState === "delivered" ? "delivered" : "accepted",
+      extra.frameKind ??
+        (message.deliveryState === "delivered" ? "delivered" : "accepted"),
       message,
       extra.frame,
     );
@@ -536,6 +537,16 @@ function addThread(world, account, spec) {
       createdAt: iso(world.now() - 3_600_000),
     });
   }
+  // A speaker change is announced by the server as a system message (INV-04).
+  const announcement = { human_active: "takeover", ai_paused: "aiPaused" }[
+    spec.control
+  ];
+  if (announcement)
+    addMessage(world, thread, "system", copy(announcement, { name: first }), {
+      minutesAgo: 9,
+      frameKind: "control",
+      frame: { control: spec.control },
+    });
   if (spec.control === "human_active") {
     addMessage(
       world,

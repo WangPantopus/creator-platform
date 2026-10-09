@@ -3,7 +3,8 @@
 // the world (faults, clock, model switch, the creator showing up). The real
 // API has none of it.
 import { Failure } from "../http.mjs";
-import { addMessage, copy, frame, seed } from "../world.mjs";
+import { addMessage, copy, seed } from "../world.mjs";
+import { sendToAi } from "./conversation.mjs";
 
 const ID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gu;
 const shape = (path) => path.replace(ID, ":id");
@@ -27,7 +28,10 @@ function threadOf({ world, params, query }) {
   return thread;
 }
 
-function takeover(world, thread, control) {
+/** What the real server does when the speaker changes: interrupt a reply in
+ * progress, raise the epoch, write the announcement as a system message, and
+ * send the control frame that points at it (INV-03, INV-04). */
+function changeControl(world, thread, control) {
   const live = thread.messages.find(
     (m) => m.id === thread.generation?.messageId,
   );
@@ -35,8 +39,16 @@ function takeover(world, thread, control) {
   thread.generation = null;
   thread.control = control;
   thread.epoch += 1;
-  thread.revision += 1;
-  frame(thread, "control", null, { control });
+  const key =
+    control === "human_active"
+      ? "takeover"
+      : control === "ai_active"
+        ? "handback"
+        : "aiPaused";
+  addMessage(world, thread, "system", copy(key, { name: thread.creatorName }), {
+    frameKind: "control",
+    frame: { control },
+  });
 }
 
 export function register(router) {
@@ -207,16 +219,32 @@ export function register(router) {
       {},
     ),
   );
+  // The fan's other device sends a message: the reply streams to this thread's open screens.
+  router.add("POST", "/__harness/threads/:handle/ask", (ctx) =>
+    sendToAi(
+      ctx.world,
+      threadOf(ctx),
+      String(ctx.body?.text ?? "A question from my other device"),
+      `harness-${ctx.world.now()}-${Math.random()}`,
+    ),
+  );
+  // Ends every live connection, as a dropped network or a server restart would.
+  router.add("POST", "/__harness/sockets/close", ({ world, body }) => {
+    const count = world.sockets.size;
+    for (const socket of [...world.sockets])
+      socket.close(body?.code ?? 1013, "Harness closed this connection");
+    return { closed: count };
+  });
   router.add("POST", "/__harness/threads/:handle/takeover", (ctx) => {
-    takeover(ctx.world, threadOf(ctx), "human_active");
+    changeControl(ctx.world, threadOf(ctx), "human_active");
     return { ok: true };
   });
   router.add("POST", "/__harness/threads/:handle/handback", (ctx) => {
-    takeover(ctx.world, threadOf(ctx), "ai_active");
+    changeControl(ctx.world, threadOf(ctx), "ai_active");
     return { ok: true };
   });
   router.add("POST", "/__harness/threads/:handle/pause", (ctx) => {
-    takeover(ctx.world, threadOf(ctx), "ai_paused");
+    changeControl(ctx.world, threadOf(ctx), "ai_paused");
     return { ok: true };
   });
   router.add("POST", "/__harness/threads/:handle/set", (ctx) => {

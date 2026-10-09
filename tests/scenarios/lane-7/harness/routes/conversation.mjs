@@ -136,7 +136,9 @@ function generate(world, thread, fanMessage, generationId) {
         { generationId, sequence: thread.generation.sequence },
       );
       thread.revision += 1;
-      schedule(world, world.sentenceDelayMs, step);
+      // The reply is delivered right after its last sentence, not a pause later.
+      const last = thread.generation.sequence === sentences.length;
+      schedule(world, last ? 20 : world.sentenceDelayMs, step);
     } else {
       ai.deliveryState = "delivered";
       ai.citations = [ids.post(1)];
@@ -171,6 +173,51 @@ function sendBody(body) {
   )
     throw invalid();
   return { text, key };
+}
+
+/** The fan sends a message to the AI: the real send path's checks, then the reply streams in. */
+export function sendToAi(world, thread, text, key) {
+  const accepted = prior(thread, key);
+  if (accepted) return accepted;
+  if (!world.generationAvailable)
+    throw new Failure(
+      503,
+      "model_unconfigured",
+      "AI messaging is not connected yet.",
+    );
+  if (thread.control !== "ai_active")
+    throw new Failure(
+      403,
+      "ai_unavailable",
+      "The AI is unavailable in this conversation.",
+    );
+  if (thread.consentVersion !== world.policy.version)
+    throw new Failure(
+      403,
+      "processor_consent_required",
+      "Review the current AI providers before messaging.",
+    );
+  if (!thread.access)
+    throw new Failure(
+      403,
+      "allowance_unavailable",
+      "Your AI access or allowance is unavailable. You can still ask the creator to step in.",
+    );
+  if (thread.generation)
+    throw new Failure(
+      403,
+      "reply_in_progress",
+      "Wait for this reply before sending another message.",
+    );
+  const generationId = randomUUID();
+  const fan = addMessage(world, thread, "fan", text, {
+    fields: { deliveryState: "accepted" },
+    frame: { generationId },
+  });
+  const result = { message: base(fan), generationId };
+  thread.idempotency.set(key, result);
+  generate(world, thread, fan, generationId);
+  return result;
 }
 
 export function register(router) {
@@ -388,47 +435,7 @@ export function register(router) {
     const { thread } = ownThread(ctx);
     const { world } = ctx;
     const { text, key } = sendBody(ctx.body);
-    const accepted = prior(thread, key);
-    if (accepted) return accepted;
-    if (!world.generationAvailable)
-      throw new Failure(
-        503,
-        "model_unconfigured",
-        "AI messaging is not connected yet.",
-      );
-    if (thread.control !== "ai_active")
-      throw new Failure(
-        403,
-        "ai_unavailable",
-        "The AI is unavailable in this conversation.",
-      );
-    if (thread.consentVersion !== world.policy.version)
-      throw new Failure(
-        403,
-        "processor_consent_required",
-        "Review the current AI providers before messaging.",
-      );
-    if (!thread.access)
-      throw new Failure(
-        403,
-        "allowance_unavailable",
-        "Your AI access or allowance is unavailable. You can still ask the creator to step in.",
-      );
-    if (thread.generation)
-      throw new Failure(
-        403,
-        "reply_in_progress",
-        "Wait for this reply before sending another message.",
-      );
-    const generationId = randomUUID();
-    const fan = addMessage(world, thread, "fan", text, {
-      fields: { deliveryState: "accepted" },
-      frame: { generationId },
-    });
-    const result = { message: base(fan), generationId };
-    thread.idempotency.set(key, result);
-    generate(world, thread, fan, generationId);
-    return result;
+    return sendToAi(world, thread, text, key);
   });
 
   router.add(

@@ -16,6 +16,14 @@ const compile = (pattern) =>
     "u",
   );
 
+/** Which app sent a request, from its User-Agent, so scenarios can count only their own app. */
+export const clientOf = (req) => {
+  const agent = String(req.headers["user-agent"] ?? "");
+  if (/Android|okhttp|Dalvik/iu.test(agent)) return "android";
+  if (/CFNetwork|Darwin|iPhone|QelvoraApp/iu.test(agent)) return "ios";
+  return "other";
+};
+
 export class Router {
   routes = [];
   add(method, pattern, handler) {
@@ -77,6 +85,7 @@ export function createHandler(world, router) {
       status: 0,
       ms: 0,
       account: null,
+      client: clientOf(req),
     };
     world.log.push(entry);
     if (world.log.length > 5000) world.log.shift();

@@ -10,17 +10,32 @@ const adb = (...args) =>
   execFileSync("adb", ["-s", SERIAL, ...args], {
     encoding: "utf8",
     maxBuffer: 32 << 20,
+    stdio: ["ignore", "pipe", "pipe"],
   });
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /** Every visible node with its text, description and centre point. */
 export function screen() {
-  adb("shell", "uiautomator", "dump", "/data/local/tmp/ui.xml");
+  // uiautomator answers "null root node" while a window is changing: ask again.
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    if (
+      /dumped to/u.test(
+        adb("shell", "uiautomator", "dump", "/data/local/tmp/ui.xml"),
+      )
+    )
+      break;
+    execFileSync("sleep", ["0.5"]);
+  }
   const xml = adb("exec-out", "cat", "/data/local/tmp/ui.xml");
   const nodes = [];
   for (const match of xml.matchAll(/<node [^>]*>/gu)) {
-    const attr = (name) =>
-      new RegExp(`${name}="([^"]*)"`, "u").exec(match[0])?.[1] ?? "";
+    // uiautomator quotes a value with single quotes when it contains a double quote.
+    const attr = (name) => {
+      const found = new RegExp(`${name}=(?:"([^"]*)"|'([^']*)')`, "u").exec(
+        match[0],
+      );
+      return found?.[1] ?? found?.[2] ?? "";
+    };
     const bounds = /\[(\d+),(\d+)\]\[(\d+),(\d+)\]/u.exec(attr("bounds"));
     if (!bounds) continue;
     const [x1, y1, x2, y2] = bounds.slice(1).map(Number);

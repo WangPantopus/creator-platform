@@ -2,7 +2,7 @@
 // Stands in for the Qelvora API so the phone apps can run signed in on a
 // simulator or an emulator without the full stack. It binds to loopback only.
 import http from "node:http";
-import { Router, createHandler } from "./http.mjs";
+import { Router, clientOf, createHandler } from "./http.mjs";
 import { createWorld } from "./world.mjs";
 import { accept } from "./ws.mjs";
 import * as commerce from "./routes/commerce.mjs";
@@ -36,6 +36,7 @@ server.on("upgrade", (req, socket) => {
     status: 101,
     ms: 0,
     account: null,
+    client: clientOf(req),
   };
   world.log.push(entry);
   let auth;
