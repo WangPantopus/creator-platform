@@ -522,7 +522,13 @@ public struct FanAppShell: View {
         }.foregroundStyle(qColor("ink", scheme)).background(qColor("ground", scheme))
             .task(id: scenePhase) {
                 guard scenePhase == .active else { return }
+                #if DEBUG
+                await DebugHarness.resetIfRequested(model)
+                #endif
                 await model.refresh()
+                #if DEBUG
+                await DebugHarness.signInIfRequested(model)
+                #endif
                 while !Task.isCancelled {
                     do { try await Task.sleep(for: .seconds(4)) } catch { return }
                     guard !Task.isCancelled else { return }
