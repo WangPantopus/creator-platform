@@ -76,12 +76,28 @@ and separate worker logins exist for a reason (isolation); do not merge them for
 Infrastructure is code; secrets never enter git; nothing deploys without the integrator.
 Never run a command against `creator-w2-original-archive-20261007` or other preserved data.
 
-## Verification and exit demo
+## Verification: end-to-end scenarios and exit demo
 
-Operate everything you build. **Exit demo:** on a clean checkout, one command produces a
-running stack and a smoke script passes (sign in with the development identity, send a message,
-see the acknowledgment); a staging environment serves HTTPS; killing a worker is recovered; a
-backup restores into a scratch database and the counts match.
+No unit tests ([working agreement](01-working-agreement.md) section 3). Everything you build is
+operated for real, and **your smoke script is the seed of every other lane's checks**, so make it
+small and reliable. Use your own port range and containers only; never touch the preserved
+databases.
+
+| ID | Workflow | Edge cases to run |
+| --- | --- | --- |
+| E2.1 ★ | Cold start: from a clean worktree and no containers, one command gives the database, migrations, seeds, backend, workers and web; the smoke script signs in (development identity), sends a message and sees the acknowledgment | Run it twice (idempotent, no duplicate seeds); rerun after a half-failed first run; a port already taken (clear error); Docker not running (clear error); two stacks on two port ranges at once; teardown removes only its own containers and volumes; the command takes the lane's port range as a parameter |
+| E2.2 ★ | A production host fails closed | Start with a missing identity, payments, model or push adapter: no domain routes, readiness red, a clear log line; the runtime database role is a superuser, BYPASSRLS or the owner: refuses to start; the development identity in a production configuration: refuses; database down: readiness red and liveness green; database back: recovers without a restart |
+| E2.3 | The staging edge | HTTPS valid; HTTP redirects; HSTS; only the allowed origin passes CORS; rate limits answer 429, not 500; the domain association files are served with the right content type |
+| E2.4 ★ | Workers | Kill -9 each worker mid-job: it restarts and the job completes exactly once; two instances of one worker do not double-process; a poison job does not block the queue; the database restarts and workers reconnect; a stuck worker fails its health check |
+| E2.5 | Observability | A slow path and an error injected: the metric and the alert fire; logs contain no tokens, emails or fan text (search a run of synthetic data); the uptime check notices an outage |
+| E2.6 ★ | Backup and restore | Back up, restore into a scratch database, counts and checksums match; restore to a point in time; measured recovery point and time against 5 minutes and 1 hour; a dry run of the retention purge |
+| E2.7 | Deploy | A trivial change reaches staging from CI; a failing health check halts promotion; rollback works; secrets are absent from logs |
+| E2.8 | Load and soak | Many concurrent readers of the public creator page; many WebSocket connections for 30 minutes with no memory growth; worker concurrency; overload answers 429, not 500; recovery after the load stops |
+| E2.9 ★ | Catalogue regeneration | Apply a new migration to a scratch database: export and delete refuse; the tool regenerates; they work again; the tool fails loudly if regeneration was forgotten |
+
+**Exit demo:** on a clean checkout, one command produces a running stack and the smoke script
+passes; a staging environment serves HTTPS; killing a worker is recovered; a backup restores into
+a scratch database and the counts match.
 
 ## Known risks
 

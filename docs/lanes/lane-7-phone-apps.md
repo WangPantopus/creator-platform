@@ -82,12 +82,33 @@ Run native builds one at a time under the heavy-build lock. Authorship is never 
 (INV-06). Never show a purchase as the way out of a failure. Do not add creator features. Debug
 conveniences stay behind `BuildConfig.DEBUG` or `#if DEBUG`.
 
-## Verification and exit demo
+## Verification: end-to-end scenarios and exit demo
 
-Build with the local JDK and XcodeGen; run Lint and the unit and snapshot tests; run on a
-simulator or emulator in Light and Night and at large text. **Exit demo on real devices:** install
-from TestFlight and Play closed testing; sign in; open a thread with a labeled Note; tap a push
-and land on the right screen; press Back; rotate with a draft; go offline; delete the account.
+No new unit or snapshot tests ([working agreement](01-working-agreement.md) section 3). Build
+with the local JDK and XcodeGen and run Lint and the existing unit and snapshot suites as a
+regression check. Then operate the app: **every scenario runs on iOS and on Android, and the pull
+request shows both results side by side. A difference between the platforms is a defect.** Run in
+Light and Night and at the largest text. Create your own simulator and emulator
+(`qelvora-lane7-...`); an Android 35 system image and the emulator are installed. Native builds one
+at a time under the lock. Use the fake API (7.1) until lane 2's stack is on `main`.
+
+| ID | Workflow | Edge cases to run |
+| --- | --- | --- |
+| E7.1 | The harness: each app runs signed in against the fake API | A release build contains none of it; a fixture for every state a screen can be in |
+| E7.2 ★ | Navigation | Back from a thread returns to where you came from (not always `/you`); Android system and predictive Back through every flow; Back after a link; kill the process and relaunch: the location and the draft come back |
+| E7.3 ★ | Keyboard, rotation and drafts | A draft survives rotation, backgrounding and a process kill; the keyboard never covers the composer; edge-to-edge insets with gesture and three-button navigation; the largest text; split screen where supported |
+| E7.4 ★ | Rendering parity | Side-by-side screenshots of: a thread with a Note (audience label, glyph, color); a reaction; each composer state (trial, ended, capacity, paused); the step-in seal; a citation; the 3-hour reminder; the 18+ confirmation; the provider consent; the packet terms block; notification rows. A grayscale screenshot still shows who is speaking; pickers show names, never ids |
+| E7.5 ★ | Sign-in (needs C1) | The system-browser flow: cancel; return after 10 minutes (expired); the wrong account; no network; sign out; a fresh sign-in for signing; an under-18 account refused with the policy; delete the account inside the app; reinstall |
+| E7.6 | Links | A link with the app installed and not; an unknown creator; a malformed link; a signed-out person goes to sign-in and then the destination; the custom scheme is absent from release builds |
+| E7.7 ★ | Push (needs credentials) | The permission asked in context; deny and keep using the app; the token registered, rotated and removed at sign-out; a tap from cold start, background and foreground; a push for a thread you can no longer open; redaction on a locked device; the Android 13 permission |
+| E7.8 | Polling and offline | Requests per minute measured before and after (target: well under today's 52 on Android); airplane mode shows the cached thread labeled as cached and refuses or queues a send honestly; reconnect catches up with no duplicates; the background does not poll |
+| E7.9 ★ | Store readiness | The signed, shrunk release build installs on a clean device and signs in; the privacy manifest, data-safety answers, 18+ rating, in-app deletion, review notes and demo account all work as described |
+| E7.10 | Copy and accessibility | No literal user-facing strings outside copy lookups (scan the source); none of the forbidden words; VoiceOver and TalkBack read authorship first; the largest text; contrast in both themes |
+| E7.11 | The web Studio deep link | A creator in the fan app is sent to the web Studio and lands signed in, or at sign-in |
+
+**Exit demo on real devices:** install from TestFlight and Play closed testing; sign in; open a
+thread with a labeled Note; tap a push and land on the right screen; press Back; rotate with a
+draft; go offline; delete the account.
 
 ## Known risks
 

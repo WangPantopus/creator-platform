@@ -5,7 +5,9 @@
 The AI is worth talking to: fast, grounded in the creator's own work, honest, and it remembers.
 This lane owns the whole path from "fan sends" to "first approved sentence is visible", the
 guard that approves it, the memory, the creator's My AI pages, and the model provider. It has
-**two tracks that run in parallel on different files**.
+**two tracks on different files**. One session works them one pull request at a time, in the
+order its prompt recommends; the founder may instead run them as two sessions (see the lanes
+README).
 
 **What a person should feel.** A fan sends a question and sees it acknowledged at once, then a
 sentence in the creator's voice with a citation that opens the exact passage, in a few seconds.
@@ -45,8 +47,8 @@ generation, public-AI and publication files in `modules/identity` with their SQL
 
 Track A edits the transaction, verification and worker files. Track B edits the prompt, guard,
 model, memory and creator-AI files. `generation-pipeline.ts` is shared: Track A touches the
-admission and bookend call sites, Track B touches stage content; keep diffs small and rebase
-often. If conflicts become frequent, the integrator merges the tracks.
+admission and bookend call sites, Track B touches stage content; keep diffs small and merge
+`main` into your branch often. If conflicts become frequent, the integrator merges the tracks.
 
 Do not touch: money, growth and content modules, `server.ts`, other lanes' files.
 
@@ -69,7 +71,7 @@ Do not touch: money, growth and content modules, `server.ts`, other lanes' files
 | --- | --- | --- | --- |
 | A1 | **Measurement harness**: run the generation path on the fixture database with a fake model, count statements and time per phase, reproduce about 625 W1 and 450 consumer statements per answer. No behavior change. **First pull request** | M | lane 2's stack helps |
 | A2 | Wake the worker on accept instead of a 1 s poll | S to M | A1 |
-| A3 | **Stop repeating verification inside one held transaction**, keeping begin and end checks and the fresh per-stage scope; tests; the integrator signs off | L | A1 |
+| A3 | **Stop repeating verification inside one held transaction**, keeping begin and end checks and the fresh per-stage scope; scenarios E3A.2, E3A.4 and E3A.5; the integrator signs off | L | A1 |
 | A4 | Fewer transactions (merge admissions, drop the second bookend, merge deliver and readback) | M | A3 |
 | A5 | Move the model safety check off the pre-acknowledgment path; keep the synchronous regex | M | **founder safety sign-off** |
 | A6 | Reliability: lease renewal, `ai_workspace` lock collisions, cost-hold sizing against the daily cap, treat a non-2xx before any body as known zero cost | M | none |
@@ -95,10 +97,33 @@ ones preserved, never an edit in place. Never release a sentence before its guar
 (INV-05, 17, 21, 25). The AI never sells and never states a price (INV-21). Context is
 thread-local (INV-11). Never edit applied SQL; migrations go through the queue.
 
-## Verification and exit demo
+## Verification: end-to-end scenarios and exit demo
 
-Measure before and after; show numbers. Safety-adjacent changes get tests and the integrator's
-review. **Exit demo:** on the lane 2 stack with a real provider key, 20 messages from a fan: p95
+No unit tests ([working agreement](01-working-agreement.md) section 3). Measure before and
+after and show the numbers. The fixture database with a fake model (with a realistic delay) is
+your first stack; move to lane 2's stack when it lands. Safety-adjacent changes also get the
+integrator's review. Every Track A change must pass E3A.2: the same conversation gives the same
+visible answer before and after.
+
+| ID | Workflow | Edge cases to run |
+| --- | --- | --- |
+| E3A.1 | Measurement: 20 messages from one fan; p50 and p95 acknowledgment and first sentence; statements per answer by phase; a before and after table in every Track A pull request | Cold start; five fans at once; a 3,000-character message |
+| E3A.2 ★ | No behavior change: the same messages give the same visible text, authorship, citations and order before and after each Track A change | Run on every Track A pull request, with a fake model and fixed seeds |
+| E3A.3 | Wake on accept (no 1 s poll) | Worker down when the message is sent (the answer arrives after restart); two workers (one answer); a burst of 30 messages |
+| E3A.4 ★ | Authority changes mid-answer | The creator pauses the AI, takes over, the fan blocks or withdraws consent, publication lapses, the account is deleted: each at +0 ms, +200 ms and just before delivery. No AI sentence appears after the change (INV-03, INV-05); takeover is visible within 500 ms |
+| E3A.5 ★ | Exactly one answer | Kill the worker after admission, after the model call and before delivery; restart: one answer, no gap, no duplicate; replay the same message with the same key |
+| E3A.6 ★ | Safety order | A hard-block phrase never reaches the screen, not even for a moment; with the classifier off the pre-acknowledgment path (A5, after sign-off) the synchronous regex still runs first and a distressed message gets the safe fallback first |
+| E3A.7 | Reliability | The lease expires during a slow provider call; a lock collision on one workspace; the daily cost cap is hit (a clean paused state, not an error); the provider answers 500, 429, a timeout or a malformed body (honest fan state, cost recorded, unknown cost handled) |
+| E3A.8 | Frames (C5) | A client paints from frames without a refetch; duplicate, missing and out-of-order frames resync from the cursor; a stale-epoch frame is dropped (INV-03); reconnect mid-answer resumes; no frame ever carries unapproved text |
+| E3B.1 ★ | Guard revision 15 | A corpus of about 200 lines: ordinary advice ("spread your glaze", "buy test tiles") passes; price statements, selling, "Maya read, remembers or felt" and the other hard blocks stay blocked; a distressed fan gets the safe fallback and never "ask Maya directly" (INV-19, INV-21); case, unicode, zero-width, leetspeak, very long and quoted variants; published versions on revisions 12 to 14 still verify and behave as before |
+| E3B.2 ★ | FAQ publish check | A creator writes an FAQ set and publishes version two with no fan data; a refusal counts as a failure; below the bar blocks, above allows; empty set, one question, duplicates, 50 questions, non-English, an instruction hidden in a question, a provider failure midway; with the clock set past 2026-11-01 the creator AI read still works |
+| E3B.3 | Citations | Cite and open the exact span; the creator re-ingests: the old citation still opens its snapshot or says honestly that the source changed; a source unapproved or removed hides the citation; offsets with emoji, CRLF and tables |
+| E3B.4 ★ | Retrieval | A follow-up ("what about the second one?") finds its evidence; no evidence gives an honest "I don't have that in Maya's materials", no invented citation; another fan's thread is never retrieved (INV-11); content outside the fan's grant is never cited (INV-08) |
+| E3B.5 ★ | Memory | A fan says something memorable; the answer arrives before extraction; the in-thread prompt "Want me to remember this? Only if you say yes." (yes stores it, no stores nothing); the next day the AI follows up an open loop; edit and delete take effect at once; an exclusion removes only what it names; sensitive memory needs its own consent (INV-23); memory never turns into "Maya remembers" (INV-05); deleting the account removes memory and the export lists it; contradictions, duplicates, an instruction hidden in a memory, 200 items |
+| E3B.6 ★ | Provider switch (needs the key) | Streaming, structured output, a bad key (401), 429, 529, a timeout; cost against reported usage; cache hit rate; the new engine revision publishes; older revisions still verify; first sentence p95 against 4.5 s |
+| E3B.7 | My AI pages | The FAQ UI and publish flow; crisis and guardrail states hide "Ask Maya to step in"; the comparison-off copy is gone; the Test tab stops polling while comparison is off |
+
+**Exit demo:** on the lane 2 stack with a real provider key, 20 messages from a fan: p95
 acknowledgment and first sentence reported; one citation opened at its exact span; the next day
 the AI follows up on an open loop; a creator publishes version two from an FAQ set.
 

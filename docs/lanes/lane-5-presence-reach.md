@@ -84,13 +84,27 @@ INV-24 (a Note is always labeled with its audience; a fan's reply to a Note is n
 another fan without consent), INV-06, INV-22, D-15. Push defaults off; notification text never
 reveals more than the label allows. Fans' private text does not leave the thread in a preview.
 
-## Verification and exit demo
+## Verification: end-to-end scenarios and exit demo
 
-Test delivery eligibility (a fan outside the audience gets nothing). **Exit demo on the lane 2
-stack:** a creator signs and publishes a members Note; an eligible fan receives it in the thread
-and as a push (a test token on a device or the sandbox); an ineligible fan does not; the creator
-reacts to a reply and the fan sees it; the public page renders a complete creator; a share card
-renders from a delivered reply and can be revoked.
+No unit tests ([working agreement](01-working-agreement.md) section 3). The question that
+matters most is who gets what: **a fan outside the audience gets nothing**, and a push never says
+more than the label allows. Use a fake push gateway until the credentials arrive and say so.
+
+| ID | Workflow | Edge cases to run |
+| --- | --- | --- |
+| E5.1 ★ | A creator signs and publishes a members Note: members see it in their thread, labeled with its audience and glyph | Non-members, blocked, deleted and restricted fans get nothing; a fan who joins later or leaves later; 600 recipients (chunking); a duplicate publish makes one Note; edit and delete update the threads; a fan whose thread does not exist yet |
+| E5.2 ★ | A creator reacts to a reply and the fan sees "Maya reacted to your reply" as a `human_reaction` | An undone reaction; a duplicate; a reaction to a deleted reply; a fan's reply to a Note is never shown to another fan (INV-24) |
+| E5.3 ★ | Push honesty and privacy | "Maya replied" only for `human_creator` and `human_call`, never for an AI answer; no private message text in a push; push off by default; quiet hours across time zones and DST; an offline device receives it on reconnect; an invalid token is removed; sign-out removes the token; two devices; a tap routes to the right screen, or to a safe fallback when access is gone |
+| E5.4 | Producers and digests | Each of the five priority types fires once per cause (a retry is safe); the recipient chunk cap; weekly impact numbers equal the database counts; a quiet week; time zone edges; unsubscribe works |
+| E5.5 ★ | The public creator page | A complete creator renders with no account; missing biography, category or photo shows a designed empty state; long and unicode text; markup in the biography appears as text; an unpublished AI; at capacity; a paused creator; a renamed handle; hammering the page gives cached answers or 429 with no lock pile-up |
+| E5.6 | Invites and entry | The creator's note shows on the invite; four screens to a first message; a link with and without the app; an unknown, expired or reused link; `useful_answer` is recorded once |
+| E5.7 ★ | The share card | Made only from a signed reply (an AI or approved-draft message is refused); the fan chooses how their handle appears; the verification page matches the content hash and shows a mismatch if the text is altered; revoke by the fan and by the creator removes page and image; the short URL is not guessable; unicode and very long text |
+| E5.8 | Metrics | Each of the 16 events fires once per action, not twice on a retry; the aggregate at 10 fans neither hides everything nor identifies a person; counts equal a hand count |
+
+**Exit demo on the lane 2 stack:** a creator signs and publishes a members Note; an eligible fan
+receives it in the thread and as a push (a test token on a device or the sandbox); an ineligible
+fan does not; the creator reacts to a reply and the fan sees it; the public page renders a
+complete creator; a share card renders from a delivered reply and can be revoked.
 
 ## Known risks
 

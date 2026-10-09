@@ -109,8 +109,8 @@ and goes through the copy review checklist in the working agreement.
 | 2026-10-08 | The Anthropic API is the production provider, switched before the first real creator publishes, as one engine revision, with the embedding provider chosen first. |
 | 2026-10-08 | Comparison stays installed and off. The creator-authored FAQ set replaces the fan-sample publish gate. |
 | 2026-10-08 | Paid replies in the native apps (Q04): continue on the web during the pilot. |
-| 2026-10-08 | Tests are required for money and for sign-in (the earlier "no new test code" rule is lifted for those). |
 | 2026-10-09 | Aim for a private web alpha first (about 10 invited adults, web only, payments in Stripe test mode), then the TestFlight and closed-testing pilot, then the public release. |
+| 2026-10-09 | **How the seven lanes work.** Seven sessions, started by hand, each working alone with no subagents. No new unit tests: every lane proves its work with end-to-end scenarios, edge cases included, run on a real database, browser or device. Money, sign-in, signing, deletion and the guard have the deepest sets. The existing suites (including the 100 money tests) stay green as regression gates. This replaces the 2026-10-08 rule that tests are required for money and sign-in. |
 
 Still open, owned by the founder: the pilot sign-in option and the 18+ method
 ([identity contract](../operations/pantopus-identity-contract.md)), hosting and domain,
@@ -159,6 +159,10 @@ integrator approves.
 | 6 Creator Studio | `modules/studio` | `features/studio`, `app/studio`, the app shell (`layout.tsx`, `theme.tsx`, `globals.css`, `error.tsx`), PWA | `packages/ui-web` use |
 | 7 Phone apps | | | `apps/ios`, `apps/android` |
 | Integrator | `server.ts`, `integration.ts`, `config.ts`, `features.ts`, `app.ts`, `core`, `db` | `app/api` proxies are owned by the lane of the feature they serve | `infra/migrations.json`, `packages/*`, generated code, `config/*`, `docs/*`, `.github/*`, `scripts/*` |
+
+Every lane also owns `tests/scenarios/lane-N/` (its scenario scripts), `docs/lanes/status/lane-N.md`
+(its status file) and any `docs/lanes/status/lane-N-<topic>.md` it writes (decision packs,
+designs, runbooks; the integrator moves them to their permanent place).
 
 Frozen (planned for later, owner is the integrator, do not extend): `modules/media`,
 `modules/session`, `features/calls`, `features/media`, `app/calls`, `app/media`.

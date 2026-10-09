@@ -31,7 +31,7 @@ or here twice, tell the integrator. "Done" means already merged to `main`.
 | A second version cannot be published without fan samples | Lane 3, B2 |
 | Citations open a whole chunk and break on re-ingest | Lane 3, B3 |
 | Lease, lock, cost-hold and unknown-cost hazards | Lane 3, A6 |
-| In-flight takeover not qualified (INV-03) | Lane 3, A3 and A7 (tests) |
+| In-flight takeover not qualified (INV-03) | Lane 3, A3 and A7 (scenarios E3A.4, E3A.8) |
 | No universal or app links; blank creator page; generic invite; link preview | Lane 5, 5.6 and 5.7; apps 7.6 |
 | Per-post "Ask about this" blocked twice | Later (lane 5, 5.x if cheap) |
 | Path to first message is six screens | Lane 5, 5.7 |
@@ -115,7 +115,7 @@ or here twice, tell the integrator. "Done" means already merged to `main`.
 | `HttpURLConnection` never cancelled | Lane 7, 7.8 |
 | Icon, release config, `targetSdk` 36, `minSdk`, call permissions and services, export compliance | Lane 7, 7.9 (decisions: founder) |
 | About 470 literal strings on iOS | Lane 7, 7.10 |
-| Thin native tests (session, Keychain, thread model, push) | Lane 7, as each is touched |
+| Thin native test coverage (session, Keychain, thread model, push) | Lane 7: proven by operating the app (E7.2 to E7.9), no new unit tests |
 
 ## Comparison (section 10)
 
@@ -165,7 +165,7 @@ screen is lane 6.
 ## Overlap check
 
 Two lanes might touch the same file in these places, each with a rule: `generation-pipeline.ts`
-(lane 3's two tracks: small diffs, rebase often); `packages/api/src/<domain>.ts` (each lane edits
+(lane 3's two tracks: small diffs, merge main often); `packages/api/src/<domain>.ts` (each lane edits
 its own domain file); `config/copy.json` (additive keys, integrator review); `server.ts` and
 the migration registry (integrator only); the fan thread screen (lane 3 owns it; lane 5's Note
 rendering is a ticket to lane 3 or lane 7 per contract C4); the `you` page (lane 3 owns the page;

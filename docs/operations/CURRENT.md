@@ -1,6 +1,6 @@
 # Current state
 
-Written 2026-10-08. Update this file at the end of every work session; it replaces the long
+Written 2026-10-08, updated 2026-10-09. Update this file at the end of every work session; it replaces the long
 handoffs as the place to start and is meant to answer two questions: what is being worked on
 right now, and what remains. Approvals come from the founder in the chat, never from a file.
 
@@ -22,10 +22,13 @@ right now, and what remains. Approvals come from the founder in the chat, never 
 
 ## In flight
 
-- **The seven lanes** are approved ([docs/lanes](../lanes/README.md)). The briefing pack
-  (charter, working agreement, contracts, coverage, one brief per lane) is in review. After the
-  founder approves it, each lane starts with a plan-only read-back, then works one pull request at
-  a time; the integrator merges in batches.
+- **The seven lanes** are approved and their briefing pack is on main
+  ([docs/lanes](../lanes/README.md): charter, working agreement, contracts, coverage, one brief
+  and one prompt per lane). The founder starts seven sessions by hand with the prompts in
+  `docs/lanes/prompts/`. Each works alone (no subagents), posts a plan, then works one pull
+  request at a time and proves it with end-to-end scenarios, edge cases included (no new unit
+  tests). The integrator reviews, re-runs the scenario scripts and merges in batches. Each lane's
+  state is in `docs/lanes/status/lane-N.md`.
 - **Main's CI** for the merged work: the macOS jobs run slowly on one runner, and every merge
   to main cancels the run in progress. Merges are therefore batched.
 - **Done today:** the money tests (100, five defects found and fixed), Android Lint fixes, the
@@ -69,6 +72,8 @@ share card in, everything else planned for later. The evidence is the
 
 ## Rules that still hold
 
+- The lanes: no subagents, no new unit tests, end-to-end scenarios with edge cases, never merge
+  ([working agreement](../lanes/01-working-agreement.md)).
 - Never reset used databases or devices, rewrite publication fingerprints or applied SQL,
   invent consent, advance clocks, or settle unknown financial costs without receipts.
 - `infra/migrations.json` is edited only by W8. Expect a new migration to change the pinned

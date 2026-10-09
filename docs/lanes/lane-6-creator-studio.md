@@ -87,9 +87,31 @@ personal and exact (a team member's approval is not the creator's). An `approved
 as a third thing, never a variant of either. No layout shift on state changes. Copy through the
 checklist.
 
-## Verification and exit demo
+## Verification: end-to-end scenarios and exit demo
 
-Operate it on a phone-sized browser (and a real phone when you can); compare with the boards.
+No unit tests ([working agreement](01-working-agreement.md) section 3). Operate it on a
+phone-sized browser, compare with the boards, and look behind the screen (the thread, the ledger
+and the queue must agree with what Studio shows). Passkey scenarios use a software passkey
+(Playwright with a virtual authenticator); the real Touch ID is the founder's, at the exit demo.
+Until lanes 1, 4 and 5 deliver, run against the lane 2 stack with the development identity and
+say which contracts were stubs.
+
+| ID | Workflow | Edge cases to run |
+| --- | --- | --- |
+| E6.1 ★ | Splitting `Studio.tsx` changes nothing | For each extracted area: before and after screenshots at 390 px in Light and Night, the same network calls, the same keyboard order |
+| E6.2 ★ | Today and a Note: land on Today, write a Note, choose the audience, sign, see it in an eligible fan's thread | The ceremony cancelled keeps the text; an expired assertion asks again without losing the text; empty and maximum-length Notes; emoji and right-to-left; a double tap publishes one Note; two tabs; an audience with no eligible fans warns |
+| E6.3 | Reactions | Five reactions in under a minute; batching signs once if the contract allows it; undo; a reaction to a deleted reply; a thread under takeover; a duplicate is idempotent |
+| E6.4 | The queue | Rule cards, the draft-ready flag and the capacity line match the backend; empty; 100 requests; an expiry removes an item without a refresh |
+| E6.5 ★ | Accept and send, and decline | Count the taps and report them (target: 2 plus signatures; decline 2); the request expires while the screen is open (the button changes, with an honest message); a double tap; offline; the signature fails or is stale; a team member sees the request but cannot give the creator's approval (INV-02, INV-22) |
+| E6.6 ★ | Takeover and handback | Step in: the AI stops within 500 ms and the fan sees the seal (INV-03); handback is announced (INV-04); "Ask for more information" uses its own input; a refresh and a second device show the same state |
+| E6.7 | The digest | Real data; the zero state |
+| E6.8 ★ | Installable, offline and push | Valid manifest and service worker; install on Android Chrome and iOS Safari; the offline shell; an update prompt after a deploy; the push permission asked in context; a push arrives while the app is closed and its tap opens the right screen; the signed-out state; after sign-out and sign-in as someone else no cached data from the first person shows |
+| E6.9 | No polling | The network log shows no 4-second polling; updates still arrive; reconnect after sleep; a background tab |
+| E6.10 | Passkey and onboarding | A pending publication that outlives the 5-minute window clears; step-up prompts; set-up takes ten minutes; every step is resumable; the pending-verification state; a passkey failure; the license and interview steps |
+| E6.11 | The phone-width pass | 320, 360, 390 and 430 px and landscape; no horizontal scroll; the keyboard never covers the composer; Light, Night and the largest text; My AI, Offers, Earnings, Team and License |
+| E6.12 | Accessibility and fidelity | Keyboard only; a screen reader hears authorship first; contrast AA in both themes; focus order; reduced motion; targets at least 44 px; compare with the boards |
+| E6.13 | Instrumentation | Creator time-per-week events fire once per action |
+
 **Exit demo:** on an iPhone in Safari and an Android phone in Chrome, install Studio to the home
 screen; open Today; sign a Note; react to five replies; accept and send a request in the agreed
 number of taps; decline one; receive a push for a new request; use Night mode.
