@@ -2796,8 +2796,11 @@ export class CommerceService {
             }
           }
         } else if (intent.status === "requires_action") {
+          // Only the first time: a poll that finds the same 3-D Secure step must
+          // not advance the version, or every client command made with the version
+          // it just read would be refused as stale.
           await client.query(
-            "UPDATE creator.commerce_packet SET payment_state='requires_action',version=version+1,updated_at=now() WHERE id=$1 AND state='submitting'",
+            "UPDATE creator.commerce_packet SET payment_state='requires_action',version=version+1,updated_at=now() WHERE id=$1 AND state='submitting' AND payment_state IS DISTINCT FROM 'requires_action'",
             [p.id],
           );
         } else if (

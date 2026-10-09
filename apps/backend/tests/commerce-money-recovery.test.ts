@@ -1587,22 +1587,28 @@ describeMoney("commerce money path: deadlines, crashes, races", () => {
     });
 
     // DEFECT-4 (aggregate version): polling a request that waits for 3-D Secure.
-    // reconcile() rewrites it with version+1 each time although nothing changed, so
-    // a client's version token goes stale on every poll and its next withdraw is
-    // refused as stale_request.
-    it.fails(
-      "DEFECT-4: polling a request that is waiting for 3-D Secure must not change its version",
-      async () => {
-        const world = await fixture.newWorld({ weeklyLimit: 1 });
-        const view = await world.submit(world.fan, {
-          paymentMethodId: "pm_cardAuthRequired",
-        });
-        const before = (await world.packetRow(view.packet.id)).version;
+    // Fixed in "FIX: do not advance a request's version when polling finds nothing
+    // new". reconcile() rewrote it with version+1 every time although nothing
+    // changed, so a client's version went stale on every poll and its next withdraw
+    // was refused as stale_request.
+    it("INV-18: polling a request that is waiting for 3-D Secure does not change its version", async () => {
+      const world = await fixture.newWorld({ weeklyLimit: 1 });
+      const view = await world.submit(world.fan, {
+        paymentMethodId: "pm_cardAuthRequired",
+      });
+      const before = view.packet.version;
+      for (let poll = 0; poll < 3; poll++)
         await world.service.reconcile(world.fan.actor, view.packet.id);
-        await world.service.reconcile(world.fan.actor, view.packet.id);
-        expect((await world.packetRow(view.packet.id)).version).toBe(before);
-      },
-    );
+      expect((await world.packetRow(view.packet.id)).version).toBe(before);
+      // The version the client read before polling still works.
+      const withdrawn = await world.service.withdraw(
+        world.fan.actor,
+        view.packet.id,
+        { version: before, idempotencyKey: world.key("withdraw") },
+      );
+      expect(withdrawn.packet.state).toBe("withdrawn");
+      await world.assertConserved();
+    });
 
     // DEFECT-5 (INV-10 capacity, INV-16 release): an authorization rejected outright.
     // When the processor refuses an authorization (HTTP 4xx: a payment method id that
