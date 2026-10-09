@@ -78,6 +78,7 @@ type PacketRow = {
   submitted_at: Date | null;
   accepted_at: Date | null;
   accepted_action: string | null;
+  accepted_act_id: string | null;
   terminal_target: string | null;
   proposed_mode: Record<string, unknown> | null;
   authorization_attempt: number;
@@ -2479,7 +2480,7 @@ export class CommerceService {
           "operator_reconciliation_required",
           "The original authorization needs provider reconciliation; no new hold is attempted.",
         );
-        const intent = packet.intent_ref
+        let intent = packet.intent_ref
           ? await this.provider.fetchIntent(packet.intent_ref)
           : (recovered ??
             (await this.provider.authorize({
@@ -2489,8 +2490,44 @@ export class CommerceService {
               paymentMethodId: effect.request.paymentMethodId!,
               key: effect.provider_key,
             })));
+        // A hold whose capture window is under the six hour margin, or not
+        // reported, can never be accepted. applyIntent refuses it by throwing, which
+        // rolls back the intent reference, so the live hold would be forgotten and
+        // could not be released. Cancel it now, while the reference is known, and
+        // settle the canceled hold like any other failed authorization.
+        if (
+          intent.status === "requires_capture" &&
+          !(
+            intent.captureBefore &&
+            intent.captureBefore.getTime() - 6 * 3600000 > Date.now()
+          )
+        )
+          intent = await this.provider.release(
+            intent.id,
+            `${effect.provider_key}:unusable`,
+          );
         await this.applyIntent(actor, effect, intent);
       } else {
+        if (effect.operation === "capture") {
+          // INV-16 in depth. decide() is the only writer of a capture effect, but
+          // neither the database nor this executor checked it, so a stray or
+          // replayed row would have captured real money for a request nobody
+          // accepted. A capture needs a request that is accepting (or already
+          // accepted) with the creator's consumed signed act.
+          const { packet } = await this.packetRecord(actor, effect.packet_id);
+          if (
+            !["accepting", "accepted"].includes(packet.state) ||
+            !packet.accepted_act_id
+          ) {
+            await this.account(actor, (client) =>
+              client.query(
+                "UPDATE creator.commerce_effect SET state='failed',error_code='capture_without_acceptance',lease_until=NULL,updated_at=now() WHERE id=$1 AND attempt=$2 AND state='processing'",
+                [effect.id, effect.attempt],
+              ),
+            );
+            return;
+          }
+        }
         let intentId = effect.request.intentId;
         if (!intentId) {
           const { packet } = await this.packet(actor, effect.packet_id);
@@ -2595,6 +2632,19 @@ export class CommerceService {
         }
       }
     } catch (error) {
+      // A 4xx on an authorization means the processor refused the request itself (a
+      // payment method that is invalid, detached or already used). Nothing was held,
+      // but without an intent there is nothing to release either, so the request
+      // used to stay in submitting with its slot reserved for the rest of the week.
+      // That is concluded only when the processor confirms it holds nothing for this
+      // key; a hold it does have is applied, and any doubt keeps the unknown path.
+      if (
+        effect.operation === "authorize" &&
+        error instanceof DomainError &&
+        error.code === "provider_rejected" &&
+        (await this.settleRejectedAuthorization(actor, effect))
+      )
+        return;
       await this.account(actor, async (client) => {
         // Reconciliation takes packet before effect everywhere else. Keep that
         // order on failure too, so a returning provider result cannot deadlock
@@ -2651,6 +2701,61 @@ export class CommerceService {
         }
       }
     }
+  }
+  /** True when a rejected authorization was final and the request is settled.
+   * Only a processor that can confirm it holds nothing for this key may say so. */
+  private async settleRejectedAuthorization(actor: Actor, effect: EffectRow) {
+    try {
+      if (!this.provider?.recoverAuthorization) return false;
+      const { packet } = await this.packetRecord(actor, effect.packet_id);
+      if (packet.intent_ref) return false;
+      const held = await this.provider.recoverAuthorization({
+        packetId: effect.packet_id,
+        amount: effect.request.amount,
+        currency: effect.request.currency,
+        paymentMethodId: effect.request.paymentMethodId!,
+        key: effect.provider_key,
+      });
+      if (held) await this.applyIntent(actor, effect, held);
+      else await this.failRejectedAuthorization(actor, effect);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /** The processor refused an authorization and holds nothing for its key. Settle
+   * the request like a declined card: the slot returns and the fan can try another
+   * payment method. A request that was already being released closes in its
+   * terminal state, and its release, which has no hold to cancel, is finished. */
+  private async failRejectedAuthorization(actor: Actor, effect: EffectRow) {
+    await this.account(actor, async (client) => {
+      const p = await this.lockPacket(client, effect.packet_id);
+      await this.fenceEffect(client, effect);
+      await client.query(
+        "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true)",
+        [p.creator_id, p.fan_id],
+      );
+      if (
+        effect.provider_key ===
+          `${p.id}:authorize:${p.authorization_attempt}` &&
+        !p.intent_ref &&
+        ["submitting", "releasing"].includes(p.state)
+      ) {
+        await this.releaseCapacity(client, p);
+        await client.query(
+          "UPDATE creator.commerce_packet SET state=$2,payment_state='failed',version=version+1,updated_at=now() WHERE id=$1",
+          [p.id, p.state === "releasing" ? p.terminal_target : "draft"],
+        );
+        await client.query(
+          "UPDATE creator.commerce_effect SET state='done',error_code='authorization_rejected',lease_until=NULL,updated_at=now() WHERE packet_id=$1 AND operation='release' AND state<>'done'",
+          [p.id],
+        );
+      }
+      await client.query(
+        "UPDATE creator.commerce_effect SET state='failed',error_code='authorization_rejected',lease_until=NULL,updated_at=now() WHERE id=$1",
+        [effect.id],
+      );
+    });
   }
   private async fenceEffect(client: PoolClient, effect: EffectRow) {
     const own = await client.query(
@@ -2759,8 +2864,11 @@ export class CommerceService {
             }
           }
         } else if (intent.status === "requires_action") {
+          // Only the first time: a poll that finds the same 3-D Secure step must
+          // not advance the version, or every client command made with the version
+          // it just read would be refused as stale.
           await client.query(
-            "UPDATE creator.commerce_packet SET payment_state='requires_action',version=version+1,updated_at=now() WHERE id=$1 AND state='submitting'",
+            "UPDATE creator.commerce_packet SET payment_state='requires_action',version=version+1,updated_at=now() WHERE id=$1 AND state='submitting' AND payment_state IS DISTINCT FROM 'requires_action'",
             [p.id],
           );
         } else if (
@@ -2843,7 +2951,15 @@ export class CommerceService {
         );
         if (p.state === "releasing") {
           await this.releaseCapacity(client, p);
-          await this.ledger(client, p, "release", effect.provider_key);
+          // A release undoes a hold. A request that never held (3-D Secure
+          // abandoned, or withdrawn before it authorized) has nothing to undo, so
+          // the ledger must not show money released that was never held.
+          const held = await client.query(
+            "SELECT 1 FROM creator.commerce_ledger WHERE packet_id=$1 AND kind='hold' AND cause=$2",
+            [p.id, `${p.id}:authorize:${p.authorization_attempt}`],
+          );
+          if (held.rowCount)
+            await this.ledger(client, p, "release", effect.provider_key);
           await client.query(
             "UPDATE creator.commerce_packet SET state=$2,payment_state='released',version=version+1,updated_at=now() WHERE id=$1",
             [p.id, p.terminal_target],
