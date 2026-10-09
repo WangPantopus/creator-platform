@@ -1,10 +1,52 @@
 # Lane 2: Platform and hosting status
 
-Updated: 2026-10-09, by the lane 2 session
-Working on: nothing. The founder limited the first round to WP 2.1, which is done and in pull request `lane-2/stack-from-scratch`
-Done: WP 2.1, the one-command local stack, its smoke script and its teardown
-Next: nothing until the founder sends "Next for lane 2". Then, in the brief's order: WP 2.2 (production composition root that fails closed), WP 2.9 (catalogue regeneration tooling, with the integrator), the WP 2.3 hosting options
-Blocked on: nothing for WP 2.1. The findings and tickets below need the integrator and lanes 3, 5 and 6
+Updated: 2026-10-09, by the resumed lane 2 session
+Working on: WP 2.8 load/soak scenarios, branch `lane-2/load-soak`, authorized by the founder's request to continue coding through the lane
+Done: WP 2.1 is on main; WP 2.2, WP 2.9 and WP 2.3 options were completed in session 1 but still need to land on main
+Next: finish the WP 2.8 measurements; owners resolve measured failures; hosting choice unlocks staging and WP 2.4 to 2.7
+Blocked on: hosting road/provider/region, monthly ceiling, web/API domain and owning account; integrator stack repair; lane 3/5 fixes and multi-worker composition
+
+## Resume here
+
+Read [the WP 2.8 note](lane-2-load-soak.md) for commands, measurements, limitations and exact
+owner tickets. The founder has authorized continued code work, including WP 2.8; do not ask
+for that authorization again. Hosting choices and accounts remain missing.
+
+The resume audit is [PR #380](https://github.com/WangPantopus/creator-platform/pull/380).
+At fetched main `c0b4ac0f030a893dfc92457f0f4348dd87174398`, all four original PRs are marked
+merged, but only [#367](https://github.com/WangPantopus/creator-platform/pull/367) reached main.
+[#370](https://github.com/WangPantopus/creator-platform/pull/370),
+[#377](https://github.com/WangPantopus/creator-platform/pull/377), and
+[#378](https://github.com/WangPantopus/creator-platform/pull/378) merged into their old lane
+bases. The integrator must land their original reviewed commits in order through replacement
+PRs. Lane 2 has not merged, retargeted or rewritten any branch. Preserve this newer status
+when resolving those older status-file changes.
+
+The complete session 1 evidence and its linked production, catalogue and hosting notes remain
+in [the original handoff](https://github.com/WangPantopus/creator-platform/blob/69ca75941dcaad02dda700d548971006a5bbd9a9/docs/lanes/status/lane-2.md).
+Reuse it; do not repeat the hosting research or the completed scenario batteries. No price
+changed, so the founder's one-page hosting options are unchanged too.
+
+Founder approvals in this chat, already recorded in #380:
+
+- Lane 1 may explicitly mark pilot calls and voice `not_offered` so those rows do not block
+  readiness. Lane 2 owns the environment declaration after its contract is agreed.
+- The integrator may review and implement catalogue fingerprints that ignore relations a
+  role cannot reach. Lane 2 does not own `core/purpose-catalogue.ts` or the review files.
+
+Neither approved behavior is implemented by the load-scenario branch. It changes only lane 2
+scenario scripts and status notes. Runtime qualification remains dependent on other owners;
+staging and WP 2.4 to 2.7 still require the founder's hosting choice and integrator deployment.
+
+Machine during this work: Docker became available, and the existing PostgreSQL 17 image was
+used without downloading. One disposable lane 2 stack was started with `--growth --no-web
+--no-smoke`. Only development identity and the model are faked. The shared 16-CPU machine
+reported load averages around 25 to 99; measurements are not a production capacity claim.
+
+Traps still apply: at most five data requests per fan per hour; delete locks that fan out of
+the creator; catalogue mismatches can latch the backend until restart; a failed generation
+can prevent further replies until this disposable stack is rebuilt. No privacy request or
+manual financial settlement is part of WP 2.8. Use only ports 56420–56429 and lane 2 objects.
 
 ## How to run it
 
@@ -17,7 +59,9 @@ Blocked on: nothing for WP 2.1. The findings and tickets below need the integrat
 | ID                            | State                                                                                                                                                                                                                                                                                                                                        | Re-run                                                                                      |
 | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | E2.1 ★ cold start, edge cases | Pass: 22 of 22 steps (cold start 32 s, repeat, port taken, Docker unreachable, killed mid-run, stop and up, two stacks, foreign objects, teardown). The acknowledgment passed in every run (227 to 914 ms). The AI reply is advisory: delivered in 3 of 11 full runs at load average 9 to 62, so it is not a reliable exit check on this Mac | `node tests/scenarios/lane-2/e2-1-cold-start.mjs`, `node infra/local/stack.mjs up --lane 2` |
-| E2.2 ★ to E2.9 ★ except E2.1  | Not run (the founder limited this round to WP 2.1)                                                                                                                                                                                                                                                                                           |                                                                                             |
+| E2.2 ★ / E2.9 ★               | Session 1: 144/144 and 19/19 passed respectively, with limits in the original handoff. Not re-run here; code is not yet on main                                                                                                                                                                                                              | Original handoff above                                                                      |
+| E2.8                          | Measurements in progress; public overload, worker completion and first socket run failed. Full results in the WP 2.8 note                                                                                                                                                                                                                    | `node tests/scenarios/lane-2/e2-8-public.mjs`, `e2-8-workers.mjs`, `e2-8-sockets.mjs`       |
+| E2.3 to E2.7                  | Not run; hosting-dependent                                                                                                                                                                                                                                                                                                                   | Hosting decision required                                                                   |
 
 ## Findings and tickets to other lanes
 
