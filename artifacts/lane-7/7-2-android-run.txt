@@ -1,0 +1,28 @@
+Lane 7, WP 7.2: node tests/scenarios/lane-7/e7-2-navigation.mjs (all 21 flows, one run)
+Date: 2026-10-09. Device: emulator qelvora-lane7-android (Android 35, gesture navigation).
+Tree: commit d2a543695 on lane-7/navigation, debug build against the fake API (port 56473). Not the real backend.
+iOS: not run.
+
+PASS android N1 Home to a thread: Back returns to Home, not You home > thread > home > app left
+PASS android N2 Discover, creator, consent, thread: Back skips the consent discover > creator > consent > thread > creator, not the consent > discover > home, the tab's parent > app left
+PASS android N3 Step-in packet: Back returns to the thread thread > packet > thread, not Requests > home
+PASS android N4 A view inside a thread closes first thread > privacy > thread > home
+PASS android N5 Account screens: Back returns to You, then Home you > spending > you > help > you > home, the tab's parent
+PASS android N6 Notifications: a tapped item, Back to the list, Back to Home list > post > its back control says Back, not Back to Maya's page > in-screen Back: list > creator page > system Back: list > home
+PASS android N7 A link while the app is open: Back returns to where you were discover > thread > discover, where you were > home > app left
+PASS android N8 A link into a stopped app: Back goes Home, then leaves thread > home > app left
+PASS android N9 Rotation keeps the trail thread > thread after rotating > home, the trail survived
+PASS android N10 Stopped and reopened: the place returns, Back goes Home thread > thread restored > home > app left
+PASS android N11 The back gesture goes back, and at Home leaves the app thread > home > app left
+PASS android N12 Sign-in chooser: Back closes it, then leaves welcome > chooser > welcome > app left
+PASS android N13 Wrong person: a new account never inherits the last one's trail devon's thread > account > signed out > chooser > priya, back on the account screen > Back: priya's You, not devon's thread > Back: home > Back: app left, nothing stale to go to > priya never asked for devon's thread
+PASS android N14 A link the app does not know changes nothing discover > still on discover > home
+PASS android N15 Repeat: the same link twice is one step, fast Back presses do not skip discover > thread > thread still > one Back: discover > thread again > two quick Backs: home
+PASS android N16 Race: a link arrives while a thread's privacy view is open thread > privacy > creator page > thread, privacy closed
+PASS android N17 Boundary: thirty screens deep, the trail holds 24 and Back never loops on the last screen > left after 27 presses (expected 27)
+PASS android N18 The system reclaims the app: the place returns, Back goes to its parent post > post restored > creator page, not the list
+PASS android N19 A new fan on the handle form can still leave with Back handle form > app left, not trapped
+PASS android N20 Edit profile: Back through the account screen to You, then Home you > account > handle form > in-screen Back: account > system Back: you > home
+PASS android N21 Requests tab: money screens go Back to Requests, not to You requests > spending > in-screen Back: requests, not you > access > system Back: requests > home
+
+all steps passed

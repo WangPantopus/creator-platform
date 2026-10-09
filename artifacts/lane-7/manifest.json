@@ -13,5 +13,10 @@
     "path": "artifacts/lane-7/7-1-night.png",
     "sha256": "083e80b7b724634adcd68b2633ee79730e5bb44986a4e732057eeeaf8b0930f1",
     "bytes": 132504
+  },
+  {
+    "path": "artifacts/lane-7/7-2-android-run.txt",
+    "sha256": "7467c7b1de56b8854916ca79ee8e870776828c288eccbea8328fe27802e3fae0",
+    "bytes": 3215
   }
 ]
