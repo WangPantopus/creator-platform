@@ -1,6 +1,12 @@
 # Lane 6: Creator Studio (web) status
 
-Updated: 2026-10-09, by the first lane 6 session, handed off in the middle of round 1
+Updated: 2026-10-09, by the continuing lane 6 session
+
+Resume correction: GitHub marks #368, #371, #374, #375 and #376 merged, but only #368
+reached `main`. The later pull requests merged into already-closed parent branches. The founder
+approved `lane-6/studio-split-recovery` against `main` to recover that reviewed stack, with the
+five remaining area pull requests stacked above it. The founder also approved the current
+Codex worktree location. No other worktree was changed.
 
 **To continue, read `docs/lanes/status/lane-6-split-recipe.md` first.** It has the exact state, the
 commands, the traps and what not to redo. Round 1 is WP 6.1 only; do not start another work package
@@ -8,8 +14,9 @@ until the founder sends "Next for lane 6".
 
 Working on: WP 6.1, splitting `apps/web/features/studio/Studio.tsx` (4,795 lines) into feature
 modules with no behavior change. One pull request per area, each branch cut from the one before
-because every area needs the shared layer first, so merge them bottom up. Nothing is merged; CI is
-pending (not polled).
+because every area needs the shared layer first. The recovery branch includes `origin/main`
+at `c0b4ac0f0`. The integrator must ensure that every area's commits reach `main`; merging a
+child into a previously closed parent pull request does not do that. CI is not polled.
 
 - [x] #368 `lane-6/studio-split-harness`: the proof (E6.1 harness and runbook), no source change
 - [x] #371 `lane-6/studio-split-shared`: types, formatting helpers, `useAction` and `Feedback`, `Modal`
@@ -44,7 +51,10 @@ Scenarios:
   notes, library, requests, threads and shell runs: not run.
   Re-run: `docs/lanes/status/lane-6-e6-1-runbook.md`.
 - E6.2 to E6.13: not run (outside round 1).
-- Not run anywhere: a real backend on PostgreSQL (lane 2's stack is not on `main`), `tests/visual`
+- This session's golden at `45fcee40f`: captured 82 shots, 636 API calls and 1,090 Tab stops;
+  Chrome 154.0.8037.98. No harness changes. An optional second baseline run was not run.
+- Not run in this round: a real backend on PostgreSQL (deferred by the founder's WP 6.1
+  recipe even though lane 2's stack is now on `main`), `tests/visual`
   (needs a Chromium download; it does not render Studio), the harness against a production build.
 
 Ports and containers: 56462 (web, `next dev`), 56463 (stand-in API). No containers.
