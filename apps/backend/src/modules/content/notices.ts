@@ -32,6 +32,11 @@ const unavailable: NotificationState = {
 function refused(code: string, message: string, status = 503) {
   return new DomainError(code, message, status);
 }
+/** A refusal for this fan (blocked, restricted, no longer eligible) hides one
+ * row; it must not fail the fan's whole list. An unknown answer (5xx) still
+ * propagates so the list says it is unavailable instead of guessing. */
+const refusedForFan = (error: unknown) =>
+  error instanceof DomainError && error.status >= 400 && error.status < 500;
 
 /** Who is told about a Note or a reaction, decided where authority exists.
  *
@@ -335,11 +340,12 @@ export function contentNoticeOwner(input: {
         return unavailable;
       let preview: string = copy.growthHiddenUpdate;
       if (strict) {
-        const item = await presence.noteFor(
-          strict,
-          event.creatorId,
-          event.aggregateId,
-        );
+        const item = await presence
+          .noteFor(strict, event.creatorId, event.aggregateId)
+          .catch((error) => {
+            if (refusedForFan(error)) return null;
+            throw error;
+          });
         if (!item) return { ...unavailable, version: index.version };
         preview = excerpt(item.text) || copy.growthHiddenUpdate;
       }
@@ -352,11 +358,12 @@ export function contentNoticeOwner(input: {
       };
     }
     if (strict) {
-      const row = await presence.reactionFor(
-        strict,
-        event.creatorId,
-        event.aggregateId,
-      );
+      const row = await presence
+        .reactionFor(strict, event.creatorId, event.aggregateId)
+        .catch((error) => {
+          if (refusedForFan(error)) return null;
+          throw error;
+        });
       if (!row) return unavailable;
     }
     return { ...base, version: 1, authorKind: "human_reaction" };

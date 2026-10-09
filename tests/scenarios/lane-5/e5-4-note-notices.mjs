@@ -280,6 +280,20 @@ await step(
   },
 );
 await step(
+  "E5.4-blocked-after",
+  "a fan blocked after the notice still loads their list; that creator's rows are hidden",
+  async () => {
+    expect((await inbox(f.ben)).length === 1, "ben sees the notice first");
+    await blockFan(f.ben, maya.id);
+    const r = await http("GET", "/v1/growth/notifications", f.ben.token);
+    expect(r.status === 200, `the list failed with ${r.status}`);
+    expect(
+      r.body.notifications.every((n) => n.creatorId !== maya.id),
+      "a blocked creator's notice is still listed",
+    );
+  },
+);
+await step(
   "E5.4-failure-and-withdrawn",
   "a push that cannot be sent is retried once, and never sent for a Note withdrawn meanwhile",
   async () => {
