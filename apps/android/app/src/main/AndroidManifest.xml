@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+    <!-- Voice notes and calls use the camera and microphone only when the person
+         chooses, so devices without them (some tablets and Chromebooks) must still
+         be able to install the app. -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -14,7 +19,7 @@
          screen, and the mediaProjection foreground service type needs its own
          Play declaration and demonstration, so drop what the library adds. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" tools:node="remove" />
-    <application android:name=".ui.GrowthApplication" android:label="@string/app_name" android:theme="@style/QelvoraTheme" android:allowBackup="false" android:supportsRtl="true">
+    <application android:name=".ui.GrowthApplication" android:label="@string/app_name" android:theme="@style/QelvoraTheme" android:allowBackup="false" android:dataExtractionRules="@xml/data_extraction_rules" android:supportsRtl="true">
         <service android:name="io.livekit.android.room.track.screencapture.ScreenCaptureService" tools:node="remove" />
         <!-- No Firebase initialization, installation registration or analytics
              occurs without approved configuration, a session and permission. -->
