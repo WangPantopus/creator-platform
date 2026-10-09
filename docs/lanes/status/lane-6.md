@@ -1,36 +1,51 @@
 # Lane 6: Creator Studio (web) status
 
-Updated: 2026-10-08, by the lane 6 session (round 1: WP 6.1 only)
+Updated: 2026-10-09, by the first lane 6 session, handed off in the middle of round 1
+
+**To continue, read `docs/lanes/status/lane-6-split-recipe.md` first.** It has the exact state, the
+commands, the traps and what not to redo. Round 1 is WP 6.1 only; do not start another work package
+until the founder sends "Next for lane 6".
 
 Working on: WP 6.1, splitting `apps/web/features/studio/Studio.tsx` (4,795 lines) into feature
 modules with no behavior change. One pull request per area, each branch cut from the one before
-because every area needs the shared layer first, so merge them bottom up. A box is ticked in the
-pull request that does the work.
+because every area needs the shared layer first, so merge them bottom up. Nothing is merged; CI is
+pending (not polled).
 
-- [x] `lane-6/studio-split-harness`: the proof (E6.1 harness and runbook), no source change
-- [x] `lane-6/studio-split-shared`: types, formatting helpers, `useAction` and `Feedback`, `Modal`
-- [x] `lane-6/studio-split-thanks-more`: Thanks and More
-- [x] `lane-6/studio-split-team`: Team
+- [x] #368 `lane-6/studio-split-harness`: the proof (E6.1 harness and runbook), no source change
+- [x] #371 `lane-6/studio-split-shared`: types, formatting helpers, `useAction` and `Feedback`, `Modal`
+- [x] #374 `lane-6/studio-split-thanks-more`: Thanks and More
+- [x] #375 `lane-6/studio-split-team`: Team
+- [x] #376 `lane-6/studio-split-handoff`: the recipe, the extraction tool and plan, the description generator, a move check that ignores formatting; no source change
 - [ ] `lane-6/studio-split-notes`: Notes and Compose
 - [ ] `lane-6/studio-split-library`: Publish (the library)
 - [ ] `lane-6/studio-split-requests`: Requests and PacketDetail
 - [ ] `lane-6/studio-split-threads`: Threads and CorrectionForm
 - [ ] `lane-6/studio-split-shell`: navigation helpers and the requests count; `Studio.tsx` is the shell
 
-Done: nothing merged. Open pull requests are listed in the round 1 report.
+Done: the first five rows above. `Studio.tsx` is 3,747 lines on the handoff tip (408 after the last
+area). The five remaining areas were dry-run on the Team tip: the extraction tool's output was
+identical to a hand-made version that passes typecheck, ESLint, Prettier, the move check and a
+production build. Only their browser runs remain.
 
-Next: stop after round 1. The founder starts the next package with "Next for lane 6". Candidates,
-in the brief's order: WP 6.2 (Today and the Note composer), 6.9 (replace the 4-second polling),
-6.3 (reactions), 6.4 (queue), 6.5 (accept and send, needs contract C3 from lane 4).
+Next: the five unchecked rows, in order, then the round 1 report, then stop. After that the founder
+starts the next package with "Next for lane 6". Candidates, in the brief's order: WP 6.2 (Today and
+the Note composer), 6.9 (replace the 4-second polling), 6.3 (reactions), 6.4 (queue), 6.5 (accept and
+send, needs contract C3 from lane 4).
 
 Blocked on: nothing for round 1. WP 6.5 waits for contract C3 (lane 4), WP 6.8 for lane 5's web
 push, WP 6.10 and 6.11 for lanes 1 and 3.
 
 Scenarios:
 
-- E6.1 (star row): run for every pull request in the stack against the stand-in backend; see each
-  pull request's results table. Re-run: `docs/lanes/status/lane-6-e6-1-runbook.md`.
+- E6.1 (star row), against the stand-in backend, golden = today's code: #371 pass (earlier harness
+  commit, covered again by the Team run), #374 pass (81 of 82 identical, one within tolerance),
+  #375 pass (82 of 82 identical). The extraction tool replay: pass. The move check controls (an edited
+  token, string and comment, a deleted declaration; a re-wrapped signature must not fail): pass. The
+  notes, library, requests, threads and shell runs: not run.
+  Re-run: `docs/lanes/status/lane-6-e6-1-runbook.md`.
 - E6.2 to E6.13: not run (outside round 1).
+- Not run anywhere: a real backend on PostgreSQL (lane 2's stack is not on `main`), `tests/visual`
+  (needs a Chromium download; it does not render Studio), the harness against a production build.
 
 Ports and containers: 56462 (web, `next dev`), 56463 (stand-in API). No containers.
 
