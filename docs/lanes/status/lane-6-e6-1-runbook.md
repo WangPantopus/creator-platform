@@ -46,7 +46,8 @@ node tests/scenarios/lane-6/e6-1-move-check.mjs lane-6/studio-split-harness
 ```
 
 `e6-1-run.mjs` starts the stand-in API (56463) and `next dev` (56462, build directory
-`.next-lane6`), waits for both, runs `e6-1-capture.mjs`, and stops them. A full run takes about ten
+`.next-lane6`), waits for both, runs `e6-1-capture.mjs` (which first calls every route once, so a
+slow first compile cannot stretch a measured page load), and stops them. A full run takes about ten
 minutes. `--only a,b` limits the steps, and `e6-1-compare.mjs --subset` compares just those.
 `next dev` rewrites the tracked file `apps/web/next-env.d.ts`; run
 `git restore apps/web/next-env.d.ts` before committing.
@@ -61,13 +62,16 @@ polling calls over 20 seconds of page time on Notes, one second at a time.
 
 `e6-1-compare.mjs` fails on any of these:
 
-- a screenshot that differs by more than 4/255 in more than 64 pixels. The existing visual suite
-  allows 64 pixels at 2/255 for Chromium rounding corners; the native search box shows 3/255 on
-  identical code, so the level here is 4. Shots inside the bound are listed, not hidden;
+- a screenshot that differs by more than 8/255 in more than 64 pixels. The existing visual suite
+  allows 64 pixels at 2/255 for Chromium rounding corners; native selects and search boxes show up
+  to 6/255 on identical code, so the level here is 8. A changed word, colour or position moves
+  hundreds of pixels by far more. Shots inside the bound are listed, not hidden;
 - a write (any call that is not a GET) that differs, or arrives in a different order;
 - a read that is missing, extra or different. Reads that start together have no fixed order, and
   whether the page cancels a read before its answer lands is a race, so reads compare as a sorted
-  set and "aborted" counts as answered;
+  list and "aborted" counts as answered. In the first shot of a step, while the page loads, reads
+  compare as a set: how often one repeats depends on how long the load took, not on the code
+  (the later shots, where time is paused, and the polling cadence cover repeats);
 - a console message, a Tab stop, or a polling count (exactly) that differs.
 
 Random ids (idempotency keys, new draft ids) are replaced by `<uuid>`; fixture ids are kept.

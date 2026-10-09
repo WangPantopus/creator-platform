@@ -5,6 +5,7 @@
 import { createHash } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import { chromium } from "@playwright/test";
+import { ID } from "./fixtures.mjs";
 import { steps } from "./e6-1-steps.mjs";
 import {
   CLOCK_START,
@@ -39,6 +40,7 @@ async function shoot(page, theme, step, shot, state, result) {
     key: `${theme}/${step.id}/${shot.name}`,
     png: file,
     sha256: createHash("sha256").update(png).digest("hex"),
+    first: step.shots[0] === shot,
     requests,
     console: state.console.splice(0),
   };
@@ -101,6 +103,26 @@ async function runShot(page, theme, step, shot, state) {
     throw error;
   }
 }
+
+// Compile every route before measuring. In `next dev` the first call to a route can take seconds, long
+// enough for the clock to run on and a 4-second poll to land in a step's first shot.
+async function warmUp() {
+  const [maya, fan] = [ID.maya, ID.fanB];
+  const headers = {
+    Cookie: `qelvora_session_${new URL(web).port}=fixture-token`,
+  };
+  for (const path of [
+    "/studio/workspace",
+    `/studio/${maya}/notes`,
+    "/api/platform/identity/session",
+    "/api/studio/session",
+    `/api/content/${maya}/studio`,
+    `/api/commerce-approvals/creators/${maya}/fans/${fan}/drafts`,
+    `/api/w6/creators/${maya}/call-availability`,
+  ])
+    await fetch(`${web}${path}`, { headers }).catch(() => {});
+}
+await warmUp();
 
 await mkdir(out, { recursive: true });
 // Software rendering and a fixed colour profile keep pixels the same from run to run.
