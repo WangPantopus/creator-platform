@@ -338,6 +338,103 @@ try {
       return "600 accepted; edit after failure made a distinct ID; unchanged retry reused it; blank note accepted";
     },
   );
+  await step(
+    "E5.6-create-failure",
+    "a real database lock fails creation; the same form request succeeds once after release",
+    async () => {
+      const owner = await signIn(
+        "http://127.0.0.1:56451",
+        ACTORS.maya,
+        "/studio/launch",
+      );
+      const spare = (
+        await db.query(
+          "SELECT id FROM growth.invite WHERE created_by=$1 AND revoked_at IS NULL AND expires_at>now() AND id<>$2 ORDER BY expires_at LIMIT 1",
+          [ACTORS.maya, fixture.id],
+        )
+      ).rows[0];
+      expect(
+        (
+          await call(
+            "http://127.0.0.1:56451",
+            "DELETE",
+            `/v1/growth/invites/${spare.id}`,
+            { token: owner.token },
+          )
+        ).status === 200,
+        "could not free test slot",
+      );
+      const input = page.getByLabel("Your invitation note (optional)", {
+        exact: true,
+      });
+      const button = page.getByRole("button", {
+        name: "Create and copy invitation",
+        exact: true,
+      });
+      await input.fill("Retry after the database is available. 陶芸");
+      const response = () =>
+        page.waitForResponse(
+          (r) =>
+            r.request().method() === "POST" &&
+            new URL(r.url()).pathname === "/api/growth/invites",
+          { timeout: 30000 },
+        );
+      const lock = await db.connect();
+      let firstBody;
+      try {
+        await lock.query("BEGIN");
+        await lock.query(
+          "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
+          [`growth.invites:${ACTORS.maya}`],
+        );
+        const [failed] = await Promise.all([response(), button.click()]);
+        firstBody = failed.request().postDataJSON();
+        expect(
+          failed.status() === 503,
+          `locked create ${failed.status()}: ${await failed.text()}`,
+        );
+        await page.waitForFunction(() =>
+          Array.from(document.querySelectorAll("button")).some(
+            (button) =>
+              button.textContent.trim() === "Create and copy invitation" &&
+              !button.disabled,
+          ),
+        );
+        expect(
+          (
+            await db.query(
+              "SELECT count(*)::int n FROM growth.invite WHERE id=$1",
+              [firstBody.id],
+            )
+          ).rows[0].n === 0,
+          "failed create persisted a link",
+        );
+      } finally {
+        await lock.query("ROLLBACK");
+        lock.release();
+      }
+      const [retried] = await Promise.all([response(), button.click()]);
+      expect(
+        retried.status() === 200,
+        `retry ${retried.status()}: ${await retried.text()}`,
+      );
+      expect(
+        JSON.stringify(retried.request().postDataJSON()) ===
+          JSON.stringify(firstBody),
+        "form retry changed ID or note",
+      );
+      const made = await retried.json();
+      expect(made.id === firstBody.id, "server changed the retry ID");
+      const rows = (
+        await db.query("SELECT note FROM growth.invite WHERE id=$1", [made.id])
+      ).rows;
+      expect(
+        rows.length === 1 && rows[0].note === firstBody.note,
+        "retry lost or duplicated the public note",
+      );
+      return "real lock produced 503 and no row; same ID/note retried to 200 and one row";
+    },
+  );
 } finally {
   await browser.close();
   await db.end();

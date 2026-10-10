@@ -1,5 +1,23 @@
 # Lane 5: invites and entry (WP 5.7)
 
+## Follow-up failure proof (2026-10-09, 18:33 PT)
+
+Fresh API regression at load 4 passed 8/8, with two not run. Its output is
+`/tmp/qelvora-lane5-invite-lock-api.log`. The earlier high-load 7/8 failure remains
+recorded below; this repeat does not prove why those two requests returned 503.
+
+The browser scenario now passes 3/3. The added failure check holds the real
+PostgreSQL creator-invite advisory lock, uses the normal form and observes a 503
+with no persisted row. After releasing the lock, a normal retry sends the same
+ID and note, returns 200 through the web proxy and stores exactly one link.
+The lock is released in `finally`. No request/response implementation is mocked.
+Log: `/tmp/qelvora-lane5-invite-lock-browser.log`.
+
+| ID                               | Steps                                                                   | Expected                                  | Observed                              | Result | Evidence          |
+| -------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------- | ------------------------------------- | ------ | ----------------- |
+| E5.6-create-failure              | Hold actual invite lock, submit form, release, retry                    | Keep request and save once after recovery | 503/no row, same ID/note, 200/one row | pass   | browser log above |
+| E5.6-form-edit / clipboard-retry | Real clipboard denial, edit, unchanged retry, blank/600-character input | Stable retries and separate edited links  | Both passed again                     | pass   | same log          |
+
 ## Approved form update (2026-10-09)
 
 The founder approved the exact label “Your invitation note (optional)” and hint
@@ -8,7 +26,7 @@ uses them, bounds input to 600 and keeps the note with its retry ID. An edit aft
 a failed copy makes a new ID; an unchanged retry reuses the stored link. Shared
 web/Swift/Kotlin copy was regenerated, never hand-edited.
 
-Real Chrome/server/PostgreSQL form checks passed 2/2: denied clipboard then
+Real Chrome/server/PostgreSQL form checks initially passed 2/2: denied clipboard then
 successful retry at the limit, exact stored/public Unicode and literal markup,
 600-character input, edit after failure with unchanged old words, unchanged edited
 retry and optional blank note. Screenshots `qelvora-lane5-invite-form.png` and
