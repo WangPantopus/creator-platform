@@ -3,7 +3,7 @@
 Updated: 2026-10-09, by the continuing lane 6 session.
 
 Working on: WP 6.1 only. The split preserves behavior; one pull request per area.
-`Studio.tsx` is now 2,383 lines after Prettier (originally 4,795).
+`Studio.tsx` is now 2,109 lines after Prettier (originally 4,795).
 The extraction tool's printed count is its buffer before the final formatting pass; the counts
 in this status and the pull requests are measured from saved files.
 
@@ -28,17 +28,17 @@ Done before handoff:
 
 This session:
 
-- [x] `lane-6/studio-split-notes`: Notes and Compose
-- [ ] `lane-6/studio-split-library`: Publish (the library)
+- [x] #383 `lane-6/studio-split-notes`: Notes and Compose
+- [x] `lane-6/studio-split-library`: Publish (the library)
 - [ ] `lane-6/studio-split-requests`: Requests and PacketDetail
 - [ ] `lane-6/studio-split-threads`: Threads and CorrectionForm
 - [ ] `lane-6/studio-split-shell`: navigation helpers and the requests count
 
-Done: Notes and Compose. Static checks, the declaration move
+Done: Notes and Compose; Publish (the library). Static checks, the declaration move
 check, the full browser comparison, all 7 workspace typechecks (zero cached tasks), and the
 production build passed for each checked area above.
 
-Next: Publish (the library); Requests and PacketDetail; Threads and CorrectionForm; navigation helpers and the requests count; then the one-time main refresh and final proof.
+Next: Requests and PacketDetail; Threads and CorrectionForm; navigation helpers and the requests count; then the one-time main refresh and final proof.
 Do not begin WP 6.2 or any other package until the founder sends "Next for lane 6".
 
 Blocked on: nothing for round 1. Later packages retain their existing contract dependencies.
@@ -49,6 +49,7 @@ Scenarios:
   Real web app and Chrome at 390 px, Light and Night. Fakes: schema-checked HTTP backend and
   browser clock. This compares HTTP writes and reads; no database state was checked.
 - Notes and Compose: 82 shots, 81 identical in pixels, calls, console and Tab order; 636 /api calls and 1090 Tab stops compared; chrome 154.0.8037.98 1 shot(s) equal within rendering tolerance (at most 64 pixels, at most 8/255): night/requests-empty/empty: 12 pixels differ, by at most 1/255 PASS: identical
+- Publish (the library): 82 shots, 81 identical in pixels, calls, console and Tab order; 636 /api calls and 1090 Tab stops compared; chrome 154.0.8037.98 1 shot(s) equal within rendering tolerance (at most 64 pixels, at most 8/255): night/requests-empty/empty: 12 pixels differ, by at most 1/255 PASS: identical
 - First Notes attempt failed in `tests/scenarios/lane-6/e6-1-page.mjs:11`:
   `clock.pauseAt: Error: Cannot fast-forward to the past` on Light empty Notes.
   The complete rerun used unchanged source and harness and passed. No tolerance was changed.
