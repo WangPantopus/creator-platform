@@ -5,27 +5,78 @@ every rule below is implemented the same way in `apps/android/.../identity/Navig
 `apps/ios/Sources/QelvoraUI/NavigationHistory.swift` (the parent map and the tab inference are the same
 table in two languages), and wired the same way into `FanSession` in `FanShell.kt` / `FanShell.swift`.
 
-## Resume here (state at the end of the first 7.2 session, 2026-10-09)
+## Resume here (2026-10-09)
 
-Branch `lane-7/navigation`, stacked on `lane-7/harness` (pull request 369, still open, CI green, no
-review comments). The 7.2 pull request is opened as a **draft**: it is not ready until the steps below
-are done.
+PR 369 is merged. `origin/main` was merged into `lane-7/navigation` at `678484ade`.
+WP 7.2 local verification is complete. Both real-stack flows, the full fake-API runs and the affected iOS gates pass after the cold-link fix. PR 379 is ready for review after publishing this evidence.
 
-| Piece                                                                                                                                             | State                                                                                                                                                                                                                                                               |
-| ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Android code and scenarios N1 to N21                                                                                                              | Done. Run on the final tree: see the results table below                                                                                                                                                                                                            |
-| iOS code                                                                                                                                          | Done, compiled and installed on `qelvora-lane7-ios`. **Six flows run by hand** on 2026-10-09 and passed: N1 (in-screen Back and the edge swipe), N3, N4, N7, N10 and the first half of N21. **The other eleven are not run** (N2, N5, N6, N8, N13 to N17, N19, N20) |
-| Regression gates (Android unit, Paparazzi, Lint, instrumentation; iOS `swift test` and UI tests; `pnpm` format, lint, typecheck on changed files) | See "Gates" below for what ran; anything not listed there was **not run**                                                                                                                                                                                           |
-| E7.2 "the draft comes back"                                                                                                                       | **Not done here.** Drafts are WP 7.3. E7.2 is not complete until that part passes                                                                                                                                                                                   |
+| Piece              | State                                                                                                                                                                                                 |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Android N1 to N21  | All 21 pass in one uninterrupted run after the merge                                                                                                                                                  |
+| iOS navigation     | The approved XCUITest run passed 13 flows with no skips: N1, N2, N5, N6, N8, N13–N17, N19, N20, and the Creator access half of N21. Earlier manual passes remain N3, N4, N7, N10, and Spending in N21 |
+| Regression gates   | Both debug builds, existing native suites, both release builds/hook checks and the 51-check contract check pass; root checks pass                                                                     |
+| E7.2 draft restore | WP 7.3; not run here                                                                                                                                                                                  |
 
-To finish 7.2: (1) run the eleven iOS flows not yet run (table below) by hand with the simulator tool
-and record the results in the pull request; (2) fix whatever they find, on both platforms, and re-run the
-Android flow that guards it; (3) `git merge origin/main` (never rebase), rebuild both apps, re-run the
-contract check, the Android flows and the gates, including the ones not run yet (Android
-`connectedDebugAndroidTest`, iOS UI tests, release builds of both apps); (4) update the pull request body
-(`gh pr edit`), then `gh pr ready`.
+Next: WP 7.3, on a separate branch and pull request. Draft restoration remains there. CI could not be read: the app's PR checks tool requires a GitHub connection.
 
 ## The spec
+
+### Resumed iOS operation
+
+The founder approved using XCUITest in the resumed Codex session because the manual simulator
+control tool is unavailable there. `apps/ios/UITests/Lane7NavigationFlows.swift` drives the real
+app's controls, gestures and OS links, and checks the fake API's requests and state. It skips
+unless explicitly enabled by `tests/scenarios/lane-7/ios-navigation.mjs`; these are operated
+end-to-end flows, not unit tests. The real backend is not proved by these runs.
+
+Build the app with the runbook's signed simulator command, using `build-for-testing` in place
+of `build`. Start the existing harness and `node tests/scenarios/lane-7/ios-link-driver.mjs`
+(loopback port 56475, only the lane's simulator and fixed scenario links). Then run:
+
+```sh
+node tests/scenarios/lane-7/ios-navigation.mjs <derived-data>/Build/Products/QelvoraApp_iphonesimulator26.5-x86_64.xctestrun N5 N1
+```
+
+Omit the flow IDs to run all fake-API flows implemented in that file. The runner takes the heavy-build
+lock, disables parallel testing, keeps result bundles outside Git, and refuses to report success
+if any selected flow was skipped or absent. `LANE7_OUT` selects the evidence directory.
+
+The first N5 run found an edge swipe activating the Memberships row under the finger. The
+screen and request log showed Manage membership instead of Home. A plain SwiftUI gesture
+also failed this case. The replacement `NativeBackSwipe` recognizer passed N5 and N1, then the complete 13-flow
+run. It gives the horizontal edge drag priority and cancels the row's tap; vertical edge
+drags still scroll, and sheets retain their own dismissal. N5 also checks the vertical
+scroll, Spending and Help API reads, and the final Home screen. The result bundle retains
+screenshots, accessibility trees and request metadata for each flow.
+
+### Real-stack check
+
+After the fake-API run, stop the harness (its port 56473 is needed by the model fake).
+Start `node infra/local/stack.mjs up --lane 7 --no-web --growth --ack-only`.
+This creates only lane 7's disposable PostgreSQL and runs the real API with synthetic
+identity and model-provider edges. The smoke creates fan one's profile and conversation
+through real endpoints. No native navigation result is claimed until the following runs pass.
+
+- Install the debug APK again after instrumentation (that task removes it).
+- Android: `node tests/scenarios/lane-7/stack-navigation.mjs android` uses the debug API
+  origin override for lane 7's port 56471, then checks the real API state and denial to
+  a signed-out visitor and another fan.
+- iOS: rebuild with `CREATOR_API_URL=http://127.0.0.1:56471` (a cold OS link needs the
+  built-in origin), keep the lane's link driver on 56475, then run
+  `node tests/scenarios/lane-7/ios-navigation.mjs <built.xctestrun> --stack` followed by
+  `node tests/scenarios/lane-7/stack-navigation.mjs verify`.
+- Both walk Home > Maya thread > Back, a warm account link > Back (iOS from the background),
+  process stop/relaunch > thread > parent, and a cold creator link > Discover > Home.
+- Android: **pass**, including API state and wrong-person denial.
+- iOS: **pass after a real failure and fix**. The first run reached Home directly from a
+  cold creator link, skipping Discover. `onOpenURL` had pushed the startup Home route.
+  The shell now remembers whether its scene has ever been active: an initial link replaces,
+  while a later link pushes, including one arriving from the background. The real-stack
+  rerun passed all four journeys, with screenshots and no skips. A discarded scene-delegate
+  approach broke startup and was removed; the final fix preserves SwiftUI scene ownership.
+- The full 21/13-flow matrices above remain fake-API proof.
+
+### Navigation rules
 
 1. **The trail.** The app keeps the screens you moved through, newest last, with the tab each was in.
    Paths and tab names only: no credential, message text, or account data. At most 24 entries.
@@ -88,33 +139,40 @@ leaving (the launcher takes focus). "On the harness": the fake API, not the real
 
 ### Results (2026-10-09, on the harness)
 
-Android: all 21 in one run, by script. iOS: six flows by hand through the simulator tool; the rest **not run**.
+Android: all 21 flows pass in one uninterrupted run after merging main.
+iOS: 13 flows passed in one XCUITest run with no skips after both the gesture and cold-link fixes; prior manual
+results are identified explicitly. All use the fake API, not the real backend.
 
-| ID  | What it walks                                                           | Android result (what was seen, in order)                                                                                                                                                                                       | iOS                                                     |
-| --- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------- |
-| N1  | Home to a thread: Back returns to Home, not You                         | pass: home > thread > home > app left                                                                                                                                                                                          | pass (in-screen Back, and the edge swipe)               |
-| N2  | Discover, creator, consent, thread: Back skips the consent              | pass: discover > creator > consent > thread > creator, not the consent > discover > home, the tab's parent > app left                                                                                                          | not run                                                 |
-| N3  | Step-in packet: Back returns to the thread                              | pass: thread > packet > thread, not Requests > home                                                                                                                                                                            | pass                                                    |
-| N4  | A view inside a thread closes first                                     | pass: thread > privacy > thread > home                                                                                                                                                                                         | pass (the sheet's new Back closes it)                   |
-| N5  | Account screens: Back returns to You, then Home                         | pass: you > spending > you > help > you > home, the tab's parent                                                                                                                                                               | not run                                                 |
-| N6  | Notifications: a tapped item, Back to the list, Back to Home            | pass: list > post > its back control says Back, not Back to Maya's page > in-screen Back: list > creator page > system Back: list > home                                                                                       | not run                                                 |
-| N7  | A link while the app is open: Back returns to where you were            | pass: discover > thread > discover, where you were > home > app left                                                                                                                                                           | pass (iOS asks Open in Qelvora? first)                  |
-| N8  | A link into a stopped app: Back goes Home, then leaves                  | pass: thread > home > app left                                                                                                                                                                                                 | not run                                                 |
-| N9  | Rotation keeps the trail                                                | pass: thread > thread after rotating > home, the trail survived                                                                                                                                                                | not run                                                 |
-| N10 | Stopped and reopened: the place returns, Back goes Home                 | pass: thread > thread restored > home > app left                                                                                                                                                                               | pass                                                    |
-| N11 | The back gesture goes back, and at Home leaves the app                  | pass: thread > home > app left                                                                                                                                                                                                 | not run                                                 |
-| N12 | Sign-in chooser: Back closes it, then leaves                            | pass: welcome > chooser > welcome > app left                                                                                                                                                                                   | not run                                                 |
-| N13 | Wrong person: a new account never inherits the last one's trail         | pass: devon's thread > account > signed out > chooser > priya, back on the account screen > Back: priya's You, not devon's thread > Back: home > Back: app left, nothing stale to go to > priya never asked for devon's thread | not run                                                 |
-| N14 | A link the app does not know changes nothing                            | pass: discover > still on discover > home                                                                                                                                                                                      | not run                                                 |
-| N15 | Repeat: the same link twice is one step, fast Back presses do not skip  | pass: discover > thread > thread still > one Back: discover > thread again > two quick Backs: home                                                                                                                             | not run                                                 |
-| N16 | Race: a link arrives while a thread's privacy view is open              | pass: thread > privacy > creator page > thread, privacy closed                                                                                                                                                                 | not run                                                 |
-| N17 | Boundary: thirty screens deep, the trail holds 24 and Back never loops  | pass: on the last screen > left after 27 presses (expected 27)                                                                                                                                                                 | not run                                                 |
-| N18 | The system reclaims the app: the place returns, Back goes to its parent | pass: post > post restored > creator page, not the list                                                                                                                                                                        | not run                                                 |
-| N19 | A new fan on the handle form can still leave with Back                  | pass: handle form > app left, not trapped                                                                                                                                                                                      | not run                                                 |
-| N20 | Edit profile: Back through the account screen to You, then Home         | pass: you > account > handle form > in-screen Back: account > system Back: you > home                                                                                                                                          | not run                                                 |
-| N21 | Requests tab: money screens go Back to Requests, not to You             | pass: requests > spending > in-screen Back: requests, not you > access > system Back: requests > home                                                                                                                          | partial: Spending and time pass; Creator access not run |
+| ID  | What it walks                                                           | Android result (what was seen, in order)                                                                                                                                                                                       | iOS                                                                                    |
+| --- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| N1  | Home to a thread: Back returns to Home, not You                         | pass: home > thread > home > app left                                                                                                                                                                                          | pass: button and edge swipe both return Home (XCUITest rerun)                          |
+| N2  | Discover, creator, consent, thread: Back skips the consent              | pass: discover > creator > consent > thread > creator, not the consent > discover > home, the tab's parent > app left                                                                                                          | pass: thread > creator > Discover > Home; exactly one consented Priya thread           |
+| N3  | Step-in packet: Back returns to the thread                              | pass: thread > packet > thread, not Requests > home                                                                                                                                                                            | pass (prior manual run; not rerun)                                                     |
+| N4  | A view inside a thread closes first                                     | pass: thread > privacy > thread > home                                                                                                                                                                                         | pass (prior manual run; not rerun)                                                     |
+| N5  | Account screens: Back returns to You, then Home                         | pass: you > spending > you > help > you > home, the tab's parent                                                                                                                                                               | pass: You after Spending and Help, then Home; vertical edge scroll also works          |
+| N6  | Notifications: a tapped item, Back to the list, Back to Home            | pass: list > post > its back control says Back, not Back to Maya's page > in-screen Back: list > creator page > system Back: list > home                                                                                       | pass: post > list > creator > list > Home; Back accessibility label; both notices read |
+| N7  | A link while the app is open: Back returns to where you were            | pass: discover > thread > discover, where you were > home > app left                                                                                                                                                           | pass (prior manual run; not rerun)                                                     |
+| N8  | A link into a stopped app: Back goes Home, then leaves                  | pass: thread > home > app left                                                                                                                                                                                                 | pass: cold thread > Home; cold creator > Discover > Home                               |
+| N9  | Rotation keeps the trail                                                | pass: thread > thread after rotating > home, the trail survived                                                                                                                                                                | not run: iOS rotation is WP 7.3                                                        |
+| N10 | Stopped and reopened: the place returns, Back goes Home                 | pass: thread > thread restored > home > app left                                                                                                                                                                               | pass (prior manual run; not rerun)                                                     |
+| N11 | The back gesture goes back, and at Home leaves the app                  | pass: thread > home > app left                                                                                                                                                                                                 | not applicable: iOS edge swipe covered by N1/N5                                        |
+| N12 | Sign-in chooser: Back closes it, then leaves                            | pass: welcome > chooser > welcome > app left                                                                                                                                                                                   | not applicable: iOS has no system Back                                                 |
+| N13 | Wrong person: a new account never inherits the last one's trail         | pass: devon's thread > account > signed out > chooser > priya, back on the account screen > Back: priya's You, not devon's thread > Back: home > Back: app left, nothing stale to go to > priya never asked for devon's thread | pass: Priya account > her You > Home; no Devon thread read; Devon session revoked      |
+| N14 | A link the app does not know changes nothing                            | pass: discover > still on discover > home                                                                                                                                                                                      | pass: unknown link leaves Discover unchanged > Home                                    |
+| N15 | Repeat: the same link twice is one step, fast Back presses do not skip  | pass: discover > thread > thread still > one Back: discover > thread again > two quick Backs: home                                                                                                                             | pass: repeated link adds one entry; consecutive edge swipes reach Home and stop        |
+| N16 | Race: a link arrives while a thread's privacy view is open              | pass: thread > privacy > creator page > thread, privacy closed                                                                                                                                                                 | pass: privacy sheet > creator > thread with privacy closed                             |
+| N17 | Boundary: thirty screens deep, the trail holds 24 and Back never loops  | pass: on the last screen > left after 27 presses (expected 27)                                                                                                                                                                 | pass: 24 trail entries > You > Home (26 Backs); another edge swipe stays Home          |
+| N18 | The system reclaims the app: the place returns, Back goes to its parent | pass: post > post restored > creator page, not the list                                                                                                                                                                        | not run separately: iOS process restart covered by N10                                 |
+| N19 | A new fan on the handle form can still leave with Back                  | pass: handle form > app left, not trapped                                                                                                                                                                                      | pass: Back keeps the handle form; no profile write                                     |
+| N20 | Edit profile: Back through the account screen to You, then Home         | pass: you > account > handle form > in-screen Back: account > system Back: you > home                                                                                                                                          | pass: handle form > account > You > Home                                               |
+| N21 | Requests tab: money screens go Back to Requests, not to You             | pass: requests > spending > in-screen Back: requests, not you > access > system Back: requests > home                                                                                                                          | pass: Spending (prior manual); Creator access > Requests > Home (XCUITest)             |
 
-Log: [artifacts/lane-7/7-2-android-run.txt](../../../artifacts/lane-7/7-2-android-run.txt).
+Logs: [Android](../../../artifacts/lane-7/7-2-android-run.txt) and
+[iOS](../../../artifacts/lane-7/7-2-ios-run.txt). The iOS runner asserts screen transitions,
+notification read state, consent creation, session revocation and account-scoped API requests.
+The resumed Android N13 check now matches `/conversations/` (the real API path); the old
+`/threads/` match was ineffective. Its existing screen assertion had caught the deliberate
+sign-out mutation, but that did not prove the old request assertion.
 
 **The assertions can fail.** I broke three behaviors on purpose, rebuilt, and ran the flows that guard
 them: with the trail not cleared at sign-out N13 failed ("Back: priya's You, not devon's thread"); with
@@ -122,10 +180,11 @@ the trail limit raised from 24 to 30 N17 failed (31 presses instead of 27); with
 conversation pushed instead of replaced N2 failed (Back landed on the consent). Restored, all three passed
 again.
 
-### iOS flows to run by hand (the simulator tool)
+### iOS flow recipe (original manual-tool instructions)
 
-Already run by hand and passed (see the table): N1 (in-screen Back and the edge swipe), N3, N4, N7, N10
-and the first half of N21. **Everything else below is not run.**
+This is the original recipe and tool guidance retained for later manual checks. The results
+above supersede its original completion notes. The founder approved XCUITest for the unfinished
+flows; all applicable unfinished rows now passed in the operated run.
 
 iOS has no system Back, so these use the in-screen Back, the left-edge swipe, links with `xcrun simctl openurl <udid> 'qelvora://app/<path>'`, and kills with
 `xcrun simctl terminate <udid> com.pantopus.qelvora` and a plain `simctl launch`. Start each from a
@@ -166,19 +225,25 @@ pull-to-refresh. The thread takes a few seconds to load after a tap on a cold st
 | N21               | `--to /requests`: "Spending and time", Back; "Creator access", Back                                           | Requests both times, not You (Spending half done)                                                                                                      |
 | N9, N11, N12, N18 | Not applicable on iOS (rotation is WP 7.3; there is no system gesture or chooser Back; a restart is N10)      |                                                                                                                                                        |
 
-## Gates (2026-10-09, on commit `d2a543695` and the docs)
+## Gates (2026-10-09, after merge `678484ade` and the navigation fixes)
 
-One change came after these gates: the iOS thread's privacy sheet got its "Back" button (one line in
-`W3FanFeatures.swift`). The iOS app was rebuilt and the sheet checked by hand (N4); `swift test` was not
-run again.
+| Gate                                                | Result                                                                                                  |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Android unit and Paparazzi                          | pass: 19 tests, 0 failures                                                                              |
+| Android Lint                                        | pass: 0 errors                                                                                          |
+| Android `connectedDebugAndroidTest`                 | pass: result XML has 8 tests, 4 passed, 4 skipped by design, 0 failures                                 |
+| Android release build and debug-hook absence        | pass: all three hook markers present in debug DEX, absent from release; fake origin absent              |
+| iOS existing UI suites                              | pass: 2 Foundation tests; 4 ConnectedJourney tests skipped by design; no failures                       |
+| iOS operated navigation                             | pass: 13 tests, no skips; separate from the regression suites                                           |
+| iOS `swift test`                                    | pass: 18 tests, 0 failures                                                                              |
+| iOS release build/hook absence                      | pass: simulator Release built; all four debug-hook markers absent, fake origin absent, API origin empty |
+| `pnpm` format, lint, typecheck, generate check      | pass: typecheck 7/7 (forced); eslint/prettier; generated resources and 119 operations                   |
+| Harness contract check against current real schemas | pass: 51/51                                                                                             |
+| GitHub CI                                           | not run: app PR checks tool needs a GitHub connection; no polling                                       |
 
-| Gate                                                                                                                                                                                             | Result                                                      |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------- |
-| Android `./gradlew --offline :app:testDebugUnitTest :app:verifyPaparazziDebug :app:lintDebug`                                                                                                    | pass: 19 unit and snapshot tests, 0 failures; Lint 0 errors |
-| iOS `swift test`                                                                                                                                                                                 | pass: 18 tests, 0 failures                                  |
-| `pnpm format:check`, `pnpm typecheck`, `pnpm lint`, `pnpm generate:check`; prettier and eslint on `tests/scenarios/lane-7`                                                                       | pass                                                        |
-| Contract check against the real schemas (51 checks)                                                                                                                                              | pass                                                        |
-| **Not run:** Android `connectedDebugAndroidTest` (8, 4 skip by design), iOS UI tests (`xcodebuild test`, 6, 4 skip by design), release builds of both apps, anything after merging `origin/main` |                                                             |
+Evidence: [local gate report](../../../artifacts/lane-7/7-2-gates.txt). The connected journey
+skips do not count as operated navigation passes. Release distribution signing and installation
+are WP 7.9 and are not run here.
 
 ## What changed in the harness during 7.2 (found by these scenarios)
 
@@ -205,9 +270,8 @@ run again.
 
 ## Not checked
 
-- iOS: the flows marked "not run" in the results table (eleven of 21, plus the second half of N21).
-  VoiceOver's escape gesture: not run. The accessibility label of the post's back control: not read
-  on iOS (OCR cannot see it).
+- VoiceOver's escape gesture: not run. The iOS post's Back accessibility label passed N6.
+- Prior manual iOS flows N3, N4, N7, N10 and Spending in N21 were not repeated after the merge.
 - Right-to-left layouts: the iOS swipe uses the physical left edge.
 - Android predictive Back's _animation_: the opt-in and the handler priority are visible in `logcat`
   (`CoreBackPreview ... mIsAnimationCallback=true`), but the cross-fade itself was not looked at.

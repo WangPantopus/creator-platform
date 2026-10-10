@@ -484,6 +484,9 @@ public struct FanAppShell: View {
     @Environment(\.colorScheme) private var scheme
     @Environment(\.dynamicTypeSize) private var textSize
     @Environment(\.scenePhase) private var scenePhase
+    // Before the scene first becomes active, an incoming link is its starting place.
+    // Keep this true through backgrounding so later links retain the existing trail.
+    @State private var hasEnteredForeground = false
     #if os(iOS)
     @ObservedObject private var push = GrowthPushCoordinator.shared
     @State private var notificationArrivalRevision = 0
@@ -562,12 +565,9 @@ public struct FanAppShell: View {
             }
         }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }.foregroundStyle(qColor("ink", scheme)).background(qColor("ground", scheme))
-            // A swipe in from the left edge goes back, like Android's Back gesture. A simultaneous
-            // gesture, so it never takes a tap or a scroll from the screen under it.
-            .simultaneousGesture(DragGesture(minimumDistance: 24).onEnded { value in
-                guard backAvailable, value.startLocation.x < 24, value.translation.width > 70, abs(value.translation.height) < 60 else { return }
-                model.back()
-            })
+            #if os(iOS)
+            .background(NativeBackSwipe(enabled: backAvailable) { model.back() })
+            #endif
             // VoiceOver's escape gesture (a two-finger Z) goes back too.
             .accessibilityAction(.escape) { if backAvailable { model.back() } }
             .task(id: scenePhase) {
@@ -587,8 +587,8 @@ public struct FanAppShell: View {
             }
             .task(id: model.destination + destinationDelivery.uuidString) { await model.loadArrival() }
             #if os(iOS)
-            .onChange(of: scenePhase) { _, phase in
-                if phase == .active { push.refreshPermission(); notificationArrivalRevision += 1 }
+            .onChange(of: scenePhase, initial: true) { _, phase in
+                if phase == .active { hasEnteredForeground = true; push.refreshPermission(); notificationArrivalRevision += 1 }
             }
             .task(id: (push.pendingTap?.delivery.uuidString ?? "") + (model.session?.sessionId ?? "") + String(notificationArrivalRevision) + String(model.checkingSession)) {
                 guard let tap = push.pendingTap else { return }
@@ -596,11 +596,18 @@ public struct FanAppShell: View {
             }
             #endif
             .onOpenURL { url in
+                #if os(iOS)
+                let initialLink = !hasEnteredForeground
+                #else
+                let initialLink = false
+                #endif
                 guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false), components.user == nil, components.password == nil, components.fragment == nil else { model.error = "This link is unavailable."; return }
                 let associationHost = Bundle.main.object(forInfoDictionaryKey: "CreatorLinkHost") as? String
                 guard (components.scheme == "qelvora" && components.host == "app" && components.port == nil) || (components.scheme == "https" && associationHost != nil && components.host == associationHost && (components.port == nil || components.port == 443)) else { model.error = "This link does not belong to this app."; return }
                 let target = components.percentEncodedPath + (components.percentEncodedQuery.map { "?" + $0 } ?? "")
-                model.open(target, arrival: true)
+                // A scene's initial link has no previous screen. Warm links push.
+                if initialLink { model.replace(target, arrival: true) }
+                else { model.open(target, arrival: true) }
                 if ApplicationDestination.isPermitted(target) { destinationDelivery = UUID() }
             }
     }

@@ -1,8 +1,8 @@
 // E7.2 Back and restore, on Android. Each flow walks forward through real
 // screens, then presses system Back (or the in-screen Back) and checks the trail
 // comes back in reverse, ending with the app leaving (the launcher takes focus).
-// iOS has no system Back: its flows are run by hand with the simulator tool and
-// recorded in the pull request.
+// iOS uses in-screen Back and edge swipes; its approved operated XCUITest
+// runner is ios-navigation.mjs. Earlier manual results are in the lane report.
 //   node tests/scenarios/lane-7/e7-2-navigation.mjs [N1 N7 ...]
 import * as android from "./android-ui.mjs";
 import * as L from "./lib.mjs";
@@ -346,7 +346,8 @@ await flow(
     const entries = await L.log(since, p);
     r.push([
       "priya never asked for devon's thread",
-      !L.seen(entries, { path: /threads\/c1000000/u, account: "priya" }).length,
+      !L.seen(entries, { path: /conversations\/c1000000/u, account: "priya" })
+        .length,
     ]);
     return r;
   },

@@ -1,7 +1,6 @@
-Lane 7, WP 7.2: node tests/scenarios/lane-7/e7-2-navigation.mjs (all 21 flows, one run)
-Date: 2026-10-09. Device: emulator qelvora-lane7-android (Android 35, gesture navigation).
-Tree: commit d2a543695 on lane-7/navigation, debug build against the fake API (port 56473). Not the real backend.
-iOS: not run.
+2026-10-09 — after merging origin/main at 678484ade.
+Real app on qelvora-lane7-android, API 35; lane 7 fake API and synthetic data.
+N13 now checks the real /conversations/ request path.
 
 PASS android N1 Home to a thread: Back returns to Home, not You home > thread > home > app left
 PASS android N2 Discover, creator, consent, thread: Back skips the consent discover > creator > consent > thread > creator, not the consent > discover > home, the tab's parent > app left

@@ -15,6 +15,15 @@ with its size and SHA-256.
 
 ## WP 7.2 (system navigation)
 
-| File                  | What it shows                                                                                                                                                                                                             |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `7-2-android-run.txt` | The output of `tests/scenarios/lane-7/e7-2-navigation.mjs`: all 21 flows (N1 to N21) on the Android emulator, one run, all passed. A text log, not a picture: the screens are what each line says it saw. iOS was not run |
+| File                  | What it shows                                                                                                                                                                                                                                                                  |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `7-2-android-run.txt` | The output of `tests/scenarios/lane-7/e7-2-navigation.mjs`: all 21 flows (N1 to N21) on the Android emulator, one run, all passed. A text log, not a picture: the screens are what each line says it saw. Repeated after merging main; N13 uses the corrected API request path |
+
+`7-2-ios-run.txt` records the approved XCUITest operation of 13 real-app navigation flows, all passing with no skips. It includes screen and fake-API checks after the edge-swipe fix. Full screenshots, accessibility trees and sanitized request attachments remain in the off-repository xcresult bundle; the navigation report distinguishes these results from the earlier manual checks.
+
+`7-2-real-stack-run.txt` records the focused navigation flow on both apps against the real
+API and PostgreSQL, plus ownership/state and wrong-person denial checks. Identity and the
+model provider are synthetic. It includes the cold-link failure and successful fix rerun.
+
+`7-2-gates.txt` records local native suites, release-hook absence, the harness contract check,
+and repository gates. Expected skips and checks not run are named explicitly.
