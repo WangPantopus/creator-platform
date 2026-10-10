@@ -106,6 +106,7 @@ export function growthAccountExport(
     ];
     if (ownedCreators.length > 0) {
       for (const table of [
+        "creator_profile_fields",
         "content_public",
         "insight_snapshot",
         "insight_window",

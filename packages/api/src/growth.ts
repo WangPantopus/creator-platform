@@ -1,5 +1,31 @@
 import { z } from "zod";
 
+/** Creator-authored public words. Identity, verification and AI state remain
+ * with their existing owners. Limits match the C8 public projection. */
+const profileWords = {
+  biography: z
+    .string()
+    .max(600)
+    .refine((value) => !value.includes("\0")),
+  category: z
+    .string()
+    .max(60)
+    .refine((value) => !value.includes("\0")),
+  photoCaption: z
+    .string()
+    .max(100)
+    .refine((value) => !value.includes("\0")),
+};
+export const CreatorProfileFieldsInputSchema = z.strictObject({
+  version: z.int().min(0).max(2147483646),
+  ...profileWords,
+});
+export const CreatorProfileFieldsSchema = z.strictObject({
+  version: z.int().min(0).max(2147483647),
+  ...profileWords,
+});
+export type CreatorProfileFields = z.infer<typeof CreatorProfileFieldsSchema>;
+
 /** Current signed-in post metadata. This reference grants no body read,
  * processor consent, generation source or continuing permission. */
 export const PostEntryContextSchema = z.strictObject({

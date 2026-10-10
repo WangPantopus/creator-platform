@@ -32529,6 +32529,66 @@
         ],
         "additionalProperties": false
       },
+      "GrowthCreatorProfileFieldsInput": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483646
+          },
+          "biography": {
+            "type": "string",
+            "maxLength": 600
+          },
+          "category": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "photoCaption": {
+            "type": "string",
+            "maxLength": 100
+          }
+        },
+        "required": [
+          "version",
+          "biography",
+          "category",
+          "photoCaption"
+        ],
+        "additionalProperties": false
+      },
+      "GrowthCreatorProfileFields": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "biography": {
+            "type": "string",
+            "maxLength": 600
+          },
+          "category": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "photoCaption": {
+            "type": "string",
+            "maxLength": 100
+          }
+        },
+        "required": [
+          "version",
+          "biography",
+          "category",
+          "photoCaption"
+        ],
+        "additionalProperties": false
+      },
       "GrowthPostEntryContextResponse": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",

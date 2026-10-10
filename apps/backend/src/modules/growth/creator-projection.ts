@@ -1,6 +1,7 @@
 import type { Pool } from "pg";
 import { z } from "zod";
 import type { PublicCreator } from "./contracts.js";
+import { readCreatorProfileFields } from "./profile-fields.js";
 
 export type CurrentCreatorProjection = Omit<
   PublicCreator,
@@ -79,6 +80,7 @@ export function canonicalCreatorProjections(
         creator.verification === "verified" && !creator.recovery_required;
       const canonical =
         verified && publicAI ? await publicAI.current(id) : null;
+      const fields = await readCreatorProfileFields(pool, id);
       // The licensed reader may await its owner's policy. Re-read public
       // identity afterward so a completed revocation/recovery or handle edit
       // is not replaced by the earlier directory snapshot.
@@ -108,12 +110,12 @@ export function canonicalCreatorProjections(
           ai && ["published", "paused"].includes(ai.state)
             ? ai.sourceSummary
             : "",
-        biography: "",
-        category: "",
+        biography: fields.biography,
+        category: fields.category,
         reliability: "",
         capacity: "",
         presence: "",
-        photoCaption: "",
+        photoCaption: fields.photoCaption,
         membershipLabel: null,
         accessLines: [],
       };
