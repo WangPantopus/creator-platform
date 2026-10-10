@@ -73,6 +73,36 @@ curl -s -XPOST http://127.0.0.1:56423/__control -d '{"mode":"error500"}'   # ok 
 curl -s http://127.0.0.1:56423/__stats                                      # calls per purpose, recent requests
 ```
 
+## Using Claude instead of OpenAI (optional)
+
+`up --provider anthropic` wires the backend to the Claude adapter (Haiku 5.5 for guards,
+judges and extraction; Sonnet 5.5 for replies; embeddings stay on OpenAI). On its own it costs
+nothing: Claude's calls go to the same local fake, which now also speaks Claude's protocol.
+
+For the real model there is one process that holds the key, the capped gateway. The founder
+starts it once (the key comes from the Keychain and is never written anywhere):
+
+```
+ANTHROPIC_API_KEY="$(security find-generic-password -a "$USER" -s qelvora-anthropic-key -w)" \
+  node infra/local/model-gateway.mjs --budget-usd 20
+```
+
+and any lane points its stack at it:
+
+```
+node infra/local/stack.mjs up --lane N --provider anthropic --model-gateway http://127.0.0.1:56499
+```
+
+The gateway listens on loopback only and forwards nothing but `POST /v1/messages` for
+`claude-sonnet-5-5` and `claude-haiku-5-5`: it adds the key itself, refuses tools and betas,
+caps `max_tokens`, keeps a dollar budget that survives restarts (it stops at the cap, with a 402)
+and counts calls and cost per lane. `curl -s http://127.0.0.1:56499/__stats` shows the spend;
+`POST /__control {"paused":true}` stops every lane at once, and Ctrl-C ends the process and the
+key with it. Use the fake by default and the real model only for what the fake cannot show
+(guard strictness, answer quality, latency). Publishing Maya's AI through the real model runs the
+six-case evaluation on it, so a strict guard can make `up` fail where the fake never would: that
+is a finding for lane 3, not a stack fault.
+
 ## Running the existing test suites against it
 
 The database container is also the disposable test database the working agreement
