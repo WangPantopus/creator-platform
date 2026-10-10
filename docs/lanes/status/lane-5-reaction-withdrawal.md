@@ -34,7 +34,16 @@ that enumerates them. Verify the full production host. This branch never edits
 
 ## Results, 2026-10-09
 
-Real HTTP server and PostgreSQL, machine load roughly 4–7. No new unit tests.
+Real HTTP server and PostgreSQL, machine load initially 4–7, rising to about 17
+during the final regression after merging main. No new unit tests.
+
+Main advanced to `21b3d4836` (#381) during this work. It was brought forward by
+ordinary merge. The six new checks and separate restart passed again on that
+tree (`/tmp/qelvora-lane5-reaction-merged-proof.log` and `-merged-restart.log`).
+Existing backend regression passed **9 files, 157/157 in 212.17 seconds** after
+the merge (`-merged-backend.log`); seven typecheck tasks and changed-source eslint
+passed. The earlier regression also passed 157/157 in 147.27 seconds. These are
+existing suites, not new unit tests. There is no real-model delivery claim.
 
 | ID                                       | Steps                                                                                                  | Expected                                                      | Observed                                                                                                      | Result  | Evidence                                                                                 |
 | ---------------------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------- | ---------------------------------------------------------------------------------------- |
