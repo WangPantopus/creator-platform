@@ -4,7 +4,7 @@ Branch `lane-5/web-push`, cut from main `c0b4ac0f0`. No pull request while #385 
 
 ## Implementation and interface
 
-Creator web registrations use the existing `PUT /v1/growth/devices` route, encrypted session binding, registration revision and per-delivery receipt ledger. Body: `{ installationId, platform: "web", token: JSON.stringify(subscription), permission, registrationRevision }`. The subscription is the browser's endpoint, optional expirationTime and p256dh/auth keys. A granted web registration requires the real creator account. A denied registration or the existing DELETE route can retire its current binding. Native registration semantics are unchanged.
+Creator web registrations use the existing `PUT /v1/growth/devices` route, encrypted session binding, registration revision and per-delivery receipt ledger. Body: `{ installationId, platform: "web", token: JSON.stringify(subscription), permission, registrationRevision }`. The subscription is the browser's endpoint, optional expirationTime and p256dh/auth keys. A granted web registration requires the real creator account. A denied registration or the existing DELETE route can retire its current binding. DELETE uses the installation UUID in the path (not the database row ID returned by registration), with `{ platform: "web", registrationRevision }`. Native registration semantics are unchanged.
 
 The endpoint must be HTTPS on exactly `fcm.googleapis.com`, `updates.push.services.mozilla.com` or `web.push.apple.com`, with no alternate port, credentials, query or fragment. Unknown push services are unsupported. Invalid P-256 points and malformed auth keys are refused before persistence. Subscriptions and their keys are encrypted; there is no new plaintext endpoint table. Browser key rotation must increase registrationRevision.
 
@@ -48,3 +48,31 @@ Do not ship the creator browser toggle before the worker/account checks are in p
 ## Re-run
 
 Put the runtime Node and fallback bin on PATH; set `npm_config_manage_package_manager_versions=false`. Run `sh tests/scenarios/lane-5/setup.sh`, then apply the pending SQL with `docker exec -i qelvora-lane5-db psql -v ON_ERROR_STOP=1 -U postgres -d creator_foundation_lane5 < apps/backend/src/modules/growth/migrations/pending_w7_web_push.sql`. Start `LANE5_WEB_PUSH=true sh tests/scenarios/lane-5/run-host.sh` and run `node tests/scenarios/lane-5/e5-4-web-push.mjs`. Restart that host without resetting the database and run the script with `--restart`. Stop the host, remove only `qelvora-lane5-db` and delete the synthetic `/tmp/qelvora-lane5-web-push-development.json` when finished. Never print its key material.
+
+## Full stock-host follow-up
+
+The pending platform constraint was also applied manually to the disposable
+`creator_stack`, and the full stock host started successfully without a catalogue
+review bypass. The first start failed with `ERR_MODULE_NOT_FOUND` for `web-push`:
+switching to a branch without that dependency had removed its local link. Running
+`pnpm install --offline --frozen-lockfile` restored seven packages from the already
+downloaded store (zero downloads); the next stock start succeeded. This is a local
+setup failure, preserved in `/tmp/qelvora-lane5-web-push-stock-start.log`.
+
+`e5-4-web-push-stock.mjs` passed 3/3, with one delivery/display case not run. It uses
+real stock sessions, the real registration/revocation endpoints and PostgreSQL.
+Edge fakes: development identity/license/model and synthetic browser crypto only.
+No production push request is sent. Load was about four on 16 CPUs.
+
+| ID                      | Steps                                                          | Expected                                         | Observed                                 | Result  | Evidence                                      |
+| ----------------------- | -------------------------------------------------------------- | ------------------------------------------------ | ---------------------------------------- | ------- | --------------------------------------------- |
+| E5.4-stock-registration | Creator registers concurrently, fan/anonymous try              | One encrypted creator binding only               | Two 200s/one row; fan 403; anonymous 401 | pass    | `/tmp/qelvora-lane5-web-push-stock-proof.log` |
+| E5.4-stock-revocation   | DELETE installation, replay old registration, newer permission | Revoke; old revision refused; new choice allowed | Denied/revoked row; 409 stale; newer 200 | pass    | same log                                      |
+| E5.4-stock-signout      | Real logout, replay registration                               | Old session refused                              | Logout 200; register 401                 | pass    | same log                                      |
+| E5.4-stock-delivery     | Actual stock provider/browser                                  | Deliver and display safely                       | Provider and worker connections absent   | not run | integrator/lane 6 tickets                     |
+
+For this extra proof, apply the SQL to `creator_stack`, start the stock host with
+`node infra/local/stack.mjs up --lane 5 --growth --no-smoke` and run
+`node tests/scenarios/lane-5/e5-4-web-push-stock.mjs`. The registration proof does
+not substitute for the separate encrypted-gateway delivery proof or real browser
+presentation. No production code changed after the 157/157 backend run.
