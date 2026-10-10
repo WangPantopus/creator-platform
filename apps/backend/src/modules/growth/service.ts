@@ -1789,6 +1789,7 @@ export class GrowthService {
           [this.privacySubjectKey(accountId)],
         );
         for (const table of [
+          "creator_profile_fields",
           "content_public",
           "insight_signal",
           "insight_snapshot",

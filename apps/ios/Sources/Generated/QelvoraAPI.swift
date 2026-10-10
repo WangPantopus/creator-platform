@@ -11047,6 +11047,32 @@ public enum APIStudioStudioThreadEntriesCoverage: String, Codable, Sendable {
   case `notes_and_requests` = "notes_and_requests"
 }
 
+public struct APIGrowthCreatorProfileFieldsInput: Codable, Sendable {
+  public let `version`: Int
+  public let `biography`: String
+  public let `category`: String
+  public let `photoCaption`: String
+  public init(version: Int, biography: String, category: String, photoCaption: String) {
+    self.version = version
+    self.biography = biography
+    self.category = category
+    self.photoCaption = photoCaption
+  }
+}
+
+public struct APIGrowthCreatorProfileFields: Codable, Sendable {
+  public let `version`: Int
+  public let `biography`: String
+  public let `category`: String
+  public let `photoCaption`: String
+  public init(version: Int, biography: String, category: String, photoCaption: String) {
+    self.version = version
+    self.biography = biography
+    self.category = category
+    self.photoCaption = photoCaption
+  }
+}
+
 public struct APIGrowthPostEntryContextResponse: Codable, Sendable {
   public let `context`: APIGrowthPostEntryContextResponseContext
   public init(context: APIGrowthPostEntryContextResponseContext) {

@@ -5876,6 +5876,22 @@ enum class APIStudioStudioThreadEntriesCoverage {
 }
 
 @Serializable
+data class APIGrowthCreatorProfileFieldsInput(
+  val `version`: Long,
+  val `biography`: String,
+  val `category`: String,
+  val `photoCaption`: String
+)
+
+@Serializable
+data class APIGrowthCreatorProfileFields(
+  val `version`: Long,
+  val `biography`: String,
+  val `category`: String,
+  val `photoCaption`: String
+)
+
+@Serializable
 data class APIGrowthPostEntryContextResponse(
   val `context`: APIGrowthPostEntryContextResponseContext
 )
