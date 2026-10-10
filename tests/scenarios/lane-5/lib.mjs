@@ -24,7 +24,7 @@ const DB =
   process.env.LANE5_ADMIN_DB ??
   "postgresql://postgres:foundation-test-only@127.0.0.1:56450/creator_foundation_lane5";
 export const RP_ID = "localhost";
-export const ORIGIN = "http://localhost:3000";
+export const ORIGIN = process.env.LANE5_WEB_ORIGIN ?? "http://localhost:3000";
 
 let pool;
 export const sql = (text, values) =>
@@ -224,7 +224,7 @@ export async function deleteFan(fan) {
 
 // ---------------------------------------------------------- creator signing
 
-function newPasskey() {
+export function newPasskey() {
   const keys = generateKeyPairSync("ec", { namedCurve: "prime256v1" });
   const jwk = keys.publicKey.export({ format: "jwk" });
   const cose = Buffer.concat([
@@ -354,7 +354,7 @@ export async function saveDraft(
   return { version: saved.body.version, document };
 }
 
-/** Sign the exact draft and publish it. Returns the publish response too. */
+/** Sign the exact Note or post draft and publish it. Returns the response too. */
 export async function signAndPublish(
   creator,
   id,
@@ -363,7 +363,7 @@ export async function signAndPublish(
   publishKey = key("publish"),
 ) {
   const signedActId = await signAct(creator, {
-    actType: "broadcast",
+    actType: document.kind === "note" ? "broadcast" : "reply",
     subjectId: id,
     content: {
       kind: "content_publication",
