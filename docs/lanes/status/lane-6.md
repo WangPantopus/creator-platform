@@ -3,7 +3,7 @@
 Updated: 2026-10-09, by the continuing lane 6 session.
 
 Working on: WP 6.1 only. The split preserves behavior; one pull request per area.
-`Studio.tsx` is now 547 lines after Prettier (originally 4,795).
+`Studio.tsx` is now 408 lines after Prettier (originally 4,795).
 The extraction tool's printed count is its buffer before the final formatting pass; the counts
 in this status and the pull requests are measured from saved files.
 
@@ -31,14 +31,14 @@ This session:
 - [x] #383 `lane-6/studio-split-notes`: Notes and Compose
 - [x] #386 `lane-6/studio-split-library`: Publish (the library)
 - [x] #387 `lane-6/studio-split-requests`: Requests and PacketDetail
-- [x] `lane-6/studio-split-threads`: Threads and CorrectionForm
-- [ ] `lane-6/studio-split-shell`: navigation helpers and the requests count
+- [x] #390 `lane-6/studio-split-threads`: Threads and CorrectionForm
+- [x] `lane-6/studio-split-shell`: navigation helpers and the requests count
 
-Done: Notes and Compose; Publish (the library); Requests and PacketDetail; Threads and CorrectionForm. Static checks, the declaration move
+Done: Notes and Compose; Publish (the library); Requests and PacketDetail; Threads and CorrectionForm; navigation helpers and the requests count. Static checks, the declaration move
 check, the full browser comparison, all 7 workspace typechecks (zero cached tasks), and the
 production build passed for each checked area above.
 
-Next: navigation helpers and the requests count; then the one-time main refresh and final proof.
+Next: the one-time main refresh, fresh baseline and final full proof, final report and cleanup.
 Do not begin WP 6.2 or any other package until the founder sends "Next for lane 6".
 
 Blocked on: nothing for round 1. Later packages retain their existing contract dependencies.
@@ -52,9 +52,12 @@ Scenarios:
 - Publish (the library): 82 shots, 81 identical in pixels, calls, console and Tab order; 636 /api calls and 1090 Tab stops compared; chrome 154.0.8037.98 1 shot(s) equal within rendering tolerance (at most 64 pixels, at most 8/255): night/requests-empty/empty: 12 pixels differ, by at most 1/255 PASS: identical
 - Requests and PacketDetail: 82 shots, 81 identical in pixels, calls, console and Tab order; 636 /api calls and 1090 Tab stops compared; chrome 154.0.8037.98 1 shot(s) equal within rendering tolerance (at most 64 pixels, at most 8/255): night/requests-empty/empty: 12 pixels differ, by at most 1/255 PASS: identical
 - Threads and CorrectionForm: 82 shots, 81 identical in pixels, calls, console and Tab order; 636 /api calls and 1090 Tab stops compared; chrome 154.0.8037.98 1 shot(s) equal within rendering tolerance (at most 64 pixels, at most 8/255): night/requests-empty/empty: 12 pixels differ, by at most 1/255 PASS: identical
+- navigation helpers and the requests count: 82 shots, 79 identical in pixels, calls, console and Tab order; 636 /api calls and 1090 Tab stops compared; chrome 154.0.8037.98 3 shot(s) equal within rendering tolerance (at most 64 pixels, at most 8/255): light/publish/search: 11 pixels differ, by at most 1/255 night/requests/filter-due: 18 pixels differ, by at most 1/255 night/requests-empty/empty: 12 pixels differ, by at most 1/255 PASS: identical
 - First Notes attempt failed in `tests/scenarios/lane-6/e6-1-page.mjs:11`:
   `clock.pauseAt: Error: Cannot fast-forward to the past` on Light empty Notes.
   The complete rerun used unchanged source and harness and passed. No tolerance was changed.
+- Shell had three full-run shots within tolerance (11–18 pixels at 1/255). Two focused repeats including the workspace startup step passed. An initial focused attempt without Workspace failed console comparison because the existing first-page 404 moved from Workspace to Requests. No messages were filtered and no source or tolerance changed.
+
 - E6.2–E6.13, real backend/PostgreSQL, actual passkey signatures, voice/photo recording,
   production-browser capture, `tests/visual`, and the optional second baseline: not run.
   The real backend remains deferred by the WP 6.1 recipe even though lane 2's stack is on main.

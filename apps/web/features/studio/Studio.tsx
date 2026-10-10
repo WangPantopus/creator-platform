@@ -1,25 +1,14 @@
 "use client";
-import {
-  Children,
-  cloneElement,
-  isValidElement,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-  type ReactElement,
-  type AnchorHTMLAttributes,
-} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { brand } from "@qelvora/brand";
-import { EmptyState, Notice, Sidebar, StudioTabBar } from "@qelvora/ui-web";
+import { EmptyState, Notice, StudioTabBar } from "@qelvora/ui-web";
 import { validReturnTarget } from "@qelvora/api";
 import { configureStudioRequests, StudioFailure, studioRequest } from "./api";
 import "./studio.css";
 import { useIdentityRequest } from "../identity/session-boundary";
-import type { Creator, Queue } from "./shared/types";
+import type { Creator } from "./shared/types";
 import { time } from "./shared/format";
 import { ThanksFeed } from "./thanks/ThanksFeed";
 import { More } from "./more/More";
@@ -30,136 +19,8 @@ import { Library } from "./library/Library";
 import { Requests } from "./requests/Requests";
 import { PacketDetail } from "./requests/PacketDetail";
 import { Threads } from "./threads/Threads";
-
-function words(node: ReactNode): string {
-  return Children.toArray(node)
-    .map((n) =>
-      typeof n === "string"
-        ? n
-        : isValidElement<{ children?: ReactNode }>(n)
-          ? words(n.props.children)
-          : "",
-    )
-    .join("");
-}
-function navigationTree(
-  node: ReactNode,
-  href: (label: string) => string,
-): ReactNode {
-  return Children.map(node, (n) => {
-    if (!isValidElement<AnchorHTMLAttributes<HTMLAnchorElement>>(n)) return n;
-    const children = navigationTree(n.props.children, href);
-    if (n.type === "a")
-      return (
-        <Link
-          {...n.props}
-          key={n.key}
-          href={href(words(n.props.children))}
-          prefetch={false}
-        >
-          {children}
-        </Link>
-      );
-    return cloneElement(n, { children });
-  });
-}
-function studioSidebar(
-  props: Parameters<typeof Sidebar>[0],
-  moreHref: string,
-  active: boolean,
-) {
-  const sidebar = Sidebar(props) as ReactElement<{ children?: ReactNode }>;
-  const children = Children.toArray(sidebar.props.children);
-  children.splice(
-    children.length - 1,
-    0,
-    <div key="w5-more" className="qv-side__group">
-      <Link
-        href={moreHref}
-        prefetch={false}
-        className={`qv-side__item${active ? " is-active" : ""}`}
-        aria-current={active ? "page" : undefined}
-      >
-        <span className="qv-side__icon" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
-            <circle cx="5.5" cy="11" r="1.4" fill="currentColor" />
-            <circle cx="11" cy="11" r="1.4" fill="currentColor" />
-            <circle cx="16.5" cy="11" r="1.4" fill="currentColor" />
-          </svg>
-        </span>
-        <span className="qv-side__label">More</span>
-      </Link>
-    </div>,
-  );
-  return cloneElement(sidebar, { children });
-}
-function useRequestsCount(creator: Creator | null, suspended: boolean) {
-  const [count, setCount] = useState<number>();
-  useEffect(() => {
-    setCount(undefined);
-    if (
-      !creator ||
-      suspended ||
-      (!creator.owned && !creator.roles.includes("triage"))
-    )
-      return;
-    let closed = false;
-    let controller: AbortController | null = null;
-    const load = async () => {
-      if (closed || document.hidden || controller) return;
-      const current = new AbortController();
-      controller = current;
-      try {
-        const result = await studioRequest<Queue>(
-          "studio",
-          `${creator.id}/queue?filter=all&limit=1`,
-          undefined,
-          creator.viewerAccountId,
-          {
-            signal: AbortSignal.any([
-              current.signal,
-              AbortSignal.timeout(4000),
-            ]),
-          },
-        );
-        if (!closed && !document.hidden)
-          setCount(
-            Number.isSafeInteger(result.requests) && result.requests >= 0
-              ? result.requests
-              : undefined,
-          );
-      } catch {
-        if (!closed) setCount(undefined);
-      } finally {
-        if (controller === current) controller = null;
-      }
-    };
-    const visibility = () => {
-      if (document.hidden) {
-        controller?.abort();
-        setCount(undefined);
-      } else void load();
-    };
-    void load();
-    const timer = setInterval(() => void load(), 15000);
-    window.addEventListener("focus", load);
-    document.addEventListener("visibilitychange", visibility);
-    return () => {
-      closed = true;
-      controller?.abort();
-      clearInterval(timer);
-      window.removeEventListener("focus", load);
-      document.removeEventListener("visibilitychange", visibility);
-    };
-  }, [
-    creator?.id,
-    creator?.viewerAccountId,
-    creator?.owned,
-    creator?.roles,
-    suspended,
-  ]);
-  return count;
-}
+import { navigationTree, studioSidebar } from "./shell/navigation";
+import { useRequestsCount } from "./shell/useRequestsCount";
 export function Studio({
   creatorId,
   screen = [],
