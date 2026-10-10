@@ -1,9 +1,9 @@
 # Lane 2: Platform and hosting status
 
 Updated: 2026-10-09, by the resumed lane 2 session
-Working on: WP 2.8 load/soak scenarios, branch `lane-2/load-soak`, authorized by the founder's request to continue coding through the lane
-Done: WP 2.1 is on main; WP 2.2, WP 2.9 and WP 2.3 options were completed in session 1 but still need to land on main
-Next: finish the WP 2.8 measurements; owners resolve measured failures; hosting choice unlocks staging and WP 2.4 to 2.7
+Working on: WP 2.8 qualification; scenario code and local measurements are saved in PR #384 on `lane-2/load-soak`
+Done: WP 2.1 is on main; WP 2.8 measurement scripts and a 30-minute idle soak are complete; WP 2.2, WP 2.9 and WP 2.3 options still need to land on main
+Next: owners resolve measured failures; re-run affected scenarios; hosting choice unlocks staging and WP 2.4 to 2.7
 Blocked on: hosting road/provider/region, monthly ceiling, web/API domain and owning account; integrator stack repair; lane 3/5 fixes and multi-worker composition
 
 ## Resume here
@@ -11,6 +11,13 @@ Blocked on: hosting road/provider/region, monthly ceiling, web/API domain and ow
 Read [the WP 2.8 note](lane-2-load-soak.md) for commands, measurements, limitations and exact
 owner tickets. The founder has authorized continued code work, including WP 2.8; do not ask
 for that authorization again. Hosting choices and accounts remain missing.
+
+The measurement code is [PR #384](https://github.com/WangPantopus/creator-platform/pull/384).
+Eight idle sockets passed 30 minutes with two planned session renewals. This is not full
+pilot qualification: at 16 public readers there were ten client deadlines and one 503; a
+fresh two-fan worker run produced one failed reply and one delivered reply, though both
+receipts settled. Multiple worker processes and sustained streaming are not run. The note
+preserves the first socket failure as well as the later idle success; do not erase either.
 
 The resume audit is [PR #380](https://github.com/WangPantopus/creator-platform/pull/380).
 At fetched main `c0b4ac0f030a893dfc92457f0f4348dd87174398`, all four original PRs are marked
@@ -43,6 +50,12 @@ used without downloading. One disposable lane 2 stack was started with `--growth
 --no-smoke`. Only development identity and the model are faked. The shared 16-CPU machine
 reported load averages around 25 to 99; measurements are not a production capacity claim.
 
+State at stop: `node infra/local/stack.mjs down --lane 2` succeeded after the final worker
+rerun. It stopped the backend and model and removed the database container, volume and state
+directory. Verification found no `qelvora-lane2-*` containers or volumes and no listeners on
+56420–56429. All scenario processes exited. The result notes are committed and pushed; raw
+scratch logs were removed after their results were recorded. No other lane's stack was touched.
+
 Traps still apply: at most five data requests per fan per hour; delete locks that fan out of
 the creator; catalogue mismatches can latch the backend until restart; a failed generation
 can prevent further replies until this disposable stack is rebuilt. No privacy request or
@@ -60,7 +73,7 @@ manual financial settlement is part of WP 2.8. Use only ports 56420–56429 and 
 | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | E2.1 ★ cold start, edge cases | Pass: 22 of 22 steps (cold start 32 s, repeat, port taken, Docker unreachable, killed mid-run, stop and up, two stacks, foreign objects, teardown). The acknowledgment passed in every run (227 to 914 ms). The AI reply is advisory: delivered in 3 of 11 full runs at load average 9 to 62, so it is not a reliable exit check on this Mac | `node tests/scenarios/lane-2/e2-1-cold-start.mjs`, `node infra/local/stack.mjs up --lane 2` |
 | E2.2 ★ / E2.9 ★               | Session 1: 144/144 and 19/19 passed respectively, with limits in the original handoff. Not re-run here; code is not yet on main                                                                                                                                                                                                              | Original handoff above                                                                      |
-| E2.8                          | Measurements in progress; public overload, worker completion and first socket run failed. Full results in the WP 2.8 note                                                                                                                                                                                                                    | `node tests/scenarios/lane-2/e2-8-public.mjs`, `e2-8-workers.mjs`, `e2-8-sockets.mjs`       |
+| E2.8                          | Not qualified: public overload and worker completion failed; eight idle sockets passed 30 minutes. Final worker run: seven checks passed, one failed. Full soak: ten passed, zero failed. Full results and limits in the WP 2.8 note                                                                                                         | Commands in the WP 2.8 note                                                                 |
 | E2.3 to E2.7                  | Not run; hosting-dependent                                                                                                                                                                                                                                                                                                                   | Hosting decision required                                                                   |
 
 ## Findings and tickets to other lanes
