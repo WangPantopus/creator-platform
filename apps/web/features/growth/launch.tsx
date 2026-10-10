@@ -1,11 +1,12 @@
 "use client";
 import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useGrowthSession } from "./session";
 export function LaunchKit() {
   const { request, signal } = useGrowthSession();
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const attempt = useRef<string | null>(null);
   return (
     <div className="growth-stack">
       <h1>{growthCopy.growthYourLaunchKit}</h1>
@@ -19,13 +20,18 @@ export function LaunchKit() {
           if (busy) return;
           setBusy(true);
           try {
+            attempt.current ??= crypto.randomUUID();
             const result = await request<{ id: string; expires_at: string }>(
               "invites",
-              { method: "POST", body: JSON.stringify({ contextId: null }) },
+              {
+                method: "POST",
+                body: JSON.stringify({ id: attempt.current, contextId: null }),
+              },
             );
             const link = `${window.location.origin}/invite/${result.id}`;
             await navigator.clipboard.writeText(link);
             signal.throwIfAborted();
+            attempt.current = null;
             setMessage(
               growthFormat("growthInvitationCopiedExpires", {
                 value1: new Date(result.expires_at).toLocaleDateString(),

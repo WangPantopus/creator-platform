@@ -5,6 +5,7 @@ import {
   createCipheriv,
   createDecipheriv,
   randomBytes,
+  randomUUID,
 } from "node:crypto";
 import { z } from "zod";
 import type { PoolClient, QueryResultRow } from "pg";
@@ -1252,9 +1253,17 @@ export class GrowthService {
   }
   async createInvite(actor: Actor, input: unknown) {
     const value = z
-        .strictObject({ contextId: z.uuid().nullable() })
+        .strictObject({
+          id: z.uuid().optional(),
+          contextId: z.uuid().nullable(),
+          note: z.string().trim().max(600).default(""),
+        })
         .parse(input),
-      creatorId = await this.requireCreator(actor);
+      creatorId = await this.requireCreator(actor),
+      id = value.id ?? randomUUID();
+    // An invitation can be the creator's first public operation; do not require
+    // an unrelated visitor to have populated the public projection already.
+    await this.refreshCreator(creatorId);
     if (value.contextId) {
       const posts = await this.posts(creatorId);
       if (!posts.some((p) => p.id === value.contextId))
@@ -1269,6 +1278,26 @@ export class GrowthService {
         "SELECT pg_advisory_xact_lock(hashtextextended($1,0))",
         [`growth.invites:${actor.accountId}`],
       );
+      const prior = (
+        await client.query(
+          "SELECT id,creator_id,context_id,note,expires_at FROM growth.invite WHERE id=$1 AND created_by=$2",
+          [id, actor.accountId],
+        )
+      ).rows[0];
+      if (prior) {
+        if (
+          prior.creator_id !== creatorId ||
+          prior.context_id !== value.contextId ||
+          prior.note !== value.note
+        )
+          throw new DomainError(
+            "invite_id_conflict",
+            copy.growthErrorEntryIdConflict,
+            409,
+          );
+        // A retry does not renew, un-revoke or consume another active slot.
+        return { id: prior.id, expires_at: prior.expires_at };
+      }
       const count = await client.query(
         "SELECT count(*)::int AS count FROM growth.invite WHERE created_by=$1 AND expires_at>now() AND revoked_at IS NULL",
         [actor.accountId],
@@ -1280,8 +1309,8 @@ export class GrowthService {
           429,
         );
       const result = await client.query(
-        "INSERT INTO growth.invite(creator_id,created_by,context_id,expires_at,campaign) SELECT id,$2,$3,now()+interval '30 days','creator_launch' FROM growth.creator_public WHERE id=$1 AND state='published' AND document->>'verified'='true' RETURNING id,expires_at",
-        [creatorId, actor.accountId, value.contextId],
+        "INSERT INTO growth.invite(id,creator_id,created_by,context_id,note,expires_at,campaign) SELECT $4,id,$2,$3,$5,now()+interval '30 days','creator_launch' FROM growth.creator_public WHERE id=$1 AND state='published' AND document->>'verified'='true' ON CONFLICT(id) DO NOTHING RETURNING id,expires_at",
+        [creatorId, actor.accountId, value.contextId, id, value.note],
       );
       if (!result.rowCount)
         throw new DomainError(
@@ -1304,7 +1333,7 @@ export class GrowthService {
       await this.refreshCreator(row.creator_id);
     }
     const result = await this.db.worker.query(
-      "SELECT i.context_id,c.document FROM growth.invite i JOIN growth.creator_public c ON c.id=i.creator_id WHERE i.id=$1 AND i.revoked_at IS NULL AND i.expires_at>now() AND c.state='published' AND c.document->>'verified'='true'",
+      "SELECT i.context_id,i.note,c.document FROM growth.invite i JOIN growth.creator_public c ON c.id=i.creator_id WHERE i.id=$1 AND i.revoked_at IS NULL AND i.expires_at>now() AND c.state='published' AND c.document->>'verified'='true'",
       [id],
     );
     if (!result.rowCount) return null;
@@ -1313,6 +1342,7 @@ export class GrowthService {
     if (context && !(await this.post(creator.handle, context))) return null;
     return {
       creator,
+      note: result.rows[0].note as string,
       destination: `/creators/${creator.handle}/chat${context ? `?context=${context}` : ""}`,
     };
   }
