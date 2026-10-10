@@ -1761,6 +1761,24 @@ export class GrowthService {
             [accountId],
           );
         }
+        // Owner notice records (pending migration): about this person as the
+        // recipient, and about any creator they owned. Present only once the
+        // migration is applied, so the check is by table, as for the scan checkpoint.
+        if (
+          (
+            await client.query(
+              "SELECT to_regclass('growth.notice') IS NOT NULL AS ready",
+            )
+          ).rows[0]?.ready
+        ) {
+          await client.query("DELETE FROM growth.notice WHERE account_id=$1", [
+            accountId,
+          ]);
+          await client.query(
+            "DELETE FROM growth.notice WHERE creator_id=ANY($1::uuid[])",
+            [ownedCreatorIds],
+          );
+        }
         await client.query(
           // Only this verified subject's envelopes are affected. An unrelated
           // event awaiting its first notification is not an erased event.

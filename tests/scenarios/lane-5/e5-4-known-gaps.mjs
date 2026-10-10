@@ -1,5 +1,5 @@
 // Cases that describe what a person should get and that this code does not yet
-// deliver. They are kept, with their true expectation, so the gap stays visible
+// deliver. (The muted-member push was one until the Note mute projection.) They are kept, with their true expectation, so the gap stays visible
 // and so the fix can be proved; they are NOT in run-all.sh's default list.
 // Block 2600-2799. Run: node tests/scenarios/lane-5/e5-4-known-gaps.mjs
 import {
@@ -28,37 +28,12 @@ import {
 const B = 2600;
 const maya = await seedCreator(B, "maya_gap", "Maya");
 const kiln = await seedTier(maya.id, "Kiln Club");
-const jon = await seedFan(B + 10, "jon_gap");
 const ben = await seedFan(B + 11, "ben_gap");
-for (const fan of [jon, ben]) {
+for (const fan of [ben]) {
   await seedMembership(maya.id, fan.id, kiln);
   await setPreferences(fan);
 }
 
-await step(
-  "GAP-mute-push",
-  "a member who muted Maya's Notes gets no push for a new Note",
-  async () => {
-    expect(
-      (
-        await http("POST", `/v1/content/${maya.id}/mute`, jon.token, {
-          muted: true,
-        })
-      ).status === 200,
-      "mute",
-    );
-    await clearPushes();
-    await publishNote(maya, "A Note jon muted.", { kind: "members" });
-    await waitFor("pushes", async () => (await pushes()).length >= 1);
-    await new Promise((r) => setTimeout(r, 2000));
-    const sent = await pushes();
-    const jonPush = sent.filter((p) => p.accountId === jon.accountId);
-    expect(
-      jonPush.length === 0,
-      `jon muted Notes and still got ${jonPush.length} push(es)`,
-    );
-  },
-);
 await step(
   "GAP-withdrawn-reply-push",
   "a reaction push is not sent after the fan withdrew the reply",

@@ -40,6 +40,19 @@ if ! docker exec "$NAME" psql -U postgres -d "$BASE" -Atc \
   docker exec -i "$NAME" psql -U postgres -d "$BASE" -v ON_ERROR_STOP=1 \
     <apps/backend/migrations/0089_w8_creator_fan_denial.sql >/dev/null
 fi
+# Lane 5 proposals awaiting the integrator's registration, applied by hand to this
+# disposable database only: the Note mute projection and the owner notice records
+# (WP 5.2).
+if ! docker exec "$NAME" psql -U postgres -d "$BASE" -Atc \
+  "select to_regprocedure('creator.content_note_muters(uuid,uuid[])') is not null" | grep -q t; then
+  docker exec -i "$NAME" psql -U postgres -d "$BASE" -v ON_ERROR_STOP=1 \
+    <apps/backend/src/modules/content/migrations/pending_w5_note_mute_read.sql >/dev/null
+fi
+if ! docker exec "$NAME" psql -U postgres -d "$BASE" -Atc \
+  "select to_regclass('growth.notice') is not null" | grep -q t; then
+  docker exec -i "$NAME" psql -U postgres -d "$BASE" -v ON_ERROR_STOP=1 \
+    <apps/backend/src/modules/growth/migrations/pending_w7_notice_snapshot.sql >/dev/null
+fi
 for role in creator_runtime growth_runtime growth_worker \
   creator_trust_runtime creator_trust_worker; do
   docker exec "$NAME" psql -U postgres -d "$BASE" \

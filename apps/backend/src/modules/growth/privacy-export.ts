@@ -39,12 +39,17 @@ export function growthAccountExport(
   assertAuthority: GrowthPrivacyHeldAuthority,
 ): GrowthPrivacyExportStream {
   const snapshotRef = randomUUID();
-  function sourcesFor(ownedCreators: readonly string[]): Source[] {
+  function sourcesFor(
+    ownedCreators: readonly string[],
+    withNotices: boolean,
+  ): Source[] {
     const sources: Source[] = [
       ...[
         "follow",
         "preference",
         "notification",
+        // Owner notice records exist only once their migration is applied.
+        ...(withNotices ? ["notice"] : []),
         "share",
         "metric",
         "feedback",
@@ -171,7 +176,13 @@ export function growthAccountExport(
       );
       // Current task/restoration custody comes before erasure/domain locks.
       const ownedCreators = await assertAuthority(client);
-      const sources = sourcesFor(ownedCreators);
+      const withNotices =
+        (
+          await client.query(
+            "SELECT to_regclass('growth.notice') IS NOT NULL AS ready",
+          )
+        ).rows[0]?.ready === true;
+      const sources = sourcesFor(ownedCreators, withNotices);
       signal.throwIfAborted();
       if (!(await service.erasure.subjects(client, [accountId], ownedCreators)))
         throw new Error("growth_data_erased");

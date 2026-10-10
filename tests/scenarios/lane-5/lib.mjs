@@ -32,7 +32,35 @@ export const sql = (text, values) =>
 export const closeDb = async () => {
   await pool?.end();
   pool = undefined;
+  await runtimePool?.end();
+  runtimePool = undefined;
 };
+
+/** Run a read as the real non-owner runtime role with a chosen signed-in
+ * account, the way a request's transaction would see the database, and roll
+ * back. For checking what the database itself refuses (a security property),
+ * not for standing in for a user action. */
+let runtimePool;
+export async function asAccount(accountId, run) {
+  runtimePool ??= new pg.Pool({
+    connectionString:
+      process.env.LANE5_RUNTIME_DB ??
+      "postgresql://creator_runtime:foundation-test-only@127.0.0.1:56450/creator_foundation_lane5",
+    max: 2,
+  });
+  const client = await runtimePool.connect();
+  try {
+    await client.query("BEGIN");
+    if (accountId)
+      await client.query("SELECT set_config('app.account_id',$1,true)", [
+        accountId,
+      ]);
+    return await run(client);
+  } finally {
+    await client.query("ROLLBACK").catch(() => {});
+    client.release();
+  }
+}
 
 export async function http(method, path, token, body) {
   const response = await fetch(`${BASE}${path}`, {
