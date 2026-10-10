@@ -123,10 +123,11 @@ actor W3ConversationClient {
 
 @MainActor
 final class W3ThreadModel: ObservableObject {
-    struct Pending { let key: String; let text: String; let clientSequence: Int; let destination: String; var uncertain = false; var rejected = false }
+    typealias Pending = W3DraftStorage.Pending
     @Published var page: W3Page?; @Published var older: [W3Message] = []; @Published var before: Int?
-    @Published var draft = ""; @Published var failure = ""; @Published var busy = false; @Published var offline = true
-    @Published var pending: Pending?
+    @Published var draft = "" { didSet { saveDraftSoon() } }
+    @Published var failure = ""; @Published var busy = false; @Published var offline = true
+    @Published var pending: Pending? { didSet { saveDraftSoon() } }
     @Published var introOfferId: String?
     private var introOfferChecked = false
     let client: W3ConversationClient; let creatorId: String; let fanId: String
@@ -144,23 +145,63 @@ final class W3ThreadModel: ObservableObject {
     private var connectionRun: UUID?
     private var activeLease: UUID?
     private var resumeActivated = false
+    private var draftTicket: W3DraftStorage.Ticket?
+    private var draftLease: W3DraftStorage.Lease?
+    private var draftRevision = 0
+    private var restoringDraft = false
+    private var refreshRevision = 0
     private let presenceId = UUID().uuidString.lowercased()
     private var storageScope: String { client.baseURL.absoluteString + "/" + root }
     var root: String { creatorId + "/" + fanId }
     private var gate: ThreadDeliveryGate?
     init(baseURL: URL, creatorId: String, fanId: String, accountId: String, sessionId: String) { self.sessionId = sessionId; client = W3ConversationClient(baseURL: baseURL, expectedAccountId: accountId); self.creatorId = creatorId; self.fanId = fanId; self.accountId = accountId }
+    private func saveDraftSoon() {
+        guard !restoringDraft, let lease = draftLease else { return }
+        draftRevision += 1
+        let revision = draftRevision, value = W3DraftStorage.Value(text: draft, pending: pending)
+        Task { [weak self] in
+            do { _ = try await W3DraftStorage.shared.save(value, lease: lease, revision: revision) }
+            catch {
+                guard let self, self.draftLease?.ticket.id == lease.ticket.id else { return }
+                self.failure = "Reconnect to refresh. Your input is kept on this screen."
+            }
+        }
+    }
+    private func saveDraftNow() async throws -> Bool {
+        guard let lease = draftLease else { return false }
+        draftRevision += 1
+        return try await W3DraftStorage.shared.save(.init(text: draft, pending: pending), lease: lease, revision: draftRevision)
+    }
     func refresh() async {
         let run = lifecycle
         guard active else { return }
+        refreshRevision += 1; let readRevision = refreshRevision
         do {
+            let currentDraft = if let draftLease { await W3DraftStorage.shared.current(draftLease) } else { false }
+            if draftTicket == nil || !currentDraft {
+                draftTicket = await W3DraftStorage.shared.begin(origin: client.baseURL.absoluteString, account: accountId, root: root)
+            }
+            let ticket = draftTicket
             if !resumeActivated {
                 await W3ResumeStorage.shared.activate(accountId: accountId)
                 resumeActivated = true
             }
             if offlineContext == nil { offlineContext = await W3OfflineStorage.shared.activate(origin: client.baseURL.absoluteString, account: accountId, session: sessionId, root: root) }
             let fresh: W3Page = try await client.request(root)
-            guard !Task.isCancelled, active, run == lifecycle else { return }
+            guard !Task.isCancelled, active, run == lifecycle, readRevision == refreshRevision else { return }
+            if let page, page.threadId != fresh.threadId { self.page = nil; older = []; before = nil }
             guard page == nil || (fresh.cursor >= page!.cursor && fresh.epoch >= page!.epoch && fresh.revision >= page!.revision) else { return }
+            let reusableDraft = if let draftLease { await W3DraftStorage.shared.current(draftLease) && draftLease.thread == fresh.threadId } else { false }
+            if !reusableDraft {
+                guard let ticket, let opened = try await W3DraftStorage.shared.open(ticket, thread: fresh.threadId) else {
+                    draftTicket = nil; draftLease = nil; draft = ""; pending = nil; conceal(); return
+                }
+                guard !Task.isCancelled, active, run == lifecycle, readRevision == refreshRevision else { return }
+                restoringDraft = true
+                draftLease = opened.lease; draft = opened.value?.text ?? ""; pending = opened.value?.pending
+                if pending != nil && pending?.rejected != true { pending?.uncertain = true }
+                restoringDraft = false; saveDraftSoon()
+            }
             offlineShowing = false
             page = fresh; if before == nil && older.isEmpty { before = fresh.before }
             gate = ThreadDeliveryGate(threadID: fresh.threadId, cursor: fresh.cursor, epoch: fresh.epoch, generationSequences: fresh.generationSequences)
@@ -176,7 +217,7 @@ final class W3ThreadModel: ObservableObject {
                 } catch { if Task.isCancelled { return } }
             }
             if let pending { let status: W3Status = try await client.request(root + "/messages/status", body: JSONEncoder().encode(W3StatusQuery(idempotencyKey: pending.key))); if status.accepted && self.pending?.key == pending.key { self.pending = nil; if draft.trimmingCharacters(in: .whitespacesAndNewlines) == pending.text { draft = "" } } }
-        } catch { if active && run == lifecycle { failed(error) } }
+        } catch { if active && run == lifecycle && readRevision == refreshRevision { failed(error, threadDenied: true) } }
     }
     private func conceal() { page = nil; older = []; before = nil; gate = nil }
     private func showOffline() async {
@@ -266,13 +307,17 @@ final class W3ThreadModel: ObservableObject {
         guard active, !busy, !offline, let page, page.canSend, page.generationSequences.isEmpty else { return }
         let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
         guard retry ? pending != nil : !text.isEmpty else { return }
-        let item = retry ? pending! : Pending(key: UUID().uuidString.lowercased(), text: text, clientSequence: (page.messages.last?.sequence ?? 0) + 1, destination: page.control == .human_active ? "fan-replies" : "messages")
+        var item = retry ? pending! : Pending(key: UUID().uuidString.lowercased(), text: text, clientSequence: (page.messages.last?.sequence ?? 0) + 1, destination: page.control == .human_active ? "fan-replies" : "messages")
+        item.uncertain = false; item.rejected = false
         pending = item; busy = true; defer { busy = false }
         do {
+            // Commit the original send key before HTTP. A stopped process can
+            // check acceptance or retry that key instead of creating a duplicate.
+            guard try await saveDraftNow() else { return }
             let body = try JSONEncoder().encode(APISendMessage(text: item.text, idempotencyKey: item.key, clientSequence: item.clientSequence))
             if item.destination == "fan-replies" { let _: APIMessage = try await client.request(root + "/fan-replies", body: body) }
             else { let _: APIAcceptedMessage = try await client.request(root + "/messages", body: body) }
-            pending = nil; if draft.trimmingCharacters(in: .whitespacesAndNewlines) == item.text { draft = "" }; await refresh()
+            pending = nil; if draft.trimmingCharacters(in: .whitespacesAndNewlines) == item.text { draft = "" }; _ = try await saveDraftNow(); await refresh()
         } catch { let status = (error as? W3Failure)?.status; pending?.uncertain = status == nil || status! >= 500 || status == 409; pending?.rejected = !(pending?.uncertain ?? true); failed(error) }
     }
     func earlier() async {
@@ -315,7 +360,7 @@ final class W3ThreadModel: ObservableObject {
             return true
         } catch { failed(error); return false }
     }
-    private func failed(_ error: Error) {
+    private func failed(_ error: Error, threadDenied: Bool = false) {
         #if DEBUG
         // Fixed domains/numeric codes only; never log errors' descriptions,
         // URLs, credentials, message content or account identifiers.
@@ -333,7 +378,13 @@ final class W3ThreadModel: ObservableObject {
         Task { [weak self] in await self?.showOffline() }
         if let failure = error as? W3Failure {
             self.failure = failure.message
-            if [401,403,404].contains(failure.status) { offlineShowing = false; let oldContext = offlineContext; offlineContext = nil; if let oldContext { Task { await W3OfflineStorage.shared.purge(oldContext) } }; authorizationDenied = true; page = nil; older = []; before = nil; draft = ""; pending = nil; introOfferId = nil; introOfferChecked = false; gate = nil; resumeActivated = false; Task { await W3ResumeStorage.shared.remove(accountId: accountId, scope: storageScope) } }
+            if [401,403,404].contains(failure.status) {
+                let oldTicket = draftTicket; draftTicket = nil; draftLease = nil
+                // A failed message action (for example, human_unavailable 403)
+                // does not establish that the conversation itself is gone.
+                if let oldTicket, failure.status == 401 || threadDenied { Task { try? await W3DraftStorage.shared.discard(oldTicket) } }
+                offlineShowing = false; let oldContext = offlineContext; offlineContext = nil; if let oldContext { Task { await W3OfflineStorage.shared.purge(oldContext) } }; authorizationDenied = true; page = nil; older = []; before = nil; draft = ""; pending = nil; introOfferId = nil; introOfferChecked = false; gate = nil; resumeActivated = false; Task { await W3ResumeStorage.shared.remove(accountId: accountId, scope: storageScope) }
+            }
         } else { offline = true; failure = "Reconnect to refresh. Your input is kept on this screen." }
     }
 }

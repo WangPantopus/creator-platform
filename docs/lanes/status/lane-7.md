@@ -26,9 +26,9 @@ Updated: 2026-10-09, by the resumed lane 7 session (one session, both platforms)
   arbitration fix (`NativeBackSwipe`) passed N5, N1 and the full iOS run. It also
   preserves vertical scrolling at the edge; screenshots and API checks corroborate it.
 
-Working on: WP 7.2 publication, PR 379. Local verification is complete: Android 21/21 and iOS 13/13 fake-API flows, both focused real-stack flows, native regression suites, release builds/hook checks, contract check and repository gates. The two iOS defects found during operation (row tap during Back; cold creator link skipping Discover) are fixed and rerun.
+Working on: WP 7.3 on `lane-7/keyboard-drafts`: [shared spec and scenario matrix](lane-7-keyboard-drafts.md). WP 7.2 is pushed at `7e1d68aee`; PR 379 is ready for review. 7.3 has verified lifecycle/largest-text layouts and partial recovery results; scoped deletion and remaining gates are in progress. The compact persistent author header awaits founder approval; see its matrix.
 
-Waiting on: GitHub connection for the app's CI reader; CI has not been inspected. This does not block the next local work. Four flags with defaults remain in [lane-7-navigation.md](lane-7-navigation.md).
+Waiting on: Founder choice on the compact fixed author label versus the full fixed identity strip in constrained layouts (WP 7.3). GitHub connection for the app's CI reader; CI has not been inspected. This does not block the next local work. Four flags with defaults remain in [lane-7-navigation.md](lane-7-navigation.md).
 
 Next, in order: 7.3 keyboard, insets, rotation and drafts; 7.4 rendering parity (C4 is on main); 7.10 copy lookups; 7.11 accessibility; 7.8 polling/offline; 7.12 web Studio link. Waiting, not started: 7.5 (C1), 7.6/7.7 (domain and credentials), 7.9 (accounts and icon art).
 

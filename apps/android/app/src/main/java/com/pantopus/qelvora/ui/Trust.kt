@@ -321,9 +321,24 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
         finally { finishWork(epoch) }
     }
     suspend fun privacyCommand(action: String) {
-        val input = buildJsonObject { put("kind", action); put("scope", scope); put("proof", if (verificationMethod == "current_session") "CURRENT_SESSION" else proof); put("idempotencyKey", key); if (scope != "account") put("creatorId", creatorId.lowercase()); if (scope == "thread") put("threadId", threadId.lowercase()) }
-        perform("privacy/jobs", input)?.let { result = "Request saved; inspect each domain's progress."; load(); jobDetail(it.text("id")) }
+        val origin = baseURL ?: return
+        val account = model.session?.accountId ?: return
+        val deletionScope = scope; val creator = creatorId.lowercase(); val thread = threadId.lowercase()
+        val input = buildJsonObject { put("kind", action); put("scope", deletionScope); put("proof", if (verificationMethod == "current_session") "CURRENT_SESSION" else proof); put("idempotencyKey", key); if (deletionScope != "account") put("creatorId", creator); if (deletionScope == "thread") put("threadId", thread) }
+        perform("privacy/jobs", input)?.let {
+            if (action == "delete") {
+                try {
+                    withContext(kotlinx.coroutines.NonCancellable) {
+                        com.pantopus.qelvora.conversation.ConversationDraftStorage(context).purge(origin, account,
+                            creator = if (deletionScope == "account") null else creator,
+                            thread = if (deletionScope == "thread") thread else null)
+                    }
+                } catch (_: Exception) { model.purge(); return }
+            }
+            result = "Request saved; inspect each domain's progress."; load(); jobDetail(it.text("id"))
+        }
     }
+
     LaunchedEffect(route, privateReady, model.error) {
         operation?.cancel()
         if (loadedRoute != route || model.error.isNotEmpty()) clearPrivateResults() else if (!privateReady) suspendPrivateResults()
