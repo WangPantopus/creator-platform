@@ -5,9 +5,47 @@ The model port (`AgentModel`) now has a second adapter, `AnthropicMessagesModel`
 selected by configuration. This is the work package B6 of lane 3, done early by the integrator
 because the founder asked for the switch.
 
-## Turn it on
+## Use it day to day: the key and the gateway
 
-Set `W2_PROVIDER=anthropic` on the host that runs generation. With it unset the host uses OpenAI,
+The key lives in one place and one process. Nobody else, including every lane session, ever holds it.
+
+1. **Create a key** in the Anthropic Console for this app only, with a monthly spend limit.
+2. **Store it once** in the macOS Keychain from your own Terminal (the prompt is hidden; nothing
+   goes to chat, git or shell history):
+
+   ```bash
+   security add-generic-password -a "$USER" -s qelvora-anthropic-key -w
+   ```
+
+   The Keychain item is named `qelvora-anthropic-key`; the environment variable the software
+   reads is `ANTHROPIC_API_KEY`. They are different things: the first is where it is kept, the
+   second is how it is handed to a process at launch.
+3. **Start the gateway** (a Terminal tab you can watch; Ctrl-C ends it and the key with it):
+
+   ```bash
+   ANTHROPIC_API_KEY="$(security find-generic-password -a "$USER" -s qelvora-anthropic-key -w)" \
+     node infra/local/model-gateway.mjs --budget-usd 20
+   ```
+
+   It listens on `127.0.0.1:56499`, forwards only the two allowed models, stops at the dollar cap
+   (kept across restarts; raise it by restarting with a larger `--budget-usd`), and counts spend per
+   lane: `curl -s http://127.0.0.1:56499/__stats`.
+4. **Run the app on Claude**, from any worktree:
+
+   ```bash
+   node infra/local/stack.mjs up --lane N --provider anthropic --model-gateway http://127.0.0.1:56499
+   ```
+
+   Without `--model-gateway` the same command runs Claude's protocol against the free local fake.
+   The stack sets every other setting itself (models, prices, the consent policy naming Anthropic
+   and OpenAI), so the key is the only thing you provide.
+
+Lanes follow the rule in the working agreement (section 3.6): the fake by default, the gateway only
+for what needs real model behavior, small requests, no loops, spend reported.
+
+## Turn it on elsewhere (a real host, not the local stack)
+
+A deployed host has no gateway: it holds the key itself, from a secret store. Set `W2_PROVIDER=anthropic` on the host that runs generation. With it unset the host uses OpenAI,
 and any other value is treated as unconfigured (no model, the host reports what is missing).
 
 | Variable | Meaning |
