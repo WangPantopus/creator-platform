@@ -1,6 +1,23 @@
 # Q2 default: public profile words — 2026-10-09
 
-Branch `lane-5/profile-fields`, **no migration pull request yet**. The founder's
+## Handoff publication update — 2026-10-09
+
+The founder requested that all work have open PRs. This concern is therefore
+published as a **draft for review**, overriding the earlier hold on opening it.
+It is **not ready to merge or register**: #385 remains first in the migration
+queue, and integrator review/registration stays serial. No migration registry,
+custody checksum, production secret or shared composition file was edited.
+
+Main `21b3d4836` was brought forward with an ordinary merge for this
+handoff. The workflow evidence below predates that merge; it was **not rerun**
+for this publication pass. Existing passes and failures are preserved as dated
+evidence, not presented as a new integrated run. No product change was added.
+
+The current global status and kickoff prompt live on
+`lane-5/reaction-withdrawal` under `docs/lanes/status/lane-5*.md`. Read those
+before relying on older status snapshots carried by this independent branch.
+
+Branch `lane-5/profile-fields`, **draft review authorized; registration queued behind #385**. The founder's
 recorded Q2 default is taken: Growth stores biography, category and photo
 caption; lane 6 builds the form. This is incomplete and not ready to merge.
 
