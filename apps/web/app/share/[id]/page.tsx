@@ -30,7 +30,7 @@ export default async function Share({
   const { id } = await params;
   try {
     const data = await growthRequest<Shared>(`public/shares/${id}`);
-    if (data.state === "withdrawn")
+    if (data.state !== "valid" || data.source?.authorKind !== "human_creator")
       return (
         <GrowthShell>
           <div className="growth-stack">
@@ -50,43 +50,23 @@ export default async function Share({
           className="growth-stack"
           style={{ background: "var(--surface-sunken)" }}
         >
-          <article
-            className={
-              source.authorKind === "approved_draft"
-                ? "growth-export growth-export--approved"
-                : "growth-export qv-on-maya"
-            }
-          >
+          <article className="growth-export qv-on-maya">
             <strong className="growth-mark">
               <Mark
-                kind={
-                  source.authorKind === "approved_draft"
-                    ? "approved_draft"
-                    : "human_creator"
-                }
-                initial={source.creatorName.slice(0, 1)}
-                onMaya={source.authorKind !== "approved_draft"}
+                kind="human_creator"
+                initial={Array.from(source.creatorName)[0] ?? ""}
+                onMaya
               />
-              {source.authorKind === "approved_draft"
-                ? growthFormat("growthPreparedByAiApprovedBy", {
-                    value1: source.creatorName,
+              {source.handle
+                ? growthFormat("growthSharedReplyTo", {
+                    name: source.creatorName,
+                    handle: source.handle,
                   })
-                : source.handle
-                  ? growthFormat("growthSharedReplyTo", {
-                      name: source.creatorName,
-                      handle: source.handle,
-                    })
-                  : growthFormat("growthSharedPersonalReply", {
-                      name: source.creatorName,
-                    })}
+                : growthFormat("growthSharedPersonalReply", {
+                    name: source.creatorName,
+                  })}
             </strong>
-            <p
-              className={
-                source.authorKind === "approved_draft" ? "" : "growth-voice"
-              }
-            >
-              {source.text}
-            </p>
+            <p className="growth-voice">{source.text}</p>
             <span>
               {growthFormat("growthSignedBy", {
                 value1: source.creatorName,

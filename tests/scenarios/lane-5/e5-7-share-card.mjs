@@ -65,6 +65,36 @@ try {
       return "page 404; export 410";
     },
   );
+  await step(
+    "E5.7-client-claims",
+    "a client cannot supply its own author or signed words",
+    async () => {
+      const before = (
+        await db.query("SELECT count(*)::int n FROM growth.share")
+      ).rows[0].n;
+      for (const authorKind of ["human_creator", "approved_draft", "ai"]) {
+        const r = await call(api, "POST", "/v1/growth/shares", {
+          token: fan.token,
+          body: {
+            grantId,
+            authorKind,
+            text: "Client claimed words",
+            signedActId: randomUUID(),
+          },
+        });
+        expect(
+          r.status === 400 && r.json?.error?.code === "invalid_request",
+          `${r.status} ${r.text}`,
+        );
+      }
+      expect(
+        (await db.query("SELECT count(*)::int n FROM growth.share")).rows[0]
+          .n === before,
+        "client claims persisted",
+      );
+      return "human/draft/AI client claims each 400; database unchanged";
+    },
+  );
   for (const [id, what] of [
     [
       "normal",

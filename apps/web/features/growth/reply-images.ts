@@ -168,7 +168,6 @@ export async function replyImages(
         yield line(current);
       }
     }
-    const approved = source.authorKind === "approved_draft";
     const header = [
       ...lines(
         source.authorLabel,
@@ -194,9 +193,7 @@ export async function replyImages(
       throw new Error(copy.growthReplyImageExportFailed);
     const body = lines(
       source.text,
-      approved
-        ? '400 40px Geist, "Helvetica Neue", Arial, sans-serif'
-        : '400 40px Newsreader, Georgia, "Times New Roman", serif',
+      '400 40px Newsreader, Georgia, "Times New Roman", serif',
       60,
     );
     let next = body.next();
@@ -246,9 +243,9 @@ export async function replyImages(
         next = body.next();
       }
       if (!page.length) throw new Error(copy.growthReplyImageExportFailed);
-      ctx.fillStyle = themes.light[approved ? "ai-surface" : "maya-surface"];
+      ctx.fillStyle = themes.light["maya-surface"];
       ctx.fillRect(0, 0, width, height);
-      ctx.fillStyle = themes.light[approved ? "ai-ink" : "on-maya"];
+      ctx.fillStyle = themes.light["on-maya"];
       draw(header, padding);
       draw(page, bodyTop);
       draw(footer, height - padding - footerHeight - 40);
