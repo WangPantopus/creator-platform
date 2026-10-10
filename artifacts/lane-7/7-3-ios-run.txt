@@ -1,0 +1,47 @@
+WP 7.3 operated iOS draft/keyboard evidence, 2026-10-09.
+
+Real iOS app, simulator qelvora-lane7-ios, XCUITest approved by the founder.
+API, development identities and message results are synthetic in these flows.
+Real API/PostgreSQL D6 also passed; see 7-3-real-stack-run.txt for its separate proof.
+All runs use the LANE-7 heavy-build lock. No new unit or snapshot tests.
+
+Current passing evidence:
+- ios-navigation-1791599747113.xcresult: D1 lifecycle and D3 largest text.
+  2 passed, 0 skipped, 0 failed. Rotation keeps the draft and keyboard clear;
+  background/process stop preserves input; refocusing the restored editor works.
+  No premature message POST. Light/Night portrait/landscape full-screen captures
+  visually show readable author words/glyph and composer/Send above the live IME.
+- ios-navigation-1791601214001.xcresult: D2, D4R, D4, D5, D7U.
+  5 passed, 0 skipped, 0 failed. Independent drafts survive navigation/restart.
+  Accepted Send clears the draft file. Rejected input survives restart/Keep editing.
+  Direct rejected-message Retry and pre-acceptance network-drop Retry both use the
+  original hashed key; exactly one synthetic message is accepted.
+  Accepted response loss followed by restart checks status, with one message POST.
+  Sign-out, other-account denial, fresh 401/403/404 and recreated physical thread
+  all remove the former draft. Emoji/Hebrew/Arabic input survives restart; stored
+  bytes lack its plaintext marker; backup exclusion is present; no message POST.
+- ios-navigation-1791600580433.xcresult: D7 and D8 individually pass.
+  D7 preserves the existing 2000-character limit through restart with ciphertext
+  and no upload. D8 accepts the older send once and preserves newer unsent input.
+  This bundle overall failed D4R and D5; those failures were fixed and passed above.
+
+Failures retained:
+- Original landscape overlapped keyboard; largest text clipped the header.
+- Intrinsic-height TextField attempts stalled in SwiftUI/TextKit layout. The final
+  input is a bounded scrolling TextEditor at the original 390-point frame width.
+- Old field/actor locators and a stale off-screen keyboard frame failed runners;
+  corrected waits, observed actor-label prefixes and restored-input editing pass.
+- A 422 response marked transport offline; direct Retry sent nothing. Both apps
+  now keep the live transport for definite input rejections. Denials, conflicts
+  and transport/server failures retain conceal/recovery behavior.
+- Harness repeated subscriptions and abrupt disconnects leaked listeners, causing
+  recreation to return 409. The HTTP/WS probe now proves one live listener and none
+  after normal close, repeated subscription or a process-like disconnect.
+
+Reproduction after build-for-testing and starting the fake API/link driver:
+LANE7_OUT=<scratch> node tests/scenarios/lane-7/ios-navigation.mjs <built.xctestrun> --drafts D1 D2 D3 D4 D4R D5 D7 D7U D8
+The runner fails unless every selected flow passes and none is skipped.
+
+Header presentation awaits founder approval: compact fixed author label/glyph;
+full identity sentence in the scroller. Charter 4.2 requires the full strip fixed.
+Physical-device/store installation and forced filesystem-write interruption: not run.

@@ -1,0 +1,146 @@
+2026-10-09 — WP 7.2, after merge 678484ade, NativeBackSwipe and cold-link fixes.
+Real iOS app on qelvora-lane7-ios (iOS 26.5), operated by founder-approved XCUITest.
+Fake: lane 7 API, synthetic accounts/data. Real-backend check is recorded separately.
+Runner: tests/scenarios/lane-7/ios-navigation.mjs, all 13 opt-in flows.
+Result bundle kept outside Git: ios-navigation-1791594603579.xcresult.
+Per-flow attachments: screenshot, accessibility tree, sanitized API request metadata.
+N8 checks cold thread > Home AND cold creator > Discover > Home.
+The latter caught a startup-trail defect in the focused real-stack run and passes here after its fix.
+
+LANE7 screen: Your people
+LANE7 screen: thread, privacy closed
+LANE7 screen: Your people
+LANE7 screen: thread, privacy closed
+LANE7 screen: Your people
+LANE7 server: successful /conversations/c1000000-0000-4000-8000-000000000002/f1000000-0000-4000-8000-000000000001, account any
+Test Case '-[QelvoraUITests.Lane7NavigationFlows testN01ThreadBackAndGesture]' passed (21.068 seconds).
+LANE7 screen: Official means
+LANE7 screen: Before your first message
+LANE7 screen: thread, privacy closed
+LANE7 screen: Official means
+LANE7 screen: Your people
+Test Case '-[QelvoraUITests.Lane7NavigationFlows testN02ConsentIsReplaced]' passed (26.799 seconds).
+LANE7 screen: THIS MONTH
+LANE7 screen: Charged this UTC calendar month
+LANE7 screen: THIS MONTH
+LANE7 screen: Reports are available without paid access
+LANE7 screen: THIS MONTH
+LANE7 screen: Your people
+LANE7 server: successful /commerce/, account any
+LANE7 server: successful /trust/, account any
+Test Case '-[QelvoraUITests.Lane7NavigationFlows testN05AccountBack]' passed (25.548 seconds).
+LANE7 screen: Your people
+LANE7 screen: POST
+LANE7 screen: Official means
+LANE7 screen: Your people
+Test Case '-[QelvoraUITests.Lane7NavigationFlows testN06NotificationTrailAndLabel]' passed (20.496 seconds).
+LANE7 screen: Your people
+LANE7 screen: thread, privacy closed
+LANE7 screen: Your people
+LANE7 server: successful /conversations/c1000000-0000-4000-8000-000000000002/f1000000-0000-4000-8000-000000000001, account any
+LANE7 screen: Official means
+LANE7 screen: Your people
+LANE7 server: successful /growth/public/creators/maya, account any
+Test Case '-[QelvoraUITests.Lane7NavigationFlows testN08ColdLink]' passed (27.398 seconds).
+LANE7 screen: thread, privacy closed
+LANE7 screen: Your account
+LANE7 screen: Your account
+LANE7 screen: @priya_n
+LANE7 screen: THIS MONTH
+LANE7 screen: @priya_n
+LANE7 screen: Your people
+LANE7 server: successful /identity/session, account priya
+Test Case '-[QelvoraUITests.Lane7NavigationFlows testN13AccountChangeClearsTrail]' passed (26.409 seconds).
+LANE7 screen: Your people
+LANE7 server: successful /growth/public/creators, account any
+Test Case '-[QelvoraUITests.Lane7NavigationFlows testN14UnknownLink]' passed (16.256 seconds).
+LANE7 screen: thread, privacy closed
+LANE7 screen: thread, privacy closed
+LANE7 screen: thread, privacy closed
+LANE7 screen: Your people
+LANE7 screen: Your people
+LANE7 server: successful /conversations/c1000000-0000-4000-8000-000000000002/f1000000-0000-4000-8000-000000000001, account any
+Test Case '-[QelvoraUITests.Lane7NavigationFlows testN15RepeatedLinkAndQuickBack]' passed (35.645 seconds).
+LANE7 screen: thread, privacy closed
+LANE7 screen: AI remembers
+LANE7 screen: Official means
+LANE7 screen: thread, privacy closed
+LANE7 server: successful /growth/public/creators/maya, account any
+Test Case '-[QelvoraUITests.Lane7NavigationFlows testN16LinkWhilePrivacyIsOpen]' passed (19.804 seconds).
+LANE7 screen: Your people
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: Official means
+LANE7 screen: Reports are available without paid access
+LANE7 screen: THIS MONTH
+LANE7 screen: Your people
+LANE7 screen: Your people
+LANE7 server: successful /growth/public/creators/maya, account any
+LANE7 server: successful /trust/, account any
+Test Case '-[QelvoraUITests.Lane7NavigationFlows testN17TrailBoundary]' passed (209.451 seconds).
+LANE7 screen: How creators will know you
+LANE7 screen: How creators will know you
+Test Case '-[QelvoraUITests.Lane7NavigationFlows testN19NewFanBack]' passed (8.450 seconds).
+LANE7 screen: THIS MONTH
+LANE7 screen: Your account
+LANE7 screen: How creators will know you
+LANE7 screen: Your account
+LANE7 screen: THIS MONTH
+LANE7 screen: Your people
+LANE7 server: successful /identity/session, account any
+Test Case '-[QelvoraUITests.Lane7NavigationFlows testN20EditProfileBack]' passed (22.403 seconds).
+LANE7 screen: YOU CAN
+LANE7 screen: Your people
+LANE7 server: successful /commerce/, account any
+Test Case '-[QelvoraUITests.Lane7NavigationFlows testN21CreatorAccessBack]' passed (13.203 seconds).
+PASS iOS: 13 operated navigation flows, none skipped.

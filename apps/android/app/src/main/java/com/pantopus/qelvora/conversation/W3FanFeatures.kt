@@ -1,6 +1,7 @@
 package com.pantopus.qelvora.conversation
 
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import android.os.SystemClock
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,6 +18,8 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.graphics.SolidColor
@@ -59,7 +62,10 @@ object W3FanFeatures {
     suspend fun clearPrivateState(context: android.content.Context) {
         ConversationRealtime.purge()
         ConversationOfflineStorage.purge(context)
-        ConversationResumeStorage(context).purge()
+        var failure: Exception? = null
+        try { ConversationDraftStorage(context).purge() } catch (current: Exception) { failure = current }
+        try { ConversationResumeStorage(context).purge() } catch (current: Exception) { failure = failure ?: current }
+        failure?.let { throw it }
     }
     fun registration(baseURL: String?) = FanFeatureRegistration(matches = {
         val path = it.substringBefore('?'); path == "/you" || path.startsWith("/threads/") || (path.startsWith("/creators/") && path.endsWith("/chat"))
@@ -76,13 +82,13 @@ object W3FanFeatures {
             val fanId = destination.getQueryParameter("fanId")
             if (ApplicationDestination.isPermitted(session.destination) && creatorId != null && fanId != null) {
                 val client = remember(baseURL, session.session?.accountId) { ConversationClient(baseURL, session::currentToken, session.session?.accountId) }
-                ConversationPrivacy(client, "$creatorId/$fanId", onBack = { session.open("/you") }, onData = { session.open("/support/privacy") }, onSupport = { session.open("/support") })
+                ConversationPrivacy(client, "$creatorId/$fanId", onBack = { session.back() }, onData = { session.open("/support/privacy") }, onSupport = { session.open("/support") })
             } else ConversationAccount(baseURL, session)
         }
         else Notice(title = "Conversation unavailable", children = "Open this conversation from your account.")
     })
 }
-private data class PendingMessage(val key: String, val text: String, val sequence: Long, val destination: String, val uncertain: Boolean = false, val rejected: Boolean = false)
+private typealias PendingMessage = ConversationDraftStorage.Pending
 
 @Composable
 private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String, session: FanSession) {
@@ -91,6 +97,11 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     val accountId = session.session?.accountId ?: "signed-out"
     val context = LocalContext.current
     val resumeStorage = remember(context) { ConversationResumeStorage(context) }
+    val draftStorage = remember(context) { ConversationDraftStorage(context) }
+    var draftTicket by remember(baseURL, root, accountId) { mutableStateOf<ConversationDraftStorage.Ticket?>(null) }
+    var draftLease by remember(baseURL, root, accountId) { mutableStateOf<ConversationDraftStorage.Lease?>(null) }
+    var draftRevision by remember(baseURL, root, accountId) { mutableStateOf(0L) }
+    var refreshRevision by remember(baseURL, root, accountId) { mutableStateOf(0L) }
     val storageScope = "$baseURL/$root"
     var resumeActivated by remember(root, accountId) { mutableStateOf(false) }
     var page by remember(root, accountId) { mutableStateOf<ConversationPage?>(null) }
@@ -106,6 +117,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     var busy by remember(root, accountId) { mutableStateOf(false) }
     var introOfferId by remember(root, accountId) { mutableStateOf<String?>(null) }
     var privacy by remember(root, accountId) { mutableStateOf(false) }
+    BackHandler(enabled = privacy) { privacy = false }
     var comparisonQuestion by remember(root, accountId) { mutableStateOf<ConversationMessage?>(null) }
     var comparisonsAvailable by remember(client) { mutableStateOf(false) }
     LaunchedEffect(client, offline) {
@@ -122,6 +134,22 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     var viewRun by remember(baseURL, root, accountId) { mutableStateOf(0) }
     val presenceId = remember(root) { UUID.randomUUID().toString() }
     val scope = rememberCoroutineScope()
+    fun updateInput(text: String = draft, item: PendingMessage? = pending) {
+        draft = text; pending = item
+        val lease = draftLease ?: return
+        val saved = draftStorage.enqueue(ConversationDraftStorage.Value(text, item), lease, ++draftRevision)
+        scope.launch {
+            try { saved.await() }
+            catch (failure: Exception) {
+                if (failure is CancellationException) throw failure
+                if (draftLease?.ticket?.id == lease.ticket.id) error = "Reconnect to refresh. Your input is kept."
+            }
+        }
+    }
+    suspend fun saveDraftNow(): Boolean {
+        val lease = draftLease ?: return false
+        return draftStorage.save(ConversationDraftStorage.Value(draft, pending), lease, ++draftRevision)
+    }
     val scroll = rememberLazyListState()
     var positionedConversation by remember(root, accountId) { mutableStateOf(false) }
     var followingReply by remember(root, accountId) { mutableStateOf(true) }
@@ -185,32 +213,50 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             ConversationOfflineStorage.purge(lease); if (offlineContext == lease) offlineContext = null
         }
     }
-    val fail: (Throwable) -> Unit = { failure ->
+    fun fail(failure: Throwable, threadDenied: Boolean = false) {
         if (failure is CancellationException) throw failure
         error = failure.message ?: "Reconnect to refresh. Your input is kept."
         offline = true; transportReady = false
-        if (failure is ConversationFailure && failure.status in listOf(401,403,404)) { offlineShowing = false; offlineContext?.let { ConversationOfflineStorage.purge(it) }; offlineContext = null; page = null; older = emptyList(); before = null; draft = ""; pending = null; gate = null; source = null; privacy = false; transportReady = false; scope.launch { runCatching { resumeStorage.remove(accountId, storageScope) } } }
+        if (failure is ConversationFailure && failure.status in listOf(401,403,404)) {
+            val ticket = draftTicket; draftTicket = null; draftLease = null
+            if (ticket != null && (failure.status == 401 || threadDenied)) draftStorage.discardLater(ticket)
+            offlineShowing = false; offlineContext?.let { ConversationOfflineStorage.purge(it) }; offlineContext = null; page = null; older = emptyList(); before = null; draft = ""; pending = null; gate = null; source = null; privacy = false; transportReady = false; scope.launch { runCatching { resumeStorage.remove(accountId, storageScope) } }
+        }
         else scope.launch { showOffline() }
     }
     suspend fun refresh(propagateFailure: Boolean = false) {
         val run = viewRun
         if (!foreground || privacy || comparisonQuestion != null) return
+        val readRevision = ++refreshRevision
         try {
+            val currentDraft = draftLease?.let { draftStorage.current(it) } == true
+            if (draftTicket == null || !currentDraft) draftTicket = draftStorage.begin(baseURL, accountId, root)
+            val ticket = draftTicket
             if (!resumeActivated) {
                 try { resumeStorage.activate(accountId) } catch (failure: Exception) { if (failure is CancellationException) throw failure }
                 resumeActivated = true
             }
             val fresh = client.page(root)
-            if (run != viewRun || !foreground || privacy || comparisonQuestion != null) return
+            if (run != viewRun || readRevision != refreshRevision || !foreground || privacy || comparisonQuestion != null) return
+            if (page != null && page?.threadId != fresh.threadId) { page = null; older = emptyList(); before = null }
             if (fresh.cursor >= (page?.cursor ?: 0) && fresh.epoch >= (page?.epoch ?: 0) && fresh.revision >= (page?.revision ?: 0)) {
+                val reusableDraft = draftLease?.let { it.thread == fresh.threadId && draftStorage.current(it) } == true
+                if (!reusableDraft) {
+                    val opened = ticket?.let { draftStorage.open(it, fresh.threadId) }
+                    if (opened == null) { draftTicket = null; draftLease = null; draft = ""; pending = null; conceal(); return }
+                    if (run != viewRun || readRevision != refreshRevision || !foreground || privacy || comparisonQuestion != null) return
+                    draftLease = opened.lease
+                    val restored = opened.value?.pending?.let { if (it.rejected) it else it.copy(uncertain = true) }
+                    updateInput(opened.value?.text.orEmpty(), restored)
+                }
                 offlineShowing = false; page = fresh; if (before == null && older.isEmpty()) before = fresh.before
                 gate = ThreadDeliveryGate(fresh.threadId, fresh.cursor, fresh.epoch, fresh.generationSequences)
                 try { resumeStorage.save(accountId, storageScope, fresh.cursor, fresh.epoch) } catch (failure: Exception) { if (failure is CancellationException) throw failure }
                 offline = !transportReady; error = ""
-                pending?.let { item -> if (client.request("$root/messages/status", buildJsonObject { put("idempotencyKey", item.key) }).jsonObject["accepted"]?.jsonPrimitive?.boolean == true && pending?.key == item.key) { pending = null; if (draft.trim() == item.text) draft = "" } }
+                pending?.let { item -> if (client.request("$root/messages/status", buildJsonObject { put("idempotencyKey", item.key) }).jsonObject["accepted"]?.jsonPrimitive?.boolean == true && pending?.key == item.key) { updateInput(if (draft.trim() == item.text) "" else draft, null) } }
             }
         } catch (failure: Throwable) {
-            if (run == viewRun) fail(failure)
+            if (run == viewRun && readRevision == refreshRevision) fail(failure, threadDenied = true)
             if (propagateFailure) throw failure
         }
     }
@@ -239,15 +285,23 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     suspend fun send(retry: Boolean = false) {
         val current = page ?: return
         if (busy || offline || !foreground || privacy || !current.canSend || (!retry && draft.isBlank())) return
-        val item = if (retry) pending ?: return else PendingMessage(UUID.randomUUID().toString(), draft.trim(), (current.messages.lastOrNull()?.sequence ?: 0) + 1, if(current.control == APIThreadControl.HUMAN_ACTIVE) "fan-replies" else "messages")
+        val item = if (retry) (pending ?: return).copy(uncertain = false, rejected = false) else PendingMessage(UUID.randomUUID().toString(), draft.trim(), (current.messages.lastOrNull()?.sequence ?: 0) + 1, if(current.control == APIThreadControl.HUMAN_ACTIVE) "fan-replies" else "messages")
         followingReply = true
-        pending = item; busy = true
+        updateInput(item = item); busy = true
         try {
+            if (!saveDraftNow()) return
             val path = item.destination
             val result = client.request("$root/$path", buildJsonObject { put("text", item.text); put("idempotencyKey", item.key); put("clientSequence", item.sequence) })
             if (path == "messages") client.json.decodeFromJsonElement<APIAcceptedMessage>(result) else client.json.decodeFromJsonElement<APIMessage>(result)
-            pending = null; if (draft.trim() == item.text) draft = ""; refresh()
-        } catch (failure: Throwable) { val uncertain = failure !is ConversationFailure || failure.status >= 500 || failure.status == 409; pending = item.copy(uncertain = uncertain, rejected = !uncertain); fail(failure) }
+            updateInput(if (draft.trim() == item.text) "" else draft, null); saveDraftNow(); refresh()
+        } catch (failure: Throwable) {
+            val uncertain = failure !is ConversationFailure || failure.status >= 500 || failure.status == 409
+            updateInput(item = item.copy(uncertain = uncertain, rejected = !uncertain))
+            // An answered input rejection does not close the live transport.
+            // Denials/conflicts still use the existing conceal/refresh path.
+            if (failure is ConversationFailure && failure.status in 400..499 && failure.status !in listOf(401,403,404,409)) error = failure.message.orEmpty()
+            else fail(failure)
+        }
         finally { busy = false }
     }
     LaunchedEffect(baseURL, root, accountId, foreground, privacy, comparisonQuestion != null, connectionRetry) {
@@ -311,17 +365,15 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         }
     } }
     val current = page
-    BoxWithConstraints(Modifier.fillMaxSize().widthIn(max = 390.dp)) {
-    // Keep the actual conversation and its privacy notice reachable when
-    // enlarged text or the keyboard leaves too little room for fixed controls.
+    BoxWithConstraints(Modifier.widthIn(max = 680.dp).fillMaxSize()) {
     val density = LocalDensity.current
-    // Keep the composer in the same composition when the IME opens. Moving
-    // the focused field between the fixed footer and list destroys its focus
-    // and immediately closes the keyboard again.
+    // The composer stays outside the list in every orientation. Only the
+    // header condenses; moving a focused field destroys the keyboard focus.
     val heightWithoutKeyboard = maxHeight + with(density) { WindowInsets.ime.getBottom(this).toDp() }
     val keyboardVisible = WindowInsets.ime.getBottom(density) > 0
-    val scrollControls = density.fontScale >= 1.5f || heightWithoutKeyboard < 480.dp
-    LaunchedEffect(current?.threadId, current?.messages?.lastOrNull(), pending?.key, scrollControls, maxHeight) {
+    val compact = density.fontScale >= 1.5f || heightWithoutKeyboard < 480.dp
+    val horizontalControls = maxHeight < 180.dp
+    LaunchedEffect(current?.threadId, current?.messages?.lastOrNull(), pending?.key, compact, maxHeight) {
         if (current != null && followingReply && !scroll.isScrollInProgress) {
             positioningReply = true
             try {
@@ -339,45 +391,56 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             Button("Help and safety", variant = ButtonVariant.QUIET) { session.open("/support") }
         } else {
             val header: @Composable () -> Unit = {
-                ThreadHeader(name = current.creatorName, subtitle = "Official AI", live = !offline && current.control == APIThreadControl.HUMAN_ACTIVE, onBack = { session.open("/you") }, onAbout = { privacy = true })
+                if (compact) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    IconButton("back", copy("back"), onClick = { session.back() })
+                    Box(Modifier.weight(1f)) {
+                        if (current.control != APIThreadControl.AI_ACTIVE && current.control != APIThreadControl.HUMAN_ACTIVE) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Glyph("pause", 16.dp, qColor("ink-muted"))
+                            BasicText(copy("aiPaused", "name" to current.creatorName), style = qText("caption").copy(color = qColor("ink")))
+                        } else AuthorLabel(kind = if (current.control == APIThreadControl.HUMAN_ACTIVE) AuthorKind.HUMAN_CREATOR else AuthorKind.AI, name = current.creatorName)
+                    }
+                    if (!horizontalControls) IconButton("info", copy("aboutConversation"), onClick = { privacy = true })
+                } else {
+                ThreadHeader(name = current.creatorName, subtitle = "Official AI", live = !offline && current.control == APIThreadControl.HUMAN_ACTIVE, onBack = { session.back() }, onAbout = { privacy = true })
                 IdentityStrip(state = if (current.control == APIThreadControl.HUMAN_ACTIVE) IdentityState.HUMAN else if (current.control == APIThreadControl.AI_ACTIVE) IdentityState.AI else IdentityState.PAUSED, name = current.creatorName)
+                }
             }
             val messageLabel = if (current.control == APIThreadControl.HUMAN_ACTIVE) "Message ${current.creatorName}" else "Message ${current.creatorName}'s AI"
             val input: @Composable (Modifier) -> Unit = { modifier ->
-                BasicTextField(value = draft, onValueChange = { draft = it.take(2000) },
-                    modifier = modifier.heightIn(min = 48.dp, max = 160.dp)
+                BasicTextField(value = draft, onValueChange = { updateInput(text = it.take(2000)) },
+                    modifier = modifier.heightIn(min = 48.dp, max = if (compact && keyboardVisible) 96.dp else 160.dp)
                         .semantics { contentDescription = messageLabel }
                         .background(qColor("surface"), RoundedCornerShape(QelvoraTokens.radiusLg))
                         .border(QelvoraTokens.hairline, qColor(if (current.control == APIThreadControl.HUMAN_ACTIVE) "maya-line" else "control-line"), RoundedCornerShape(QelvoraTokens.radiusLg))
-                        .padding(QelvoraTokens.space3),
-                    textStyle = qText("body").copy(color = qColor("ink")), cursorBrush = SolidColor(qColor("ink")), maxLines = 5,
+                        .padding(if (horizontalControls) 8.dp else QelvoraTokens.space3),
+                    textStyle = qText("body").copy(color = qColor("ink")), cursorBrush = SolidColor(qColor("ink")), maxLines = if (compact && keyboardVisible) 1 else 5,
                     decorationBox = { field -> Box {
                         if (draft.isEmpty()) BasicText(messageLabel, modifier = Modifier.clearAndSetSemantics { }, style = qText("body").copy(color = qColor("ink-muted")))
                         field()
                     } })
             }
             val sendButton: @Composable () -> Unit = {
-                Button("Send", variant = if (current.control == APIThreadControl.HUMAN_ACTIVE) ButtonVariant.MAYA else ButtonVariant.AI, block = scrollControls, disabled = !current.canSend || offline || !foreground || busy || pending != null || current.generationSequences.isNotEmpty() || draft.isBlank()) { scope.launch { send() } }
+                Button("Send", variant = if (current.control == APIThreadControl.HUMAN_ACTIVE) ButtonVariant.MAYA else ButtonVariant.AI, disabled = !current.canSend || offline || !foreground || busy || pending != null || current.generationSequences.isNotEmpty() || draft.isBlank()) { scope.launch { send() } }
             }
             val privacyControls: @Composable () -> Unit = {
                 Button("Me and privacy", variant = ButtonVariant.QUIET) { privacy = true }
                 Button("Get support", variant = ButtonVariant.QUIET) { session.open("/support") }
             }
             val composer: @Composable () -> Unit = {
-                Column(Modifier.imePadding().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    if (!current.canSend) Notice(title = "AI unavailable", children = current.unavailableReason ?: "Messaging is unavailable.")
-                    Button("Ask ${current.creatorName} to step in", variant = ButtonVariant.MAYA, block = true) { session.open("/commerce/packet?creatorId=$creatorId") }
-                    if (scrollControls) {
-                        BasicText(messageLabel, style = qText("label").copy(color = qColor("ink")))
-                        input(Modifier.fillMaxWidth())
-                        sendButton()
-                    } else Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { input(Modifier.weight(1f)); sendButton() }
-                    if (!keyboardVisible) { if (scrollControls) Column { privacyControls() } else Row { privacyControls() } }
+                Column(Modifier.imePadding().padding(horizontal = if (horizontalControls) 4.dp else 16.dp, vertical = if (keyboardVisible && compact) 4.dp else 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    if (!current.canSend && !horizontalControls) Notice(title = "AI unavailable", children = current.unavailableReason ?: "Messaging is unavailable.")
+                    if (!keyboardVisible && !compact) Button("Ask ${current.creatorName} to step in", variant = ButtonVariant.MAYA, block = true) { session.open("/commerce/packet?creatorId=$creatorId") }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.Bottom) { input(Modifier.weight(1f)); sendButton() }
+                    if (!keyboardVisible && !compact) Row { privacyControls() }
                 }
             }
-            if (!scrollControls) header()
-            LazyColumn(state = scroll, modifier = Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                if (scrollControls) item { Column { header() } }
+            ThreadInputLayout(horizontalControls, header, composer) {
+            LazyColumn(state = scroll, modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                if (horizontalControls) item {
+                    Button(copy("aboutConversation"), variant = ButtonVariant.QUIET) { privacy = true }
+                    if (!current.canSend) Notice(title = "AI unavailable", children = current.unavailableReason ?: "Messaging is unavailable.")
+                }
+                if (compact) item { IdentityStrip(state = if (current.control == APIThreadControl.HUMAN_ACTIVE) IdentityState.HUMAN else if (current.control == APIThreadControl.AI_ACTIVE) IdentityState.AI else IdentityState.PAUSED, name = current.creatorName) }
                 item(key = "intro-offer") {
                     NativeIntroOffer(client, root, session, introOfferId, current.feedbackPolicy != null,
                         enabled = !busy && !offline && foreground && !privacy && comparisonQuestion == null && source == null)
@@ -454,14 +517,48 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                         }
                     }
                 }
-                pending?.let { pendingItem -> item { Message(kind = MessageKind.FAN, children = pendingItem.text, name = current.creatorName, delivery = if (pendingItem.rejected) Delivery.FAILED else if (pendingItem.uncertain) null else Delivery.PENDING); if (pendingItem.uncertain) { BasicText("Acceptance hasn't been confirmed. Retry checks the same message without a duplicate.", style = qText("caption").copy(color = qColor("ink"))); Button("Retry", variant = ButtonVariant.QUIET, disabled = busy || offline) { scope.launch { send(true) } } } else if (pendingItem.rejected) { BasicText("Not sent", style = qText("caption").copy(color = qColor("ink"))); Button("Keep editing", variant = ButtonVariant.QUIET) { draft = pendingItem.text; pending = null } } } }
+                pending?.let { pendingItem -> item { Message(kind = MessageKind.FAN, children = pendingItem.text, name = current.creatorName, delivery = if (pendingItem.rejected) Delivery.FAILED else if (pendingItem.uncertain) null else Delivery.PENDING, onRetry = { scope.launch { send(true) } }); if (pendingItem.uncertain) { BasicText("Acceptance hasn't been confirmed. Retry checks the same message without a duplicate.", style = qText("caption").copy(color = qColor("ink"))); Button("Retry", variant = ButtonVariant.QUIET, disabled = busy || offline) { scope.launch { send(true) } } } else if (pendingItem.rejected) { BasicText("Not sent", style = qText("caption").copy(color = qColor("ink"))); Button("Keep editing", variant = ButtonVariant.QUIET, disabled = busy) { updateInput(pendingItem.text, null) } } } }
                 if (error.isNotEmpty()) item { Notice(title = "Conversation status", children = error) }
-                if (scrollControls) item { composer() }
                 item(key = "conversation-end") { Spacer(Modifier.height(1.dp)) }
+                if (compact && !keyboardVisible) item {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Button("Ask ${current.creatorName} to step in", variant = ButtonVariant.MAYA, block = true) { session.open("/commerce/packet?creatorId=$creatorId") }
+                        privacyControls()
+                    }
+                }
             }
-            if (!scrollControls) composer()
+            }
         }
     }
+    }
+}
+
+/** The same three children remain composed while the window changes shape.
+ * In a short window the author and input share one row instead of squeezing
+ * two rows below their readable/touchable sizes. */
+@Composable private fun ThreadInputLayout(horizontal: Boolean, header: @Composable () -> Unit,
+    composer: @Composable () -> Unit, history: @Composable () -> Unit) {
+    Layout(content = { Column { header() }; Box { composer() }; Box { history() } },
+        modifier = Modifier.fillMaxSize()) { children, constraints ->
+        val width = constraints.maxWidth; val height = constraints.maxHeight
+        val authorWidth = if (horizontal) (width * if (width > 600.dp.roundToPx()) 0.38f else 0.5f).toInt() else width
+        val author = children[0].measure(Constraints(minWidth = authorWidth, maxWidth = authorWidth, maxHeight = height))
+        val inputWidth = if (horizontal) width - authorWidth else width
+        val input = children[1].measure(Constraints(minWidth = inputWidth, maxWidth = inputWidth,
+            maxHeight = if (horizontal) height else (height - author.height).coerceAtLeast(0)))
+        val controlsHeight = if (horizontal) maxOf(author.height, input.height) else author.height + input.height
+        val messagesHeight = (height - controlsHeight).coerceAtLeast(0)
+        val messages = children[2].measure(Constraints.fixed(width, messagesHeight))
+        layout(width, height) {
+            if (horizontal) {
+                messages.placeRelative(0, 0)
+                author.placeRelative(0, messagesHeight + (controlsHeight - author.height) / 2)
+                input.placeRelative(authorWidth, messagesHeight + (controlsHeight - input.height) / 2)
+            } else {
+                author.placeRelative(0, 0); messages.placeRelative(0, author.height)
+                input.placeRelative(0, author.height + messagesHeight)
+            }
+        }
     }
 }
 
@@ -671,7 +768,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     LazyColumn(Modifier.fillMaxSize().widthIn(max = 390.dp).background(qColor("ground")), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 36.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
         item {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                IconButton("back", "Back", qColor("ink")) { session.open("/creators/$handle") }
+                IconButton("back", "Back", qColor("ink")) { session.back() }
                 BasicText("1 OF 1", style = qText("data-sm").copy(color = qColor("ink-muted")))
             }
         }
@@ -729,10 +826,10 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 try {
                     val page=capture.client.beginConversation(capture.expectedAccountId, capture.sessionId, APIConversationBeginConversation(selectedCreator.getString("id"),policy.version,APIConversationBeginConversationAccessNoticeAccepted,key))
                     if (!foreground || !capture.isCurrent() || page.creatorId != selectedCreator.getString("id") || runCatching { UUID.fromString(page.fanId) }.isFailure) return@launch
-                    session.open("/threads/${page.creatorId}/${page.fanId}")
+                    session.replace("/threads/${page.creatorId}/${page.fanId}")
                 } catch(failure: Throwable) { if(failure is CancellationException) throw failure;if(foreground && capture.isCurrent()) error="Reconnect to try again. No message was sent." } finally {busy=false}
             } }
-            Button("Not now",variant=ButtonVariant.QUIET,block=true) { session.open("/creators/$handle") }
+            Button("Not now",variant=ButtonVariant.QUIET,block=true) { session.back() }
             }
         }
     }

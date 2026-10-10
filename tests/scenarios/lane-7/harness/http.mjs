@@ -1,6 +1,6 @@
 // A small HTTP layer for the lane 7 fake API: routes, JSON bodies, the real
 // API's error shape, a request log and fault injection. No dependencies.
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 
 export class Failure extends Error {
   constructor(status, code, message) {
@@ -59,8 +59,11 @@ async function readBody(req) {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /** Faults are set through the control API: { match, method?, status?,
- * delayMs?, drop?, remaining? }. `drop` destroys the socket, as a dead
- * network does; `remaining` counts requests that still receive the fault. */
+ * delayMs?, drop?, responseDelayMs?, dropResponse?, remaining? }.
+ * `drop` fails before the handler; `dropResponse` loses a response AFTER the
+ * handler committed its state. This proves interrupted-send recovery without
+ * pretending that a transport failure means the server did nothing.
+ * `remaining` counts requests that still receive the fault. */
 function applyFault(world, req, path) {
   for (const fault of world.faults) {
     if (fault.remaining === 0) continue;
@@ -98,11 +101,29 @@ export function createHandler(world, router) {
         "Content-Type": "application/json; charset=utf-8",
         "Cache-Control": "no-store",
         "X-Request-Id": requestId,
+        // The emulator reaches this server through an adb tunnel that does not pass
+        // on Node's idle close: a reused connection then fails with "unexpected end
+        // of stream". One request per connection keeps both apps honest.
+        Connection: "close",
       });
       res.end(text);
     };
     try {
       const control = url.pathname.startsWith("/__harness/");
+      const body = ["POST", "PUT", "PATCH", "DELETE"].includes(req.method)
+        ? await readBody(req)
+        : undefined;
+      // Compare only hashes of synthetic message command keys. Never log
+      // authorization headers, identity credentials, or request bodies.
+      if (
+        !control &&
+        req.method === "POST" &&
+        /\/(messages|fan-replies|messages\/status)$/u.test(url.pathname) &&
+        typeof body?.idempotencyKey === "string"
+      )
+        entry.commandKeyHash = createHash("sha256")
+          .update(body.idempotencyKey)
+          .digest("hex");
       const fault = control ? null : applyFault(world, req, url.pathname);
       if (fault?.delayMs) await sleep(fault.delayMs);
       if (fault?.drop) {
@@ -132,12 +153,17 @@ export function createHandler(world, router) {
         url,
         params: found.params,
         query: Object.fromEntries(url.searchParams),
-        body: ["POST", "PUT", "PATCH", "DELETE"].includes(req.method)
-          ? await readBody(req)
-          : undefined,
+        body,
         entry,
       };
       const result = await found.handler(ctx);
+      if (fault?.responseDelayMs) await sleep(fault.responseDelayMs);
+      if (fault?.dropResponse) {
+        entry.status = -2; // processed, but no HTTP response reached the app
+        entry.ms = Date.now() - started;
+        req.socket.destroy();
+        return;
+      }
       if (result?.status !== undefined && "json" in result)
         finish(result.status, result.json);
       else finish(200, result);

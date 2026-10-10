@@ -134,7 +134,7 @@ public struct TrustFanFeature: View {
             Button("Refresh", variant: .secondary, block: true, disabled: busy || model.checkingSession || model.busy) { refreshOperation?.cancel(); refreshOperation = Task { await model.refresh() } }
         }.padding(16) }.foregroundStyle(qColor("ink", scheme)).background(qColor("ground", scheme))
         .task(id: route + (privateReady ? "|ready" : "|unavailable")) { await load() }
-        .onChange(of: privateReady) { _, ready in if !ready { operation?.cancel(); suspendPrivateResults() } }
+        .onChange(of: privateReady) { _, ready in if !ready { operation?.cancel(); suspendPrivateResults(keepConfirmation: privateVisible && model.checkingSession) } }
         .onChange(of: model.error) { _, error in if !error.isEmpty { operation?.cancel(); clearPrivateResults() } }
         .onChange(of: route) { _, _ in operation?.cancel(); clearPrivateResults() }
         .onDisappear { operation?.cancel(); refreshOperation?.cancel(); clearPrivateResults() }
@@ -256,7 +256,9 @@ public struct TrustFanFeature: View {
         cases = []; notices = []; jobs = []; history = []; selectedJob = nil
         capability = nil
     }
-    private func suspendPrivateResults() { workEpoch += 1; busy = false; exportPayload = nil; confirmingDelete = false; result = ""; error = "" }
+    // The generic confirmation holds no authority; the action remains disabled
+    // and requires a fresh capture while a same-session check is in flight.
+    private func suspendPrivateResults(keepConfirmation: Bool = false) { workEpoch += 1; busy = false; exportPayload = nil; if !keepConfirmation { confirmingDelete = false }; result = ""; error = "" }
     private func beginWork() -> Int { workEpoch += 1; busy = true; return workEpoch }
     private func finishWork(_ epoch: Int) { if workEpoch == epoch { busy = false } }
     private func capture() async throws -> FanSessionRequestCapture {
@@ -311,7 +313,22 @@ public struct TrustFanFeature: View {
         var input: [String: Any] = ["kind": kind, "reason": reason, "idempotencyKey": commandKey]; if kind != "support" && !creatorID.isEmpty { input["creatorId"] = creatorID.lowercased() }; if kind == "ai_report" { input["messageId"] = messageID.lowercased() }; if kind == "support" && !requestID.isEmpty { input["requestId"] = requestID.lowercased() }; if let ack = await perform("reports", input) { result = "CASE-\(ack.number ?? 0) is saved. No provider action is implied."; reason = ""; await load() }
     }
     private func appeal(_ item: TrustCase) async { if await perform("cases/" + item.id + "/appeals", ["version": item.version, "reason": reason, "idempotencyKey": commandKey]) != nil { result = "Your appeal is saved for a different reviewer."; reason = ""; await load() } }
-    private func privacyCommand(_ kind: String) async { var input: [String: Any] = ["kind": kind, "scope": scope, "proof": capability?.verificationMethod == "current_session" ? "CURRENT_SESSION" : proof, "idempotencyKey": commandKey]; if scope != "account" { input["creatorId"] = creatorID.lowercased() }; if scope == "thread" { input["threadId"] = threadID.lowercased() }; if let ack = await perform("privacy/jobs", input) { result = "Request saved; inspect each domain's progress."; await load(); if let id = ack.id { await jobDetail(id) } } }
+    private func privacyCommand(_ kind: String) async {
+        guard let origin = client?.baseURL.absoluteString, let account = model.session?.accountId else { return }
+        let deletionScope = scope, creator = creatorID.lowercased(), thread = threadID.lowercased()
+        var input: [String: Any] = ["kind": kind, "scope": deletionScope, "proof": capability?.verificationMethod == "current_session" ? "CURRENT_SESSION" : proof, "idempotencyKey": commandKey]
+        if deletionScope != "account" { input["creatorId"] = creator }
+        if deletionScope == "thread" { input["threadId"] = thread }
+        if let ack = await perform("privacy/jobs", input) {
+            if kind == "delete" {
+                do { try await W3DraftStorage.shared.purge(origin: origin, account: account, creator: deletionScope == "account" ? nil : creator, thread: deletionScope == "thread" ? thread : nil) }
+                catch { await model.purge(); return }
+            }
+            result = "Request saved; inspect each domain's progress."; await load()
+            if let id = ack.id { await jobDetail(id) }
+        }
+    }
+
     private func jobDetail(_ id: String) async {
         guard !privateDisabled else { return }
         let epoch = beginWork(); defer { finishWork(epoch) }

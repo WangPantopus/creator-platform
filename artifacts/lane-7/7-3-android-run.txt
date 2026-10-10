@@ -1,0 +1,50 @@
+WP 7.3 Android operated draft scenarios, 2026-10-09.
+Device: qelvora-lane7-android, emulator-5574. Serial LANE-7 build slot.
+The API, accounts, messages and faults are synthetic. The app, keyboard,
+Android lifecycle, HTTP, Keystore encryption and private files are real.
+
+D1 / D3 / D3I pass in draft-android-row-v2.log: lifecycle/focus restoration,
+normal and largest text, Light/Night, portrait/landscape, gesture and
+three-button navigation. Composer/Send targets are at least 48dp and above
+live IME. Full screenshots were visually reviewed. Split-screen testing
+later found a wrapping development banner; its fix and rerun follow below.
+D2 pass in draft-android-resize.log (before final header layout): independent
+Maya/Kiln drafts, navigation and restart; two ciphertext files, no message POST.
+D4 / D4R pass in draft-android-recovery-v3.log: normal acceptance clears;
+rejection survives restart/Keep editing; pre-acceptance loss retains the
+original key for Retry; accepted response loss restarts with one message POST.
+Direct rejected-message Retry uses the same hashed key in two POSTs and is
+accepted once. Empty input and zero encrypted files checked after acceptance.
+D5 pass in draft-android-recovery-v4.log: sign-out, same and other account,
+fresh 401/403/404 reads and recreated physical thread. Old input is absent,
+ciphertext is removed, and no message POST occurs before explicit Send.
+D7 pass in draft-android-recovery-v5.log: 2004 characters through the real
+native text-input action become exactly 2000. Restart restores them;
+2275-byte ciphertext has no plaintext marker; no message POST.
+D7U / D8 pass in draft-android-recovery-v6.log: emoji/Hebrew/Arabic restore
+(305-byte ciphertext, no POST); accepting an older send once preserves newer
+unsent text through restart (293-byte ciphertext, one POST for the older text).
+Unicode screenshot visually reviewed.
+
+Failures retained:
+- Recovery v1/v2: runner could not reach Keep editing because its gesture
+  began outside the history scroller; corrected to use actual scroll bounds.
+- Recovery v3 D5: missing-directory diagnostic was counted as seven filenames.
+  Actual removal succeeded. Checker now requires readable app storage and
+  treats the specifically absent draft directory as empty.
+- Recovery v4 D7: adb burst typing delivered only 59 characters. Native text
+  input now exercises the full boundary; external checks still inspect the
+  relaunched real UI, ciphertext and API state.
+- Recovery v5 D7U: UiAutomator encoded emoji numerically. Screenshot restored
+  it correctly; XML decoder now handles numeric entities exactly once.
+- Initial split-screen largest landscape: development banner wrapped, leaving
+  composer text clipped. Banner now scrolls horizontally on one line.
+- Split v2: all four split/text combinations pass, but the runner measured
+  return-to-fullscreen before IME appeared. It now waits for visible IME.
+
+Split v3 passes D3S and the full-screen D3 guard. Both orientations at normal
+and largest text, then return to full screen: 126px (48dp) composer/Send targets
+above live IME. Draft remains, 299-byte ciphertext, no message POST. Largest
+landscape split screenshot reviewed. Full-screen Light/Night/both orientations
+also pass after the banner fix. Real API deletion also passed; see 7-3-real-stack-run.txt. Final gates are recorded separately.
+Forced filesystem-write interruption and cancellation at deletion ack: not run.
