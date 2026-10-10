@@ -321,7 +321,7 @@ export class GrowthService {
       // A negative event can arrive before the first positive projection.
       // Its opaque parent cannot be served as a public creator or grant access.
       await client.query(
-        "INSERT INTO growth.creator_public(id,version,handle,state,document,updated_at) VALUES($1,1,'~'||$1::text,'revoked',jsonb_build_object('id',$1::uuid,'state','revoked'),clock_timestamp()) ON CONFLICT(id) DO NOTHING",
+        "INSERT INTO growth.creator_public(id,version,handle,state,document,updated_at) VALUES($1::uuid,1,'~'||($1::uuid)::text,'revoked',jsonb_build_object('id',$1::uuid,'state','revoked'),clock_timestamp()) ON CONFLICT(id) DO NOTHING",
         [creatorId],
       );
       await client.query(
