@@ -1,7 +1,8 @@
 # Lane 5: Presence and reach status
 
 Updated: 2026-10-09, resumed lane 5 session
-Working on: WP 5.6 public-page read work on `lane-5/public-page`, stacked on the
+Working on: WP 5.6 public-page read work in [PR #389](https://github.com/WangPantopus/creator-platform/pull/389)
+(`lane-5/public-page`), stacked on the
 separate withdrawal fix [PR #388](https://github.com/WangPantopus/creator-platform/pull/388)
 (`lane-5/public-withdrawal`, base main, head `7a3e29516`). Both began from main. Owner notice records
 are open for review in [PR #385](https://github.com/WangPantopus/creator-platform/pull/385),
@@ -38,6 +39,9 @@ queue removal; unpublish/archive did not start delivery; the withdrawal SQL reje
 its UUID parameter. The real post workflow now passes 5/5, including re-signing an
 edit, wrong-person refusal and racing archive retries. [Evidence and owner tickets](lane-5-public-withdrawal.md).
 Both public-page PRs stay draft until the outstanding lane-wide star rows are complete.
+
+The final backend regression passed: 9 files, 157/157, 254.28 seconds; T-11 took
+183.92 seconds. Seven typecheck tasks and changed-source eslint also passed.
 
 The old scenario database/container were removed. The stock stack currently runs
 on 56450–56453 with `qelvora-lane5-postgres` / `creator_stack`. Stop it with

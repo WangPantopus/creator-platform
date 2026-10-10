@@ -36,6 +36,10 @@ withdrawal fix PR #388 (`lane-5/public-withdrawal`, head `7a3e29516`, base main)
 none of that work depends on #385. The full lane 2 stock stack is running on ports 56450–56453
 with the model and development identity at the outer edge. Its database is `creator_stack`. No new unit tests were written.
 
+The cache/read work is open as draft PR #389, base `lane-5/public-withdrawal`
+(#388). The final backend regression passed 157/157 in 254.28 seconds (T-11:
+183.92 seconds); seven typecheck tasks and changed-source eslint passed.
+
 The real public-page checks passed: API 7/7 (two not run), restart 1/1, browser
 5/5 (one not run), conditional/outage 2/2. PostgreSQL outage gave 503, then recovered 200. Public post workflow is now 5/5 after the withdrawal fixes. See the C8 note and
 `lane-5-public-withdrawal.md` for complete tables and first-run failures. Missing
