@@ -26,13 +26,13 @@ model edge, and a software passkey enrolled in the disposable database. Draft,
 sign, publish, edit, unpublish and archive use the real HTTP endpoints. SQL reads
 check public state and completed effects. No new unit tests.
 
-| ID | Steps | Expected | Observed | Result | Evidence |
-| --- | --- | --- | --- | --- | --- |
-| E5.5-post-publish | Draft, sign and publish Unicode and markup text | Exact public text, version 1 | Exact body, stored published row | Pass | `e5-5-public-posts.mjs` |
-| E5.5-post-edit | Warm page; save edit; wait; sign new draft | Old text removed; version 2 can publish | Removed, then new text/version 2 | Pass | Same script, public HTTP + database |
-| E5.5-post-wrong-person | Another account unpublishes Maya's post | Refused; unchanged page | 503 `scope_denial_unavailable`; unchanged | Pass for refusal; status ticket below | Same script |
-| E5.5-post-withdraw | Warm page; unpublish | Removed without manual effects action | Stored tombstone, absent from page | Pass | Same script |
-| E5.5-post-archive-race | Three archives with the same request key | One withdrawal | Three 200s, one completed effect | Pass | Same script + effect count |
+| ID                     | Steps                                           | Expected                                | Observed                                  | Result                                | Evidence                            |
+| ---------------------- | ----------------------------------------------- | --------------------------------------- | ----------------------------------------- | ------------------------------------- | ----------------------------------- |
+| E5.5-post-publish      | Draft, sign and publish Unicode and markup text | Exact public text, version 1            | Exact body, stored published row          | Pass                                  | `e5-5-public-posts.mjs`             |
+| E5.5-post-edit         | Warm page; save edit; wait; sign new draft      | Old text removed; version 2 can publish | Removed, then new text/version 2          | Pass                                  | Same script, public HTTP + database |
+| E5.5-post-wrong-person | Another account unpublishes Maya's post         | Refused; unchanged page                 | 503 `scope_denial_unavailable`; unchanged | Pass for refusal; status ticket below | Same script                         |
+| E5.5-post-withdraw     | Warm page; unpublish                            | Removed without manual effects action   | Stored tombstone, absent from page        | Pass                                  | Same script                         |
+| E5.5-post-archive-race | Three archives with the same request key        | One withdrawal                          | Three 200s, one completed effect          | Pass                                  | Same script + effect count          |
 
 Initial runs failed on the three defects above. Scenario setup also needed fixes:
 an unsupported sign-in return target, the Note-only signing helper, a misspelled

@@ -114,9 +114,17 @@ try {
     "another account cannot remove the creator's public post",
     async () => {
       const other = await signIn(BASE, ACTORS.fanTwo);
-      const r = await http("POST", `/v1/content/${creator.id}/${id}/unpublish`, other.token, {version:2,idempotencyKey:randomUUID()});
-      expect([403,404,503].includes(r.status), JSON.stringify(r));
-      expect((await page()).body.posts.some((p) => p.id === id && p.version === 2), "other account removed the post");
+      const r = await http(
+        "POST",
+        `/v1/content/${creator.id}/${id}/unpublish`,
+        other.token,
+        { version: 2, idempotencyKey: randomUUID() },
+      );
+      expect([403, 404, 503].includes(r.status), JSON.stringify(r));
+      expect(
+        (await page()).body.posts.some((p) => p.id === id && p.version === 2),
+        "other account removed the post",
+      );
       return `refused ${r.status} (${r.body?.error?.code}); public post unchanged`;
     },
   );
@@ -147,20 +155,53 @@ try {
       expect(stored.state === "withdrawn", JSON.stringify(stored));
     },
   );
-  await step("E5.5-post-archive-race", "three repeated archives withdraw one publication once", async () => {
-    const second = randomUUID();
-    const draft = await saveDraft(creator, second, 0, "Archive this public post.", {kind:"public"}, {kind:"post",title:"Temporary public post"});
-    const made = await signAndPublish(creator, second, draft.version, draft.document);
-    expect(made.response.status === 200, JSON.stringify(made.response));
-    await projected((posts) => posts.some((p) => p.id === second));
-    const body = {version:1,idempotencyKey:randomUUID()};
-    const outcomes = await Promise.all(Array.from({length:3}, () => http("POST", `/v1/content/${creator.id}/${second}/archive`, creator.token, body)));
-    expect(outcomes.every((r) => r.status === 200 && r.body.state === "archived"), JSON.stringify(outcomes));
-    await projected((posts) => posts.every((p) => p.id !== second));
-    const row = (await sql("SELECT count(*)::int AS n,bool_and(state='done') AS done FROM creator.content_effect WHERE content_id=$1 AND type='withdrawn'", [second])).rows[0];
-    expect(row.n === 1 && row.done, JSON.stringify(row));
-    return "three 200 responses; one completed withdrawal effect";
-  });
+  await step(
+    "E5.5-post-archive-race",
+    "three repeated archives withdraw one publication once",
+    async () => {
+      const second = randomUUID();
+      const draft = await saveDraft(
+        creator,
+        second,
+        0,
+        "Archive this public post.",
+        { kind: "public" },
+        { kind: "post", title: "Temporary public post" },
+      );
+      const made = await signAndPublish(
+        creator,
+        second,
+        draft.version,
+        draft.document,
+      );
+      expect(made.response.status === 200, JSON.stringify(made.response));
+      await projected((posts) => posts.some((p) => p.id === second));
+      const body = { version: 1, idempotencyKey: randomUUID() };
+      const outcomes = await Promise.all(
+        Array.from({ length: 3 }, () =>
+          http(
+            "POST",
+            `/v1/content/${creator.id}/${second}/archive`,
+            creator.token,
+            body,
+          ),
+        ),
+      );
+      expect(
+        outcomes.every((r) => r.status === 200 && r.body.state === "archived"),
+        JSON.stringify(outcomes),
+      );
+      await projected((posts) => posts.every((p) => p.id !== second));
+      const row = (
+        await sql(
+          "SELECT count(*)::int AS n,bool_and(state='done') AS done FROM creator.content_effect WHERE content_id=$1 AND type='withdrawn'",
+          [second],
+        )
+      ).rows[0];
+      expect(row.n === 1 && row.done, JSON.stringify(row));
+      return "three 200 responses; one completed withdrawal effect";
+    },
+  );
 } finally {
   await sql(
     "UPDATE creator.passkey_credential SET revoked_at=now() WHERE id=$1",
