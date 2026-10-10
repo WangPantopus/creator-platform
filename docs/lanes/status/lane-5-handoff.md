@@ -20,7 +20,7 @@ stopped work: `/Users/yingpengwang/.codex/worktrees/bf8e/creator-platform`.
 Work alone, no agents or other sessions. No new unit tests. Real server/PostgreSQL
 workflows, named edge fakes, honest failures. Never read/print credentials or .env.
 
-Current branch `lane-5/reaction-withdrawal`: implementation `62d80dfec`, normal
+Current branch `lane-5/reaction-withdrawal`, PR #400: implementation `62d80dfec`, normal
 merge from main `b3979c9d5`, with subsequent evidence/status commits as needed.
 Main advanced from `c0b4ac0f0` to `21b3d4836` when the integrator merged #381.
 That adds the Anthropic adapter and changes the local stack's fake model default.
@@ -32,9 +32,14 @@ Use ordinary `git merge` for shared bases. No merge permission remains from
 #365/#366. New concerns start from latest origin/main. Stay in the lane's files;
 shared composition, registry and other lanes' files require tickets.
 
-## 2. PRs and held branches
+## 2. PRs and migration queue
 
-**#385 is the one open migration PR.** #372 merged into main at 23:17:30 UTC;
+**#385 is first in the migration registration queue.** The founder subsequently
+requested all PRs opened for this handoff. That authorizes draft #397–#400 in
+addition to #385; review/registration and merging remain gated and serial. This
+publication exception does not waive safety review or grant merge permission.
+
+#372 merged into main at 23:17:30 UTC;
 #373 merged into its already-closed delivery branch at 23:17:44 UTC. Main lacks
 #373. #385 carries BOTH `pending_w5_note_mute_read.sql` and
 `pending_w7_notice_snapshot.sql`; its description was corrected. Neither closed
@@ -43,27 +48,33 @@ PR needs retargeting. #365/#366/#372 are merged into main.
 All branches below have prefix `lane-5/`. Heads exclude later status-only commits
 on the current branch. PRs are at `https://github.com/WangPantopus/creator-platform/pull/<number>`.
 
-| PR   | Branch              | Head        | Base              | State / purpose                                       |
-| ---- | ------------------- | ----------- | ----------------- | ----------------------------------------------------- |
-| #385 | notice-snapshots    | `6b14b9dcc` | main              | Open; mute + owner records, sole migration PR         |
-| #388 | public-withdrawal   | `7a3e29516` | main              | Draft; remove old public post versions                |
-| #389 | public-page         | `3a8e6a5f1` | public-withdrawal | Draft; cache/rate limit, plain text, C8               |
-| #392 | share-card          | `400391383` | main              | Draft; approved human-only contract and refusal proof |
-| #393 | launch-kit          | `e9d9e5cea` | main              | Draft; creator link and checklist                     |
-| #394 | push-offline        | `d6905e1b5` | main              | Draft; one-day Android ID retention, iOS held         |
-| #395 | digest-owners       | `598738028` | main              | Draft; real missing digest connections and tickets    |
-| #396 | metrics-contract    | `223b9eb2c` | main              | Draft; C9 and observed missing events                 |
-| none | invite-entry        | `74d53f812` | main at c0b4ac0f0 | Held: pending invite-note column                      |
-| none | profile-fields      | `aa48528ca` | main at c0b4ac0f0 | Held: pending table, independent catalogue review     |
-| none | web-push            | `b655d2434` | main at c0b4ac0f0 | Held: pending platform constraint                     |
-| none | reaction-withdrawal | current     | main at 21b3d4836 | Held: approved limited reader, privacy review         |
+| PR   | Branch              | Head        | Base              | State / purpose                                             |
+| ---- | ------------------- | ----------- | ----------------- | ----------------------------------------------------------- |
+| #385 | notice-snapshots    | `6b14b9dcc` | main              | Open; mute + owner records, first registration              |
+| #388 | public-withdrawal   | `7a3e29516` | main              | Draft; remove old public post versions                      |
+| #389 | public-page         | `3a8e6a5f1` | public-withdrawal | Draft; cache/rate limit, plain text, C8                     |
+| #392 | share-card          | `400391383` | main              | Draft; approved human-only contract and refusal proof       |
+| #393 | launch-kit          | `e9d9e5cea` | main              | Draft; creator link and checklist                           |
+| #394 | push-offline        | `d6905e1b5` | main              | Draft; one-day Android ID retention, iOS held               |
+| #395 | digest-owners       | `598738028` | main              | Draft; real missing digest connections and tickets          |
+| #396 | metrics-contract    | `223b9eb2c` | main              | Draft; C9 and observed missing events                       |
+| #397 | invite-entry        | `f51bfa228` | main              | Draft; invite note/form; registration after #385            |
+| #398 | profile-fields      | `e6c3e4443` | main              | Draft; catalogue startup blocked; review after #385         |
+| #399 | web-push            | `c54f0125d` | main              | Draft; encrypted browser transport; registration after #385 |
+| #400 | reaction-withdrawal | current     | main              | Draft; limited reader; privacy review after #385            |
 
-Four held migration branches have **no PR on purpose**. Queue them behind #385;
-the integrator registers/reviews one at a time. Do not edit registry or custody
+All four formerly held branches now have open drafts, **#397–#400**, as requested.
+Their migrations remain queued behind #385; the integrator registers/reviews one
+at a time. #397/#398/#399 were brought forward to main `21b3d4836` by ordinary
+merge. Their previous workflow results were not rerun during this handoff pass;
+PR descriptions say so explicitly. #400 already had post-merge proof. No product
+code changed during publication. Do not edit registry or custody
 checksums. Branches are independent except #389 on #388. All created PRs were
 attached to this task. CI was checked once per new PR: web/backend and some
 Android jobs passed, longer checks were pending, no failed check observed. These
 snapshots do not claim every current head is green. Do not repeatedly poll CI.
+The initial check of #397–#400 was made once during publication; CI was still
+starting/running. No completed green run is claimed for those draft heads.
 
 ## 3. Founder decisions
 
@@ -135,7 +146,7 @@ never implied. No new unit tests; backend regression uses the existing suites.
 ## 5. Tickets and next work
 
 1. **Integrator, migrations/custody:** register both SQL files in #385. Review each
-   held proposal separately. Profile adds a table and changes the independently
+   queued proposal separately. Profile adds a table and changes the independently
    reviewed catalogue; do not silence its checksum guard. Reaction adds a limited
    role/function and scoped read policies; review permissions before registration.
 2. **Integrator, apps/backend/src/server.ts and composition:** connect content
@@ -207,3 +218,10 @@ Evidence logs/screenshots: `/tmp/qelvora-lane5-*`. Exact names/excerpts live in
 concern notes. Before a long stop: finish checks, update both status files, commit,
 push, stop only lane 5 processes/containers and temporary development key files,
 then verify ports. Do not claim cleanup before verifying it.
+
+## 7. Next-session kickoff
+
+Copy [lane-5-next-session.md](lane-5-next-session.md) into the next lane 5 session.
+It starts with reconciliation, preserves all approvals and directs work toward
+the current owner/registration gates. The source-of-truth handoff lives on
+`origin/lane-5/reaction-withdrawal`, not necessarily main. No old work should be redone.
