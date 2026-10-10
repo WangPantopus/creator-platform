@@ -4,11 +4,26 @@ Three pictures, each iOS on the left and Android on the right, scaled to 800 px 
 on `qelvora-lane7-ios` and `qelvora-lane7-android` against the lane 7 fake API, signed in by the debug
 hook (`--harness-actor devon` / `harness_actor=devon`). Nothing here is the real backend.
 
-| File | What it shows |
-| --- | --- |
-| `7-1-home.png` | Home, Light, signed in as the fan "Devon": the same six conversations on both apps. iOS shows each person's last message as a preview; Android shows only a button label (a platform difference, not fixed here) |
-| `7-1-night.png` | Maya's thread, Night: the identity strip, a signed reply, an "Answered publicly." line, the step-in button and the composer, on both apps |
+| File                   | What it shows                                                                                                                                                                                                                      |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `7-1-home.png`         | Home, Light, signed in as the fan "Devon": the same six conversations on both apps. iOS shows each person's last message as a preview; Android shows only a button label (a platform difference, not fixed here)                   |
+| `7-1-night.png`        | Maya's thread, Night: the identity strip, a signed reply, an "Answered publicly." line, the step-in button and the composer, on both apps                                                                                          |
 | `7-1-largest-text.png` | The same thread at the largest text size. iOS truncates the strip, the composer and the tab labels and leaves almost no room for the thread; on Android the identity strip has scrolled out of view. Baselines for WP 7.3 and 7.11 |
 
 Produced with `tests/scenarios/lane-7/run-app.mjs ... --shot` and `side-by-side.mjs`. `manifest.json` lists each file
 with its size and SHA-256.
+
+## WP 7.2 (system navigation)
+
+| File                  | What it shows                                                                                                                                                                                                                                                                  |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `7-2-android-run.txt` | The output of `tests/scenarios/lane-7/e7-2-navigation.mjs`: all 21 flows (N1 to N21) on the Android emulator, one run, all passed. A text log, not a picture: the screens are what each line says it saw. Repeated after merging main; N13 uses the corrected API request path |
+
+`7-2-ios-run.txt` records the approved XCUITest operation of 13 real-app navigation flows, all passing with no skips. It includes screen and fake-API checks after the edge-swipe fix. Full screenshots, accessibility trees and sanitized request attachments remain in the off-repository xcresult bundle; the navigation report distinguishes these results from the earlier manual checks.
+
+`7-2-real-stack-run.txt` records the focused navigation flow on both apps against the real
+API and PostgreSQL, plus ownership/state and wrong-person denial checks. Identity and the
+model provider are synthetic. It includes the cold-link failure and successful fix rerun.
+
+`7-2-gates.txt` records local native suites, release-hook absence, the harness contract check,
+and repository gates. Expected skips and checks not run are named explicitly.

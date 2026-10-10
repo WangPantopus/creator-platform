@@ -304,6 +304,7 @@ export function register(router) {
         generation: null,
         idempotency: new Map(),
         memory: [],
+        privacyNoticeAt: new Date(world.now()).toISOString(),
       };
       world.threads.set(`${creator.id}/${account.fan.id}`, thread);
     }

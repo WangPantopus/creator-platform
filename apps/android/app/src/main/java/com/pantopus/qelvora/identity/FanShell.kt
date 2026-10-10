@@ -14,6 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.semantics.contentDescription
@@ -98,7 +99,7 @@ class FanSessionRequestCapture private constructor(
         }
     }
 }
-class FanSession(private val context: Context, private val baseURL: String?, returnTo: String, restoreSavedDestination: Boolean = returnTo == "/home") {
+class FanSession(private val context: Context, private val baseURL: String?, returnTo: String, restoreSavedDestination: Boolean = returnTo == "/home", initialHistory: List<NavEntry> = emptyList(), initialTab: String? = null) {
     private val storage = SecureSessionStorage(context, baseURL)
     fun currentToken(): String? = storage.read()
     val api = baseURL?.let { CreatorAPIClient(it) { storage.read() } }
@@ -106,9 +107,31 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     var hasSavedCredential by mutableStateOf(false); private set
     var checkingSession by mutableStateOf(baseURL != null); private set
     private var currentDestination by mutableStateOf(if (ApplicationDestination.isPermitted(returnTo)) returnTo else "/home")
+    // Back (work package 7.2). The screens you moved through, newest last, and the tab you are in.
+    // Paths only. See NavigationParents for the rules.
+    private enum class Move { PUSH, REPLACE }
+    private var move = Move.PUSH
+    var history by mutableStateOf(initialHistory); private set
+    var tab by mutableStateOf(initialTab?.takeIf { it in NavigationParents.roots } ?: NavigationParents.tab(currentDestination)); private set
+    val canGoBack: Boolean get() = history.isNotEmpty() || NavigationParents.parent(currentDestination) != null
+    private fun track(next: String, mode: Move) {
+        if (NavigationParents.isRoot(next)) { history = emptyList(); tab = next }
+        else if (mode == Move.PUSH) history = (history + NavEntry(currentDestination, tab)).takeLast(NavigationParents.LIMIT)
+    }
     var destination: String
         get() = currentDestination
-        set(value) { if (value != currentDestination) { destinationGeneration++; navigationRestoreAllowed = false; navigationPersistencePending = true; currentDestination = value; persistDestination() } }
+        set(value) { val mode = move; move = Move.PUSH; if (value != currentDestination) { track(value, mode); destinationGeneration++; navigationRestoreAllowed = false; navigationPersistencePending = true; currentDestination = value; persistDestination() } }
+    /** Where Back goes from here, so a control that names its destination can say so truthfully. */
+    val backTarget: String? get() = history.lastOrNull()?.path ?: NavigationParents.parent(currentDestination)
+    /** One step back: the last screen you were on, or else the screen this one belongs under. */
+    fun back(): Boolean {
+        val last = history.lastOrNull()
+        val target = last ?: NavigationParents.parent(currentDestination)?.let { NavEntry(it, NavigationParents.tab(it)) } ?: return false
+        if (last != null) history = history.dropLast(1)
+        removedArrivalFor = null; tab = target.tab; move = Move.REPLACE
+        destination = target.path
+        return true
+    }
     var error by mutableStateOf("")
     var busy by mutableStateOf(false)
     var choosingActor by mutableStateOf(false)
@@ -142,7 +165,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
             navigationInitialized = true
             val restore = navigationRestoreAllowed
             navigationRestoreAllowed = false
-            if (restore && saved != null) destination = saved
+            if (restore && saved != null) { move = Move.REPLACE; destination = saved }
             persistDestination()
         } catch (_: Exception) {
             navigationInitialized = true; navigationRestoreAllowed = false
@@ -177,7 +200,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         val pushCredential = runCatching { currentToken() }.getOrNull()
         purgingPrivateState = true; localPurgeFailed = true
         try {
-            generation++; confirmedCredential = null; session = null; hasSavedCredential = false; checkingSession = false; actors = emptyList(); choosingActor = false; error = ""
+            generation++; confirmedCredential = null; session = null; hasSavedCredential = false; checkingSession = false; actors = emptyList(); choosingActor = false; error = ""; history = emptyList()
             navigationInitialized = false; navigationRestoreAllowed = false; navigationPersistencePending = true
             GrowthPush.clearSession(context, pushCredential)
             var cleared = true
@@ -259,7 +282,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (_: Exception) { /* No invented public projection. */ }
     }
-    fun removeArrival() { arrival = null; removedArrivalFor = destination.substringBefore('?'); destination = removedArrivalFor!! }
+    fun removeArrival() { arrival = null; removedArrivalFor = destination.substringBefore('?'); move = Move.REPLACE; destination = removedArrivalFor!! }
     suspend fun beginSignIn() {
         if (busy) return; busy = true
         try {
@@ -348,7 +371,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
             if (!capture.isCurrent()) return false
             val target = GrowthPush.resolveTap(GrowthClient(origin, ::currentToken), id, credential)
             if (!capture.isCurrent()) return false
-            open(target)
+            replace(target, arrival = true)
             return true
         } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (_: Exception) {
@@ -384,7 +407,16 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         catch (_: Exception) { if (current == generation) error = "Session refresh could not complete. Reconnect and try again." }
         finally { busy = false; rotatingCredential = false }
     }
-    fun open(target: String) { if (ApplicationDestination.isPermitted(target)) { navigationRestoreAllowed = false; removedArrivalFor = null; destination = target } else error = "This link is unavailable. Open the object from the app." }
+    /** Go forward. A link or a push (`arrival`) says which tab it belongs to; a route that only forwards replaces itself. */
+    fun open(target: String, arrival: Boolean = false) = go(target, if (NavigationParents.isTransient(currentDestination)) Move.REPLACE else Move.PUSH, arrival)
+    /** Go forward without leaving this screen on the trail, so Back never returns to it. */
+    fun replace(target: String, arrival: Boolean = false) = go(target, Move.REPLACE, arrival)
+    private fun go(target: String, mode: Move, arrival: Boolean) {
+        if (!ApplicationDestination.isPermitted(target)) { error = "This link is unavailable. Open the object from the app."; return }
+        navigationRestoreAllowed = false; removedArrivalFor = null; move = mode
+        destination = target
+        if (arrival && !NavigationParents.isRoot(target)) tab = NavigationParents.tab(target)
+    }
     private fun message(failure: Exception): String = if (failure is CreatorAPIError) runCatching { Json.decodeFromString<APIError>(failure.body).error.message }.getOrDefault("This action could not complete. Reconnect and try again.") else "This action could not complete. Reconnect and try again."
 }
 
@@ -394,6 +426,13 @@ class FanFeatureRegistration(
     val rootObserver: @Composable (FanSession) -> Unit = {},
     val screen: @Composable (FanSession) -> Unit,
 )
+
+/**
+ * Names this process. The trail is saved with the activity so rotation keeps it, but a trail
+ * saved by an earlier process is dropped: iOS keeps it in memory only, so after any restart
+ * both platforms restore the place and Back goes to the screen it belongs under.
+ */
+private val processToken = java.util.UUID.randomUUID().toString()
 
 @Composable
 fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/home", features: List<FanFeatureRegistration> = emptyList(), destinationDelivery: Long = 0L, notificationID: String? = null, restoreSavedDestination: Boolean = returnTo == "/home", onNotificationConsumed: () -> Unit = {}) {
@@ -409,7 +448,10 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                 saved.getString("return") == permittedReturn && saved.getLong("delivery") == destinationDelivery &&
                 ApplicationDestination.isPermitted(it)
         }
-        FanSession(context, baseURL, restored ?: returnTo, restoreSavedDestination && restored == null)
+        val sameProcess = restored != null && saved.getString("process") == processToken
+        FanSession(context, baseURL, restored ?: returnTo, restoreSavedDestination && restored == null,
+            initialHistory = if (sameProcess) NavigationParents.decode(saved.getStringArray("history")) else emptyList(),
+            initialTab = if (sameProcess) saved.getString("tab") else null)
     }
     // Observe genuine boundaries while a restored/private feature is unmounted.
     // Feature observers issue no session authority and serialize no private data.
@@ -423,6 +465,9 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                 putString("return", currentReturn)
                 putLong("delivery", currentDelivery)
                 putString("destination", model.destination.takeIf(ApplicationDestination::isPermitted) ?: "/home")
+                putString("process", processToken)
+                putStringArray("history", NavigationParents.encode(model.history))
+                putString("tab", model.tab)
             }
         }
         onDispose { registry?.unregisterSavedStateProvider("qelvora.fan.navigation") }
@@ -440,9 +485,15 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
     LaunchedEffect(returnTo, destinationDelivery) {
         // A new explicit delivery takes priority; an unchanged initial intent
         // must not overwrite the route restored for this origin.
-        if (!ApplicationDestination.isPermitted(returnTo) || appliedReturn != returnTo || appliedDelivery != destinationDelivery) model.open(returnTo)
+        if (!ApplicationDestination.isPermitted(returnTo) || appliedReturn != returnTo || appliedDelivery != destinationDelivery) model.open(returnTo, arrival = true)
         appliedReturn = returnTo; appliedDelivery = destinationDelivery
     }
+    // System Back, the Back gesture and predictive Back. Handled only when there is somewhere in
+    // the app to go, so at Home the system shows its own animation and leaves the app. A screen
+    // with a sheet or step of its own registers its handler later, and that one wins.
+    val signedOutScreen = model.session == null && features.any { it.matches(model.destination) && it.allowsSignedOut(model.destination) }
+    BackHandler(enabled = model.choosingActor) { model.choosingActor = false }
+    BackHandler(enabled = !model.choosingActor && model.canGoBack && (model.session != null || signedOutScreen)) { model.back() }
     LaunchedEffect(model.destination) { model.loadArrival() }
     LaunchedEffect(model, foreground) { if (foreground) { HarnessLaunch.resetIfRequested(context, model); model.refresh(); HarnessLaunch.signInIfRequested(context, model); while (true) { delay(4000); if (!model.choosingActor && !model.busy && (model.session != null || model.hasSavedCredential)) model.refresh() } } }
     LaunchedEffect(model.session?.sessionId, model.checkingSession, foreground) {
@@ -504,9 +555,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                     else Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) { BasicText("This destination is not connected yet", style = qText("title").copy(color = qColor("ink"))); BasicText("Your account and arrival context are kept.", style = qText("body").copy(color = qColor("ink-muted"))); Button("Your account", ButtonVariant.SECONDARY) { model.destination = "/you" } }
                 }
                 val labels = listOf("navHome" to "/home", "navDiscover" to "/discover", "navRequests" to "/requests", "navYou" to "/you")
-                val path = model.destination.substringBefore('?')
-                val accountDestination = path.startsWith("/identity/") || path == "/support" || path.startsWith("/support/") || path == "/notifications/settings" || path == "/studio/impact" || path == "/commerce/spending" || StudioTeamFeature.matches(path)
-                val selectedTab = if (accountDestination) "navYou" else if (path.startsWith("/commerce/")) "navRequests" else labels.firstOrNull { path == it.second || path.startsWith(it.second + "/") }?.first ?: "navHome"
+                val selectedTab = labels.first { it.second == model.tab }.first
                 if (!isConversation) TabBar(QelvoraCopy.text(selectedTab)) { label -> model.destination = labels.first { QelvoraCopy.text(it.first) == label }.second }
             }
         }
@@ -521,7 +570,7 @@ private fun HandleForm(model: FanSession) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).heightIn(min = available).padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 36.dp), verticalArrangement = Arrangement.SpaceBetween) {
             Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Box(Modifier.size(44.dp).clickable(role = Role.Button) { model.open("/you") }.semantics { contentDescription = "Back" }, contentAlignment = Alignment.Center) { Glyph("back", 22.dp, qColor("ink")) }
+                    Box(Modifier.size(44.dp).clickable(role = Role.Button) { model.back() }.semantics { contentDescription = "Back" }, contentAlignment = Alignment.Center) { Glyph("back", 22.dp, qColor("ink")) }
                     BasicText(if (model.session?.mode == APISessionMode.DEVELOPMENT) "DEVELOPMENT SIGN-IN" else "SIGNED IN WITH PANTOPUS", style = qText("data-sm").copy(color = qColor("ink-muted")))
                 }
                 BasicText("How creators will know you", Modifier.semantics { heading() }, style = qText("display-lg").copy(color = qColor("ink")))

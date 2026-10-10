@@ -13,5 +13,25 @@
     "path": "artifacts/lane-7/7-1-night.png",
     "sha256": "083e80b7b724634adcd68b2633ee79730e5bb44986a4e732057eeeaf8b0930f1",
     "bytes": 132504
+  },
+  {
+    "path": "artifacts/lane-7/7-2-android-run.txt",
+    "sha256": "dca58923f2edd28073f2fe24b13bfe99a5ddae972a9f18518b5ec9df3ec7cba4",
+    "bytes": 3096
+  },
+  {
+    "path": "artifacts/lane-7/7-2-ios-run.txt",
+    "sha256": "53edd1b46fe140883afddb0b7b46033ed0d03ffced3f80454df81c4e4a564c6c",
+    "bytes": 6928
+  },
+  {
+    "path": "artifacts/lane-7/7-2-gates.txt",
+    "sha256": "d72c8b2d83b923b0695f17b5b58cb681ce27f592facf2d2e69871c19ba9755c3",
+    "bytes": 2725
+  },
+  {
+    "path": "artifacts/lane-7/7-2-real-stack-run.txt",
+    "sha256": "9ab47923fb823fbaf5c5c27eb0cab3736d0fb8666daaaee8433f7044f2240523",
+    "bytes": 3332
   }
 ]

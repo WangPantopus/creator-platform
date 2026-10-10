@@ -1,0 +1,63 @@
+2026-10-09 — WP 7.2 focused navigation on the disposable real stack.
+Real: Qelvora API and PostgreSQL; native apps, HTTP and secure storage.
+Synthetic at the edge: development identity and lane 2's model provider.
+Command: node infra/local/stack.mjs up --lane 7 --no-web --growth --ack-only
+Stack smoke: all steps pass; message acknowledged in 470 ms; same-key repeat returns same acknowledgment;
+changed payload refused (403 idempotency_conflict); visitor 401 and other fan 403.
+Model reply quality/guard strictness: not checked; model is permissive and synthetic.
+
+Initial setup attempt: Android instrumentation had uninstalled the debug app.
+Reinstalled the APK before the complete run. No launch claimed for the failed attempt.
+Initial iOS real-stack result: FAILED cold creator > Back > Home; expected Discover.
+The failure's accessibility hierarchy confirmed Home selected.
+A discarded scene-delegate attempt broke startup and was removed.
+Final fix: remember whether the SwiftUI scene has ever been active; the first link
+replaces startup location, later links push even when arriving from the background.
+
+Final Android rerun after the iOS fix:
+Command: node tests/scenarios/lane-7/stack-navigation.mjs android
+PASS real Android: Home
+PASS real Android: Maya thread
+PASS real Android: Home
+PASS real Android: Maya thread
+PASS real Android: warm link to account
+PASS real Android: Maya thread
+PASS real Android: Maya thread
+PASS real Android: Home
+PASS real Android: cold creator link
+PASS real Android: creator parent: Discover
+PASS real Android: Home
+PASS real Android: Back from Home leaves the app
+PASS real API: owner's Maya conversation exists with the smoke's accepted fan message
+PASS real API: Home points at that owner's conversation
+PASS real API: signed-out read 401, other fan read 403
+PASS real stack navigation verification
+
+Final iOS run (real app, XCUITest, real API and PostgreSQL):
+Command: node tests/scenarios/lane-7/ios-navigation.mjs <built.xctestrun> --stack
+Result bundle outside Git: ios-navigation-1791594443703.xcresult.
+Home > thread > Back Home; reopen thread > background app > account link > Back thread;
+terminate/relaunch > restored thread > Back Home; cold Maya link > Back Discover > Back Home.
+LANE7 real stack: Your people
+LANE7 real stack: Maya thread
+LANE7 real stack: Your people
+LANE7 real stack: Maya thread
+LANE7 real stack: Your account
+LANE7 real stack: Maya thread
+LANE7 real stack: Maya thread
+LANE7 real stack: Your people
+LANE7 real stack: Official means
+LANE7 real stack: Your people
+Test Case '-[QelvoraUITests.Lane7StackNavigationFlow testNavigationOnRealStack]' passed (37.617 seconds).
+PASS iOS: 1 operated navigation flows, none skipped.
+
+Post-iOS API state and denial check:
+PASS real API: owner's Maya conversation exists with the smoke's accepted fan message
+PASS real API: Home points at that owner's conversation
+PASS real API: signed-out read 401, other fan read 403
+PASS real stack navigation verification
+
+Screenshots retained in the xcresult. Inspected the warm-link return screenshot:
+Maya's thread, labeled AI authorship, smoke's accepted message, composer and privacy controls.
+No claim about reply quality: ack-only synthetic model shows Reply unavailable.
+Full 21-Android/13-iOS navigation matrices use the fake API; this is a focused real-stack check.
