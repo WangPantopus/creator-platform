@@ -1,11 +1,27 @@
 # WP 5.2: suppress a reaction push after reply withdrawal
 
+## Handoff publication update — 2026-10-09
+
+The founder requested that all work have open PRs. This concern is therefore
+published as a **draft for review**, overriding the earlier hold on opening it.
+It is **not ready to merge or register**: #385 remains first in the migration
+queue, and integrator review/registration stays serial. No migration registry,
+custody checksum, production secret or shared composition file was edited.
+
+This branch already includes main `21b3d4836`; the post-merge six-case
+scenario, restart and 157-test regression results below apply to it. This
+publication pass changes documentation only and adds no new test claim.
+
+The current global status and kickoff prompt live on
+`lane-5/reaction-withdrawal` under `docs/lanes/status/lane-5*.md`. Read those
+before relying on older status snapshots carried by this independent branch.
+
 The worker now checks the exact creator, reply and recipient before preparing a
 reaction notice and again before the provider submits it. A withdrawn reply or a
 reply whose current review is no longer allowed suppresses delivery. An unavailable
 reader fails closed and retries. No reply words enter this reader or the push.
 
-Branch: `lane-5/reaction-withdrawal`. **No PR while #385 is open.** The founder
+Branch: `lane-5/reaction-withdrawal`. **Draft review authorized; migration registration remains queued behind #385.** The founder
 approved this limited reader on 2026-10-09, with integrator privacy review before
 registration. This does not approve an engine revision or broader private reads.
 
