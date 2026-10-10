@@ -1,5 +1,22 @@
 # Lane 5: invites and entry (WP 5.7)
 
+## Handoff publication update — 2026-10-09
+
+The founder requested that all work have open PRs. This concern is therefore
+published as a **draft for review**, overriding the earlier hold on opening it.
+It is **not ready to merge or register**: #385 remains first in the migration
+queue, and integrator review/registration stays serial. No migration registry,
+custody checksum, production secret or shared composition file was edited.
+
+Main `21b3d4836` was brought forward with an ordinary merge for this
+handoff. The workflow evidence below predates that merge; it was **not rerun**
+for this publication pass. Existing passes and failures are preserved as dated
+evidence, not presented as a new integrated run. No product change was added.
+
+The current global status and kickoff prompt live on
+`lane-5/reaction-withdrawal` under `docs/lanes/status/lane-5*.md`. Read those
+before relying on older status snapshots carried by this independent branch.
+
 ## Follow-up failure proof (2026-10-09, 18:33 PT)
 
 Fresh API regression at load 4 passed 8/8, with two not run. Its output is
@@ -48,8 +65,8 @@ unit tests. Full backend 157-test suite was not rerun for this form/copy change.
 The pending migration is still held behind #385. Domain/app IDs and the real lane 3
 `useful_answer` producer remain unconnected. A first AI answer is still not proven.
 
-Branch `lane-5/invite-entry`, cut from main `c0b4ac0f0`. No pull request while
-#385 is the open lane 5 migration PR. Pending SQL:
+Branch `lane-5/invite-entry`, cut from main `c0b4ac0f0`. Draft publication is authorized by the founder's final handoff request;
+migration registration remains queued behind #385. Pending SQL:
 `apps/backend/src/modules/growth/migrations/pending_w7_invite_note.sql`.
 The integrator owns registration. No domain or native association is invented.
 
@@ -93,24 +110,24 @@ SQL checks the stored note, expiry, active-link count and accepted fan message.
 The authored note uses the real creator API; the note form is still gated below.
 No new unit tests.
 
-| ID                       | Steps                                                        | Expected                                    | Observed                                              | Result              | Evidence                           |
-| ------------------------ | ------------------------------------------------------------ | ------------------------------------------- | ----------------------------------------------------- | ------------------- | ---------------------------------- |
-| E5.6-create-race         | Five identical creates                                       | One link and expiry                         | Five 201s, one row/expiry                             | Pass                | `e5-6-invites.mjs`                 |
-| E5.6-open-reuse          | Anonymous reuse, changed body, unknown ID                    | Same text; changed body 409; unknown 404    | Matched                                               | Pass                | Same script                        |
-| E5.6-wrong-person        | Fan creates or revokes creator invite                        | Refused; link retained                      | Refused, original still 200                           | Pass                | Same script                        |
-| E5.6-boundaries          | 600 Unicode characters; 601; invalid ID/context              | Exact boundary; invalid values refused      | 201/400/400/404                                       | Pass                | Same script                        |
-| E5.6-limit               | Concurrent creates fill 20 slots; retry original             | Exactly 20, two refused; retry allowed      | Matched stored count                                  | Pass                | Same script                        |
-| E5.6-revoke/expire/pause | Repeat revoke; expired retry; real pause/resume              | No resurrection; current state              | Matched                                               | Pass                | Same script                        |
-| E5.6-browser-note/card   | Read real note and metadata; render PNG; request dead images | Plain text, PNG, dead images 404            | Matched                                               | Pass                | `e5-6-invite-browser.mjs`          |
-| E5.6-four-screens        | New fan signs in, chooses handle, reviews providers, sends   | Four product screens and one stored message | Four + development provider; one accepted fan message | Pass                | Same script, `--fan-two` final run |
-| E5.6-browser-errors      | Observe browser exceptions                                   | None                                        | None                                                  | Pass                | Same script                        |
-| E5.6-clean-restart       | Restart before the first message                             | Note survives; dead links remain 404        | Matched                                               | Pass                | `e5-6-invites.mjs --after-restart` |
-| E5.6-database-outage     | Pause own database, read, unpause                            | No stale answer; recovery                   | 503 then 200                                          | Pass                | `e5-6-invite-failure.mjs`          |
-| E5.6-clipboard-retry     | Deny clipboard; allow and retry at 20-link limit             | One link                                    | Two web-proxy 200s, same ID, one row                  | Pass                | Same script                        |
-| E5.6-restart/failure     | Restart after an active generation                           | Public reads recover                        | Worker recovery loop; public AI busy                  | Fail outside lane 5 | Logs and owner ticket below        |
-| E5.6-note-form           | Creator writes note through UI                               | Real form                                   | Copy awaiting founder                                 | Not run             | Question below                     |
-| E5.6-useful-answer       | Owner records useful answer once                             | Prompt eligibility from real outcome        | Owner not connected                                   | Not run             | Lane 3 ticket                      |
-| E5.6-app-links           | App installed/absent                                         | Correct app/web route                       | Domain and app identifiers missing                    | Not run             | Q4                                 |
+| ID                       | Steps                                                        | Expected                                    | Observed                                              | Result              | Evidence                                     |
+| ------------------------ | ------------------------------------------------------------ | ------------------------------------------- | ----------------------------------------------------- | ------------------- | -------------------------------------------- |
+| E5.6-create-race         | Five identical creates                                       | One link and expiry                         | Five 201s, one row/expiry                             | Pass                | `e5-6-invites.mjs`                           |
+| E5.6-open-reuse          | Anonymous reuse, changed body, unknown ID                    | Same text; changed body 409; unknown 404    | Matched                                               | Pass                | Same script                                  |
+| E5.6-wrong-person        | Fan creates or revokes creator invite                        | Refused; link retained                      | Refused, original still 200                           | Pass                | Same script                                  |
+| E5.6-boundaries          | 600 Unicode characters; 601; invalid ID/context              | Exact boundary; invalid values refused      | 201/400/400/404                                       | Pass                | Same script                                  |
+| E5.6-limit               | Concurrent creates fill 20 slots; retry original             | Exactly 20, two refused; retry allowed      | Matched stored count                                  | Pass                | Same script                                  |
+| E5.6-revoke/expire/pause | Repeat revoke; expired retry; real pause/resume              | No resurrection; current state              | Matched                                               | Pass                | Same script                                  |
+| E5.6-browser-note/card   | Read real note and metadata; render PNG; request dead images | Plain text, PNG, dead images 404            | Matched                                               | Pass                | `e5-6-invite-browser.mjs`                    |
+| E5.6-four-screens        | New fan signs in, chooses handle, reviews providers, sends   | Four product screens and one stored message | Four + development provider; one accepted fan message | Pass                | Same script, `--fan-two` final run           |
+| E5.6-browser-errors      | Observe browser exceptions                                   | None                                        | None                                                  | Pass                | Same script                                  |
+| E5.6-clean-restart       | Restart before the first message                             | Note survives; dead links remain 404        | Matched                                               | Pass                | `e5-6-invites.mjs --after-restart`           |
+| E5.6-database-outage     | Pause own database, read, unpause                            | No stale answer; recovery                   | 503 then 200                                          | Pass                | `e5-6-invite-failure.mjs`                    |
+| E5.6-clipboard-retry     | Deny clipboard; allow and retry at 20-link limit             | One link                                    | Two web-proxy 200s, same ID, one row                  | Pass                | Same script                                  |
+| E5.6-restart/failure     | Restart after an active generation                           | Public reads recover                        | Worker recovery loop; public AI busy                  | Fail outside lane 5 | Logs and owner ticket below                  |
+| E5.6-note-form           | Creator writes note through UI                               | Exact approved form, stable retry           | Three browser checks passed in the follow-up above    | Pass                | `/tmp/qelvora-lane5-invite-lock-browser.log` |
+| E5.6-useful-answer       | Owner records useful answer once                             | Prompt eligibility from real outcome        | Owner not connected                                   | Not run             | Lane 3 ticket                                |
+| E5.6-app-links           | App installed/absent                                         | Correct app/web route                       | Domain and app identifiers missing                    | Not run             | Q4                                           |
 
 API: 8/8, two not run, including the clean rerun. Browser: final 4/4, one not
 run. Clean restart: 1/1; database outage: 1/1; clipboard retry: 1/1. The initial browser run
@@ -138,9 +155,8 @@ eslint passed; these do not replace the workflows.
 
 ## Decisions and owner tickets
 
-- Founder copy approval pending: “Your invitation note (optional)” and “This
-  note is public to anyone with the link. Up to 600 characters.” Until answered,
-  the existing creator form stays unchanged. No note copy is invented for creators.
+- Founder approved the invitation label and hint; the form is implemented and
+  its three browser checks passed (current evidence above). Do not ask again.
 - Lane 3 / lane 4 / integrator: after the first real fan message, stop/up left
   one AI message `generating`. The worker repeatedly logged
   `generation_terminal_recovery_incomplete`; PostgreSQL reported
