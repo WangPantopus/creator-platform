@@ -2,12 +2,11 @@
 
 ## State
 
-Work continues on `lane-7/keyboard-drafts`. The branch includes main through `21b3d4836`. PR 379 remains open and ready for WP 7.2.
-WP 7.3 is being published as a draft pending the header decision. Operated
+Clean handoff on `lane-7/keyboard-drafts`. The branch includes main through `21b3d4836`. PR 379 remains open and ready for WP 7.2.
+WP 7.3 is [draft PR 401](https://github.com/WangPantopus/creator-platform/pull/401), pending the header decision. Operated
 recovery, real thread deletion, layout and final local gates all pass as recorded.
 
-The compact persistent author header awaits the founder's decision below. Storage
-and recovery work continue independently. No new unit or snapshot tests.
+The compact persistent author header awaits the founder's decision below. Storage and recovery verification is finished; the next independent work is WP 7.4. No new unit or snapshot tests.
 
 ## Shared behavior spec
 

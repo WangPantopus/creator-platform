@@ -3,6 +3,10 @@
 This is a continuation, not a new start. The founder requested a clean handoff.
 Read this alongside `lane-7.md`, `lane-7-keyboard-drafts.md` and the harness runbook.
 
+Open PRs: [379](https://github.com/WangPantopus/creator-platform/pull/379) (ready, navigation) and [401](https://github.com/WangPantopus/creator-platform/pull/401) (draft, keyboard/drafts; stacked on 379).
+Final implementation/evidence commit: `0b0ae6984`; the later handoff commit changes
+only documentation. All local gates passed. CI reader still requires GitHub connection.
+
 ## What is finished
 
 - WP 7.1: PR 369 merged. Do not repeat its harness/sign-in/state proof.

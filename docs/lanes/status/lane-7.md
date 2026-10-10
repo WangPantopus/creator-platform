@@ -26,7 +26,7 @@ Updated: 2026-10-09, by the resumed lane 7 session (one session, both platforms)
   arbitration fix (`NativeBackSwipe`) passed N5, N1 and the full iOS run. It also
   preserves vertical scrolling at the edge; screenshots and API checks corroborate it.
 
-Working on: Clean handoff on `lane-7/keyboard-drafts`; see [handoff](lane-7-handoff.md) and [WP 7.3 spec/results](lane-7-keyboard-drafts.md). WP 7.2 is complete and PR 379 is ready. WP 7.3 operated layout, lifecycle, recovery and real thread-deletion checks pass on both platforms; final local regression gates also pass (exact counts/skips in `artifacts/lane-7/7-3-gates.txt`).
+Working on: Clean handoff on `lane-7/keyboard-drafts`, [draft PR 401](https://github.com/WangPantopus/creator-platform/pull/401); see [handoff](lane-7-handoff.md) and [WP 7.3 spec/results](lane-7-keyboard-drafts.md). WP 7.2 is complete and PR 379 is ready. WP 7.3 operated layout, lifecycle, recovery and real thread-deletion checks pass on both platforms; final local regression gates also pass (exact counts/skips in `artifacts/lane-7/7-3-gates.txt`).
 
 Waiting on: Founder approval of the compact persistent author label in constrained layouts (charter 4.2); keep WP 7.3 draft until answered. GitHub connection for the app's CI reader. Four earlier defaults remain in [navigation](lane-7-navigation.md). Backend domain erasure is blocked/retrying; see the lane 1/domain-owner ticket in the 7.3 report.
 
