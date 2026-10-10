@@ -1,5 +1,11 @@
 # Lane 6: finishing the Studio split (handoff and recipe)
 
+**Round 1 is complete.** See [current status](lane-6.md) and the
+[final report](lane-6-round-1-report.md). The sections below preserve the original handoff;
+their PR states and intermediate printed line counts are historical. The founder approved
+recovery PR #382 after the earlier child PRs merged into closed parents instead of reaching
+main. The five final area PRs are #383, #386, #387, #390 and #391. Wait for "Next for lane 6".
+
 Written 2026-10-09 by the first lane 6 session, for the session that continues round 1. The integrator
 moves this to its permanent place. Round 1 is WP 6.1 only: split `Studio.tsx` with no behavior
 change, one pull request per area, then stop and report. Do not start WP 6.2 or anything else until

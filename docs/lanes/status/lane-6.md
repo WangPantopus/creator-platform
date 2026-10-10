@@ -2,7 +2,8 @@
 
 Updated: 2026-10-09, by the continuing lane 6 session.
 
-Working on: WP 6.1 only. The split preserves behavior; one pull request per area.
+Working on: WP 6.1 complete. The split preserves behavior; one pull request per area.
+Round 1 is finished; no later work package has started.
 `Studio.tsx` is now 408 lines after Prettier (originally 4,795).
 The extraction tool's printed count is its buffer before the final formatting pass; the counts
 in this status and the pull requests are measured from saved files.
@@ -32,13 +33,14 @@ This session:
 - [x] #386 `lane-6/studio-split-library`: Publish (the library)
 - [x] #387 `lane-6/studio-split-requests`: Requests and PacketDetail
 - [x] #390 `lane-6/studio-split-threads`: Threads and CorrectionForm
-- [x] `lane-6/studio-split-shell`: navigation helpers and the requests count
+- [x] #391 `lane-6/studio-split-shell`: navigation helpers and the requests count
 
 Done: Notes and Compose; Publish (the library); Requests and PacketDetail; Threads and CorrectionForm; navigation helpers and the requests count. Static checks, the declaration move
 check, the full browser comparison, all 7 workspace typechecks (zero cached tasks), and the
 production build passed for each checked area above.
 
-Next: the one-time main refresh, fresh baseline and final full proof, final report and cleanup.
+Next: integrator review and merge the recovery PR, then retarget and merge each child in order.
+Wait for the founder’s "Next for lane 6" before starting another package.
 Do not begin WP 6.2 or any other package until the founder sends "Next for lane 6".
 
 Blocked on: nothing for round 1. Later packages retain their existing contract dependencies.
@@ -62,6 +64,25 @@ Scenarios:
   production-browser capture, `tests/visual`, and the optional second baseline: not run.
   The real backend remains deferred by the WP 6.1 recipe even though lane 2's stack is on main.
 - Re-run commands and limitations: `docs/lanes/status/lane-6-e6-1-runbook.md`.
+
+Final whole-stack proof: after the one-time fetch, main remained at `c0b4ac0f0`. The
+recovery branch and all five area branches were already up to date and explicitly pushed.
+The closed historical branches were left alone. A fresh baseline from that main commit
+was compared with the complete split at `de2699865`:
+
+```text
+82 shots, 81 identical in pixels, calls, console and Tab order; 636 /api calls and 1090 Tab stops compared; chrome 154.0.8037.98
+1 shot(s) equal within rendering tolerance (at most 64 pixels, at most 8/255):
+  light/requests-empty/empty: 11 pixels differ, by at most 1/255
+PASS: identical
+```
+
+All 35 declarations remained present once and unchanged (34 moved). The final forced
+workspace typecheck passed 7/7 with zero cached tasks; ESLint and Prettier passed; the
+production build exited 0. This covers every recovered and newly extracted area together.
+Only documentation changed after that proof. The [round 1 report](lane-6-round-1-report.md)
+contains the PR links and exact rerun commands. No PR was merged, no main branch was pushed,
+and no unit test or harness expectation was added or changed.
 
 Ports and containers: 56462 (web, `next dev`), 56463 (stand-in API). No containers.
 
@@ -88,6 +109,13 @@ in `Studio.tsx` at the base, `b6e0f426a`). Each is for my own backlog:
    `<button>` (lines 2362 to 2383) and `QueueCard` renders its own buttons
    (`packages/ui-web/src/components.ts` 1744 onward). React logs "button cannot be a descendant of
    button" and a hydration error on every visit to Requests.
+
+Current locations of the unchanged product findings above: dropped taps at
+`apps/web/features/studio/shared/action.tsx:10`; badge polling reset at
+`apps/web/features/studio/shell/useRequestsCount.ts:67`; Team focus restoration at
+`apps/web/features/studio/team/Team.tsx:162`; nested request buttons at
+`apps/web/features/studio/requests/Requests.tsx:185`. The pre-format line-count print is at
+`tests/scenarios/lane-6/e6-1-extract.mjs:134`; it was documented, not changed.
 
 Tickets to other lanes: none. (Finding 4 touches `packages/ui-web`, which lane 6 uses; the fix is
 in `Requests`, so no ticket.)
