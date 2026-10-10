@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// Fake of the model provider's HTTP API, for the local development stack only.
+// Fake of the model provider's HTTP API (OpenAI Responses and Embeddings, and
+// Claude Messages), for the local development stack only.
 //
 // It sits at the outer edge: the backend sends the same requests it would send
 // to the provider (redirected here by preload.mjs) and gets schema-valid,
@@ -10,7 +11,7 @@
 //
 // Control (for failure scenarios), all on the same port:
 //   POST /__control  {"mode":"ok|error500|error429|hang|garbage","delayMs":0}
-//   GET  /__stats    counts per purpose, the current mode, recent requests
+//   GET  /__stats    counts per purpose and per API path, the current mode, recent requests
 import { createServer } from "node:http";
 import { createHash } from "node:crypto";
 
@@ -18,7 +19,7 @@ const port = Number(process.argv[2] ?? process.env.FAKE_MODEL_PORT);
 if (!Number.isInteger(port) || port < 1024 || port > 65535)
   throw new Error("usage: model.mjs <port>");
 
-const state = { mode: "ok", delayMs: 0, counts: {}, recent: [] };
+const state = { mode: "ok", delayMs: 0, counts: {}, paths: {}, recent: [] };
 const record = (purpose, detail = {}) => {
   state.counts[purpose] = (state.counts[purpose] ?? 0) + 1;
   state.recent.push({ at: new Date().toISOString(), purpose, ...detail });
@@ -212,6 +213,79 @@ async function handleResponses(body, response) {
   response.end();
 }
 
+/** Claude Messages: same answers as the Responses route, in Claude's shapes. */
+async function handleMessages(body, response) {
+  const schema = body.output_config?.format?.schema;
+  const textOf = (content) =>
+    typeof content === "string"
+      ? content
+      : (content ?? []).map((block) => block.text ?? "").join("");
+  const contextText = (body.messages ?? [])
+    .map((message) => textOf(message.content))
+    .join("\n\n");
+  const instructions = textOf(body.system);
+  const text = JSON.stringify(answer(schema, contextText));
+  const usage = {
+    input_tokens: tokens(`${instructions}${contextText}`),
+    output_tokens: tokens(text),
+    cache_creation_input_tokens: 0,
+    cache_read_input_tokens: 0,
+  };
+  const meta = {
+    id: "msg_fake",
+    type: "message",
+    role: "assistant",
+    model: body.model,
+  };
+  if (!body.stream) {
+    response.writeHead(200, { "content-type": "application/json" });
+    response.end(
+      JSON.stringify({
+        ...meta,
+        content: [{ type: "text", text }],
+        stop_reason: "end_turn",
+        stop_sequence: null,
+        usage,
+      }),
+    );
+    return;
+  }
+  response.writeHead(200, {
+    "content-type": "text/event-stream",
+    "cache-control": "no-cache",
+  });
+  const send = (type, data) =>
+    response.write(
+      `event: ${type}\ndata: ${JSON.stringify({ type, ...data })}\n\n`,
+    );
+  send("message_start", {
+    message: {
+      ...meta,
+      content: [],
+      stop_reason: null,
+      usage: { ...usage, output_tokens: 1 },
+    },
+  });
+  send("content_block_start", {
+    index: 0,
+    content_block: { type: "text", text: "" },
+  });
+  for (let at = 0; at < text.length; at += 48) {
+    if (state.delayMs) await sleep(Math.min(state.delayMs, 2000));
+    send("content_block_delta", {
+      index: 0,
+      delta: { type: "text_delta", text: text.slice(at, at + 48) },
+    });
+  }
+  send("content_block_stop", { index: 0 });
+  send("message_delta", {
+    delta: { stop_reason: "end_turn", stop_sequence: null },
+    usage: { output_tokens: usage.output_tokens },
+  });
+  send("message_stop", {});
+  response.end();
+}
+
 const server = createServer(async (request, response) => {
   try {
     const url = new URL(request.url ?? "/", "http://fake");
@@ -241,6 +315,7 @@ const server = createServer(async (request, response) => {
       return;
     }
     const body = await readBody(request);
+    state.paths[url.pathname] = (state.paths[url.pathname] ?? 0) + 1;
     if (state.mode === "hang") return; // never answers; the caller times out
     if (state.mode === "error500" || state.mode === "error429") {
       record("injected_failure", { mode: state.mode });
@@ -276,6 +351,10 @@ const server = createServer(async (request, response) => {
     }
     if (url.pathname === "/v1/responses") {
       await handleResponses(body, response);
+      return;
+    }
+    if (url.pathname === "/v1/messages") {
+      await handleMessages(body, response);
       return;
     }
     response.writeHead(404).end("unsupported endpoint");
