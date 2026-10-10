@@ -8,6 +8,10 @@ Blocked on: hosting road/provider/region, monthly ceiling, web/API domain and ow
 
 ## Resume here
 
+The complete kickoff prompt is [lane-2-next-session.md](lane-2-next-session.md). Start by
+fetching and reading this status from `origin/lane-2/load-soak`; it is not on main yet.
+Do not switch a branch already attached to another worktree. Read through `git show` instead.
+
 Read [the WP 2.8 note](lane-2-load-soak.md) for commands, measurements, limitations and exact
 owner tickets. The founder has authorized continued code work, including WP 2.8; do not ask
 for that authorization again. Hosting choices and accounts remain missing.
@@ -20,7 +24,7 @@ receipts settled. Multiple worker processes and sustained streaming are not run.
 preserves the first socket failure as well as the later idle success; do not erase either.
 
 The resume audit is [PR #380](https://github.com/WangPantopus/creator-platform/pull/380).
-At fetched main `c0b4ac0f030a893dfc92457f0f4348dd87174398`, all four original PRs are marked
+At the initial audit main `c0b4ac0f030a893dfc92457f0f4348dd87174398`, all four original PRs were marked
 merged, but only [#367](https://github.com/WangPantopus/creator-platform/pull/367) reached main.
 [#370](https://github.com/WangPantopus/creator-platform/pull/370),
 [#377](https://github.com/WangPantopus/creator-platform/pull/377), and
@@ -28,6 +32,40 @@ merged, but only [#367](https://github.com/WangPantopus/creator-platform/pull/36
 bases. The integrator must land their original reviewed commits in order through replacement
 PRs. Lane 2 has not merged, retargeted or rewritten any branch. Preserve this newer status
 when resolving those older status-file changes.
+
+### Final handoff verification
+
+Both session PRs are open, target main and are ready for review:
+
+| PR                                                                | Branch                          | Contents                                                                                                                             |
+| ----------------------------------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| [#380](https://github.com/WangPantopus/creator-platform/pull/380) | `lane-2/resume-status-20261009` | Resume audit, original reviewed heads, founder approvals; pushed head `1c3b19e176e7854b2204469431b79f21381d1393`                     |
+| [#384](https://github.com/WangPantopus/creator-platform/pull/384) | `lane-2/load-soak`              | Scenario code `b69a58ad25b5ab8ab474de55194a760ee39a809b`, final results `30fd0d96bdc3eb29362ef66c410f884cd4c36614`, and this handoff |
+
+Final fetch found main at `21b3d4836340b0ad494dd0faa8adb041d8e244fa`, after integrator PR #381
+added the Anthropic adapter and capped model gateway. The original reviewed heads for #370,
+#377 and #378 are still not ancestors of main; #367 is. The newer code has **not** been merged
+into this branch or load-tested here. These measurements remain tied to the earlier `c0b4ac0`
+base. No CI check was polled during this handoff.
+
+Before operating a newer checkout, read `origin/main:docs/lanes/01-working-agreement.md`
+section 3.6 and `origin/main:infra/local/README.md`. They now describe the optional founder-run
+model gateway. Load loops use the fake model; do not start or stop the shared gateway, read
+its key, or point load scripts at a paid provider. The founder starts that service. No gateway
+availability or live-provider behavior was checked by lane 2.
+
+Resume order:
+
+1. Read this status and the WP 2.8 note, then inspect PR #384/#380 and main once for changes.
+   Keep the latest status if older PRs overlap it. Fix own review feedback with new commits.
+2. Check whether lane 3/5 fixed the listed runtime failures and provided a supported
+   multi-worker composition. Only re-run the affected real scenarios after relevant changes;
+   preserve failure criteria and receipt checks. Do not repair their feature files yourself.
+3. If hosting is decided, read the saved hosting note, verify a claimed true superuser on a
+   provider scratch database first, and build WP 2.3 staging as code in a new PR. Accounts,
+   credentials and purchases need the founder; deployment needs the integrator.
+4. If hosting is still undecided, keep it as a visible gate. WP 2.4 to 2.7 stay blocked. Do
+   not repeat unchanged soak runs or the hosting research just to fill time.
 
 The complete session 1 evidence and its linked production, catalogue and hosting notes remain
 in [the original handoff](https://github.com/WangPantopus/creator-platform/blob/69ca75941dcaad02dda700d548971006a5bbd9a9/docs/lanes/status/lane-2.md).
@@ -96,8 +134,8 @@ manual financial settlement is part of WP 2.8. Use only ports 56420–56429 and 
 - Fakes used by the stack, all at the outer edge: the development identity (accounts 1 to 7), a local model fake
   (`infra/local/fake-edge/model.mjs`, redirected by a Node preload that refuses to load outside a loopback
   development process). No payment processor or push gateway is run; payments are not composed.
-- Never run `pkill -f` by pattern on this shared Mac. Early in this session I ran one (`pkill -f "src/server.ts"`) when
-  only my own, already crashed, process could have matched; it could in principle have matched another session's server.
-  Everything since is by recorded pid or by listening port inside lane 2's range.
+- Never run `pkill -f` by pattern on this shared Mac. Session 1 reported running one early,
+  when only its own, already crashed process was believed to match. That was not this resumed
+  session. Stop only your own processes by recorded PID and verified ownership.
 - The database container sets `jit=off` and no parallel workers; the stack runs `ANALYZE` after an install. Neither
   changed whether replies succeed.

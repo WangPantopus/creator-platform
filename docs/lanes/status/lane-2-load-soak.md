@@ -7,6 +7,10 @@ The founder's instruction to continue coding through the lane authorizes this pa
 The branch `lane-2/load-soak` starts at `origin/main` commit
 `c0b4ac0f030a893dfc92457f0f4348dd87174398`, which contains WP 2.1. It does not
 contain the production host or catalogue tool: see the resume audit in PR #380.
+The final handoff fetch found main at `21b3d4836340b0ad494dd0faa8adb041d8e244fa`
+with PR #381's model changes. Those changes were not present in these measurements and were
+not re-tested here. Read the current stack instructions before running on a newer checkout;
+keep load runs on the fake model rather than the optional paid gateway.
 
 ## What the code does
 
