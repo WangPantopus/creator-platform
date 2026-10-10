@@ -334,6 +334,8 @@ public enum QelvoraCopy {
     "growthStopThisProposal": "Stop this proposal",
     "growthCouldNotStopThisProposal": "Could not stop this proposal.",
     "growthYourLaunchKit": "Your launch kit",
+    "growthInvitationNoteLabel": "Your invitation note (optional)",
+    "growthInvitationNoteHint": "This note is public to anyone with the link. Up to 600 characters.",
     "growthShareYourPublicCreatorPageOrAnInvitationWithPeople": "Share your public creator page or an invitation with people who choose to open it.",
     "growthCreateAndCopyInvitation": "Create and copy invitation",
     "growthInvitationCopiedExpires": "Invitation copied. Expires {value1}.",

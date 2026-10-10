@@ -1,5 +1,35 @@
 # Lane 5: invites and entry (WP 5.7)
 
+## Approved form update (2026-10-09)
+
+The founder approved the exact label “Your invitation note (optional)” and hint
+“This note is public to anyone with the link. Up to 600 characters.” The form now
+uses them, bounds input to 600 and keeps the note with its retry ID. An edit after
+a failed copy makes a new ID; an unchanged retry reuses the stored link. Shared
+web/Swift/Kotlin copy was regenerated, never hand-edited.
+
+Real Chrome/server/PostgreSQL form checks passed 2/2: denied clipboard then
+successful retry at the limit, exact stored/public Unicode and literal markup,
+600-character input, edit after failure with unchanged old words, unchanged edited
+retry and optional blank note. Screenshots `qelvora-lane5-invite-form.png` and
+`-form-public.png` were inspected. Logs `/tmp/qelvora-lane5-invite-form-browser-final.log`.
+First form run was 1/2: the scenario granted clipboard permission before the previous
+copy finished, so it wrongly expected a retry after a successful copy. Waiting for
+the button to become enabled fixed the scenario; no product behavior was changed
+for that failure.
+
+Fresh API regression was 7/8 with two not run. At load 23–25, the twenty concurrent
+limit requests returned eighteen 201s and two 503s instead of two 429s. The database
+still had only 20 active links at that boundary (19 after the following revoke).
+This run is a failure, not a pass attributed to load. The earlier clean 8/8 remains
+historical evidence. Diagnostics are in `/tmp/qelvora-lane5-invite-form-api.log` and
+`-invite-limit-diagnostic.log`; the scenario now prints error codes on failure. A separate twenty-request repeat at the existing limit returned twenty 429 `invite_limit` responses and created no links. The earlier 503 bodies were not captured; backend logs show roughly 5.5 seconds for each and no error code. Do not claim their cause is proven.
+
+Typecheck passed 7/7; changed web lint and generated-resource check passed. No new
+unit tests. Full backend 157-test suite was not rerun for this form/copy change.
+The pending migration is still held behind #385. Domain/app IDs and the real lane 3
+`useful_answer` producer remain unconnected. A first AI answer is still not proven.
+
 Branch `lane-5/invite-entry`, cut from main `c0b4ac0f0`. No pull request while
 #385 is the open lane 5 migration PR. Pending SQL:
 `apps/backend/src/modules/growth/migrations/pending_w7_invite_note.sql`.

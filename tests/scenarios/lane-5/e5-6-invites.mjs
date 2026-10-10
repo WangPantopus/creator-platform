@@ -148,11 +148,21 @@ if (process.argv.includes("--after-restart")) {
       );
       expect(
         results.filter((r) => r.status === 201).length === 20 - before,
-        JSON.stringify(results.map((r) => r.status)),
+        JSON.stringify(
+          results.map((r) => ({
+            status: r.status,
+            error: r.json?.error ?? null,
+          })),
+        ),
       );
       expect(
         results.filter((r) => r.status === 429).length === 2,
-        JSON.stringify(results.map((r) => r.status)),
+        JSON.stringify(
+          results.map((r) => ({
+            status: r.status,
+            error: r.json?.error ?? null,
+          })),
+        ),
       );
       status(await create(first), 201);
       const row = (

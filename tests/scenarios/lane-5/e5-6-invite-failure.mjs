@@ -109,6 +109,28 @@ try {
       });
       await button.waitFor({ timeout: 90000 });
       await page.waitForLoadState("networkidle");
+      const note = "Come talk pottery. 陶芸 <b>plain text</b> مرحبا 🧑🏽‍🎨";
+      const input = page.getByLabel("Your invitation note (optional)", {
+        exact: true,
+      });
+      await input.fill(note);
+      expect(
+        (await input.getAttribute("maxlength")) === "600",
+        "missing 600-character form bound",
+      );
+      expect(
+        await page
+          .getByText(
+            "This note is public to anyone with the link. Up to 600 characters.",
+            { exact: true },
+          )
+          .isVisible(),
+        "public note hint missing",
+      );
+      await page.screenshot({
+        path: "/tmp/qelvora-lane5-invite-form.png",
+        fullPage: true,
+      });
       const cdp = await browser.newBrowserCDPSession();
       const { browserContextIds } = await cdp.send("Target.getBrowserContexts");
       expect(browserContextIds.length === 1, "unexpected browser context");
@@ -155,12 +177,165 @@ try {
         .waitFor();
       const row = (
         await db.query(
-          "SELECT count(*)::int AS n FROM growth.invite WHERE id=$1",
+          "SELECT count(*)::int AS n, min(note) AS note FROM growth.invite WHERE id=$1",
           [made.id],
         )
       ).rows[0];
-      expect(row.n === 1, JSON.stringify(row));
-      return "clipboard denied then granted; two web-proxy 200s reused one stored link";
+      expect(row.n === 1 && row.note === note, JSON.stringify(row));
+      const publicPage = await browser.newPage({
+        viewport: { width: 390, height: 844 },
+      });
+      await publicPage.goto(`${web}/invite/${made.id}`, {
+        waitUntil: "domcontentloaded",
+        timeout: 90000,
+      });
+      expect(
+        (await publicPage
+          .locator(".growth-invite .growth-voice")
+          .first()
+          .textContent()) === note,
+        "form note differs on public invitation",
+      );
+      expect(
+        (await publicPage.locator(".growth-invite .growth-voice b").count()) ===
+          0,
+        "form note rendered markup",
+      );
+      await publicPage.screenshot({
+        path: "/tmp/qelvora-lane5-invite-form-public.png",
+        fullPage: true,
+      });
+      await publicPage.close();
+      return "clipboard denied then granted; two web-proxy 200s reused one stored link; approved form copy, exact stored/public Unicode note, plain markup and 600-character bound";
+    },
+  );
+  await step(
+    "E5.6-form-edit",
+    "600-character input and editing after copy failure keep separate link contents",
+    async () => {
+      const owner = await signIn(
+        "http://127.0.0.1:56451",
+        ACTORS.maya,
+        "/studio/launch",
+      );
+      const active = (
+        await db.query(
+          "SELECT id FROM growth.invite WHERE created_by=$1 AND revoked_at IS NULL AND expires_at>now() ORDER BY expires_at",
+          [ACTORS.maya],
+        )
+      ).rows;
+      for (const row of active
+        .filter((row) => row.id !== fixture.id)
+        .slice(0, 3)) {
+        expect(
+          (
+            await call(
+              "http://127.0.0.1:56451",
+              "DELETE",
+              `/v1/growth/invites/${row.id}`,
+              { token: owner.token },
+            )
+          ).status === 200,
+          "could not free own test slots",
+        );
+      }
+      const input = page.getByLabel("Your invitation note (optional)", {
+        exact: true,
+      });
+      const button = page.getByRole("button", {
+        name: "Create and copy invitation",
+        exact: true,
+      });
+      const cdp = await browser.newBrowserCDPSession();
+      const { browserContextIds } = await cdp.send("Target.getBrowserContexts");
+      await cdp.send("Browser.setPermission", {
+        permission: { name: "clipboard-write" },
+        setting: "denied",
+        origin: web,
+        browserContextId: browserContextIds[0],
+      });
+      const create = async () => {
+        const [r] = await Promise.all([
+          page.waitForResponse(
+            (r) =>
+              r.request().method() === "POST" &&
+              new URL(r.url()).pathname === "/api/growth/invites",
+          ),
+          button.click(),
+        ]);
+        expect(
+          r.status() === 200,
+          `form create ${r.status()}: ${await r.text()}`,
+        );
+        await page.waitForFunction(() =>
+          Array.from(document.querySelectorAll("button")).some(
+            (button) =>
+              button.textContent.trim() === "Create and copy invitation" &&
+              !button.disabled,
+          ),
+        );
+        return r.json();
+      };
+      await input.fill("a".repeat(620));
+      expect(
+        (await input.inputValue()).length === 600,
+        "browser failed to enforce 600 limit",
+      );
+      const boundary = await create();
+      await page
+        .getByRole("status")
+        .filter({ hasText: /denied|permission/i })
+        .waitFor();
+      const changed = "Changed after the copy failed. 陶芸";
+      await input.fill(changed);
+      const edit = await create();
+      await page
+        .getByRole("status")
+        .filter({ hasText: /denied|permission/i })
+        .waitFor();
+      expect(
+        boundary.id !== edit.id,
+        "editing reused the old content-bound ID",
+      );
+      const rows = (
+        await db.query(
+          "SELECT id,note FROM growth.invite WHERE id=ANY($1::uuid[])",
+          [[boundary.id, edit.id]],
+        )
+      ).rows;
+      expect(
+        rows.find((row) => row.id === boundary.id)?.note === "a".repeat(600),
+        "old link words changed",
+      );
+      expect(
+        rows.find((row) => row.id === edit.id)?.note === changed,
+        "edited note not stored",
+      );
+      await cdp.send("Browser.setPermission", {
+        permission: { name: "clipboard-write" },
+        setting: "granted",
+        origin: web,
+        browserContextId: browserContextIds[0],
+      });
+      expect(
+        (await create()).id === edit.id,
+        "unchanged edited retry made another ID",
+      );
+      await page
+        .getByRole("status")
+        .filter({ hasText: "Invitation copied. Expires" })
+        .waitFor();
+      await input.fill("");
+      const optional = await create();
+      expect(
+        (
+          await db.query("SELECT note FROM growth.invite WHERE id=$1", [
+            optional.id,
+          ])
+        ).rows[0].note === "",
+        "optional empty note failed",
+      );
+      return "600 accepted; edit after failure made a distinct ID; unchanged retry reused it; blank note accepted";
     },
   );
 } finally {
