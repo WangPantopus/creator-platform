@@ -3653,6 +3653,28 @@
         }
       }
     },
+    "Your invitation note (optional)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your invitation note (optional)"
+          }
+        }
+      }
+    },
+    "This note is public to anyone with the link. Up to 600 characters.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This note is public to anyone with the link. Up to 600 characters."
+          }
+        }
+      }
+    },
     "Share your public creator page or an invitation with people who choose to open it.": {
       "extractionState": "manual",
       "localizations": {

@@ -334,6 +334,8 @@ object QelvoraCopy {
     "growthStopThisProposal" to "Stop this proposal",
     "growthCouldNotStopThisProposal" to "Could not stop this proposal.",
     "growthYourLaunchKit" to "Your launch kit",
+    "growthInvitationNoteLabel" to "Your invitation note (optional)",
+    "growthInvitationNoteHint" to "This note is public to anyone with the link. Up to 600 characters.",
     "growthShareYourPublicCreatorPageOrAnInvitationWithPeople" to "Share your public creator page or an invitation with people who choose to open it.",
     "growthCreateAndCopyInvitation" to "Create and copy invitation",
     "growthInvitationCopiedExpires" to "Invitation copied. Expires {value1}.",

@@ -335,6 +335,8 @@
   <string name="growth_stop_this_proposal" formatted="false">Stop this proposal</string>
   <string name="growth_could_not_stop_this_proposal" formatted="false">Could not stop this proposal.</string>
   <string name="growth_your_launch_kit" formatted="false">Your launch kit</string>
+  <string name="growth_invitation_note_label" formatted="false">Your invitation note (optional)</string>
+  <string name="growth_invitation_note_hint" formatted="false">This note is public to anyone with the link. Up to 600 characters.</string>
   <string name="growth_share_your_public_creator_page_or_an_invitation_with_people" formatted="false">Share your public creator page or an invitation with people who choose to open it.</string>
   <string name="growth_create_and_copy_invitation" formatted="false">Create and copy invitation</string>
   <string name="growth_invitation_copied_expires" formatted="false">Invitation copied. Expires {value1}.</string>
