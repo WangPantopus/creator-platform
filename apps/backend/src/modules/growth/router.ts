@@ -13,6 +13,9 @@ import { Retention } from "./retention.js";
 import { Engagement } from "./engagement.js";
 import { GrowthExperiments } from "./experiments.js";
 import type { PostEntryContext } from "./entry-context.js";
+import { PublicCreatorPages } from "./public-pages.js";
+import { contentHash } from "../../core/canonical.js";
+import { requestAuthority } from "../identity/request-authority.js";
 
 /** W1 mounts this router before its 404, supplies the canonical session resolver. */
 export function createGrowthRouter(
@@ -32,6 +35,7 @@ export function createGrowthRouter(
   const retention = options.retention ?? new Retention(service);
   const engagement = options.engagement ?? new Engagement(service);
   const experiments = options.experiments ?? new GrowthExperiments(service);
+  const publicPages = new PublicCreatorPages(service);
   router.use((_req, res, next) => {
     res.setHeader("Cache-Control", "no-store");
     next();
@@ -57,15 +61,59 @@ export function createGrowthRouter(
       ),
     ),
   );
+  router.use("/public/creators/:handle", (req, res, next) => {
+    const retryAfter = publicPages.admit(req.socket.remoteAddress ?? "unknown");
+    if (retryAfter) {
+      res.setHeader("Retry-After", String(retryAfter));
+      throw new DomainError(
+        "public_read_limited",
+        copy.growthTheServiceIsUnavailablePleaseTryAgain,
+        429,
+      );
+    }
+    next();
+  });
   router.get("/public/creators/:handle", async (req, res) => {
-    const creator = await service.creator(String(req.params.handle));
-    if (!creator)
+    const handle = z
+      .string()
+      .regex(/^[a-z0-9_]{3,30}$/u)
+      .parse(req.params.handle);
+    let result;
+    try {
+      result = await publicPages.read(handle);
+    } catch (error) {
+      if (error instanceof DomainError && error.code === "public_read_busy")
+        res.setHeader("Retry-After", "1");
+      throw error;
+    }
+    const { page, hit } = result;
+    if (!page)
       throw new DomainError(
         "creator_unavailable",
         copy.growthThisCreatorIsUnavailable,
         404,
       );
-    res.json({ creator, posts: await service.posts(creator.id) });
+    res.setHeader("X-Qelvora-Public-Cache", hit ? "hit" : "miss");
+    if (!requestAuthority.getStore() && !req.headers.authorization) {
+      res.setHeader("Cache-Control", "public, max-age=0, must-revalidate");
+      const tag = `"${contentHash(page)}"`;
+      res.setHeader("ETag", tag);
+      // Evaluate only after current authority/state succeeds, including when
+      // a client explicitly asks to revalidate with Cache-Control: no-cache.
+      if (
+        req
+          .get("If-None-Match")
+          ?.split(",")
+          .some(
+            (value) =>
+              value.trim() === "*" || value.trim().replace(/^W\//u, "") === tag,
+          )
+      ) {
+        res.status(304).end();
+        return;
+      }
+    }
+    res.json(page);
   });
   router.get("/public/creators/:handle/posts/:id", async (req, res) => {
     const value = await service.post(
