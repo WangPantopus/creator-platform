@@ -70,8 +70,14 @@ class ScenarioIdentity extends DevelopmentIdentityAdapter {
 // to be down so a scenario can watch the engine retry.
 const sent: Record<string, unknown>[] = [];
 let gatewayDown = false;
+let gatewayHeld = false;
+const gatewayWaiters = new Set<() => void>();
 const provider: DeliveryProvider = {
   async send(input) {
+    // Outer-edge pause: let a person withdraw while this submission waits, then
+    // exercise the actual final owner check. No owner answer is replaced.
+    if (gatewayHeld)
+      await new Promise<void>((resolve) => gatewayWaiters.add(resolve));
     // A real provider rechecks lease, owner state and controls right before
     // external bytes; the engine supplies that check.
     await input.beforeSubmit();
@@ -102,6 +108,18 @@ const gateway = createServer((req, res) => {
   } else if (req.method === "PUT" && req.url === "/up") {
     gatewayDown = false;
     res.end("{}");
+  } else if (req.method === "PUT" && req.url === "/hold") {
+    gatewayHeld = true;
+    res.end("{}");
+  } else if (req.method === "PUT" && req.url === "/release") {
+    gatewayHeld = false;
+    for (const release of gatewayWaiters) release();
+    gatewayWaiters.clear();
+    res.end("{}");
+  } else if (req.method === "GET" && req.url === "/status") {
+    res.end(
+      JSON.stringify({ held: gatewayHeld, waiting: gatewayWaiters.size }),
+    );
   } else {
     res.statusCode = 404;
     res.end("{}");

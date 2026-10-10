@@ -238,6 +238,8 @@ export function contentNoticeProducer(input: {
  * - the growth worker has no fan session, so it checks only what the content
  *   module publishes about itself (the public index, the creator's profile): the
  *   Note is still published at this version and the creator is still verified.
+ *   For a reaction, a purpose-limited boolean reader checks the exact reply,
+ *   creator and recipient, including a fan's withdrawal, without reading text.
  *   Its wording is the generic hidden update, never any text. The fan was
  *   checked when the notice was queued, and meets the strict check again on
  *   every tap. */
@@ -365,6 +367,20 @@ export function contentNoticeOwner(input: {
           throw error;
         });
       if (!row) return unavailable;
+    } else {
+      const available = await once(
+        `reaction:${event.creatorId}:${event.aggregateId}:${recipient.accountId}`,
+        async () =>
+          (
+            await input.pool.query<{ available: boolean }>(
+              "SELECT creator.content_reaction_available($1,$2,$3) AS available",
+              [event.creatorId, event.aggregateId, recipient.accountId],
+            )
+          ).rows[0]?.available === true,
+      );
+      // A missing reader or database failure throws: the worker retries without
+      // submitting. Only an actual current match can allow the generic notice.
+      if (!available) return unavailable;
     }
     return { ...base, version: 1, authorKind: "human_reaction" };
   };
