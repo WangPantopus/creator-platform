@@ -8,7 +8,7 @@ export type ReplySentence = z.infer<typeof ReplySchema>["sentences"][number];
 export type StreamProposal = { sentence: ReplySentence } | { usage: Usage };
 
 /** Parse only complete sentence objects at the beginning of the strict response schema. */
-function completedSentences(raw: string): ReplySentence[] {
+export function completedSentences(raw: string): ReplySentence[] {
   const prefix = raw.match(/^\s*\{\s*"sentences"\s*:\s*\[/u);
   if (!prefix) return [];
   let cursor = prefix[0].length;

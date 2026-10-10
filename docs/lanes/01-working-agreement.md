@@ -148,6 +148,15 @@ Until the founder supplies keys, the money, model, push and sign-in scenarios ru
 the report says "not verified against the real provider". When keys arrive, repeat the ★
 scenarios against the real one (Stripe in test mode only).
 
+**The real model.** You never hold a model key. The founder runs a capped gateway
+(`infra/local/model-gateway.mjs`, see `infra/local/README.md`) and you point your stack at it with
+`node infra/local/stack.mjs up --lane N --provider anthropic --model-gateway http://127.0.0.1:56499`.
+Use the fake (`--provider anthropic` alone, or the default) for plumbing and the gateway only for
+what needs real model behavior: guard strictness, answer quality, latency. Keep requests small,
+never loop on it, and put the gateway's `/__stats` spend for your lane in your report. If it is
+not running, say so and carry on with the fake; the founder starts it. A "budget reached" (402)
+means stop and report, not retry.
+
 ### 3.7 Environment
 
 Toolchain on the founder's Mac (verified, see the local toolchain note in `CURRENT`):

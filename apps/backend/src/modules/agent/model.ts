@@ -8,6 +8,7 @@ import {
 import { DomainError } from "../../core/errors.js";
 import { streamResponses, type StreamProposal } from "./streaming.js";
 import { contentHash } from "../../core/canonical.js";
+import { anthropicModelFromEnvironment } from "./anthropic-model.js";
 import {
   ModelRateSchema,
   ProviderResponseError,
@@ -470,6 +471,11 @@ export class OpenAIResponsesModel implements AgentModel {
 export function modelFromEnvironment(
   env: NodeJS.ProcessEnv = process.env,
 ): AgentModel | null {
+  // W2_PROVIDER selects the generation provider. Unset keeps OpenAI; any
+  // other value is unconfigured, never a silent fallback to a different processor.
+  const provider = env.W2_PROVIDER ?? "openai";
+  if (provider === "anthropic") return anthropicModelFromEnvironment(env);
+  if (provider !== "openai") return null;
   if (
     !env.OPENAI_API_KEY ||
     !env.W2_SMALL_MODEL ||
