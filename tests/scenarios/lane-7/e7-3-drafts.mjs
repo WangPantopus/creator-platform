@@ -87,13 +87,19 @@ function inputControl() {
     nodes,
   );
 }
-function keyboardClear(name) {
-  const state = A.adb("shell", "dumpsys", "window");
-  const match =
-    /type=ime frame=\[(-?\d+),(-?\d+)\]\[(-?\d+),(-?\d+)\][^\n]*? visible=true/u.exec(
-      state,
-    );
-  assert.ok(match, "Software keyboard must be visible");
+async function keyboardClear(name) {
+  const until = Date.now() + 10000;
+  let match;
+  while (!match) {
+    const state = A.adb("shell", "dumpsys", "window");
+    match =
+      /type=ime frame=\[(-?\d+),(-?\d+)\]\[(-?\d+),(-?\d+)\][^\n]*? visible=true/u.exec(
+        state,
+      );
+    if (match) break;
+    assert.ok(Date.now() < until, "Software keyboard must be visible");
+    await L.sleep(250);
+  }
   const top = Number(match[2]);
   const densities = [
     ...A.adb("shell", "wm", "density").matchAll(/density: (\d+)/gu),
@@ -122,16 +128,21 @@ function keyboardClear(name) {
 }
 function encryptedFiles(markers, expected) {
   const directory = "no_backup/conversation-drafts";
-  let files;
-  try {
-    files = A.adb("exec-out", "run-as", bundle, "ls", directory)
-      .trim()
-      .split(/\s+/u)
-      .filter(Boolean);
-  } catch (error) {
-    if (expected !== 0) throw error;
-    files = [];
-  }
+  const files = A.adb(
+    "exec-out",
+    "run-as",
+    bundle,
+    "sh",
+    "-c",
+    "if [ -d no_backup ]; then if [ -d no_backup/conversation-drafts ]; then ls no_backup/conversation-drafts; fi; else echo LANE7_STORAGE_UNAVAILABLE; fi",
+  )
+    .trim()
+    .split(/\s+/u)
+    .filter(Boolean);
+  assert.ok(
+    files.every((file) => /^[0-9a-f]{64}\.enc$/u.test(file)),
+    "Draft storage must be readable and contain only encrypted records",
+  );
   assert.equal(files.length, expected);
   let bytes = 0;
   for (const file of files) {
@@ -209,7 +220,19 @@ async function revealConversation(label) {
       await L.sleep(500);
       continue;
     }
-    A.swipe(500, composer.y - composer.h / 2 - 30, 500, 400);
+    const history = nodes
+      .filter((node) => node.scrollable && node.y < composer.y)
+      .sort((a, b) => b.w * b.h - a.w * a.h)[0];
+    if (!history) {
+      await L.sleep(500);
+      continue;
+    }
+    A.swipe(
+      history.x,
+      history.y + history.h * 0.35,
+      history.x,
+      history.y - history.h * 0.35,
+    );
     await L.sleep(300);
   }
   L.screenshot("android", "missing-recovery-control");
@@ -232,6 +255,23 @@ async function waitRead(status) {
     await L.sleep(250);
   }
 }
+function nativeInput(mode) {
+  const result = A.adb(
+    "shell",
+    "am",
+    "instrument",
+    "-w",
+    "-r",
+    "-e",
+    "lane7DraftInput",
+    mode,
+    "-e",
+    "class",
+    "com.pantopus.qelvora.Lane7DraftInputFlow",
+    "com.pantopus.qelvora.test/androidx.test.runner.AndroidJUnitRunner",
+  );
+  assert.match(result, /OK \(1 test\)/u);
+}
 const flows = {
   async D1() {
     await fresh();
@@ -239,11 +279,11 @@ const flows = {
     await A.tap("Message Maya's AI");
     A.type(marker);
     await hasDraft(marker);
-    keyboardClear("D1-portrait-keyboard");
+    await keyboardClear("D1-portrait-keyboard");
     encryptedFiles([marker], 1);
     A.rotate("landscape");
     await hasDraft(marker);
-    keyboardClear("D1-landscape-keyboard");
+    await keyboardClear("D1-landscape-keyboard");
     A.rotate("portrait");
     await hasDraft(marker);
     A.home();
@@ -290,18 +330,65 @@ const flows = {
         await A.tap("Message Maya's AI");
         await hasDraft("Large text draft");
       }
-      keyboardClear(`D3-${appearance}-largest-portrait`);
+      await keyboardClear(`D3-${appearance}-largest-portrait`);
       assert.ok(
         A.screen().some((node) => node.desc === "Maya's AI"),
         "Authorship words and glyph must stay available",
       );
       A.rotate("landscape");
       await hasDraft("Large text draft");
-      keyboardClear(`D3-${appearance}-largest-landscape`);
+      await keyboardClear(`D3-${appearance}-largest-landscape`);
       A.rotate("portrait");
       await hasDraft("Large text draft");
     }
     await noSends();
+  },
+  async D3S() {
+    await fresh();
+    await typeDraft("Split screen draft");
+    A.key("BACK");
+    A.adb("shell", "am", "start", "-a", "android.settings.SETTINGS");
+    A.key("APP_SWITCH");
+    await A.waitFor("Settings");
+    // The owned Pixel launcher's app-menu icon, observed in Recents.
+    A.tapAt(540, 275);
+    await A.tap("Split screen");
+    await A.tap("Qelvora", 15000);
+    await A.tap("Message Maya's AI", 30000);
+    await hasDraft("Split screen draft");
+    A.type(" keeps");
+    for (const scale of ["1.0", "2.0"]) {
+      A.adb("shell", "settings", "put", "system", "font_scale", scale);
+      for (const orientation of ["portrait", "landscape"]) {
+        A.rotate(orientation);
+        await L.sleep(1200);
+        await A.tap("Message Maya's AI", 30000);
+        await hasDraft("Split screen draft keeps");
+        await keyboardClear(`D3S-${scale}-${orientation}`);
+        const tasks = A.adb("shell", "am", "stack", "list");
+        assert.match(tasks, /com\.android\.settings.+visible=true/u);
+        assert.match(tasks, /com\.pantopus\.qelvora.+visible=true/u);
+      }
+    }
+    A.key("BACK");
+    A.rotate("portrait");
+    A.adb("shell", "settings", "put", "system", "font_scale", "1.0");
+    await L.sleep(1200);
+    const tasks = A.adb("shell", "am", "stack", "list");
+    const bounds =
+      /taskId=\d+: com\.pantopus\.qelvora[^\n]+bounds=\[(\d+),(\d+)\]\[(\d+),(\d+)\]/u.exec(
+        tasks,
+      );
+    assert.ok(bounds, "Qelvora's split task must be present");
+    const top = Number(bounds[2]);
+    assert.ok(top > 500, "Qelvora must occupy the lower split");
+    A.swipe(540, top - 13, 540, 0, 600);
+    await L.sleep(1200);
+    await hasDraft("Split screen draft keeps");
+    await A.tap("Message Maya's AI");
+    await keyboardClear("D3S-return-fullscreen");
+    await noSends();
+    encryptedFiles(["Split screen draft keeps"], 1);
   },
   async D3I() {
     await fresh();
@@ -316,10 +403,10 @@ const flows = {
     A.adb("shell", "settings", "put", "system", "font_scale", "2.0");
     L.launch("android", "--appearance", "night");
     await typeDraft("Three button inset draft");
-    keyboardClear("D3-three-button-largest-portrait");
+    await keyboardClear("D3-three-button-largest-portrait");
     A.rotate("landscape");
     await hasDraft("Three button inset draft");
-    keyboardClear("D3-three-button-largest-landscape");
+    await keyboardClear("D3-three-button-largest-landscape");
     await noSends();
   },
   async D4() {
@@ -455,8 +542,8 @@ const flows = {
   async D7() {
     await fresh();
     const marker = "draft7".repeat(334);
-    await A.tap("Message Maya's AI");
-    A.type(marker);
+    nativeInput("boundary");
+    L.launch("android");
     await hasDraft(marker.slice(0, 2000));
     assert.equal(inputControl().text.length, 2000);
     encryptedFiles(["draft7draft7"], 1);
@@ -464,6 +551,15 @@ const flows = {
     await hasDraft(marker.slice(0, 2000));
     await noSends();
     L.screenshot("android", "D7-boundary-restored");
+  },
+  async D7U() {
+    await fresh();
+    nativeInput("unicode");
+    L.launch("android");
+    await hasDraft("Draft 🙂 שלום مرحبا");
+    encryptedFiles(["Draft 🙂 שלום مرحبا"], 1);
+    await noSends();
+    L.screenshot("android", "D7-unicode-restored");
   },
   async D8() {
     await fresh();

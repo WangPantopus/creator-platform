@@ -1,0 +1,32 @@
+WP 7.3 local regression gates, 2026-10-09.
+Main merged through 21b3d4836. Operated draft scenarios are recorded separately.
+
+Android (offline Gradle, LANE-7 heavy-build lock, ANDROID_SERIAL=emulator-5574):
+./gradlew --offline :app:testDebugUnitTest :app:verifyPaparazziDebug :app:lintDebug :app:connectedDebugAndroidTest :app:assembleRelease -PcreatorApiUrl=
+BUILD SUCCESSFUL in 2m 51s; 133 tasks: 41 executed, 92 up-to-date.
+Unit/snapshot XML: 8 snapshots, 9 delivery protocol, 2 contract = 19 pass.
+Lint: 0 errors, 1164 warnings. No warning-free claim.
+Instrumentation XML: 9 unique tests; 4 pass, 5 skipped, 0 errors/failures.
+Skips: four ConnectedJourneyTest cases need selected backend inputs; the opt-in
+Lane7DraftInputFlow needs explicit boundary/Unicode mode (both operated separately).
+The Gradle progress counter printed 14; the XML contains 9 unique tests.
+Unsigned release APK built; distribution signing/install not run (WP 7.9).
+Debug DEX markers harness_actor, harness_reset, No development actor matches: 1 each.
+Release DEX: all three 0, fake API origin absent.
+
+iOS Swift package: 18 pass, 0 failures (8 delivery protocol, 2 generated contract,
+5 identity, 3 snapshot suites). Command: swift test --skip-update --jobs 4.
+iOS existing UI: FoundationFlowTests 2 pass; ConnectedJourneyTests 4 skipped
+by design (explicit backend journey inputs absent); 0 failures. TEST SUCCEEDED.
+Ad-hoc signed Debug with empty API origin, owned iPhone simulator, serial tests.
+Result: draft-ios-existing-ui.xcresult. No test or snapshot expectation weakened.
+
+iOS Release simulator: BUILD SUCCEEDED, x86_64 and arm64, ad-hoc signed.
+Debug markers: harness-actor=1, harness-reset=1, No development actor matches=1,
+DebugHarness=36. Release: all four 0; fake API origin absent; CreatorAPIURL empty.
+Distribution archive/physical installation/release sign-in: not run (WP 7.9).
+Post-merge/final harness contract: 51/51 current schema checks pass.
+Root typecheck: 7/7 tasks pass, forced execution, no cache, concurrency 1.
+Root eslint: pass. Root prettier: all matched files pass.
+Generated-file check: pass, 12 shared resources and 119 OpenAPI operations.
+App PR check reader: GitHub connection required; CI not inspected, no fallback.

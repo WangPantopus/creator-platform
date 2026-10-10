@@ -70,8 +70,11 @@ server.on("upgrade", (req, socket) => {
       thread.fanAccountId !== auth.account.id
     )
       return connection.close(1008, "Subscription refused");
-    if (subscriptions.size >= 64)
+    if (!subscriptions.has(thread.id) && subscriptions.size >= 64)
       return connection.close(1008, "Subscription limit");
+    // Resuming the same thread replaces its listener. Otherwise the Map drops
+    // the old cleanup callback while the thread retains a duplicate listener.
+    subscriptions.get(thread.id)?.();
     for (const frame of thread.frames)
       if (frame.cursor > message.cursor) connection.send(JSON.stringify(frame));
     const listener = (frame) => connection.send(JSON.stringify(frame));

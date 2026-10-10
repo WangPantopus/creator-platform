@@ -318,7 +318,15 @@ final class W3ThreadModel: ObservableObject {
             if item.destination == "fan-replies" { let _: APIMessage = try await client.request(root + "/fan-replies", body: body) }
             else { let _: APIAcceptedMessage = try await client.request(root + "/messages", body: body) }
             pending = nil; if draft.trimmingCharacters(in: .whitespacesAndNewlines) == item.text { draft = "" }; _ = try await saveDraftNow(); await refresh()
-        } catch { let status = (error as? W3Failure)?.status; pending?.uncertain = status == nil || status! >= 500 || status == 409; pending?.rejected = !(pending?.uncertain ?? true); failed(error) }
+        } catch {
+            let rejection = error as? W3Failure, status = rejection?.status
+            pending?.uncertain = status == nil || status! >= 500 || status == 409
+            pending?.rejected = !(pending?.uncertain ?? true)
+            // A definite input rejection is an answered request, not a lost
+            // transport. Keep the live conversation and its Retry usable.
+            if let rejection, (400..<500).contains(rejection.status), ![401,403,404,409].contains(rejection.status) { failure = rejection.message }
+            else { failed(error) }
+        }
     }
     func earlier() async {
         guard active, !offline, let before, !busy else { return }; busy = true; defer { busy = false }

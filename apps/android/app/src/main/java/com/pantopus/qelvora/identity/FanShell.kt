@@ -10,6 +10,7 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import android.os.Bundle
@@ -533,7 +534,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
             else -> {
                 val isConversation = model.destination.substringBefore('?').startsWith("/threads/")
                 if (model.session?.mode == APISessionMode.DEVELOPMENT) {
-                    if (isConversation) BasicText("Development identity · synthetic account · actual local API", style = qText("caption").copy(color = qColor("ink")), modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+                    if (isConversation) BasicText("Development identity · synthetic account · actual local API", style = qText("caption").copy(color = qColor("ink")), maxLines = 1, modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp))
                     else Notice(title = "Development identity", children = "Synthetic account · actual local API.")
                 }
                 Box(Modifier.weight(1f).fillMaxWidth()) {

@@ -183,9 +183,11 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
     var authorship by remember { mutableStateOf<Boolean?>(null) }
     var feedbackConsent by remember { mutableStateOf(false) }
     var feedbackComment by remember { mutableStateOf("") }
-    fun suspendPrivateResults() {
+    fun suspendPrivateResults(keepConfirmation: Boolean = false) {
         workEpoch++; busy = false
-        pendingExport = null; confirmDelete = false; result = ""; error = ""
+        // The generic confirmation carries no authority. Keep it through a
+        // same-session readiness check; its action stays disabled and captured.
+        pendingExport = null; if (!keepConfirmation) confirmDelete = false; result = ""; error = ""
     }
     fun clearPrivateResults() {
         suspendPrivateResults()
@@ -341,7 +343,7 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
 
     LaunchedEffect(route, privateReady, model.error) {
         operation?.cancel()
-        if (loadedRoute != route || model.error.isNotEmpty()) clearPrivateResults() else if (!privateReady) suspendPrivateResults()
+        if (loadedRoute != route || model.error.isNotEmpty()) clearPrivateResults() else if (!privateReady) suspendPrivateResults(keepConfirmation = privateVisible && model.checkingSession)
         loadedRoute = route; load()
     }
     LaunchedEffect(draftOwner, privateReady) {
@@ -465,7 +467,7 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
         }
         Button("Refresh", ButtonVariant.SECONDARY, block = true, disabled = busy || model.checkingSession || model.busy) { refreshOperation?.cancel(); refreshOperation = coroutine.launch { model.refresh() } }
     }
-    if (confirmDelete && privateReady) Dialog(onDismissRequest = { confirmDelete = false }) {
+    if (confirmDelete && privateVisible) Dialog(onDismissRequest = { confirmDelete = false }) {
         Column(Modifier.background(qColor("surface")).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             TrustText("Delete this data scope?", "title")
             TrustText("Access closes immediately. Purging waits for every domain. Store subscriptions must be canceled separately.")

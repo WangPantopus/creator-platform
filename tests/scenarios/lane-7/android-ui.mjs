@@ -39,18 +39,32 @@ export function screen() {
     const bounds = /\[(\d+),(\d+)\]\[(\d+),(\d+)\]/u.exec(attr("bounds"));
     if (!bounds) continue;
     const [x1, y1, x2, y2] = bounds.slice(1).map(Number);
+    // Decode once: supplementary characters are numeric XML entities, and
+    // literal user input such as "&lt;" must not be decoded twice.
     const unescape = (value) =>
-      value
-        .replaceAll("&quot;", '"')
-        .replaceAll("&amp;", "&")
-        .replaceAll("&lt;", "<")
-        .replaceAll("&gt;", ">")
-        .replaceAll("&#10;", "\n")
-        .replaceAll("&apos;", "'");
+      value.replaceAll(
+        /&(?:quot|amp|lt|gt|apos|#\d+|#x[0-9a-fA-F]+);/gu,
+        (entity) => {
+          const named = {
+            "&quot;": '"',
+            "&amp;": "&",
+            "&lt;": "<",
+            "&gt;": ">",
+            "&apos;": "'",
+          };
+          if (entity in named) return named[entity];
+          return String.fromCodePoint(
+            entity.startsWith("&#x")
+              ? Number.parseInt(entity.slice(3, -1), 16)
+              : Number(entity.slice(2, -1)),
+          );
+        },
+      );
     nodes.push({
       text: unescape(attr("text")),
       desc: unescape(attr("content-desc")),
       clickable: attr("clickable") === "true",
+      scrollable: attr("scrollable") === "true",
       x: Math.round((x1 + x2) / 2),
       y: Math.round((y1 + y2) / 2),
       w: x2 - x1,

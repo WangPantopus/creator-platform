@@ -33,5 +33,50 @@
     "path": "artifacts/lane-7/7-2-real-stack-run.txt",
     "sha256": "9ab47923fb823fbaf5c5c27eb0cab3736d0fb8666daaaee8433f7044f2240523",
     "bytes": 3332
+  },
+  {
+    "path": "artifacts/lane-7/7-3-android-deleted-thread.jpg",
+    "sha256": "608c13bf7de443a3dede7fc6d4d443cf34507588df7ec02d9ca5f22734bef218",
+    "bytes": 35256
+  },
+  {
+    "path": "artifacts/lane-7/7-3-android-largest-landscape.jpg",
+    "sha256": "8dbbad1b60158eeb18b600ade0733ca084dfadba749f7f6e97e8a6827b9ac0b8",
+    "bytes": 85163
+  },
+  {
+    "path": "artifacts/lane-7/7-3-android-run.txt",
+    "sha256": "5d6a3be24af69daa24a0feba74b0ea1482490864a1e1cbb9742927622620a304",
+    "bytes": 3434
+  },
+  {
+    "path": "artifacts/lane-7/7-3-android-split-landscape.jpg",
+    "sha256": "b20fb55ff19d6dac3e2b73b181720a8774d3819ba155136d6cb5f12dade18114",
+    "bytes": 93641
+  },
+  {
+    "path": "artifacts/lane-7/7-3-gates.txt",
+    "sha256": "bc398c73921b44c20cb8fb0ae4214c8b35267e3d8c0098190d987eac4c9e757d",
+    "bytes": 2233
+  },
+  {
+    "path": "artifacts/lane-7/7-3-ios-deleted-thread.jpg",
+    "sha256": "6f7bbf7f72beb68b5d0645749e6a4a60df1acf351ebda7c0ce1170a2cf7e8afd",
+    "bytes": 39340
+  },
+  {
+    "path": "artifacts/lane-7/7-3-ios-largest-landscape.jpg",
+    "sha256": "d52b7470cd9ff433553c8dec943782a6b57b3b71072cae8cf57fb96cf14582e4",
+    "bytes": 90317
+  },
+  {
+    "path": "artifacts/lane-7/7-3-ios-run.txt",
+    "sha256": "bab9125a95a6203390dfc5867ac69b02c957057af1c37d311ee56acc251f0e74",
+    "bytes": 3229
+  },
+  {
+    "path": "artifacts/lane-7/7-3-real-stack-run.txt",
+    "sha256": "e4f7031410e6d13b0c07093fb2bad307097840bd7a29a5837f339615e6358851",
+    "bytes": 4449
   }
 ]

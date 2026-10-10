@@ -3,6 +3,7 @@
 // node tests/scenarios/lane-7/ios-navigation.mjs <built.xctestrun> [N2 N5 ... | --stack]
 // LANE7_OUT is an off-repository directory for the xcresult evidence.
 import { execFileSync, spawnSync } from "node:child_process";
+import { randomUUID } from "node:crypto";
 import { readFileSync, writeFileSync, unlinkSync, mkdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
@@ -39,6 +40,7 @@ const flows = draftStack
         D4R: "testD04RejectedRetry",
         D5: "testD05AuthorizationAndReplacement",
         D7: "testD07BoundaryAndCiphertext",
+        D7U: "testD07Unicode",
         D8: "testD08NewTextDuringSend",
       }
     : stack
@@ -88,6 +90,9 @@ const optIn = (value) => {
       ];
       if (Object.keys(fixture).some((key) => !fields.includes(key)))
         throw new Error("Unexpected fixture field");
+      // A partial run may already have accepted its synthetic Send. Reusing
+      // object IDs is safe; each operated run needs a distinct message marker.
+      fixture.marker += " " + randomUUID().slice(0, 8);
       value.EnvironmentVariables.LANE7_STACK_FIXTURE = JSON.stringify(fixture);
     }
     targets += 1;

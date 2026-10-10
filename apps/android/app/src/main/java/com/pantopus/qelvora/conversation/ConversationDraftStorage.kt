@@ -66,7 +66,7 @@ internal class ConversationDraftStorage(context: Context) {
     }
     private fun read(name: String): Record? {
         val target = file(name)
-        if (!target.exists()) return null
+        if (!target.exists() && !File(target.path + ".bak").exists()) return null
         val key = key(false) ?: run { removeFile(name); return null }
         val bytes = AtomicFile(target).readFully()
         if (bytes.size !in 28..65536) { removeFile(name); return null }
@@ -140,10 +140,14 @@ internal class ConversationDraftStorage(context: Context) {
         fun matches(binding: Binding, id: String?) = binding.origin == origin && binding.account == account &&
             (creator == null || binding.creator == creator) && (thread == null || id == null || id == thread)
         owners.toMap().forEach { (name, owner) -> if (matches(owner.binding, owner.thread)) invalidate(name) }
-        directory.listFiles()?.filter { it.extension == "enc" }?.forEach { file ->
-            val name = file.nameWithoutExtension
-            read(name)?.let { if (matches(it.binding, it.thread)) { invalidate(name); removeFile(name) } }
-        }
+        // Include AtomicFile remnants from an interrupted commit. A lone .new
+        // is not restorable, but deletion must not leave its ciphertext behind.
+        directory.listFiles()?.map { it.name.removeSuffix(".bak").removeSuffix(".new") }
+            ?.filter { it.matches(Regex("[0-9a-f]{64}[.]enc")) }?.distinct()?.forEach { filename ->
+                val name = filename.removeSuffix(".enc")
+                val record = read(name)
+                if (record == null || matches(record.binding, record.thread)) { invalidate(name); removeFile(name) }
+            }
     } }
     suspend fun purge() = withContext(Dispatchers.IO) { synchronized(lock) {
         generation++; owners.clear(); cachedKey = null

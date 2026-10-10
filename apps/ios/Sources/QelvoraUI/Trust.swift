@@ -134,7 +134,7 @@ public struct TrustFanFeature: View {
             Button("Refresh", variant: .secondary, block: true, disabled: busy || model.checkingSession || model.busy) { refreshOperation?.cancel(); refreshOperation = Task { await model.refresh() } }
         }.padding(16) }.foregroundStyle(qColor("ink", scheme)).background(qColor("ground", scheme))
         .task(id: route + (privateReady ? "|ready" : "|unavailable")) { await load() }
-        .onChange(of: privateReady) { _, ready in if !ready { operation?.cancel(); suspendPrivateResults() } }
+        .onChange(of: privateReady) { _, ready in if !ready { operation?.cancel(); suspendPrivateResults(keepConfirmation: privateVisible && model.checkingSession) } }
         .onChange(of: model.error) { _, error in if !error.isEmpty { operation?.cancel(); clearPrivateResults() } }
         .onChange(of: route) { _, _ in operation?.cancel(); clearPrivateResults() }
         .onDisappear { operation?.cancel(); refreshOperation?.cancel(); clearPrivateResults() }
@@ -256,7 +256,9 @@ public struct TrustFanFeature: View {
         cases = []; notices = []; jobs = []; history = []; selectedJob = nil
         capability = nil
     }
-    private func suspendPrivateResults() { workEpoch += 1; busy = false; exportPayload = nil; confirmingDelete = false; result = ""; error = "" }
+    // The generic confirmation holds no authority; the action remains disabled
+    // and requires a fresh capture while a same-session check is in flight.
+    private func suspendPrivateResults(keepConfirmation: Bool = false) { workEpoch += 1; busy = false; exportPayload = nil; if !keepConfirmation { confirmingDelete = false }; result = ""; error = "" }
     private func beginWork() -> Int { workEpoch += 1; busy = true; return workEpoch }
     private func finishWork(_ epoch: Int) { if workEpoch == epoch { busy = false } }
     private func capture() async throws -> FanSessionRequestCapture {

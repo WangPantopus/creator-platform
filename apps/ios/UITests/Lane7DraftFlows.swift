@@ -44,10 +44,32 @@ final class Lane7StackDraftFlow: XCTestCase {
             guard result == .completed else { throw NSError(domain: "Lane7RealDraft", code: 1) }
         }
         func reveal(_ element: XCUIElement) throws {
-            for _ in 0..<8 {
-                if element.exists && element.isHittable { return }
-                app.scrollViews.firstMatch.swipeUp()
+            for _ in 0..<10 {
+                let scroll = app.scrollViews.firstMatch
+                let bounds = scroll.frame
+                let keyboardTop = app.keyboards.firstMatch.exists ? app.keyboards.firstMatch.frame.minY : app.frame.maxY
+                let top = max(bounds.minY + 24, app.frame.minY + 160)
+                let bottom = min(bounds.maxY - 24, keyboardTop - 24)
+                var towardTop = true
+                var distance = min(160, (bottom - top) * 0.55)
+                if element.exists {
+                    let frame = element.frame
+                    if !frame.isEmpty && frame.minY >= top && frame.maxY <= bottom && element.isHittable { return }
+                    if !frame.isEmpty {
+                        towardTop = frame.midY >= (top + bottom) / 2
+                        distance = min(distance, max(60, towardTop ? frame.maxY - bottom + 20 : top - frame.minY + 20))
+                    }
+                }
+                // Stay inside the visible scroller and correct overscroll in
+                // either direction; offscreen text fields have no hit point.
+                let origin = app.coordinate(withNormalizedOffset: .zero)
+                let start = towardTop ? bottom - 10 : top + 10
+                let end = towardTop ? start - distance : start + distance
+                origin.withOffset(CGVector(dx: bounds.maxX - 8, dy: start))
+                    .press(forDuration: 0.05, thenDragTo: origin.withOffset(CGVector(dx: bounds.maxX - 8, dy: end)))
             }
+            let shot = XCTAttachment(screenshot: XCUIScreen.main.screenshot()); shot.name = "D6-unreachable-control"; shot.lifetime = .keepAlways; add(shot)
+            let tree = XCTAttachment(string: app.debugDescription); tree.name = "D6-unreachable-control-AX"; tree.lifetime = .keepAlways; add(tree)
             XCTFail("Could not reach privacy control"); throw NSError(domain: "Lane7RealDraft", code: 2)
         }
         func capture(_ name: String) {
@@ -80,9 +102,26 @@ final class Lane7StackDraftFlow: XCTestCase {
         try reveal(scope); scope.tap(); app.buttons["Conversation"].tap()
         for (label, value) in [("Creator ID", fixture["creator"]!), ("Conversation ID", fixture["thread"]!), ("Local confirmation", "LOCAL DEVELOPMENT")] {
             let input = app.textFields[label]; try reveal(input); input.tap(); input.typeText(value)
-            app.scrollViews.firstMatch.swipeUp()
+            XCTAssertEqual(input.value as? String, value)
+            if app.keyboards.buttons["Return"].exists { app.keyboards.buttons["Return"].tap() }
         }
         try reveal(app.buttons["Request deletion"]); app.buttons["Request deletion"].tap()
+        try await Task.sleep(for: .seconds(6)) // Cross the readiness heartbeat.
+        let dialogTitle = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Delete this data scope?'")).firstMatch
+        XCTAssertTrue(dialogTitle.exists)
+        capture("D6-confirmation-after-session-check")
+        if app.buttons["Keep data"].exists { app.buttons["Keep data"].tap() }
+        else {
+            // iOS's popover presentation omits the cancel action; tapping its
+            // dimmed background is the native cancellation path.
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.95, dy: 0.7)).tap()
+        }
+        XCTAssertFalse(dialogTitle.exists)
+        try await storage(1)
+        let retained = try await request(path, token: token); XCTAssertEqual(retained.0, 200)
+        app.buttons["Request deletion"].tap()
+        try await Task.sleep(for: .seconds(6))
+        XCTAssertTrue(dialogTitle.exists)
         let confirmations = app.buttons.matching(identifier: "Request deletion")
         let confirm = confirmations.element(boundBy: confirmations.count - 1)
         XCTAssertTrue(confirm.waitForExistence(timeout: 5)); confirm.tap()
@@ -97,7 +136,10 @@ final class Lane7StackDraftFlow: XCTestCase {
         print("LANE7 real API: saved thread deletion; subsequent read \(denied.0)")
         let origin = app.coordinate(withNormalizedOffset: .zero)
         origin.withOffset(CGVector(dx: 10, dy: 500)).press(forDuration: 0.05, thenDragTo: origin.withOffset(CGVector(dx: 240, dy: 502)))
+        XCTAssertTrue(app.staticTexts["Conversation unavailable"].waitForExistence(timeout: 30))
+        XCTAssertFalse(app.textViews.matching(NSPredicate(format: "value == 'real deletion draft'")).firstMatch.exists)
         try await storage(0); app.terminate(); app.launch(); try await storage(0)
+        XCTAssertTrue(app.staticTexts["Conversation unavailable"].waitForExistence(timeout: 30))
         XCTAssertFalse(app.textViews.matching(NSPredicate(format: "value == 'real deletion draft'")).firstMatch.exists)
         capture("D6-real-deletion-restored")
     }
@@ -217,6 +259,7 @@ final class Lane7DraftFlows: XCTestCase {
             try await Task.sleep(for: .milliseconds(250))
         }
         XCTFail("The explicit send was not accepted exactly once")
+        throw NSError(domain: "Lane7Flow", code: 5)
     }
     private func messagePosts() async throws -> [[String: Any]] {
         let rows = try await control("/__harness/log?limit=1000") as! [[String: Any]]
@@ -385,6 +428,14 @@ final class Lane7DraftFlows: XCTestCase {
         _ = try await control("/__harness/threads/maya/recreate", body: [:])
         app.launch(); emptyInput(); try await storage("former conversation draft", count: 0)
         try await noSends(); capture("D5-recreated-thread-without-old-draft")
+    }
+    func testD07Unicode() async throws {
+        try await fresh()
+        let marker = "Draft 🙂 שלום مرحبا"
+        input().tap(); input().typeText(marker); try hasDraft(marker)
+        try await storage(marker, count: 1)
+        app.terminate(); app.launch(); try hasDraft(marker)
+        try await noSends(); capture("D7-unicode-restored")
     }
     func testD08NewTextDuringSend() async throws {
         try await fresh()

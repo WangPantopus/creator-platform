@@ -2,129 +2,202 @@
 
 ## State
 
-Implementation in progress on `lane-7/keyboard-drafts`, following navigation PR 379
-(`7e1d68aee`). Debug builds pass on both platforms. iOS D1, D2 and D8 have passed individually. Larger text and Android rotation exposed further layout defects; fixes are still being operated. No new unit or snapshot tests.
+Work continues on `lane-7/keyboard-drafts`. The branch includes main through `21b3d4836`. PR 379 remains open and ready for WP 7.2.
+WP 7.3 is being published as a draft pending the header decision. Operated
+recovery, real thread deletion, layout and final local gates all pass as recorded.
+
+The compact persistent author header awaits the founder's decision below. Storage
+and recovery work continue independently. No new unit or snapshot tests.
 
 ## Shared behavior spec
 
 The founder authorized this default: a draft stays on the device only, encrypted,
-bound to the account and thread, cleared on send, sign-out, data deletion or when the
-conversation goes away. It never leaves the device. The PR must state this default.
+bound to the account and thread, cleared on accepted send, sign-out, data deletion
+or when the conversation goes away. Unsent input never leaves the device. State
+this default in the PR.
 
-- Each account/thread has independent input. Rotation, backgrounding and process death
-  preserve it. A fresh authorized thread read must precede restoration; an offline or
-  denied launch does not reveal a saved draft. A recreated conversation cannot inherit
-  the former conversation's input even if its creator/fan route is the same.
-- Draft storage is separate from credentials, navigation history, replay cursors and
-  the short offline reading lease. Encryption keys remain device-bound; draft files
-  are excluded from backup. No server endpoint receives input before explicit Send.
-- A pending send retains its original idempotency key, body, sequence and destination.
-  A restart checks the existing acceptance endpoint. It never automatically sends.
-  An unconfirmed send offers the existing Retry action with the same key. An accepted
-  send clears that pending item and matching draft; text edited after Send remains.
-- Sign-out/account change purges drafts. Accepted data deletion clears the matching
-  scope. A fresh 401/403/404 or a changed physical thread ID discards that thread's
-  draft. Storage generations and writer ownership reject late writes after a purge.
-- The software keyboard leaves the composer and Send reachable. Rotation does not
-  lose focus/input or invent a navigation step. Gesture and three-button system
-  insets are respected. Largest text remains readable; authorship stays available
-  as words and a glyph. Light and Night use the same layout behavior.
+- Each account/thread has independent input. Rotation, backgrounding and process
+  death preserve it. A fresh authorized thread read precedes restoration. A denied
+  or offline launch does not reveal a saved draft. A recreated conversation cannot
+  inherit input from the previous physical thread at the same creator/fan route.
+- Drafts are separate from credentials, navigation history, replay cursors and
+  offline reading leases. iOS uses AES-GCM with a device-only Keychain key and
+  protected files excluded from backup. Android uses AES-GCM with Android Keystore
+  and atomic files in `no_backup`.
+- An unconfirmed send retains its original key, body, sequence and destination.
+  Restart checks acceptance without automatically sending. Explicit Retry uses
+  that original key. Acceptance clears matching input; newer edits remain.
+- Sign-out/account change purges drafts. Accepted deletion clears its matching
+  scope. A fresh 401/403/404 or changed physical thread ID discards that thread's
+  draft. Generation, ownership and revision checks reject stale writes.
+- Composer and Send remain above the software keyboard. Rotation preserves focus
+  and input. Largest text remains readable in Light/Night. Android handles window
+  resizing in place; process restoration remains a separate encrypted-storage path.
 
 ## Operated scenarios
 
-The fake API provides synthetic identities/data and controllable faults. Screens,
-keyboard, lifecycle, encryption and HTTP are real. Repeat the affected normal and
-restart/send paths on the disposable real API/PostgreSQL stack (identity/model edges
-remain synthetic). Check server state and absence of premature/duplicate sends.
+The fake API supplies synthetic identities/data and controllable faults. The apps,
+keyboard, lifecycle, cryptography, files and HTTP are real. D6 uses the real
+local API/PostgreSQL, with synthetic development identity and model edges.
 
-| ID  | Steps and expected result                                                                                                                       | iOS                                                                                                                         | Android                                                                                                                                                       |
-| --- | ----------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| D1  | Type, show keyboard, rotate both ways, background, kill and relaunch: same input/thread; composer and Send above keyboard; no message POST      | pass after hiding secondary step-in while focused; rotation/background/process restart and no POST                          | pass after in-place activity resize: keyboard stays open in both orientations, background/process restart preserves input, encrypted file and no POST checked |
-| D2  | Type different input in two threads, navigate away and reopen each: independent drafts                                                          | pass: independent input, process restart, no message POST                                                                   | not run                                                                                                                                                       |
-| D3  | Largest type in Light/Night; gesture/three-button insets on Android; split screen where supported: readable authorship and reachable composer   | fail: largest landscape overlaps keyboard; compact header correction pending                                                | not run                                                                                                                                                       |
-| D4  | Send accepted clears input; rejected/network failure keeps it; acceptance with lost response and restart checks status without a duplicate POST | partial: accepted clears ciphertext; rejected text survives restart, recovery control needs scroll; remaining cases not run | not run                                                                                                                                                       |
-| D5  | Sign-out, same-account sign-in, wrong account, 401/403/404 and recreated conversation: no old draft restored                                    | not run                                                                                                                     | not run                                                                                                                                                       |
-| D6  | Accepted data deletion clears matching scope; late writes cannot resurrect it                                                                   | not run                                                                                                                     | not run                                                                                                                                                       |
-| D7  | Existing 2000-character boundary; ciphertext lacks the synthetic input marker; no backup/upload                                                 | not run                                                                                                                     | not run                                                                                                                                                       |
-| D8  | Edit new text while an older send is unconfirmed; acceptance clears only the old pending item                                                   | pass: one accepted old message, no POST for new text, new encrypted draft survives restart                                  | not run                                                                                                                                                       |
+| ID  | Steps and expected outcome                                                                                                                | iOS                                                               | Android                                                                             |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| D1  | Type, rotate, background, kill/relaunch and refocus: input preserved, keyboard clear, no message POST                                     | pass: bounded editor, both orientations and restored focus        | pass: IME stays open on rotation; 308-byte encrypted file, no plaintext marker/POST |
+| D2  | Different input in two threads; navigate away and restart: independent drafts                                                             | pass with current editor; separate thread drafts survive restart  | pass before final header layout; independent files and no POST                      |
+| D3  | Largest text in Light/Night portrait and landscape: readable fixed author label/glyph and full composer/Send                              | pass, screenshots reviewed; header approval pending               | pass, screenshots reviewed; targets at least 48dp; header approval pending          |
+| D3I | Android three-button navigation at largest text in both orientations                                                                      | not applicable                                                    | pass; navigation mode/font/rotation restored afterward                              |
+| D3S | Split screen where supported: input preserved and keyboard clear                                                                          | not supported on the owned iPhone simulator                       | pass: both orientations at normal/largest text; return to full screen, no POST      |
+| D4  | Accepted send clears; rejection survives restart; pre-acceptance drop retries same key; accepted/lost response restarts without duplicate | pass with rejection-handling correction                           | pass: acceptance, rejection, both loss paths and original key                       |
+| D4R | Tap Retry directly on a rejected message: accepted once with the original key                                                             | pass: rejection fix; two POSTs, one key, one acceptance           | pass: same-key Retry accepts once and clears ciphertext                             |
+| D5  | Sign out, same/wrong account, fresh 401/403/404 and recreated physical thread: old input absent                                           | pass: all cases, including recreated physical thread              | pass: sign-out, account switch, fresh denials and physical replacement              |
+| D6  | Real API restart/send accepted once; accepted thread deletion removes ciphertext; Back/restart cannot resurrect it                        | pass: cancellation, send once, exact database scope, purge/denial | pass: cancellation, send once, exact database scope, purge/denial                   |
+| D7  | Existing 2000-character boundary; ciphertext lacks marker; restart restores; no backup/upload                                             | pass                                                              | pass: 2004 native input clips to 2000; encrypted restart, no POST                   |
+| D7U | Emoji and RTL input survives process restart without premature upload                                                                     | pass: emoji, Hebrew and Arabic restored; no POST                  | pass: emoji/RTL input, encrypted restart and no POST                                |
+| D8  | Edit newer text while an older send is pending: old send accepted once, newer draft survives                                              | pass with bounded editor, one message POST                        | pass: older send accepted once; newer input survives restart                        |
 
-## Not checked
+All failures remain recorded below. “Pass” applies to the observed cases, not
+founder approval of the header. Final Android unit/snapshot/Lint/instrumentation,
+iOS Swift/UI suites, both release builds/hook scans, root checks and 51/51 contract
+checks pass: see `artifacts/lane-7/7-3-gates.txt` for exact counts and expected skips.
+Physical-device/store installation remains WP 7.9. Forced interruption during the
+filesystem write, cancellation at deletion acknowledgement, account/creator-wide
+deletion and complete domain erasure are not run/proved.
 
-The table records partial runs; D5–D7 and all WP 7.3 regression gates are not run yet. Physical devices and store
-build installation remain WP 7.9. Navigation history remains process-only (WP 7.2).
+## Findings and evidence so far
 
-## First operated finding
+Compact receipts, reviewed screenshots and manifest hashes are in `artifacts/lane-7/7-3-*`.
+The clean handoff preserves concise review evidence and build caches outside Git.
 
-The iOS D1 screenshot/accessibility tree shows the landscape composer ending at y=249.7
-while the keyboard begins at y=238; Send also extends into it. Portrait passed. The
-input subsequently survived backgrounding and process stop/relaunch, and no message
-POST occurred, but D1 remains failed until the layout is fixed. D2 passed separately.
-Evidence remains outside Git: `ios-navigation-1791596615711.xcresult`.
+- Initial iOS landscape overlapped the keyboard; largest text also truncated the
+  header. Widening the frame and using an intrinsic-height TextField caused runtime
+  layout stalls. Those attempts were discarded. The bounded scrolling TextEditor
+  passed D1/D3 together in `ios-navigation-1791599747113.xcresult` (2 passed, no skips).
+  Full-screen Light/Night captures confirm readable author words/glyph and controls
+  above the live keyboard. The width remains 390.
+- Android rotation originally closed the IME. Keeping one composer composition and
+  resizing the activity in place fixed that. Largest landscape then squeezed the
+  controls into a clipped strip. The compact row now puts author and composer side
+  by side in short windows. Visual review caught that defect despite a bounds-only
+  pass; the checker now measures the clickable/editable parent and enforces 48dp.
+  D1/D3/D3I pass in `draft-android-row-v2.log`; screenshots were reviewed.
+- iOS D4 passed in `ios-navigation-1791600152174.xcresult`: accepted send clears;
+  rejected input survives restart/Keep editing; dropped requests retry the same
+  hashed key; accepted response loss produces exactly one message POST. The D5
+  runner then used an incomplete synthetic actor label and was corrected.
+- In `ios-navigation-1791600580433.xcresult`, D7 and D8 pass with the bounded editor.
+  D4R failed: a 422 response closed the live transport, making Retry ineffective.
+  Both apps now preserve the existing live connection for definite input rejections.
+  Denials 401/403/404, conflicts 409 and network/server failures retain their existing
+  conceal/recovery handling. The corrected D4R and full D4 pass in `ios-navigation-1791601214001.xcresult`.
+  That bundle has five passes, no skips/failures: D2, D4R, D4, D5 and D7U.
+  Its Unicode capture was visually reviewed.
+- The same bundle's D5 sign-out, wrong-account and denial checks clear ciphertext.
+  Recreation returned 409 because the fake retained subscriptions after process
+  termination. A real HTTP/WS probe reproduced both causes: repeated subscribe had
+  2 listeners and left 1 after close; a process-like disconnect also left 1.
+  The fake now replaces the previous listener and handles TCP end. All three probe
+  cases (normal close, repeat subscribe, process stop) now have 1 live listener and
+  0 after exit: `harness-connections-before.log` / `harness-connections-after.log`.
+- Android D4's recovery gesture started in composer padding, so it could not reach
+  Keep editing. The runner now swipes inside the actual scrollable node. The failed
+  runs remain `draft-android-recovery.log` / `draft-android-recovery-v2.log`.
+- Android D4 and D4R pass in `draft-android-recovery-v3.log`. D5 then exposed
+  a checker bug: adb returned a missing-directory diagnostic in stdout, which the
+  checker counted as seven filenames. The directory was correctly removed. The
+  checker now explicitly distinguishes a removed draft directory from unreadable
+  app storage; later runs below finish the remaining flows.
+- Android D5 passes in `draft-android-recovery-v4.log`. Its subsequent D7 failed:
+  adb burst input delivered only 59 of 2004 characters. Native text-input operation
+  in `draft-android-recovery-v5.log` passes the boundary and external restore/file/API
+  checks. D7U then exposed a checker bug: UiAutomator encodes emoji as numeric XML
+  entities. The restored screen was correct and visually reviewed; the decoder
+  now handles numeric entities and decodes exactly once. D7U/D8 pass in `draft-android-recovery-v6.log`; the newer draft remains
+  encrypted after the older message is accepted exactly once.
+- Android largest landscape split screen exposed a wrapping development banner
+  that clipped composer text. The banner now stays one line and scrolls horizontally.
+  `draft-android-split-v3.log` passes all four split/text combinations and return to
+  full screen: composer/Send targets are 126px (48dp), above the live IME. Input
+  survives resizing; one 299-byte ciphertext record and no message POST. The
+  largest landscape screenshot was visually reviewed. The prior v2 run passed
+  split checks but measured the keyboard too soon on return; the checker now waits
+  for a visible IME before measuring. Full-screen D3 also passes after this change in the same v3 run (Light/Night, both orientations).
+- iOS backup exclusion is `com.apple.metadata:com_apple_backup_excludeItem` on this
+  simulator. The driver checks that attribute and reads only this feature's
+  ciphertext directory, never Keychain or credential files.
 
-The normal-size layout fix hides secondary step-in/privacy controls while editing,
-keeping the composer in its existing view. A wider iOS frame was discarded after a runtime stall.
-For constrained layouts, the current fix keeps a compact author label/glyph fixed and
-puts the longer identity strip in the message scroller. No wording is added.
-The same behavior is being applied on Android; no wording is changed. Verification pending.
+## Real API deletion findings
 
-The first layout attempt (wider flexible frame plus hiding step-in while focused)
-stalled during typing. The owned app used about 96% CPU; a process sample showed
-SwiftUI/TextKit layout work on the main thread, not encryption. That run was stopped
-after its explicit main-run-loop timeout. The width was reverted to 390; D1 then passed (`ios-navigation-1791597584037.xcresult`).
-Raw log: `draft-ios-layout-check.log`; sample: `draft-typing-stall.sample.txt` (outside Git).
+The disposable lane 7 stack used real API/PostgreSQL and synthetic identity/model
+edges. Both apps pass D6. Earlier Android failures:
 
-## Subsequent operated findings
+- v1 selected the Creator ID caption instead of its editable field; the subsequent
+  Back left privacy. The runner now targets the editable accessibility description,
+  waits for a real keyboard, and checks the entered value.
+- v2 requested takeover of an already human-active conversation and received 403.
+  Preparation now reads current control and only requests takeover when needed.
+- v3 filled the fields but could not keep the deletion confirmation on screen.
+  Direct operation proved it appears, then the ordinary session-readiness heartbeat
+  dismisses it. Both apps now preserve only the generic confirmation during a
+  same-session check. Actions still disable during verification and use the original
+  capture/fresh authority checks. Errors, route/owner changes and disappearance
+  continue to clear confirmation and private results. The new D6 flow waits across
+  the heartbeat, chooses Keep data, checks retained access/ciphertext, then confirms.
 
-- Android portrait D1 has an encrypted 308-byte file in `no_backup` with no synthetic
-  plaintext marker. Rotation restores the input but closes the IME. Keeping the
-  composer outside the list alone did not fix activity recreation; orientation/window
-  resize handling is now being verified. No Android D1 pass is claimed.
-- iOS largest-text screenshot confirms truncated header/identity text, and landscape
-  input ends at y=316 versus keyboard y=238. The compact layout is not verified yet.
-- iOS D4 accepted send removed the draft file. Rejected text survived restart; the
-  recovery control was below the lazy viewport. The updated runner scrolls to it.
-  Inspection also found the message component's Retry callback was unwired on both
-  apps; both callbacks now use the existing same-key retry, pending operation proof.
-- iOS D8 passed in `ios-navigation-1791597927831.xcresult`: the older send appears once
-  in API state, the newer input does not, there is one message POST, and the newer input
-  survives process restart in a 296-byte ciphertext file. The overall bundle has
-  two failures (D3 and D4), one pass (D8), zero skips.
-- iOS backup exclusion exists as `com.apple.metadata:com_apple_backup_excludeItem`
-  with value `com.apple.MobileBackup` on this simulator. The checker was corrected
-  to use this attribute; it had incorrectly reported the obsolete attribute absent.
+D6 now checks the exact account/thread in PostgreSQL: one deletion job, one tombstone
+and eight domain tasks. This proves accepted scope and immediate denial, not that
+all domain erasure has completed. Android D6 passes in `draft-real-android-v5.log`: explicit send once, confirmation
+survives readiness checks, Keep data preserves access/ciphertext, confirmed deletion
+removes the file, exact database job/tombstone/tasks exist, and Back/restart both
+show Conversation unavailable with no old input. v4 stopped before deletion because
+a field tap used bounds during a keyboard transition; the runner now waits for
+keyboard dismissal and refocuses from current bounds. iOS D6 passes in `ios-navigation-1791605313318.xcresult` (1 pass, 0 failures/skips),
+with its exact database scope independently verified by `stack-drafts.mjs verify-ios`.
+Its cancellation uses the native popover background when iOS omits the cancel
+button. The confirmation survived the six-second wait; cancellation preserved
+access/ciphertext, deletion removed it, and Back/restart showed the denied screen.
+Both final captures were visually reviewed. Earlier iOS v1/v3 runs had unreachable
+field/button gestures; v2 reused a sent fixture marker; v4 expected a cancel button
+in a popover that remained open. The runner now uses visible scroll bounds, Return,
+a unique per-run marker and native popover cancellation. No product change was
+needed for the v4 locator failure.
 
-- The next iOS run passed D1 again with the compact header. D3 Light reached both
-  orientations, but focusing the restored draft in Night at the largest size stalled
-  the app at ~99% CPU. The owned run was interrupted; D4/D5/D7 did not run. The
-  sample again shows layout work. A bounded scrolling TextEditor now replaces the
-  intrinsic-height TextField; it is not built or operated yet. Bundle:
-  `ios-navigation-1791598464014.xcresult`; sample: `draft-compact-stall.sample.txt`.
-- Android now handles orientation/window-size changes in place through the activity
-  configuration declaration. Draft restoration after a process kill remains a separate
-  encrypted-storage path. This latest build is being operated; no pass claimed yet.
+### Backend observation for lane 1
 
-- Android D1 passed with in-place resize (`draft-android-resize.log`): IME top1517
-  portrait /394 landscape, input and Send fully above it, rotation/background/process
-  restart preserved input, one encrypted308-byte no-backup file, no plaintext marker
-  and no message POST. D2/D3 are still running.
-
-- Visual review overruled the Android D3 bounds-only pass: largest landscape
-  squeezed input and Send to a clipped strip. The checker now rejects targets shorter
-  than48dp. A stable three-child layout places author and composer side by side in
-  short windows; its first operated run is pending. No final D3 pass is claimed.
-- The bounded iOS editor no longer stalls in the first run. The runner chose the old
-  TextField locator before the restored TextView appeared (D1), and a stale off-screen
-  keyboard frame in Night (D3). Those runs remain failed. The locator now waits for
-  TextView; Night explicitly edits the restored text to bring up the software keyboard.
-  Bundle `ios-navigation-1791599044007.xcresult`; full captures are outside Git.
-
-- Bounded iOS TextEditor D1/D3 passed together in `ios-navigation-1791599747113.xcresult`: 2 passed, 0 skipped, 0 failed. Full-screen captures visually confirm readable author words/glyph and input/Send above the live keyboard in both Light/Night largest-text orientations. Restored input was focused and edited again after process restart without a stall.
-- The first Android 48dp assertion measured label children instead of their clickable/editable parents. It now measures the actual parent targets and checks draft text specifically in the editable field. Visual review also caught overlapping normal header children inside a Box; they now stack in a Column. The corrected run is in progress.
-
-- Android corrected D1/D3/D3I passed together (`draft-android-row-v2.log`). All measured input/Send targets are at least48dp, remain above the IME, and screenshots show readable contents in largest-text landscape. Gesture and three-button modes both pass; three-button landscape IME top520px. The previous system navigation mode/font/orientation were restored. Split screen remains not run.
+Owner: lane 1 (trust integration), with the domain owners. Files to inspect:
+`apps/backend/src/modules/trust/domain-adapters.ts` and the host wiring in
+`apps/backend/src/integration.ts`. Confirm/configure the disposable local stack's
+privacy adapters; no backend files changed in this lane. Android's accepted thread
+job is blocked after immediate denial and local draft removal. Observed task codes:
+`accounting_boundary_pending`, `commerce_retention_unconfigured`,
+`content_retention_unconfigured`, `conversation_recordings_unavailable`,
+`domain_hook_error` (growth), `identity_retention_unconfigured`,
+`media_retention_unconfigured`, `comparison_artifact_purge_pending`.
+This does not invalidate the app's accepted-scope cleanup proof; complete backend
+erasure is not proved and must not be reported as complete.
 
 ## Founder flag: compact persistent authorship
 
-The verified compact layout keeps the existing author label and glyph fixed and puts the longer identity strip in the scroller. Charter4.2 says the identity strip never scrolls away. Approval requested before accepting that presentation; recommended default is the compact fixed author label. No wording changes. Storage/recovery work continues independently.
+[Charter 4.2](../00-charter.md) says, “The identity strip at the top of a thread never
+scrolls away.” The verified constrained layout keeps the existing author label and
+glyph fixed and puts the full identity sentence in the message scroller. The
+recommended default is this compact fixed author label. Approval is pending before
+accepting that presentation; no wording changes are proposed.
 
-- iOS D4 passed in `ios-navigation-1791600152174.xcresult`: accepted send clears ciphertext; rejected input survives restart/Keep editing; pre-acceptance drop retries the original hashed key; accepted response loss restarts and checks status with exactly one message POST. D5 confirmed sign-out removal, then failed on a runner locator (`Devon` versus `Harness: Devon, ...`). The run was interrupted; D7/D8 were not run in that bundle. The selector now matches the observed prefix and throws on failure.
+## Run it
+
+Use the harness runbook, owned devices and serial heavy-build lock. Stop the other
+platform's app before resetting the shared fake API. Rebuild after source changes.
+
+- Android: `LANE7_OUT=<scratch> node scripts/with-heavy-build-lock.mjs --owner LANE-7 -- node tests/scenarios/lane-7/e7-3-drafts.mjs D1 D2 D3 D3I D4 D4R D5 D7 D7U D8`.
+  D7 and D7U also need the debug Android test APK installed. Its opt-in instrumentation
+  uses the real text-input action because adb hardware-key mapping cannot type RTL
+  and emoji; the external journey then kills/relaunches and checks files/API state.
+- iOS: build-for-testing, start `ios-link-driver.mjs`, then
+  `LANE7_OUT=<scratch> node tests/scenarios/lane-7/ios-navigation.mjs <built.xctestrun> --drafts`.
+  The runner requires every selected flow to pass with zero skips.
+- With both apps stopped: `node tests/scenarios/lane-7/harness-connections.mjs`.
+  This resets the fake and checks actual HTTP/WS subscription cleanup.
+- Real stack: `stack-drafts.mjs android`, or
+  `stack-drafts.mjs prepare-ios <scratch/fixture.json>` followed by the iOS runner's
+  `--draft-stack` with `LANE7_STACK_FIXTURE=<scratch/fixture.json>`. The fixture
+  contains synthetic object IDs only. Tokens remain in memory and are never logged.

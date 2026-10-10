@@ -294,7 +294,14 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             val result = client.request("$root/$path", buildJsonObject { put("text", item.text); put("idempotencyKey", item.key); put("clientSequence", item.sequence) })
             if (path == "messages") client.json.decodeFromJsonElement<APIAcceptedMessage>(result) else client.json.decodeFromJsonElement<APIMessage>(result)
             updateInput(if (draft.trim() == item.text) "" else draft, null); saveDraftNow(); refresh()
-        } catch (failure: Throwable) { val uncertain = failure !is ConversationFailure || failure.status >= 500 || failure.status == 409; updateInput(item = item.copy(uncertain = uncertain, rejected = !uncertain)); fail(failure) }
+        } catch (failure: Throwable) {
+            val uncertain = failure !is ConversationFailure || failure.status >= 500 || failure.status == 409
+            updateInput(item = item.copy(uncertain = uncertain, rejected = !uncertain))
+            // An answered input rejection does not close the live transport.
+            // Denials/conflicts still use the existing conceal/refresh path.
+            if (failure is ConversationFailure && failure.status in 400..499 && failure.status !in listOf(401,403,404,409)) error = failure.message.orEmpty()
+            else fail(failure)
+        }
         finally { busy = false }
     }
     LaunchedEffect(baseURL, root, accountId, foreground, privacy, comparisonQuestion != null, connectionRetry) {
