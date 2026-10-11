@@ -5,7 +5,7 @@ export interface ReplyExport {
   version: number;
   sourceHash: string;
   authorLabel: string;
-  authorKind: "human_creator" | "approved_draft";
+  authorKind: "human_creator";
   verificationURL: string;
   text: string;
 }
@@ -32,7 +32,7 @@ export function parseReplyExport(value: unknown, id: string): ReplyExport {
     typeof source.authorLabel !== "string" ||
     !source.authorLabel.length ||
     source.authorLabel.length > 512 ||
-    !["human_creator", "approved_draft"].includes(source.authorKind ?? "") ||
+    source.authorKind !== "human_creator" ||
     typeof source.text !== "string" ||
     !source.text.length ||
     source.text.length > 128000 ||

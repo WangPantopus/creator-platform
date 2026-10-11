@@ -38,7 +38,7 @@ const ShareSourceRecord = z.strictObject({
   creatorName: z.string().min(1).max(80),
   version: z.int().positive(),
   text: z.string().min(1).max(100000),
-  authorKind: z.enum(["human_creator", "approved_draft"]),
+  authorKind: z.literal("human_creator"),
   signedActId: z.uuid(),
   signedAt: z.iso.datetime(),
   contentHash: z.string().regex(/^[a-f0-9]{64}$/u),
@@ -1086,7 +1086,7 @@ export class GrowthService {
   async createShare(actor: Actor, grantId: string) {
     z.uuid().parse(grantId);
     const supplied = await this.owners.shareSource(actor, grantId);
-    if (!supplied)
+    if (!supplied || supplied.authorKind !== "human_creator")
       throw new DomainError(
         "sharing_unavailable",
         copy.growthErrorSharingUnavailable,
@@ -1157,7 +1157,11 @@ export class GrowthService {
         )
       ).rows[0];
       if (!row) return { id, state: "withdrawn" as const };
-      const source = ShareSourceRecord.parse(row.source);
+      // Old approved-draft records are no longer public under E5.7. Treat any
+      // unsupported stored source as withdrawn, never as a human reply.
+      const parsed = ShareSourceRecord.safeParse(row.source);
+      if (!parsed.success) return { id, state: "withdrawn" as const };
+      const source = parsed.data;
       const status = await this.owners.shareStatus(row.grant_id, source);
       return status.valid
         ? {
@@ -1198,26 +1202,21 @@ export class GrowthService {
     if (
       source.text.length > 100000 ||
       source.creatorName.length > 80 ||
-      !["human_creator", "approved_draft"].includes(source.authorKind)
+      source.authorKind !== "human_creator"
     )
       throw new DomainError(
         "share_source_unavailable",
         copy.growthCardUnavailable,
         503,
       );
-    const author =
-      source.authorKind === "approved_draft"
-        ? formatCopy("growthPreparedByAiApprovedBy", {
-            value1: source.creatorName,
-          })
-        : source.handle
-          ? formatCopy("growthSharedReplyTo", {
-              name: source.creatorName,
-              handle: source.handle,
-            })
-          : formatCopy("growthSharedPersonalReply", {
-              name: source.creatorName,
-            });
+    const author = source.handle
+      ? formatCopy("growthSharedReplyTo", {
+          name: source.creatorName,
+          handle: source.handle,
+        })
+      : formatCopy("growthSharedPersonalReply", {
+          name: source.creatorName,
+        });
     return {
       id: share.id,
       version: source.version,
