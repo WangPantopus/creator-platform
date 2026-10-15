@@ -20,6 +20,7 @@
  * APNs and FCM (the real adapters need Apple and Google credentials, WP 5.3).
  */
 import { createServer } from "node:http";
+import { createRequire } from "node:module";
 import { randomUUID } from "node:crypto";
 import { createConfiguredBackend } from "../../../apps/backend/src/integration.js";
 import { readConfig } from "../../../apps/backend/src/config.js";
@@ -34,6 +35,10 @@ import { composeContentHost } from "../../../apps/backend/src/modules/content/in
 import { contentNoticeOwner } from "../../../apps/backend/src/modules/content/notices.js";
 import { configureGrowthForBackend } from "../../../apps/backend/src/modules/growth/configured.js";
 import { composeNotificationOwners } from "../../../apps/backend/src/modules/growth/owners.js";
+import { stableUuid } from "../../../apps/backend/src/modules/growth/relay.js";
+import { growthAccountExport } from "../../../apps/backend/src/modules/growth/privacy-export.js";
+import type { FeatureRegistration } from "../../../apps/backend/src/app.js";
+import { copy } from "../../../packages/copy/src/index.js";
 import {
   DeliveryFailure,
   type DeliveryProvider,
@@ -109,6 +114,307 @@ const gateway = createServer((req, res) => {
 });
 gateway.listen(56453, "127.0.0.1");
 
+// ---- Stand-in owners ----------------------------------------------------
+// Lane 3's conversation host and lane 4's commerce and calls hosts are not in
+// this host. Each real owner will, in its own process and in the request that
+// changed its own state, (1) record what a notice may say with
+// `growth.notices.emit`, (2) enqueue the event with `growth.relay`, and
+// (3) `growth.notices.withdraw` when its object stops being something to tell
+// anyone about. These routes make exactly those calls for a scenario, so the
+// table, the engine and the dispatcher run for real. The state is built here
+// from fixed copy, as an owner builds it, never taken from the request;
+// `secretText` stands for the private words an owner holds (a message, an
+// amount) and is never passed on. `liar` lets a scenario ask for a wrong author
+// to prove the engine's own rule refuses it.
+const requireFromBackend = createRequire(
+  new URL("../../../apps/backend/package.json", import.meta.url),
+);
+const { Router } = requireFromBackend("express");
+const { z } = requireFromBackend("zod");
+const gone = new Set<string>();
+const standInKinds = {
+  ai_reply: {
+    producer: "conversation",
+    author: "ai",
+    role: "fan",
+    say: copy.growthAiConversationUpdate,
+    where: "chat",
+  },
+  approved_draft: {
+    producer: "conversation",
+    author: "approved_draft",
+    role: "fan",
+    say: copy.growthSignedConversationUpdate,
+    where: "chat",
+  },
+  personal_reply: {
+    producer: "conversation",
+    author: "human_creator",
+    role: "fan",
+    say: copy.growthSignedConversationUpdate,
+    where: "chat",
+  },
+  creator_offer: {
+    producer: "commerce",
+    author: "human_creator",
+    role: "fan",
+    say: copy.requestUpdate,
+    where: "requests",
+  },
+  request_status: {
+    producer: "commerce",
+    author: "system",
+    role: "fan",
+    say: copy.requestUpdate,
+    where: "requests",
+  },
+  new_packet: {
+    producer: "commerce",
+    author: "system",
+    role: "creator",
+    say: copy.queueNew,
+    where: "requests",
+  },
+  commitment_due: {
+    producer: "commerce",
+    author: "system",
+    role: "creator",
+    say: copy.requestUpdate,
+    where: "requests",
+  },
+  call_reminder: {
+    producer: "calls",
+    author: "system",
+    role: "fan",
+    say: copy.growthCurrentCallUpdate,
+    where: "call",
+  },
+} as const;
+type StandInKind = keyof typeof standInKinds;
+type StandInCall = {
+  kind: StandInKind;
+  creatorId: string;
+  recipientAccountId: string;
+  aggregateId: string;
+  version: number;
+  status?: string;
+  liar?: string;
+  secretText?: string;
+};
+const standInCall = z.strictObject({
+  kind: z.enum(Object.keys(standInKinds) as [StandInKind, ...StandInKind[]]),
+  creatorId: z.uuid(),
+  recipientAccountId: z.uuid(),
+  aggregateId: z.uuid(),
+  version: z.int().min(1),
+  status: z.string().optional(),
+  liar: z.string().optional(),
+  secretText: z.string().optional(),
+});
+function standInOwners(
+  g: NonNullable<typeof growth>,
+  pool: {
+    query: (
+      text: string,
+      values: unknown[],
+    ) => Promise<{ rows: Record<string, string>[] }>;
+  },
+): FeatureRegistration {
+  return {
+    name: "lane5-owners",
+    // createApp allows a fixed list of feature paths; "/" is one, so the routes
+    // below carry their own prefix and the sign-in check stays inside it.
+    path: "/",
+    router: ({ actorFor }) => {
+      const router = Router();
+      const outer = Router();
+      router.use(async (req: unknown, _res: unknown, next: () => void) => {
+        await actorFor(req as never);
+        next();
+      });
+      const event = (call: StandInCall) => {
+        const id = stableUuid(
+          `lane5.standin:${call.kind}:${call.aggregateId}:${call.version}:${call.recipientAccountId}`,
+        );
+        return {
+          id,
+          schemaVersion: 1,
+          type: call.kind,
+          creatorId: call.creatorId,
+          aggregateId: call.aggregateId,
+          aggregateVersion: call.version,
+          causationId: id,
+          correlationId: call.aggregateId,
+          // The same cause must be the same bytes every time it is named, or the
+          // relay refuses it as a conflicting event: a real owner uses the time
+          // its own row was written. Derived from the id here.
+          occurredAt: new Date(
+            Date.UTC(2026, 9, 9) +
+              (Number.parseInt(id.slice(0, 7), 16) % 86_400_000),
+          ).toISOString(),
+          recipients: [
+            {
+              accountId: call.recipientAccountId,
+              role: standInKinds[call.kind].role,
+            },
+          ],
+        };
+      };
+      const notice = async (call: StandInCall) => {
+        const kind = standInKinds[call.kind];
+        const creator = (
+          await pool.query(
+            "SELECT handle,display_name FROM creator.creator_profile WHERE id=$1",
+            [call.creatorId],
+          )
+        ).rows[0];
+        if (!creator) throw new Error("unknown creator");
+        let destination = `/creators/${creator.handle}/chat`;
+        if (kind.where === "requests") destination = "/commerce/requests";
+        if (kind.where === "call") {
+          const fan = (
+            await pool.query(
+              "SELECT id FROM creator.fan_profile WHERE account_id=$1",
+              [call.recipientAccountId],
+            )
+          ).rows[0];
+          destination = `/calls/${call.creatorId}/${fan?.id}/${call.aggregateId}`;
+        }
+        return g.notices.emit({
+          type: call.kind,
+          aggregateId: call.aggregateId,
+          accountId: call.recipientAccountId,
+          creatorId: call.creatorId,
+          version: call.version,
+          authorKind: (call.liar ?? kind.author) as never,
+          creatorName: creator.display_name,
+          safePreview: kind.say,
+          destination,
+          ...(call.status ? { status: call.status } : {}),
+        });
+      };
+      router.post(
+        "/emit",
+        async (req: { body: unknown }, res: { json(v: unknown): void }) =>
+          res.json(await notice(standInCall.parse(req.body))),
+      );
+      router.post(
+        "/enqueue",
+        async (req: { body: unknown }, res: { json(v: unknown): void }) => {
+          const call = standInCall.parse(req.body);
+          await g.relay.enqueue(standInKinds[call.kind].producer, event(call));
+          res.json({ enqueued: true });
+        },
+      );
+      // What an owner does in one request: record, then enqueue the event.
+      router.post(
+        "/both",
+        async (req: { body: unknown }, res: { json(v: unknown): void }) => {
+          const call = standInCall.parse(req.body);
+          const recorded = await notice(call);
+          await g.relay.enqueue(standInKinds[call.kind].producer, event(call));
+          res.json({ ...recorded, enqueued: true });
+        },
+      );
+      router.post(
+        "/withdraw",
+        async (req: { body: unknown }, res: { json(v: unknown): void }) => {
+          const call = z
+            .strictObject({
+              kind: z.enum(
+                Object.keys(standInKinds) as [StandInKind, ...StandInKind[]],
+              ),
+              aggregateId: z.uuid(),
+              recipientAccountId: z.uuid().optional(),
+              version: z.int().min(1).optional(),
+            })
+            .parse(req.body);
+          res.json(
+            await g.notices.withdraw({
+              type: call.kind,
+              aggregateId: call.aggregateId,
+              ...(call.recipientAccountId
+                ? { accountId: call.recipientAccountId }
+                : {}),
+              ...(call.version ? { version: call.version } : {}),
+            }),
+          );
+        },
+      );
+      // Host or operator recovery once a missing owner record exists.
+      router.post(
+        "/resume",
+        async (req: { body: unknown }, res: { json(v: unknown): void }) => {
+          const call = z
+            .strictObject({
+              producer: z.enum(["conversation", "commerce", "calls"]),
+              creatorId: z.uuid(),
+            })
+            .parse(req.body);
+          res.json(await g.relay.resume(call.producer, call.creatorId));
+        },
+      );
+      // The connected owner's own live truth, for a signed-in person reading
+      // their list: this message is gone for good.
+      router.post(
+        "/live",
+        async (req: { body: unknown }, res: { json(v: unknown): void }) => {
+          const call = z
+            .strictObject({ aggregateId: z.uuid(), gone: z.boolean() })
+            .parse(req.body);
+          if (call.gone) gone.add(call.aggregateId);
+          else gone.delete(call.aggregateId);
+          res.json({ gone: [...gone] });
+        },
+      );
+      // The real growth erasure and export over a fake authority: W8's job lease
+      // is the part that does not exist here, so the authority check says "these
+      // are the creators this account owned" and nothing more.
+      router.post(
+        "/erase",
+        async (req: { body: unknown }, res: { json(v: unknown): void }) => {
+          const call = z
+            .strictObject({
+              accountId: z.uuid(),
+              ownedCreatorIds: z.array(z.uuid()).default([]),
+            })
+            .parse(req.body);
+          await g.service.privacyDelete(
+            call.accountId,
+            new AbortController().signal,
+            async () => call.ownedCreatorIds,
+          );
+          res.json({ erased: true });
+        },
+      );
+      router.post(
+        "/export",
+        async (req: { body: unknown }, res: { json(v: unknown): void }) => {
+          const call = z
+            .strictObject({
+              accountId: z.uuid(),
+              ownedCreatorIds: z.array(z.uuid()).default([]),
+            })
+            .parse(req.body);
+          const stream = growthAccountExport(
+            g.service,
+            call.accountId,
+            new AbortController().signal,
+            async () => call.ownedCreatorIds,
+          );
+          const parts: string[] = [];
+          for await (const chunk of stream.chunks)
+            parts.push(Buffer.from(chunk.data).toString("utf8"));
+          await stream.finish();
+          res.json({ ndjson: parts.join("") });
+        },
+      );
+      outer.use("/v1/lane5-owners", router);
+      return outer;
+    },
+  };
+}
+
 const growthAPIPool = await createGrowthAPIPool(config.databaseUrl);
 let growth: Awaited<ReturnType<typeof configureGrowthForBackend>> = null;
 const backend = await createConfiguredBackend({
@@ -150,6 +456,18 @@ const backend = await createConfiguredBackend({
                   safePreview: "",
                   destination: "/notifications",
                 },
+          // A connected conversation owner would answer live for a signed-in
+          // person's own list: "gone" if it says so, no opinion otherwise.
+          conversation: async (event) => ({
+            retryable: !gone.has(event.aggregateId),
+            available: false,
+            authorized: false,
+            version: 0,
+            creatorName: "",
+            authorKind: "system",
+            safePreview: "",
+            destination: "/notifications",
+          }),
         }),
       },
     });
@@ -178,7 +496,11 @@ const backend = await createConfiguredBackend({
     composition.bindContent(content);
     late.contentOwner = contentNoticeOwner({ pool: runtime.pool, content });
     runtime.configureSignedSubjects([contentSignedSubjects(content)]);
-    return [contentFeature(content), growth.feature];
+    return [
+      contentFeature(content),
+      growth.feature,
+      standInOwners(growth, runtime.pool),
+    ];
   },
 });
 

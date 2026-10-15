@@ -225,6 +225,8 @@ public struct GrowthFanFeature: View {
   private let destination: String
   private let signIn: (String) -> Void
   private let navigate: ((String) -> Void)?
+  private let goBack: (() -> Void)?
+  private let backTarget: String?
   @State private var route: String
   @FocusState private var discoverSearchFocused: Bool
   @State private var query = ""
@@ -268,7 +270,9 @@ public struct GrowthFanFeature: View {
     token: (@Sendable () async throws -> String?)? = nil,
     session: FanSession? = nil,
     onSignIn: @escaping (String) -> Void = { _ in },
-    onNavigate: ((String) -> Void)? = nil
+    onNavigate: ((String) -> Void)? = nil,
+    onBack: (() -> Void)? = nil,
+    backTarget: String? = nil
   ) {
     client = baseURL.map { origin in
       if let session { return GrowthClient(baseURL: origin, session: session, destination: destination) }
@@ -278,6 +282,8 @@ public struct GrowthFanFeature: View {
     _route = State(initialValue: destination)
     signIn = onSignIn
     navigate = onNavigate
+    goBack = onBack
+    self.backTarget = backTarget
   }
   public static func registration(baseURL: URL?) -> FanFeatureRegistration {
     FanFeatureRegistration(
@@ -458,11 +464,11 @@ public struct GrowthFanFeature: View {
             } else if route.contains("/posts/") {
               HStack(spacing: 10) {
                 SwiftUI.Button {
-                  open("/creators/" + creator.handle)
+                  if let goBack { goBack() } else { open("/creators/" + creator.handle) }
                 } label: {
                   QelvoraGlyph(name: "back", color: qColor("ink", scheme))
                     .frame(width: 44, height: 44)
-                }.buttonStyle(.plain).accessibilityLabel(QelvoraCopy.text("growthBackToSPage", values: ["name": creator.name]))
+                }.buttonStyle(.plain).accessibilityLabel(goBack == nil || backTarget == "/creators/" + creator.handle ? QelvoraCopy.text("growthBackToSPage", values: ["name": creator.name]) : QelvoraCopy.text("back"))
                 Avatar(initial: String(creator.name.prefix(1)))
                 VStack(alignment: .leading, spacing: 2) {
                   Text(creator.name).qText("body-strong")
@@ -841,7 +847,7 @@ private struct GrowthSessionScreen: View {
       if scenePhase == .active {
         GrowthFanFeature(baseURL: baseURL, destination: model.destination, session: model,
           onSignIn: { target in model.open(target); Task { await model.beginSignIn() } },
-          onNavigate: model.open)
+          onNavigate: { model.open($0) }, onBack: { model.back() }, backTarget: model.backTarget)
           .id(model.destination + (model.session?.sessionId ?? "signed-out"))
       } else {
         qColor("ground", scheme)

@@ -50,8 +50,10 @@ const outward = (n) => ({
 function homeEntry(world, thread) {
   const last = thread.messages.at(-1);
   const name = thread.creatorName;
-  const label =
-    last.authorKind === "fan"
+  // Nothing delivered yet (a conversation just begun): the system label, no preview.
+  const label = !last
+    ? copy("growthSystem")
+    : last.authorKind === "fan"
       ? copy("navYou")
       : last.authorKind === "ai"
         ? copy("aiAuthor", { name })
@@ -67,9 +69,9 @@ function homeEntry(world, thread) {
     creatorId: thread.creatorId,
     creatorName: name,
     label,
-    preview: Array.from(last.text).slice(0, 240).join(""),
+    preview: last ? Array.from(last.text).slice(0, 240).join("") : "",
     destination: `/threads/${thread.creatorId}/${thread.fanId}`,
-    updatedAt: last.createdAt,
+    updatedAt: last?.createdAt ?? thread.privacyNoticeAt,
     kind: "thread",
   };
 }

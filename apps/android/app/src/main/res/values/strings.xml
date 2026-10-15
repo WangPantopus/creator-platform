@@ -67,6 +67,7 @@
   <string name="decision_eta" formatted="false">{name} usually decides in {range}</string>
   <string name="draft_notice" formatted="false">{name} may answer with her AI\'s draft; you\'ll see that label.</string>
   <string name="capacity" formatted="false">{name} answers {mode} within {deadline} · {n} of {cap} left this week.</string>
+  <string name="mode_members_only" formatted="false">For members whose tier includes requests</string>
   <string name="audit_access" formatted="false">Opening this conversation is logged and visible to the fan.</string>
   <string name="long_session" formatted="false">You\'ve been talking with {name}\'s AI for a while. It\'s an AI, and it will be here when you\'re back.</string>
   <string name="note_audience" formatted="false">{name} · to {audience}</string>
@@ -82,6 +83,7 @@
   <string name="conversation_development_policy_notice" formatted="false">Use fictional content only. This development configuration does not represent provider approval or permission to serve real fans. Message retention may apply.</string>
   <string name="sensitive_memory" formatted="false">Want me to remember this? Only if you say yes.</string>
   <string name="spend_limit" formatted="false">Set a monthly limit. You can change it any time; raising it takes 24 hours.</string>
+  <string name="spend_this_month" formatted="false">This month · {spent} of your {limit} limit</string>
   <string name="step_in" formatted="false">Ask {name} to step in</string>
   <string name="included_in_request" formatted="false">Included in your request</string>
   <string name="ai_author" formatted="false">{name}\'s AI</string>
@@ -129,6 +131,14 @@
   <string name="page_unavailable_body" formatted="false">Nothing you saved was changed. Try again in a moment.</string>
   <string name="adult_only_title" formatted="false">This app is for adults</string>
   <string name="adult_only_body" formatted="false">This app is available to adults aged 18 and over.</string>
+  <string name="sign_in_with_apple" formatted="false">Continue with Apple</string>
+  <string name="sign_in_with_google" formatted="false">Continue with Google</string>
+  <string name="sign_in_age_title" formatted="false">Your date of birth</string>
+  <string name="sign_in_age_note" formatted="false">We keep only whether you can use the app, never the date.</string>
+  <string name="sign_in_age_continue" formatted="false">Continue</string>
+  <string name="sign_in_failed" formatted="false">This sign-in could not be completed. Start again.</string>
+  <string name="sign_in_unavailable" formatted="false">Sign-in is unavailable right now. Try again in a moment.</string>
+  <string name="sign_in_rate_limited" formatted="false">Too many sign-in attempts. Wait a minute and try again.</string>
   <string name="nav_home" formatted="false">Home</string>
   <string name="nav_discover" formatted="false">Discover</string>
   <string name="nav_requests" formatted="false">Requests</string>

@@ -37,8 +37,8 @@ private func callOfferNotice(_ error: Error, fallback: String) -> String {
         if parts.count == 2, parts[0] == "calls", let id = UUID(uuidString: String(parts[1])) {
             NativeAccountCallLookup(model: model, callID: id.uuidString.lowercased()).id(lifetime)
         } else if URLComponents(string: model.destination)?.queryItems?.contains(where: { $0.name == "offer" && $0.value == "1" }) == true {
-            NativeCallOffers(baseURL: baseURL, destination: model.destination, model: model, open: model.open).id(lifetime)
-        } else { NativeCallView(baseURL: baseURL, destination: model.destination, model: model, open: model.open).id(lifetime) }
+            NativeCallOffers(baseURL: baseURL, destination: model.destination, model: model, open: { model.open($0) }).id(lifetime)
+        } else { NativeCallView(baseURL: baseURL, destination: model.destination, model: model, open: { model.open($0) }).id(lifetime) }
     }
 }
 @MainActor private struct NativeAccountCallLookup: View {

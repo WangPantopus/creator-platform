@@ -5,6 +5,7 @@ import {
   closeDb,
   expect,
   finish,
+  http,
   publishNote,
   runEffects,
   seedCreator,
@@ -33,9 +34,10 @@ async function inBatches(count, size, work) {
 
 const maya = await seedCreator(B, "maya_chunks", "Maya");
 const tier = await seedTier(maya.id, "Kiln Club");
-await inBatches(MEMBERS, 20, async (n) => {
+const members = await inBatches(MEMBERS, 20, async (n) => {
   const fan = await seedFan(B + 10 + n, `m${n}_chunks`);
   await seedMembership(maya.id, fan.id, tier);
+  return fan;
 });
 await inBatches(20, 20, (n) => seedFan(B + 800 + n, `o${n}_chunks`));
 
@@ -96,6 +98,52 @@ await step(
       JSON.stringify(before) === JSON.stringify(after),
       `${JSON.stringify(before)} -> ${JSON.stringify(after)}`,
     );
+  },
+);
+await step(
+  "E5.1-chunks-cap",
+  "after 100 of the 600 mute Maya's Notes, the next Note is exactly one event of exactly 500",
+  async () => {
+    const results = await inBatches(100, 20, (n) =>
+      http("POST", `/v1/content/${maya.id}/mute`, members[n].token, {
+        muted: true,
+      }),
+    );
+    expect(
+      results.every((r) => r.status === 200),
+      "a mute failed",
+    );
+    const second = await publishNote(maya, "Five hundred of you remain.", {
+      kind: "members",
+    });
+    expect(second.response.status === 200, `publish ${second.response.status}`);
+    await waitFor(
+      "the second Note's notices",
+      async () =>
+        (
+          await sql(
+            "SELECT count(*)::int AS n FROM growth.notification n JOIN growth.producer_relay r ON r.id=n.event_id WHERE r.envelope->>'aggregateId'=$1",
+            [second.id],
+          )
+        ).rows[0].n >= 500,
+      120000,
+    );
+    await new Promise((r) => setTimeout(r, 2000));
+    const sizes = (
+      await sql(
+        "SELECT jsonb_array_length(envelope->'recipients')::int AS n FROM growth.producer_relay WHERE envelope->>'aggregateId'=$1",
+        [second.id],
+      )
+    ).rows.map((r) => r.n);
+    expect(sizes.join() === "500", `event sizes ${sizes}`);
+    const mutedTold = (
+      await sql(
+        "SELECT count(*)::int AS n FROM growth.notification n JOIN growth.producer_relay r ON r.id=n.event_id JOIN creator.fan_profile f ON f.account_id=n.account_id WHERE r.envelope->>'aggregateId'=$1 AND f.handle ~ '^m[0-9]{1,2}_chunks$' AND substring(f.handle from 2 for length(f.handle)-8)::int < 100",
+        [second.id],
+      )
+    ).rows[0].n;
+    expect(mutedTold === 0, `${mutedTold} muted members were told`);
+    return "one event of 500; the 100 who muted were left out";
   },
 );
 await closeDb();

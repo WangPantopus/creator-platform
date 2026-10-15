@@ -37,8 +37,8 @@ The key lives in one place and one process. Nobody else, including every lane se
    ```
 
    Without `--model-gateway` the same command runs Claude's protocol against the free local fake.
-   The stack sets every other setting itself (models, prices, the consent policy naming Anthropic
-   and OpenAI), so the key is the only thing you provide.
+   The stack sets every other setting itself (Sonnet 5.5 for every call, prices, the consent policy
+   naming Anthropic and OpenAI), so the key is the only thing you provide.
 
 Lanes follow the rule in the working agreement (section 3.6): the fake by default, the gateway only
 for what needs real model behavior, small requests, no loops, spend reported.
@@ -52,8 +52,8 @@ and any other value is treated as unconfigured (no model, the host reports what 
 | --- | --- |
 | `ANTHROPIC_API_KEY` | The Claude key. Never commit it, never paste it in chat. |
 | `OPENAI_API_KEY` | Still required: embeddings stay on OpenAI (Anthropic has no embedding model). |
-| `W2_SMALL_MODEL` | Guards, classification, memory extraction. Recommended `claude-haiku-5-5`. |
-| `W2_LARGE_MODEL` | The reply. Recommended `claude-sonnet-5-5`. |
+| `W2_SMALL_MODEL` | Guards, judges, memory extraction. `claude-sonnet-5-5` (the founder's choice) or the cheaper `claude-haiku-5-5`. |
+| `W2_LARGE_MODEL` | The reply. `claude-sonnet-5-5`. |
 | `W2_EMBEDDING_MODEL` | The OpenAI embedding model id. |
 | `W2_PROVIDER_POLICY_REFERENCE` | Same meaning as today. |
 | `W2_MODEL_RATES_JSON` | Prices by model id, in micro-dollars per million tokens (below). Without them the host reports "provider rates" as missing. |
@@ -90,8 +90,12 @@ Put the real embedding price in that last row.
 ## Known follow-ups (not in this change)
 
 - Guard revision 15 (word boundaries, distress-safe fallback) is still lane 3 B1.
-- Time to the first sentence has not been measured against the real API yet: run the live check
-  below, then decide whether to turn thinking off (`between_tools` on Sonnet 5.5).
+- Measured live on 2026-10-15 (Sonnet 5.5, effort `low`, through the gateway; five of five checks
+  passed for $0.019): the provider alone gives its first sentence in 3.5 s on a cold prompt (that
+  includes a one-time schema compile and writing the prompt cache) and 1.5 s with the cache warm,
+  and the cache cut a repeat reply's price by about 70 percent. The full pipeline (guards,
+  retrieval, delivery) is not included: lane 3's A1 measures that. Leave thinking at the default for
+  now; revisit `between_tools` only if the full path is too slow.
 - Structured schemas compile on first use (a one-time delay per schema); a warm-up at start would
   hide it.
 - A non-success response before any output is still recorded as an unknown cost, as with OpenAI;

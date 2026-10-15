@@ -43,13 +43,12 @@ export class AudienceIdentityAuthority {
   constructor(
     private readonly pool: Pool,
     private readonly configuration: Readonly<{
-      mode: "development" | "pantopus";
+      mode: "development" | "pantopus" | "qelvora";
       assertAllowed: AudienceRestriction;
     }>,
   ) {
     invariant(
-      (configuration.mode === "development" ||
-        configuration.mode === "pantopus") &&
+      ["development", "pantopus", "qelvora"].includes(configuration.mode) &&
         typeof configuration.assertAllowed === "function",
       "audience_denial_unconfigured",
       "Content audience reads require their current denial authority.",

@@ -78,7 +78,10 @@ Random ids (idempotency keys, new draft ids) are replaced by `<uuid>`; fixture i
 
 `e6-1-move-check.mjs` parses the base `Studio.tsx` from git and requires every top-level
 declaration, with its leading comments, to exist exactly once under `features/studio` with
-identical text (a leading `export` is ignored), and reports where each one went.
+identical text, and reports where each one went. A leading `export` is ignored and so is
+formatting: both sides go through Prettier first, because adding `export` can push a signature past
+80 columns and Prettier (which CI enforces) then wraps it. Any changed token, string or comment still
+fails.
 
 ## Known limits
 

@@ -32,6 +32,12 @@ const unavailable: NotificationState = {
 function refused(code: string, message: string, status = 503) {
   return new DomainError(code, message, status);
 }
+const creatorSessionRequired = () =>
+  refused(
+    "creator_session_required",
+    "Only the creator's own session can tell her audience; this waits for her.",
+    403,
+  );
 /** A refusal for this fan (blocked, restricted, no longer eligible) hides one
  * row; it must not fail the fan's whole list. An unknown answer (5xx) still
  * propagates so the list says it is unavailable instead of guessing. */
@@ -60,6 +66,45 @@ export function contentNoticeProducer(input: {
       );
     return content.dependencies.holdCreatorFanNegative;
   };
+
+  /** Drop the members who muted this creator's Notes. A mute is private to the
+   * fan, so the creator's session asks one narrow database function that answers
+   * only "which of these accounts muted my Notes?" and only for the verified
+   * creator who owns them. If it is not installed, or does not answer, nothing
+   * is sent: better late than to someone who asked for silence. */
+  async function withoutMuted(
+    actor: Actor,
+    creatorId: string,
+    fans: readonly { account_id: string; fan_id: string }[],
+  ) {
+    const kept: { account_id: string; fan_id: string }[] = [];
+    for (let start = 0; start < fans.length; start += 500) {
+      const batch = fans.slice(start, start + 500);
+      let muted: string[] | null;
+      try {
+        muted = await content.transaction(actor, creatorId, async (client) => {
+          const result = await client.query<{ muted: string[] | null }>(
+            "SELECT creator.content_note_muters($1,$2::uuid[]) AS muted",
+            [creatorId, batch.map((fan) => fan.account_id)],
+          );
+          return result.rows[0]?.muted ?? null;
+        });
+      } catch (error) {
+        const code = (error as { code?: string } | null)?.code;
+        // 42883: the function is not installed; 42501: this role may not run it.
+        if (code === "42883" || code === "42501") muted = null;
+        else throw error;
+      }
+      if (muted === null)
+        throw refused(
+          "content_delivery_unconfigured",
+          "Notices wait until the Note mute projection is installed.",
+        );
+      const mutedAccounts = new Set(muted);
+      kept.push(...batch.filter((fan) => !mutedAccounts.has(fan.account_id)));
+    }
+    return kept;
+  }
 
   /** Keep only the fans W8 does not deny, 50 per short transaction. A denial
    * drops that fan; an unknown answer stops the whole run so it can retry. */
@@ -91,7 +136,9 @@ export function contentNoticeProducer(input: {
       actor,
       effect.creatorId,
       async (client) => {
-        await content.role(client, actor, effect.creatorId, ["publisher"]);
+        const role = await content.role(client, actor, effect.creatorId, [
+          "publisher",
+        ]);
         const row = (
           await client.query<{
             kind: string;
@@ -107,6 +154,9 @@ export function contentNoticeProducer(input: {
           )
         ).rows[0];
         if (!row || row.kind !== "note") return null;
+        // Only her own session can see her members. A team publisher who runs the
+        // Studio's effects must leave this one for her, not finish it with nobody.
+        if (!role.creator) throw creatorSessionRequired();
         if (
           row.state !== "published" ||
           row.version !== effect.version ||
@@ -154,7 +204,8 @@ export function contentNoticeProducer(input: {
       return {
         reference: `note-notice:edit-silent:${effect.contentId}:${effect.version}`,
       };
-    const recipients = await notDenied(actor, effect.creatorId, found.fans);
+    const unmuted = await withoutMuted(actor, effect.creatorId, found.fans);
+    const recipients = await notDenied(actor, effect.creatorId, unmuted);
     const queued = await relay.enqueueRecipients("content", {
       type: "note",
       creatorId: effect.creatorId,
@@ -166,7 +217,7 @@ export function contentNoticeProducer(input: {
       recipients,
     });
     return {
-      reference: `note-notice:${effect.contentId}:eligible=${recipients.length}:queued=${queued.queued}`,
+      reference: `note-notice:${effect.contentId}:eligible=${recipients.length}:muted=${found.fans.length - unmuted.length}:queued=${queued.queued}`,
     };
   }
 
@@ -175,7 +226,11 @@ export function contentNoticeProducer(input: {
       actor,
       effect.creatorId,
       async (client) => {
-        await content.role(client, actor, effect.creatorId, ["publisher"]);
+        const role = await content.role(client, actor, effect.creatorId, [
+          "publisher",
+        ]);
+        // A team member cannot read a fan's reply; do not mistake that for "gone".
+        if (!role.creator) throw creatorSessionRequired();
         return (
           await client.query<{
             fan_id: string;
