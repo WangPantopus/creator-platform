@@ -52,7 +52,8 @@ public struct APIAgentDraftConfig: Codable, Sendable {
   public let `sessionNudgeMinutes`: Int
   public let `usefulnessCriteria`: String
   public let `styleCriteria`: String
-  public init(mode: APIAgentDraftConfigMode, tone: APIAgentDraftConfigTone, styleCard: String, examples: [APIAgentDraftConfigExamplesItem], rules: [String], neverReveal: [String], handoff: String, dailyCostCapMicros: Int, sessionNudgeMinutes: Int, usefulnessCriteria: String, styleCriteria: String) {
+  public let `faq`: [APIAgentDraftConfigFaqItem]?
+  public init(mode: APIAgentDraftConfigMode, tone: APIAgentDraftConfigTone, styleCard: String, examples: [APIAgentDraftConfigExamplesItem], rules: [String], neverReveal: [String], handoff: String, dailyCostCapMicros: Int, sessionNudgeMinutes: Int, usefulnessCriteria: String, styleCriteria: String, faq: [APIAgentDraftConfigFaqItem]? = nil) {
     self.mode = mode
     self.tone = tone
     self.styleCard = styleCard
@@ -64,6 +65,7 @@ public struct APIAgentDraftConfig: Codable, Sendable {
     self.sessionNudgeMinutes = sessionNudgeMinutes
     self.usefulnessCriteria = usefulnessCriteria
     self.styleCriteria = styleCriteria
+    self.faq = faq
   }
 }
 
@@ -92,6 +94,15 @@ public struct APIAgentDraftConfigExamplesItem: Codable, Sendable {
   }
 }
 
+public struct APIAgentDraftConfigFaqItem: Codable, Sendable {
+  public let `question`: String
+  public let `answer`: String
+  public init(question: String, answer: String) {
+    self.question = question
+    self.answer = answer
+  }
+}
+
 public struct APIAgentDraftWrite: Codable, Sendable {
   public let `expectedRevision`: Int
   public let `configuration`: APIAgentDraftWriteConfiguration
@@ -113,7 +124,8 @@ public struct APIAgentDraftWriteConfiguration: Codable, Sendable {
   public let `sessionNudgeMinutes`: Int
   public let `usefulnessCriteria`: String
   public let `styleCriteria`: String
-  public init(mode: APIAgentDraftWriteConfigurationMode, tone: APIAgentDraftWriteConfigurationTone, styleCard: String, examples: [APIAgentDraftWriteConfigurationExamplesItem], rules: [String], neverReveal: [String], handoff: String, dailyCostCapMicros: Int, sessionNudgeMinutes: Int, usefulnessCriteria: String, styleCriteria: String) {
+  public let `faq`: [APIAgentDraftWriteConfigurationFaqItem]?
+  public init(mode: APIAgentDraftWriteConfigurationMode, tone: APIAgentDraftWriteConfigurationTone, styleCard: String, examples: [APIAgentDraftWriteConfigurationExamplesItem], rules: [String], neverReveal: [String], handoff: String, dailyCostCapMicros: Int, sessionNudgeMinutes: Int, usefulnessCriteria: String, styleCriteria: String, faq: [APIAgentDraftWriteConfigurationFaqItem]? = nil) {
     self.mode = mode
     self.tone = tone
     self.styleCard = styleCard
@@ -125,6 +137,7 @@ public struct APIAgentDraftWriteConfiguration: Codable, Sendable {
     self.sessionNudgeMinutes = sessionNudgeMinutes
     self.usefulnessCriteria = usefulnessCriteria
     self.styleCriteria = styleCriteria
+    self.faq = faq
   }
 }
 
@@ -153,6 +166,15 @@ public struct APIAgentDraftWriteConfigurationExamplesItem: Codable, Sendable {
   }
 }
 
+public struct APIAgentDraftWriteConfigurationFaqItem: Codable, Sendable {
+  public let `question`: String
+  public let `answer`: String
+  public init(question: String, answer: String) {
+    self.question = question
+    self.answer = answer
+  }
+}
+
 public struct APIAgentEvaluationRequest: Codable, Sendable {
   public let `expectedRevision`: Int
   public init(expectedRevision: Int) {
@@ -170,6 +192,15 @@ public struct APIAgentExample: Codable, Sendable {
     self.text = text
     self.fixed = fixed
     self.approved = approved
+  }
+}
+
+public struct APIAgentFaqItem: Codable, Sendable {
+  public let `question`: String
+  public let `answer`: String
+  public init(question: String, answer: String) {
+    self.question = question
+    self.answer = answer
   }
 }
 
