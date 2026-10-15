@@ -2,7 +2,7 @@
 
 Updated: 2026-10-15, by the lane 3 session
 Working on: A2 (wake on accept). B2 is open as #441, its defaults approved by the founder 2026-10-15
-Done: A1 #411, A3 #426, A6b #433, A6a #434, A6c #436, A6 hold sizing #438, B2 #441 (all open)
+Done: merged A1 #411, A3 #426, A6a #434. Open: A6b #433, A6c #436, A6 hold sizing #438, B2 #441
 Next: B9. Findings 8 and 9 need migrations (W1 lease release; crash recovery with lane 4), proposed for the next migration wave
 Blocked on: nothing. Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
 
@@ -157,6 +157,7 @@ Model gateway spend for lane 3 so far: 72 calls, 181,087 micros (/\_\_stats, 202
 
 | To         | File                                                                                                                    | Change                                                                                                                                                                   | Why                                                                                                          |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| Lane 2     | `tests/scenarios/lane-2/seed-maya.mjs`                                                                                  | Seed a daily cap above the Claude run ceiling (for example 20,000,000) until hold sizing (#438) merges                                                                   | Finding 2: a `--provider anthropic` stack can never deliver a reply                                          |
 | Lane 4     | `modules/commerce/generation-audience.ts` (`assertCatalog`), `modules/commerce/generation-safety-terminal-catalogue.ts` | Wrap each check in `verifyInHeldTransaction(client, <its frozen custody object>, () => check)` from `modules/identity/generation-held-verification.ts` (after A3 merges) | 68 audience runs per answer; the safety terminal catalogue is about 1 s of the longest remaining transaction |
 | Lane 4     | `creator.generation_settle_typed_original_allowance` (W4 safety terminal settlement SQL)                                | Settle an interrupted answer that has stored output but no complete typed provenance, with lane 3 in A6                                                                  | Finding 9: a crash mid-answer is never recovered                                                             |
 | Integrator | `tests/scenarios/integrator/anthropic-adapter.mts` (case A6)                                                            | Expect a `ProviderResponseError` with a known zero usage for a non-2xx answer before any body (code, upstream status and the no-secret check are unchanged)              | A6a makes that error a known zero cost, as the brief decided; this case pinned the old behavior              |

@@ -7,7 +7,7 @@ import {
 } from "../../../../features/growth/server";
 
 const allowed =
-  /^(?:home|discovery-access|notifications(?:\/[a-f0-9-]+(?:\/read)?)?|preferences(?:\/creators)?|follow\/[a-f0-9-]+|devices(?:\/[a-f0-9-]+)?|shares|invites(?:\/[a-f0-9-]+)?|referrals|entry|engagement(?:\/(?:install|return)\/(?:claim|choice))?|insights|funnel|impact|activation|experiments(?:\/[a-f0-9-]+\/stop|\/variant\/[a-z0-9_]+)?|feedback|recommendations(?:\/publish)?)$/u;
+  /^(?:home|discovery-access|notifications(?:\/[a-f0-9-]+(?:\/read)?)?|preferences(?:\/creators)?|follow\/[a-f0-9-]+|devices(?:\/[a-f0-9-]+)?|shares|invites(?:\/[a-f0-9-]+)?|referrals|entry|engagement(?:\/(?:install|return)\/(?:claim|choice))?|insights|funnel|impact|activation|experiments(?:\/[a-f0-9-]+\/stop|\/variant\/[a-z0-9_]+)?|feedback|recommendations(?:\/publish)?|launch)$/u;
 async function handle(
   request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> },
@@ -20,7 +20,11 @@ async function handle(
       { error: { message: "This endpoint is unavailable." } },
       { status: 404 },
     );
-  if (postContext && (request.method !== "GET" || request.nextUrl.search))
+  // Read-only views: the post context and the creator's launch kit.
+  if (
+    (postContext && (request.method !== "GET" || request.nextUrl.search)) ||
+    (path === "launch" && request.method !== "GET")
+  )
     return NextResponse.json(
       { error: { message: "This endpoint is unavailable." } },
       { status: 405, headers: { Allow: "GET", "Cache-Control": "no-store" } },
@@ -33,7 +37,7 @@ async function handle(
   const expectedAccount = request.headers.get("X-Expected-Account-Id");
   const expectedSession = request.headers.get("X-Expected-Session-Id");
   if (
-    /^(?:home|preferences(?:\/creators)?|notifications(?:\/[a-f0-9-]+(?:\/read)?)?|engagement(?:\/(?:install|return)\/(?:claim|choice))?|feedback|insights|impact|activation|recommendations(?:\/publish)?|invites|funnel|experiments(?:\/[a-f0-9-]+\/stop)?)$/u.test(
+    /^(?:home|preferences(?:\/creators)?|notifications(?:\/[a-f0-9-]+(?:\/read)?)?|engagement(?:\/(?:install|return)\/(?:claim|choice))?|feedback|insights|impact|activation|recommendations(?:\/publish)?|invites|funnel|launch|experiments(?:\/[a-f0-9-]+\/stop)?)$/u.test(
       path,
     ) &&
     (!expectedAccount || !expectedSession)

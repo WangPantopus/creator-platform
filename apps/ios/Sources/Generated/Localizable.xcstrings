@@ -705,6 +705,17 @@
         }
       }
     },
+    "For members whose tier includes requests": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "For members whose tier includes requests"
+          }
+        }
+      }
+    },
     "Opening this conversation is logged and visible to the fan.": {
       "extractionState": "manual",
       "localizations": {
@@ -866,6 +877,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Set a monthly limit. You can change it any time; raising it takes 24 hours."
+          }
+        }
+      }
+    },
+    "This month · {spent} of your {limit} limit": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This month · {spent} of your {limit} limit"
           }
         }
       }

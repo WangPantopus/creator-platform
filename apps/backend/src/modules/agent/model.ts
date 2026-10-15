@@ -14,6 +14,7 @@ import {
   ProviderResponseError,
   responseUsage,
   type ModelRate,
+  providerRefused,
 } from "./response-usage.js";
 import type { Usage } from "../../../../../packages/api/src/agent/contracts.js";
 
@@ -309,10 +310,10 @@ export class OpenAIResponsesModel implements AgentModel {
         redirect: "error",
       });
       if (!response.ok)
-        throw new DomainError(
-          response.status === 429 ? "provider_busy" : "provider_failed",
-          "The configured model is unavailable. Your draft is safe.",
-          503,
+        throw providerRefused(
+          response.status,
+          "OpenAI",
+          String((body as { model?: unknown }).model ?? "unknown"),
         );
       const raw = await response.text();
       if (raw.length > 2_000_000)

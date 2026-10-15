@@ -1,6 +1,8 @@
 name: Foundation checks
 on:
+  # Pull request branches run once, as a pull request; a push runs only on main.
   push:
+    branches: [main]
   pull_request:
 concurrency:
   group: foundation-${{ github.event_name }}-${{ github.ref }}

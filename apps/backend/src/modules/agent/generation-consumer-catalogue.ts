@@ -4,6 +4,7 @@ import { contentHash } from "../../core/canonical.js";
 import { DomainError } from "../../core/errors.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
 import type { GenerationPurposeConsumer } from "../identity/generation-scope.js";
+import { verifyInHeldTransaction } from "../identity/generation-held-verification.js";
 
 export { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
 
@@ -20,6 +21,17 @@ export type GenerationConsumerCustody = Readonly<{
 }>;
 
 export async function assertGenerationConsumerCustody(
+  query: Pick<Pool, "query">,
+  custody: GenerationConsumerCustody,
+  signal?: AbortSignal,
+): Promise<void> {
+  // Once when first used in a held transaction and again before its COMMIT.
+  await verifyInHeldTransaction(query, custody, () =>
+    verifyConsumerCustody(query, custody, signal),
+  );
+}
+
+async function verifyConsumerCustody(
   query: Pick<Pool, "query">,
   custody: GenerationConsumerCustody,
   signal?: AbortSignal,

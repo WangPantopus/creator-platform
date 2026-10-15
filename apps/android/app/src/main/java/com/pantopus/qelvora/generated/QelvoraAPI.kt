@@ -2959,6 +2959,7 @@ object APISessionAdultEligibleSerializer : KSerializer<APISessionAdultEligible> 
 @Serializable
 enum class APISessionMode {
   @SerialName("development") DEVELOPMENT,
+  @SerialName("qelvora") QELVORA,
   @SerialName("pantopus") PANTOPUS
 }
 
@@ -3036,6 +3037,7 @@ object APIIdentityCompletionSessionAdultEligibleSerializer : KSerializer<APIIden
 @Serializable
 enum class APIIdentityCompletionSessionMode {
   @SerialName("development") DEVELOPMENT,
+  @SerialName("qelvora") QELVORA,
   @SerialName("pantopus") PANTOPUS
 }
 
@@ -3077,6 +3079,184 @@ enum class APIIdentityCompletionSessionTeamsItemRolesItem {
   @SerialName("publisher") PUBLISHER,
   @SerialName("scheduler") SCHEDULER
 }
+
+@Serializable
+data class APIIdentityProviderContinue(
+  val `returnTo`: String,
+  val `provider`: APIIdentityProviderContinueProvider,
+  val `reauthenticate`: Boolean? = null
+)
+
+@Serializable
+enum class APIIdentityProviderContinueProvider {
+  @SerialName("apple") APPLE,
+  @SerialName("google") GOOGLE
+}
+
+@Serializable
+data class APINativeSignInStart(
+  val `provider`: APINativeSignInStartProvider,
+  val `platform`: APINativeSignInStartPlatform,
+  val `returnTo`: String? = null,
+  val `reauthenticate`: Boolean? = null
+)
+
+@Serializable
+enum class APINativeSignInStartProvider {
+  @SerialName("apple") APPLE,
+  @SerialName("google") GOOGLE
+}
+
+@Serializable
+enum class APINativeSignInStartPlatform {
+  @SerialName("ios") IOS,
+  @SerialName("android") ANDROID
+}
+
+@Serializable
+data class APINativeSignInNonce(
+  val `continuationId`: String,
+  val `nonce`: String,
+  val `expiresAt`: String
+)
+
+@Serializable
+data class APINativeSignInComplete(
+  val `continuationId`: String,
+  val `provider`: APINativeSignInCompleteProvider,
+  val `idToken`: String,
+  val `authorizationCode`: String? = null
+)
+
+@Serializable
+enum class APINativeSignInCompleteProvider {
+  @SerialName("apple") APPLE,
+  @SerialName("google") GOOGLE
+}
+
+@Serializable
+data class APIAgeConfirmationInput(
+  val `ageContinuationId`: String,
+  val `birthDate`: String,
+  val `platformSignal`: APIAgeConfirmationInputPlatformSignal? = null
+)
+
+@Serializable
+data class APIAgeConfirmationInputPlatformSignal(
+  val `source`: APIAgeConfirmationInputPlatformSignalSource,
+  val `under18`: Boolean
+)
+
+@Serializable
+enum class APIAgeConfirmationInputPlatformSignalSource {
+  @SerialName("apple_declared_age_range") APPLE_DECLARED_AGE_RANGE,
+  @SerialName("google_play_age_signals") GOOGLE_PLAY_AGE_SIGNALS
+}
+
+@Serializable
+data class APIAgeConfirmationRequired(
+  val `ageContinuationId`: String,
+  val `expiresAt`: String
+)
+
+@Serializable
+data class APIIdentitySignInResult(
+  val `status`: APIIdentitySignInResultStatus,
+  @Required
+  val `completion`: APIIdentitySignInResultCompletion? = null,
+  @Required
+  val `ageConfirmation`: APIIdentitySignInResultAgeConfirmation? = null
+)
+
+@Serializable
+enum class APIIdentitySignInResultStatus {
+  @SerialName("signed_in") SIGNED_IN,
+  @SerialName("age_required") AGE_REQUIRED
+}
+
+@Serializable
+data class APIIdentitySignInResultCompletion(
+  val `token`: String,
+  val `returnTo`: String,
+  val `session`: APIIdentitySignInResultCompletionSession
+)
+
+@Serializable
+data class APIIdentitySignInResultCompletionSession(
+  val `accountId`: String,
+  val `adultEligible`: APIIdentitySignInResultCompletionSessionAdultEligible,
+  val `sessionId`: String,
+  val `expiresAt`: String,
+  val `mode`: APIIdentitySignInResultCompletionSessionMode,
+  @Required
+  val `fan`: APIIdentitySignInResultCompletionSessionFan? = null,
+  @Required
+  val `creator`: APIIdentitySignInResultCompletionSessionCreator? = null,
+  val `teams`: List<APIIdentitySignInResultCompletionSessionTeamsItem>
+)
+
+@Serializable(with = APIIdentitySignInResultCompletionSessionAdultEligibleSerializer::class)
+object APIIdentitySignInResultCompletionSessionAdultEligible { const val value: Boolean = true }
+object APIIdentitySignInResultCompletionSessionAdultEligibleSerializer : KSerializer<APIIdentitySignInResultCompletionSessionAdultEligible> {
+  override val descriptor = PrimitiveSerialDescriptor("APIIdentitySignInResultCompletionSessionAdultEligible", PrimitiveKind.BOOLEAN)
+  override fun deserialize(decoder: Decoder): APIIdentitySignInResultCompletionSessionAdultEligible {
+    if (decoder.decodeBoolean() != true) throw SerializationException("Expected true")
+    return APIIdentitySignInResultCompletionSessionAdultEligible
+  }
+  override fun serialize(encoder: Encoder, value: APIIdentitySignInResultCompletionSessionAdultEligible) { encoder.encodeBoolean(true) }
+}
+
+@Serializable
+enum class APIIdentitySignInResultCompletionSessionMode {
+  @SerialName("development") DEVELOPMENT,
+  @SerialName("qelvora") QELVORA,
+  @SerialName("pantopus") PANTOPUS
+}
+
+@Serializable
+data class APIIdentitySignInResultCompletionSessionFan(
+  val `id`: String,
+  val `handle`: String,
+  val `intro`: String,
+  val `version`: Long
+)
+
+@Serializable
+data class APIIdentitySignInResultCompletionSessionCreator(
+  val `id`: String,
+  val `handle`: String,
+  val `displayName`: String,
+  val `verification`: APIIdentitySignInResultCompletionSessionCreatorVerification,
+  val `version`: Long
+)
+
+@Serializable
+enum class APIIdentitySignInResultCompletionSessionCreatorVerification {
+  @SerialName("pending") PENDING,
+  @SerialName("verified") VERIFIED,
+  @SerialName("rejected") REJECTED,
+  @SerialName("revoked") REVOKED
+}
+
+@Serializable
+data class APIIdentitySignInResultCompletionSessionTeamsItem(
+  val `creatorId`: String,
+  val `roles`: List<APIIdentitySignInResultCompletionSessionTeamsItemRolesItem>
+)
+
+@Serializable
+enum class APIIdentitySignInResultCompletionSessionTeamsItemRolesItem {
+  @SerialName("triage") TRIAGE,
+  @SerialName("drafter") DRAFTER,
+  @SerialName("publisher") PUBLISHER,
+  @SerialName("scheduler") SCHEDULER
+}
+
+@Serializable
+data class APIIdentitySignInResultAgeConfirmation(
+  val `ageContinuationId`: String,
+  val `expiresAt`: String
+)
 
 @Serializable
 data class APISessionToken(
