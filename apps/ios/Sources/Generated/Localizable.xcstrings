@@ -705,6 +705,17 @@
         }
       }
     },
+    "For members whose tier includes requests": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "For members whose tier includes requests"
+          }
+        }
+      }
+    },
     "Opening this conversation is logged and visible to the fan.": {
       "extractionState": "manual",
       "localizations": {

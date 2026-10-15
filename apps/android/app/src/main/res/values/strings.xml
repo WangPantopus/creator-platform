@@ -67,6 +67,7 @@
   <string name="decision_eta" formatted="false">{name} usually decides in {range}</string>
   <string name="draft_notice" formatted="false">{name} may answer with her AI\'s draft; you\'ll see that label.</string>
   <string name="capacity" formatted="false">{name} answers {mode} within {deadline} · {n} of {cap} left this week.</string>
+  <string name="mode_members_only" formatted="false">For members whose tier includes requests</string>
   <string name="audit_access" formatted="false">Opening this conversation is logged and visible to the fan.</string>
   <string name="long_session" formatted="false">You\'ve been talking with {name}\'s AI for a while. It\'s an AI, and it will be here when you\'re back.</string>
   <string name="note_audience" formatted="false">{name} · to {audience}</string>

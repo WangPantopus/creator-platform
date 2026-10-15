@@ -66,6 +66,7 @@ public enum QelvoraCopy {
     "decisionEta": "{name} usually decides in {range}",
     "draftNotice": "{name} may answer with her AI's draft; you'll see that label.",
     "capacity": "{name} answers {mode} within {deadline} · {n} of {cap} left this week.",
+    "modeMembersOnly": "For members whose tier includes requests",
     "auditAccess": "Opening this conversation is logged and visible to the fan.",
     "longSession": "You've been talking with {name}'s AI for a while. It's an AI, and it will be here when you're back.",
     "noteAudience": "{name} · to {audience}",

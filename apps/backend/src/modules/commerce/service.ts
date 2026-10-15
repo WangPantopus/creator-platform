@@ -156,6 +156,10 @@ const ModeCommand = z
     weeklyLimit: z.number().int().min(0).max(100000),
     shareable: z.boolean(),
     state: z.enum(["hidden", "offered", "paused"]),
+    /** Who may ask (T-07): no entry is anyone with a conversation; "request"
+     * is a fan whose current access includes requests (a tier that grants
+     * them). Absent leaves an existing offer's eligibility as it was. */
+    eligibility: z.array(z.literal("request")).max(1).optional(),
     version: z.number().int().nonnegative(),
     idempotencyKey: z.string().min(8).max(128),
   })
@@ -984,7 +988,7 @@ export class CommerceService {
               "The weekly limit cannot be lower than existing reservations and accepted requests.",
             );
             const updated = await client.query(
-              `UPDATE creator.commerce_mode SET title=$3,kind=$4,amount=$5,public_amount=$6,currency=$7,decision_hours=$8,delivery_hours=$9,duration_seconds=$10,weekly_limit=$11,shareable=$12,state=$13,version=version+1 WHERE id=$1 AND creator_id=$2 AND version=$14 RETURNING *`,
+              `UPDATE creator.commerce_mode SET title=$3,kind=$4,amount=$5,public_amount=$6,currency=$7,decision_hours=$8,delivery_hours=$9,duration_seconds=$10,weekly_limit=$11,shareable=$12,state=$13,eligibility=coalesce($15::text[],eligibility),version=version+1 WHERE id=$1 AND creator_id=$2 AND version=$14 RETURNING *`,
               [
                 id,
                 creatorId,
@@ -1000,6 +1004,7 @@ export class CommerceService {
                 body.shareable,
                 body.state,
                 body.version,
+                body.eligibility ?? null,
               ],
             );
             invariant(
@@ -1027,7 +1032,7 @@ export class CommerceService {
           }
           return (
             await client.query(
-              `INSERT INTO creator.commerce_mode(id,creator_id,title,kind,amount,public_amount,currency,decision_hours,delivery_hours,duration_seconds,weekly_limit,shareable,state) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *`,
+              `INSERT INTO creator.commerce_mode(id,creator_id,title,kind,amount,public_amount,currency,decision_hours,delivery_hours,duration_seconds,weekly_limit,shareable,state,eligibility) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *`,
               [
                 id,
                 creatorId,
@@ -1042,6 +1047,7 @@ export class CommerceService {
                 body.weeklyLimit,
                 body.shareable,
                 body.state,
+                body.eligibility ?? [],
               ],
             )
           ).rows[0];
