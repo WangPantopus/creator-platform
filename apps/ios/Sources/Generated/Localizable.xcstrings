@@ -1409,6 +1409,94 @@
         }
       }
     },
+    "Continue with Apple": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue with Apple"
+          }
+        }
+      }
+    },
+    "Continue with Google": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue with Google"
+          }
+        }
+      }
+    },
+    "Your date of birth": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your date of birth"
+          }
+        }
+      }
+    },
+    "We keep only whether you can use the app, never the date.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We keep only whether you can use the app, never the date."
+          }
+        }
+      }
+    },
+    "Continue": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue"
+          }
+        }
+      }
+    },
+    "This sign-in could not be completed. Start again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This sign-in could not be completed. Start again."
+          }
+        }
+      }
+    },
+    "Sign-in is unavailable right now. Try again in a moment.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign-in is unavailable right now. Try again in a moment."
+          }
+        }
+      }
+    },
+    "Too many sign-in attempts. Wait a minute and try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Too many sign-in attempts. Wait a minute and try again."
+          }
+        }
+      }
+    },
     "Home": {
       "extractionState": "manual",
       "localizations": {

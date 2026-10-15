@@ -56,6 +56,14 @@ const { privateKey, publicKey } = generateKeyPairSync("rsa", {
 const kid = randomBytes(8).toString("hex");
 const b64 = (value) => Buffer.from(JSON.stringify(value)).toString("base64url");
 const codes = new Map();
+const escape = (value) =>
+  String(value).replace(
+    /[&<>"']/gu,
+    (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        c
+      ],
+  );
 const revoked = [];
 const stats = { authorize: 0, token: 0, keys: 0, refused: 0 };
 let mode = "ok";
@@ -142,11 +150,20 @@ function authorize(provider, res, q) {
     (q.code_challenge_method !== "S256" || !q.code_challenge)
   )
     return refuse(res, "invalid_request");
-  if (!q.sub)
-    return send(res, 200, {
-      choose: "add &sub=<test person>",
-      received: Object.keys(q),
-    });
+  if (!q.sub) {
+    // A browser chooses its test person here, as a person would at Apple or Google.
+    const hidden = Object.entries(q)
+      .map(
+        ([name, value]) =>
+          `<input type="hidden" name="${escape(name)}" value="${escape(value)}">`,
+      )
+      .join("");
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(
+      `<!doctype html><title>Fake ${provider}</title><h1>Fake ${provider} sign-in</h1><form method="get">${hidden}<label>Test person <input name="sub" required></label> <button>Sign in</button></form>`,
+    );
+    return;
+  }
   const code = newCode({
     provider,
     clientId: q.client_id,
@@ -167,7 +184,7 @@ function authorize(provider, res, q) {
   // Apple returns with a cross-site form post when the email scope is asked.
   res.writeHead(200, { "Content-Type": "text/html" });
   res.end(
-    `<form method="post" action="${q.redirect_uri}"><input name="code" value="${code}"><input name="state" value="${q.state}"></form>`,
+    `<!doctype html><title>Fake apple</title><form method="post" action="${escape(q.redirect_uri)}"><input name="code" value="${code}"><input name="state" value="${escape(q.state)}"><button>Continue</button></form><script>document.forms[0].submit()</script>`,
   );
 }
 function token(provider, res, form) {
