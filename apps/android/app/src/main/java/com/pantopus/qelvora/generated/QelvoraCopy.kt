@@ -66,6 +66,7 @@ object QelvoraCopy {
     "decisionEta" to "{name} usually decides in {range}",
     "draftNotice" to "{name} may answer with her AI's draft; you'll see that label.",
     "capacity" to "{name} answers {mode} within {deadline} · {n} of {cap} left this week.",
+    "modeMembersOnly" to "For members whose tier includes requests",
     "auditAccess" to "Opening this conversation is logged and visible to the fan.",
     "longSession" to "You've been talking with {name}'s AI for a while. It's an AI, and it will be here when you're back.",
     "noteAudience" to "{name} · to {audience}",
