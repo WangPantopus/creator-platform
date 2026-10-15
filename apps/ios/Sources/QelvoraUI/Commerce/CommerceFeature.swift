@@ -16,6 +16,8 @@ struct CommerceFeature: View {
     var storeProductIDs: [String] = []
     @State private var overview: CommerceOverview?; @State private var detail: CommerceDetail?
     @State private var screen = "requests"; @State private var category = "Open"; @State private var creator = ""
+    // Back leaves a step opened inside this screen first, then goes back through where the person came from.
+    @State private var arrivalScreen = "requests"; @State private var backStep = UUID()
     @State private var amount = ""; @State private var choice = ""; @State private var reminders = false
     @State private var summary = ""; @State private var info = ""; @State private var selectedMode: String?
     @State private var includeSummary = true; @State private var includeMessages: [IncludeItem] = []
@@ -49,8 +51,8 @@ struct CommerceFeature: View {
             VStack(alignment: .leading, spacing: 24) {
                 HStack {
                     if screen != "requests" { Button("Back", variant: .quiet) {
-                        if screen == "spending", URLComponents(string: session.destination)?.path == "/commerce/spending" { session.open("/you") }
-                        else { screen = "requests"; detail = nil }
+                        if screen != arrivalScreen { screen = arrivalScreen; detail = nil }
+                        else { session.back() }
                     } }
                     Spacer(); Text(title.uppercased()).qText("data-sm"); Spacer()
                     Button("Refresh", variant: .quiet, disabled: refreshDisabled) { launch(requireReady: false) { await retry() } }
@@ -86,13 +88,17 @@ struct CommerceFeature: View {
             .onChange(of: session.session?.accountId) { _, value in if value != accountId { operation?.cancel(); clearPrivateState() } }
             .onAppear { disposed = false }
             .onChange(of: privateReady) { _, value in if !value { operation?.cancel() } }
-            .onDisappear { disposed = true; operation?.cancel(); clearPrivateState() }
+            .onChange(of: screen) { _, value in
+                if value != arrivalScreen { session.holdBack(backStep) { screen = arrivalScreen; detail = nil } } else { session.releaseBack(backStep) }
+            }
+            .onDisappear { session.releaseBack(backStep); disposed = true; operation?.cancel(); clearPrivateState() }
     }
     private var title: String { ["spending":"Spending and time", "access":"Access", "packet":"Included in your request", "status":"Your request", "membership":"Manage membership", "pass":"Your pass"][screen] ?? "Requests" }
     private func arrive() async {
         let parts = URLComponents(string: destination)
         let path = parts?.path ?? "/requests"
-        screen = path.hasPrefix("/commerce/") ? String(path.split(separator: "/").last ?? "requests") : path.hasSuffix("/access") ? "access" : "requests"
+        arrivalScreen = path.hasPrefix("/commerce/") ? String(path.split(separator: "/").last ?? "requests") : path.hasSuffix("/access") ? "access" : "requests"
+        screen = arrivalScreen
         await refresh()
         guard !Task.isCancelled, privateReady else { return }
         if let selected = parts?.queryItems?.first(where: { $0.name == "creatorId" })?.value { creator = selected }

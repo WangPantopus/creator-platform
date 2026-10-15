@@ -3,6 +3,7 @@ package com.pantopus.qelvora.commerce
 import android.content.Context
 import android.net.Uri
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.background
@@ -117,6 +118,9 @@ object CommerceFanFeature {
     var data by remember { mutableStateOf<CommerceOverview?>(null) }; var detail by remember { mutableStateOf<CommerceDetail?>(null) }
     val arrival = remember(originalDestination) { Uri.parse(originalDestination) }; val arrivalPath = arrival.path.orEmpty()
     var screen by remember { mutableStateOf(if (arrivalPath.startsWith("/commerce/")) arrivalPath.substringAfterLast("/") else if (arrivalPath.endsWith("/access")) "access" else "requests") }
+    // Back leaves a step opened inside this screen first, then goes back through where the person came from.
+    val arrivalScreen = remember { screen }
+    BackHandler(enabled = screen != arrivalScreen) { screen = arrivalScreen; detail = null }
     var category by remember { mutableStateOf("Open") }; var creator by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }; var failure by remember { mutableStateOf("") }; var notice by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }; var choice by remember { mutableStateOf<String?>(null) }; var reminders by remember { mutableStateOf(false) }
@@ -240,8 +244,8 @@ object CommerceFanFeature {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = if (screen == "packet") 20.dp else 16.dp).padding(top = 20.dp, bottom = 36.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             if (screen != "requests") Button("Back", ButtonVariant.QUIET) {
-                if (screen == "spending" && arrivalPath == "/commerce/spending") session.open("/you")
-                else { screen = "requests"; detail = null }
+                if (screen != arrivalScreen) { screen = arrivalScreen; detail = null }
+                else session.back()
             }
             Button("Refresh", ButtonVariant.QUIET, disabled = refreshDisabled) { scope.launch { retry() } }
         }
