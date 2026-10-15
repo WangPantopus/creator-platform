@@ -1,0 +1,22 @@
+[
+  {
+    "path": "artifacts/lane-6/6-2-compose-no-members.png",
+    "sha256": "499bda1b9a0c97f70e2b06245f487ac0fb71a9cd6ebfacdc05abcd6a03aa01eb",
+    "bytes": 47435
+  },
+  {
+    "path": "artifacts/lane-6/6-2-today-light.png",
+    "sha256": "39ac789c063409c84a5da1b62733fb15b6f8a8024c929c3772202cf66ffb0e6d",
+    "bytes": 43749
+  },
+  {
+    "path": "artifacts/lane-6/6-2-today-night.png",
+    "sha256": "c00d15c045e4383fb9a1c6fc591992c690e20e6a345d0bb55d0a815dfef4cfb3",
+    "bytes": 43417
+  },
+  {
+    "path": "artifacts/lane-6/README.md",
+    "sha256": "72875db410c6d60353b666cbf3012ec66177e9c54215c1ba6081d15473d99e58",
+    "bytes": 896
+  }
+]

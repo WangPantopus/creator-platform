@@ -158,6 +158,25 @@
   <string name="confirm" formatted="false">Confirm</string>
   <string name="waiting" formatted="false">{count} waiting</string>
   <string name="studio_live" formatted="false">Your AI is live · {version}</string>
+  <string name="studio_today_title" formatted="false">Today</string>
+  <string name="studio_new_note" formatted="false">New Note</string>
+  <string name="studio_today_latest_note" formatted="false">Your latest Note</string>
+  <string name="studio_first_note_title" formatted="false">Your first Note</string>
+  <string name="studio_first_note_body" formatted="false">Write one Note for your audience. Each fan\'s reply stays private.</string>
+  <string name="studio_today_replies" formatted="false">Replies</string>
+  <string name="studio_today_unread_reply" formatted="false">1 unread reply</string>
+  <string name="studio_today_unread_replies" formatted="false">{count} unread replies</string>
+  <string name="studio_today_no_unread_replies" formatted="false">No unread replies</string>
+  <string name="studio_today_replies_help" formatted="false">Read and react in Notes.</string>
+  <string name="studio_today_requests" formatted="false">Requests</string>
+  <string name="studio_today_requests_none" formatted="false">You\'re up to date</string>
+  <string name="studio_today_my_a_i" formatted="false">My AI</string>
+  <string name="studio_today_ai_paused" formatted="false">Your AI is paused</string>
+  <string name="studio_today_ai_not_published" formatted="false">Your AI is not published yet</string>
+  <string name="studio_today_loading" formatted="false">Loading…</string>
+  <string name="studio_today_unavailable" formatted="false">This part of Today is unavailable right now.</string>
+  <string name="studio_choose_studio" formatted="false">Choose your Studio</string>
+  <string name="studio_audience_empty" formatted="false">No one is in this audience right now. No one will be told about this Note; members who join later can read it.</string>
   <string name="this_week" formatted="false">This week</string>
   <string name="queue_accepted" formatted="false">Accepted</string>
   <string name="queue_rule" formatted="false">Matched your rule</string>

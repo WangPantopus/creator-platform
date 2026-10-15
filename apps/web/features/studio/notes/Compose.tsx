@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { copy } from "@qelvora/copy";
 import { AuthorLabel, Notice } from "@qelvora/ui-web";
 import type { SignedActCommand } from "@qelvora/api";
 import type {
@@ -30,6 +31,7 @@ const emptyBody = (kind: ContentBody["kind"] = "note"): ContentBody => ({
   quote: null,
   packetId: null,
 });
+type Reach = "some" | "none" | "unknown";
 const scheduleInput = (value: string | null) => {
   if (!value) return "";
   const date = new Date(value);
@@ -39,11 +41,14 @@ const scheduleInput = (value: string | null) => {
 export function Compose({
   creator,
   id,
+  back = `/studio/${creator.id}/notes`,
   onDone,
   post = false,
 }: {
   creator: Creator;
   id?: string;
+  /** Where Cancel leads: Today or Notes, whichever opened the composer. */
+  back?: string;
   onDone: () => void;
   post?: boolean;
 }) {
@@ -69,7 +74,8 @@ export function Compose({
     } | null>(null),
     [catalog, setCatalog] = useState<{
       audienceCountsAvailable: boolean;
-      tiers: { id: string; name: string }[];
+      members: Reach;
+      tiers: { id: string; name: string; reach: Reach }[];
       groups: { id: string; name: string }[];
     } | null>(null),
     [pendingPublication, setPendingPublication] = useState<{
@@ -244,6 +250,22 @@ export function Compose({
     }
   };
   const plannedAnswer = !!document.planRef;
+  // Anyone in the chosen audience right now (the creator's own view only). A
+  // Note to nobody still publishes: members who join later can read it.
+  const tierReach = (ids: string[]) =>
+    ids.map((t) => catalog?.tiers.find((tier) => tier.id === t)?.reach);
+  const reach: Reach =
+    document.kind !== "note" || plannedAnswer || !catalog
+      ? "unknown"
+      : document.audience.kind === "members"
+        ? catalog.members
+        : document.audience.kind === "tiers" && document.audience.ids.length
+          ? tierReach(document.audience.ids).includes("some")
+            ? "some"
+            : tierReach(document.audience.ids).every((r) => r === "none")
+              ? "none"
+              : "unknown"
+          : "unknown";
   const chooseAudienceIds =
     !plannedAnswer && ["tiers", "groups"].includes(document.audience.kind);
   const chooseKind =
@@ -278,7 +300,7 @@ export function Compose({
     return (
       <section className="w5-compose">
         <header className="w5-compose-head">
-          <Link href={`/studio/${creator.id}/notes`}>Cancel</Link>
+          <Link href={back}>Cancel</Link>
           <strong>{post ? "Publish" : "Edit Note"}</strong>
           <span />
         </header>
@@ -296,7 +318,7 @@ export function Compose({
   return (
     <section className="w5-compose">
       <header className="w5-compose-head">
-        <Link href={`/studio/${creator.id}/notes`}>Cancel</Link>
+        <Link href={back}>Cancel</Link>
         <strong>{post ? "Publish" : id ? "Edit Note" : "New Note"}</strong>
         <span />
       </header>
@@ -405,6 +427,7 @@ export function Compose({
             )}
           </fieldset>
         )}
+        {reach === "none" && <Notice>{copy.studioAudienceEmpty}</Notice>}
         {plannedAnswer && (
           <p className="qv-help">
             This answer keeps its original request audience. To change that
@@ -520,6 +543,7 @@ export function Compose({
         <textarea
           ref={noteInput}
           id="note-text"
+          dir="auto"
           autoFocus={!!id}
           rows={5}
           maxLength={20000}
@@ -810,6 +834,9 @@ export function Compose({
             <p className="qv-meta">
               Signature preview · this draft has not been signed or posted.
             </p>
+          )}
+          {!pendingPublication && reach === "none" && (
+            <Notice>{copy.studioAudienceEmpty}</Notice>
           )}
           {pendingPublication ? (
             <div role="status">

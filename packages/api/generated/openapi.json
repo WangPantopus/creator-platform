@@ -21375,12 +21375,29 @@
         ],
         "additionalProperties": false
       },
+      "StudioAudienceReach": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "string",
+        "enum": [
+          "some",
+          "none",
+          "unknown"
+        ]
+      },
       "StudioAudiences": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
           "audienceCountsAvailable": {
             "type": "boolean"
+          },
+          "members": {
+            "type": "string",
+            "enum": [
+              "some",
+              "none",
+              "unknown"
+            ]
           },
           "tiers": {
             "type": "array",
@@ -21394,11 +21411,20 @@
                 },
                 "name": {
                   "type": "string"
+                },
+                "reach": {
+                  "type": "string",
+                  "enum": [
+                    "some",
+                    "none",
+                    "unknown"
+                  ]
                 }
               },
               "required": [
                 "id",
-                "name"
+                "name",
+                "reach"
               ],
               "additionalProperties": false
             }
@@ -21427,6 +21453,7 @@
         },
         "required": [
           "audienceCountsAvailable",
+          "members",
           "tiers",
           "groups"
         ],
@@ -32239,12 +32266,29 @@
         ],
         "additionalProperties": false
       },
+      "StudioStudioAudienceReach": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "string",
+        "enum": [
+          "some",
+          "none",
+          "unknown"
+        ]
+      },
       "StudioStudioAudiences": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
           "audienceCountsAvailable": {
             "type": "boolean"
+          },
+          "members": {
+            "type": "string",
+            "enum": [
+              "some",
+              "none",
+              "unknown"
+            ]
           },
           "tiers": {
             "type": "array",
@@ -32258,11 +32302,20 @@
                 },
                 "name": {
                   "type": "string"
+                },
+                "reach": {
+                  "type": "string",
+                  "enum": [
+                    "some",
+                    "none",
+                    "unknown"
+                  ]
                 }
               },
               "required": [
                 "id",
-                "name"
+                "name",
+                "reach"
               ],
               "additionalProperties": false
             }
@@ -32291,6 +32344,7 @@
         },
         "required": [
           "audienceCountsAvailable",
+          "members",
           "tiers",
           "groups"
         ],
