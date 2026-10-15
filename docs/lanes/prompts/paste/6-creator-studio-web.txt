@@ -1,0 +1,14 @@
+You are resuming Qelvora lane 6, "Creator Studio (web)", from its 2026-10-09 handoff. Same lane, new session. Write to the founder in plain words.
+
+RULES (the founder's): work alone, no subagents, workflows or other sessions. No new unit tests: prove every change end to end with edge cases (working agreement section 3). Never merge, push to main, force-push or rebase a pushed branch (merge origin/main into your branch); one concern per pull request titled "[lane 6] <WP>: <what>". Stay in your lane's files and file tickets for the rest. Migrations: write the SQL, apply it by hand to your own database, describe it in the pull request, keep going; the integrator registers it. Stop and ask the founder about invariants, money semantics, safety, engine revisions, user-facing copy, secrets, accounts and downloads. Be honest; say "not run" for what you did not run.
+
+START: git fetch origin and work in your own worktree (git rev-parse --show-toplevel must contain .claude/worktrees/). Read docs/lanes/README.md, 00-charter.md, 01-working-agreement.md, 02-contracts.md and docs/lanes/lane-6-creator-studio.md, then your status: git show origin/main:docs/lanes/status/lane-6.md (if the integrator has not merged it yet: origin/lane-6/studio-split-shell). WP 6.1 is complete (Studio.tsx went from 4,795 to 408 lines). The integrator is merging the chain #382, #383, #386, #387, #390, #391. Before you do anything else check that all six are on main (git log origin/main --oneline | head -30). If they are not, stop and tell the founder.
+
+NEXT FOR LANE 6 (the founder's go): do WP 6.2, Today and the Note composer, and nothing else; then stop and report. Lane 5's Note delivery and contract C4 are on main, so you can check the fan side of E6.2. Keep the E6.1 comparison green.
+
+WHAT CHANGED
+- The one-command stack is on main: node infra/local/stack.mjs up --lane 6 (read infra/local/README.md).
+- The real model: you never hold a key. The founder runs a capped gateway at http://127.0.0.1:56499. Sonnet 5.5 is the model. Studio work rarely needs it: use the fake (--provider anthropic) and add --model-gateway http://127.0.0.1:56499 only when a scenario needs real answers; report spend; a 402 means stop. Section 3.6 of the working agreement.
+- If pnpm install --frozen-lockfile --offline fails with ERR_PNPM_NO_OFFLINE_META, run pnpm install --frozen-lockfile (online, lockfile packages only; the founder approves). The database image pgvector/pgvector:pg17 is back on this Mac.
+- Replies from the stack's AI can stall when the Mac is busy; the Studio checks do not depend on them.
+- Ticket for you from lane 2 and lane 5: apps/web/next.config.ts or .gitignore (next dev rewrites the tracked apps/web/next-env.d.ts); the profile form, PushManager and notification worker for lane 5's web push, and the thread screen's session polling (shared with lane 3).

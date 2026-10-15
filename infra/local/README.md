@@ -75,8 +75,9 @@ curl -s http://127.0.0.1:56423/__stats                                      # ca
 
 ## Using Claude instead of OpenAI (optional)
 
-`up --provider anthropic` wires the backend to the Claude adapter (Haiku 5.5 for guards,
-judges and extraction; Sonnet 5.5 for replies; embeddings stay on OpenAI). On its own it costs
+`up --provider anthropic` wires the backend to the Claude adapter (Sonnet 5.5 for every call,
+the founder's choice; `--claude-small haiku` puts guards, judges and extraction on the much
+cheaper Haiku 5.5; embeddings stay on OpenAI). On its own it costs
 nothing: Claude's calls go to the same local fake, which now also speaks Claude's protocol.
 
 For the real model there is one process that holds the key, the capped gateway. The founder
