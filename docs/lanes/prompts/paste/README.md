@@ -7,7 +7,7 @@ order to start them in and the suggested model and effort.
 
 | File | Lane | Start |
 | --- | --- | --- |
-| `0-integrator.txt` | Integrator | First |
+| `0-integrator.txt` | Integrator | Next session; fill in its AUTHORIZATION line first (rewritten at the 2026-10-15 handoff) |
 | `1-identity-and-trust.txt` | Lane 1, Identity and trust | Now |
 | `2-platform-and-hosting.txt` | Lane 2, Platform and hosting | After the founder chooses hosting |
 | `3-ai-engine.txt` | Lane 3, AI engine | Now |
