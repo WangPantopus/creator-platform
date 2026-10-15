@@ -4,7 +4,7 @@
 // real WebSocket; the database's own statistics count the statements per answer.
 // No product behavior is changed. Fakes: development identity, model fake.
 //   node tests/scenarios/lane-3/a1-measure.mjs [--messages 20] [--fans 1] [--delay 300]
-//     [--long] [--cap 20000000] [--out run.json] [--compare before.json] [--detail]
+//     [--chars N] [--cap 20000000] [--out run.json] [--compare before.json] [--detail]
 import { writeFileSync, readFileSync } from "node:fs";
 import { loadavg } from "node:os";
 import {
@@ -29,6 +29,7 @@ import {
 const messages = Number(flag("--messages", "20"));
 const fanCount = Number(flag("--fans", "1"));
 const delayMs = Number(flag("--delay", "300"));
+const chars = Number(flag("--chars", "0"));
 const { step, finish } = reporter();
 const FANS = [
   ACTORS.fanOne,
@@ -181,9 +182,9 @@ const rounds = [];
 for (let i = 0; i < messages; i++) {
   await resetStats();
   maxXactMs = 0;
-  const text = process.argv.includes("--long")
-    ? `Question ${i + 1}: ${"How should I glaze a test tile so it does not crawl? ".repeat(60).slice(0, 2980)}`
-    : `Question ${i + 1}: how should I glaze a test tile so it does not crawl?`;
+  const short = `Question ${i + 1}: how should I glaze a test tile so it does not crawl?`;
+  // --chars N pads the question to exactly N characters (the reply path accepts at most 2,000).
+  const text = chars ? short.padEnd(chars, ".") : short;
   const results = await Promise.all(
     fans.map(async (fan) => {
       const started = performance.now();
@@ -269,7 +270,7 @@ const summary = {
   messages,
   fans: fanCount,
   delayMs,
-  long: process.argv.includes("--long"),
+  chars,
   ack: {
     p50: percentile(
       answers.map((a) => a.ack),
