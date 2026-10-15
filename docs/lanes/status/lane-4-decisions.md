@@ -53,3 +53,16 @@ hold appear and vanish.
 **Proposed default: fix it.** If the request is being released or has ended, and the processor has
 no hold for it, the retry places no new hold. It records that nothing was held, and the release
 finishes. This places fewer holds and never changes a charge.
+
+## 5. Do expired requests count toward "usually decides in"? (WP 4.9, C8)
+
+**Today:** no range is shown anywhere. The public summary (#427) leaves `reliability` empty until
+the creator's decision record exists. That record needs a migration, proposed in #427.
+
+**Proposed default: count an expiry at its deadline.** The range ("Maya usually decides in 1 to 2
+days") is then honest about how long a fan waits, including requests nobody answered. Show it only
+once there are at least five outcomes in the last 90 days, as the middle half of them (25th to 75th
+percentile), rounded to hours or days.
+
+Alternative: count only accepts and declines. The range is then about Maya's decisions, but a
+creator who lets requests expire would look faster than fans experience her.
