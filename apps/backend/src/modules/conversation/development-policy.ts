@@ -49,9 +49,13 @@ export class DevelopmentConversationPolicy {
       input.reference === SYNTHETIC_PROVIDER_REFERENCE &&
         input.policy.reference === SYNTHETIC_PROVIDER_REFERENCE &&
         input.policy.verified === false &&
-        input.policy.providers.length === 1 &&
-        input.policy.providers[0]!.name === "OpenAI" &&
-        input.policy.providers[0]!.noRetention === false,
+        input.policy.providers.length >= 1 &&
+        input.policy.providers.length <= 2 &&
+        input.policy.providers.every(
+          ({ name, noRetention }) =>
+            (name === "OpenAI" || name === "Anthropic") &&
+            noRetention === false,
+        ),
       "synthetic_policy_reference_required",
       "Use the explicit unreviewed development policy. Provider approval is unavailable.",
     );
