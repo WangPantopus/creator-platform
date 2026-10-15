@@ -162,8 +162,11 @@ export class PasskeyService {
   }
   async list(actor: Actor) {
     return identityTransaction(this.pool, actor.accountId, async (client) => {
+      // retired_at is read through to_jsonb until pending-passkey-retirement.sql is
+      // registered: without the column no key can be retired, so every key counts
+      // as unretired. Lane 1 reads the column directly once it is registered.
       const credentials = await client.query(
-        'SELECT id,created_at AS "createdAt",revoked_at IS NOT NULL AS revoked,retired_at IS NOT NULL AS retired FROM creator.passkey_credential WHERE account_id=$1 ORDER BY created_at DESC LIMIT 100',
+        `SELECT id,created_at AS "createdAt",revoked_at IS NOT NULL AS revoked,(to_jsonb(pc)->>'retired_at') IS NOT NULL AS retired FROM creator.passkey_credential pc WHERE account_id=$1 ORDER BY created_at DESC LIMIT 100`,
         [actor.accountId],
       );
       const profile = await client.query(

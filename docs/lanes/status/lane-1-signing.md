@@ -82,6 +82,13 @@ retires the key and past signatures stay valid; a compromised device keeps today
   `subjects.ts`). Every reader of past acts (the public page, commerce, content, media, the
   signature-read fences) checks only `revoked_at` and the signature flags, so past acts stay valid
   with no other lane's code touched.
+- Until the integrator registers `pending-passkey-retirement.sql`, the three signing reads and the
+  key list read the column as `to_jsonb(pc)->>'retired_at'`, which is null while the column does
+  not exist. Signing therefore works on a database with registered migrations only (CI's backend
+  suite: 157 of 157), and retirement is enforced once the column exists (the key-loss scenario
+  below). Before registration the two lost-device updates fail inside their transaction and
+  change nothing (read from the code, not run). Once it is registered, lane 1 replaces the four
+  reads with the plain column.
 - **Lost** (`recover(actor, "lost")`, `revoke(actor, id, "lost")`): every working key is retired,
   open challenges are cancelled, and `recovery_started_at` is set. That alone requires a fresh
   sign-in and fresh, ops-approved proof before the next key. The creator stays verified and

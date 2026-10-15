@@ -180,8 +180,11 @@ export class SignedActService {
       "creator_required",
       "Only the verified creator can sign this act.",
     );
+    // retired_at is read through to_jsonb until pending-passkey-retirement.sql is
+    // registered: without the column no key can be retired, so every key counts
+    // as unretired. Lane 1 reads the column directly once it is registered.
     const credentials = await client.query<{ id: string }>(
-      "SELECT id FROM creator.passkey_credential WHERE account_id=$1 AND revoked_at IS NULL AND retired_at IS NULL ORDER BY created_at,id LIMIT 100",
+      "SELECT id FROM creator.passkey_credential pc WHERE account_id=$1 AND revoked_at IS NULL AND (to_jsonb(pc)->>'retired_at') IS NULL ORDER BY created_at,id LIMIT 100",
       [actor.accountId],
     );
     invariant(
@@ -272,7 +275,7 @@ export class SignedActService {
         public_key: Buffer;
         counter: string;
       }>(
-        "SELECT id,public_key,counter FROM creator.passkey_credential WHERE id=$1 AND account_id=$2 AND revoked_at IS NULL AND retired_at IS NULL FOR UPDATE",
+        "SELECT id,public_key,counter FROM creator.passkey_credential pc WHERE id=$1 AND account_id=$2 AND revoked_at IS NULL AND (to_jsonb(pc)->>'retired_at') IS NULL FOR UPDATE",
         [response.id, actor.accountId],
       );
       const credential = credentials.rows[0];
