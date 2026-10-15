@@ -26,6 +26,7 @@ export function responseUsage(
   raw: unknown,
   model: string,
   rate: ModelRate | undefined,
+  provider = "OpenAI",
 ): Usage {
   const usage = z
     .object({
@@ -67,7 +68,7 @@ export function responseUsage(
     if (Number.isSafeInteger(cost)) costMicros = cost;
   }
   return {
-    provider: "OpenAI",
+    provider,
     model,
     inputTokens: usage.input_tokens,
     outputTokens: usage.output_tokens,
