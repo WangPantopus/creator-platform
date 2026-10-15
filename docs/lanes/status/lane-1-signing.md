@@ -91,7 +91,7 @@ retires the key and past signatures stay valid; a compromised device keeps today
   the approved wording: "Add a second passkey on another device, so losing one does not stop you
   signing."
 
-**Wording that still needs approval** (in `config/copy.json`, used on the setup page):
+**Wording, approved by the founder on 2026-10-15** (in `config/copy.json`, used on the setup page):
 
 | Key                              | Proposed                                                                                                         |
 | -------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
