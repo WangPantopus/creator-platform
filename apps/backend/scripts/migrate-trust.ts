@@ -279,6 +279,7 @@ try {
     domain: rows.some((r) => r.version === "0103_w8_domain_privacy_task_fence"),
     canonicalBeforeGeneration: generation && !installedGeneration,
     generationBeforeContent: installedGeneration > 0 && !installedContent,
+    contentBeforeOutput: installedContent && !installedOutput,
     outputBeforePublic: installedOutput && !installedPublic,
     publicBeforeComparison: Boolean(installedPublic && !installedComparison),
     comparisonBeforeNotices: Boolean(installedComparison && !installedNotices),
