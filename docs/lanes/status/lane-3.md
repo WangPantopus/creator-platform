@@ -1,9 +1,9 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-15, by the lane 3 session
-Working on: A3 (verify reviewed catalogues once per held transaction), branch `lane-3/a3-verify-once`, stacked on A1
-Done: A1 measurement harness, pull request `lane-3/a1-measure` (open)
-Next: A3, then B2 (FAQ publish check), A2 (wake on accept), B9, A6 (the cost-hold and uncertain-cost lockout below)
+Working on: nothing in flight. A3 is in review (needs the integrator's sign-off)
+Done: A1 measurement harness, pull request #411 (open). A3 checks reviewed catalogues once per held transaction, branch `lane-3/a3-verify-once` (open, stacked on #411)
+Next: A6 before B2 (reason: findings 3, 7 and 9 lock a creator's AI after any interrupted answer and block every lane's end-to-end checks), then B2, A2, B9
 Blocked on: nothing. Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
 
 ## How to measure
@@ -37,6 +37,20 @@ transactions, 22.6 s of worker database time. The heaviest: the shared permissio
 (`core/purpose-catalogue.ts`, about 630 runs, 6.4 s), the W1 catalogue (870 runs, 5.3 s), the W2
 consumer owner check (434 runs, 2.9 s), the W3 column catalogue (144 runs, 2.1 s).
 
+## After A3 (same harness and settings)
+
+| Run                          | Delivered (main then A3) | First sentence p50 / p95 (main then A3) | Worker statements per answer | Longest worker transaction |
+| ---------------------------- | ------------------------ | --------------------------------------- | ---------------------------- | -------------------------- |
+| Cold start, 3 messages       | 3/3 then 3/3             | 25.8 / 26.2 s then 9.0 / 9.1 s          | 7,364 then 2,808             | 4.5 s then 2.8 s           |
+| 20 messages, one fan         | 1/20 then 20/20          | 27.7 s (one sample) then 9.5 / 12.4 s   | 7,431 then 2,624             | 5.07 s then 3.0 s          |
+| Five fans at once            | 4/5 then 5/5             | 65.4 / 101.9 s then 45.0 / 82.7 s       | 7,571 then 2,532             | 5.02 s then 3.66 s         |
+| 2,000 characters, 3 messages | 2/3 then 3/3             | 27.8 / 28.8 s then 10.7 / 11.1 s        | 6,068 then 2,628             | 4.93 s then 2.51 s         |
+
+W1 catalogue runs per answer went from 847 to 37, consumer catalogue statements from 3,190 to 897,
+and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgment is unchanged
+(A3 does not touch that path). The longest transaction is now the terminal one; most of it is lane
+4's safety terminal catalogue (ticket below).
+
 ## Findings (lane 3 unless noted)
 
 1. Every generation transaction runs within about 0.5 s of the fixed 5-second scope window
@@ -54,16 +68,39 @@ consumer owner check (434 runs, 2.9 s), the W3 column catalogue (144 runs, 2.1 s
    (2-second authority deadline); a client must reconnect from its cursor. A7.
 6. The worker's `FOR UPDATE NOWAIT` on the thread row collides with the API's thread reads
    ("could not obtain lock on row in relation thread", several per run). A6.
+7. Any authority change while the model is streaming (takeover, pause, consent withdrawal, licence
+   lapse, block, AI pause, sign-out) leaves a provider-cost row with no cost (the aborted stream),
+   which then locks the creator's AI for every fan (finding 3). Same on main and A3. A6.
+8. An authority change right after the worker claims an answer leaves it "generating" until its
+   60 s lease expires and recovery finishes it. Same on main and A3. A6.
+9. After a crash once a sentence is stored, recovery fails every pass
+   (`generation_terminal_recovery_incomplete`; the database says "Complete actual typed
+   output/classifier provenance is unavailable" in `creator.generation_settle_typed_original_allowance`)
+   and the answer stays "generating" for good. Same on main and A3; lane 5 reported it too. A6 with lane 4.
+10. "Takeover visible within 500 ms" fails when the takeover waits behind a worker transaction: main up
+    to 2.3 s, A3 up to 1.2 s. A4.
+11. Account deletion cannot be requested with the development identity (it needs a Pantopus-mode
+    session), so the E3A.4 deletion case is not run until lane 1's sign-in is on the stack.
 
 ## Scenarios
 
-| ID                | State                               | Re-run                    |
-| ----------------- | ----------------------------------- | ------------------------- |
-| E3A.1 measurement | Baseline recorded above, 2026-10-15 | `a1-measure.mjs` as above |
-| E3A.2 to E3B.7    | Not run yet                         |                           |
+| ID                | State                                                                                                                                                                                       | Re-run                                            |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| E3A.1 measurement | Main and A3 recorded above, 2026-10-15                                                                                                                                                      | `a1-measure.mjs` as above                         |
+| E3A.2 ★           | Pass on A3: identical visible text, authorship, citations and order for every answer main also delivered                                                                                    | `a1-measure.mjs --compare`                        |
+| E3A.4 ★           | A3: no AI sentence after any change in 27 runs (7 kinds of change, up to 4 timings). Takeover within 500 ms fails at some timings (finding 10, also on main). Deletion not run (finding 11) | `e3a4-authority.mjs`, one case per fresh stack    |
+| E3A.5 ★           | A3: kill after admission passes; kill during the guard call leaves an uncertain cost (finding 7); kill after the first sentence never finishes (finding 9). Same on main                    | `e3a5-restart.mjs --at admitted\|guard\|sentence` |
+| E3A.6 ★           | Distressed message gets the safe response first: pass. Hard-block half not run (needs the real model)                                                                                       | `e3a6-safety.mjs`                                 |
+| A3 drift          | Pass on main and A3                                                                                                                                                                         | `a3-drift.mjs`                                    |
+| E3B.1 to E3B.7    | Not run yet                                                                                                                                                                                 |                                                   |
+
+Model gateway spend for lane 3 so far: none (every run used the local fake).
 
 ## Tickets to other lanes
 
-| To     | File                                   | Change                                                                                           | Why                                                                 |
-| ------ | -------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
-| Lane 2 | `tests/scenarios/lane-2/seed-maya.mjs` | Seed a daily cap above the Claude run ceiling (for example 20,000,000) until A6 resizes the hold | Finding 2: a `--provider anthropic` stack can never deliver a reply |
+| To     | File                                                                                                                    | Change                                                                                                                                                                   | Why                                                                                                          |
+| ------ | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| Lane 2 | `tests/scenarios/lane-2/seed-maya.mjs`                                                                                  | Seed a daily cap above the Claude run ceiling (for example 20,000,000) until A6 resizes the hold                                                                         | Finding 2: a `--provider anthropic` stack can never deliver a reply                                          |
+| Lane 4 | `modules/commerce/generation-audience.ts` (`assertCatalog`), `modules/commerce/generation-safety-terminal-catalogue.ts` | Wrap each check in `verifyInHeldTransaction(client, <its frozen custody object>, () => check)` from `modules/identity/generation-held-verification.ts` (after A3 merges) | 68 audience runs per answer; the safety terminal catalogue is about 1 s of the longest remaining transaction |
+| Lane 4 | `creator.generation_settle_typed_original_allowance` (W4 safety terminal settlement SQL)                                | Settle an interrupted answer that has stored output but no complete typed provenance, with lane 3 in A6                                                                  | Finding 9: a crash mid-answer is never recovered                                                             |
+| Lane 1 | `modules/trust/restoration.ts` (`assertGenerationWorkerRestoredInTransaction`)                                          | The same wrapper, if W8 agrees its restoration facts cannot change inside one transaction                                                                                | 41 runs per answer                                                                                           |

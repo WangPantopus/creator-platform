@@ -7,6 +7,7 @@ import { generationPrivacySourcesRegistered } from "../../db/generation-privacy-
 import { generationPrivacyCatalogueChecksum } from "../../db/content-privacy-profile.js";
 import { assertGenerationOutputRepairIfRegistered } from "../../db/generation-output-profile.js";
 import { requestAuthority } from "./request-authority.js";
+import { verifyInHeldTransaction } from "./generation-held-verification.js";
 
 export const generationOutputCursorSignature =
   "creator.generation_output_cursor_view(uuid,uuid,integer,integer)";
@@ -78,6 +79,19 @@ export async function assertGenerationOutputCursorCatalogue(
 ) {
   if (requestAuthority.getStore() || !generationOutputCursorCatalogueChecksum)
     unavailable();
+  const reviewed = generationOutputCursorCatalogueChecksum;
+  // Once when first used in a held transaction and again before its COMMIT.
+  await verifyInHeldTransaction(
+    client,
+    assertGenerationOutputCursorCatalogue,
+    () => verifyOutputCursorCatalogue(client, reviewed),
+  );
+}
+
+async function verifyOutputCursorCatalogue(
+  client: PoolClient,
+  reviewed: string,
+): Promise<void> {
   try {
     if (!(await generationPrivacySourcesRegistered())) unavailable();
     await assertRegisteredMigration(client, generationOutputCursorSource);
@@ -99,10 +113,7 @@ export async function assertGenerationOutputCursorCatalogue(
     ).rows[0]?.catalogue;
     if (
       contentHash({ cursor, writer, catalogue }) !==
-      (await generationPrivacyCatalogueChecksum(
-        "output",
-        generationOutputCursorCatalogueChecksum,
-      ))
+      (await generationPrivacyCatalogueChecksum("output", reviewed))
     )
       unavailable();
     // Restore only after a successful metadata read. Any failure escapes to
