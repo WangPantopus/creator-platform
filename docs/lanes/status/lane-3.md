@@ -1,9 +1,9 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-15, by the lane 3 session
-Working on: A6 (reliability): A6a, a provider error before any body is a known zero cost, branch `lane-3/a6-provider-errors` (stacked on A3); A6b, an interrupted reply's unknown cost counts as its whole hold, #433 (needs a migration registration)
-Done: A1 #411, A3 #426, A6b #433, A6a (all open)
-Next: the rest of A6 (stuck answers after a claim, crash recovery with lane 4, the acknowledgment-time unknown cost, hold sizing), then B2, A2, B9
+Working on: A6 (reliability): A6b #433 (interrupted cost, migration), A6a #434 (provider error is zero cost), A6c `lane-3/a6-ack-disconnect` (a dropped request no longer locks the creator)
+Done: A1 #411, A3 #426, A6b #433, A6a #434, A6c (all open)
+Next: answers stuck after a change right after the claim (A6), crash recovery with lane 4, hold sizing (needs the founder's choice), then B2, A2, B9
 Blocked on: nothing. Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
 
 ## How to measure
@@ -97,6 +97,7 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
 | E3A.5 ★             | A3: kill after admission passes; kill during the guard call leaves an uncertain cost (finding 7); kill after the first sentence never finishes (finding 9). Same on main                    | `e3a5-restart.mjs --at admitted\|guard\|sentence` |
 | E3A.6 ★             | Distressed message gets the safe response first: pass. Hard-block half not run (needs the real model)                                                                                       | `e3a6-safety.mjs`                                 |
 | A3 drift            | Pass on main and A3                                                                                                                                                                         | `a3-drift.mjs`                                    |
+| A6c dropped request | Before: a fan dropping the request during the safety check, or a timed-out check, locks the creator (4 of 7 fail). After: 7 of 7                                                            | `a6-ack-disconnect.mjs`                           |
 | A6a provider errors | Before: one 429 locks the creator; an error during the acknowledgment leaves an unknown cost. After: 7 of 7 pass, every failed call records 0 and the next reply is delivered               | `a6-provider-errors.mjs`                          |
 | E3B.1 to E3B.7      | Not run yet                                                                                                                                                                                 |                                                   |
 
