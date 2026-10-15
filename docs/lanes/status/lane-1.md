@@ -2,7 +2,7 @@
 
 Updated: 2026-10-15, by the lane 1 session (Claude Opus 5.5)
 
-Working on: nothing in flight. Next is deletion with option D (after #409) or WP 1.6.
+Working on: nothing in flight. WP 1.6 continues once the founder answers P1, P2 and R1.
 
 Done (open, not merged):
 
@@ -20,18 +20,22 @@ Done (open, not merged):
 - WP 1.5, a lost passkey retires and past signatures stay valid; a compromised one revokes (founder,
   2026-10-15); the second-passkey prompt: #439 (`lane-1/passkey-retirement`, stacked on #437).
   Pending migration `pending-passkey-retirement.sql`; register with the pull request.
+- WP 1.6 (first part), the ops console proven end to end; reviewers cannot review their own cases;
+  stuck effects show why; findings and decisions in `lane-1-ops.md`: #440 (`lane-1/ops-console`, on
+  main).
 - WP 1.7 (lane 1 part), identity and media finish a fan's deletion, plus the findings for every
   other domain: #409 (`lane-1/deletion-completeness`). E1.8 still fails on lanes 3, 4 and 5.
 
-Next: deletion with option D once #409 merges (remove provider identities, revoke Apple's token,
-export the new tables), then WP 1.6 (ops console and the Note-reply queue).
+Next: WP 1.6 second part after the founder's answers (automatic allowing of clean Note replies,
+lifting a pause), then deletion with option D once #409 merges.
 
 Blocked on:
 
 - Counsel's confirmation of the 18+ method, and the policy page for younger people (WP 1.9) that
   the adults-only page should link to.
-- The founder's approval of the recovery-choice wording (#439, five keys listed in
-  `lane-1-signing.md`).
+- The founder's ops decisions in `lane-1-ops.md` (#440): P1 (open paid requests on a pause), P2
+  (lifting a pause), R1 (when a Note reply is clean), O1 (supervisor-wide audit wording), O2
+  (adding ops reviewers).
 - The founder's deletion decisions D1 to D4 ([deletion findings, section 4](lane-1-deletion.md)
   on #409): creator signature retention, sign-in after deletion, how long the redacted fan record
   is kept, and Q16.
@@ -57,7 +61,9 @@ Scenarios:
   `e1-5-pending-publication.mjs`, `e1-5-refused-publish.mjs`).
 - Key loss (#439), 2026-10-15: `e1-5-key-loss.mjs` 15 of 15 (lost retires, past Notes valid, a
   retired key refused, fresh proof, compromised revokes), twice.
-- E1.5 signing a Note end to end with a Qelvora creator, E1.6, E1.7, E1.9 to E1.11: not run yet.
+- E1.6 (#440), 2026-10-15: `e1-6-ops.mjs` 24 pass, pause completion fails (lane 4), unpause not
+  run; `e1-6-console.mjs` 8 of 8.
+- E1.5 signing a Note end to end with a Qelvora creator, E1.7, E1.9 to E1.11: not run yet.
 
 Tickets to other lanes:
 
@@ -71,6 +77,10 @@ Tickets to other lanes:
   in `server.ts`); a trusted-proxy setting so the start limit sees the client's address (#431).
 - Lane 3, the development provider policy: Qelvora accounts get `providers_unconfigured`; staging
   and the exit demo need a verified policy or an allowance for fake-provider accounts (#431).
+- Lane 4: settle a paused creator's open paid requests (`settleDeparture`); a pause never resolves
+  without it (#440).
+- Lane 3: "resume" for a paused agent; and a creator's trust action times out while their AI holds
+  the profile row in a generation transaction (#440).
 - Integrator: register `pending-passkey-retirement.sql` with #439 (T-34 needs the column).
 - Lane 6, `features/studio/notes/Compose.tsx`: clear the pending publication when a retry is refused
   with `signed_act_required` (verified patch in `lane-1-signing.md`, #437).
