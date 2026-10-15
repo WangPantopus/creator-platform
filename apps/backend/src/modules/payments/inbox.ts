@@ -63,10 +63,12 @@ export interface CommerceWorkIndex {
   ): Promise<CommerceWorkScope | null>;
   unknownCase(scope: CommerceWorkScope, cause: string): Promise<void>;
 }
-/** W8 supplies a non-owner inbox worker pool and current issued identity scopes. */
+/** W8 supplies a non-owner inbox worker pool and current issued identity scopes.
+ * Without an inbox pool the worker still finishes every due request; provider
+ * notifications only make it sooner, never different. */
 export class CommerceRecoveryWorker {
   constructor(
-    private readonly inbox: Pool,
+    private readonly inbox: Pool | undefined,
     private readonly service: CommerceService,
     private readonly index: CommerceWorkIndex,
     private readonly recovery?: {
@@ -122,9 +124,9 @@ export class CommerceRecoveryWorker {
       await this.service.reconcile(scope.actor, scope.packetId);
     }
   }
-  async tick() {
-    const notification = (
-      await this.inbox.query<{
+  private async claimNotifications(inbox: Pool) {
+    return (
+      await inbox.query<{
         event_id: string;
         event_type: string;
         object_ref: string;
@@ -133,7 +135,10 @@ export class CommerceRecoveryWorker {
         `UPDATE creator.commerce_provider_inbox SET state='processing',lease_until=now()+interval '30 seconds',attempt=attempt+1 WHERE (provider,event_id) IN (SELECT provider,event_id FROM creator.commerce_provider_inbox WHERE provider='stripe' AND state IN ('pending','processing') AND (lease_until IS NULL OR lease_until<now()) ORDER BY received_at LIMIT 25 FOR UPDATE SKIP LOCKED) RETURNING event_id,event_type,object_ref,attempt`,
       )
     ).rows;
-    for (const event of notification) {
+  }
+  async tick() {
+    const inbox = this.inbox;
+    for (const event of inbox ? await this.claimNotifications(inbox) : []) {
       try {
         const scope = await this.index.notificationScope(
           event.event_type,
@@ -146,12 +151,12 @@ export class CommerceRecoveryWorker {
         );
         // Event age/order never dictates state. The service fetches the current provider object.
         await this.reconcileScope(scope);
-        await this.inbox.query(
+        await inbox!.query(
           "UPDATE creator.commerce_provider_inbox SET state='done',lease_until=NULL,error_code=NULL WHERE provider='stripe' AND event_id=$1 AND attempt=$2 AND state='processing'",
           [event.event_id, event.attempt],
         );
       } catch {
-        await this.inbox.query(
+        await inbox!.query(
           "UPDATE creator.commerce_provider_inbox SET state='pending',lease_until=now()+interval '1 minute',error_code='current_state_unavailable' WHERE provider='stripe' AND event_id=$1 AND attempt=$2 AND state='processing'",
           [event.event_id, event.attempt],
         );
