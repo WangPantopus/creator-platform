@@ -39,7 +39,7 @@ const ask = (text) =>
     },
   });
 const finished = async (g) => {
-  for (let w = 0; w < 150; w++) {
+  for (let w = 0; w < 240; w++) {
     const [row] = await sql(
       "SELECT g.state, g.last_sequence AS seq, m.delivery_state AS delivery FROM creator.generation g JOIN creator.message m ON m.id=g.ai_message_id WHERE g.id=$1",
       [g],
@@ -82,6 +82,14 @@ step(
   inside && activity.n > 0,
   `granted SELECT on creator.message to ${role}`,
 );
+// While the drift lasts every purpose fails closed, recovery included.
+await sleep(10_000);
+const [during] = await sql(
+  "SELECT g.state, m.delivery_state AS delivery FROM creator.generation g JOIN creator.message m ON m.id=g.ai_message_id WHERE g.id=$1",
+  [g],
+);
+await sql(`REVOKE SELECT ON creator.message FROM ${role}`);
+// After the revoke, recovery finishes the answer once its 60 s lease has passed.
 const end = await finished(g);
 const late = await sql(
   "SELECT count(*)::int AS n FROM creator.event WHERE type='sentence' AND payload->>'generationId'=$1 AND created_at>$2",
@@ -90,14 +98,13 @@ const late = await sql(
 step(
   "no AI sentence stored after the drift",
   late[0].n === 0,
-  `${late[0].n} after, answer ${end?.state}/${end?.delivery}, ${end?.seq ?? "?"} sentence(s)`,
+  `${late[0].n} after; 10 s into the drift the answer was ${during?.state}/${during?.delivery}`,
 );
 step(
-  "the answer ended honestly, not delivered under drift",
+  "after the revoke the answer ended honestly, not delivered under drift",
   end && end.state !== "delivered",
-  `${end?.state}`,
+  `${end?.state}/${end?.delivery}, ${end?.seq ?? "?"} sentence(s)`,
 );
-await sql(`REVOKE SELECT ON creator.message FROM ${role}`);
 const left = await sql(
   "SELECT count(*)::int AS n FROM creator.ai_usage WHERE cost_micros IS NULL",
 );
@@ -109,7 +116,7 @@ if (left[0].n === 0) {
   step(
     "after revoking, the next answer is delivered",
     after?.state === "delivered",
-    `${after?.state}/${after?.delivery}`,
+    `send ${next.status}, ${after?.state}/${after?.delivery}`,
   );
 } else
   step(

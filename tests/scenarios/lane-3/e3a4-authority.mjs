@@ -6,7 +6,7 @@
 // lane 3's own disposable database). Passes when no AI sentence is stored after
 // the change committed (INV-03, INV-05), the answer ends in a terminal state, and
 // a takeover reaches the fan's socket within 500 ms.
-//   node tests/scenarios/lane-3/e3a4-authority.mjs [--cases takeover,pause,consent,lapse,block,pause_ai,delete]
+//   node tests/scenarios/lane-3/e3a4-authority.mjs [--cases takeover,pause,consent,lapse,block,pause_ai,signout,delete]
 //     [--timings 0,200,claimed,stream] [--delay 300]
 import {
   ACTORS,
@@ -130,6 +130,12 @@ const CHANGES = {
         token: maya,
         headers: { "Idempotency-Key": key("pause-ai") },
       }),
+  },
+  // The fan signs out everywhere: the initiating session is revoked.
+  signout: {
+    fresh: true,
+    do: (f) =>
+      call(API, "POST", "/v1/identity/revoke-sessions", { token: f.token }),
   },
   delete: {
     fresh: true,

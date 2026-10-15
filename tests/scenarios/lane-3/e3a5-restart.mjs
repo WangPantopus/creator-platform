@@ -135,7 +135,8 @@ step(
 );
 
 let state;
-for (let w = 0; w < 150; w++) {
+// Recovery finishes an orphaned answer after its 60 s lease; allow four minutes.
+for (let w = 0; w < 240; w++) {
   [state] = await sql(
     "SELECT g.state, g.last_sequence AS seq, m.delivery_state AS delivery, m.text FROM creator.generation g JOIN creator.message m ON m.id=g.ai_message_id WHERE g.id=$1",
     [g],
@@ -147,6 +148,22 @@ for (let w = 0; w < 150; w++) {
     break;
   await sleep(1000);
 }
+const terminal = !["queued", "generating"].includes(state.state);
+if (!terminal)
+  // The worker's own pass reports: operational codes only, no content.
+  process.stdout.write(
+    execFileSync(
+      process.execPath,
+      ["infra/local/stack.mjs", "logs", "backend", "--lane", "3", "-n", "400"],
+      { cwd: new URL("../../..", import.meta.url).pathname },
+    )
+      .toString()
+      .split("\n")
+      .filter((line) => line.includes("generation_pass"))
+      .slice(-4)
+      .map((line) => `  ${line}\n`)
+      .join(""),
+  );
 step(
   "the answer reached a terminal state after restart",
   !["queued", "generating"].includes(state.state),
