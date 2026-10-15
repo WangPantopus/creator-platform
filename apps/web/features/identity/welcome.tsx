@@ -4,15 +4,28 @@ import { brand } from "@qelvora/brand";
 import { copy } from "@qelvora/copy";
 import { ContextCard, Notice } from "@qelvora/ui-web";
 
+/** Option D's errors, in the approved wording. */
+const signInErrors: Record<string, string> = {
+  continuation_expired: copy.signInFailed,
+  continuation_failed: copy.signInFailed,
+  sign_in_unavailable: copy.signInUnavailable,
+  rate_limited: copy.signInRateLimited,
+};
 export function IdentityWelcome({
   returnTo,
   arrival,
   error,
+  providers = [],
+  development = false,
 }: {
   returnTo: string;
   arrival: { source: string; title: string; creatorName: string } | null;
   error?: string;
+  /** Apple and Google, when the Qelvora sign-in is configured. */
+  providers?: readonly ("apple" | "google")[];
+  development?: boolean;
 }) {
+  const qelvora = providers.length > 0;
   const [context, setContext] = useState(arrival);
   const [destination, setDestination] = useState(returnTo);
   return (
@@ -55,7 +68,12 @@ export function IdentityWelcome({
             }}
           />
         )}
-        {error && (
+        {qelvora && error && signInErrors[error] && (
+          <div>
+            <Notice tone="error">{signInErrors[error]}</Notice>
+          </div>
+        )}
+        {error && !(qelvora && signInErrors[error]) && (
           <div>
             <Notice
               tone="error"
@@ -82,14 +100,29 @@ export function IdentityWelcome({
             </Notice>
           </div>
         )}
-        <a
-          className="qv-btn qv-btn--secondary qv-btn--lg qv-btn--block"
-          href={`/api/auth/continue?returnTo=${encodeURIComponent(destination)}`}
-        >
-          {error === "identity_unconfigured"
-            ? copy.retry
-            : copy.continueWithPantopus}
-        </a>
+        {(["apple", "google"] as const)
+          .filter((provider) => providers.includes(provider))
+          .map((provider) => (
+            <a
+              key={provider}
+              className="qv-btn qv-btn--secondary qv-btn--lg qv-btn--block"
+              href={`/api/auth/start?provider=${provider}&returnTo=${encodeURIComponent(destination)}`}
+            >
+              {provider === "apple"
+                ? copy.signInWithApple
+                : copy.signInWithGoogle}
+            </a>
+          ))}
+        {(!qelvora || development) && (
+          <a
+            className={`qv-btn ${qelvora ? "qv-btn--quiet" : "qv-btn--secondary qv-btn--lg"} qv-btn--block`}
+            href={`/api/auth/continue?returnTo=${encodeURIComponent(destination)}`}
+          >
+            {error === "identity_unconfigured"
+              ? copy.retry
+              : copy.continueWithPantopus}
+          </a>
+        )}
         {error === "identity_unconfigured" && (
           <a
             className="qv-btn qv-btn--text qv-btn--block"
@@ -98,7 +131,7 @@ export function IdentityWelcome({
             {copy.back}
           </a>
         )}
-        <p>{copy.pantopusAccount}</p>
+        {!qelvora && <p>{copy.pantopusAccount}</p>}
       </div>
     </main>
   );
