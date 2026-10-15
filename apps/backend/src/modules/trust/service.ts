@@ -34,6 +34,19 @@ type CaseRow = CaseSummary & {
   resolution_reason: string | null;
   decision_account_id: string | null;
 };
+/** A reviewer never opens or decides a case they filed or a case about
+ * their own account (which covers a creator's own verification and any report
+ * about their creator profile): another reviewer must handle it. */
+function independentReviewer(actor: Actor, current: CaseRow) {
+  if (
+    current.reporter_account_id === actor.accountId ||
+    current.subject_account_id === actor.accountId
+  )
+    throw new DomainError(
+      "independent_reviewer_required",
+      "Another reviewer must handle a case about your own account.",
+    );
+}
 const summaryColumns =
   "id,number,kind,queue,creator_name,state,version,created_at,updated_at";
 function caseDto<T extends CaseSummary>(row: T): T {
@@ -256,6 +269,7 @@ export class TrustService {
           404,
         );
       await this.requireQueue(client, current.queue);
+      independentReviewer(actor, current);
       await client.query(
         "INSERT INTO creator_trust.case_access(case_id,account_id,purpose,granted_at,expires_at) VALUES($1,$2,$3,now(),now()+make_interval(mins=>$4)) ON CONFLICT(case_id,account_id) DO UPDATE SET purpose=$3,granted_at=now(),expires_at=now()+make_interval(mins=>$4)",
         [caseId, actor.accountId, purpose, minutes],
@@ -373,6 +387,7 @@ export class TrustService {
           input,
           async () => {
             const current = await this.requireCase(client, caseId, true);
+            independentReviewer(actor, current);
             if (current.version !== input.version)
               throw new DomainError(
                 "stale_case",

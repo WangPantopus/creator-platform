@@ -514,19 +514,22 @@ export class TrustWorker {
         }
       });
     } catch (error) {
+      // A domain refusal keeps its own code (an identifier, never personal
+      // data) so ops can see why an effect is stuck; anything else stays generic.
       const code =
-        error instanceof Error &&
-        [
-          "hook_timeout",
-          "receipt_invalid",
-          "trust_connection_budget_unavailable",
-          "trust_transaction_unavailable",
-          "trust_client_settlement_unavailable",
-        ].includes(error instanceof DomainError ? error.code : error.message)
-          ? error instanceof DomainError
-            ? error.code
-            : error.message
-          : "effect_hook_error";
+        error instanceof DomainError &&
+        /^[a-z][a-z0-9_]{2,63}$/u.test(error.code)
+          ? error.code
+          : error instanceof Error &&
+              [
+                "hook_timeout",
+                "receipt_invalid",
+                "trust_connection_budget_unavailable",
+                "trust_transaction_unavailable",
+                "trust_client_settlement_unavailable",
+              ].includes(error.message)
+            ? error.message
+            : "effect_hook_error";
       await trustTransaction(this.pool, (client) =>
         client.query(
           "UPDATE creator_trust.effect SET state=$3,error_code=$5,lease_until=NULL,available_at=now()+make_interval(secs=>$4) WHERE id=$1 AND lease_token=$2 AND state='running'",
