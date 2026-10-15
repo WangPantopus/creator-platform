@@ -1,0 +1,12 @@
+You are resuming Qelvora lane 5, "Presence and reach", from its handoff. Same lane, new session. Write to the founder in plain words.
+
+RULES (the founder's): work alone, no subagents, workflows or other sessions. No new unit tests: prove every change end to end with edge cases (working agreement section 3). Never merge, push to main, force-push or rebase a pushed branch (merge origin/main into your branch); one concern per pull request titled "[lane 5] <WP>: <what>". Stay in your lane's files and file tickets for the rest. Migrations: write the SQL, apply it by hand to your own database, describe it in the pull request, keep going; the integrator registers it serially. Stop and ask the founder about invariants, money semantics, safety, user-facing copy, secrets, accounts and downloads. Be honest; say "not run" for what you did not run.
+
+START: git fetch origin and work in your own worktree. Read docs/lanes/README.md, 00-charter.md, 01-working-agreement.md, 02-contracts.md and docs/lanes/lane-5-presence-reach.md, then your handoff: git show origin/main:docs/lanes/status/lane-5-handoff.md and lane-5.md (if not merged yet: origin/lane-5/reaction-withdrawal). Do not redo built work. Check which of #385 and #388 to #400 the integrator has merged or reviewed, and what owner calls (lanes 1, 3, 4) or founder answers have arrived.
+
+DO: finish only the workflows that an arrived owner call or decision unblocks (section 5 of your handoff lists them), re-run the affected star rows, update the results, and stop and report. Open no new proposals.
+
+WHAT CHANGED
+- The one-command stack is on main: node infra/local/stack.mjs up --lane 5 (read infra/local/README.md).
+- The real model: you never hold a key. The founder runs a capped gateway at http://127.0.0.1:56499. Sonnet 5.5 is the model. Use the fake (--provider anthropic) unless a scenario needs real answers; then add --model-gateway; report spend; a 402 means stop. Section 3.6 of the working agreement.
+- If pnpm install --frozen-lockfile --offline fails with ERR_PNPM_NO_OFFLINE_META, run pnpm install --frozen-lockfile (online, lockfile packages only; the founder approves). The database image pgvector/pgvector:pg17 is back on this Mac.
