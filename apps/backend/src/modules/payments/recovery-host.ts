@@ -54,6 +54,15 @@ const inbox = process.env.COMMERCE_INBOX_DATABASE_URL
       connectionTimeoutMillis: 5000,
     })
   : undefined;
+// pg removes a failed idle client before emitting; active queries still reject.
+// Without a listener the process would exit and take the scheduler with it.
+// Errors can carry connection details, so only a fixed line is written.
+pool.on("error", () => {
+  console.error("An idle database connection failed and was discarded.");
+});
+inbox?.on("error", () => {
+  console.error("An idle inbox connection failed and was discarded.");
+});
 const commerce = readCommerceEnvironment(pool);
 if (!commerce || !("payments" in commerce))
   throw new Error("The commerce scheduler needs the payment settings.");

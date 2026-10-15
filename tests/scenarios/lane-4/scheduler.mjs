@@ -5,9 +5,11 @@
 // It also receives the processor's notifications on 127.0.0.1:56445 (the
 // signing secret is a placeholder the scenarios share) and, when this stack has
 // the inbox login (inbox-login in the lane 4 scenario directory, made by the
-// e4-6 scenario), claims them.
+// e4-6 scenario), claims them. The login is put back on every start, because
+// the local stack gives every login role a new password on `up`.
 //   node tests/scenarios/lane-4/scheduler.mjs start [interval ms] | stop | kill | status
 import { spawn } from "node:child_process";
+import { randomBytes } from "node:crypto";
 import {
   closeSync,
   existsSync,
@@ -21,6 +23,7 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { sql } from "./lib.mjs";
 
 const backend = fileURLToPath(
   new URL("../../../apps/backend/", import.meta.url),
@@ -32,13 +35,33 @@ const log = join(dir, "scheduler.log");
 export const WEBHOOK_URL =
   "http://127.0.0.1:56445/v1/commerce/provider-notifications/stripe";
 export const WEBHOOK_SECRET = "whsec_lane4_fake_edge";
-const inboxLogin = () => {
-  try {
-    return `postgresql://creator_commerce_inbox:${readFileSync(join(dir, "inbox-login"), "utf8").trim()}@127.0.0.1:56440/creator_stack`;
-  } catch {
-    return undefined;
-  }
-};
+const loginFile = join(dir, "inbox-login");
+const loginSecret = () =>
+  readFileSync(loginFile, "utf8").replace(/[^A-Za-z0-9_-]/gu, "");
+const inboxLogin = () =>
+  existsSync(loginFile)
+    ? `postgresql://creator_commerce_inbox:${loginSecret()}@127.0.0.1:56440/creator_stack`
+    : undefined;
+/**
+ * Stand-in for the proposed migration (schema-provider-inbox-worker.sql, in its
+ * own pull request) in this stack's own database: the non-owner login that may
+ * claim notifications. Its password lives only in the scenario directory.
+ */
+export async function ensureInboxLogin() {
+  mkdirSync(dir, { recursive: true, mode: 0o700 });
+  if (!existsSync(loginFile))
+    writeFileSync(loginFile, randomBytes(18).toString("base64url"), {
+      mode: 0o600,
+    });
+  await sql(
+    "DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='creator_commerce_inbox') THEN CREATE ROLE creator_commerce_inbox LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOBYPASSRLS NOREPLICATION; END IF; END $$",
+  );
+  await sql(`ALTER ROLE creator_commerce_inbox PASSWORD '${loginSecret()}'`);
+  await sql("GRANT USAGE ON SCHEMA creator TO creator_commerce_inbox");
+  await sql(
+    "GRANT SELECT (provider,event_id,event_type,object_ref,received_at,state,lease_until,attempt), UPDATE (state,lease_until,attempt,error_code) ON creator.commerce_provider_inbox TO creator_commerce_inbox",
+  );
+}
 
 const pid = () => {
   try {
@@ -54,6 +77,7 @@ export const schedulerRunning = () => pid() !== null;
 export async function startScheduler(intervalMs = 2000) {
   if (pid()) return pid();
   mkdirSync(dir, { recursive: true, mode: 0o700 });
+  if (existsSync(loginFile)) await ensureInboxLogin();
   // Only what this start writes counts as its readiness.
   const from = existsSync(log) ? statSync(log).size : 0;
   const out = openSync(log, "a");
@@ -130,4 +154,5 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
         ? `scheduler running (pid ${pid()})`
         : "scheduler not running",
     );
+  process.exit(0);
 }

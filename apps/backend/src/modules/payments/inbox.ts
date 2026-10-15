@@ -1,7 +1,7 @@
 import { Router, raw } from "express";
 import type { Pool } from "pg";
 import { verifyStripeWebhook } from "./provider.js";
-import { invariant } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 import type { Actor } from "../identity/adapter.js";
 import type { CommerceService } from "../commerce/service.js";
 
@@ -144,10 +144,41 @@ export class CommerceRecoveryWorker {
     ).rows;
   }
   async tick() {
-    const inbox = this.inbox;
-    for (const event of inbox ? await this.claimNotifications(inbox) : []) {
+    // Notifications only make recovery sooner: when the inbox cannot be claimed
+    // or updated, the due scan still runs, and the failure is raised after it.
+    let notifications: unknown;
+    if (this.inbox)
+      try {
+        await this.applyNotifications(this.inbox);
+      } catch (cause) {
+        notifications = cause;
+      }
+    for (const scope of await this.index.dueScopes(50)) {
+      try {
+        await this.reconcileScope(scope);
+        if (scope.kind && scope.kind !== "packet") continue;
+        const current = await this.service.packet(scope.actor, scope.packetId);
+        if (
+          current.packet.payment_state === "unknown" &&
+          Date.now() - current.packet.created_at.getTime() > 3600000
+        )
+          await this.index.unknownCase(scope, "money_unknown_over_one_hour");
+      } catch {
+        await this.index.unknownCase(scope, "reconciliation_incomplete");
+      }
+    }
+    if (notifications !== undefined)
+      throw new DomainError(
+        "notifications_unavailable",
+        "Provider notifications could not be claimed; the due scan still ran.",
+        503,
+        { cause: notifications },
+      );
+  }
+  private async applyNotifications(inbox: Pool) {
+    for (const event of await this.claimNotifications(inbox)) {
       if (this.index.handles && !this.index.handles(event.event_type)) {
-        await inbox!.query(
+        await inbox.query(
           "UPDATE creator.commerce_provider_inbox SET state='done',lease_until=NULL,error_code='not_applicable' WHERE provider='stripe' AND event_id=$1 AND attempt=$2 AND state='processing'",
           [event.event_id, event.attempt],
         );
@@ -165,29 +196,15 @@ export class CommerceRecoveryWorker {
         );
         // Event age/order never dictates state. The service fetches the current provider object.
         await this.reconcileScope(scope);
-        await inbox!.query(
+        await inbox.query(
           "UPDATE creator.commerce_provider_inbox SET state='done',lease_until=NULL,error_code=NULL WHERE provider='stripe' AND event_id=$1 AND attempt=$2 AND state='processing'",
           [event.event_id, event.attempt],
         );
       } catch {
-        await inbox!.query(
+        await inbox.query(
           "UPDATE creator.commerce_provider_inbox SET state=CASE WHEN attempt>=$3 THEN 'blocked' ELSE 'pending' END,lease_until=now()+interval '1 minute',error_code='current_state_unavailable' WHERE provider='stripe' AND event_id=$1 AND attempt=$2 AND state='processing'",
           [event.event_id, event.attempt, NOTIFICATION_TRIES],
         );
-      }
-    }
-    for (const scope of await this.index.dueScopes(50)) {
-      try {
-        await this.reconcileScope(scope);
-        if (scope.kind && scope.kind !== "packet") continue;
-        const current = await this.service.packet(scope.actor, scope.packetId);
-        if (
-          current.packet.payment_state === "unknown" &&
-          Date.now() - current.packet.created_at.getTime() > 3600000
-        )
-          await this.index.unknownCase(scope, "money_unknown_over_one_hour");
-      } catch {
-        await this.index.unknownCase(scope, "reconciliation_incomplete");
       }
     }
   }

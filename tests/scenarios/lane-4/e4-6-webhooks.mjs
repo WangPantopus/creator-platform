@@ -7,13 +7,10 @@
 // recorded; an unknown event type is acknowledged and ignored. Notifications
 // are signed here the way Stripe signs them (with the stack's placeholder
 // secret). Fakes: card processor, development identity, software passkey; the
-// inbox login is created by hand in this stack's own database
+// inbox login is made by the scheduler harness in this stack's own database
 // (schema-provider-inbox-worker.sql, proposed for registration).
 //   node tests/scenarios/lane-4/e4-6-webhooks.mjs
 import { createHmac, randomBytes } from "node:crypto";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 import {
   ACCOUNT,
   CREATOR,
@@ -35,6 +32,7 @@ import {
 import {
   WEBHOOK_SECRET,
   WEBHOOK_URL,
+  ensureInboxLogin,
   startScheduler,
   stopScheduler,
 } from "./scheduler.mjs";
@@ -43,24 +41,8 @@ const maya = await asCreator(ACCOUNT.maya, CREATOR.maya);
 const fan = await asFan(ACCOUNT.fanTwo);
 await setLimit(fan, 1_000_000);
 const mode = (await offer(maya, { weeklyLimit: 10 })).body;
-// Stand-in for the proposed migration (schema-provider-inbox-worker.sql, in
-// its own pull request) in this stack's own database: the non-owner login that
-// may claim notifications. Its password lives only in the scenario directory.
-const loginFile = join(tmpdir(), "qelvora-lane4-scenarios", "inbox-login");
-if (!existsSync(loginFile))
-  writeFileSync(loginFile, randomBytes(18).toString("base64url"), {
-    mode: 0o600,
-  });
-await sql(
-  "DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='creator_commerce_inbox') THEN CREATE ROLE creator_commerce_inbox LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOBYPASSRLS NOREPLICATION; END IF; END $$",
-);
-await sql(
-  `ALTER ROLE creator_commerce_inbox PASSWORD '${readFileSync(loginFile, "utf8").replace(/[^A-Za-z0-9_-]/gu, "")}'`,
-);
-await sql("GRANT USAGE ON SCHEMA creator TO creator_commerce_inbox");
-await sql(
-  "GRANT SELECT (provider,event_id,event_type,object_ref,received_at,state,lease_until,attempt), UPDATE (state,lease_until,attempt,error_code) ON creator.commerce_provider_inbox TO creator_commerce_inbox",
-);
+// The non-owner login that may claim notifications (a stand-in for the proposed migration).
+await ensureInboxLogin();
 await stopScheduler();
 await startScheduler(2000);
 const event = (type, object, extra = {}) => ({

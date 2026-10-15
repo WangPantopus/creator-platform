@@ -52,6 +52,15 @@ export function createCommerceRecovery(input: {
   };
 }
 
+/** A failure's own code (a SQLSTATE such as 28P01, a domain or Node code), never
+ * its message, which can carry connection details or data. */
+const codeOf = (cause: unknown) => {
+  const code = (cause as { code?: unknown } | null | undefined)?.code;
+  return typeof code === "string" && /^[A-Za-z0-9_]{1,64}$/u.test(code)
+    ? code
+    : "unknown";
+};
+
 /** The development host's scheduler: scopes come from the development identity adapter. */
 export async function createDevelopmentCommerceRecovery(input: {
   service: CommerceService;
@@ -73,11 +82,15 @@ export async function createDevelopmentCommerceRecovery(input: {
     index,
     ...(input.inbox ? { inbox: input.inbox } : {}),
     ...(input.intervalMs ? { intervalMs: input.intervalMs } : {}),
-    onError: () =>
+    onError: (cause) =>
       report(
         JSON.stringify({
           event: "commerce_recovery_pass_failed",
           at: new Date().toISOString(),
+          code: codeOf(cause),
+          ...(cause instanceof Error && cause.cause !== undefined
+            ? { cause: codeOf(cause.cause) }
+            : {}),
         }),
       ),
   });
