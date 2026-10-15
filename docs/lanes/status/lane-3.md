@@ -51,6 +51,11 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
 (A3 does not touch that path). The longest transaction is now the terminal one; most of it is lane
 4's safety terminal catalogue (ticket below).
 
+## Decisions
+
+- 2026-10-15, founder: a reply that fails on a provider error before any output releases the fan's
+  allowance (nothing ran). A6a (#434) records that error as a known zero cost.
+
 ## Findings (lane 3 unless noted)
 
 1. Every generation transaction runs within about 0.5 s of the fixed 5-second scope window
