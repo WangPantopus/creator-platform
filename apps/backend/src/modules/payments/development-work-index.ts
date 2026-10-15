@@ -95,6 +95,11 @@ export class DevelopmentCommerceWorkIndex implements CommerceWorkIndex {
     return scopes;
   }
 
+  /** Payments, their charges and refunds; nothing else happens on this host. */
+  handles(type: string) {
+    return /^(payment_intent|charge|refund)\./u.test(type);
+  }
+
   async notificationScope(_type: string, reference: string) {
     for (const actor of this.actors) {
       const [row] = await this.read(actor, NOTIFIED, [

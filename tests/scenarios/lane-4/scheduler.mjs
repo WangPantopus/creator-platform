@@ -2,14 +2,20 @@
 // backend (apps/backend/src/modules/payments/recovery-host.ts), with the
 // backend's own settings file, so scenarios can leave requests alone and watch
 // the system finish them, and can kill and restart the scheduler mid-flight.
+// It also receives the processor's notifications on 127.0.0.1:56445 (the
+// signing secret is a placeholder the scenarios share) and, when this stack has
+// the inbox login (inbox-login in the lane 4 scenario directory, made by the
+// e4-6 scenario), claims them.
 //   node tests/scenarios/lane-4/scheduler.mjs start [interval ms] | stop | kill | status
 import { spawn } from "node:child_process";
 import {
   closeSync,
+  existsSync,
   mkdirSync,
   openSync,
   readFileSync,
   rmSync,
+  statSync,
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -23,6 +29,16 @@ const dir = join(tmpdir(), "qelvora-lane4-scenarios");
 const settings = join(tmpdir(), "qelvora-stack", "lane4", "backend.env");
 const pidFile = join(dir, "scheduler.pid");
 const log = join(dir, "scheduler.log");
+export const WEBHOOK_URL =
+  "http://127.0.0.1:56445/v1/commerce/provider-notifications/stripe";
+export const WEBHOOK_SECRET = "whsec_lane4_fake_edge";
+const inboxLogin = () => {
+  try {
+    return `postgresql://creator_commerce_inbox:${readFileSync(join(dir, "inbox-login"), "utf8").trim()}@127.0.0.1:56440/creator_stack`;
+  } catch {
+    return undefined;
+  }
+};
 
 const pid = () => {
   try {
@@ -38,6 +54,8 @@ export const schedulerRunning = () => pid() !== null;
 export async function startScheduler(intervalMs = 2000) {
   if (pid()) return pid();
   mkdirSync(dir, { recursive: true, mode: 0o700 });
+  // Only what this start writes counts as its readiness.
+  const from = existsSync(log) ? statSync(log).size : 0;
   const out = openSync(log, "a");
   const child = spawn(
     process.execPath,
@@ -56,6 +74,9 @@ export async function startScheduler(intervalMs = 2000) {
         HOME: process.env.HOME,
         TMPDIR: process.env.TMPDIR,
         COMMERCE_RECOVERY_INTERVAL_MS: String(intervalMs),
+        STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET,
+        COMMERCE_WEBHOOK_PORT: "56445",
+        ...(inboxLogin() ? { COMMERCE_INBOX_DATABASE_URL: inboxLogin() } : {}),
       },
     },
   );
@@ -63,7 +84,11 @@ export async function startScheduler(intervalMs = 2000) {
   closeSync(out);
   writeFileSync(pidFile, String(child.pid));
   for (let i = 0; i < 100; i++) {
-    if (readFileSync(log, "utf8").includes(`pass every ${intervalMs} ms`))
+    if (
+      readFileSync(log, "utf8")
+        .slice(from)
+        .includes(`pass every ${intervalMs} ms`)
+    )
       return child.pid;
     await new Promise((r) => setTimeout(r, 200));
   }

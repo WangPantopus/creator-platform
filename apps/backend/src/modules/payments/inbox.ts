@@ -62,7 +62,14 @@ export interface CommerceWorkIndex {
     reference: string,
   ): Promise<CommerceWorkScope | null>;
   unknownCase(scope: CommerceWorkScope, cause: string): Promise<void>;
+  /** Whether a notification of this type can concern work this host does.
+   * Others are acknowledged and ignored; without it, every type is tried. */
+  handles?(type: string): boolean;
 }
+/** A notification no scope can be found for is tried this many times, about a
+ * minute apart, then blocked for an operator. The due scan still finishes the
+ * request it may concern. */
+const NOTIFICATION_TRIES = 10;
 /** W8 supplies a non-owner inbox worker pool and current issued identity scopes.
  * Without an inbox pool the worker still finishes every due request; provider
  * notifications only make it sooner, never different. */
@@ -139,6 +146,13 @@ export class CommerceRecoveryWorker {
   async tick() {
     const inbox = this.inbox;
     for (const event of inbox ? await this.claimNotifications(inbox) : []) {
+      if (this.index.handles && !this.index.handles(event.event_type)) {
+        await inbox!.query(
+          "UPDATE creator.commerce_provider_inbox SET state='done',lease_until=NULL,error_code='not_applicable' WHERE provider='stripe' AND event_id=$1 AND attempt=$2 AND state='processing'",
+          [event.event_id, event.attempt],
+        );
+        continue;
+      }
       try {
         const scope = await this.index.notificationScope(
           event.event_type,
@@ -157,8 +171,8 @@ export class CommerceRecoveryWorker {
         );
       } catch {
         await inbox!.query(
-          "UPDATE creator.commerce_provider_inbox SET state='pending',lease_until=now()+interval '1 minute',error_code='current_state_unavailable' WHERE provider='stripe' AND event_id=$1 AND attempt=$2 AND state='processing'",
-          [event.event_id, event.attempt],
+          "UPDATE creator.commerce_provider_inbox SET state=CASE WHEN attempt>=$3 THEN 'blocked' ELSE 'pending' END,lease_until=now()+interval '1 minute',error_code='current_state_unavailable' WHERE provider='stripe' AND event_id=$1 AND attempt=$2 AND state='processing'",
+          [event.event_id, event.attempt, NOTIFICATION_TRIES],
         );
       }
     }
