@@ -1,7 +1,10 @@
 import { createHash, randomBytes } from "node:crypto";
 import type { Pool, PoolClient } from "pg";
 import { z } from "zod";
-import type { Usage } from "../../../../../packages/api/src/agent/contracts.js";
+import {
+  DraftConfig,
+  type Usage,
+} from "../../../../../packages/api/src/agent/contracts.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import {
   GenerationIdentityAuthority,
@@ -18,6 +21,7 @@ import {
 import { PreparedGenerationJournal } from "./generation-journal.js";
 import { AgentService } from "./service.js";
 import type { AgentModel } from "./model.js";
+import { CONTEXT_BUDGET, maximumGenerationCalls } from "./pipeline.js";
 import { ProviderResponseError } from "./response-usage.js";
 import type { StreamProposal } from "./streaming.js";
 import {
@@ -264,9 +268,27 @@ export class PreparedGenerationProviderAccounting {
       licensedFacts ?? (await this.inputs.currentInTransaction(client, scope));
     if (licensedFacts)
       await this.inputs.authorizeLicensedInTransaction(facts, scope, client);
-    const ceiling = this.model.maximumRunCostMicros(
-      Buffer.byteLength(facts.version.compiledPrefix, "utf8"),
-    );
+    // A strict bound on what this run can send for this creator's actual
+    // configuration and message (founder decision 2026-10-15), each call at
+    // its own model's rate. Models without the bound keep the old envelope.
+    const ceiling =
+      this.model.maximumBoundedRunCostMicros &&
+      this.model.contextTokenCeiling &&
+      this.model.outputTokenCap
+        ? this.model.maximumBoundedRunCostMicros(
+            maximumGenerationCalls({
+              compiledPrefix: facts.version.compiledPrefix,
+              message: context.acceptedText,
+              configuration: DraftConfig.parse(facts.version.configuration),
+              sponsors: facts.sponsors,
+              contextTokenCeiling:
+                this.model.contextTokenCeiling(CONTEXT_BUDGET),
+              outputTokenCap: this.model.outputTokenCap,
+            }),
+          )
+        : this.model.maximumRunCostMicros(
+            Buffer.byteLength(facts.version.compiledPrefix, "utf8"),
+          );
     invariant(
       ceiling !== null &&
         Number.isSafeInteger(ceiling) &&

@@ -2,7 +2,13 @@ import { z } from "zod";
 import { DomainError } from "../../core/errors.js";
 import { contentHash } from "../../core/canonical.js";
 import type { Usage } from "../../../../../packages/api/src/agent/contracts.js";
-import { CALL_OVERHEAD_TOKENS, ReplySchema, type AgentModel } from "./model.js";
+import {
+  CALL_OVERHEAD_TOKENS,
+  ReplySchema,
+  priceBoundedCalls,
+  type AgentModel,
+  type BoundedCall,
+} from "./model.js";
 import { completedSentences, type StreamProposal } from "./streaming.js";
 import {
   ModelRateSchema,
@@ -329,6 +335,20 @@ export class AnthropicMessagesModel implements AgentModel {
           rate.cacheWriteMicrosPerMillion !== undefined
         );
       })
+    );
+  }
+  readonly outputTokenCap = MAX_OUTPUT_TOKENS;
+  /** Budget units are UTF-8 bytes / 3 (rounded up), and bytes bound tokens. */
+  contextTokenCeiling(budget: number) {
+    return budget * 3;
+  }
+  maximumBoundedRunCostMicros(calls: readonly BoundedCall[]) {
+    if (!this.pricingConfigured) return null;
+    return priceBoundedCalls(
+      this.configuration,
+      this.configuration.rates,
+      calls,
+      MAX_OUTPUT_TOKENS,
     );
   }
   maximumCallCostMicros(inputBytes: number) {
