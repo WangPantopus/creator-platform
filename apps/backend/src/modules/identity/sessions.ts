@@ -11,12 +11,21 @@ import { CompleteIdentitySchema, IdentityContinueSchema } from "@qelvora/api";
 import type { Actor, PantopusIdentityAdapter } from "./adapter.js";
 import { resolveActor } from "./adapter.js";
 import { DomainError, invariant } from "../../core/errors.js";
+import {
+  QelvoraSignIn,
+  type IssueSession,
+  type SignInStep,
+} from "./qelvora-sign-in.js";
 
 const hash = (token: string) =>
   createHash("sha256").update(token).digest("hex");
 export class SessionService implements PantopusIdentityAdapter {
   readonly mode;
   readonly developmentActors;
+  /** Option D. It is the upstream itself on a Qelvora host, or runs beside
+   * the development identity when QELVORA_SIGN_IN configures it. Each session
+   * row records which one issued it, and resolves through that one. */
+  readonly qelvora: QelvoraSignIn | undefined;
   constructor(
     private readonly pool: Pool,
     private readonly upstream: PantopusIdentityAdapter,
@@ -26,6 +35,55 @@ export class SessionService implements PantopusIdentityAdapter {
       throw new Error("IDENTITY_SESSION_KEY must decode to 32 bytes.");
     this.mode = upstream.mode ?? "pantopus";
     this.developmentActors = upstream.developmentActors;
+    this.qelvora =
+      upstream instanceof QelvoraSignIn
+        ? upstream
+        : QelvoraSignIn.fromEnvironment(pool, key);
+  }
+  private signIn() {
+    if (!this.qelvora)
+      throw new DomainError(
+        "sign_in_unconfigured",
+        "Sign-in with Apple or Google is not connected yet.",
+        503,
+      );
+    return this.qelvora;
+  }
+  /** A Qelvora session: the grant is the encrypted upstream token, and the
+   * provider's authentication time is the session's freshness. */
+  private readonly issueQelvora: IssueSession = async (client, admitted) => {
+    const token = randomBytes(32).toString("base64url");
+    await client.query(
+      "INSERT INTO creator.identity_session(account_id,token_hash,upstream_cipher,mode,expires_at,refresh_until,created_at) VALUES($1,$2,$3,'qelvora',now()+interval '15 minutes',now()+interval '7 days',$4)",
+      [
+        admitted.accountId,
+        hash(token),
+        this.encrypt(admitted.grantToken),
+        admitted.authenticatedAt,
+      ],
+    );
+    return token;
+  };
+  startWeb(input: Parameters<QelvoraSignIn["startWeb"]>[0]) {
+    return this.signIn().startWeb(input);
+  }
+  completeWeb(
+    input: Parameters<QelvoraSignIn["completeWeb"]>[0],
+  ): Promise<SignInStep> {
+    return this.signIn().completeWeb(input, this.issueQelvora);
+  }
+  startNative(input: Parameters<QelvoraSignIn["startNative"]>[0]) {
+    return this.signIn().startNative(input);
+  }
+  completeNative(
+    input: Parameters<QelvoraSignIn["completeNative"]>[0],
+  ): Promise<SignInStep> {
+    return this.signIn().completeNative(input, this.issueQelvora);
+  }
+  confirmAge(
+    input: Parameters<QelvoraSignIn["confirmAge"]>[0],
+  ): Promise<SignInStep> {
+    return this.signIn().confirmAge(input, this.issueQelvora);
   }
   private encrypt(token: string) {
     const iv = randomBytes(12);
@@ -171,8 +229,9 @@ export class SessionService implements PantopusIdentityAdapter {
       upstream_cipher: string;
       expires_at: Date;
       created_at: Date;
+      mode: "development" | "pantopus" | "qelvora";
     }>(
-      `SELECT id,account_id,upstream_cipher,expires_at,created_at FROM creator.identity_session WHERE token_hash=$1 AND revoked_at IS NULL AND ${refreshing ? "refresh_until" : "expires_at"}>now()`,
+      `SELECT id,account_id,upstream_cipher,expires_at,created_at,mode FROM creator.identity_session WHERE token_hash=$1 AND revoked_at IS NULL AND ${refreshing ? "refresh_until" : "expires_at"}>now()`,
       [hash(token)],
     );
     const row = found.rows[0];
@@ -182,13 +241,17 @@ export class SessionService implements PantopusIdentityAdapter {
         "Your session ended. Continue with Pantopus again.",
         401,
       );
+    const issuer = row.mode === "qelvora" ? this.qelvora : this.upstream;
+    if (!issuer)
+      throw new DomainError(
+        "identity_unavailable",
+        "Account authorization is unavailable. Reconnect and try again. Your session is kept.",
+        503,
+      );
     let actor: Actor;
     let adultVerifiedAt: string;
     try {
-      actor = await resolveActor(
-        this.upstream,
-        this.decrypt(row.upstream_cipher),
-      );
+      actor = await resolveActor(issuer, this.decrypt(row.upstream_cipher));
       // This is the time of this actual current upstream confirmation, not
       // session creation, refresh time or caller-supplied adult provenance.
       adultVerifiedAt = new Date().toISOString();
@@ -206,6 +269,14 @@ export class SessionService implements PantopusIdentityAdapter {
         "UPDATE creator.identity_session SET revoked_at=now() WHERE id=$1",
         [row.id],
       );
+      // An account flagged under 18 after sign-in sees the under-18 state,
+      // not a sign-in prompt (D-11). The session ends either way.
+      if (error.code === "adult_eligibility_required")
+        throw new DomainError(
+          "adult_eligibility_required",
+          "This app is available to adults aged 18 and over.",
+          403,
+        );
       throw new DomainError(
         "authorization_ended",
         "Your authorization could not be confirmed. Continue with Pantopus again.",
@@ -229,6 +300,7 @@ export class SessionService implements PantopusIdentityAdapter {
       expiresAt: row.expires_at.toISOString(),
       authenticatedAt: row.created_at,
       adultVerifiedAt,
+      mode: row.mode,
     };
   }
   async refresh(token: string) {
@@ -248,11 +320,12 @@ export class SessionService implements PantopusIdentityAdapter {
   }
   async logout(token: string, all = false) {
     if (all) {
-      const { actor } = await this.resolve(token, true);
+      const { actor, mode } = await this.resolve(token, true);
       await this.pool.query(
         "UPDATE creator.identity_session SET revoked_at=now() WHERE account_id=$1 AND revoked_at IS NULL",
         [actor.accountId],
       );
+      if (mode === "qelvora") await this.qelvora?.revokeGrants(actor.accountId);
     } else
       await this.pool.query(
         "UPDATE creator.identity_session SET revoked_at=now() WHERE token_hash=$1 AND revoked_at IS NULL",

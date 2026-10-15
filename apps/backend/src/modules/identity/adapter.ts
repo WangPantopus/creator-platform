@@ -8,7 +8,7 @@ const IdentityEnvelope = z.strictObject({
 });
 export type Actor = Readonly<z.infer<typeof IdentityEnvelope>>;
 export interface PantopusIdentityAdapter {
-  readonly mode?: "development" | "pantopus";
+  readonly mode?: "development" | "pantopus" | "qelvora";
   readonly developmentActors?: readonly { id: string; label: string }[];
   beginSession(context: {
     returnTo: string;
