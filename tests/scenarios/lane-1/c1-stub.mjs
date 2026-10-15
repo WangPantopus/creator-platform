@@ -308,11 +308,7 @@ const routes = {
   },
 };
 async function webFlow(req, res, url, body) {
-  if (
-    req.method === "POST" &&
-    url.pathname === "/v1/identity/continue" &&
-    body?.provider
-  ) {
+  if (req.method === "POST" && url.pathname === "/v1/identity/web/start") {
     const input = IdentityProviderContinueSchema.parse(body);
     const continuationId = randomUUID();
     const state = randomBytes(32).toString("base64url");
@@ -368,13 +364,9 @@ async function webFlow(req, res, url, body) {
     res.writeHead(303, { Location: back.href }).end();
     return true;
   }
-  if (
-    req.method === "POST" &&
-    url.pathname === "/v1/identity/complete" &&
-    continuations.get(body?.continuationId)?.kind === "web"
-  ) {
-    const entry = take(continuations, body.continuationId);
-    if (!entry) return (expired(res), true);
+  if (req.method === "POST" && url.pathname === "/v1/identity/web/complete") {
+    const entry = take(continuations, body?.continuationId);
+    if (!entry || entry.kind !== "web") return (expired(res), true);
     const state = Buffer.from(String(body.state ?? ""));
     if (
       state.length !== entry.state.length ||
@@ -437,10 +429,8 @@ http
     const raw = Buffer.concat(chunks);
     try {
       const route = routes[`${req.method} ${url.pathname}`];
-      const c1 =
-        route ||
-        /^\/v1\/identity\/(continue|complete|native\/|age)/u.test(url.pathname);
-      if (c1 && !url.pathname.startsWith("/__fake")) {
+      // Like the backend, only the two start endpoints are limited.
+      if (/^\/v1\/identity\/(web\/start|native\/nonce)$/u.test(url.pathname)) {
         const ip = req.socket.remoteAddress;
         const recent = (hits.get(ip) ?? []).filter(
           (t) => t > Date.now() - WINDOW,

@@ -280,7 +280,7 @@ step(
     "age_required",
 );
 
-const web = await call("/v1/identity/continue", {
+const web = await call("/v1/identity/web/start", {
   returnTo: "/home",
   provider: "google",
 });
@@ -298,13 +298,13 @@ step(
 step(
   "W1 a callback with another state is refused",
   code(
-    await call("/v1/identity/complete", {
+    await call("/v1/identity/web/complete", {
       ...params,
       state: `${params.state.slice(0, -2)}xx`,
     }),
   ) === "403 identity_state_invalid",
 );
-const web2 = await call("/v1/identity/continue", {
+const web2 = await call("/v1/identity/web/start", {
   returnTo: "/home",
   provider: "google",
 });
@@ -315,7 +315,7 @@ const params2 = Object.fromEntries(
     ).headers.get("location"),
   ).searchParams,
 );
-const done = await call("/v1/identity/complete", params2);
+const done = await call("/v1/identity/web/complete", params2);
 step(
   "W2 web completion signs a known adult in",
   done.body?.status === "signed_in" &&
@@ -324,7 +324,7 @@ step(
 );
 step(
   "W2 a replayed callback is refused",
-  code(await call("/v1/identity/complete", params2)) ===
+  code(await call("/v1/identity/web/complete", params2)) ===
     "403 continuation_expired",
 );
 
