@@ -3,7 +3,7 @@
 Updated: 2026-10-15, by the lane 3 session
 Working on: A6 (reliability): A6b #433 (interrupted cost, migration), A6a #434 (provider error is zero cost), A6c `lane-3/a6-ack-disconnect` (a dropped request no longer locks the creator)
 Done: A1 #411, A3 #426, A6b #433, A6a #434, A6c (all open)
-Next: answers stuck after a change right after the claim (A6), crash recovery with lane 4, hold sizing (needs the founder's choice), then B2, A2, B9
+Next: hold sizing (waits on the founder's choice), then B2, A2, B9. Findings 8 and 9 need migrations (W1 lease release; crash recovery with lane 4), proposed for the next migration wave
 Blocked on: nothing. Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
 
 ## How to measure
@@ -77,11 +77,20 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
    lapse, block, AI pause, sign-out) leaves a provider-cost row with no cost (the aborted stream),
    which then locks the creator's AI for every fan (finding 3). Same on main and A3. A6.
 8. An authority change right after the worker claims an answer leaves it "generating" until its
-   60 s lease expires and recovery finishes it. Same on main and A3. A6.
+   60 s lease expires and recovery finishes it. Same on main and A3. Cause: by design the terminal
+   step lets the original worker complete only while the thread's full authority holds (a takeover
+   makes the trust check answer "denied"); after a change only reconciliation may finish, and only
+   once the original lease has passed. A worker-only fix cannot help (tried, not opened). Needs a W1
+   SQL change: the worker releases its own lease when authority ends, so reconciliation runs at once.
 9. After a crash once a sentence is stored, recovery fails every pass
    (`generation_terminal_recovery_incomplete`; the database says "Complete actual typed
    output/classifier provenance is unavailable" in `creator.generation_settle_typed_original_allowance`)
-   and the answer stays "generating" for good. Same on main and A3; lane 5 reported it too. A6 with lane 4.
+   and the answer stays "generating" for good. Same on main and A3; lane 5 reported it too. Cause: the
+   killed reply call's usage row stays `provider_state='admitted'` (its finish never ran), and the W4
+   settlement requires every sentence's call to be `completed`. Fix, either: lane 3's journal seal
+   closes orphaned admitted calls as completed with an unknown cost (new update policy on `ai_usage`,
+   so more pinned catalogues change), or lane 4's settlement accepts an admitted call inside a sealed
+   unknown receipt (one condition in `0238`). Both need a migration.
 10. "Takeover visible within 500 ms" fails when the takeover waits behind a worker transaction: main up
     to 2.3 s, A3 up to 1.2 s. A4.
 11. Account deletion cannot be requested with the development identity (it needs a Pantopus-mode
