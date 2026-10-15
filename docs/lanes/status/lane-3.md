@@ -1,9 +1,9 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-15, by the lane 3 session
-Working on: nothing in flight. A3 is in review (needs the integrator's sign-off)
-Done: A1 measurement harness, pull request #411 (open). A3 checks reviewed catalogues once per held transaction, branch `lane-3/a3-verify-once` (open, stacked on #411)
-Next: A6 before B2 (reason: findings 3, 7 and 9 lock a creator's AI after any interrupted answer and block every lane's end-to-end checks), then B2, A2, B9
+Working on: A6 (reliability): A6a, a provider error before any body is a known zero cost, branch `lane-3/a6-provider-errors` (stacked on A3); A6b, an interrupted reply's unknown cost counts as its whole hold, #433 (needs a migration registration)
+Done: A1 #411, A3 #426, A6b #433, A6a (all open)
+Next: the rest of A6 (stuck answers after a claim, crash recovery with lane 4, the acknowledgment-time unknown cost, hold sizing), then B2, A2, B9
 Blocked on: nothing. Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
 
 ## How to measure
@@ -51,6 +51,11 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
 (A3 does not touch that path). The longest transaction is now the terminal one; most of it is lane
 4's safety terminal catalogue (ticket below).
 
+## Decisions
+
+- 2026-10-15, founder: a reply that fails on a provider error before any output releases the fan's
+  allowance (nothing ran). A6a (#434) records that error as a known zero cost.
+
 ## Findings (lane 3 unless noted)
 
 1. Every generation transaction runs within about 0.5 s of the fixed 5-second scope window
@@ -84,23 +89,25 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
 
 ## Scenarios
 
-| ID                | State                                                                                                                                                                                       | Re-run                                            |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| E3A.1 measurement | Main and A3 recorded above, 2026-10-15                                                                                                                                                      | `a1-measure.mjs` as above                         |
-| E3A.2 ★           | Pass on A3: identical visible text, authorship, citations and order for every answer main also delivered                                                                                    | `a1-measure.mjs --compare`                        |
-| E3A.4 ★           | A3: no AI sentence after any change in 27 runs (7 kinds of change, up to 4 timings). Takeover within 500 ms fails at some timings (finding 10, also on main). Deletion not run (finding 11) | `e3a4-authority.mjs`, one case per fresh stack    |
-| E3A.5 ★           | A3: kill after admission passes; kill during the guard call leaves an uncertain cost (finding 7); kill after the first sentence never finishes (finding 9). Same on main                    | `e3a5-restart.mjs --at admitted\|guard\|sentence` |
-| E3A.6 ★           | Distressed message gets the safe response first: pass. Hard-block half not run (needs the real model)                                                                                       | `e3a6-safety.mjs`                                 |
-| A3 drift          | Pass on main and A3                                                                                                                                                                         | `a3-drift.mjs`                                    |
-| E3B.1 to E3B.7    | Not run yet                                                                                                                                                                                 |                                                   |
+| ID                  | State                                                                                                                                                                                       | Re-run                                            |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| E3A.1 measurement   | Main and A3 recorded above, 2026-10-15                                                                                                                                                      | `a1-measure.mjs` as above                         |
+| E3A.2 ★             | Pass on A3: identical visible text, authorship, citations and order for every answer main also delivered                                                                                    | `a1-measure.mjs --compare`                        |
+| E3A.4 ★             | A3: no AI sentence after any change in 27 runs (7 kinds of change, up to 4 timings). Takeover within 500 ms fails at some timings (finding 10, also on main). Deletion not run (finding 11) | `e3a4-authority.mjs`, one case per fresh stack    |
+| E3A.5 ★             | A3: kill after admission passes; kill during the guard call leaves an uncertain cost (finding 7); kill after the first sentence never finishes (finding 9). Same on main                    | `e3a5-restart.mjs --at admitted\|guard\|sentence` |
+| E3A.6 ★             | Distressed message gets the safe response first: pass. Hard-block half not run (needs the real model)                                                                                       | `e3a6-safety.mjs`                                 |
+| A3 drift            | Pass on main and A3                                                                                                                                                                         | `a3-drift.mjs`                                    |
+| A6a provider errors | Before: one 429 locks the creator; an error during the acknowledgment leaves an unknown cost. After: 7 of 7 pass, every failed call records 0 and the next reply is delivered               | `a6-provider-errors.mjs`                          |
+| E3B.1 to E3B.7      | Not run yet                                                                                                                                                                                 |                                                   |
 
 Model gateway spend for lane 3 so far: none (every run used the local fake).
 
 ## Tickets to other lanes
 
-| To     | File                                                                                                                    | Change                                                                                                                                                                   | Why                                                                                                          |
-| ------ | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| Lane 2 | `tests/scenarios/lane-2/seed-maya.mjs`                                                                                  | Seed a daily cap above the Claude run ceiling (for example 20,000,000) until A6 resizes the hold                                                                         | Finding 2: a `--provider anthropic` stack can never deliver a reply                                          |
-| Lane 4 | `modules/commerce/generation-audience.ts` (`assertCatalog`), `modules/commerce/generation-safety-terminal-catalogue.ts` | Wrap each check in `verifyInHeldTransaction(client, <its frozen custody object>, () => check)` from `modules/identity/generation-held-verification.ts` (after A3 merges) | 68 audience runs per answer; the safety terminal catalogue is about 1 s of the longest remaining transaction |
-| Lane 4 | `creator.generation_settle_typed_original_allowance` (W4 safety terminal settlement SQL)                                | Settle an interrupted answer that has stored output but no complete typed provenance, with lane 3 in A6                                                                  | Finding 9: a crash mid-answer is never recovered                                                             |
-| Lane 1 | `modules/trust/restoration.ts` (`assertGenerationWorkerRestoredInTransaction`)                                          | The same wrapper, if W8 agrees its restoration facts cannot change inside one transaction                                                                                | 41 runs per answer                                                                                           |
+| To         | File                                                                                                                    | Change                                                                                                                                                                   | Why                                                                                                          |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| Lane 2     | `tests/scenarios/lane-2/seed-maya.mjs`                                                                                  | Seed a daily cap above the Claude run ceiling (for example 20,000,000) until A6 resizes the hold                                                                         | Finding 2: a `--provider anthropic` stack can never deliver a reply                                          |
+| Lane 4     | `modules/commerce/generation-audience.ts` (`assertCatalog`), `modules/commerce/generation-safety-terminal-catalogue.ts` | Wrap each check in `verifyInHeldTransaction(client, <its frozen custody object>, () => check)` from `modules/identity/generation-held-verification.ts` (after A3 merges) | 68 audience runs per answer; the safety terminal catalogue is about 1 s of the longest remaining transaction |
+| Lane 4     | `creator.generation_settle_typed_original_allowance` (W4 safety terminal settlement SQL)                                | Settle an interrupted answer that has stored output but no complete typed provenance, with lane 3 in A6                                                                  | Finding 9: a crash mid-answer is never recovered                                                             |
+| Integrator | `tests/scenarios/integrator/anthropic-adapter.mts` (case A6)                                                            | Expect a `ProviderResponseError` with a known zero usage for a non-2xx answer before any body (code, upstream status and the no-secret check are unchanged)              | A6a makes that error a known zero cost, as the brief decided; this case pinned the old behavior              |
+| Lane 1     | `modules/trust/restoration.ts` (`assertGenerationWorkerRestoredInTransaction`)                                          | The same wrapper, if W8 agrees its restoration facts cannot change inside one transaction                                                                                | 41 runs per answer                                                                                           |
