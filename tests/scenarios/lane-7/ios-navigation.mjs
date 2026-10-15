@@ -128,7 +128,7 @@ try {
       "-xctestrun",
       scratch,
       "-destination",
-      "platform=iOS Simulator,id=62DDB9C8-4B10-48CB-94ED-1746980B54EA",
+      `platform=iOS Simulator,name=${process.env.LANE7_IOS ?? "qelvora-lane7-ios"}`,
       "-parallel-testing-enabled",
       "NO",
       "-resultBundlePath",
