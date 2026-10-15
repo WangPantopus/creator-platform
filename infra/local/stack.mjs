@@ -12,6 +12,8 @@
 //   node infra/local/stack.mjs reset  --lane 2     down, then up: a stack rebuilt from nothing
 //   node infra/local/stack.mjs stop   --lane 2     stop everything, keep the data
 //   node infra/local/stack.mjs down   --lane 2     remove everything this stack created
+//   node infra/local/stack.mjs catalogues check|snapshot|diff|write --lane 2 [tool options]
+//                                                  the reviewed catalogue pins (WP 2.9)
 //
 // Lane N owns ports 564N0 to 564N9 and containers named qelvora-laneN-*;
 // --base-port moves the range and --lane may be a label such as 3a.
@@ -72,7 +74,10 @@ function parse(argv) {
     else if (arg === "--base-port") options.base = Number(value());
     else if (arg === "--env") options.env.push(value());
     else if (arg === "--web-env") options.webEnv.push(value());
+    else if (arg === "--provider") options.provider = value();
+    else if (arg === "--model-gateway") options.modelGateway = value();
     else if (arg === "--growth") options.growth = true;
+    else if (arg === "--db-only") options.dbOnly = true;
     else if (arg === "--no-web") options.noWeb = true;
     else if (arg === "--no-ai") options.noAi = true;
     else if (arg === "--no-smoke") options.noSmoke = true;
@@ -625,12 +630,76 @@ const quote = (value) => {
   throw new StackError("An environment value cannot contain both ' and `.");
 };
 
+/** Which model provider the backend is wired to, and where its calls go.
+ * openai (default): the OpenAI adapter, every call answered by the local fake.
+ * anthropic: the Claude adapter; its calls go to the same fake, or with
+ * --model-gateway to the capped gateway (infra/local/model-gateway.mjs), the
+ * only process that holds a real key. The stack never sees a key. */
+async function providerFor(plan, options) {
+  const provider = options.provider ?? "openai";
+  if (!["openai", "anthropic"].includes(provider))
+    throw new StackError(
+      `Unknown provider "${provider}".`,
+      "Use openai or anthropic.",
+      2,
+    );
+  if (options.modelGateway && provider !== "anthropic")
+    throw new StackError("--model-gateway needs --provider anthropic.", "", 2);
+  if (provider === "openai") return { provider };
+  if (!options.modelGateway)
+    return {
+      provider,
+      edge: `http://127.0.0.1:${plan.ports.model}`,
+      live: false,
+    };
+  let gateway;
+  try {
+    gateway = new URL(options.modelGateway);
+  } catch {
+    throw new StackError(`"${options.modelGateway}" is not a URL.`, "", 2);
+  }
+  if (
+    gateway.protocol !== "http:" ||
+    !["127.0.0.1", "localhost"].includes(gateway.hostname)
+  )
+    throw new StackError(
+      "The model gateway must be an http loopback URL.",
+      "Start it with node infra/local/model-gateway.mjs.",
+      2,
+    );
+  const stats = await http(`${gateway.origin}/__stats`).catch(() => null);
+  if (stats?.status !== 200 || stats.json?.budgetMicros === undefined)
+    throw new StackError(
+      `No model gateway answers at ${gateway.origin}.`,
+      "The founder starts it with the key from the Keychain: see docs/operations/anthropic-provider.md.",
+    );
+  if (stats.json.paused)
+    throw new StackError(
+      "The model gateway is paused.",
+      'Resume it with POST /__control {"paused":false}.',
+    );
+  return { provider, edge: `${gateway.origin}/lane/${plan.lane}`, live: true };
+}
+
 async function writeBackendConfig(plan, secrets, options) {
+  const wired = await providerFor(plan, options);
+  const claude = wired.provider === "anthropic";
   mkdirSync(plan.file("artifacts"), { recursive: true, mode: 0o700 });
   writeJson(plan.file("policy.json"), {
     version: "development-unreviewed-20261008",
     reference: SYNTHETIC_REFERENCE,
     providers: [
+      // Claude writes the replies; OpenAI still embeds (Anthropic has no embedding model).
+      ...(claude
+        ? [
+            {
+              name: "Anthropic",
+              termsUrl: "https://www.anthropic.com/legal/commercial-terms",
+              noTraining: true,
+              noRetention: false,
+            },
+          ]
+        : []),
       {
         name: "OpenAI",
         termsUrl: "https://openai.com/policies/services-agreement/",
@@ -653,7 +722,22 @@ async function writeBackendConfig(plan, secrets, options) {
     priorCostRules: [],
     trialAllowance: 1_000_000,
   });
+  const claudeRates = {
+    "claude-haiku-5-5": {
+      inputMicrosPerMillion: 100000,
+      outputMicrosPerMillion: 500000,
+      cachedInputMicrosPerMillion: 10000,
+      cacheWriteMicrosPerMillion: 125000,
+    },
+    "claude-sonnet-5-5": {
+      inputMicrosPerMillion: 2000000,
+      outputMicrosPerMillion: 10000000,
+      cachedInputMicrosPerMillion: 200000,
+      cacheWriteMicrosPerMillion: 2500000,
+    },
+  };
   const rates = JSON.stringify({
+    ...(claude ? claudeRates : {}),
     "gpt-4o-mini": {
       inputMicrosPerMillion: 150000,
       outputMicrosPerMillion: 600000,
@@ -698,11 +782,19 @@ async function writeBackendConfig(plan, secrets, options) {
     W3_DEVELOPMENT_ECONOMICS_FILE: plan.file("economics.json"),
     W3_DEVELOPMENT_INGESTION: `${MAYA}:${MAYA_ACCOUNT},${DEVON}:${DEVON_ACCOUNT}`,
     OPENAI_API_KEY: "sk-local-development-fake",
-    W2_SMALL_MODEL: "gpt-4o-mini",
-    W2_LARGE_MODEL: "gpt-4o",
+    W2_SMALL_MODEL: claude ? "claude-haiku-5-5" : "gpt-4o-mini",
+    W2_LARGE_MODEL: claude ? "claude-sonnet-5-5" : "gpt-4o",
     W2_EMBEDDING_MODEL: "text-embedding-3-small",
     W2_MODEL_RATES_JSON: rates,
     QELVORA_FAKE_MODEL_URL: `http://127.0.0.1:${plan.ports.model}`,
+    ...(claude
+      ? {
+          W2_PROVIDER: "anthropic",
+          // Never a real key: the fake ignores it and the gateway replaces it.
+          ANTHROPIC_API_KEY: "sk-ant-local-development-fake",
+          QELVORA_ANTHROPIC_EDGE_URL: wired.edge,
+        }
+      : {}),
     ...(options.growth
       ? {
           GROWTH_ENABLED: "true",
@@ -946,6 +1038,8 @@ async function up(plan, options) {
     await preflightPorts(plan, options);
     await ensureContainer(plan);
     await bootstrapDatabase(plan, secrets, options);
+    // Just the database, roles and seed: for work that brings its own host.
+    if (options.dbOnly) return;
     plan.webExtra = options.webEnv;
     const hash = await writeBackendConfig(plan, secrets, options);
     const backendRecord = owned.backend;
@@ -994,6 +1088,15 @@ async function up(plan, options) {
       );
   });
   say();
+  if (options.dbOnly) {
+    say(
+      `READY  ${plan.name} database only  (${Math.round((Date.now() - began) / 1000)} s)`,
+    );
+    say(
+      `  database  postgresql://postgres:${TEST_PASSWORD}@127.0.0.1:${plan.ports.postgres}/${plan.database}`,
+    );
+    return;
+  }
   say(`READY  ${plan.name}  (${Math.round((Date.now() - began) / 1000)} s)`);
   await printAddresses(plan, options);
   if (!options.noSmoke) {
@@ -1050,6 +1153,19 @@ async function smoke(plan, options = {}) {
     });
     child.on("close", (code) => done(code ?? 1));
   });
+}
+
+/** Which provider the running backend was configured for, read from its env file. */
+async function providerNote(plan) {
+  try {
+    const text = readFileSync(plan.file("backend.env"), "utf8");
+    const edge = /^QELVORA_ANTHROPIC_EDGE_URL=(.+)$/mu.exec(text)?.[1];
+    if (!edge) return "";
+    const live = !edge.includes(`:${plan.ports.model}`);
+    return `; backend uses Claude ${live ? `LIVE through the gateway at ${edge.replace(/'/gu, "")}` : "against this fake"}`;
+  } catch {
+    return "";
+  }
 }
 
 async function status(plan) {
@@ -1116,7 +1232,7 @@ async function status(plan) {
     "model",
     stats?.status === 200 && (await isOurs(pids.model)),
     stats?.json
-      ? `fake provider on ${plan.ports.model}, mode ${stats.json.mode}, calls ${JSON.stringify(stats.json.counts)}`
+      ? `fake provider on ${plan.ports.model}, mode ${stats.json.mode}, calls ${JSON.stringify(stats.json.counts)}${await providerNote(plan)}`
       : "not answering",
   );
   const web = pids.web
@@ -1256,14 +1372,47 @@ async function env(plan) {
   say(`QELVORA_FAKE_MODEL_URL=http://127.0.0.1:${plan.ports.model}`);
 }
 
-const help = `Usage: node infra/local/stack.mjs <up|status|smoke|env|logs|stop|down|reset> --lane N [options]
+const help = `Usage: node infra/local/stack.mjs <up|status|smoke|env|logs|stop|down|reset|catalogues> --lane N [options]
+  --provider P    openai (default) or anthropic: Claude answers, against the local fake
+  --model-gateway URL   with --provider anthropic: send Claude calls to the capped gateway (real model)
   --lane N        lane number (ports 564N0-564N9) or a label such as 3a with --base-port
   --base-port P   first of ten ports (default 56400 + N*10)
-  up options      --growth  --no-web  --no-ai  --no-smoke  --ack-only  --require-reply  --env KEY=VALUE  --web-env KEY=VALUE
+  up options      --db-only  --growth  --no-web  --no-ai  --no-smoke  --ack-only  --require-reply  --env KEY=VALUE  --web-env KEY=VALUE
   down options    --keep-data
-  logs            logs backend|web|model [-n 80]`;
+  logs            logs backend|web|model [-n 80]
+  catalogues      check | snapshot --out F | diff --base F | write [--base F] [--dry-run] [--variant L]
+                  the reviewed catalogue pins against this stack's database (docs/lanes/status/lane-2-catalogue-pins.md)`;
+
+// ---------------------------------------------------- the reviewed catalogue pins
+/** Everything but --lane and --base-port belongs to the tool; its exit code is ours. */
+async function catalogues(rest) {
+  const own = [];
+  const forwarded = [];
+  for (let at = 0; at < rest.length; at += 1)
+    if (rest[at] === "--lane" || rest[at] === "--base-port")
+      own.push(rest[at], rest[(at += 1)]);
+    else forwarded.push(rest[at]);
+  const plan = planFor(parse(["catalogues", ...own]).options);
+  return new Promise((done) => {
+    const child = spawn(
+      process.execPath,
+      [
+        "--import",
+        "tsx",
+        "src/operations/catalogues/catalogue-pins.ts",
+        ...forwarded,
+        "--database-url",
+        adminUrl(plan),
+      ],
+      { cwd: join(root, "apps/backend"), stdio: "inherit" },
+    );
+    child.on("close", (code) => done(code ?? 3));
+  });
+}
 
 async function main() {
+  if (process.argv[2] === "catalogues")
+    process.exit(await catalogues(process.argv.slice(3)));
   const { command, options } = parse(process.argv.slice(2));
   if (command === "help" || command === "--help") return say(help);
   const plan = planFor(options);
