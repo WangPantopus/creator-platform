@@ -64,6 +64,8 @@ export function CreatorSetup({ initial }: { initial: Session }) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
+  // Changing passkeys needs a sign-in from the last five minutes.
+  const [freshSignIn, setFreshSignIn] = useState(false);
   const [proofRead, setProofRead] = useState<{
     creatorId: string | null;
     status: "loading" | "ready" | "unavailable";
@@ -151,9 +153,14 @@ export function CreatorSetup({ initial }: { initial: Session }) {
     setBusy(true);
     setError("");
     setNotice("");
+    setFreshSignIn(false);
     try {
       await work();
     } catch (error) {
+      setFreshSignIn(
+        error instanceof IdentityActionError &&
+          error.code === "fresh_identity_required",
+      );
       setError(
         error instanceof Error
           ? error.message
@@ -581,6 +588,21 @@ export function CreatorSetup({ initial }: { initial: Session }) {
             <Notice tone="error" title="Action unavailable">
               {error}
             </Notice>
+          </div>
+        )}
+        {freshSignIn && initial.mode === "qelvora" && (
+          <div className="passkey-controls">
+            {(["apple", "google"] as const).map((provider) => (
+              <a
+                key={provider}
+                className="qv-btn qv-btn--secondary qv-btn--block"
+                href={`/api/auth/start?provider=${provider}&reauthenticate=1&returnTo=${encodeURIComponent("/studio/setup")}`}
+              >
+                {provider === "apple"
+                  ? copy.signInWithApple
+                  : copy.signInWithGoogle}
+              </a>
+            ))}
           </div>
         )}
         {notice && (

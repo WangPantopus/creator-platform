@@ -38,6 +38,8 @@ type Mode = {
   public_amount: string | null;
   currency: string;
   weekly_limit: number;
+  /** Capabilities a fan's current access must include to ask; empty is any fan. */
+  eligibility: string[];
   used: number;
   reserved: number;
   decision_hours: number;
@@ -609,6 +611,10 @@ function CommerceAccountScreen({
     [whole, setWhole] = useState(false),
     [filter, setFilter] = useState("Open");
   const pending = useRef(new Map<string, string>());
+  /** The request being sent and the card it was first sent with. */
+  const submission = useRef<{ draft: string; paymentMethodId: string } | null>(
+    null,
+  );
   const [membershipTier, setMembershipTier] = useState<string | null>(null);
   const [editingModeId, setEditingModeId] = useState<string | null>(null);
   const [editingTierId, setEditingTierId] = useState<string | null>(null);
@@ -781,8 +787,9 @@ function CommerceAccountScreen({
   useEffect(() => {
     setAccess(null);
     setAccessNow(Date.now());
+    // The request screen reads it too, to show which offers this access includes.
     if (
-      screen !== "access" ||
+      (screen !== "access" && screen !== "packet") ||
       !identityAvailable ||
       !activeCreator ||
       !data?.fan
@@ -867,6 +874,14 @@ function CommerceAccountScreen({
       (m) => m.creator_id === activeCreator && m.state !== "hidden",
     ) ?? [];
   const chosen = modes.find((m) => m.id === selectedMode);
+  /** An offer the fan's current access does not include (T-07), or not yet
+   * confirmed to include; the server rechecks it again before any hold. */
+  const outsideAccess = (m: Mode) =>
+    m.eligibility.length > 0 &&
+    !(
+      currentAccess &&
+      m.eligibility.some((c) => currentAccess.capabilities.includes(c))
+    );
   const limit = data?.limits.find((l) => l.currency === currency);
   const hasSpendingLimit = Boolean(limit && !limit.explicit_none);
   const exposurePercent = hasSpendingLimit
@@ -887,6 +902,7 @@ function CommerceAccountScreen({
   const chosenAvailable =
     chosen?.state === "offered" &&
     chosen.used + chosen.reserved < chosen.weekly_limit &&
+    !outsideAccess(chosen) &&
     chosenAmount !== null;
   const requestLimit = data?.limits.find(
     (l) => l.currency === chosen?.currency,
@@ -1365,7 +1381,7 @@ function CommerceAccountScreen({
                     {modes.map((m) => (
                       <label
                         key={m.id}
-                        className={`qv-mode ${selectedMode === m.id ? "is-selected" : ""} ${m.state !== "offered" || m.used + m.reserved >= m.weekly_limit ? "is-disabled" : ""}`}
+                        className={`qv-mode ${selectedMode === m.id ? "is-selected" : ""} ${m.state !== "offered" || m.used + m.reserved >= m.weekly_limit || outsideAccess(m) ? "is-disabled" : ""}`}
                       >
                         <input
                           type="radio"
@@ -1374,15 +1390,26 @@ function CommerceAccountScreen({
                           onChange={() => setSelectedMode(m.id)}
                           disabled={
                             m.state !== "offered" ||
-                            m.used + m.reserved >= m.weekly_limit
+                            m.used + m.reserved >= m.weekly_limit ||
+                            outsideAccess(m)
                           }
                         />
                         <span className="qv-mode__text">
                           <span className="qv-mode__title">{m.title}</span>
                           <span className="qv-mode__meta">
-                            Within {m.delivery_hours} hours or a full refund ·{" "}
-                            {Math.max(0, m.weekly_limit - m.used - m.reserved)}{" "}
-                            of {m.weekly_limit} left this week
+                            {outsideAccess(m) ? (
+                              copy.modeMembersOnly
+                            ) : (
+                              <>
+                                Within {m.delivery_hours} hours or a full refund
+                                ·{" "}
+                                {Math.max(
+                                  0,
+                                  m.weekly_limit - m.used - m.reserved,
+                                )}{" "}
+                                of {m.weekly_limit} left this week
+                              </>
+                            )}
                           </span>
                         </span>
                         <span className="qv-mode__price">
@@ -1466,6 +1493,16 @@ function CommerceAccountScreen({
                       ? ` · ${money(chosenAmount, chosen.currency)} if accepted`
                       : ""}
                   </Button>
+                  {chosen && hasSpendingLimit && limit?.amount != null && (
+                    // What this month already counts (captures and open
+                    // holds), beside the limit it is checked against.
+                    <span className="qv-meta commerce-spend-line">
+                      {formatCopy("spendThisMonth", {
+                        spent: money(data.exposure?.total ?? 0, currency),
+                        limit: money(Number(limit.amount), currency),
+                      })}
+                    </span>
+                  )}
                   {checkout &&
                     chosen &&
                     chosenAvailable &&
@@ -1485,7 +1522,7 @@ function CommerceAccountScreen({
                               throw new Error(
                                 "This request is unavailable. Return to review its current access, limit and capacity.",
                               );
-                            const result = await command("packets", {
+                            const draft = {
                               creatorId: activeCreator,
                               fanId: data.fan!.id,
                               modeId: chosen.id,
@@ -1505,9 +1542,26 @@ function CommerceAccountScreen({
                                 accessNoticeVersion:
                                   disclosure.accessNoticeVersion,
                               },
-                              paymentMethodId,
+                            };
+                            // A lost answer can leave this exact request already
+                            // sent, with the card it first used. A retry of the same
+                            // request reuses that card, so it is the same command
+                            // with the same key: the server returns the first result
+                            // and no second hold is ever placed. A new card is used
+                            // only for a changed request.
+                            const signature = JSON.stringify(draft);
+                            if (submission.current?.draft !== signature)
+                              submission.current = {
+                                draft: signature,
+                                paymentMethodId,
+                              };
+                            const result = await command("packets", {
+                              ...draft,
+                              paymentMethodId:
+                                submission.current.paymentMethodId,
                             });
                             if (result?.packet?.id) {
+                              submission.current = null;
                               setCheckout(false);
                               window.location.assign(
                                 `/commerce/status?packetId=${result.packet.id}`,
@@ -2177,6 +2231,12 @@ function CommerceAccountScreen({
                         )}
                         onNew={() => setEditingModeId(null)}
                         currency={currency}
+                        requestTier={data.tiers.some(
+                          (t) =>
+                            t.creator_id === (creatorId ?? data.owned[0]?.id) &&
+                            t.state === "active" &&
+                            t.capabilities.includes("request"),
+                        )}
                         busy={busy}
                         onSave={(body) =>
                           void command(
@@ -2461,12 +2521,15 @@ function decimalInput(value: string | null, currency: string) {
 function ModeForm({
   currency: fallbackCurrency,
   existing,
+  requestTier,
   busy,
   onSave,
   onNew,
 }: {
   currency: string;
   existing?: Mode;
+  /** Whether an active tier of this creator includes requests. */
+  requestTier: boolean;
   busy: boolean;
   onSave: (body: Record<string, unknown>) => void;
   onNew: () => void;
@@ -2494,6 +2557,9 @@ function ModeForm({
     ),
     [shareable, setShareable] = useState(existing?.shareable ?? false),
     [state, setState] = useState(existing?.state ?? "hidden"),
+    [who, setWho] = useState(
+      existing?.eligibility.includes("request") ? "request" : "anyone",
+    ),
     [error, setError] = useState("");
   return (
     <form
@@ -2513,6 +2579,7 @@ function ModeForm({
             durationSeconds: duration ? Number(duration) : null,
             shareable,
             state,
+            eligibility: who === "request" ? ["request"] : [],
             version: existing?.version ?? 0,
           });
           setError("");
@@ -2619,6 +2686,20 @@ function ModeForm({
             <option value="offered">Offered</option>
             <option value="paused">Paused</option>
           </select>
+        </label>
+        <label className="commerce-field">
+          Who can ask
+          <select value={who} onChange={(e) => setWho(e.target.value)}>
+            <option value="anyone">Any fan</option>
+            <option value="request">
+              Members whose tier includes requests
+            </option>
+          </select>
+          {who === "request" && !requestTier && (
+            <span>
+              No active tier includes requests yet, so no one can ask.
+            </span>
+          )}
         </label>
       </div>
       <label className="commerce-check">

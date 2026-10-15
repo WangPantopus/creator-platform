@@ -1,7 +1,7 @@
 import { Router, raw } from "express";
 import type { Pool } from "pg";
 import { verifyStripeWebhook } from "./provider.js";
-import { invariant } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 import type { Actor } from "../identity/adapter.js";
 import type { CommerceService } from "../commerce/service.js";
 
@@ -62,11 +62,20 @@ export interface CommerceWorkIndex {
     reference: string,
   ): Promise<CommerceWorkScope | null>;
   unknownCase(scope: CommerceWorkScope, cause: string): Promise<void>;
+  /** Whether a notification of this type can concern work this host does.
+   * Others are acknowledged and ignored; without it, every type is tried. */
+  handles?(type: string): boolean;
 }
-/** W8 supplies a non-owner inbox worker pool and current issued identity scopes. */
+/** A notification no scope can be found for is tried this many times, about a
+ * minute apart, then blocked for an operator. The due scan still finishes the
+ * request it may concern. */
+const NOTIFICATION_TRIES = 10;
+/** W8 supplies a non-owner inbox worker pool and current issued identity scopes.
+ * Without an inbox pool the worker still finishes every due request; provider
+ * notifications only make it sooner, never different. */
 export class CommerceRecoveryWorker {
   constructor(
-    private readonly inbox: Pool,
+    private readonly inbox: Pool | undefined,
     private readonly service: CommerceService,
     private readonly index: CommerceWorkIndex,
     private readonly recovery?: {
@@ -122,9 +131,9 @@ export class CommerceRecoveryWorker {
       await this.service.reconcile(scope.actor, scope.packetId);
     }
   }
-  async tick() {
-    const notification = (
-      await this.inbox.query<{
+  private async claimNotifications(inbox: Pool) {
+    return (
+      await inbox.query<{
         event_id: string;
         event_type: string;
         object_ref: string;
@@ -133,30 +142,17 @@ export class CommerceRecoveryWorker {
         `UPDATE creator.commerce_provider_inbox SET state='processing',lease_until=now()+interval '30 seconds',attempt=attempt+1 WHERE (provider,event_id) IN (SELECT provider,event_id FROM creator.commerce_provider_inbox WHERE provider='stripe' AND state IN ('pending','processing') AND (lease_until IS NULL OR lease_until<now()) ORDER BY received_at LIMIT 25 FOR UPDATE SKIP LOCKED) RETURNING event_id,event_type,object_ref,attempt`,
       )
     ).rows;
-    for (const event of notification) {
+  }
+  async tick() {
+    // Notifications only make recovery sooner: when the inbox cannot be claimed
+    // or updated, the due scan still runs, and the failure is raised after it.
+    let notifications: unknown;
+    if (this.inbox)
       try {
-        const scope = await this.index.notificationScope(
-          event.event_type,
-          event.object_ref,
-        );
-        invariant(
-          scope,
-          "notification_scope_unavailable",
-          "Current payment scope needs reconciliation.",
-        );
-        // Event age/order never dictates state. The service fetches the current provider object.
-        await this.reconcileScope(scope);
-        await this.inbox.query(
-          "UPDATE creator.commerce_provider_inbox SET state='done',lease_until=NULL,error_code=NULL WHERE provider='stripe' AND event_id=$1 AND attempt=$2 AND state='processing'",
-          [event.event_id, event.attempt],
-        );
-      } catch {
-        await this.inbox.query(
-          "UPDATE creator.commerce_provider_inbox SET state='pending',lease_until=now()+interval '1 minute',error_code='current_state_unavailable' WHERE provider='stripe' AND event_id=$1 AND attempt=$2 AND state='processing'",
-          [event.event_id, event.attempt],
-        );
+        await this.applyNotifications(this.inbox);
+      } catch (cause) {
+        notifications = cause;
       }
-    }
     for (const scope of await this.index.dueScopes(50)) {
       try {
         await this.reconcileScope(scope);
@@ -169,6 +165,46 @@ export class CommerceRecoveryWorker {
           await this.index.unknownCase(scope, "money_unknown_over_one_hour");
       } catch {
         await this.index.unknownCase(scope, "reconciliation_incomplete");
+      }
+    }
+    if (notifications !== undefined)
+      throw new DomainError(
+        "notifications_unavailable",
+        "Provider notifications could not be claimed; the due scan still ran.",
+        503,
+        { cause: notifications },
+      );
+  }
+  private async applyNotifications(inbox: Pool) {
+    for (const event of await this.claimNotifications(inbox)) {
+      if (this.index.handles && !this.index.handles(event.event_type)) {
+        await inbox.query(
+          "UPDATE creator.commerce_provider_inbox SET state='done',lease_until=NULL,error_code='not_applicable' WHERE provider='stripe' AND event_id=$1 AND attempt=$2 AND state='processing'",
+          [event.event_id, event.attempt],
+        );
+        continue;
+      }
+      try {
+        const scope = await this.index.notificationScope(
+          event.event_type,
+          event.object_ref,
+        );
+        invariant(
+          scope,
+          "notification_scope_unavailable",
+          "Current payment scope needs reconciliation.",
+        );
+        // Event age/order never dictates state. The service fetches the current provider object.
+        await this.reconcileScope(scope);
+        await inbox.query(
+          "UPDATE creator.commerce_provider_inbox SET state='done',lease_until=NULL,error_code=NULL WHERE provider='stripe' AND event_id=$1 AND attempt=$2 AND state='processing'",
+          [event.event_id, event.attempt],
+        );
+      } catch {
+        await inbox.query(
+          "UPDATE creator.commerce_provider_inbox SET state=CASE WHEN attempt>=$3 THEN 'blocked' ELSE 'pending' END,lease_until=now()+interval '1 minute',error_code='current_state_unavailable' WHERE provider='stripe' AND event_id=$1 AND attempt=$2 AND state='processing'",
+          [event.event_id, event.attempt, NOTIFICATION_TRIES],
+        );
       }
     }
   }

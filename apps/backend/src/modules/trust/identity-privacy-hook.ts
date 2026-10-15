@@ -1,30 +1,141 @@
 import type { Pool, PoolClient } from "pg";
 import { ContentHeldClient } from "../content/held-client-cleanup.js";
-import { invariant } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 import type { PrivacyHook } from "./contracts.js";
 import {
   privacyTaskAuthority,
   restoredPrivacyTaskAuthorityInTransaction,
 } from "./privacy-authority.js";
 
+type Job = Parameters<PrivacyHook["run"]>[0];
 /** Export account records through existing W1 RLS; credentials and upstream
- * tokens never enter an artifact. Erasure awaits the reviewed retention policy. */
+ * tokens never enter an artifact. Fan erasure redacts in place; creator
+ * erasure awaits the reviewed signature-retention policy. */
 export function identityPrivacyHook(
   runtime: Pool,
   coordinator: Pool,
   assertRestoredInTransaction?: (client: PoolClient) => Promise<void>,
 ): PrivacyHook {
   const verify = privacyTaskAuthority(coordinator);
+  /** Retained payment and request records (D-08) reference the fan profile id,
+   * so the row stays as an anchor without its handle or intro. Identity erases
+   * last: other domains locate data through it, and the person keeps watching
+   * the job's progress (the tombstone already denies everything else) until
+   * every session is revoked here, as the job completes. Identity holds
+   * nothing per relationship for a fan. */
+  async function erase(input: Job) {
+    const creatorAccount = async (client: Pool | PoolClient) =>
+      (
+        await client.query(
+          "SELECT 1 FROM creator.creator_profile WHERE account_id=$1 LIMIT 1",
+          [input.accountId],
+        )
+      ).rowCount !== 0;
+    const creatorRefused = () =>
+      new DomainError(
+        "identity_retention_unconfigured",
+        "Creator account erasure requires the reviewed signature-retention policy.",
+        503,
+      );
+    // A creator is refused at once rather than waiting behind other domains.
+    if (await creatorAccount(runtime)) throw creatorRefused();
+    if (input.scope === "account") {
+      const open = await coordinator.query<{ open: string }>(
+        "SELECT count(*) AS open FROM creator_trust.privacy_task WHERE job_id=$1 AND domain<>'identity' AND state<>'complete'",
+        [input.jobId],
+      );
+      if (Number(open.rows[0]?.open) !== 0)
+        throw new DomainError(
+          "identity_erasure_waiting",
+          "Identity erasure runs after every other domain completes.",
+          503,
+        );
+    }
+    const client = await runtime.connect();
+    const held = new ContentHeldClient(client, input.signal, runtime);
+    let failure: unknown;
+    try {
+      input.signal!.throwIfAborted();
+      await held.begin();
+      await restoredPrivacyTaskAuthorityInTransaction(
+        client,
+        input,
+        assertRestoredInTransaction,
+      );
+      await client.query("SELECT set_config('app.account_id',$1,true)", [
+        input.accountId,
+      ]);
+      if (await creatorAccount(client)) throw creatorRefused();
+      const counts: Record<string, number> = {};
+      if (input.scope === "account") {
+        const statements = [
+          [
+            "redactedProfiles",
+            "UPDATE creator.fan_profile SET handle='deleted-'||substr(md5(gen_random_uuid()::text),1,16),intro='',version=version+1 WHERE account_id=$1 AND handle NOT LIKE 'deleted-%'",
+          ],
+          [
+            "revokedSessions",
+            "UPDATE creator.identity_session SET revoked_at=coalesce(revoked_at,now()),upstream_cipher='' WHERE account_id=$1 AND (revoked_at IS NULL OR upstream_cipher<>'')",
+          ],
+          [
+            "revokedMemberships",
+            "UPDATE creator.team_membership SET revoked_at=now() WHERE account_id=$1 AND revoked_at IS NULL",
+          ],
+          [
+            "revokedInvitations",
+            "UPDATE creator.team_invitation SET revoked_at=now() WHERE account_id=$1 AND accepted_at IS NULL AND revoked_at IS NULL",
+          ],
+        ] as const;
+        for (const [name, sql] of statements) {
+          await restoredPrivacyTaskAuthorityInTransaction(
+            client,
+            input,
+            assertRestoredInTransaction,
+          );
+          counts[name] = (await client.query(sql, [input.accountId])).rowCount!;
+        }
+      }
+      await restoredPrivacyTaskAuthorityInTransaction(
+        client,
+        input,
+        assertRestoredInTransaction,
+      );
+      input.signal!.throwIfAborted();
+      await held.commit();
+      input.signal!.throwIfAborted();
+      return {
+        receipt: {
+          domain: "identity",
+          jobId: input.jobId,
+          complete: true,
+          scope: input.scope,
+          ...counts,
+        },
+        retained:
+          input.scope === "account"
+            ? [
+                {
+                  category: "pseudonymous_fan_record",
+                  until: null,
+                  reason:
+                    "A fan record without its handle or intro stays only as the anchor for payment and request records that must be kept; final retention review is pending.",
+                },
+              ]
+            : [],
+      };
+    } catch (error) {
+      failure = error;
+      throw error;
+    } finally {
+      await held.settle(failure);
+    }
+  }
   return {
     domain: "identity",
     async run(input) {
       input.signal?.throwIfAborted();
       await verify(input);
-      invariant(
-        input.kind === "export",
-        "identity_retention_unconfigured",
-        "Identity erasure requires the reviewed signature-retention and closed-account reauthentication policy.",
-      );
+      if (input.kind === "delete") return erase(input);
       invariant(
         input.scope === "account",
         "identity_scope_adapter_required",

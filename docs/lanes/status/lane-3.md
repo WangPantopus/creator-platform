@@ -2,7 +2,7 @@
 
 Updated: 2026-10-15, by the lane 3 session
 Working on: A2 (wake on accept). B2 is open as #441, its defaults approved by the founder 2026-10-15
-Done: A1 #411, A3 #426, A6b #433, A6a #434, A6c #436, A6 hold sizing #438, B2 #441 (all open)
+Done: merged A1 #411, A3 #426, A6a #434. Open: A6b #433, A6c #436, A6 hold sizing #438, B2 #441
 Next: B9. Findings 8 and 9 need migrations (W1 lease release; crash recovery with lane 4), proposed for the next migration wave
 Blocked on: nothing. Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
 
@@ -109,37 +109,6 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
     creator whose sources do not cover a question therefore fails that FAQ entry however good the
     expected answer is (three of Maya's five with the real model). Founder decision 2026-10-15: the
     FAQ stays a check only; a creator adds sources that cover the questions.
-15. Two workers on one database lose most answers: 2 of 10 messages from 5 fans were answered, on
-    main and on A2 alike (the rest fail before any sentence; none is answered twice). Two causes.
-    First, the W2 admission SQL locks the creator's `ai_workspace` row with `FOR UPDATE NOWAIT`
-    (`generation_begin_agent_attempt`, `generation_open_provider_usage`,
-    `generation_agent_journal_receipt`; migrations 0097 and 0105), so two answers for one creator at
-    once fail. Second, a worker that loses a claim race reconciles the task the winner is answering,
-    and their `NOWAIT` thread locks collide (finding 6). Skipping the reconciliation when the task is
-    no longer pending removes the second cause (tried, not opened) but not the first. Fix: a short
-    lock wait instead of `NOWAIT` on the workspace row (a migration), then the skip. A6. Today the
-    development host runs one worker per backend.
-
-## A2: wake on accept
-
-The fan's accepting transaction sends `pg_notify('creator_generation_queued', '')` (delivered only
-on commit, carrying nothing). The development host keeps one `LISTEN` session on the worker login,
-reconnects with backoff and wakes the worker after every reconnect. A wakeup during a pass runs one
-more pass. While the session listens the idle wait is 5 s instead of 1 s; without it, the old 1 s
-poll. Same harness, fresh stack each, model fake at 300 ms:
-
-| Measure                                          | Main (1 s poll)                      | A2                                   |
-| ------------------------------------------------ | ------------------------------------ | ------------------------------------ |
-| Accept to claim, 8 messages, p50 / p95           | 809 / 818 ms                         | 371 / 568 ms                         |
-| Idle worker, 30 s: statements a second           | 72.1                                 | 15.7                                 |
-| Idle worker, 30 s: database time a second        | 83.7 ms                              | 19.5 ms                              |
-| Idle passes in 30 s                              | 29                                   | 5                                    |
-| A1 harness, 8 messages: ack p50 / first sentence | 608 ms / 21.7 s (host load 7.7)      | 552 ms / 19.4 s (host load 4.5)      |
-| Answers delivered (E3A.3 latency case)           | 7 of 8 (one interrupted, finding 6) | 7 of 8 (one interrupted, finding 6) |
-
-The first-sentence difference is mostly host load; accept to claim is the direct measure. What
-remains of it is the pass's own work before the claim (the recovery check and discovery with their
-catalogue checks), which A3 and A4 shrink.
 
 ## B2: the FAQ publish check
 
@@ -172,7 +141,6 @@ passing, on top of the existing boundary cases (all must pass). A first version 
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
 | E3A.1 measurement     | Main and A3 recorded above, 2026-10-15                                                                                                                                                                                                                                                                                                                                                                    | `a1-measure.mjs` as above                         |
 | E3A.2 ★               | Pass on A3: identical visible text, authorship, citations and order for every answer main also delivered                                                                                                                                                                                                                                                                                                  | `a1-measure.mjs --compare`                        |
-| E3A.3 | A2: wakeup claims 371 ms after accept (main 809 ms); the wakeup session killed before a send: answered (claimed in 430 ms) and the session returns; the backend killed with work accepted but unclaimed: answered once after the restart; two workers: 2 of 10 answered, none twice, same on main (finding 15); burst: BURST | `e3a3-wake.mjs` |
 | E3A.4 ★               | A3: no AI sentence after any change in 27 runs (7 kinds of change, up to 4 timings). Takeover within 500 ms fails at some timings (finding 10, also on main). Deletion not run (finding 11)                                                                                                                                                                                                               | `e3a4-authority.mjs`, one case per fresh stack    |
 | E3A.5 ★               | A3: kill after admission passes; kill during the guard call leaves an uncertain cost (finding 7); kill after the first sentence never finishes (finding 9). Same on main                                                                                                                                                                                                                                  | `e3a5-restart.mjs --at admitted\|guard\|sentence` |
 | E3A.6 ★               | Distressed message gets the safe response first: pass. Hard-block half not run (needs the real model)                                                                                                                                                                                                                                                                                                     | `e3a6-safety.mjs`                                 |
@@ -189,6 +157,7 @@ Model gateway spend for lane 3 so far: 72 calls, 181,087 micros (/\_\_stats, 202
 
 | To         | File                                                                                                                    | Change                                                                                                                                                                   | Why                                                                                                          |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| Lane 2     | `tests/scenarios/lane-2/seed-maya.mjs`                                                                                  | Seed a daily cap above the Claude run ceiling (for example 20,000,000) until hold sizing (#438) merges                                                                   | Finding 2: a `--provider anthropic` stack can never deliver a reply                                          |
 | Lane 4     | `modules/commerce/generation-audience.ts` (`assertCatalog`), `modules/commerce/generation-safety-terminal-catalogue.ts` | Wrap each check in `verifyInHeldTransaction(client, <its frozen custody object>, () => check)` from `modules/identity/generation-held-verification.ts` (after A3 merges) | 68 audience runs per answer; the safety terminal catalogue is about 1 s of the longest remaining transaction |
 | Lane 4     | `creator.generation_settle_typed_original_allowance` (W4 safety terminal settlement SQL)                                | Settle an interrupted answer that has stored output but no complete typed provenance, with lane 3 in A6                                                                  | Finding 9: a crash mid-answer is never recovered                                                             |
 | Integrator | `tests/scenarios/integrator/anthropic-adapter.mts` (case A6)                                                            | Expect a `ProviderResponseError` with a known zero usage for a non-2xx answer before any body (code, upstream status and the no-secret check are unchanged)              | A6a makes that error a known zero cost, as the brief decided; this case pinned the old behavior              |

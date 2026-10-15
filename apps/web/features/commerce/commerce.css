@@ -435,3 +435,10 @@
   padding: 12px 16px;
   border-top: 1px solid var(--line);
 }
+.commerce .commerce-spend-line {
+  display: block;
+  text-align: center;
+  /* Money must never be clipped at phone width. */
+  white-space: normal;
+  overflow-wrap: anywhere;
+}

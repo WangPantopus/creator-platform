@@ -97,6 +97,8 @@ type EffectRow = {
     paymentMethodId?: string;
     intentId?: string;
     returnState?: string;
+    /** On a retried refund: the key of the original refund obligation. */
+    obligation?: string;
   };
   state: string;
   attempt: number;
@@ -104,6 +106,24 @@ type EffectRow = {
   provider_ref: string | null;
   updated_at: Date;
   created_at: Date;
+};
+/** Refunds the processor reports failed are tried again, each under a new key,
+ * until this many refunds were made for one obligation. */
+const REFUND_ATTEMPTS = 3;
+/** A refund call that keeps failing (outage, timeout, 5xx) is reported to
+ * operations on this try, and keeps being tried. */
+const REFUND_TRIES_BEFORE_ESCALATION = 6;
+/** 30 s, 1, 2, 4, 8 minutes and so on, at most an hour between refund tries. */
+const refundBackoffSeconds = (attempt: number) =>
+  Math.min(3600, 30 * 2 ** Math.max(0, attempt - 1));
+/** The processor's minimum card charge in minor units (Stripe's published
+ * minimums for the currencies the pilot can use); others default to 50. */
+const MINIMUM_CHARGE: Readonly<Record<string, number>> = {
+  USD: 50,
+  EUR: 50,
+  GBP: 30,
+  CAD: 50,
+  AUD: 50,
 };
 export type CommerceTrialAdmission = Readonly<{
   allowance: GenerationAllowance;
@@ -145,6 +165,10 @@ const ModeCommand = z
     weeklyLimit: z.number().int().min(0).max(100000),
     shareable: z.boolean(),
     state: z.enum(["hidden", "offered", "paused"]),
+    /** Who may ask (T-07): no entry is anyone with a conversation; "request"
+     * is a fan whose current access includes requests (a tier that grants
+     * them). Absent leaves an existing offer's eligibility as it was. */
+    eligibility: z.array(z.literal("request")).max(1).optional(),
     version: z.number().int().nonnegative(),
     idempotencyKey: z.string().min(8).max(128),
   })
@@ -929,6 +953,14 @@ export class CommerceService {
     input: unknown,
   ) {
     const body = ModeCommand.parse(input);
+    // The processor refuses a card payment below its minimum charge, so a lower
+    // price could be offered but never held.
+    const minimum = MINIMUM_CHARGE[body.currency] ?? 50;
+    invariant(
+      [body.amount, body.publicAmount].every((v) => v === null || v >= minimum),
+      "price_below_minimum",
+      `Choose a price of at least the minimum card payment (${(minimum / 100).toFixed(2)} ${body.currency}).`,
+    );
     invariant(
       body.state !== "offered" || this.fulfillmentAvailable(body.kind),
       "fulfillment_unavailable",
@@ -973,7 +1005,7 @@ export class CommerceService {
               "The weekly limit cannot be lower than existing reservations and accepted requests.",
             );
             const updated = await client.query(
-              `UPDATE creator.commerce_mode SET title=$3,kind=$4,amount=$5,public_amount=$6,currency=$7,decision_hours=$8,delivery_hours=$9,duration_seconds=$10,weekly_limit=$11,shareable=$12,state=$13,version=version+1 WHERE id=$1 AND creator_id=$2 AND version=$14 RETURNING *`,
+              `UPDATE creator.commerce_mode SET title=$3,kind=$4,amount=$5,public_amount=$6,currency=$7,decision_hours=$8,delivery_hours=$9,duration_seconds=$10,weekly_limit=$11,shareable=$12,state=$13,eligibility=coalesce($15::text[],eligibility),version=version+1 WHERE id=$1 AND creator_id=$2 AND version=$14 RETURNING *`,
               [
                 id,
                 creatorId,
@@ -989,6 +1021,7 @@ export class CommerceService {
                 body.shareable,
                 body.state,
                 body.version,
+                body.eligibility ?? null,
               ],
             );
             invariant(
@@ -1016,7 +1049,7 @@ export class CommerceService {
           }
           return (
             await client.query(
-              `INSERT INTO creator.commerce_mode(id,creator_id,title,kind,amount,public_amount,currency,decision_hours,delivery_hours,duration_seconds,weekly_limit,shareable,state) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *`,
+              `INSERT INTO creator.commerce_mode(id,creator_id,title,kind,amount,public_amount,currency,decision_hours,delivery_hours,duration_seconds,weekly_limit,shareable,state,eligibility) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *`,
               [
                 id,
                 creatorId,
@@ -1031,6 +1064,7 @@ export class CommerceService {
                 body.weeklyLimit,
                 body.shareable,
                 body.state,
+                body.eligibility ?? [],
               ],
             )
           ).rows[0];
@@ -2470,6 +2504,7 @@ export class CommerceService {
                 currency: effect.request.currency,
                 paymentMethodId: effect.request.paymentMethodId!,
                 key: effect.provider_key,
+                since: effect.created_at,
               })
             : undefined;
         // Stripe can prune idempotency records after 24h. Never recreate an ambiguous hold.
@@ -2617,7 +2652,7 @@ export class CommerceService {
               );
             }
             await client.query(
-              "UPDATE creator.commerce_effect SET state=$2,provider_ref=$3,lease_until=NULL,next_at=now()+interval '30 seconds',updated_at=now() WHERE id=$1",
+              "UPDATE creator.commerce_effect SET state=$2,provider_ref=$3,lease_until=NULL,next_at=now()+($4*interval '1 second'),updated_at=now() WHERE id=$1",
               [
                 effect.id,
                 refund.state === "succeeded"
@@ -2626,8 +2661,16 @@ export class CommerceService {
                     ? "failed"
                     : "unknown",
                 refund.id,
+                refundBackoffSeconds(effect.attempt),
               ],
             );
+            if (refund.state === "failed")
+              await this.retryOrEscalateRefund(
+                client,
+                p,
+                effect,
+                "refund_failed",
+              );
           });
         }
       }
@@ -2645,20 +2688,49 @@ export class CommerceService {
         (await this.settleRejectedAuthorization(actor, effect))
       )
         return;
+      const code =
+        error instanceof DomainError ? error.code : "provider_unknown";
+      // A refund the processor refuses outright (4xx) is not tried again on its
+      // own: retrying the same refusal cannot pay the fan, so it goes to
+      // operations at once. Every other refund failure is tried again, a little
+      // later each time, and reported to operations after a few tries.
+      const refused =
+        effect.operation === "refund" &&
+        ["provider_rejected", "operator_reconciliation_required"].includes(
+          code,
+        );
       await this.account(actor, async (client) => {
         // Reconciliation takes packet before effect everywhere else. Keep that
         // order on failure too, so a returning provider result cannot deadlock
         // with this recovery transaction while each holds the other's row.
-        await this.lockPacket(client, effect.packet_id);
+        const p = await this.lockPacket(client, effect.packet_id);
         const changed = await client.query(
-          "UPDATE creator.commerce_effect SET state='unknown',error_code=$2,lease_until=NULL,next_at=now()+interval '30 seconds',updated_at=now() WHERE id=$1 AND attempt=$3 AND state='processing'",
+          "UPDATE creator.commerce_effect SET state=$4,error_code=$2,lease_until=NULL,next_at=now()+($5*interval '1 second'),updated_at=now() WHERE id=$1 AND attempt=$3 AND state='processing'",
           [
             effect.id,
-            error instanceof DomainError ? error.code : "provider_unknown",
+            code,
             effect.attempt,
+            refused && code === "provider_rejected" ? "failed" : "unknown",
+            effect.operation === "refund"
+              ? refundBackoffSeconds(effect.attempt)
+              : 30,
           ],
         );
         if (!changed.rowCount) return;
+        if (effect.operation === "refund") {
+          if (refused)
+            await this.retryOrEscalateRefund(
+              client,
+              p,
+              effect,
+              code === "provider_rejected"
+                ? "refund_rejected"
+                : "refund_unconfirmed",
+            );
+          else if (effect.attempt === REFUND_TRIES_BEFORE_ESCALATION)
+            await this.escalateRefund(client, p, effect, "refund_delayed");
+          return;
+        }
         await client.query(
           "UPDATE creator.commerce_packet SET payment_state='unknown',updated_at=now() WHERE id=$1 AND state NOT IN ('accepted','declined','withdrawn','expired')",
           [effect.packet_id],
@@ -2715,6 +2787,7 @@ export class CommerceService {
         currency: effect.request.currency,
         paymentMethodId: effect.request.paymentMethodId!,
         key: effect.provider_key,
+        since: effect.created_at,
       });
       if (held) await this.applyIntent(actor, effect, held);
       else await this.failRejectedAuthorization(actor, effect);
@@ -2771,6 +2844,78 @@ export class CommerceService {
             own.rows[0].attempt === effect.attempt),
       "effect_lease_lost",
       "A newer payment worker owns this recovery.",
+    );
+  }
+  /** A refund the processor reported failed is tried again under a new key,
+   * later each time, up to REFUND_ATTEMPTS refunds for the same obligation;
+   * then, or at once when the processor refused it, the fan's refund waits for
+   * operations. It is never dropped: the commitment stays visibly unresolved. */
+  private async retryOrEscalateRefund(
+    client: PoolClient,
+    p: PacketRow,
+    effect: EffectRow,
+    cause: "refund_failed" | "refund_rejected" | "refund_unconfirmed",
+  ) {
+    const obligation = effect.request.obligation ?? effect.provider_key;
+    const tries = Number(
+      (
+        await client.query<{ n: string }>(
+          "SELECT count(*)::text AS n FROM creator.commerce_effect WHERE packet_id=$1 AND operation='refund' AND (provider_key=$2 OR request->>'obligation'=$2)",
+          [p.id, obligation],
+        )
+      ).rows[0]!.n,
+    );
+    if (cause === "refund_failed" && tries < REFUND_ATTEMPTS) {
+      await client.query(
+        "INSERT INTO creator.commerce_effect(creator_id,fan_id,packet_id,operation,provider_key,request,next_at) VALUES($1,$2,$3,'refund',$4,$5,now()+($6*interval '1 second')) ON CONFLICT(provider_key) DO NOTHING",
+        [
+          p.creator_id,
+          p.fan_id,
+          p.id,
+          `${obligation}:retry:${tries}`,
+          JSON.stringify({ ...effect.request, obligation }),
+          refundBackoffSeconds(tries),
+        ],
+      );
+      return;
+    }
+    await this.escalateRefund(client, p, effect, cause, tries);
+  }
+  /** The durable record operations work from: the commitment waits for them
+   * (unless it was delivered) and an event names the cause and the tries. */
+  private async escalateRefund(
+    client: PoolClient,
+    p: PacketRow,
+    effect: EffectRow,
+    cause: string,
+    refunds = 1,
+  ) {
+    // One report per refund attempt and cause: a refund that keeps failing the
+    // same way is not reported again on every try.
+    const reported = await client.query(
+      "SELECT 1 FROM creator.commerce_event WHERE aggregate_id=$1 AND type='refund_escalated' AND payload->>'effectId'=$2::text AND payload->>'cause'=$3",
+      [p.id, effect.id, cause],
+    );
+    if (reported.rowCount) return;
+    if (cause !== "refund_delayed")
+      await client.query(
+        "UPDATE creator.commerce_commitment SET state='resolution_required',outcome=$2,version=version+1 WHERE packet_id=$1 AND state='refund_pending'",
+        [p.id, cause],
+      );
+    await client.query(
+      "UPDATE creator.commerce_packet SET version=version+1,updated_at=now() WHERE id=$1",
+      [p.id],
+    );
+    await this.event(
+      client,
+      { ...p, version: p.version + 1 },
+      "refund_escalated",
+      {
+        cause,
+        effectId: effect.id,
+        tries: effect.attempt,
+        refunds,
+      },
     );
   }
   private async applyIntent(actor: Actor, effect: EffectRow, intent: Intent) {

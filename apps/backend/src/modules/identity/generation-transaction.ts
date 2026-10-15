@@ -1,6 +1,11 @@
 import { Client, type Pool, type PoolClient } from "pg";
 import { DomainError, invariant } from "../../core/errors.js";
 import { querySettlementUncertain } from "../../core/query-settlement.js";
+import {
+  closeHeldVerification,
+  discardHeldVerification,
+  openHeldVerification,
+} from "./generation-held-verification.js";
 
 /** The original worker must have a finite one-connection acquisition/read
  * budget and no pipelined
@@ -146,8 +151,12 @@ export async function generationTransaction<T>(
     signal?.throwIfAborted();
     phase = "begin";
     await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
+    openHeldVerification(client);
     phase = "work";
     value = await work(client);
+    // End bookend: every reviewed catalogue check used in this transaction
+    // runs again here, still inside it and before COMMIT.
+    await closeHeldVerification(client);
     await settle();
     if (cancellationFailures.length || transportFailures.length)
       throw new DomainError(
@@ -212,6 +221,7 @@ export async function generationTransaction<T>(
       }
     }
   } finally {
+    discardHeldVerification(client);
     await settle();
     // Await destruction for every uncertain transport or failed rollback,
     // before release. Preserve end/release failures alongside the first cause.

@@ -1,6 +1,7 @@
 import { IdentityContinueSchema } from "@qelvora/api/schemas";
 import { IdentityWelcome } from "../../../features/identity/welcome";
 import { platformFetch } from "../../../lib/session";
+import { signInProviders } from "../../../features/identity/sign-in-flow";
 export default async function Page({
   searchParams,
 }: {
@@ -36,6 +37,8 @@ export default async function Page({
     <IdentityWelcome
       returnTo={returnTo}
       arrival={arrival}
+      providers={signInProviders()}
+      development={process.env.NODE_ENV === "development"}
       {...(error || (requested && !context.success)
         ? { error: error ?? "invalid_return" }
         : {})}

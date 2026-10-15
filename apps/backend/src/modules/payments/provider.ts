@@ -38,7 +38,10 @@ export interface PaymentProvider {
   /** Read-only recovery of the original authorization attempt. No aged lookup
    * result can authorize creating another hold after idempotency expiry. */
   recoverAuthorization?(
-    input: Parameters<PaymentProvider["authorize"]>[0],
+    input: Parameters<PaymentProvider["authorize"]>[0] & {
+      /** When the attempt was first recorded: its hold cannot be older. */
+      since?: Date;
+    },
   ): Promise<Intent | undefined>;
   fetchIntent(id: string): Promise<Intent>;
   capture(id: string, key: string): Promise<Intent>;
@@ -143,16 +146,27 @@ export class StripePaymentProvider implements PaymentProvider {
     });
   }
   async recoverAuthorization(
-    input: Parameters<PaymentProvider["authorize"]>[0],
+    input: Parameters<PaymentProvider["authorize"]>[0] & { since?: Date },
   ) {
     return stripeOperation(async () => {
       const key = createHash("sha256").update(input.key).digest("hex");
       const matches: Stripe.PaymentIntent[] = [];
       let count = 0;
-      // Use the paginated list rather than eventually-consistent search. A
-      // bounded history that cannot be fully inspected remains unresolved.
+      // Use the paginated list rather than eventually-consistent search. Only
+      // payments created since the attempt was recorded (less five minutes for
+      // clock skew) can be its hold, so an account's whole history is never
+      // scanned. A window that cannot be fully inspected remains unresolved.
       for await (const intent of this.client.paymentIntents.list(
-        { limit: 100 },
+        {
+          limit: 100,
+          ...(input.since
+            ? {
+                created: {
+                  gte: Math.floor(input.since.getTime() / 1000) - 300,
+                },
+              }
+            : {}),
+        },
         this.options,
       )) {
         invariant(
@@ -334,10 +348,18 @@ export function verifyStripeWebhook(
     );
   }
   const objectReference = z
-    .object({ id: z.string().min(1).max(200).optional() })
+    .object({
+      id: z.string().min(1).max(200).optional(),
+      payment_intent: z.string().min(1).max(200).nullish(),
+    })
     .safeParse(event.data?.object);
+  // A charge's notification concerns its payment: the payment is what this
+  // system records and reconciles, so it is the reference kept.
   const ref = objectReference.success
-    ? (objectReference.data.id ??
+    ? ((event.type.startsWith("charge.")
+        ? objectReference.data.payment_intent
+        : undefined) ??
+      objectReference.data.id ??
       (event.type === "balance.available"
         ? (event.account ?? "platform")
         : undefined))

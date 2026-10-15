@@ -1,6 +1,7 @@
 import type { Pool, PoolClient } from "pg";
 import { DomainError } from "../../core/errors.js";
 import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
+import { verifyInHeldTransaction } from "../identity/generation-held-verification.js";
 
 export const GENERATION_PROFILE_BOUND_SOURCE = Object.freeze({
   name: "w2_generation_profile_bound",
@@ -17,6 +18,15 @@ const predicate =
  * consumer still checks its independently reviewed full effective catalogue.
  * Hand-installed policies or a ledger row cannot activate this held addition. */
 export async function assertGenerationProfileBound(
+  client: Pick<Pool | PoolClient, "query">,
+): Promise<void> {
+  // Once when first used in a held transaction and again before its COMMIT.
+  await verifyInHeldTransaction(client, GENERATION_PROFILE_BOUND_SOURCE, () =>
+    verifyProfileBound(client),
+  );
+}
+
+async function verifyProfileBound(
   client: Pick<Pool | PoolClient, "query">,
 ): Promise<void> {
   try {
