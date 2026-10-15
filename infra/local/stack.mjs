@@ -42,6 +42,11 @@ const IMAGE = "pgvector/pgvector:pg17";
 /** The repository's documented loopback-only test constant for the database
  * administrator and the request role (tests and the working agreement use it). */
 const TEST_PASSWORD = "foundation-test-only";
+/** The Growth API login. The reviewed "incoming Growth" catalogue variants were
+ * captured with this name (a member of creator_runtime and growth_runtime, and
+ * nothing else), so a stack that uses it matches them and passes the migration
+ * checks with --growth. */
+const GROWTH_API_LOGIN = "creator_review_growth_api";
 const SYNTHETIC_REFERENCE =
   "synthetic-review-only-unapproved-processor-20261001";
 const MAYA = "20000000-0000-4000-8000-000000000001";
@@ -515,8 +520,7 @@ async function bootstrapDatabase(plan, secrets, options) {
       W8_LEGACY_ROOT_MIGRATIONS: "false",
     });
   // The reviewed migration checks run while the history is incomplete. Once all
-  // of it is applied they are not repeated on every `up`: a later, deliberate
-  // addition such as the Growth API login would otherwise fail them.
+  // of it is applied they are not repeated on every `up`.
   const applied = async () =>
     (await psql(
       plan,
@@ -584,12 +588,12 @@ async function bootstrapDatabase(plan, secrets, options) {
     // roles and owns or is granted nothing itself (db/growth-api-pool.ts).
     await psql(
       plan,
-      `DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='growth_api') THEN
-         CREATE ROLE growth_api LOGIN INHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
-         GRANT creator_runtime, growth_runtime TO growth_api;
+      `DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='${GROWTH_API_LOGIN}') THEN
+         CREATE ROLE ${GROWTH_API_LOGIN} LOGIN INHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+         GRANT creator_runtime, growth_runtime TO ${GROWTH_API_LOGIN};
        END IF; END $$`,
     );
-    roles.push("growth_api");
+    roles.push(GROWTH_API_LOGIN);
   }
   const statements = roles.map((role) => {
     secrets.passwords[role] ??= randomBytes(18).toString("base64url");
@@ -810,7 +814,7 @@ async function writeBackendConfig(plan, secrets, options) {
     ...(options.growth
       ? {
           GROWTH_ENABLED: "true",
-          GROWTH_API_DATABASE_URL: roleUrl(plan, secrets, "growth_api"),
+          GROWTH_API_DATABASE_URL: roleUrl(plan, secrets, GROWTH_API_LOGIN),
           GROWTH_WORKER_DATABASE_URL: roleUrl(plan, secrets, "growth_worker"),
           GROWTH_ENCRYPTION_KEY: secrets.growthKey,
         }

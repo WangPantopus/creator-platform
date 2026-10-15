@@ -134,11 +134,13 @@ eval "$(node infra/local/stack.mjs env --lane 2 | sed 's/^/export /')"
   endpoint hundreds of times; the launch review already records the identity heartbeat
   re-keying screens, and that is my hypothesis for the stall, not something I proved.
   Sign-in, Home and the chat entry page (`/creators/maya/chat`) work.
-- **`--growth`** adds the Growth module: a login `growth_api` that inherits only the two
-  request roles (what `db/growth-api-pool.ts` requires), the Growth worker URL and a
-  generated key. The public creator page then answers. The reviewed generation-purpose
-  catalogue treats that extra login as drift, so once all 116 migrations are applied the
-  stack no longer repeats the migration checks on later runs. No HTTPS origin exists
+- **`--growth`** adds the Growth module: a login `creator_review_growth_api` that inherits
+  only the two request roles (what `db/growth-api-pool.ts` requires), the Growth worker URL
+  and a generated key. The public creator page then answers. The login carries the name the
+  reviewed "incoming Growth" catalogue variants were captured with, so the migration checks
+  accept it (a stack built before this change has a `growth_api` login instead: `reset` it).
+  The pin tool still reports one difference with the login present,
+  `runtimeCatalogues.family`, a pin with no incoming variant that no runtime path reads. No HTTPS origin exists
   locally, so `GROWTH_PUBLIC_ORIGIN` is left unset (pass one with `--env` if you need it).
   Notifications, shares and the senders are not exercised by the stack.
 - **`apps/web/next-env.d.ts`** is a tracked file that `next dev` rewrites. While the web
