@@ -1458,7 +1458,8 @@ describeMoney("commerce money path: deadlines, crashes, races", () => {
   describe("defects found by this suite", () => {
     // Each test here pins a defect as an `it.fails`, which passes while the
     // defect exists. The FIX: commit for a defect turns its test into a normal
-    // test in place. DEFECT-1b is database-level and has no FIX: commit.
+    // test in place. DEFECT-1b is database-level: lane 4's WP 4.1 migration
+    // (modules/commerce/schema-capture-guard.sql) fixed it.
 
     // DEFECT-1 (INV-16, defence in depth): a capture for a request nobody accepted.
     // Fixed in "FIX: refuse a capture for a request nobody accepted". runEffect used
@@ -1471,22 +1472,36 @@ describeMoney("commerce money path: deadlines, crashes, races", () => {
       const world = await fixture.newWorld();
       const { packet } = await world.submitted();
       const row = await world.packetRow(packet.id);
-      const effect = await world.admin.query<{ id: string }>(
-        `INSERT INTO creator.commerce_effect(creator_id,fan_id,packet_id,operation,provider_key,request)
-         VALUES($1,$2,$3,'capture',$4,$5) RETURNING id`,
-        [
-          row.creator_id,
-          row.fan_id,
-          row.id,
-          `${row.id}:capture:1`,
-          JSON.stringify({
-            intentId: row.intent_ref,
-            amount: world.price,
-            currency: "USD",
-          }),
-        ],
-      );
-      await world.service.runEffect(world.fan.actor, effect.rows[0]!.id);
+      // The database guard (DEFECT-1b below) now refuses this row, so plant it
+      // the way a row from before the guard could exist, with triggers off for
+      // this one write, to keep proving the executor's own check.
+      const planting = await world.admin.connect();
+      let effectId: string;
+      try {
+        await planting.query("BEGIN");
+        await planting.query("SET LOCAL session_replication_role=replica");
+        effectId = (
+          await planting.query<{ id: string }>(
+            `INSERT INTO creator.commerce_effect(creator_id,fan_id,packet_id,operation,provider_key,request)
+             VALUES($1,$2,$3,'capture',$4,$5) RETURNING id`,
+            [
+              row.creator_id,
+              row.fan_id,
+              row.id,
+              `${row.id}:capture:1`,
+              JSON.stringify({
+                intentId: row.intent_ref,
+                amount: world.price,
+                currency: "USD",
+              }),
+            ],
+          )
+        ).rows[0]!.id;
+        await planting.query("COMMIT");
+      } finally {
+        planting.release();
+      }
+      await world.service.runEffect(world.fan.actor, effectId);
       expect(world.provider.capturedTotal()).toBe(0);
       expect(world.provider.realCalls("capture")).toHaveLength(0);
       expect((await world.effects(packet.id)).at(-1)).toMatchObject({
@@ -1735,37 +1750,33 @@ describeMoney("commerce money path: deadlines, crashes, races", () => {
       await world.assertConserved({ settled: false });
     });
 
-    // GAP (database level), the other half of DEFECT-1. The accepted_act_id check
-    // (commerce_packet_check1) protects the `accepted` state only: neither the
-    // `accepting` state nor a `capture` effect row requires an act, so the SQL
-    // guard does not stand between a stray row and the processor. Closing it needs
-    // a new migration (a CHECK or trigger on commerce_effect), which changes the
-    // pinned catalogue checksums, so it is left for the founder's engineer and has
-    // no FIX: commit.
-    it.fails(
-      "DEFECT-1b: the database should refuse a capture effect for a request with no accepted act",
-      async () => {
-        const world = await fixture.newWorld();
-        const { packet } = await world.submitted();
-        const row = await world.packetRow(packet.id);
-        await expect(
-          world.admin.query(
-            `INSERT INTO creator.commerce_effect(creator_id,fan_id,packet_id,operation,provider_key,request)
+    // DEFECT-1b (database level), the other half of DEFECT-1. The accepted_act_id
+    // check (commerce_packet_check1) protects the `accepted` state only: neither
+    // the `accepting` state nor a `capture` effect row required an act, so the SQL
+    // guard did not stand between a stray row and the processor. Fixed by the
+    // commerce_capture_guard trigger (schema-capture-guard.sql, lane 4 WP 4.1): a
+    // capture row needs the creator's consumed signed acceptance of that request.
+    it("DEFECT-1b: the database refuses a capture effect for a request with no accepted act", async () => {
+      const world = await fixture.newWorld();
+      const { packet } = await world.submitted();
+      const row = await world.packetRow(packet.id);
+      await expect(
+        world.admin.query(
+          `INSERT INTO creator.commerce_effect(creator_id,fan_id,packet_id,operation,provider_key,request)
            VALUES($1,$2,$3,'capture',$4,$5)`,
-            [
-              row.creator_id,
-              row.fan_id,
-              row.id,
-              `${row.id}:capture:1`,
-              JSON.stringify({
-                intentId: row.intent_ref,
-                amount: world.price,
-                currency: "USD",
-              }),
-            ],
-          ),
-        ).rejects.toThrow();
-      },
-    );
+          [
+            row.creator_id,
+            row.fan_id,
+            row.id,
+            `${row.id}:capture:1`,
+            JSON.stringify({
+              intentId: row.intent_ref,
+              amount: world.price,
+              currency: "USD",
+            }),
+          ],
+        ),
+      ).rejects.toMatchObject({ code: "23514" });
+    });
   });
 });
