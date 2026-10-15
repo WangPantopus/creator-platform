@@ -31,7 +31,7 @@ depends on the machine's load (see "Things to know"); `smoke --require-reply` ma
 
 | Part                        | Address (lane 2)         | Notes                                                                                                                                             |
 | --------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| PostgreSQL 17 with pgvector | `127.0.0.1:56420`        | Container `qelvora-lane2-postgres`, volume `qelvora-lane2-pgdata`. All 114 registered migrations, the seed, a password on every login role        |
+| PostgreSQL 17 with pgvector | `127.0.0.1:56420`        | Container `qelvora-lane2-postgres`, volume `qelvora-lane2-pgdata`. All 116 registered migrations, the seed, a password on every login role        |
 | Backend                     | `http://127.0.0.1:56421` | The real `server.ts`, development identity, trust runtime, Maya's AI live. The generation, trust and usage-expiry workers run inside this process |
 | Web                         | `http://localhost:56422` | `next dev`, pointed at that backend                                                                                                               |
 | Model fake                  | `127.0.0.1:56423`        | Stands in for the model provider (see below)                                                                                                      |
@@ -136,7 +136,7 @@ eval "$(node infra/local/stack.mjs env --lane 2 | sed 's/^/export /')"
 - **`--growth`** adds the Growth module: a login `growth_api` that inherits only the two
   request roles (what `db/growth-api-pool.ts` requires), the Growth worker URL and a
   generated key. The public creator page then answers. The reviewed generation-purpose
-  catalogue treats that extra login as drift, so once all 114 migrations are applied the
+  catalogue treats that extra login as drift, so once all 116 migrations are applied the
   stack no longer repeats the migration checks on later runs. No HTTPS origin exists
   locally, so `GROWTH_PUBLIC_ORIGIN` is left unset (pass one with `--env` if you need it).
   Notifications, shares and the senders are not exercised by the stack.
