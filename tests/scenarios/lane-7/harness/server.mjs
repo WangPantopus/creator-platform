@@ -6,6 +6,7 @@ import { Router, clientOf, createHandler } from "./http.mjs";
 import { createWorld } from "./world.mjs";
 import { accept } from "./ws.mjs";
 import * as commerce from "./routes/commerce.mjs";
+import * as content from "./routes/content.mjs";
 import * as control from "./routes/control.mjs";
 import * as conversation from "./routes/conversation.mjs";
 import * as growth from "./routes/growth.mjs";
@@ -19,7 +20,15 @@ const port = Number(flag("--port", "56473"));
 
 export const world = createWorld();
 const router = new Router();
-for (const routes of [identity, growth, conversation, commerce, trust, control])
+for (const routes of [
+  identity,
+  growth,
+  conversation,
+  content,
+  commerce,
+  trust,
+  control,
+])
   routes.register(router);
 
 const server = http.createServer(createHandler(world, router));

@@ -106,8 +106,11 @@ private struct W3ThreadScreen: View {
                             if model.offline { Notice(tone: .offline, title: "You're offline", children: "You're seeing a saved conversation with a short reading lease. Reconnect to send.") }
                             if page.offTheRecord { SystemLine(children: "Off the record · the AI keeps no memory from this conversation.") }
                             if model.before != nil { Button("Earlier messages", variant: .quiet, disabled: model.busy || model.offline) { Task { await model.earlier() } } }
-                            ForEach(model.older.filter { old in !page.messages.contains { $0.id == old.id } } + page.messages) { message in
-                                row(message, page: page).id(message.id)
+                            ForEach(model.timeline(page)) { entry in
+                                switch entry {
+                                case .message(let message): row(message, page: page).id(message.id)
+                                case .presence(let item): presenceRow(item).id(entry.id)
+                                }
                             }
                             if let pending = model.pending {
                                 Message(kind: .fan, children: pending.text, name: page.creatorName, delivery: pending.rejected ? .failed : pending.uncertain ? nil : .pending, onRetry: { Task { await model.send(retry: true) } })
@@ -261,12 +264,30 @@ private struct W3ThreadScreen: View {
             if message.authorKind == .fan { if message.offTheRecord { Text("Not used for memory").qText("caption") } else { Button("Don't remember this",variant:.quiet,disabled:model.busy || model.offline) { Task { await model.forget(message) } } } }
         } else {
             VStack(alignment: .leading, spacing: 8) {
-                Text(message.authorKind == .human_broadcast ? "Note from \(page.creatorName) · audience details unavailable" : message.authorKind == .human_reaction ? "\(page.creatorName) reacted" : "Call with \(page.creatorName)").qText("label")
+                HStack(spacing: QelvoraLayout.authorGap) {
+                    if message.authorKind == .human_broadcast { Mark(kind: .humanBroadcast) } else if message.authorKind == .human_reaction { Mark(kind: .humanReaction) }
+                    Text(message.authorKind == .human_broadcast ? "Note from \(page.creatorName) · audience details unavailable" : message.authorKind == .human_reaction ? "\(page.creatorName) reacted" : "Call with \(page.creatorName)").qText("label")
+                }
                 Text(message.text).qText("body")
                 if let act = message.signedActId { SignedMarker(name: page.creatorName) { session.open("/verify/" + act) } }
             }
         }
 
+    }
+    /// C4: a Note or reaction with the server's label, glyph and creator color.
+    /// A Note is never answered through the thread composer.
+    @ViewBuilder private func presenceRow(_ item: W3ThreadPresence) -> some View {
+        switch item {
+        case .note(let note):
+            Note(children: note.text, name: note.creatorName, reply: false, label: note.authorLabel) { session.open("/verify/" + note.signedActId) }
+                .accessibilityIdentifier("presence-note-" + note.id)
+        case .reaction(let reaction):
+            VStack(alignment: .leading, spacing: 8) {
+                ReactionChip(name: reaction.creatorName, label: reaction.authorLabel)
+                SignedMarker(name: reaction.creatorName) { session.open("/verify/" + reaction.signedActId) }
+            }.accessibilityElement(children: .contain).accessibilityIdentifier("presence-reaction-" + reaction.id)
+        case .unknown: EmptyView()
+        }
     }
     @ViewBuilder private func recordingRow(_ message: W3Message, page: W3Page) -> some View {
         if let recording = message.recording {

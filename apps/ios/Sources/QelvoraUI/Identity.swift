@@ -60,11 +60,14 @@ public struct AuthorLabel: View {
     public var member: String
     public var time: String?
     public var onMaya: Bool
+    /// A label the server built (C4 `authorLabel`), shown verbatim instead of one assembled here.
+    public var label: String?
     @Environment(\.colorScheme) private var scheme
 
-    public init(kind: AuthorKind = .ai, name: String = "Maya", audience: String = "Kiln Club members", member: String = "Priya", time: String? = nil, onMaya: Bool = false) {
-        self.kind = kind; self.name = name; self.audience = audience; self.member = member; self.time = time; self.onMaya = onMaya
+    public init(kind: AuthorKind = .ai, name: String = "Maya", audience: String = "Kiln Club members", member: String = "Priya", time: String? = nil, onMaya: Bool = false, label: String? = nil) {
+        self.kind = kind; self.name = name; self.audience = audience; self.member = member; self.time = time; self.onMaya = onMaya; self.label = label
     }
+    private var words: String { label ?? kind.label(name: name, audience: audience, member: member) }
 
     public var body: some View {
         HStack(spacing: QelvoraLayout.authorGap) {
@@ -73,7 +76,7 @@ public struct AuthorLabel: View {
                 (Text(QelvoraCopy.text("preparedByAI")).foregroundColor(qColor("ai-ink", scheme)) + Text(" · " + QelvoraCopy.text("approvedBy", values: ["name": name])).foregroundColor(qColor(kind.colorToken(onMaya: onMaya), scheme)))
                     .qText("caption", weight: .semibold)
             } else {
-                Text(kind.label(name: name, audience: audience, member: member))
+                Text(words)
                     .qText("caption", weight: .semibold)
                     .foregroundStyle(qColor(kind.colorToken(onMaya: onMaya), scheme))
             }
@@ -83,7 +86,7 @@ public struct AuthorLabel: View {
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(kind.label(name: name, audience: audience, member: member) + (time.map { " at \($0)" } ?? ""))
+        .accessibilityLabel(words + (time.map { " at \($0)" } ?? ""))
     }
 }
 

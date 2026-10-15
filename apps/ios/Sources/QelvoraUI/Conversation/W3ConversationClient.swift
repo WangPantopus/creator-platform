@@ -71,6 +71,42 @@ struct W3Usage: Decodable, Sendable {
     struct Day: Decodable, Sendable { let day: String; let seconds: Double; let companionSeconds: Double }
     let timezone: String; let days: [Day]; let modeAvailable: Bool; let measurement: String
 }
+/// C4: a Note or a reaction drawn into this fan's thread at read time. It is
+/// never a thread message: no sequence, no control epoch (INV-03 untouched).
+/// The server builds `authorLabel`; the app shows it verbatim.
+enum W3ThreadPresence: Decodable, Identifiable, Sendable {
+    case note(APIThreadPresenceNote), reaction(APIThreadPresenceReaction), unknown
+    private enum Key: String, CodingKey { case authorKind }
+    init(from decoder: any Decoder) throws {
+        switch try decoder.container(keyedBy: Key.self).decode(String.self, forKey: .authorKind) {
+        case "human_broadcast": self = .note(try APIThreadPresenceNote(from: decoder))
+        case "human_reaction": self = .reaction(try APIThreadPresenceReaction(from: decoder))
+        // A closed authorship set (INV-01): an unknown kind is never drawn.
+        default: self = .unknown
+        }
+    }
+    var id: String { switch self { case .note(let n): "note-" + n.id; case .reaction(let r): "reaction-" + r.id; case .unknown: "unknown" } }
+    var occurredAt: String? { switch self { case .note(let n): n.occurredAt; case .reaction(let r): r.occurredAt; case .unknown: nil } }
+}
+struct W3PresencePage: Decodable, Sendable { let items: [W3ThreadPresence]; let nextBefore: String? }
+/// An exact instant for ordering presence against messages: whole seconds and
+/// microseconds, offset applied. Doubles lose microseconds at today's epoch.
+struct W3Instant: Comparable, Sendable {
+    let seconds: Int64; let micros: Int
+    static func < (a: W3Instant, b: W3Instant) -> Bool { a.seconds == b.seconds ? a.micros < b.micros : a.seconds < b.seconds }
+    init?(_ value: String) {
+        let pattern = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d{1,9}))?(Z|[+-]\d{2}:\d{2})$/
+        guard let match = value.wholeMatch(of: pattern) else { return nil }
+        let formatter = ISO8601DateFormatter(); formatter.formatOptions = [.withInternetDateTime]
+        guard let date = formatter.date(from: String(match.1) + String(match.3)) else { return nil }
+        let fraction = String((match.2.map(String.init) ?? "").prefix(6))
+        seconds = Int64(date.timeIntervalSince1970.rounded()); micros = Int(fraction.padding(toLength: 6, withPad: "0", startingAt: 0)) ?? 0
+    }
+}
+enum W3ThreadRow: Identifiable {
+    case message(W3Message), presence(W3ThreadPresence)
+    var id: String { switch self { case .message(let m): m.id; case .presence(let p): "presence-" + p.id } }
+}
 
 /// W1's OS credential store supplies account authority; no model credential reaches a fan client.
 actor W3ConversationClient {
@@ -85,12 +121,12 @@ actor W3ConversationClient {
         configuration.urlCache = nil; configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         session = URLSession(configuration: configuration)
     }
-    func request<T: Decodable & Sendable>(_ path: String, body: Data? = nil, publicRead: Bool = false) async throws -> T {
-        try JSONDecoder().decode(T.self, from: await requestData(path, body: body, publicRead: publicRead))
+    func request<T: Decodable & Sendable>(_ path: String, body: Data? = nil, publicRead: Bool = false, area: String = "v1/conversations/") async throws -> T {
+        try JSONDecoder().decode(T.self, from: await requestData(path, body: body, publicRead: publicRead, area: area))
     }
-    func requestData(_ path: String, body: Data? = nil, publicRead: Bool = false) async throws -> Data {
+    func requestData(_ path: String, body: Data? = nil, publicRead: Bool = false, area: String = "v1/conversations/") async throws -> Data {
         guard let components = URLComponents(string: path) else { throw URLError(.badURL) }
-        var target = URLComponents(url: baseURL.appendingPathComponent("v1/conversations/" + components.path), resolvingAgainstBaseURL: false)!
+        var target = URLComponents(url: baseURL.appendingPathComponent(area + components.path), resolvingAgainstBaseURL: false)!
         target.queryItems = components.queryItems
         var request = URLRequest(url: target.url!)
         request.httpMethod = body == nil ? "GET" : "POST"; request.httpBody = body; request.timeoutInterval = body != nil && path.hasSuffix("/comparison") ? 65 : 15
@@ -129,6 +165,10 @@ final class W3ThreadModel: ObservableObject {
     @Published var failure = ""; @Published var busy = false; @Published var offline = true
     @Published var pending: Pending? { didSet { saveDraftSoon() } }
     @Published var introOfferId: String?
+    /// C4 Notes and reactions, oldest first; memory only, cleared on conceal.
+    @Published private(set) var presence: [W3ThreadPresence] = []
+    private var presenceStale = true
+    private var presenceRead = 0
     private var introOfferChecked = false
     let client: W3ConversationClient; let creatorId: String; let fanId: String
     private let accountId: String
@@ -207,6 +247,7 @@ final class W3ThreadModel: ObservableObject {
             gate = ThreadDeliveryGate(threadID: fresh.threadId, cursor: fresh.cursor, epoch: fresh.epoch, generationSequences: fresh.generationSequences)
             await W3ResumeStorage.shared.save(accountId: accountId, scope: storageScope, cursor: fresh.cursor, epoch: fresh.epoch)
             offline = !transportReady; authorizationDenied = false; failure = ""
+            if presenceStale { presenceStale = false; Task { [weak self] in await self?.readPresence(run) } }
             if fresh.feedbackPolicy == nil { introOfferId = nil; introOfferChecked = false }
             else if !introOfferChecked {
                 do {
@@ -219,7 +260,49 @@ final class W3ThreadModel: ObservableObject {
             if let pending { let status: W3Status = try await client.request(root + "/messages/status", body: JSONEncoder().encode(W3StatusQuery(idempotencyKey: pending.key))); if status.accepted && self.pending?.key == pending.key { self.pending = nil; if draft.trimmingCharacters(in: .whitespacesAndNewlines) == pending.text { draft = "" } } }
         } catch { if active && run == lifecycle && readRevision == refreshRevision { failed(error, threadDenied: true) } }
     }
-    private func conceal() { page = nil; older = []; before = nil; gate = nil }
+    private func conceal() { page = nil; older = []; before = nil; gate = nil; presence = []; presenceRead += 1; presenceStale = true }
+    /// C4: follow every cursor (empty pages included), at most 20 pages. A read
+    /// replaces the list only when it finishes; a refusal clears it; a network
+    /// or server failure keeps the last complete list. Never touches the page,
+    /// the draft, the delivery gate or the thread's denial path.
+    private func readPresence(_ run: Int) async {
+        presenceRead += 1; let ticket = presenceRead
+        var items: [W3ThreadPresence] = [], before: String?
+        do {
+            for _ in 0..<20 {
+                var path = creatorId + "/presence?limit=50"
+                if let before {
+                    guard before.wholeMatch(of: /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z~[0-9a-f-]{36}/) != nil else { throw W3Failure(message: "", status: 502) }
+                    path += "&before=" + before
+                }
+                let page: W3PresencePage = try await client.request(path, area: "v1/content/")
+                guard active, run == lifecycle, ticket == presenceRead else { return }
+                items = page.items + items
+                guard let next = page.nextBefore else { break }
+                before = next
+            }
+            presence = items.filter { if case .unknown = $0 { false } else { $0.occurredAt.flatMap(W3Instant.init) != nil } }
+        } catch {
+            guard active, run == lifecycle, ticket == presenceRead else { return }
+            if let refusal = error as? W3Failure, (400..<500).contains(refusal.status) { presence = [] }
+        }
+    }
+    /// Messages in server order with presence placed by time (rule 6). While
+    /// earlier messages are unloaded, older presence waits for them (rule 7).
+    func timeline(_ page: W3Page) -> [W3ThreadRow] {
+        let messages = older.filter { old in !page.messages.contains { $0.id == old.id } } + page.messages
+        let floor = before == nil ? nil : messages.first.flatMap { W3Instant($0.createdAt) }
+        var waiting = presence.compactMap { item in item.occurredAt.flatMap(W3Instant.init).map { (item, $0) } }
+            .filter { floor == nil || !($0.1 < floor!) }
+        var rows: [W3ThreadRow] = []
+        for message in messages {
+            if let at = W3Instant(message.createdAt) {
+                while let first = waiting.first, first.1 < at { rows.append(.presence(first.0)); waiting.removeFirst() }
+            }
+            rows.append(.message(message))
+        }
+        return rows + waiting.map { .presence($0.0) }
+    }
     private func showOffline() async {
         offlineShowing = true
         let run = lifecycle
@@ -239,7 +322,7 @@ final class W3ThreadModel: ObservableObject {
         } catch { await W3OfflineStorage.shared.purge(context); if offlineContext == context { offlineContext = nil } }
     }
     func setActive(_ value: Bool) {
-        if active != value { lifecycle += 1 }
+        if active != value { lifecycle += 1; presenceStale = true }
         active = value
         if !value {
             transportReady = false; offline = true; offlineShowing = false; introOfferChecked = false; conceal()
@@ -283,6 +366,7 @@ final class W3ThreadModel: ObservableObject {
                                 switch event {
                                 case .connected:
                                     transportReady = true; delay = 1
+                                    presenceStale = true
                                     await refresh()
                                 case .frame(let frame):
                                     if try !(gate?.receive(frame).isEmpty ?? true) { await refresh() }
@@ -391,7 +475,7 @@ final class W3ThreadModel: ObservableObject {
                 // A failed message action (for example, human_unavailable 403)
                 // does not establish that the conversation itself is gone.
                 if let oldTicket, failure.status == 401 || threadDenied { Task { try? await W3DraftStorage.shared.discard(oldTicket) } }
-                offlineShowing = false; let oldContext = offlineContext; offlineContext = nil; if let oldContext { Task { await W3OfflineStorage.shared.purge(oldContext) } }; authorizationDenied = true; page = nil; older = []; before = nil; draft = ""; pending = nil; introOfferId = nil; introOfferChecked = false; gate = nil; resumeActivated = false; Task { await W3ResumeStorage.shared.remove(accountId: accountId, scope: storageScope) }
+                offlineShowing = false; let oldContext = offlineContext; offlineContext = nil; if let oldContext { Task { await W3OfflineStorage.shared.purge(oldContext) } }; authorizationDenied = true; page = nil; older = []; before = nil; presence = []; presenceRead += 1; presenceStale = true; draft = ""; pending = nil; introOfferId = nil; introOfferChecked = false; gate = nil; resumeActivated = false; Task { await W3ResumeStorage.shared.remove(accountId: accountId, scope: storageScope) }
             }
         } else { offline = true; failure = "Reconnect to refresh. Your input is kept on this screen." }
     }
