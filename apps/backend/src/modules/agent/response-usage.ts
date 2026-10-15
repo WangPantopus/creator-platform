@@ -20,6 +20,33 @@ export class ProviderResponseError extends DomainError {
   }
 }
 
+/** A non-2xx answer before any response body: the provider ran nothing, so the
+ * call's cost is a known zero. Left unknown, it would hold the creator's budget
+ * until reconciled by hand. Code, message and status are those of the old error. */
+export function providerRefused(
+  status: number,
+  provider: string,
+  model: string,
+  message = "The configured model is unavailable. Your draft is safe.",
+  code = status === 429 || status === 529 ? "provider_busy" : "provider_failed",
+): ProviderResponseError {
+  const error = new ProviderResponseError(code, message, {
+    provider,
+    model,
+    inputTokens: 0,
+    outputTokens: 0,
+    cachedInputTokens: 0,
+    cacheWriteInputTokens: 0,
+    costMicros: 0,
+  });
+  Object.defineProperty(error, "cause", {
+    value: { upstreamStatus: status, upstreamType: null },
+    configurable: true,
+    writable: true,
+  });
+  return error;
+}
+
 /** Reported cache reads/writes are subsets of input tokens, never extra tokens.
  * Missing counters/rates remain unknown unless their price cannot change the total. */
 export function responseUsage(
