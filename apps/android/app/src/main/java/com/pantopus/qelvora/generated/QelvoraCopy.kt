@@ -81,6 +81,7 @@ object QelvoraCopy {
     "conversationDevelopmentPolicyNotice" to "Use fictional content only. This development configuration does not represent provider approval or permission to serve real fans. Message retention may apply.",
     "sensitiveMemory" to "Want me to remember this? Only if you say yes.",
     "spendLimit" to "Set a monthly limit. You can change it any time; raising it takes 24 hours.",
+    "spendThisMonth" to "This month · {spent} of your {limit} limit",
     "stepIn" to "Ask {name} to step in",
     "includedInRequest" to "Included in your request",
     "aiAuthor" to "{name}'s AI",
