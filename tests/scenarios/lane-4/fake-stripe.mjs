@@ -19,7 +19,8 @@
 //
 // Scenario controls (never called by the backend): GET /__state, and POST
 // /__control with one of {fault}, {authenticate, ok}, {captureBefore, seconds},
-// {expire}, {refundStatus}, {settleRefund, status}, {reset}. A fault is
+// {expire}, {refundStatus}, {settleRefund, status}, {seedHistory: {count,
+// ageSeconds}}, {reset}. A fault is
 // {op, phase: "before"|"after", status|drop|delayMs, times, method}: "before"
 // fails without acting, "after" acts, stores the answer, then fails or drops it.
 import { createServer } from "node:http";
@@ -56,6 +57,8 @@ const reset = () =>
   });
 const maps = ["intents", "refunds", "stored"];
 function save() {
+  // The call log is for scenarios to read; keep the recent part only.
+  if (state.calls.length > 2000) state.calls = state.calls.slice(-1000);
   const plain = { ...state };
   for (const name of maps) plain[name] = [...state[name]];
   mkdirSync(dirname(file), { recursive: true, mode: 0o700 });
@@ -160,7 +163,12 @@ const refundView = (r) => ({ ...r });
 
 const ops = {
   create(body) {
-    const method = METHODS[body.payment_method];
+    // Each card entry is a new payment method; any pm_cardVisa… id holds.
+    const method =
+      METHODS[body.payment_method] ??
+      (/^pm_cardVisa\w+$/u.test(body.payment_method ?? "")
+        ? METHODS.pm_cardVisa
+        : undefined);
     if (!method)
       return fail(
         400,
@@ -247,7 +255,12 @@ const ops = {
   },
   list_intents: (query) =>
     page(
-      [...state.intents.values()].map((pi) => view(pi, [])),
+      [...state.intents.values()]
+        .filter(
+          (pi) =>
+            !query.created?.gte || pi.created >= Number(query.created.gte),
+        )
+        .map((pi) => view(pi, [])),
       query,
       "/v1/payment_intents",
     ),
@@ -338,6 +351,25 @@ function control(body) {
     state.faults.push({ phase: "before", times: 1, ...body.fault });
   if (body.clearFaults) state.faults = [];
   if (body.refundStatus) state.refundStatus = body.refundStatus;
+  // The account's earlier history: settled payments created long ago.
+  for (let n = 0; n < (body.seedHistory?.count ?? 0); n++) {
+    const pi = {
+      id: id("pi"),
+      object: "payment_intent",
+      amount: 1000,
+      currency: "usd",
+      amount_received: 1000,
+      capture_method: "automatic",
+      livemode: false,
+      metadata: {},
+      payment_method: "pm_cardVisa",
+      status: "succeeded",
+      created: now() - body.seedHistory.ageSeconds,
+      charge: id("ch"),
+      client_secret: "",
+    };
+    state.intents.set(pi.id, pi);
+  }
   const pi = state.intents.get(
     body.authenticate ?? body.captureBefore ?? body.expire,
   );
