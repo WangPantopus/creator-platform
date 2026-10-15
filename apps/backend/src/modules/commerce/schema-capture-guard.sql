@@ -35,6 +35,8 @@ BEGIN
  END IF;
  RETURN NEW;
 END $$;
+-- A trigger function needs no EXECUTE grant to fire; no role may call it.
+REVOKE ALL ON FUNCTION creator.commerce_capture_guard() FROM PUBLIC;
 CREATE TRIGGER commerce_capture_guard BEFORE INSERT OR UPDATE ON creator.commerce_effect
  FOR EACH ROW EXECUTE FUNCTION creator.commerce_capture_guard();
 COMMIT;
