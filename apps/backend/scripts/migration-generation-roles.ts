@@ -6,6 +6,7 @@ import outputReview from "../../../infra/migrations/reviews/20261007-generation-
 import partialRecoveryReview from "../../../infra/migrations/reviews/20261007-partial-generation-recovery.json" with { type: "json" };
 import recoveryReview from "../../../infra/migrations/reviews/20261007-generation-recovery.json" with { type: "json" };
 import comparisonReview from "../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
+import noticesReview from "../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
 import { comparisonReaderCatalogue } from "../src/modules/conversation/comparison-feed.js";
 import { comparisonPrivacyCatalogue } from "../src/modules/conversation/comparison-privacy.js";
 import { comparisonArtifactCatalogue } from "../src/modules/trust/comparison-artifacts.js";
@@ -168,7 +169,8 @@ export async function assertGenerationWaveRoleSafety(
     | "public-ai"
     | "generation-recovery"
     | "partial-generation-recovery"
-    | "comparison",
+    | "comparison"
+    | "notices",
 ) {
   if (
     purposeReview.schemaVersion !== 1 ||
@@ -180,7 +182,11 @@ export async function assertGenerationWaveRoleSafety(
     throw new WaveRoleSafetyError(
       "Generation-purpose wave review is unavailable.",
     );
-  const comparison = extension === "comparison";
+  const notices = extension === "notices";
+  const comparison = notices || extension === "comparison";
+  // Every pinned catalogue lists every relation, so the newest installed
+  // wave's review holds the current pins.
+  const head = notices ? noticesReview : comparisonReview;
   const recovery =
     comparison ||
     extension === "generation-recovery" ||
@@ -201,7 +207,7 @@ export async function assertGenerationWaveRoleSafety(
   const catalogue = await generationWavePurposeCatalogue(client);
   const accepted = extension
     ? (comparison
-        ? comparisonReview
+        ? head
         : recovery
           ? selectedRecovery
           : extension === "public-ai"
@@ -267,7 +273,7 @@ export async function assertGenerationWaveRoleSafety(
           );
       if (
         contentHash(await publicAIPurposeCatalogue(client)) !==
-        (comparison ? comparisonReview : publicAIReview).publicCatalogueChecksum
+        (comparison ? head : publicAIReview).publicCatalogueChecksum
       )
         throw new WaveRoleSafetyError("Public AI purpose catalogue changed.");
     }
@@ -307,13 +313,28 @@ export async function assertGenerationWaveRoleSafety(
             "Exact complete comparison source graph is required.",
           );
       }
+      if (notices)
+        for (const source of noticesReview.sources)
+          if (
+            sha256(await readFile(new URL(source.path, repositoryRoot))) !==
+              source.checksum ||
+            !(
+              await client.query(
+                "SELECT 1 FROM creator.schema_migration WHERE version=$1 AND checksum=$2",
+                [source.version, source.checksum],
+              )
+            ).rowCount
+          )
+            throw new WaveRoleSafetyError(
+              "Exact complete notices source graph is required.",
+            );
       if (
         contentHash(await comparisonReaderCatalogue(client)) !==
-          comparisonReview.comparison.readerCatalogueChecksum ||
+          head.comparison.readerCatalogueChecksum ||
         contentHash(await comparisonPrivacyCatalogue(client)) !==
-          comparisonReview.comparison.privacy.catalogueChecksum ||
+          head.comparison.privacy.catalogueChecksum ||
         contentHash(await comparisonArtifactCatalogue(client)) !==
-          comparisonReview.comparison.artifactsCatalogueChecksum
+          head.comparison.artifactsCatalogueChecksum
       )
         throw new WaveRoleSafetyError(
           "Complete comparison purpose custody changed.",

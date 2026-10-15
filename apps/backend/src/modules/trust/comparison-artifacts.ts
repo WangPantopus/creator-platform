@@ -4,6 +4,7 @@ import { contentHash } from "../../core/canonical.js";
 import { invariant } from "../../core/errors.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
 import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
+import { registeredComparisonProfile } from "../../db/comparison-profile.js";
 import { agentPrivacyQueryTimeout } from "../agent/privacy-transaction.js";
 import { requestAuthority } from "../identity/request-authority.js";
 import { comparisonPrivacyCatalogue } from "../conversation/comparison-privacy.js";
@@ -35,10 +36,8 @@ export const comparisonArtifactPrivacySource = Object.freeze({
   path: "apps/backend/src/modules/trust/0243_comparison_export_privacy.sql",
   checksum: "b9974d48123516ebcdd318b3149107e10fe2795551c10ec2f1079270f1dd0a7b",
 });
-// Independently operated numbered graph and complete restore. This is metadata
-// only; exact executable registration and original host composition are required.
-export const comparisonArtifactPrivacyCatalogueChecksum =
-  comparisonReview.comparison.artifactsCatalogueChecksum;
+// The artifact and privacy catalogue pins come from the head review
+// (registeredComparisonProfile): every later registered wave changes them.
 const Owner = "creator_comparison_artifact";
 const Snapshot = z.string().min(8).max(200);
 const Domain = z.enum(["agent", "conversation"]);
@@ -423,9 +422,11 @@ export class PreparedComparisonArtifacts {
       this.workerPool,
       async (client) => {
         await this.assertClient(client, "creator_trust_worker", signal);
+        const review = await registeredComparisonProfile(signal);
         invariant(
-          contentHash(await comparisonPrivacyCatalogue(client, signal)) ===
-            comparisonReview.comparison.privacy.catalogueChecksum,
+          review &&
+            contentHash(await comparisonPrivacyCatalogue(client, signal)) ===
+              review.comparison.privacy.catalogueChecksum,
           "comparison_privacy_custody_changed",
           "The original comparison expiry owner must match independent review.",
         );

@@ -1,10 +1,11 @@
 import type { PoolClient } from "pg";
 import { DomainError } from "../../core/errors.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
+import { registeredComparisonProfile } from "../../db/comparison-profile.js";
 import { contentHash } from "../../core/canonical.js";
+import comparisonReview from "../../../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
 import {
   comparisonArtifactCatalogue,
-  comparisonArtifactPrivacyCatalogueChecksum,
   comparisonArtifactPrivacySource,
 } from "./comparison-artifacts.js";
 
@@ -77,6 +78,34 @@ export async function assertDomainPrivacyTaskCatalog(
   client: PoolClient,
   domain: "trust" | "growth",
 ) {
+  // The head review's pin: a later registered wave changes every catalogue.
+  return assertDomainPrivacyTask(
+    client,
+    domain,
+    async () =>
+      (await registeredComparisonProfile())?.comparison
+        .artifactsCatalogueChecksum,
+  );
+}
+
+/** Fixed114 operator metadata before the notices wave: the comparison
+ * review's own artifact pin. No task authority and no caller-provided pin. */
+export async function assertDomainPrivacyTaskCatalogForComparisonReview(
+  client: PoolClient,
+  domain: "trust" | "growth",
+) {
+  return assertDomainPrivacyTask(
+    client,
+    domain,
+    async () => comparisonReview.comparison.artifactsCatalogueChecksum,
+  );
+}
+
+async function assertDomainPrivacyTask(
+  client: PoolClient,
+  domain: "trust" | "growth",
+  artifactsPin: () => Promise<string | undefined>,
+) {
   const comparisonArtifacts =
     (
       await client.query<{ installed: boolean }>(
@@ -95,10 +124,11 @@ export async function assertDomainPrivacyTaskCatalog(
           [source.version, source.checksum],
         )
       ).rows[0]?.ready;
+    const pin = await artifactsPin();
     if (
       registered !== true ||
-      contentHash(await comparisonArtifactCatalogue(client)) !==
-        comparisonArtifactPrivacyCatalogueChecksum
+      !pin ||
+      contentHash(await comparisonArtifactCatalogue(client)) !== pin
     )
       throw new DomainError(
         "reviewed_migration_unavailable",

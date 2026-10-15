@@ -5,9 +5,13 @@ import {
   assertGenerationPrivacyTaskCatalogForReview,
   assertOutputPrivacyTaskCatalogForReview,
   assertPublicPrivacyTaskCatalogForReview,
+  assertComparisonPrivacyTaskCatalogForReview,
   assertPrivacyTaskCatalog,
 } from "../src/modules/trust/privacy-catalog.js";
-import { assertDomainPrivacyTaskCatalog } from "../src/modules/trust/domain-privacy-catalog.js";
+import {
+  assertDomainPrivacyTaskCatalog,
+  assertDomainPrivacyTaskCatalogForComparisonReview,
+} from "../src/modules/trust/domain-privacy-catalog.js";
 import { repositoryRoot, sha256 } from "./migration-custody.js";
 import { WaveRoleSafetyError } from "./migration-wave-roles.js";
 
@@ -42,6 +46,7 @@ export async function assertPrivacyWaveRoleSafety(
     generationBeforeContent?: boolean;
     outputBeforePublic?: boolean;
     publicBeforeComparison?: boolean;
+    comparisonBeforeNotices?: boolean;
   },
 ) {
   const fail = (purpose: string): never => {
@@ -126,15 +131,20 @@ export async function assertPrivacyWaveRoleSafety(
         await assertOutputPrivacyTaskCatalogForReview(client);
       else if (installed.publicBeforeComparison)
         await assertPublicPrivacyTaskCatalogForReview(client);
+      else if (installed.comparisonBeforeNotices)
+        await assertComparisonPrivacyTaskCatalogForReview(client);
       else await assertPrivacyTaskCatalog(client);
       await client.query("RESET SESSION AUTHORIZATION");
     }
     if (installed.domain) {
+      const domainCatalog = installed.comparisonBeforeNotices
+        ? assertDomainPrivacyTaskCatalogForComparisonReview
+        : assertDomainPrivacyTaskCatalog;
       await client.query("SET SESSION AUTHORIZATION creator_trust_worker");
-      await assertDomainPrivacyTaskCatalog(client, "trust");
+      await domainCatalog(client, "trust");
       await client.query("RESET SESSION AUTHORIZATION");
       await client.query("SET SESSION AUTHORIZATION growth_worker");
-      await assertDomainPrivacyTaskCatalog(client, "growth");
+      await domainCatalog(client, "growth");
       await client.query("RESET SESSION AUTHORIZATION");
     }
   } catch {

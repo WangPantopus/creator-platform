@@ -48,7 +48,10 @@ const MAYA = "20000000-0000-4000-8000-000000000001";
 const MAYA_ACCOUNT = "10000000-0000-4000-8000-000000000003";
 const DEVON = "20000000-0000-4000-8000-000000000002";
 const DEVON_ACCOUNT = "10000000-0000-4000-8000-000000000005";
-const TOTAL_MIGRATIONS = 114;
+/** The stack applies the whole registered graph. */
+const TOTAL_MIGRATIONS = JSON.parse(
+  readFileSync(join(root, "infra/migrations.json"), "utf8"),
+).migrations.length;
 
 class StackError extends Error {
   constructor(message, hint = "", exit = 1) {
