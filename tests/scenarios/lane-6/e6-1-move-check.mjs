@@ -1,17 +1,21 @@
 // E6.1 move check: node tests/scenarios/lane-6/e6-1-move-check.mjs [BASE_REF]
 // Proves a split only moved code. Every top-level declaration of the base Studio.tsx (with its
 // leading comments) must exist exactly once under apps/web/features/studio with identical text,
-// ignoring a leading `export`. Reports what moved where, and anything missing, edited or added.
+// ignoring a leading `export` and formatting: both sides go through Prettier first, because adding
+// `export` can push a signature past 80 columns and Prettier (which CI enforces) then wraps it.
+// Every token and comment still has to match. Reports what moved where, and anything missing,
+// edited or added.
 import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import ts from "typescript";
+import * as prettier from "prettier";
 
 const base = process.argv[2] ?? "origin/main";
 const dir = "apps/web/features/studio";
 const baseFile = `${dir}/Studio.tsx`;
 
-function declarations(path, source) {
+async function declarations(path, source) {
   const sf = ts.createSourceFile(
     path,
     source,
@@ -33,10 +37,13 @@ function declarations(path, source) {
     const text = st.getText(sf),
       full = st.getFullText(sf);
     const comments = full.slice(0, full.length - text.length).trim();
+    const bare = `${comments}\n${text.replace(/^export\s+(?:default\s+)?/u, "")}`;
     found.push({
       name: names.join(","),
       path,
-      text: `${comments}\n${text.replace(/^export\s+(?:default\s+)?/u, "")}`.trim(),
+      text: (
+        await prettier.format(bare, { parser: "typescript", filepath: path })
+      ).trim(),
     });
   }
   return found;
@@ -49,16 +56,18 @@ const walk = (d) =>
         ? [join(d, e.name)]
         : [],
   );
-const original = declarations(
+const original = await declarations(
   baseFile,
   execFileSync("git", ["show", `${base}:${baseFile}`], {
     encoding: "utf8",
     maxBuffer: 1 << 26,
   }),
 );
-const current = walk(dir).flatMap((p) =>
-  declarations(p, readFileSync(p, "utf8")),
-);
+const current = (
+  await Promise.all(
+    walk(dir).map((p) => declarations(p, readFileSync(p, "utf8"))),
+  )
+).flat();
 const baseFiles = new Set(
   execFileSync("git", ["ls-tree", "-r", "--name-only", base, dir], {
     encoding: "utf8",
