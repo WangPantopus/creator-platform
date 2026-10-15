@@ -86,6 +86,9 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
     to 2.3 s, A3 up to 1.2 s. A4.
 11. Account deletion cannot be requested with the development identity (it needs a Pantopus-mode
     session), so the E3A.4 deletion case is not run until lane 1's sign-in is on the stack.
+12. Any fan could lock a creator's AI: dropping the connection during the acknowledgment's safety check
+    cancelled the provider call, and its unknown cost (no hold) refused every later reply for every fan.
+    A6c fixes it: the check runs to its deadline, and a timed-out check records its own upper bound.
 
 ## Scenarios
 
