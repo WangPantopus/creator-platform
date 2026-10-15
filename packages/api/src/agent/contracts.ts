@@ -26,7 +26,7 @@ export const FaqItem = z.strictObject({
 });
 export type FaqItem = z.infer<typeof FaqItem>;
 export const FAQ_MAX_QUESTIONS = 50;
-/** Proposed default (pending the founder): replacing a live version needs at
+/** Founder decision 2026-10-15: replacing a live version needs at
  * least this many creator-written questions, at least this share answered as
  * the creator expects. Boundary and regression cases must all pass. */
 export const FAQ_MIN_QUESTIONS = 5;

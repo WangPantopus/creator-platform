@@ -1,10 +1,10 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-15, by the lane 3 session
-Working on: B2 (FAQ publish check), branch `lane-3/b2-faq-publish`, stacked on A1
-Done: A1 #411, A3 #426, A6b #433, A6a #434, A6c #436, A6 hold sizing #438, B2 (all open)
-Next: A2 (wake on accept), B9. Findings 8 and 9 need migrations (W1 lease release; crash recovery with lane 4), proposed for the next migration wave
-Blocked on: the founder's yes on B2's bar (5 questions, 80%), its copy, and whether FAQ answers become a source (finding 14). Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
+Working on: A2 (wake on accept). B2 is open as #441, its defaults approved by the founder 2026-10-15
+Done: A1 #411, A3 #426, A6b #433, A6a #434, A6c #436, A6 hold sizing #438, B2 #441 (all open)
+Next: B9. Findings 8 and 9 need migrations (W1 lease release; crash recovery with lane 4), proposed for the next migration wave
+Blocked on: nothing. Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
 
 ## How to measure
 
@@ -107,9 +107,8 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
     sentence fails the case. An honest identity answer should pass the guard whole. B1 (guard), not B2.
 14. The AI answers only from approved sources, and the creator's FAQ answers are not a source. A
     creator whose sources do not cover a question therefore fails that FAQ entry however good the
-    expected answer is (three of Maya's five with the real model). Proposed default: keep the FAQ as
-    a check only; making its answers a source would change grounding and the engine revision, so it
-    is the founder's call.
+    expected answer is (three of Maya's five with the real model). Founder decision 2026-10-15: the
+    FAQ stays a check only; a creator adds sources that cover the questions.
 
 ## B2: the FAQ publish check
 
@@ -120,11 +119,11 @@ AI's answer against the expected one; a refusal or "the sources do not cover thi
 A new version may replace the live one only with at least 5 questions and at least 80% of them
 passing, on top of the existing boundary cases (all must pass). A first version needs no FAQ.
 
-- Proposed, waiting on the founder: the bar (5 questions, 80%: `FAQ_MIN_QUESTIONS`,
-  `FAQ_PASS_RATE` in `packages/api/src/agent/contracts.ts`) and the new copy keys `creatorAiFaq*`
-  in `config/copy.json` (title "QUESTIONS FANS ASK YOU"), plus the API's gate and `faq_required`
-  sentences in `modules/agent/service.ts` ("Write at least 5 questions fans ask you, …"), and
-  finding 14.
+- Founder decision 2026-10-15: the bar is 5 questions and 80% (`FAQ_MIN_QUESTIONS`,
+  `FAQ_PASS_RATE` in `packages/api/src/agent/contracts.ts`); the copy keys `creatorAiFaq*` in
+  `config/copy.json` (title "QUESTIONS FANS ASK YOU") and the API's gate and `faq_required`
+  sentences in `modules/agent/service.ts` ("Write at least 5 questions fans ask you, …") are
+  approved as written; FAQ answers stay a check only, not a source (finding 14).
 - Real model (Sonnet through the gateway, Maya's seeded FAQ): all 6 boundary cases pass, 1 of 5
   FAQ entries pass, publishing is refused (`403 evaluation_required`). Three fail because Maya's
   sources do not cover them (finding 14), one is finding 13.
