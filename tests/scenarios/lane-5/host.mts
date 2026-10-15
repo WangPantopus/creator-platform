@@ -45,6 +45,8 @@ import {
   trustScopeRestrictionInTransaction,
 } from "../../../apps/backend/src/modules/trust/scope-restriction.js";
 import { actorId, ACTOR_COUNT } from "./ids.mjs";
+import { NativeDeliveryProvider } from "../../../apps/backend/src/modules/growth/providers.js";
+import { nativeGateway } from "./native-gateway.mjs";
 
 if (process.env.NODE_ENV !== "development")
   throw new Error("The scenario host runs only with NODE_ENV=development.");
@@ -107,10 +109,34 @@ const gateway = createServer((req, res) => {
     res.end("{}");
   }
 });
-gateway.listen(56453, "127.0.0.1");
+const nativeMode = process.env.LANE5_NATIVE_PUSH === "true";
+const activeGateway = nativeMode ? nativeGateway() : gateway;
+activeGateway.listen(56453, "127.0.0.1");
 
 const growthAPIPool = await createGrowthAPIPool(config.databaseUrl);
 let growth: Awaited<ReturnType<typeof configureGrowthForBackend>> = null;
+const nativeProvider = new NativeDeliveryProvider(
+  () => {
+    if (!growth) throw new Error("Growth is not bound.");
+    return growth.service;
+  },
+  {
+    publicOrigin: "https://qelvora.test",
+    brandName: "Qelvora",
+    fcm: {
+      projectId: "lane5",
+      accessToken: async () => "local-fake-gateway-only",
+    },
+  },
+  async (url, init) => {
+    if (
+      String(url) !==
+      "https://fcm.googleapis.com/v1/projects/lane5/messages:send"
+    )
+      throw new Error("Unexpected gateway endpoint.");
+    return fetch("http://127.0.0.1:56453/fcm", init);
+  },
+);
 const backend = await createConfiguredBackend({
   config,
   identity: new ScenarioIdentity(config.allowedOrigin, "development"),
@@ -134,7 +160,7 @@ const backend = await createConfiguredBackend({
         creatorId
           ? runtime.assertCreatorAllowed(actor, creatorId)
           : runtime.assertActorAllowed(actor),
-      provider,
+      provider: nativeMode ? nativeProvider : provider,
       owners: {
         notificationState: composeNotificationOwners({
           content: async (event, recipient, custody) =>
@@ -188,7 +214,7 @@ backend.server.listen(config.port, "127.0.0.1", () =>
 );
 const stop = () =>
   void backend.close().then(async () => {
-    gateway.close();
+    activeGateway.close();
     await growthAPIPool?.end();
     process.exit(0);
   });
