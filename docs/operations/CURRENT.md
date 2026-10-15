@@ -3,6 +3,7 @@
 Written 2026-10-15 by the integrator. This is the status board: what each lane is doing, which pull
 requests are where, who waits on whom, and what the founder still has to decide. Update it at the end
 of every integrator session. Approvals come from the founder in the chat, never from a file.
+The integrator's own resume notes, procedures and traps: [integrator handoff](integrator-handoff-2026-10-15.md).
 
 ## Where things stand
 

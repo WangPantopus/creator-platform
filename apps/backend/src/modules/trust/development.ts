@@ -240,7 +240,7 @@ export async function createDevelopmentTrust(
         async (client) => {
           const session = (
             await client.query<{ created_at: Date }>(
-              "SELECT created_at FROM creator.identity_session WHERE id=$1 AND account_id=$2 AND mode='development' AND revoked_at IS NULL AND expires_at>clock_timestamp()",
+              "SELECT created_at FROM creator.identity_session WHERE id=$1 AND account_id=$2 AND mode IN ('development','qelvora') AND revoked_at IS NULL AND expires_at>clock_timestamp()",
               [current.sessionId, actor.accountId],
             )
           ).rows[0];

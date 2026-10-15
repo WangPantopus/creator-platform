@@ -5580,6 +5580,7 @@ public struct APISessionAdultEligible: Codable, Sendable {
 
 public enum APISessionMode: String, Codable, Sendable {
   case `development` = "development"
+  case `qelvora` = "qelvora"
   case `pantopus` = "pantopus"
 }
 
@@ -5710,6 +5711,7 @@ public struct APIIdentityCompletionSessionAdultEligible: Codable, Sendable {
 
 public enum APIIdentityCompletionSessionMode: String, Codable, Sendable {
   case `development` = "development"
+  case `qelvora` = "qelvora"
   case `pantopus` = "pantopus"
 }
 
@@ -5762,6 +5764,281 @@ public enum APIIdentityCompletionSessionTeamsItemRolesItem: String, Codable, Sen
   case `drafter` = "drafter"
   case `publisher` = "publisher"
   case `scheduler` = "scheduler"
+}
+
+public struct APIIdentityProviderContinue: Codable, Sendable {
+  public let `returnTo`: String
+  public let `provider`: APIIdentityProviderContinueProvider
+  public let `reauthenticate`: Bool?
+  public init(returnTo: String, provider: APIIdentityProviderContinueProvider, reauthenticate: Bool? = nil) {
+    self.returnTo = returnTo
+    self.provider = provider
+    self.reauthenticate = reauthenticate
+  }
+}
+
+public enum APIIdentityProviderContinueProvider: String, Codable, Sendable {
+  case `apple` = "apple"
+  case `google` = "google"
+}
+
+public struct APINativeSignInStart: Codable, Sendable {
+  public let `provider`: APINativeSignInStartProvider
+  public let `platform`: APINativeSignInStartPlatform
+  public let `returnTo`: String?
+  public let `reauthenticate`: Bool?
+  public init(provider: APINativeSignInStartProvider, platform: APINativeSignInStartPlatform, returnTo: String? = nil, reauthenticate: Bool? = nil) {
+    self.provider = provider
+    self.platform = platform
+    self.returnTo = returnTo
+    self.reauthenticate = reauthenticate
+  }
+}
+
+public enum APINativeSignInStartProvider: String, Codable, Sendable {
+  case `apple` = "apple"
+  case `google` = "google"
+}
+
+public enum APINativeSignInStartPlatform: String, Codable, Sendable {
+  case `ios` = "ios"
+  case `android` = "android"
+}
+
+public struct APINativeSignInNonce: Codable, Sendable {
+  public let `continuationId`: String
+  public let `nonce`: String
+  public let `expiresAt`: String
+  public init(continuationId: String, nonce: String, expiresAt: String) {
+    self.continuationId = continuationId
+    self.nonce = nonce
+    self.expiresAt = expiresAt
+  }
+}
+
+public struct APINativeSignInComplete: Codable, Sendable {
+  public let `continuationId`: String
+  public let `provider`: APINativeSignInCompleteProvider
+  public let `idToken`: String
+  public let `authorizationCode`: String?
+  public init(continuationId: String, provider: APINativeSignInCompleteProvider, idToken: String, authorizationCode: String? = nil) {
+    self.continuationId = continuationId
+    self.provider = provider
+    self.idToken = idToken
+    self.authorizationCode = authorizationCode
+  }
+}
+
+public enum APINativeSignInCompleteProvider: String, Codable, Sendable {
+  case `apple` = "apple"
+  case `google` = "google"
+}
+
+public struct APIAgeConfirmationInput: Codable, Sendable {
+  public let `ageContinuationId`: String
+  public let `birthDate`: String
+  public let `platformSignal`: APIAgeConfirmationInputPlatformSignal?
+  public init(ageContinuationId: String, birthDate: String, platformSignal: APIAgeConfirmationInputPlatformSignal? = nil) {
+    self.ageContinuationId = ageContinuationId
+    self.birthDate = birthDate
+    self.platformSignal = platformSignal
+  }
+}
+
+public struct APIAgeConfirmationInputPlatformSignal: Codable, Sendable {
+  public let `source`: APIAgeConfirmationInputPlatformSignalSource
+  public let `under18`: Bool
+  public init(source: APIAgeConfirmationInputPlatformSignalSource, under18: Bool) {
+    self.source = source
+    self.under18 = under18
+  }
+}
+
+public enum APIAgeConfirmationInputPlatformSignalSource: String, Codable, Sendable {
+  case `apple_declared_age_range` = "apple_declared_age_range"
+  case `google_play_age_signals` = "google_play_age_signals"
+}
+
+public struct APIAgeConfirmationRequired: Codable, Sendable {
+  public let `ageContinuationId`: String
+  public let `expiresAt`: String
+  public init(ageContinuationId: String, expiresAt: String) {
+    self.ageContinuationId = ageContinuationId
+    self.expiresAt = expiresAt
+  }
+}
+
+public struct APIIdentitySignInResult: Codable, Sendable {
+  public let `status`: APIIdentitySignInResultStatus
+  public let `completion`: APIIdentitySignInResultCompletion?
+  public let `ageConfirmation`: APIIdentitySignInResultAgeConfirmation?
+  public init(status: APIIdentitySignInResultStatus, completion: APIIdentitySignInResultCompletion? = nil, ageConfirmation: APIIdentitySignInResultAgeConfirmation? = nil) {
+    self.status = status
+    self.completion = completion
+    self.ageConfirmation = ageConfirmation
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `status`
+    case `completion`
+    case `ageConfirmation`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.status = try container.decode(APIIdentitySignInResultStatus.self, forKey: .status)
+    self.completion = try container.decode(APIIdentitySignInResultCompletion?.self, forKey: .completion)
+    self.ageConfirmation = try container.decode(APIIdentitySignInResultAgeConfirmation?.self, forKey: .ageConfirmation)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(status, forKey: .status)
+    try container.encode(completion, forKey: .completion)
+    try container.encode(ageConfirmation, forKey: .ageConfirmation)
+  }
+}
+
+public enum APIIdentitySignInResultStatus: String, Codable, Sendable {
+  case `signed_in` = "signed_in"
+  case `age_required` = "age_required"
+}
+
+public struct APIIdentitySignInResultCompletion: Codable, Sendable {
+  public let `token`: String
+  public let `returnTo`: String
+  public let `session`: APIIdentitySignInResultCompletionSession
+  public init(token: String, returnTo: String, session: APIIdentitySignInResultCompletionSession) {
+    self.token = token
+    self.returnTo = returnTo
+    self.session = session
+  }
+}
+
+public struct APIIdentitySignInResultCompletionSession: Codable, Sendable {
+  public let `accountId`: String
+  public let `adultEligible`: APIIdentitySignInResultCompletionSessionAdultEligible
+  public let `sessionId`: String
+  public let `expiresAt`: String
+  public let `mode`: APIIdentitySignInResultCompletionSessionMode
+  public let `fan`: APIIdentitySignInResultCompletionSessionFan?
+  public let `creator`: APIIdentitySignInResultCompletionSessionCreator?
+  public let `teams`: [APIIdentitySignInResultCompletionSessionTeamsItem]
+  public init(accountId: String, adultEligible: APIIdentitySignInResultCompletionSessionAdultEligible, sessionId: String, expiresAt: String, mode: APIIdentitySignInResultCompletionSessionMode, fan: APIIdentitySignInResultCompletionSessionFan? = nil, creator: APIIdentitySignInResultCompletionSessionCreator? = nil, teams: [APIIdentitySignInResultCompletionSessionTeamsItem]) {
+    self.accountId = accountId
+    self.adultEligible = adultEligible
+    self.sessionId = sessionId
+    self.expiresAt = expiresAt
+    self.mode = mode
+    self.fan = fan
+    self.creator = creator
+    self.teams = teams
+  }
+  private enum CodingKeys: String, CodingKey {
+    case `accountId`
+    case `adultEligible`
+    case `sessionId`
+    case `expiresAt`
+    case `mode`
+    case `fan`
+    case `creator`
+    case `teams`
+  }
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.accountId = try container.decode(String.self, forKey: .accountId)
+    self.adultEligible = try container.decode(APIIdentitySignInResultCompletionSessionAdultEligible.self, forKey: .adultEligible)
+    self.sessionId = try container.decode(String.self, forKey: .sessionId)
+    self.expiresAt = try container.decode(String.self, forKey: .expiresAt)
+    self.mode = try container.decode(APIIdentitySignInResultCompletionSessionMode.self, forKey: .mode)
+    self.fan = try container.decode(APIIdentitySignInResultCompletionSessionFan?.self, forKey: .fan)
+    self.creator = try container.decode(APIIdentitySignInResultCompletionSessionCreator?.self, forKey: .creator)
+    self.teams = try container.decode([APIIdentitySignInResultCompletionSessionTeamsItem].self, forKey: .teams)
+  }
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(accountId, forKey: .accountId)
+    try container.encode(adultEligible, forKey: .adultEligible)
+    try container.encode(sessionId, forKey: .sessionId)
+    try container.encode(expiresAt, forKey: .expiresAt)
+    try container.encode(mode, forKey: .mode)
+    try container.encode(fan, forKey: .fan)
+    try container.encode(creator, forKey: .creator)
+    try container.encode(teams, forKey: .teams)
+  }
+}
+
+public struct APIIdentitySignInResultCompletionSessionAdultEligible: Codable, Sendable {
+  public let value: Bool = true
+  public init() {}
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == true else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Expected true") }
+  }
+  public func encode(to encoder: Encoder) throws { var container = encoder.singleValueContainer(); try container.encode(true) }
+}
+
+public enum APIIdentitySignInResultCompletionSessionMode: String, Codable, Sendable {
+  case `development` = "development"
+  case `qelvora` = "qelvora"
+  case `pantopus` = "pantopus"
+}
+
+public struct APIIdentitySignInResultCompletionSessionFan: Codable, Sendable {
+  public let `id`: String
+  public let `handle`: String
+  public let `intro`: String
+  public let `version`: Int
+  public init(id: String, handle: String, intro: String, version: Int) {
+    self.id = id
+    self.handle = handle
+    self.intro = intro
+    self.version = version
+  }
+}
+
+public struct APIIdentitySignInResultCompletionSessionCreator: Codable, Sendable {
+  public let `id`: String
+  public let `handle`: String
+  public let `displayName`: String
+  public let `verification`: APIIdentitySignInResultCompletionSessionCreatorVerification
+  public let `version`: Int
+  public init(id: String, handle: String, displayName: String, verification: APIIdentitySignInResultCompletionSessionCreatorVerification, version: Int) {
+    self.id = id
+    self.handle = handle
+    self.displayName = displayName
+    self.verification = verification
+    self.version = version
+  }
+}
+
+public enum APIIdentitySignInResultCompletionSessionCreatorVerification: String, Codable, Sendable {
+  case `pending` = "pending"
+  case `verified` = "verified"
+  case `rejected` = "rejected"
+  case `revoked` = "revoked"
+}
+
+public struct APIIdentitySignInResultCompletionSessionTeamsItem: Codable, Sendable {
+  public let `creatorId`: String
+  public let `roles`: [APIIdentitySignInResultCompletionSessionTeamsItemRolesItem]
+  public init(creatorId: String, roles: [APIIdentitySignInResultCompletionSessionTeamsItemRolesItem]) {
+    self.creatorId = creatorId
+    self.roles = roles
+  }
+}
+
+public enum APIIdentitySignInResultCompletionSessionTeamsItemRolesItem: String, Codable, Sendable {
+  case `triage` = "triage"
+  case `drafter` = "drafter"
+  case `publisher` = "publisher"
+  case `scheduler` = "scheduler"
+}
+
+public struct APIIdentitySignInResultAgeConfirmation: Codable, Sendable {
+  public let `ageContinuationId`: String
+  public let `expiresAt`: String
+  public init(ageContinuationId: String, expiresAt: String) {
+    self.ageContinuationId = ageContinuationId
+    self.expiresAt = expiresAt
+  }
 }
 
 public struct APISessionToken: Codable, Sendable {

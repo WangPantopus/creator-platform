@@ -99,7 +99,9 @@ export const SessionSchema = z.strictObject({
   adultEligible: z.literal(true),
   sessionId: z.uuid(),
   expiresAt: z.iso.datetime(),
-  mode: z.enum(["development", "pantopus"]),
+  /** C1: "qelvora" is the Qelvora-owned sign-in (option D); "pantopus" stays
+   * reserved for a Pantopus connect flow. Clients branch only on "development". */
+  mode: z.enum(["development", "qelvora", "pantopus"]),
   fan: FanProfileSchema.nullable(),
   creator: CreatorProfileSchema.nullable(),
   teams: z
@@ -118,6 +120,61 @@ export const SessionTokenSchema = z.strictObject({
   token: z.string(),
   expiresAt: z.iso.datetime(),
 });
+/** C1, the pilot sign-in (lane 1). Apple and Google ID tokens are verified by
+ * the backend only; no provider token, subject or email reaches a client. */
+export const IdentityProviderSchema = z.enum(["apple", "google"]);
+export const IdentityProviderContinueSchema = z.strictObject({
+  returnTo: ReturnTargetSchema,
+  provider: IdentityProviderSchema,
+  reauthenticate: z.boolean().optional(),
+});
+export const NativeSignInStartSchema = z.strictObject({
+  provider: IdentityProviderSchema,
+  platform: z.enum(["ios", "android"]),
+  returnTo: ReturnTargetSchema.optional(),
+  reauthenticate: z.boolean().optional(),
+});
+/** Single use, five minutes. iOS passes SHA-256(nonce) to Apple; Google takes it as is. */
+export const NativeSignInNonceSchema = z.strictObject({
+  continuationId: z.uuid(),
+  nonce: z.string().min(32).max(128),
+  expiresAt: z.iso.datetime(),
+});
+export const NativeSignInCompleteSchema = z.strictObject({
+  continuationId: z.uuid(),
+  provider: IdentityProviderSchema,
+  idToken: z.string().min(1).max(8192),
+  /** Apple only: kept encrypted so account deletion can revoke the grant at Apple. */
+  authorizationCode: z.string().min(1).max(4096).optional(),
+});
+/** Platform age signals can only refuse: an adult report is never proof. */
+export const PlatformAgeSignalSchema = z.strictObject({
+  source: z.enum(["apple_declared_age_range", "google_play_age_signals"]),
+  under18: z.boolean(),
+});
+export const AgeConfirmationInputSchema = z.strictObject({
+  ageContinuationId: z.uuid(),
+  birthDate: z.iso.date(),
+  platformSignal: PlatformAgeSignalSchema.optional(),
+});
+export const AgeConfirmationRequiredSchema = z.strictObject({
+  ageContinuationId: z.uuid(),
+  expiresAt: z.iso.datetime(),
+});
+/** Flat rather than a union so every generated client can decode it. Exactly
+ * one of completion and ageConfirmation is present, matching status. */
+export const IdentitySignInResultSchema = z
+  .strictObject({
+    status: z.enum(["signed_in", "age_required"]),
+    completion: IdentityCompletionSchema.nullable(),
+    ageConfirmation: AgeConfirmationRequiredSchema.nullable(),
+  })
+  .refine(
+    (value) =>
+      (value.status === "signed_in") === (value.completion !== null) &&
+      (value.status === "age_required") === (value.ageConfirmation !== null),
+    "status must match exactly one of completion and ageConfirmation",
+  );
 export const DoneSchema = z.strictObject({ done: z.literal(true) });
 export const ProofInputSchema = z.strictObject({
   platform: z.enum(["instagram", "youtube"]),
@@ -211,6 +268,13 @@ export const identitySchemas = {
   CreatorProfile: CreatorProfileSchema,
   Session: SessionSchema,
   IdentityCompletion: IdentityCompletionSchema,
+  IdentityProviderContinue: IdentityProviderContinueSchema,
+  NativeSignInStart: NativeSignInStartSchema,
+  NativeSignInNonce: NativeSignInNonceSchema,
+  NativeSignInComplete: NativeSignInCompleteSchema,
+  AgeConfirmationInput: AgeConfirmationInputSchema,
+  AgeConfirmationRequired: AgeConfirmationRequiredSchema,
+  IdentitySignInResult: IdentitySignInResultSchema,
   SessionToken: SessionTokenSchema,
   Done: DoneSchema,
   ProofInput: ProofInputSchema,
