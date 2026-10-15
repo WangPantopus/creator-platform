@@ -7,6 +7,7 @@ import { completedSentences, type StreamProposal } from "./streaming.js";
 import {
   ModelRateSchema,
   ProviderResponseError,
+  providerRefused,
   responseUsage,
   type ModelRate,
 } from "./response-usage.js";
@@ -214,7 +215,8 @@ class OpenAIEmbeddings {
       signal: AbortSignal.any([signal, AbortSignal.timeout(CALL_TIMEOUT_MS)]),
       redirect: "error",
     });
-    if (!response.ok) throw unavailable(response.status);
+    if (!response.ok)
+      throw providerRefused(response.status, "OpenAI", this.model);
     const raw = await response.text();
     if (raw.length > MAX_BODY_CHARS)
       throw new DomainError(
@@ -473,7 +475,9 @@ export class AnthropicMessagesModel implements AgentModel {
       signal,
       STREAM_TIMEOUT_MS,
     );
-    if (!response.ok || !response.body) throw unavailable(response.status);
+    if (!response.ok)
+      throw providerRefused(response.status, "Anthropic", this.model(route));
+    if (!response.body) throw unavailable(response.status);
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let frames = "";
@@ -639,7 +643,8 @@ export class AnthropicMessagesModel implements AgentModel {
         signal,
         CALL_TIMEOUT_MS,
       );
-      if (!response.ok) throw unavailable(response.status);
+      if (!response.ok)
+        throw providerRefused(response.status, "Anthropic", this.model(route));
       const text = await response.text();
       if (text.length > MAX_BODY_CHARS)
         throw new DomainError(

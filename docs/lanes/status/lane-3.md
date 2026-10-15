@@ -1,9 +1,9 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-15, by the lane 3 session
-Working on: A6 (reliability). A6b, an interrupted reply's unknown cost counts as its whole hold: branch `lane-3/a6-interrupted-cost` (stacked on A3; needs a migration registration)
-Done: A1 #411 (open). A3 #426 (open, stacked on #411). A6b (open, stacked on #426)
-Next: A6a (a provider error before any body is a known zero cost), then the rest of A6 (findings 8 to 11), then B2, A2, B9
+Working on: A6 (reliability): A6a, a provider error before any body is a known zero cost, branch `lane-3/a6-provider-errors` (stacked on A3); A6b, an interrupted reply's unknown cost counts as its whole hold, #433 (needs a migration registration)
+Done: A1 #411, A3 #426, A6b #433, A6a (all open)
+Next: the rest of A6 (stuck answers after a claim, crash recovery with lane 4, the acknowledgment-time unknown cost, hold sizing), then B2, A2, B9
 Blocked on: nothing. Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
 
 ## How to measure
@@ -57,6 +57,8 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
   is recorded as an estimate, and the creator is unlocked. Implemented by A6b
   (`pending_w2_interrupted_cost_estimate.sql`, which replaces only the budget lines of
   `creator.generation_begin_agent_attempt`).
+- 2026-10-15, founder: a reply that fails on a provider error before any output releases the fan's
+  allowance (nothing ran). A6a (#434) records that error as a known zero cost.
 
 ## Findings (lane 3 unless noted)
 
@@ -103,6 +105,7 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
 | E3A.6 ★              | Distressed message gets the safe response first: pass. Hard-block half not run (needs the real model)                                                                                       | `e3a6-safety.mjs`                                                                                                                  |
 | A3 drift             | Pass on main and A3                                                                                                                                                                         | `a3-drift.mjs`                                                                                                                     |
 | A6b interrupted cost | Before the migration: locked after one interruption (6 of 12 steps fail). With it: 12 of 12 pass, and a crash during the model call also unlocks once the hold lapses                       | `a6-interrupted-cost.mjs`; `e3a5-restart.mjs --at guard --after-lapse` (both with the migration applied, see the A6b pull request) |
+| A6a provider errors  | Before: one 429 locks the creator; an error during the acknowledgment leaves an unknown cost. After: 7 of 7 pass, every failed call records 0 and the next reply is delivered               | `a6-provider-errors.mjs`                                                                                                           |
 | E3B.1 to E3B.7       | Not run yet                                                                                                                                                                                 |                                                                                                                                    |
 
 Model gateway spend for lane 3 so far: none (every run used the local fake).
@@ -115,4 +118,5 @@ Model gateway spend for lane 3 so far: none (every run used the local fake).
 | Lane 4     | `modules/commerce/generation-audience.ts` (`assertCatalog`), `modules/commerce/generation-safety-terminal-catalogue.ts` | Wrap each check in `verifyInHeldTransaction(client, <its frozen custody object>, () => check)` from `modules/identity/generation-held-verification.ts` (after A3 merges)                                                                                                                         | 68 audience runs per answer; the safety terminal catalogue is about 1 s of the longest remaining transaction |
 | Lane 4     | `creator.generation_settle_typed_original_allowance` (W4 safety terminal settlement SQL)                                | Settle an interrupted answer that has stored output but no complete typed provenance, with lane 3 in A6                                                                                                                                                                                          | Finding 9: a crash mid-answer is never recovered                                                             |
 | Integrator | `infra/migrations.json`, `infra/migrations/reviews/*`                                                                   | Register `pending_w2_interrupted_cost_estimate.sql`. Its receipt for `creator.generation_begin_agent_attempt` cites the new migration, definition checksum `47688d2d…4012`; regenerate the runtime catalogue pins it changes (the active financial pin becomes `4145eb37…eb63` on a fresh stack) | Founder decision on interrupted costs (A6b)                                                                  |
+| Integrator | `tests/scenarios/integrator/anthropic-adapter.mts` (case A6)                                                            | Expect a `ProviderResponseError` with a known zero usage for a non-2xx answer before any body (code, upstream status and the no-secret check are unchanged)                                                                                                                                      | A6a makes that error a known zero cost, as the brief decided; this case pinned the old behavior              |
 | Lane 1     | `modules/trust/restoration.ts` (`assertGenerationWorkerRestoredInTransaction`)                                          | The same wrapper, if W8 agrees its restoration facts cannot change inside one transaction                                                                                                                                                                                                        | 41 runs per answer                                                                                           |
