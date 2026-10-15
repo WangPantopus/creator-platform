@@ -108,6 +108,16 @@ export async function assertGenerationPrivacyTaskCatalogForReview(
   return assertPrivacyExtensionForReview(client, "generation", signal);
 }
 
+/** Fixed101 operator metadata after the Content wave and before the output
+ * repair. No task authority or caller-provided checksums; runtime retains its
+ * complete registered graph. */
+export async function assertContentPrivacyTaskCatalogForReview(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  return assertPrivacyExtensionForReview(client, "content", signal);
+}
+
 /** Fixed102 operator metadata before public-AI DDL. No task authority or
  * caller-provided checksums; runtime retains its complete registered graph. */
 export async function assertOutputPrivacyTaskCatalogForReview(
@@ -139,14 +149,15 @@ export async function assertComparisonPrivacyTaskCatalogForReview(
 
 async function assertPrivacyExtensionForReview(
   client: PoolClient,
-  profile: "generation" | "output" | "public" | "comparison",
+  profile: "generation" | "content" | "output" | "public" | "comparison",
   signal?: AbortSignal,
 ) {
   for (const source of generationReview.sources)
     await assertRegisteredMigration(client, source, signal);
   if (profile !== "generation") {
     await assertRegisteredMigration(client, contentReview.source, signal);
-    await assertRegisteredMigration(client, outputReview.source, signal);
+    if (profile !== "content")
+      await assertRegisteredMigration(client, outputReview.source, signal);
     if (profile === "public" || profile === "comparison") {
       for (const source of publicAIReview.sources)
         await assertRegisteredMigration(client, source, signal);
@@ -169,7 +180,9 @@ async function assertPrivacyExtensionForReview(
           ? publicAIReview.runtimeCatalogues.detached
           : profile === "output"
             ? outputReview.runtimeCatalogues.detached
-            : accountDetachedUsageExpectedCatalogue) ||
+            : profile === "content"
+              ? contentReview.runtimeCatalogues.detached
+              : accountDetachedUsageExpectedCatalogue) ||
     contentHash(await accountingBoundaryCatalogue(client, signal)) !==
       (profile === "comparison"
         ? comparisonReview.runtimeCatalogues.boundary
@@ -177,7 +190,9 @@ async function assertPrivacyExtensionForReview(
           ? publicAIReview.runtimeCatalogues.boundary
           : profile === "output"
             ? outputReview.runtimeCatalogues.boundary
-            : accountingBoundaryExpectedCatalogue)
+            : profile === "content"
+              ? contentReview.runtimeCatalogues.boundary
+              : accountingBoundaryExpectedCatalogue)
   )
     throw new DomainError(
       "privacy_commit_fence_unavailable",

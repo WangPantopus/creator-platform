@@ -705,6 +705,17 @@
         }
       }
     },
+    "For members whose tier includes requests": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "For members whose tier includes requests"
+          }
+        }
+      }
+    },
     "Opening this conversation is logged and visible to the fan.": {
       "extractionState": "manual",
       "localizations": {
@@ -866,6 +877,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Set a monthly limit. You can change it any time; raising it takes 24 hours."
+          }
+        }
+      }
+    },
+    "This month · {spent} of your {limit} limit": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This month · {spent} of your {limit} limit"
           }
         }
       }
@@ -1383,6 +1405,94 @@
           "stringUnit": {
             "state": "translated",
             "value": "This app is available to adults aged 18 and over."
+          }
+        }
+      }
+    },
+    "Continue with Apple": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue with Apple"
+          }
+        }
+      }
+    },
+    "Continue with Google": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue with Google"
+          }
+        }
+      }
+    },
+    "Your date of birth": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your date of birth"
+          }
+        }
+      }
+    },
+    "We keep only whether you can use the app, never the date.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We keep only whether you can use the app, never the date."
+          }
+        }
+      }
+    },
+    "Continue": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue"
+          }
+        }
+      }
+    },
+    "This sign-in could not be completed. Start again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This sign-in could not be completed. Start again."
+          }
+        }
+      }
+    },
+    "Sign-in is unavailable right now. Try again in a moment.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign-in is unavailable right now. Try again in a moment."
+          }
+        }
+      }
+    },
+    "Too many sign-in attempts. Wait a minute and try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Too many sign-in attempts. Wait a minute and try again."
           }
         }
       }

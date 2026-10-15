@@ -112,8 +112,10 @@ const summary =
     .find((line) => /pin groups match/u.test(line)) ?? "";
 step(
   "the pinned catalogues match this database",
-  growth ? /43 of 45/u.test(summary) : pins.status === 0,
-  growth ? `${summary} (the Growth login's two known differences)` : summary,
+  growth ? /4[34] of 45/u.test(summary) : pins.status === 0,
+  growth
+    ? `${summary} (with the Growth login: the known runtimeCatalogues.family difference, plus purposeProfiles for a login not named creator_review_growth_api)`
+    : summary,
 );
 const ledger = sql(
   "SELECT count(*)||' '||string_agg(version,',' ORDER BY version) FILTER (WHERE version>='0247') FROM creator.schema_migration",

@@ -598,6 +598,7 @@ async function activate() {
         ),
         canonicalBeforeGeneration: generationInstalled === 0,
         generationBeforeContent: generationInstalled > 0 && !contentInstalled,
+        contentBeforeOutput: Boolean(contentInstalled && !outputInstalled),
         outputBeforePublic: Boolean(outputInstalled && !installedPublic),
         publicBeforeComparison: Boolean(
           installedPublic && !installedComparison,
@@ -724,6 +725,7 @@ async function activate() {
           domain: true,
           canonicalBeforeGeneration: !generation,
           generationBeforeContent: generation && !content,
+          contentBeforeOutput: content && !output,
           outputBeforePublic: output && !publicAI,
           publicBeforeComparison: publicAI && !comparison,
           comparisonBeforeNotices: comparison && !notices,

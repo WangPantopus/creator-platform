@@ -146,10 +146,17 @@ async function open(options: Options) {
   try {
     const where = new URL(options.databaseUrl!);
     const name = where.pathname.slice(1);
+    // The "incoming" variants describe a Growth API login that is a member of
+    // the core runtime role, whatever its name (the stack's is
+    // creator_review_growth_api, the name those variants were reviewed with).
     const facts: DatabaseFacts = {
       growthApi:
-        (await pool.query("SELECT 1 FROM pg_roles WHERE rolname='growth_api'"))
-          .rowCount === 1,
+        (
+          await pool.query(
+            `SELECT 1 FROM pg_auth_members m JOIN pg_roles r ON r.oid=m.member
+             WHERE m.roleid='creator_runtime'::regrole AND r.rolcanlogin LIMIT 1`,
+          )
+        ).rowCount === 1,
     };
     const ledger = Number(
       (

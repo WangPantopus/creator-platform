@@ -376,6 +376,7 @@ export class TrustWorker {
         "generation_settlement_clock_unavailable",
         "identity_retention_unconfigured",
         "identity_scope_adapter_required",
+        "growth_scope_adapter_required",
         "content_retention_unconfigured",
         "content_privacy_purpose_unconfigured",
         "media_retention_unconfigured",
@@ -392,6 +393,7 @@ export class TrustWorker {
           [
             ...unavailable,
             "comparison_artifact_purge_pending",
+            "identity_erasure_waiting",
             "hook_timeout",
             "privacy_family_cancel_unavailable",
             "privacy_family_rollback_unavailable",
@@ -419,6 +421,8 @@ export class TrustWorker {
           : "domain_hook_error";
       const accounting = accountingPrivacyFailure(code);
       const artifactPending = code === "comparison_artifact_purge_pending";
+      // Identity erases last: it waits for every other domain, never dead-letters.
+      const identityWaiting = code === "identity_erasure_waiting";
       const blocked =
         unavailable.includes(code) && !retryableAuthorityFailure(error);
       const saved = await trustTransaction(this.pool, (client) =>
@@ -431,12 +435,16 @@ export class TrustWorker {
             accounting?.state ??
               (blocked
                 ? "blocked"
-                : task.attempts >= 8 && !artifactPending
+                : task.attempts >= 8 && !artifactPending && !identityWaiting
                   ? "dead_letter"
                   : "retry"),
             code,
             accounting?.retrySeconds ??
-              (artifactPending ? 30 : Math.min(3600, 2 ** task.attempts * 5)),
+              (artifactPending
+                ? 30
+                : identityWaiting
+                  ? 60
+                  : Math.min(3600, 2 ** task.attempts * 5)),
           ],
         ),
       );

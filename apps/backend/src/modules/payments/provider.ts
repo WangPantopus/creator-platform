@@ -334,10 +334,18 @@ export function verifyStripeWebhook(
     );
   }
   const objectReference = z
-    .object({ id: z.string().min(1).max(200).optional() })
+    .object({
+      id: z.string().min(1).max(200).optional(),
+      payment_intent: z.string().min(1).max(200).nullish(),
+    })
     .safeParse(event.data?.object);
+  // A charge's notification concerns its payment: the payment is what this
+  // system records and reconciles, so it is the reference kept.
   const ref = objectReference.success
-    ? (objectReference.data.id ??
+    ? ((event.type.startsWith("charge.")
+        ? objectReference.data.payment_intent
+        : undefined) ??
+      objectReference.data.id ??
       (event.type === "balance.available"
         ? (event.account ?? "platform")
         : undefined))
