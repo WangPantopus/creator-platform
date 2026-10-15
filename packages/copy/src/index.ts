@@ -1069,7 +1069,17 @@ export const copy = {
   "growthImpactPeopleHelped": "You helped {people} people this week.",
   "growthImpactThankYou": "A THANK-YOU, SHARED WITH PERMISSION",
   "growthImpactWeekCounts": "Counts are for this week only. Fans are never named here without their consent.",
-  "growthImpactNotAvailable": "No weekly digest is available yet."
+  "growthImpactNotAvailable": "No weekly digest is available yet.",
+  "creatorAiFaqTitle": "QUESTIONS FANS ASK YOU",
+  "creatorAiFaqIntro": "Write the questions your fans ask, with the answer you expect. Before a new version replaces the live one, it must answer at least {percent}% of them the way you expect.",
+  "creatorAiFaqQuestion": "Question",
+  "creatorAiFaqAnswer": "The answer you expect",
+  "creatorAiFaqAdd": "Add a question",
+  "creatorAiFaqRemove": "Remove question {number}",
+  "creatorAiFaqCount": "{count} of {max} questions",
+  "creatorAiFaqMinimum": "Write at least {min} to replace the live version.",
+  "creatorAiFaqDuplicate": "This question is already on the list.",
+  "creatorAiFaqEmpty": "No questions yet."
 } as const;
 export type CopyKey = keyof typeof copy;
 type Placeholders<T extends string> = T extends `${string}{${infer Key}}${infer Rest}` ? Key | Placeholders<Rest> : never;

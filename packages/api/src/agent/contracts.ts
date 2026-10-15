@@ -26,6 +26,11 @@ export const FaqItem = z.strictObject({
 });
 export type FaqItem = z.infer<typeof FaqItem>;
 export const FAQ_MAX_QUESTIONS = 50;
+/** Proposed default (pending the founder): replacing a live version needs at
+ * least this many creator-written questions, at least this share answered as
+ * the creator expects. Boundary and regression cases must all pass. */
+export const FAQ_MIN_QUESTIONS = 5;
+export const FAQ_PASS_RATE = 0.8;
 export const DraftConfig = z.strictObject({
   mode: Mode.default("expert"),
   tone: z.enum(["Plainer", "As written", "Warmer"]).default("As written"),

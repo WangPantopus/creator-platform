@@ -30,8 +30,12 @@ import type {
 import {
   DEVELOPMENT_LICENSE_TERMS,
   DraftConfig as ConfigurationSchema,
+  FAQ_MIN_QUESTIONS,
+  FAQ_PASS_RATE,
   developmentProofReference,
 } from "../../../../packages/api/src/agent/contracts";
+import { copy } from "@qelvora/copy";
+import { FaqEditor } from "./FaqEditor";
 import "./creator-ai.css";
 
 type ErrorBody = { error?: { code: string; message: string } };
@@ -963,6 +967,15 @@ export function CreatorAI({
           ...configuration,
           rules: configuration.rules.filter((s) => s.trim()),
           neverReveal: configuration.neverReveal.filter((s) => s.trim()),
+          // Unstarted rows are dropped; a half-written one is kept so the
+          // server's validation explains what is missing.
+          ...(configuration.faq
+            ? {
+                faq: configuration.faq.filter(
+                  (item) => item.question.trim() || item.answer.trim(),
+                ),
+              }
+            : {}),
         },
       },
       "PUT",
@@ -2084,6 +2097,16 @@ export function CreatorAI({
                       The fan always sees the AI label. Criteria measure
                       usefulness and style.
                     </p>
+                  </Panel>
+                  <Panel title={copy.creatorAiFaqTitle}>
+                    <FaqEditor
+                      value={configuration.faq ?? []}
+                      onChange={(faq) => edit({ ...configuration, faq })}
+                      disabled={controlsDisabled}
+                      minimum={FAQ_MIN_QUESTIONS}
+                      percent={Math.round(FAQ_PASS_RATE * 100)}
+                      live={Boolean(state.liveVersionId)}
+                    />
                   </Panel>
                 </div>
                 <div className="w2-actions">

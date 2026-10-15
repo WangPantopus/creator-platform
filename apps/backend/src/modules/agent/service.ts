@@ -9,6 +9,8 @@ import {
   CorrectionRequest,
   DraftWrite,
   EvaluationRequest,
+  FAQ_MIN_QUESTIONS,
+  FAQ_PASS_RATE,
   InterviewWrite,
   LicenseRequest,
   PreviewRequest,
@@ -114,11 +116,6 @@ type EvaluationSnapshot = {
   creatorName: string;
   fingerprint: string;
 };
-/** Proposed default (pending the founder): replacing a live version needs at
- * least five creator-written questions, and at least 80% of them answered as
- * the creator expects. Boundary and regression cases must all pass. */
-export const FAQ_MIN_QUESTIONS = 5;
-export const FAQ_PASS_RATE = 0.8;
 function evaluationPasses(cases: readonly EvaluationCase[]) {
   const faq = cases.filter((c) => c.kind === "faq");
   return (
