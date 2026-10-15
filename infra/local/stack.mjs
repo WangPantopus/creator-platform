@@ -75,6 +75,7 @@ function parse(argv) {
     else if (arg === "--provider") options.provider = value();
     else if (arg === "--model-gateway") options.modelGateway = value();
     else if (arg === "--growth") options.growth = true;
+    else if (arg === "--db-only") options.dbOnly = true;
     else if (arg === "--no-web") options.noWeb = true;
     else if (arg === "--no-ai") options.noAi = true;
     else if (arg === "--no-smoke") options.noSmoke = true;
@@ -1035,6 +1036,8 @@ async function up(plan, options) {
     await preflightPorts(plan, options);
     await ensureContainer(plan);
     await bootstrapDatabase(plan, secrets, options);
+    // Just the database, roles and seed: for work that brings its own host.
+    if (options.dbOnly) return;
     plan.webExtra = options.webEnv;
     const hash = await writeBackendConfig(plan, secrets, options);
     const backendRecord = owned.backend;
@@ -1083,6 +1086,15 @@ async function up(plan, options) {
       );
   });
   say();
+  if (options.dbOnly) {
+    say(
+      `READY  ${plan.name} database only  (${Math.round((Date.now() - began) / 1000)} s)`,
+    );
+    say(
+      `  database  postgresql://postgres:${TEST_PASSWORD}@127.0.0.1:${plan.ports.postgres}/${plan.database}`,
+    );
+    return;
+  }
   say(`READY  ${plan.name}  (${Math.round((Date.now() - began) / 1000)} s)`);
   await printAddresses(plan, options);
   if (!options.noSmoke) {
@@ -1363,7 +1375,7 @@ const help = `Usage: node infra/local/stack.mjs <up|status|smoke|env|logs|stop|d
   --model-gateway URL   with --provider anthropic: send Claude calls to the capped gateway (real model)
   --lane N        lane number (ports 564N0-564N9) or a label such as 3a with --base-port
   --base-port P   first of ten ports (default 56400 + N*10)
-  up options      --growth  --no-web  --no-ai  --no-smoke  --ack-only  --require-reply  --env KEY=VALUE  --web-env KEY=VALUE
+  up options      --db-only  --growth  --no-web  --no-ai  --no-smoke  --ack-only  --require-reply  --env KEY=VALUE  --web-env KEY=VALUE
   down options    --keep-data
   logs            logs backend|web|model [-n 80]`;
 
