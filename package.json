@@ -11,6 +11,7 @@
     "generate:check": "pnpm --filter @qelvora/api generate --check && node scripts/generate-shared.mjs --check && node scripts/generate-native-api.mjs --check",
     "brand:rename": "node scripts/rename-brand.mjs",
     "dev": "turbo run dev",
+    "stack": "node infra/local/stack.mjs",
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
     "lint": "eslint apps/backend packages apps/web scripts tests playwright.config.ts --ignore-pattern '**/generated/**'",

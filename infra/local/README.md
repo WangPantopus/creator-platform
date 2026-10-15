@@ -8,8 +8,8 @@ production setting.
 node infra/local/stack.mjs up --lane 2
 ```
 
-(Lane N uses `--lane N`. A second stack, or a label such as `3a`, needs
-`--base-port`.) `up` is safe to repeat. It ends by running the smoke check:
+(`pnpm stack up --lane 2` is the same. Lane N uses `--lane N`. A second stack, or a
+label such as `3a`, needs `--base-port`.) `up` is safe to repeat. It ends by running the smoke check:
 a fan signs in, opens a conversation with the fictional creator Maya, sends a
 message and must see the acknowledgment (and be refused as a signed-out visitor or another
 fan); then the AI's first sentence should arrive. That last part only warns, because it
