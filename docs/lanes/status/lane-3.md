@@ -3,7 +3,7 @@
 Updated: 2026-10-15, by the lane 3 session
 Working on: A6 (reliability). A6b, an interrupted reply's unknown cost counts as its whole hold: branch `lane-3/a6-interrupted-cost` (stacked on A3; needs a migration registration)
 Done: A1 #411 (open). A3 #426 (open, stacked on #411). A6b (open, stacked on #426)
-Next: A6a (a provider error before any body is a known zero cost), then the rest of A6 (findings 8 to 10 and 12), then B2, A2, B9
+Next: A6a (a provider error before any body is a known zero cost), then the rest of A6 (findings 8 to 11), then B2, A2, B9
 Blocked on: nothing. Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
 
 ## How to measure
