@@ -8,6 +8,7 @@ import { generationPrivacyCatalogueChecksum } from "../../db/content-privacy-pro
 import type { GenerationTerminalPurposeConsumer } from "./generation-scope.js";
 import { requestAuthority } from "./request-authority.js";
 import { assertGenerationTerminalPageCatalogue } from "./generation-terminal-page.js";
+import { verifyInHeldTransaction } from "./generation-held-verification.js";
 
 export const generationTerminalDiscoverySource = Object.freeze({
   owner: "W1",
@@ -80,6 +81,11 @@ export async function assertGenerationTerminalDiscoveryCatalogue(
     !generationTerminalDiscoveryCatalogueChecksum
   )
     unavailable();
+  // Once when first used in a held transaction and again before its COMMIT.
+  await verifyInHeldTransaction(client, assertGenerationTerminalDiscoveryCatalogue, () => verifyTerminalDiscoveryCatalogue(client));
+}
+
+async function verifyTerminalDiscoveryCatalogue(client: PoolClient): Promise<void> {
   try {
     if (!(await generationPrivacySourcesRegistered())) unavailable();
     await assertRegisteredMigration(client, generationTerminalDiscoverySource);

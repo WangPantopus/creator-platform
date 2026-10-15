@@ -7,6 +7,7 @@ import { generationPrivacySourcesRegistered } from "../../db/generation-privacy-
 import { generationPrivacyCatalogueChecksum } from "../../db/content-privacy-profile.js";
 import { assertGenerationOutputRepairIfRegistered } from "../../db/generation-output-profile.js";
 import { requestAuthority } from "./request-authority.js";
+import { verifyInHeldTransaction } from "./generation-held-verification.js";
 
 export const generationOutputCursorSignature =
   "creator.generation_output_cursor_view(uuid,uuid,integer,integer)";
@@ -78,6 +79,11 @@ export async function assertGenerationOutputCursorCatalogue(
 ) {
   if (requestAuthority.getStore() || !generationOutputCursorCatalogueChecksum)
     unavailable();
+  // Once when first used in a held transaction and again before its COMMIT.
+  await verifyInHeldTransaction(client, assertGenerationOutputCursorCatalogue, () => verifyOutputCursorCatalogue(client));
+}
+
+async function verifyOutputCursorCatalogue(client: PoolClient): Promise<void> {
   try {
     if (!(await generationPrivacySourcesRegistered())) unavailable();
     await assertRegisteredMigration(client, generationOutputCursorSource);
