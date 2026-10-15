@@ -12,7 +12,13 @@
 // migration that adds a relation changes them in exactly the same way.
 import { execFileSync, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import {
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -28,7 +34,20 @@ import {
 
 const { step, advise, finish } = reporter();
 const repo = join(dirname(fileURLToPath(import.meta.url)), "../../..");
-const REVIEW = "infra/migrations/reviews/20261008-comparison.json";
+// The head review: the newest file with pinned runtime catalogues, the one the
+// pin tool reads and rewrites (20261015-notices since #412 registered that wave).
+const REVIEW = `infra/migrations/reviews/${readdirSync(
+  join(repo, "infra/migrations/reviews"),
+)
+  .filter((name) => name.endsWith(".json"))
+  .sort()
+  .reverse()
+  .find((name) => {
+    const review = JSON.parse(
+      readFileSync(join(repo, "infra/migrations/reviews", name), "utf8"),
+    );
+    return review.runtimeCatalogues && review.sources;
+  })}`;
 const reviewPath = join(repo, REVIEW);
 const BASE = "http://127.0.0.1:56421";
 const DATABASE =
