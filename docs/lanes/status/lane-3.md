@@ -1,9 +1,9 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-15, by the lane 3 session
-Working on: A6 (reliability): A6b #433 (interrupted cost, migration), A6a #434 (provider error is zero cost), A6c `lane-3/a6-ack-disconnect` (a dropped request no longer locks the creator)
-Done: A1 #411, A3 #426, A6b #433, A6a #434, A6c (all open)
-Next: hold sizing (waits on the founder's choice), then B2, A2, B9. Findings 8 and 9 need migrations (W1 lease release; crash recovery with lane 4), proposed for the next migration wave
+Working on: A6 (reliability): open #433 (A6b), #434 (A6a), #436 (A6c) and hold sizing on `lane-3/a6-hold-sizing`
+Done: A1 #411, A3 #426, A6b #433, A6a #434, A6c #436, A6 hold sizing (all open)
+Next: B2 (FAQ publish check), A2, B9. Findings 8 and 9 need migrations (W1 lease release; crash recovery with lane 4), proposed for the next migration wave
 Blocked on: nothing. Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
 
 ## How to measure
@@ -53,6 +53,9 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
 
 ## Decisions
 
+- 2026-10-15, founder: a reply's cost hold is a strict upper bound computed from what this pipeline can
+  send for the creator's configuration (calls actually made, each at its own model's rate); the cap is
+  never exceeded. Implemented on `lane-3/a6-hold-sizing`.
 - 2026-10-15, founder: a reply that fails on a provider error before any output releases the fan's
   allowance (nothing ran). A6a (#434) records that error as a known zero cost.
 
@@ -61,7 +64,7 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
 1. Every generation transaction runs within about 0.5 s of the fixed 5-second scope window
    (`generation_scope_matches`); past it the reply fails (`generation_scope_changed` or
    `generation_authority_unavailable`) and the fan sees "interrupted", sometimes after one sentence. A3.
-2. With `--provider anthropic` no reply is ever admitted on a stack seeded with a $5 daily cap: the
+2. (Fixed by A6 hold sizing.) With `--provider anthropic` no reply is ever admitted on a stack seeded with a $5 daily cap: the
    Claude adapter's run ceiling is 5.24 M micros (`anthropic-model.ts` `maximumRunCostMicros`:
    22 admissions at the highest rate plus 21 x 4,000 output tokens), larger than the cap. A6.
 3. One failed reply leaves a provider-cost row with no cost, and `generation_begin_agent_attempt`
@@ -101,25 +104,25 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
 
 ## Scenarios
 
-| ID                  | State                                                                                                                                                                                       | Re-run                                            |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| E3A.1 measurement   | Main and A3 recorded above, 2026-10-15                                                                                                                                                      | `a1-measure.mjs` as above                         |
-| E3A.2 ★             | Pass on A3: identical visible text, authorship, citations and order for every answer main also delivered                                                                                    | `a1-measure.mjs --compare`                        |
-| E3A.4 ★             | A3: no AI sentence after any change in 27 runs (7 kinds of change, up to 4 timings). Takeover within 500 ms fails at some timings (finding 10, also on main). Deletion not run (finding 11) | `e3a4-authority.mjs`, one case per fresh stack    |
-| E3A.5 ★             | A3: kill after admission passes; kill during the guard call leaves an uncertain cost (finding 7); kill after the first sentence never finishes (finding 9). Same on main                    | `e3a5-restart.mjs --at admitted\|guard\|sentence` |
-| E3A.6 ★             | Distressed message gets the safe response first: pass. Hard-block half not run (needs the real model)                                                                                       | `e3a6-safety.mjs`                                 |
-| A3 drift            | Pass on main and A3                                                                                                                                                                         | `a3-drift.mjs`                                    |
-| A6c dropped request | Before: a fan dropping the request during the safety check, or a timed-out check, locks the creator (4 of 7 fail). After: 7 of 7                                                            | `a6-ack-disconnect.mjs`                           |
-| A6a provider errors | Before: one 429 locks the creator; an error during the acknowledgment leaves an unknown cost. After: 7 of 7 pass, every failed call records 0 and the next reply is delivered               | `a6-provider-errors.mjs`                          |
-| E3B.1 to E3B.7      | Not run yet                                                                                                                                                                                 |                                                   |
+| ID                  | State                                                                                                                                                                                                            | Re-run                                            |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| E3A.1 measurement   | Main and A3 recorded above, 2026-10-15                                                                                                                                                                           | `a1-measure.mjs` as above                         |
+| E3A.2 ★             | Pass on A3: identical visible text, authorship, citations and order for every answer main also delivered                                                                                                         | `a1-measure.mjs --compare`                        |
+| E3A.4 ★             | A3: no AI sentence after any change in 27 runs (7 kinds of change, up to 4 timings). Takeover within 500 ms fails at some timings (finding 10, also on main). Deletion not run (finding 11)                      | `e3a4-authority.mjs`, one case per fresh stack    |
+| E3A.5 ★             | A3: kill after admission passes; kill during the guard call leaves an uncertain cost (finding 7); kill after the first sentence never finishes (finding 9). Same on main                                         | `e3a5-restart.mjs --at admitted\|guard\|sentence` |
+| E3A.6 ★             | Distressed message gets the safe response first: pass. Hard-block half not run (needs the real model)                                                                                                            | `e3a6-safety.mjs`                                 |
+| A3 drift            | Pass on main and A3                                                                                                                                                                                              | `a3-drift.mjs`                                    |
+| A6 hold bound       | Before: a $5 cap admits no Claude reply. After: hold $2.62 (Sonnet as small model) or $0.20 (Haiku); 15 of 15 replies delivered, spend at most 2.3% of the hold; one real reply cost $0.018 against a $2.62 hold | `a6-hold-bound.mjs`                               |
+| A6c dropped request | Before: a fan dropping the request during the safety check, or a timed-out check, locks the creator (4 of 7 fail). After: 7 of 7                                                                                 | `a6-ack-disconnect.mjs`                           |
+| A6a provider errors | Before: one 429 locks the creator; an error during the acknowledgment leaves an unknown cost. After: 7 of 7 pass, every failed call records 0 and the next reply is delivered                                    | `a6-provider-errors.mjs`                          |
+| E3B.1 to E3B.7      | Not run yet                                                                                                                                                                                                      |                                                   |
 
-Model gateway spend for lane 3 so far: none (every run used the local fake).
+Model gateway spend for lane 3 so far: 6 calls, 19,010 micros (one real reply to check the hold bound, 2026-10-15).
 
 ## Tickets to other lanes
 
 | To         | File                                                                                                                    | Change                                                                                                                                                                   | Why                                                                                                          |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| Lane 2     | `tests/scenarios/lane-2/seed-maya.mjs`                                                                                  | Seed a daily cap above the Claude run ceiling (for example 20,000,000) until A6 resizes the hold                                                                         | Finding 2: a `--provider anthropic` stack can never deliver a reply                                          |
 | Lane 4     | `modules/commerce/generation-audience.ts` (`assertCatalog`), `modules/commerce/generation-safety-terminal-catalogue.ts` | Wrap each check in `verifyInHeldTransaction(client, <its frozen custody object>, () => check)` from `modules/identity/generation-held-verification.ts` (after A3 merges) | 68 audience runs per answer; the safety terminal catalogue is about 1 s of the longest remaining transaction |
 | Lane 4     | `creator.generation_settle_typed_original_allowance` (W4 safety terminal settlement SQL)                                | Settle an interrupted answer that has stored output but no complete typed provenance, with lane 3 in A6                                                                  | Finding 9: a crash mid-answer is never recovered                                                             |
 | Integrator | `tests/scenarios/integrator/anthropic-adapter.mts` (case A6)                                                            | Expect a `ProviderResponseError` with a known zero usage for a non-2xx answer before any body (code, upstream status and the no-secret check are unchanged)              | A6a makes that error a known zero cost, as the brief decided; this case pinned the old behavior              |
