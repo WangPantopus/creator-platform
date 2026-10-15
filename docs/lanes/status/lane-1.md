@@ -17,6 +17,9 @@ Done (open, not merged):
   the wording on 2026-10-15.
 - WP 1.5, signing fixes: the shared signing panel recovers when a publication is refused; decisions
   on recovery and Android 8 and 9 in `lane-1-signing.md`: #437 (`lane-1/signing-fix`, on main).
+- WP 1.5, a lost passkey retires and past signatures stay valid; a compromised one revokes (founder,
+  2026-10-15); the second-passkey prompt: #439 (`lane-1/passkey-retirement`, stacked on #437).
+  Pending migration `pending-passkey-retirement.sql`; register with the pull request.
 - WP 1.7 (lane 1 part), identity and media finish a fan's deletion, plus the findings for every
   other domain: #409 (`lane-1/deletion-completeness`). E1.8 still fails on lanes 3, 4 and 5.
 
@@ -27,9 +30,8 @@ Blocked on:
 
 - Counsel's confirmation of the 18+ method, and the policy page for younger people (WP 1.9) that
   the adults-only page should link to.
-- The founder's signing decisions in `lane-1-signing.md` (#437): what recovery does to past
-  signatures (proposed: split lost from compromised) with the second-passkey wording, and Android 8
-  and 9 (proposed: fans stay on 8, creators sign on 9 or later).
+- The founder's approval of the recovery-choice wording (#439, five keys listed in
+  `lane-1-signing.md`).
 - The founder's deletion decisions D1 to D4 ([deletion findings, section 4](lane-1-deletion.md)
   on #409): creator signature retention, sign-in after deletion, how long the redacted fan record
   is kept, and Q16.
@@ -53,6 +55,8 @@ Scenarios:
 - WP 1.5 (#437), 2026-10-15: the stuck Note reproduced and recovered with lane 6's patch; the
   signing panel's refused-publication case fixed and its lost-answer case unchanged (scripts
   `e1-5-pending-publication.mjs`, `e1-5-refused-publish.mjs`).
+- Key loss (#439), 2026-10-15: `e1-5-key-loss.mjs` 15 of 15 (lost retires, past Notes valid, a
+  retired key refused, fresh proof, compromised revokes), twice.
 - E1.5 signing a Note end to end with a Qelvora creator, E1.6, E1.7, E1.9 to E1.11: not run yet.
 
 Tickets to other lanes:
@@ -67,6 +71,7 @@ Tickets to other lanes:
   in `server.ts`); a trusted-proxy setting so the start limit sees the client's address (#431).
 - Lane 3, the development provider policy: Qelvora accounts get `providers_unconfigured`; staging
   and the exit demo need a verified policy or an allowance for fake-provider accounts (#431).
+- Integrator: register `pending-passkey-retirement.sql` with #439 (T-34 needs the column).
 - Lane 6, `features/studio/notes/Compose.tsx`: clear the pending publication when a retry is refused
   with `signed_act_required` (verified patch in `lane-1-signing.md`, #437).
 - Integrator, `config/navigation.json`: exempt `studio/setup` from the fan-handle step (#432).
