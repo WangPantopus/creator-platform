@@ -1,9 +1,9 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-15, by the lane 3 session
-Working on: A6 (reliability): A6b #433 (interrupted cost, migration), A6a #434 (provider error is zero cost), A6c `lane-3/a6-ack-disconnect` (a dropped request no longer locks the creator)
-Done: A1 #411, A3 #426, A6b #433, A6a #434, A6c (all open)
-Next: hold sizing (waits on the founder's choice), then B2, A2, B9. Findings 8 and 9 need migrations (W1 lease release; crash recovery with lane 4), proposed for the next migration wave
+Working on: A2 (wake on accept). B2 is open as #441, its defaults approved by the founder 2026-10-15
+Done: merged A1 #411, A3 #426, A6a #434. Open: A6b #433, A6c #436, A6 hold sizing #438, B2 #441
+Next: B9. Findings 8 and 9 need migrations (W1 lease release; crash recovery with lane 4), proposed for the next migration wave
 Blocked on: nothing. Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
 
 ## How to measure
@@ -53,6 +53,9 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
 
 ## Decisions
 
+- 2026-10-15, founder: a reply's cost hold is a strict upper bound computed from what this pipeline can
+  send for the creator's configuration (calls actually made, each at its own model's rate); the cap is
+  never exceeded. Implemented on `lane-3/a6-hold-sizing`.
 - 2026-10-15, founder: a reply that fails on a provider error before any output releases the fan's
   allowance (nothing ran). A6a (#434) records that error as a known zero cost.
 
@@ -61,7 +64,7 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
 1. Every generation transaction runs within about 0.5 s of the fixed 5-second scope window
    (`generation_scope_matches`); past it the reply fails (`generation_scope_changed` or
    `generation_authority_unavailable`) and the fan sees "interrupted", sometimes after one sentence. A3.
-2. With `--provider anthropic` no reply is ever admitted on a stack seeded with a $5 daily cap: the
+2. (Fixed by A6 hold sizing.) With `--provider anthropic` no reply is ever admitted on a stack seeded with a $5 daily cap: the
    Claude adapter's run ceiling is 5.24 M micros (`anthropic-model.ts` `maximumRunCostMicros`:
    22 admissions at the highest rate plus 21 x 4,000 output tokens), larger than the cap. A6.
 3. One failed reply leaves a provider-cost row with no cost, and `generation_begin_agent_attempt`
@@ -98,28 +101,63 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
 12. Any fan could lock a creator's AI: dropping the connection during the acknowledgment's safety check
     cancelled the provider call, and its unknown cost (no hold) refused every later reply for every fan.
     A6c fixes it: the check runs to its deadline, and a timed-out check records its own upper bound.
+13. With the real model, the FAQ "Am I talking to Maya or to her AI?" fails although the AI's first
+    sentence is right ("You're talking to Maya's AI, not Maya herself."): the delivery guard
+    withholds a later sentence of the same answer (category `ai_identity_question`), and a withheld
+    sentence fails the case. An honest identity answer should pass the guard whole. B1 (guard), not B2.
+14. The AI answers only from approved sources, and the creator's FAQ answers are not a source. A
+    creator whose sources do not cover a question therefore fails that FAQ entry however good the
+    expected answer is (three of Maya's five with the real model). Founder decision 2026-10-15: the
+    FAQ stays a check only; a creator adds sources that cover the questions.
+
+## B2: the FAQ publish check
+
+The fan-sample comparison gate (shadow replay of recent fan messages) no longer decides publishing.
+The creator writes the questions fans ask, each with the answer they expect (`faq` in the draft, up
+to 50, no duplicates ignoring case). The evaluation asks each one as a fan and a judge checks the
+AI's answer against the expected one; a refusal or "the sources do not cover this" is not a pass.
+A new version may replace the live one only with at least 5 questions and at least 80% of them
+passing, on top of the existing boundary cases (all must pass). A first version needs no FAQ.
+
+- Founder decision 2026-10-15: the bar is 5 questions and 80% (`FAQ_MIN_QUESTIONS`,
+  `FAQ_PASS_RATE` in `packages/api/src/agent/contracts.ts`); the copy keys `creatorAiFaq*` in
+  `config/copy.json` (title "QUESTIONS FANS ASK YOU") and the API's gate and `faq_required`
+  sentences in `modules/agent/service.ts` ("Write at least 5 questions fans ask you, …") are
+  approved as written; FAQ answers stay a check only, not a source (finding 14).
+- Real model (Sonnet through the gateway, Maya's seeded FAQ): all 6 boundary cases pass, 1 of 5
+  FAQ entries pass, publishing is refused (`403 evaluation_required`). Three fail because Maya's
+  sources do not cover them (finding 14), one is finding 13.
+- Studio (web, browser pane, Maya): the panel saves to `creator.ai_workspace.configuration->'faq'`;
+  a duplicate shows "This question is already on the list." and the server refuses the save, leaving
+  the stored draft unchanged; Night theme at 375 px has no horizontal overflow.
+- Not run: the clock past 2026-11-01. The comparison window reads the database clock and the stack
+  does not turn on `TRUST_DEVELOPMENT_COMPARISON_POLICY`. On main, reading the state and publishing
+  call `comparisonSamples` (`service.ts` read and publish); on B2 neither does, so the date no longer
+  matters.
 
 ## Scenarios
 
-| ID                  | State                                                                                                                                                                                       | Re-run                                            |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| E3A.1 measurement   | Main and A3 recorded above, 2026-10-15                                                                                                                                                      | `a1-measure.mjs` as above                         |
-| E3A.2 ★             | Pass on A3: identical visible text, authorship, citations and order for every answer main also delivered                                                                                    | `a1-measure.mjs --compare`                        |
-| E3A.4 ★             | A3: no AI sentence after any change in 27 runs (7 kinds of change, up to 4 timings). Takeover within 500 ms fails at some timings (finding 10, also on main). Deletion not run (finding 11) | `e3a4-authority.mjs`, one case per fresh stack    |
-| E3A.5 ★             | A3: kill after admission passes; kill during the guard call leaves an uncertain cost (finding 7); kill after the first sentence never finishes (finding 9). Same on main                    | `e3a5-restart.mjs --at admitted\|guard\|sentence` |
-| E3A.6 ★             | Distressed message gets the safe response first: pass. Hard-block half not run (needs the real model)                                                                                       | `e3a6-safety.mjs`                                 |
-| A3 drift            | Pass on main and A3                                                                                                                                                                         | `a3-drift.mjs`                                    |
-| A6c dropped request | Before: a fan dropping the request during the safety check, or a timed-out check, locks the creator (4 of 7 fail). After: 7 of 7                                                            | `a6-ack-disconnect.mjs`                           |
-| A6a provider errors | Before: one 429 locks the creator; an error during the acknowledgment leaves an unknown cost. After: 7 of 7 pass, every failed call records 0 and the next reply is delivered               | `a6-provider-errors.mjs`                          |
-| E3B.1 to E3B.7      | Not run yet                                                                                                                                                                                 |                                                   |
+| ID                    | State                                                                                                                                                                                                                                                                                                                                                                                                     | Re-run                                            |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| E3A.1 measurement     | Main and A3 recorded above, 2026-10-15                                                                                                                                                                                                                                                                                                                                                                    | `a1-measure.mjs` as above                         |
+| E3A.2 ★               | Pass on A3: identical visible text, authorship, citations and order for every answer main also delivered                                                                                                                                                                                                                                                                                                  | `a1-measure.mjs --compare`                        |
+| E3A.4 ★               | A3: no AI sentence after any change in 27 runs (7 kinds of change, up to 4 timings). Takeover within 500 ms fails at some timings (finding 10, also on main). Deletion not run (finding 11)                                                                                                                                                                                                               | `e3a4-authority.mjs`, one case per fresh stack    |
+| E3A.5 ★               | A3: kill after admission passes; kill during the guard call leaves an uncertain cost (finding 7); kill after the first sentence never finishes (finding 9). Same on main                                                                                                                                                                                                                                  | `e3a5-restart.mjs --at admitted\|guard\|sentence` |
+| E3A.6 ★               | Distressed message gets the safe response first: pass. Hard-block half not run (needs the real model)                                                                                                                                                                                                                                                                                                     | `e3a6-safety.mjs`                                 |
+| A3 drift              | Pass on main and A3                                                                                                                                                                                                                                                                                                                                                                                       | `a3-drift.mjs`                                    |
+| A6 hold bound         | Before: a $5 cap admits no Claude reply. After: hold $2.62 (Sonnet as small model) or $0.20 (Haiku); 10 of 10 replies delivered, spend at most 2.3% of the hold; one real reply cost $0.018 against a $2.62 hold                                                                                                                                                                                          | `a6-hold-bound.mjs`                               |
+| A6c dropped request   | Before: a fan dropping the request during the safety check, or a timed-out check, locks the creator (4 of 7 fail). After: 7 of 7                                                                                                                                                                                                                                                                          | `a6-ack-disconnect.mjs`                           |
+| A6a provider errors   | Before: one 429 locks the creator; an error during the acknowledgment leaves an unknown cost. After: 7 of 7 pass, every failed call records 0 and the next reply is delivered                                                                                                                                                                                                                             | `a6-provider-errors.mjs`                          |
+| E3B.2 ★               | Pass on the fake (11 of 11): no FAQ or one question refused (`faq_required`); five (Spanish and a hidden instruction included) publish version 2 with no fan data; duplicates, 51 and empty questions refused at save; 50 questions evaluated in 66 s; a provider failure midway fails the evaluation. Real model: refused at 1 of 5 FAQ (finding 13). The clock past 2026-11-01 case is not run (see B2) | `e3b2-faq-publish.mjs`                            |
+| E3B.1, E3B.3 to E3B.7 | Not run yet                                                                                                                                                                                                                                                                                                                                                                                               |                                                   |
 
-Model gateway spend for lane 3 so far: none (every run used the local fake).
+Model gateway spend for lane 3 so far: 72 calls, 181,087 micros (/\_\_stats, 2026-10-15): 6 calls, 19,010 micros for one real reply to check the hold bound; 66 calls, 162,077 micros for B2's real-model FAQ evaluation.
 
 ## Tickets to other lanes
 
 | To         | File                                                                                                                    | Change                                                                                                                                                                   | Why                                                                                                          |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| Lane 2     | `tests/scenarios/lane-2/seed-maya.mjs`                                                                                  | Seed a daily cap above the Claude run ceiling (for example 20,000,000) until A6 resizes the hold                                                                         | Finding 2: a `--provider anthropic` stack can never deliver a reply                                          |
+| Lane 2     | `tests/scenarios/lane-2/seed-maya.mjs`                                                                                  | Seed a daily cap above the Claude run ceiling (for example 20,000,000) until hold sizing (#438) merges                                                                   | Finding 2: a `--provider anthropic` stack can never deliver a reply                                          |
 | Lane 4     | `modules/commerce/generation-audience.ts` (`assertCatalog`), `modules/commerce/generation-safety-terminal-catalogue.ts` | Wrap each check in `verifyInHeldTransaction(client, <its frozen custody object>, () => check)` from `modules/identity/generation-held-verification.ts` (after A3 merges) | 68 audience runs per answer; the safety terminal catalogue is about 1 s of the longest remaining transaction |
 | Lane 4     | `creator.generation_settle_typed_original_allowance` (W4 safety terminal settlement SQL)                                | Settle an interrupted answer that has stored output but no complete typed provenance, with lane 3 in A6                                                                  | Finding 9: a crash mid-answer is never recovered                                                             |
 | Integrator | `tests/scenarios/integrator/anthropic-adapter.mts` (case A6)                                                            | Expect a `ProviderResponseError` with a known zero usage for a non-2xx answer before any body (code, upstream status and the no-secret check are unchanged)              | A6a makes that error a known zero cost, as the brief decided; this case pinned the old behavior              |
