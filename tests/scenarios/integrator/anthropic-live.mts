@@ -156,17 +156,18 @@ await check(
   },
 );
 
-await check("L6 bad key maps to a provider failure", async () => {
-  const bad = new AnthropicMessagesModel({
-    ...configuration,
-    apiKey: "invalid",
+if (!gateway)
+  await check("L6 bad key maps to a provider failure", async () => {
+    const bad = new AnthropicMessagesModel({
+      ...configuration,
+      apiKey: "invalid",
+    });
+    const error = await failure(
+      bad.structured("x", ["y"], InputVerdict, "small", signal),
+    );
+    assert.equal(error.code, "provider_failed");
+    return `status ${(error.cause as { upstreamStatus: number }).upstreamStatus}`;
   });
-  const error = await failure(
-    bad.structured("x", ["y"], InputVerdict, "small", signal),
-  );
-  assert.equal(error.code, "provider_failed");
-  return `status ${(error.cause as { upstreamStatus: number }).upstreamStatus}`;
-});
 
 if (process.env.OPENAI_API_KEY)
   await check("L7 embeddings through OpenAI", async () => {
