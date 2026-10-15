@@ -81,11 +81,19 @@ export async function assertGenerationTerminalDiscoveryCatalogue(
     !generationTerminalDiscoveryCatalogueChecksum
   )
     unavailable();
+  const reviewed = generationTerminalDiscoveryCatalogueChecksum;
   // Once when first used in a held transaction and again before its COMMIT.
-  await verifyInHeldTransaction(client, assertGenerationTerminalDiscoveryCatalogue, () => verifyTerminalDiscoveryCatalogue(client));
+  await verifyInHeldTransaction(
+    client,
+    assertGenerationTerminalDiscoveryCatalogue,
+    () => verifyTerminalDiscoveryCatalogue(client, reviewed),
+  );
 }
 
-async function verifyTerminalDiscoveryCatalogue(client: PoolClient): Promise<void> {
+async function verifyTerminalDiscoveryCatalogue(
+  client: PoolClient,
+  reviewed: string,
+): Promise<void> {
   try {
     if (!(await generationPrivacySourcesRegistered())) unavailable();
     await assertRegisteredMigration(client, generationTerminalDiscoverySource);
@@ -107,10 +115,7 @@ async function verifyTerminalDiscoveryCatalogue(client: PoolClient): Promise<voi
     ).rows[0]?.catalogue;
     if (
       contentHash({ discovery, original, catalogue }) !==
-      (await generationPrivacyCatalogueChecksum(
-        "terminal",
-        generationTerminalDiscoveryCatalogueChecksum,
-      ))
+      (await generationPrivacyCatalogueChecksum("terminal", reviewed))
     )
       unavailable();
     // An uncertain or failed response escapes directly to original custody.

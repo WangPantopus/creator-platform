@@ -79,11 +79,19 @@ export async function assertGenerationOutputCursorCatalogue(
 ) {
   if (requestAuthority.getStore() || !generationOutputCursorCatalogueChecksum)
     unavailable();
+  const reviewed = generationOutputCursorCatalogueChecksum;
   // Once when first used in a held transaction and again before its COMMIT.
-  await verifyInHeldTransaction(client, assertGenerationOutputCursorCatalogue, () => verifyOutputCursorCatalogue(client));
+  await verifyInHeldTransaction(
+    client,
+    assertGenerationOutputCursorCatalogue,
+    () => verifyOutputCursorCatalogue(client, reviewed),
+  );
 }
 
-async function verifyOutputCursorCatalogue(client: PoolClient): Promise<void> {
+async function verifyOutputCursorCatalogue(
+  client: PoolClient,
+  reviewed: string,
+): Promise<void> {
   try {
     if (!(await generationPrivacySourcesRegistered())) unavailable();
     await assertRegisteredMigration(client, generationOutputCursorSource);
@@ -105,10 +113,7 @@ async function verifyOutputCursorCatalogue(client: PoolClient): Promise<void> {
     ).rows[0]?.catalogue;
     if (
       contentHash({ cursor, writer, catalogue }) !==
-      (await generationPrivacyCatalogueChecksum(
-        "output",
-        generationOutputCursorCatalogueChecksum,
-      ))
+      (await generationPrivacyCatalogueChecksum("output", reviewed))
     )
       unavailable();
     // Restore only after a successful metadata read. Any failure escapes to
