@@ -37,8 +37,8 @@ The key lives in one place and one process. Nobody else, including every lane se
    ```
 
    Without `--model-gateway` the same command runs Claude's protocol against the free local fake.
-   The stack sets every other setting itself (models, prices, the consent policy naming Anthropic
-   and OpenAI), so the key is the only thing you provide.
+   The stack sets every other setting itself (Sonnet 5.5 for every call, prices, the consent policy
+   naming Anthropic and OpenAI), so the key is the only thing you provide.
 
 Lanes follow the rule in the working agreement (section 3.6): the fake by default, the gateway only
 for what needs real model behavior, small requests, no loops, spend reported.
@@ -52,8 +52,8 @@ and any other value is treated as unconfigured (no model, the host reports what 
 | --- | --- |
 | `ANTHROPIC_API_KEY` | The Claude key. Never commit it, never paste it in chat. |
 | `OPENAI_API_KEY` | Still required: embeddings stay on OpenAI (Anthropic has no embedding model). |
-| `W2_SMALL_MODEL` | Guards, classification, memory extraction. Recommended `claude-haiku-5-5`. |
-| `W2_LARGE_MODEL` | The reply. Recommended `claude-sonnet-5-5`. |
+| `W2_SMALL_MODEL` | Guards, judges, memory extraction. `claude-sonnet-5-5` (the founder's choice) or the cheaper `claude-haiku-5-5`. |
+| `W2_LARGE_MODEL` | The reply. `claude-sonnet-5-5`. |
 | `W2_EMBEDDING_MODEL` | The OpenAI embedding model id. |
 | `W2_PROVIDER_POLICY_REFERENCE` | Same meaning as today. |
 | `W2_MODEL_RATES_JSON` | Prices by model id, in micro-dollars per million tokens (below). Without them the host reports "provider rates" as missing. |

@@ -74,6 +74,7 @@ function parse(argv) {
     else if (arg === "--web-env") options.webEnv.push(value());
     else if (arg === "--provider") options.provider = value();
     else if (arg === "--model-gateway") options.modelGateway = value();
+    else if (arg === "--claude-small") options.claudeSmall = value();
     else if (arg === "--growth") options.growth = true;
     else if (arg === "--no-web") options.noWeb = true;
     else if (arg === "--no-ai") options.noAi = true;
@@ -642,6 +643,8 @@ async function providerFor(plan, options) {
     );
   if (options.modelGateway && provider !== "anthropic")
     throw new StackError("--model-gateway needs --provider anthropic.", "", 2);
+  if (options.claudeSmall && !["sonnet", "haiku"].includes(options.claudeSmall))
+    throw new StackError("--claude-small is sonnet (default) or haiku.", "", 2);
   if (provider === "openai") return { provider };
   if (!options.modelGateway)
     return {
@@ -779,7 +782,13 @@ async function writeBackendConfig(plan, secrets, options) {
     W3_DEVELOPMENT_ECONOMICS_FILE: plan.file("economics.json"),
     W3_DEVELOPMENT_INGESTION: `${MAYA}:${MAYA_ACCOUNT},${DEVON}:${DEVON_ACCOUNT}`,
     OPENAI_API_KEY: "sk-local-development-fake",
-    W2_SMALL_MODEL: claude ? "claude-haiku-5-5" : "gpt-4o-mini",
+    // The founder's choice is Sonnet 5.5 for every call; Haiku 5.5 is the cheaper option for the
+    // small route (guards, judges, extraction).
+    W2_SMALL_MODEL: claude
+      ? options.claudeSmall === "haiku"
+        ? "claude-haiku-5-5"
+        : "claude-sonnet-5-5"
+      : "gpt-4o-mini",
     W2_LARGE_MODEL: claude ? "claude-sonnet-5-5" : "gpt-4o",
     W2_EMBEDDING_MODEL: "text-embedding-3-small",
     W2_MODEL_RATES_JSON: rates,
@@ -1361,6 +1370,7 @@ async function env(plan) {
 const help = `Usage: node infra/local/stack.mjs <up|status|smoke|env|logs|stop|down|reset> --lane N [options]
   --provider P    openai (default) or anthropic: Claude answers, against the local fake
   --model-gateway URL   with --provider anthropic: send Claude calls to the capped gateway (real model)
+  --claude-small haiku  with --provider anthropic: guards, judges and extraction on Haiku 5.5 (default: Sonnet 5.5 for every call)
   --lane N        lane number (ports 564N0-564N9) or a label such as 3a with --base-port
   --base-port P   first of ten ports (default 56400 + N*10)
   up options      --growth  --no-web  --no-ai  --no-smoke  --ack-only  --require-reply  --env KEY=VALUE  --web-env KEY=VALUE
