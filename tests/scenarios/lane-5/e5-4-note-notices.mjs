@@ -32,7 +32,18 @@ const B = 2100;
 const maya = await seedCreator(B, "maya_e54", "Maya");
 const kiln = await seedTier(maya.id, "Kiln Club");
 const f = {};
-const members = ["ana", "ben", "cy", "eve", "fay", "gus", "hal", "kim", "lee"];
+const members = [
+  "ana",
+  "ben",
+  "cy",
+  "eve",
+  "fay",
+  "gus",
+  "hal",
+  "kim",
+  "lee",
+  "jon",
+];
 for (const [i, name] of [...members, "dee", "ivy"].entries())
   f[name] = await seedFan(B + 10 + i, `${name}_e54`);
 const joined = {};
@@ -48,6 +59,7 @@ for (const name of [
   "hal",
   "kim",
   "lee",
+  "jon",
   "dee",
   "ivy",
 ])
@@ -56,6 +68,15 @@ for (const name of [
     ...(name === "kim" ? { mutedCreators: [maya.id] } : {}),
     ...(name === "lee" ? { disabledPushTypes: ["note"] } : {}),
   });
+// jon muted Maya's Notes in the content module before this Note is published.
+expect(
+  (
+    await http("POST", `/v1/content/${maya.id}/mute`, f.jon.token, {
+      muted: true,
+    })
+  ).status === 200,
+  "jon could not mute",
+);
 await blockFan(f.eve, maya.id);
 await deleteFan(f.fay);
 await restrictFan(f.gus, maya.id);
@@ -77,7 +98,7 @@ await waitFor(
 
 await step(
   "E5.4-recipients",
-  "only fans who may read the Note are told: not outsiders, blocked, deleted or restricted",
+  "only fans who may read the Note are told: not outsiders, blocked, deleted, restricted or muted",
   async () => {
     const got = await notified();
     expect(got.join() === "ana,ben,cy,hal,kim,lee", `notified ${got.join()}`);
@@ -88,10 +109,16 @@ await step(
       )
     ).rows[0];
     expect(
-      effect.state === "done" && effect.result_ref.includes("eligible=6"),
+      effect.state === "done" &&
+        effect.result_ref.includes("eligible=6") &&
+        effect.result_ref.includes("muted=1"),
       `effect ${JSON.stringify(effect)}`,
     );
-    return `6 told of 9 members; ${effect.result_ref.split(":").slice(2).join(":")}`;
+    expect(
+      !(await notified()).includes("jon"),
+      "a member who muted Notes was told",
+    );
+    return `6 told of 10 members (1 muted); ${effect.result_ref.split(":").slice(2).join(":")}`;
   },
 );
 await step(
@@ -385,6 +412,42 @@ await step(
       `the kept Note's pushes: ${JSON.stringify(keptStates)}`,
     );
     return `${sent.length} push after the retry, none for the withdrawn Note`;
+  },
+);
+await step(
+  "E5.4-unmute",
+  "a member who unmutes is told about the next Note, and a muted member's push never leaves",
+  async () => {
+    // Across every push sent in this whole run, none went to the muted member.
+    expect(
+      !(await pushes()).some((p) => p.accountId === f.jon.accountId),
+      "jon was pushed while muted",
+    );
+    const unmute = await http(
+      "POST",
+      `/v1/content/${maya.id}/mute`,
+      f.jon.token,
+      { muted: false },
+    );
+    expect(unmute.status === 200, `unmute ${unmute.status}`);
+    await publishNote(maya, "A Note after jon unmuted.", { kind: "members" });
+    await waitFor(
+      "jon's notice",
+      async () =>
+        (
+          await sql(
+            "SELECT count(*)::int AS n FROM growth.notification n JOIN creator.fan_profile f ON f.account_id=n.account_id WHERE f.handle='jon_e54' AND n.type='note'",
+          )
+        ).rows[0].n >= 1,
+    );
+    await waitFor("jon's push", async () =>
+      (await pushes()).some((p) => p.accountId === f.jon.accountId),
+    );
+    const mine = (await inbox(f.jon)).filter((n) => n.type === "note");
+    expect(
+      mine.length === 1 && mine[0].preview.startsWith("A Note after jon"),
+      JSON.stringify(mine),
+    );
   },
 );
 await closeDb();

@@ -451,6 +451,7 @@ function addThread(world, account, spec) {
     generation: null,
     idempotency: new Map(),
     memory: [],
+    privacyNoticeAt: iso(world.now()),
   };
   world.threads.set(`${creator.id}/${account.fan.id}`, thread);
   const first = creator.name;

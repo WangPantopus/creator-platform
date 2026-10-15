@@ -714,6 +714,20 @@
       "owner": "W8",
       "sourceSha256": "22de8203086fd7f7ad18140c087d0aa6355390616b90511da280bc71296c1b3f",
       "wave": "20261008-comparison"
+    },
+    {
+      "version": "0247_w5_note_mute_read",
+      "path": "apps/backend/src/modules/content/migrations/pending_w5_note_mute_read.sql",
+      "owner": "W5",
+      "sourceSha256": "79b07279d620614f3af6961e0e014e13f82c6aa9700f88b79ee02d78f9ffc782",
+      "wave": "20261015-notices"
+    },
+    {
+      "version": "0248_w7_notice_snapshot",
+      "path": "apps/backend/src/modules/growth/migrations/pending_w7_notice_snapshot.sql",
+      "owner": "W7",
+      "sourceSha256": "c4aedad199f7c68537ba7eb27a7d99ef2fa44a6f44b892261316c6a59caec9ca",
+      "wave": "20261015-notices"
     }
   ],
   "reserved": [
@@ -1254,6 +1268,26 @@
       "state": "registered",
       "registeredVersion": "0246_comparison_artifact_scope",
       "reason": "Exact additive comparison graph registered after original populated and independent restore rollback review. Apply only through the closed 20261008-comparison wave; registration is not runtime activation, consent or provider acceptance."
+    },
+    {
+      "id": "0247",
+      "version": "0247_w5_note_mute_read",
+      "owner": "W5",
+      "path": "apps/backend/src/modules/content/migrations/pending_w5_note_mute_read.sql",
+      "sourceSha256": "79b07279d620614f3af6961e0e014e13f82c6aa9700f88b79ee02d78f9ffc782",
+      "state": "registered",
+      "registeredVersion": "0247_w5_note_mute_read",
+      "reason": "Lane 5 proposal (pull request #385), registered by the integrator on 2026-10-15 after review of the exact source against a fresh database: the purpose-role reach it adds is the one the file grants. Apply only through the 20261015-notices wave; registration is not runtime activation."
+    },
+    {
+      "id": "0248",
+      "version": "0248_w7_notice_snapshot",
+      "owner": "W7",
+      "path": "apps/backend/src/modules/growth/migrations/pending_w7_notice_snapshot.sql",
+      "sourceSha256": "c4aedad199f7c68537ba7eb27a7d99ef2fa44a6f44b892261316c6a59caec9ca",
+      "state": "registered",
+      "registeredVersion": "0248_w7_notice_snapshot",
+      "reason": "Lane 5 proposal (pull request #385), registered by the integrator on 2026-10-15 after review of the exact source against a fresh database: the purpose-role reach it adds is the one the file grants. Apply only through the 20261015-notices wave; registration is not runtime activation."
     }
   ]
 }

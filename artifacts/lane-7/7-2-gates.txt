@@ -1,0 +1,36 @@
+WP 7.2 local regression gates, 2026-10-09, after merge 678484ade and the edge-swipe/cold-link fixes.
+
+Android (offline Gradle, LANE-7 heavy-build lock, emulator-5574 only):
+Command: ./gradlew --offline :app:testDebugUnitTest :app:verifyPaparazziDebug :app:lintDebug :app:connectedDebugAndroidTest :app:assembleRelease
+BUILD SUCCESSFUL in 3m 49s; 133 actionable tasks: 33 executed, 100 up-to-date.
+Unit/snapshot XML: NativeSnapshotsTest 8, DeliveryProtocolTest 9, GeneratedContractTest 2; all 19 pass.
+Lint: 0 errors.
+Instrumentation XML: 8 total, 4 pass, 4 skipped by design, 0 errors/failures.
+Skipped: ConnectedJourneyTest (requires an explicitly selected backend journey).
+The Gradle progress counter printed 12; the result XML contains exactly 8 unique tests.
+Release unsigned APK built. Not installed or signed for distribution (WP 7.9).
+Debug DEX contains harness_actor, harness_reset, and No development actor matches once each.
+Release DEX contains none of those markers, and no fake API origin (127.0.0.1:56473).
+
+iOS existing UI suites (ad-hoc signed debug, API origin unconfigured):
+xcodebuild test, QelvoraUITests/FoundationFlowTests and QelvoraUITests/ConnectedJourneyTests.
+FoundationFlowTests: 2 pass (authorship labels; sign-in fails closed in Light and Night).
+ConnectedJourneyTests: 4 skipped by design (explicit real journey inputs absent).
+Final rerun: 6 total, 2 pass, 4 skipped, 0 failures. TEST SUCCEEDED.
+Result bundle outside Git: ios-existing-ui-final.xcresult.
+Separate operated navigation run: 13 pass, 0 skipped (see 7-2-ios-run.txt).
+
+Final Swift package rerun: 18 passed, 0 failures (8 delivery protocol, 2 generated contract, 5 identity, 3 snapshot suites).
+Final iOS Release simulator rerun: BUILD SUCCEEDED (arm64 and x86_64), ad-hoc signed.
+The final binary scan below also passes after the cold-link fix.
+Debug binary marker counts: harness-actor 1; harness-reset 1; No development actor matches 1; DebugHarness 36.
+Release binary: all four markers 0; fake API origin absent; CreatorAPIURL empty.
+Distribution archive, physical-device installation and release sign-in: not run (WP 7.9).
+Harness contract check after merge: 51/51 against the current real schemas.
+Root typecheck: 7/7 tasks pass, forced execution with no cache, concurrency 1.
+Root eslint: pass.
+Root prettier: all matched files pass.
+Generated-file check: 12 shared resources and native models/119 OpenAPI operations verified.
+Real-stack navigation: both apps pass the focused flow; real API state/ownership/denial checks pass.
+Identity and model-provider edges are synthetic; see 7-2-real-stack-run.txt.
+App PR checks tool: attempted; blocked by missing GitHub connection. CI not inspected. No CI polling or CLI fallback.

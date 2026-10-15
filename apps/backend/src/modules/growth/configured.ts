@@ -32,6 +32,7 @@ import {
   type WeeklyImpactNoticeReader,
 } from "./impact-notifications.js";
 import type { CurrentPostEntryReader } from "./entry-context.js";
+import { noticeSnapshots, withNoticeSnapshots } from "./notices.js";
 
 /** Canonical host seam. Owner callbacks are injected; absent producers never become fixtures. */
 export async function configureGrowthForBackend(
@@ -84,6 +85,14 @@ export async function configureGrowthForBackend(
       "Growth worker database connection lost; leased work requires reconnecting.",
     );
   });
+  // Answers, request status, call reminders and commitments live in private rows
+  // the worker cannot read. Their owners record what a notice may say (see
+  // notices.ts); a signed-in person reading their own list still gets a
+  // connected owner's live answer first.
+  const owned = withNoticeSnapshots(
+    input.owners?.notificationState ?? unavailableOwners.notificationState,
+    noticeSnapshots(worker),
+  );
   try {
     const runtime = await createGrowthRuntime({
       runtimePool: input.pool,
@@ -109,10 +118,7 @@ export async function configureGrowthForBackend(
                   recipient,
                   custody,
                 )
-              : (
-                  input.owners?.notificationState ??
-                  unavailableOwners.notificationState
-                )(event, recipient, custody),
+              : owned(event, recipient, custody),
         creatorFor: input.assertAllowed
           ? canonicalCreatorOwner(input.identity.profiles, input.assertAllowed)
           : async (actor) => {

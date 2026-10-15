@@ -24,7 +24,7 @@ export function trustIdentityAuthority(
     if (
       !current ||
       current.accountId !== actor.accountId ||
-      identity.sessions.mode !== "pantopus"
+      !["pantopus", "qelvora"].includes(identity.sessions.mode)
     )
       throw new DomainError(
         "fresh_verification_required",
@@ -34,7 +34,7 @@ export function trustIdentityAuthority(
     return identityTransaction(pool, actor.accountId, async (client) => {
       const row = (
         await client.query<{ created_at: Date }>(
-          "SELECT created_at FROM creator.identity_session WHERE id=$1 AND account_id=$2 AND mode='pantopus' AND revoked_at IS NULL AND expires_at>clock_timestamp()",
+          "SELECT created_at FROM creator.identity_session WHERE id=$1 AND account_id=$2 AND mode IN ('pantopus','qelvora') AND revoked_at IS NULL AND expires_at>clock_timestamp()",
           [current.sessionId, actor.accountId],
         )
       ).rows[0];

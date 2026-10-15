@@ -1,6 +1,7 @@
 package com.pantopus.qelvora.conversation
 
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import android.os.SystemClock
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -76,7 +77,7 @@ object W3FanFeatures {
             val fanId = destination.getQueryParameter("fanId")
             if (ApplicationDestination.isPermitted(session.destination) && creatorId != null && fanId != null) {
                 val client = remember(baseURL, session.session?.accountId) { ConversationClient(baseURL, session::currentToken, session.session?.accountId) }
-                ConversationPrivacy(client, "$creatorId/$fanId", onBack = { session.open("/you") }, onData = { session.open("/support/privacy") }, onSupport = { session.open("/support") })
+                ConversationPrivacy(client, "$creatorId/$fanId", onBack = { session.back() }, onData = { session.open("/support/privacy") }, onSupport = { session.open("/support") })
             } else ConversationAccount(baseURL, session)
         }
         else Notice(title = "Conversation unavailable", children = "Open this conversation from your account.")
@@ -106,6 +107,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     var busy by remember(root, accountId) { mutableStateOf(false) }
     var introOfferId by remember(root, accountId) { mutableStateOf<String?>(null) }
     var privacy by remember(root, accountId) { mutableStateOf(false) }
+    BackHandler(enabled = privacy) { privacy = false }
     var comparisonQuestion by remember(root, accountId) { mutableStateOf<ConversationMessage?>(null) }
     var comparisonsAvailable by remember(client) { mutableStateOf(false) }
     LaunchedEffect(client, offline) {
@@ -339,7 +341,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             Button("Help and safety", variant = ButtonVariant.QUIET) { session.open("/support") }
         } else {
             val header: @Composable () -> Unit = {
-                ThreadHeader(name = current.creatorName, subtitle = "Official AI", live = !offline && current.control == APIThreadControl.HUMAN_ACTIVE, onBack = { session.open("/you") }, onAbout = { privacy = true })
+                ThreadHeader(name = current.creatorName, subtitle = "Official AI", live = !offline && current.control == APIThreadControl.HUMAN_ACTIVE, onBack = { session.back() }, onAbout = { privacy = true })
                 IdentityStrip(state = if (current.control == APIThreadControl.HUMAN_ACTIVE) IdentityState.HUMAN else if (current.control == APIThreadControl.AI_ACTIVE) IdentityState.AI else IdentityState.PAUSED, name = current.creatorName)
             }
             val messageLabel = if (current.control == APIThreadControl.HUMAN_ACTIVE) "Message ${current.creatorName}" else "Message ${current.creatorName}'s AI"
@@ -671,7 +673,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     LazyColumn(Modifier.fillMaxSize().widthIn(max = 390.dp).background(qColor("ground")), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 36.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
         item {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                IconButton("back", "Back", qColor("ink")) { session.open("/creators/$handle") }
+                IconButton("back", "Back", qColor("ink")) { session.back() }
                 BasicText("1 OF 1", style = qText("data-sm").copy(color = qColor("ink-muted")))
             }
         }
@@ -729,10 +731,10 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 try {
                     val page=capture.client.beginConversation(capture.expectedAccountId, capture.sessionId, APIConversationBeginConversation(selectedCreator.getString("id"),policy.version,APIConversationBeginConversationAccessNoticeAccepted,key))
                     if (!foreground || !capture.isCurrent() || page.creatorId != selectedCreator.getString("id") || runCatching { UUID.fromString(page.fanId) }.isFailure) return@launch
-                    session.open("/threads/${page.creatorId}/${page.fanId}")
+                    session.replace("/threads/${page.creatorId}/${page.fanId}")
                 } catch(failure: Throwable) { if(failure is CancellationException) throw failure;if(foreground && capture.isCurrent()) error="Reconnect to try again. No message was sent." } finally {busy=false}
             } }
-            Button("Not now",variant=ButtonVariant.QUIET,block=true) { session.open("/creators/$handle") }
+            Button("Not now",variant=ButtonVariant.QUIET,block=true) { session.back() }
             }
         }
     }

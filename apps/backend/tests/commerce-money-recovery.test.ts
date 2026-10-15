@@ -207,7 +207,7 @@ describeMoney("commerce money path: deadlines, crashes, races", () => {
       await world.assertConserved();
     });
 
-    it("a refund the processor fails is not booked, and an authorized refund request then completes it once", async () => {
+    it("a refund the processor fails is not booked, is tried again, and after the last try an authorized refund request completes it once", async () => {
       const provider = new FakePaymentProvider({ refundState: "pending" });
       const world = await fixture.newWorld({ weeklyLimit: 2, provider });
       const id = await accepted(world);
@@ -223,9 +223,42 @@ describeMoney("commerce money path: deadlines, crashes, races", () => {
       expect(await world.packetRow(id)).toMatchObject({
         payment_state: "refund_pending",
       });
-      expect((await world.effects(id)).at(-1)).toMatchObject({
-        state: "failed",
+      // WP 4.3: the failed refund is not dropped. A new refund is scheduled
+      // under a new key, and while it is pending no second refund can be asked.
+      const [failed, retry] = await world
+        .effects(id)
+        .then((effects) =>
+          effects.filter((effect) => effect.operation === "refund"),
+        );
+      expect(failed).toMatchObject({ state: "failed" });
+      expect(retry).toMatchObject({
+        state: "pending",
+        provider_key: `${id}:refund:deadline:retry:1`,
+        request: { obligation: `${id}:refund:deadline` },
       });
+      expect(retry!.next_at.getTime()).toBeGreaterThan(Date.now());
+      await expect(
+        world.service.requestRefund(
+          world.creator.actor,
+          id,
+          world.price,
+          "case-refund-while-retrying",
+          "ops_resolved",
+        ),
+      ).rejects.toMatchObject({ code: "refund_exceeds_balance" });
+
+      // Every later refund fails too: after the third, operations take over.
+      provider.refundState = "failed";
+      for (let tries = 0; tries < 2; tries++) {
+        await world.makeEffectsDue(id);
+        await world.service.reconcile(world.fan.actor, id);
+      }
+      expect(provider.realCalls("refund")).toHaveLength(3);
+      expect(provider.refundedTotal()).toBe(0);
+      expect(await world.commitments(id)).toMatchObject([
+        { state: "resolution_required", outcome: "refund_failed" },
+      ]);
+      expect(await world.events(id)).toContain("refund_escalated");
 
       // The authorized path (a case adapter) can still refund, once and in full.
       provider.refundState = "succeeded";
