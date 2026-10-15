@@ -1,5 +1,10 @@
 import { Router, type Request } from "express";
-import { IdSchema, SessionSchema, PasskeyRevocationSchema } from "@qelvora/api";
+import {
+  IdSchema,
+  SessionSchema,
+  PasskeyRecoverySchema,
+  PasskeyRevocationSchema,
+} from "@qelvora/api";
 import { DomainError } from "../../core/errors.js";
 import type { Actor } from "./adapter.js";
 import type { SessionService } from "./sessions.js";
@@ -133,15 +138,22 @@ export function createIdentityRouter(
     ),
   );
   router.post("/passkeys/revoke", async (req, res) => {
+    const body = PasskeyRevocationSchema.parse(req.body);
     res.json(
       await runtime.passkeys.revoke(
         await actor(req),
-        PasskeyRevocationSchema.parse(req.body).credentialId,
+        body.credentialId,
+        body.loss,
       ),
     );
   });
   router.post("/passkeys/recovery", async (req, res) =>
-    res.json(await runtime.passkeys.recover(await actor(req))),
+    res.json(
+      await runtime.passkeys.recover(
+        await actor(req),
+        PasskeyRecoverySchema.parse(req.body ?? {}).loss,
+      ),
+    ),
   );
   router.post("/:creatorId/team/invite", async (req, res) =>
     res.json(

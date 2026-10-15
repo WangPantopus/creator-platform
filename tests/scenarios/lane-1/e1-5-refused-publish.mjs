@@ -161,6 +161,16 @@ if (lost) {
     panel.replaceAll("\n", " | ").slice(-220),
   );
 }
+// Leave the conversation as it was: hand it back to the AI.
+await fetch(new URL(`/v1/studio/${MAYA}/threads/${fanId}/handback`, API), {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+    "X-Expected-Account-Id": MAYA_ACCOUNT,
+  },
+  body: JSON.stringify({ idempotencyKey: `handback-${Date.now()}` }),
+});
 await browser.close();
 console.log(failures ? `${failures} failed` : "all steps passed");
 process.exit(failures ? 1 : 0);

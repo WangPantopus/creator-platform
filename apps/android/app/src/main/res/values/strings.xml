@@ -129,6 +129,12 @@
   <string name="page_unavailable_body" formatted="false">Nothing you saved was changed. Try again in a moment.</string>
   <string name="adult_only_title" formatted="false">This app is for adults</string>
   <string name="adult_only_body" formatted="false">This app is available to adults aged 18 and over.</string>
+  <string name="passkey_second_prompt" formatted="false">Add a second passkey on another device, so losing one does not stop you signing.</string>
+  <string name="passkey_recovery_body" formatted="false">Choose what happened. Either way, sign in again and submit fresh creator proof before registering a new passkey.</string>
+  <string name="passkey_recovery_lost" formatted="false">It\'s lost or broken</string>
+  <string name="passkey_recovery_lost_help" formatted="false">Your past signatures stay valid. That passkey can\'t sign again.</string>
+  <string name="passkey_recovery_compromised" formatted="false">Someone else may have it</string>
+  <string name="passkey_recovery_compromised_help" formatted="false">Every past signature will show as revoked, because no one can tell which were yours.</string>
   <string name="nav_home" formatted="false">Home</string>
   <string name="nav_discover" formatted="false">Discover</string>
   <string name="nav_requests" formatted="false">Requests</string>

@@ -23165,11 +23165,32 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 2048
+          },
+          "loss": {
+            "type": "string",
+            "enum": [
+              "lost",
+              "compromised"
+            ]
           }
         },
         "required": [
           "credentialId"
         ],
+        "additionalProperties": false
+      },
+      "PasskeyRecovery": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "loss": {
+            "type": "string",
+            "enum": [
+              "lost",
+              "compromised"
+            ]
+          }
+        },
         "additionalProperties": false
       },
       "Passkeys": {
@@ -23192,12 +23213,16 @@
                 },
                 "revoked": {
                   "type": "boolean"
+                },
+                "retired": {
+                  "type": "boolean"
                 }
               },
               "required": [
                 "id",
                 "createdAt",
-                "revoked"
+                "revoked",
+                "retired"
               ],
               "additionalProperties": false
             }

@@ -5960,9 +5960,28 @@ public struct APIPasskeyRegistration: Codable, Sendable {
 
 public struct APIPasskeyRevocation: Codable, Sendable {
   public let `credentialId`: String
-  public init(credentialId: String) {
+  public let `loss`: APIPasskeyRevocationLoss?
+  public init(credentialId: String, loss: APIPasskeyRevocationLoss? = nil) {
     self.credentialId = credentialId
+    self.loss = loss
   }
+}
+
+public enum APIPasskeyRevocationLoss: String, Codable, Sendable {
+  case `lost` = "lost"
+  case `compromised` = "compromised"
+}
+
+public struct APIPasskeyRecovery: Codable, Sendable {
+  public let `loss`: APIPasskeyRecoveryLoss?
+  public init(loss: APIPasskeyRecoveryLoss? = nil) {
+    self.loss = loss
+  }
+}
+
+public enum APIPasskeyRecoveryLoss: String, Codable, Sendable {
+  case `lost` = "lost"
+  case `compromised` = "compromised"
 }
 
 public struct APIPasskeys: Codable, Sendable {
@@ -5978,10 +5997,12 @@ public struct APIPasskeysCredentialsItem: Codable, Sendable {
   public let `id`: String
   public let `createdAt`: String
   public let `revoked`: Bool
-  public init(id: String, createdAt: String, revoked: Bool) {
+  public let `retired`: Bool
+  public init(id: String, createdAt: String, revoked: Bool, retired: Bool) {
     self.id = id
     self.createdAt = createdAt
     self.revoked = revoked
+    self.retired = retired
   }
 }
 
