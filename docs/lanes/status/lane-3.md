@@ -4,7 +4,7 @@ Updated: 2026-10-15, by the lane 3 session
 Working on: B2 (FAQ publish check), branch `lane-3/b2-faq-publish`, stacked on A1
 Done: A1 #411, A3 #426, A6b #433, A6a #434, A6c #436, A6 hold sizing #438, B2 (all open)
 Next: A2 (wake on accept), B9. Findings 8 and 9 need migrations (W1 lease release; crash recovery with lane 4), proposed for the next migration wave
-Blocked on: the founder's yes on B2's bar (5 questions, 80%) and its copy. Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
+Blocked on: the founder's yes on B2's bar (5 questions, 80%), its copy, and whether FAQ answers become a source (finding 14). Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
 
 ## How to measure
 
@@ -101,10 +101,15 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
 12. Any fan could lock a creator's AI: dropping the connection during the acknowledgment's safety check
     cancelled the provider call, and its unknown cost (no hold) refused every later reply for every fan.
     A6c fixes it: the check runs to its deadline, and a timed-out check records its own upper bound.
-13. With the real model the delivery guard withholds the answer to the FAQ "Am I talking to Maya or to
-    her AI?" (category `ai_identity_question`), so the answer the creator expects ("To Maya's AI, not
-    Maya herself.") can never be delivered and that FAQ entry always fails. An honest identity answer
-    should pass the guard. B1 (guard), not B2.
+13. With the real model, the FAQ "Am I talking to Maya or to her AI?" fails although the AI's first
+    sentence is right ("You're talking to Maya's AI, not Maya herself."): the delivery guard
+    withholds a later sentence of the same answer (category `ai_identity_question`), and a withheld
+    sentence fails the case. An honest identity answer should pass the guard whole. B1 (guard), not B2.
+14. The AI answers only from approved sources, and the creator's FAQ answers are not a source. A
+    creator whose sources do not cover a question therefore fails that FAQ entry however good the
+    expected answer is (three of Maya's five with the real model). Proposed default: keep the FAQ as
+    a check only; making its answers a source would change grounding and the engine revision, so it
+    is the founder's call.
 
 ## B2: the FAQ publish check
 
@@ -117,10 +122,12 @@ passing, on top of the existing boundary cases (all must pass). A first version 
 
 - Proposed, waiting on the founder: the bar (5 questions, 80%: `FAQ_MIN_QUESTIONS`,
   `FAQ_PASS_RATE` in `packages/api/src/agent/contracts.ts`) and the new copy keys `creatorAiFaq*`
-  in `config/copy.json` (title "QUESTIONS FANS ASK YOU").
+  in `config/copy.json` (title "QUESTIONS FANS ASK YOU"), plus the API's gate and `faq_required`
+  sentences in `modules/agent/service.ts` ("Write at least 5 questions fans ask you, …"), and
+  finding 14.
 - Real model (Sonnet through the gateway, Maya's seeded FAQ): all 6 boundary cases pass, 1 of 5
   FAQ entries pass, publishing is refused (`403 evaluation_required`). Three fail because Maya's
-  sources do not cover them, one is finding 13.
+  sources do not cover them (finding 14), one is finding 13.
 - Studio (web, browser pane, Maya): the panel saves to `creator.ai_workspace.configuration->'faq'`;
   a duplicate shows "This question is already on the list." and the server refuses the save, leaving
   the stored draft unchanged; Night theme at 375 px has no horizontal overflow.
