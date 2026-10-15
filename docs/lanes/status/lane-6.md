@@ -2,7 +2,7 @@
 
 Updated: 2026-10-15, by the lane 6 session resumed from the 2026-10-09 handoff.
 
-Working on: nothing. WP 6.2 (Today and the Note composer) is done in PULL_REQUEST on
+Working on: nothing. WP 6.2 (Today and the Note composer) is done in #443 on
 `lane-6/today-note`; the session stopped for the founder's review, as asked.
 
 Waiting on: the founder's yes on the new copy and on Today's place in the tab bar, and the
@@ -13,7 +13,7 @@ integrator's approval of the small additive change to `config/navigation.json`.
 - **WP 6.1** (round 1, all on `main`): #368 harness, #382 recovery, #383 Notes and Compose,
   #386 Publish, #387 Requests and PacketDetail, #390 Threads, #391 navigation and the requests
   count. `Studio.tsx` went from 4,795 to 408 lines. Details: [round 1 report](lane-6-round-1-report.md).
-- **WP 6.2** (PULL_REQUEST): Today is where Studio opens; "New Note" is one tap from it; the
+- **WP 6.2** (#443): Today is where Studio opens; "New Note" is one tap from it; the
   composer warns when nobody is in the chosen audience, handles right-to-left text, and returns
   to Today after a Note is signed. Contract **C10** is written:
   [lane-6-c10-today.md](lane-6-c10-today.md).
