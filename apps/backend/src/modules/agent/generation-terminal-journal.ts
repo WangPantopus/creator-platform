@@ -15,6 +15,7 @@ import {
 } from "../identity/generation-terminal.js";
 import { PreparedGenerationJournal } from "./generation-journal.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
+import { verifyInHeldTransaction } from "../identity/generation-held-verification.js";
 
 export const GENERATION_TERMINAL_JOURNAL_MIGRATION =
   "0188_w2_generation_terminal_journal";
@@ -169,9 +170,16 @@ export class PreparedGenerationTerminalJournal {
     return terminalJournal;
   }
 
+  /** Once when first used in a held transaction and again before its COMMIT. */
+  private async assertCustody(client: PoolClient): Promise<void> {
+    await verifyInHeldTransaction(client, this.custody, () =>
+      this.verifyCustody(client),
+    );
+  }
+
   /** Current fixed-consumer custody on the actual held worker client. Factory
    * preparation does not authorize a subsequently changed executable/ACL. */
-  private async assertCustody(client: PoolClient) {
+  private async verifyCustody(client: PoolClient) {
     const receipts = this.custody.consumers;
     try {
       const ready = (

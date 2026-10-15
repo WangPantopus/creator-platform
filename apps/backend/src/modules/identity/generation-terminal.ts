@@ -18,6 +18,7 @@ import {
   assertGenerationTerminalPageCatalogue,
   generationTerminalPageConsumer,
 } from "./generation-terminal-page.js";
+import { verifyInHeldTransaction } from "./generation-held-verification.js";
 
 export const GENERATION_TERMINAL_MIGRATION =
   "0183_w1_generation_terminal_scope";
@@ -439,7 +440,10 @@ export class GenerationTerminalAuthority {
   private async assertCatalogue(client: PoolClient): Promise<void> {
     try {
       await this.configuration.generation.assertCatalogueInTransaction(client);
-      await assertTerminalCatalogue(client, this.configuration.catalogue);
+      // Once when first used in a held transaction and again before its COMMIT.
+      await verifyInHeldTransaction(client, this.configuration.catalogue, () =>
+        assertTerminalCatalogue(client, this.configuration.catalogue),
+      );
     } catch (cause) {
       this.unconfigured(cause);
     }

@@ -6,6 +6,7 @@ import { canonical, contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import { generationHostDatabase } from "../identity/generation-host-database.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
+import { verifyInHeldTransaction } from "../identity/generation-held-verification.js";
 import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 import {
   GenerationIdentityAuthority,
@@ -295,8 +296,15 @@ export class PreparedGenerationConversationContext {
     return prepared;
   }
 
-  /** Factory qualification cannot approve later role, policy or code drift. */
+  /** Once when first used in a held transaction and again before its COMMIT. */
   private async assertCustody(client: PoolClient): Promise<void> {
+    await verifyInHeldTransaction(client, this.custody, () =>
+      this.verifyCustody(client),
+    );
+  }
+
+  /** Factory qualification cannot approve later role, policy or code drift. */
+  private async verifyCustody(client: PoolClient): Promise<void> {
     const receipt = this.custody.consumer;
     try {
       await assertRegisteredMigration(
