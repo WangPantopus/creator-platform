@@ -1,10 +1,103 @@
 # Lane 2: Platform and hosting status
 
-Updated: 2026-10-09, by the lane 2 session
-Working on: nothing. The founder limited the first round to WP 2.1, which is done and in pull request `lane-2/stack-from-scratch`
-Done: WP 2.1, the one-command local stack, its smoke script and its teardown
-Next: nothing until the founder sends "Next for lane 2". Then, in the brief's order: WP 2.2 (production composition root that fails closed), WP 2.9 (catalogue regeneration tooling, with the integrator), the WP 2.3 hosting options
-Blocked on: nothing for WP 2.1. The findings and tickets below need the integrator and lanes 3, 5 and 6
+Updated: 2026-10-09, by the resumed lane 2 session
+Working on: WP 2.8 qualification; scenario code and local measurements are saved in PR #384 on `lane-2/load-soak`
+Done: WP 2.1 is on main; WP 2.8 measurement scripts and a 30-minute idle soak are complete; WP 2.2, WP 2.9 and WP 2.3 options still need to land on main
+Next: owners resolve measured failures; re-run affected scenarios; hosting choice unlocks staging and WP 2.4 to 2.7
+Blocked on: hosting road/provider/region, monthly ceiling, web/API domain and owning account; integrator stack repair; lane 3/5 fixes and multi-worker composition
+
+## Resume here
+
+The complete kickoff prompt is [lane-2-next-session.md](lane-2-next-session.md). Start by
+fetching and reading this status from `origin/lane-2/load-soak`; it is not on main yet.
+Do not switch a branch already attached to another worktree. Read through `git show` instead.
+
+Read [the WP 2.8 note](lane-2-load-soak.md) for commands, measurements, limitations and exact
+owner tickets. The founder has authorized continued code work, including WP 2.8; do not ask
+for that authorization again. Hosting choices and accounts remain missing.
+
+The measurement code is [PR #384](https://github.com/WangPantopus/creator-platform/pull/384).
+Eight idle sockets passed 30 minutes with two planned session renewals. This is not full
+pilot qualification: at 16 public readers there were ten client deadlines and one 503; a
+fresh two-fan worker run produced one failed reply and one delivered reply, though both
+receipts settled. Multiple worker processes and sustained streaming are not run. The note
+preserves the first socket failure as well as the later idle success; do not erase either.
+
+The resume audit is [PR #380](https://github.com/WangPantopus/creator-platform/pull/380).
+At the initial audit main `c0b4ac0f030a893dfc92457f0f4348dd87174398`, all four original PRs were marked
+merged, but only [#367](https://github.com/WangPantopus/creator-platform/pull/367) reached main.
+[#370](https://github.com/WangPantopus/creator-platform/pull/370),
+[#377](https://github.com/WangPantopus/creator-platform/pull/377), and
+[#378](https://github.com/WangPantopus/creator-platform/pull/378) merged into their old lane
+bases. The integrator must land their original reviewed commits in order through replacement
+PRs. Lane 2 has not merged, retargeted or rewritten any branch. Preserve this newer status
+when resolving those older status-file changes.
+
+### Final handoff verification
+
+Both session PRs are open, target main and are ready for review:
+
+| PR                                                                | Branch                          | Contents                                                                                                                             |
+| ----------------------------------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| [#380](https://github.com/WangPantopus/creator-platform/pull/380) | `lane-2/resume-status-20261009` | Resume audit, original reviewed heads, founder approvals; pushed head `1c3b19e176e7854b2204469431b79f21381d1393`                     |
+| [#384](https://github.com/WangPantopus/creator-platform/pull/384) | `lane-2/load-soak`              | Scenario code `b69a58ad25b5ab8ab474de55194a760ee39a809b`, final results `30fd0d96bdc3eb29362ef66c410f884cd4c36614`, and this handoff |
+
+Final fetch found main at `21b3d4836340b0ad494dd0faa8adb041d8e244fa`, after integrator PR #381
+added the Anthropic adapter and capped model gateway. The original reviewed heads for #370,
+#377 and #378 are still not ancestors of main; #367 is. The newer code has **not** been merged
+into this branch or load-tested here. These measurements remain tied to the earlier `c0b4ac0`
+base. No CI check was polled during this handoff.
+
+Before operating a newer checkout, read `origin/main:docs/lanes/01-working-agreement.md`
+section 3.6 and `origin/main:infra/local/README.md`. They now describe the optional founder-run
+model gateway. Load loops use the fake model; do not start or stop the shared gateway, read
+its key, or point load scripts at a paid provider. The founder starts that service. No gateway
+availability or live-provider behavior was checked by lane 2.
+
+Resume order:
+
+1. Read this status and the WP 2.8 note, then inspect PR #384/#380 and main once for changes.
+   Keep the latest status if older PRs overlap it. Fix own review feedback with new commits.
+2. Check whether lane 3/5 fixed the listed runtime failures and provided a supported
+   multi-worker composition. Only re-run the affected real scenarios after relevant changes;
+   preserve failure criteria and receipt checks. Do not repair their feature files yourself.
+3. If hosting is decided, read the saved hosting note, verify a claimed true superuser on a
+   provider scratch database first, and build WP 2.3 staging as code in a new PR. Accounts,
+   credentials and purchases need the founder; deployment needs the integrator.
+4. If hosting is still undecided, keep it as a visible gate. WP 2.4 to 2.7 stay blocked. Do
+   not repeat unchanged soak runs or the hosting research just to fill time.
+
+The complete session 1 evidence and its linked production, catalogue and hosting notes remain
+in [the original handoff](https://github.com/WangPantopus/creator-platform/blob/69ca75941dcaad02dda700d548971006a5bbd9a9/docs/lanes/status/lane-2.md).
+Reuse it; do not repeat the hosting research or the completed scenario batteries. No price
+changed, so the founder's one-page hosting options are unchanged too.
+
+Founder approvals in this chat, already recorded in #380:
+
+- Lane 1 may explicitly mark pilot calls and voice `not_offered` so those rows do not block
+  readiness. Lane 2 owns the environment declaration after its contract is agreed.
+- The integrator may review and implement catalogue fingerprints that ignore relations a
+  role cannot reach. Lane 2 does not own `core/purpose-catalogue.ts` or the review files.
+
+Neither approved behavior is implemented by the load-scenario branch. It changes only lane 2
+scenario scripts and status notes. Runtime qualification remains dependent on other owners;
+staging and WP 2.4 to 2.7 still require the founder's hosting choice and integrator deployment.
+
+Machine during this work: Docker became available, and the existing PostgreSQL 17 image was
+used without downloading. One disposable lane 2 stack was started with `--growth --no-web
+--no-smoke`. Only development identity and the model are faked. The shared 16-CPU machine
+reported load averages around 25 to 99; measurements are not a production capacity claim.
+
+State at stop: `node infra/local/stack.mjs down --lane 2` succeeded after the final worker
+rerun. It stopped the backend and model and removed the database container, volume and state
+directory. Verification found no `qelvora-lane2-*` containers or volumes and no listeners on
+56420–56429. All scenario processes exited. The result notes are committed and pushed; raw
+scratch logs were removed after their results were recorded. No other lane's stack was touched.
+
+Traps still apply: at most five data requests per fan per hour; delete locks that fan out of
+the creator; catalogue mismatches can latch the backend until restart; a failed generation
+can prevent further replies until this disposable stack is rebuilt. No privacy request or
+manual financial settlement is part of WP 2.8. Use only ports 56420–56429 and lane 2 objects.
 
 ## How to run it
 
@@ -17,7 +110,9 @@ Blocked on: nothing for WP 2.1. The findings and tickets below need the integrat
 | ID                            | State                                                                                                                                                                                                                                                                                                                                        | Re-run                                                                                      |
 | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | E2.1 ★ cold start, edge cases | Pass: 22 of 22 steps (cold start 32 s, repeat, port taken, Docker unreachable, killed mid-run, stop and up, two stacks, foreign objects, teardown). The acknowledgment passed in every run (227 to 914 ms). The AI reply is advisory: delivered in 3 of 11 full runs at load average 9 to 62, so it is not a reliable exit check on this Mac | `node tests/scenarios/lane-2/e2-1-cold-start.mjs`, `node infra/local/stack.mjs up --lane 2` |
-| E2.2 ★ to E2.9 ★ except E2.1  | Not run (the founder limited this round to WP 2.1)                                                                                                                                                                                                                                                                                           |                                                                                             |
+| E2.2 ★ / E2.9 ★               | Session 1: 144/144 and 19/19 passed respectively, with limits in the original handoff. Not re-run here; code is not yet on main                                                                                                                                                                                                              | Original handoff above                                                                      |
+| E2.8                          | Not qualified: public overload and worker completion failed; eight idle sockets passed 30 minutes. Final worker run: seven checks passed, one failed. Full soak: ten passed, zero failed. Full results and limits in the WP 2.8 note                                                                                                         | Commands in the WP 2.8 note                                                                 |
+| E2.3 to E2.7                  | Not run; hosting-dependent                                                                                                                                                                                                                                                                                                                   | Hosting decision required                                                                   |
 
 ## Findings and tickets to other lanes
 
@@ -39,8 +134,8 @@ Blocked on: nothing for WP 2.1. The findings and tickets below need the integrat
 - Fakes used by the stack, all at the outer edge: the development identity (accounts 1 to 7), a local model fake
   (`infra/local/fake-edge/model.mjs`, redirected by a Node preload that refuses to load outside a loopback
   development process). No payment processor or push gateway is run; payments are not composed.
-- Never run `pkill -f` by pattern on this shared Mac. Early in this session I ran one (`pkill -f "src/server.ts"`) when
-  only my own, already crashed, process could have matched; it could in principle have matched another session's server.
-  Everything since is by recorded pid or by listening port inside lane 2's range.
+- Never run `pkill -f` by pattern on this shared Mac. Session 1 reported running one early,
+  when only its own, already crashed process was believed to match. That was not this resumed
+  session. Stop only your own processes by recorded PID and verified ownership.
 - The database container sets `jit=off` and no parallel workers; the stack runs `ANALYZE` after an install. Neither
   changed whether replies succeed.

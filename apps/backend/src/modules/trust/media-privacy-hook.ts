@@ -28,16 +28,115 @@ export function mediaPrivacyHook(input: {
     input.coordinator,
     input.assertRestoredInTransaction,
   );
+  /** Media is frozen for the pilot, so a fan normally holds none. Erasure
+   * completes only when every (creator, fan) pair of this account is proven
+   * empty in every media table, read directly rather than through
+   * conversation relationships another task may already have removed. Held
+   * media and creator accounts stay blocked until the approved storage, call
+   * settlement and retention adapters exist. */
+  async function eraseIfNothingHeld(job: Job) {
+    const client = await input.runtime.connect();
+    const held = new ContentHeldClient(client, job.signal, input.runtime);
+    let failure: unknown;
+    try {
+      job.signal!.throwIfAborted();
+      await held.begin();
+      await restoredPrivacyTaskAuthorityInTransaction(
+        client,
+        job,
+        input.assertRestoredInTransaction,
+      );
+      const owned = await client.query(
+        "SELECT 1 FROM creator.creator_profile WHERE account_id=$1 LIMIT 1",
+        [job.accountId],
+      );
+      invariant(
+        owned.rowCount === 0,
+        "media_retention_unconfigured",
+        "Creator media erasure requires the approved storage, call settlement and retention adapters.",
+      );
+      const fans = (
+        await client.query<{ id: string }>(
+          "SELECT id FROM creator.fan_profile WHERE account_id=$1",
+          [job.accountId],
+        )
+      ).rows;
+      const creators = (
+        await client.query<{ id: string }>(
+          "SELECT id FROM creator.creator_profile WHERE $1::uuid IS NULL OR id=$1 ORDER BY id LIMIT 101",
+          [job.creatorId],
+        )
+      ).rows;
+      invariant(
+        creators.length <= 100,
+        "bounded_subjob_required",
+        "Media erasure needs bounded creator subjobs.",
+      );
+      let checkedPairs = 0;
+      for (const fan of fans)
+        for (const creator of creators) {
+          await restoredPrivacyTaskAuthorityInTransaction(
+            client,
+            job,
+            input.assertRestoredInTransaction,
+          );
+          await client.query(
+            "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true)",
+            [creator.id, fan.id],
+          );
+          const tables = [
+            "media_asset",
+            "call_offer",
+            "call_slot",
+            "call_session",
+            "call_admission",
+            "call_consent",
+            "call_event",
+            "call_outcome",
+            "call_effect",
+          ];
+          const found = await client.query<{ held: boolean }>(
+            `SELECT ${tables.map((table) => `EXISTS(SELECT 1 FROM creator.${table} WHERE creator_id=$1 AND fan_id=$2)`).join(" OR ")} AS held`,
+            [creator.id, fan.id],
+          );
+          invariant(
+            found.rows[0]?.held === false,
+            "media_retention_unconfigured",
+            "Media erasure requires the approved storage, call settlement and retention adapters.",
+          );
+          checkedPairs += 1;
+        }
+      await restoredPrivacyTaskAuthorityInTransaction(
+        client,
+        job,
+        input.assertRestoredInTransaction,
+      );
+      job.signal!.throwIfAborted();
+      await held.commit();
+      job.signal!.throwIfAborted();
+      return {
+        receipt: {
+          domain: "media",
+          jobId: job.jobId,
+          complete: true,
+          scope: job.scope,
+          checkedPairs,
+          heldMedia: 0,
+        },
+      };
+    } catch (error) {
+      failure = error;
+      throw error;
+    } finally {
+      await held.settle(failure);
+    }
+  }
   return {
     domain: "media",
     async run(job) {
       job.signal?.throwIfAborted();
       await verify(job);
-      invariant(
-        job.kind === "export",
-        "media_retention_unconfigured",
-        "Media erasure requires the approved storage, call settlement and retention adapters.",
-      );
+      if (job.kind === "delete") return eraseIfNothingHeld(job);
       const families = await authority.families(job);
       const client = await input.runtime.connect();
       const held = new ContentHeldClient(client, job.signal, input.runtime);

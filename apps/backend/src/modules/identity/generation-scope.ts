@@ -28,6 +28,7 @@ import {
   assertGenerationPoolCustody,
   generationTransaction,
 } from "./generation-transaction.js";
+import { verifyInHeldTransaction } from "./generation-held-verification.js";
 
 export const GENERATION_SCOPE_MIGRATION = "0159_w1_generation_worker_scope";
 const Hash = z.string().regex(/^[a-f0-9]{64}$/u);
@@ -673,21 +674,28 @@ export class GenerationIdentityAuthority {
 
   async assertCatalogueInTransaction(client: PoolClient): Promise<void> {
     this.assertWorker();
-    // Refuse an implicit statement transaction; this is a caller-held proof.
-    await client.query(
-      "SAVEPOINT w1_generation_catalogue; RELEASE SAVEPOINT w1_generation_catalogue",
+    // Once when first used in a held transaction and again before its COMMIT.
+    await verifyInHeldTransaction(
+      client,
+      this.configuration.catalogue,
+      async () => {
+        // Refuse an implicit statement transaction; this is a caller-held proof.
+        await client.query(
+          "SAVEPOINT w1_generation_catalogue; RELEASE SAVEPOINT w1_generation_catalogue",
+        );
+        try {
+          await assertGenerationCatalogue(client, this.configuration.catalogue);
+        } catch (cause) {
+          const failure = new DomainError(
+            "generation_scope_unconfigured",
+            "The current reviewed generation catalogue is unavailable.",
+            503,
+            { cause },
+          );
+          throw failure;
+        }
+      },
     );
-    try {
-      await assertGenerationCatalogue(client, this.configuration.catalogue);
-    } catch (cause) {
-      const failure = new DomainError(
-        "generation_scope_unconfigured",
-        "The current reviewed generation catalogue is unavailable.",
-        503,
-        { cause },
-      );
-      throw failure;
-    }
   }
 
   private async begin(client: PoolClient): Promise<void> {

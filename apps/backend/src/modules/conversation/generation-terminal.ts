@@ -7,6 +7,7 @@ import { canonical, contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import { generationHostDatabase } from "../identity/generation-host-database.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
+import { verifyInHeldTransaction } from "../identity/generation-held-verification.js";
 import {
   GenerationIdentityAuthority,
   type GenerationTerminalPurposeConsumer,
@@ -314,9 +315,16 @@ export class PreparedGenerationConversationTerminal {
     return prepared;
   }
 
+  /** Once when first used in a held transaction and again before its COMMIT. */
+  private async assertCustody(client: PoolClient): Promise<void> {
+    await verifyInHeldTransaction(client, this.custody, () =>
+      this.verifyCustody(client),
+    );
+  }
+
   /** Recheck actual live custody on the original worker client. Factory
    * qualification cannot approve a later owner, grant, policy or code change. */
-  private async assertCustody(client: PoolClient): Promise<void> {
+  private async verifyCustody(client: PoolClient): Promise<void> {
     const receipt = this.custody.consumer;
     try {
       await this.identity.assertCatalogueInTransaction(client);

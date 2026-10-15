@@ -8,6 +8,7 @@ import { generationPrivacyCatalogueChecksum } from "../../db/content-privacy-pro
 import type { GenerationTerminalPurposeConsumer } from "./generation-scope.js";
 import { requestAuthority } from "./request-authority.js";
 import { assertGenerationTerminalPageCatalogue } from "./generation-terminal-page.js";
+import { verifyInHeldTransaction } from "./generation-held-verification.js";
 
 export const generationTerminalDiscoverySource = Object.freeze({
   owner: "W1",
@@ -80,6 +81,19 @@ export async function assertGenerationTerminalDiscoveryCatalogue(
     !generationTerminalDiscoveryCatalogueChecksum
   )
     unavailable();
+  const reviewed = generationTerminalDiscoveryCatalogueChecksum;
+  // Once when first used in a held transaction and again before its COMMIT.
+  await verifyInHeldTransaction(
+    client,
+    assertGenerationTerminalDiscoveryCatalogue,
+    () => verifyTerminalDiscoveryCatalogue(client, reviewed),
+  );
+}
+
+async function verifyTerminalDiscoveryCatalogue(
+  client: PoolClient,
+  reviewed: string,
+): Promise<void> {
   try {
     if (!(await generationPrivacySourcesRegistered())) unavailable();
     await assertRegisteredMigration(client, generationTerminalDiscoverySource);
@@ -101,10 +115,7 @@ export async function assertGenerationTerminalDiscoveryCatalogue(
     ).rows[0]?.catalogue;
     if (
       contentHash({ discovery, original, catalogue }) !==
-      (await generationPrivacyCatalogueChecksum(
-        "terminal",
-        generationTerminalDiscoveryCatalogueChecksum,
-      ))
+      (await generationPrivacyCatalogueChecksum("terminal", reviewed))
     )
       unavailable();
     // An uncertain or failed response escapes directly to original custody.

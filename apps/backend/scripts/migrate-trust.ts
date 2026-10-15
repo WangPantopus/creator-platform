@@ -21,6 +21,7 @@ import publicAIReview from "../../../infra/migrations/reviews/20261007-public-ai
 import { registeredPublicAIProfile } from "../src/db/public-ai-profile.js";
 import comparisonReview from "../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
 import { registeredComparisonProfile } from "../src/db/comparison-profile.js";
+import noticesReview from "../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
 import generationReview from "../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
 
 if (!process.env.DATABASE_MIGRATION_URL)
@@ -126,6 +127,17 @@ try {
     throw new Error(
       "Comparison registry requires all eight reviewed sources and the complete partial-recovery predecessor.",
     );
+  const noticesVersions = new Set(
+    noticesReview.sources.map((source) => source.version),
+  );
+  const notices = registry.migrations.some((source) =>
+    noticesVersions.has(source.version),
+  );
+  // The comparison profile also refuses a partial or changed notices registration.
+  if (notices && (!comparison || !(await registeredComparisonProfile())))
+    throw new Error(
+      "Notices registry requires both reviewed sources and the complete comparison predecessor.",
+    );
   const registeredFiles = registry.migrations
     .filter(
       (file) =>
@@ -217,6 +229,18 @@ try {
     throw new Error(
       "Incomplete or unregistered comparison wave; no per-file repair was attempted.",
     );
+  const installedNotices = applied.filter((source) =>
+    noticesVersions.has(source.version),
+  ).length;
+  if (
+    installedNotices &&
+    (!notices ||
+      installedComparison !== comparisonVersions.size ||
+      installedNotices !== noticesVersions.size)
+  )
+    throw new Error(
+      "Incomplete or unregistered notices wave; no per-file repair was attempted.",
+    );
   // Fresh databases still bootstrap the exact canonical61. The complete new
   // wave is only installed atomically by activate-wave after private backup,
   // separate restore and closed-admission checks. Registered code alone cannot
@@ -231,7 +255,8 @@ try {
       (installedRecovery || source.version !== recoveryReview.source.version) &&
       (installedPartialRecovery ||
         source.version !== partialRecoveryReview.source.version) &&
-      (installedComparison || !comparisonVersions.has(source.version)),
+      (installedComparison || !comparisonVersions.has(source.version)) &&
+      (installedNotices || !noticesVersions.has(source.version)),
   );
   const historical = localLegacy
     ? new Set<string>()
@@ -254,8 +279,10 @@ try {
     domain: rows.some((r) => r.version === "0103_w8_domain_privacy_task_fence"),
     canonicalBeforeGeneration: generation && !installedGeneration,
     generationBeforeContent: installedGeneration > 0 && !installedContent,
+    contentBeforeOutput: installedContent && !installedOutput,
     outputBeforePublic: installedOutput && !installedPublic,
     publicBeforeComparison: Boolean(installedPublic && !installedComparison),
+    comparisonBeforeNotices: Boolean(installedComparison && !installedNotices),
   });
   const hasWave = files.some(
     (file) => file.version === "0062_w6_creator_media_worker",
@@ -278,19 +305,21 @@ try {
       if (installedGeneration)
         await assertGenerationWaveRoleSafety(
           client,
-          installedComparison
-            ? "comparison"
-            : installedPartialRecovery
-              ? "partial-generation-recovery"
-              : installedRecovery
-                ? "generation-recovery"
-                : installedPublic
-                  ? "public-ai"
-                  : installedOutput
-                    ? "generation-output"
-                    : installedContent
-                      ? "content-privacy"
-                      : undefined,
+          installedNotices
+            ? "notices"
+            : installedComparison
+              ? "comparison"
+              : installedPartialRecovery
+                ? "partial-generation-recovery"
+                : installedRecovery
+                  ? "generation-recovery"
+                  : installedPublic
+                    ? "public-ai"
+                    : installedOutput
+                      ? "generation-output"
+                      : installedContent
+                        ? "content-privacy"
+                        : undefined,
         );
       else await assertWaveRoleSafety(client, installedRoles(applied));
       if (continuation)
@@ -380,19 +409,21 @@ try {
       if (installedGeneration)
         await assertGenerationWaveRoleSafety(
           client,
-          installedComparison
-            ? "comparison"
-            : installedPartialRecovery
-              ? "partial-generation-recovery"
-              : installedRecovery
-                ? "generation-recovery"
-                : installedPublic
-                  ? "public-ai"
-                  : installedOutput
-                    ? "generation-output"
-                    : installedContent
-                      ? "content-privacy"
-                      : undefined,
+          installedNotices
+            ? "notices"
+            : installedComparison
+              ? "comparison"
+              : installedPartialRecovery
+                ? "partial-generation-recovery"
+                : installedRecovery
+                  ? "generation-recovery"
+                  : installedPublic
+                    ? "public-ai"
+                    : installedOutput
+                      ? "generation-output"
+                      : installedContent
+                        ? "content-privacy"
+                        : undefined,
         );
       else await assertWaveRoleSafety(client, installedRoles(files));
       if (continuation)
@@ -418,6 +449,10 @@ try {
   if (comparison && !installedComparison)
     process.stdout.write(
       "Comparison sources remain unapplied. After partial-recovery106, use W8_MIGRATION_WAVE=20261008-comparison with verified private backup/restore and closed admission.\n",
+    );
+  if (notices && !installedNotices)
+    process.stdout.write(
+      "Notices sources remain unapplied. After comparison114, use W8_MIGRATION_WAVE=20261015-notices with verified private backup/restore and closed admission.\n",
     );
 } finally {
   await client.query(

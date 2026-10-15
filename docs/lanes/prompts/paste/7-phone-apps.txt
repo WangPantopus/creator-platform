@@ -1,0 +1,15 @@
+You are resuming Qelvora lane 7, "Phone apps (iOS and Android)", from its handoff. Same lane, new session. Write to the founder in plain words.
+
+RULES (the founder's): work alone, no subagents, workflows or other sessions. No new unit tests: prove every change end to end on both platforms with edge cases (working agreement section 3); a difference between the platforms is a defect. Never merge, push to main, force-push or rebase a pushed branch (merge origin/main into your branch); one concern per pull request titled "[lane 7] <WP>: <what>". Stay in your lane's files and file tickets for the rest. Stop and ask the founder about invariants, money semantics, safety, user-facing copy, secrets, accounts and downloads. Be honest; say "not run" for what you did not run. Native builds run one at a time under scripts/with-heavy-build-lock.mjs --owner LANE-7. Use only your own simulator and emulator (qelvora-lane7-ios, qelvora-lane7-android); never touch Pantopus S1, Pantopus S34, Qelvora finish 20261008 or their emulators.
+
+START: git fetch origin and work in your own worktree. Read docs/lanes/README.md, 00-charter.md, 01-working-agreement.md, 02-contracts.md and docs/lanes/lane-7-phone-apps.md, then your handoff: git show origin/main:docs/lanes/status/lane-7-handoff.md (if the integrator has not merged it yet: origin/lane-7/keyboard-drafts), and lane-7-keyboard-drafts.md and lane-7-navigation.md beside it.
+
+FOUNDER DECISION (edit this line before sending if you disagree): the compact persistent author header in constrained layouts is ACCEPTED. Once pull request #379 (WP 7.2) is on main, merge origin/main into lane-7/keyboard-drafts, re-run only the gates that the merge could affect, note the decision in draft pull request #401 and mark it ready for review. The founder will connect GitHub in the app so the CI reader works.
+
+THEN: do WP 7.4 as your handoff describes (the shared behavior spec and the C4 harness update first), and stop and report. Do not start 7.10, 7.11, 7.8 or 7.12 until the founder sends "Next for lane 7".
+
+WHAT CHANGED
+- The one-command stack is on main: node infra/local/stack.mjs up --lane 7 (read infra/local/README.md); your fake API harness stays for the full matrix.
+- The real model: you never hold a key. The founder runs a capped gateway at http://127.0.0.1:56499. Sonnet 5.5 is the model. Native scenarios rarely need it: use the fake (--provider anthropic); add --model-gateway only when a scenario needs real answers; report spend; a 402 means stop. Section 3.6 of the working agreement.
+- If pnpm install --frozen-lockfile --offline fails with ERR_PNPM_NO_OFFLINE_META, run pnpm install --frozen-lockfile (online, lockfile packages only; the founder approves). The database image pgvector/pgvector:pg17 is back on this Mac.
+- Backend account deletion is incomplete (your ticket to lane 1 stands; lane 1 now has it).

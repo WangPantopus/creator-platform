@@ -30,6 +30,9 @@ import { contentPublicProjection } from "./modules/growth/content.js";
 import { canonicalConversationHomePage } from "./modules/growth/home.js";
 import { canonicalHomePage } from "./modules/growth/home-composition.js";
 import { canonicalPassAccess } from "./modules/growth/integration.js";
+import { composeNotificationOwners } from "./modules/growth/owners.js";
+import type { GrowthOwners } from "./modules/growth/contracts.js";
+import { contentNoticeOwner } from "./modules/content/notices.js";
 import { createGrowthAPIPool } from "./db/growth-api-pool.js";
 import { DomainError } from "./core/errors.js";
 import { domainPrivacyTaskAuthorityInTransaction } from "./modules/trust/domain-privacy-authority.js";
@@ -264,6 +267,14 @@ try {
             // the actual reader after the canonical Content service is bound,
             // before listeners start; no request can borrow a projection DTO.
             let postEntryReader: CurrentPostEntryReader | undefined;
+            // Note and reaction notices (lane 5): Content queues them through
+            // Growth's relay, and Growth asks Content whether each one is still
+            // current. Content needs the relay first, so its owner is bound once
+            // the Content service exists; until then a notice stays unconfigured.
+            // Conversation, commerce and call owners are not connected yet.
+            const notices: {
+              content?: GrowthOwners["notificationState"];
+            } = {};
             features.growth = await configureGrowthForBackend({
               ...runtime,
               pool: growthAPIPool ?? runtime.pool,
@@ -316,6 +327,14 @@ try {
                           ),
                         }
                       : {}),
+                    notificationState: composeNotificationOwners({
+                      content: (event, recipient, custody) =>
+                        (notices.content ?? composeNotificationOwners({}))(
+                          event,
+                          recipient,
+                          custody,
+                        ),
+                    }),
                   }
                 : undefined,
             });
@@ -376,6 +395,9 @@ try {
               ...(runtime.audienceIdentity
                 ? { tenure: { audienceIdentity: runtime.audienceIdentity } }
                 : {}),
+              ...(features.growth
+                ? { notices: { relay: features.growth.relay } }
+                : {}),
               ...(runtime.holdCreatorFanNegativeAuthority
                 ? {
                     creatorTenure: {
@@ -414,6 +436,11 @@ try {
                   dependencies: contentHost.dependencies,
                 });
             contentHost.bindContent(content.content);
+            if (features.growth)
+              notices.content = contentNoticeOwner({
+                pool: runtime.pool,
+                content: content.content,
+              });
             if (
               features.growth &&
               runtime.audienceIdentity &&

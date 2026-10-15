@@ -4,6 +4,7 @@ import type { Actor } from "../identity/adapter.js";
 import { DomainError } from "../../core/errors.js";
 import type { CommerceService } from "./service.js";
 import { CreatorEarningsReader } from "./creator-earnings.js";
+import { commercePublicSummary } from "./public-summary.js";
 
 export function createCommerceRouter(input: {
   service?: CommerceService;
@@ -56,6 +57,21 @@ export function createCommerceRouter(input: {
       ),
     }),
   );
+  // Public by design (C8): what a creator offers and how much of this week is
+  // left. No account is needed, and nothing private is read.
+  router.get("/creators/:creatorId/summary", async (req, res) => {
+    const summary = await commercePublicSummary(
+      service().pool,
+      id(req.params.creatorId),
+    );
+    if (!summary)
+      throw new DomainError(
+        "creator_unavailable",
+        "This creator is unavailable.",
+        404,
+      );
+    res.set("Cache-Control", "no-store").json(summary);
+  });
   router.get("/overview", async (req, res) => {
     const actor = await actorFor(req);
     const value = await service().overview(

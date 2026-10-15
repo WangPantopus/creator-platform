@@ -2,7 +2,11 @@ import { z } from "zod";
 import type { Usage } from "../../../../../packages/api/src/agent/contracts.js";
 import { DomainError } from "../../core/errors.js";
 import { ReplySchema, type ModelConfiguration } from "./model.js";
-import { ProviderResponseError, responseUsage } from "./response-usage.js";
+import {
+  ProviderResponseError,
+  providerRefused,
+  responseUsage,
+} from "./response-usage.js";
 import { contentHash } from "../../core/canonical.js";
 export type ReplySentence = z.infer<typeof ReplySchema>["sentences"][number];
 export type StreamProposal = { sentence: ReplySentence } | { usage: Usage };
@@ -92,7 +96,15 @@ export async function* streamResponses(
     signal: AbortSignal.any([signal, AbortSignal.timeout(45_000)]),
     redirect: "error",
   });
-  if (!response.ok || !response.body)
+  if (!response.ok)
+    throw providerRefused(
+      response.status,
+      "OpenAI",
+      model,
+      "The configured model is unavailable.",
+      "provider_failed",
+    );
+  if (!response.body)
     throw new DomainError(
       "provider_failed",
       "The configured model is unavailable.",

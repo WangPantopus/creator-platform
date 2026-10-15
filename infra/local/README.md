@@ -8,29 +8,30 @@ production setting.
 node infra/local/stack.mjs up --lane 2
 ```
 
-(Lane N uses `--lane N`. A second stack, or a label such as `3a`, needs
-`--base-port`.) `up` is safe to repeat. It ends by running the smoke check:
+(`pnpm stack up --lane 2` is the same. Lane N uses `--lane N`. A second stack, or a
+label such as `3a`, needs `--base-port`.) `up` is safe to repeat. It ends by running the smoke check:
 a fan signs in, opens a conversation with the fictional creator Maya, sends a
 message and must see the acknowledgment (and be refused as a signed-out visitor or another
 fan); then the AI's first sentence should arrive. That last part only warns, because it
 depends on the machine's load (see "Things to know"); `smoke --require-reply` makes it fail.
 
-| Command                            | What it does                                                                                                                                                                                                                                                                                                                                     |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `up`                               | Everything below, then the smoke check. `--no-web`, `--no-ai`, `--no-smoke`, `--ack-only` skip parts. `--growth` also composes the Growth module (see below). `--env KEY=VALUE` adds backend settings, `--web-env KEY=VALUE` adds web settings. Options are not remembered: pass them every time, and a changed option restarts only the backend |
-| `status`                           | What is running and healthy (exit 0 only if all of it is)                                                                                                                                                                                                                                                                                        |
-| `smoke`                            | Sign in, send a message, see the acknowledgment                                                                                                                                                                                                                                                                                                  |
-| `env`                              | The addresses, and `CREATOR_TEST_DATABASE_URL` for the existing test suites                                                                                                                                                                                                                                                                      |
-| `logs backend\|web\|model [-n 80]` | The tail of a service log                                                                                                                                                                                                                                                                                                                        |
-| `stop`                             | Stop everything and keep the data; `up` brings it back                                                                                                                                                                                                                                                                                           |
-| `down`                             | Remove everything this stack created: processes, container, volume, files                                                                                                                                                                                                                                                                        |
-| `reset`                            | `down`, then `up`: a stack rebuilt from nothing                                                                                                                                                                                                                                                                                                  |
+| Command                            | What it does                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `up`                               | Everything below, then the smoke check. `--no-web`, `--no-ai`, `--no-smoke`, `--ack-only` skip parts. `--db-only` brings up just the database, its roles and the seed, for work that runs its own host (the production host's scenario, E2.2). `--growth` also composes the Growth module (see below). `--env KEY=VALUE` adds backend settings, `--web-env KEY=VALUE` adds web settings. Options are not remembered: pass them every time, and a changed option restarts only the backend |
+| `status`                           | What is running and healthy (exit 0 only if all of it is)                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `smoke`                            | Sign in, send a message, see the acknowledgment                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `env`                              | The addresses, and `CREATOR_TEST_DATABASE_URL` for the existing test suites                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `logs backend\|web\|model [-n 80]` | The tail of a service log                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `stop`                             | Stop everything and keep the data; `up` brings it back                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `down`                             | Remove everything this stack created: processes, container, volume, files                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `reset`                            | `down`, then `up`: a stack rebuilt from nothing                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `catalogues <command>`             | The reviewed catalogue pins against this stack's database: `check`, `snapshot --out F`, `diff --base F`, `write`. A new migration changes them and the product refuses until they are regenerated: [the procedure](../../docs/lanes/status/lane-2-catalogue-pins.md)                                                                                                                                                                                                                      |
 
 ## What you get
 
 | Part                        | Address (lane 2)         | Notes                                                                                                                                             |
 | --------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| PostgreSQL 17 with pgvector | `127.0.0.1:56420`        | Container `qelvora-lane2-postgres`, volume `qelvora-lane2-pgdata`. All 114 registered migrations, the seed, a password on every login role        |
+| PostgreSQL 17 with pgvector | `127.0.0.1:56420`        | Container `qelvora-lane2-postgres`, volume `qelvora-lane2-pgdata`. All 116 registered migrations, the seed, a password on every login role        |
 | Backend                     | `http://127.0.0.1:56421` | The real `server.ts`, development identity, trust runtime, Maya's AI live. The generation, trust and usage-expiry workers run inside this process |
 | Web                         | `http://localhost:56422` | `next dev`, pointed at that backend                                                                                                               |
 | Model fake                  | `127.0.0.1:56423`        | Stands in for the model provider (see below)                                                                                                      |
@@ -75,8 +76,9 @@ curl -s http://127.0.0.1:56423/__stats                                      # ca
 
 ## Using Claude instead of OpenAI (optional)
 
-`up --provider anthropic` wires the backend to the Claude adapter (Haiku 5.5 for guards,
-judges and extraction; Sonnet 5.5 for replies; embeddings stay on OpenAI). On its own it costs
+`up --provider anthropic` wires the backend to the Claude adapter (Sonnet 5.5 for every call,
+the founder's choice; `--claude-small haiku` puts guards, judges and extraction on the much
+cheaper Haiku 5.5; embeddings stay on OpenAI). On its own it costs
 nothing: Claude's calls go to the same local fake, which now also speaks Claude's protocol.
 
 For the real model there is one process that holds the key, the capped gateway. The founder
@@ -132,11 +134,13 @@ eval "$(node infra/local/stack.mjs env --lane 2 | sed 's/^/export /')"
   endpoint hundreds of times; the launch review already records the identity heartbeat
   re-keying screens, and that is my hypothesis for the stall, not something I proved.
   Sign-in, Home and the chat entry page (`/creators/maya/chat`) work.
-- **`--growth`** adds the Growth module: a login `growth_api` that inherits only the two
-  request roles (what `db/growth-api-pool.ts` requires), the Growth worker URL and a
-  generated key. The public creator page then answers. The reviewed generation-purpose
-  catalogue treats that extra login as drift, so once all 114 migrations are applied the
-  stack no longer repeats the migration checks on later runs. No HTTPS origin exists
+- **`--growth`** adds the Growth module: a login `creator_review_growth_api` that inherits
+  only the two request roles (what `db/growth-api-pool.ts` requires), the Growth worker URL
+  and a generated key. The public creator page then answers. The login carries the name the
+  reviewed "incoming Growth" catalogue variants were captured with, so the migration checks
+  accept it (a stack built before this change has a `growth_api` login instead: `reset` it).
+  The pin tool still reports one difference with the login present,
+  `runtimeCatalogues.family`, a pin with no incoming variant that no runtime path reads. No HTTPS origin exists
   locally, so `GROWTH_PUBLIC_ORIGIN` is left unset (pass one with `--env` if you need it).
   Notifications, shares and the senders are not exercised by the stack.
 - **`apps/web/next-env.d.ts`** is a tracked file that `next dev` rewrites. While the web

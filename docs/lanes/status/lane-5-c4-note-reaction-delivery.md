@@ -104,8 +104,8 @@ the Studio's `POST /v1/content/{creatorId}/studio/effects/run` retries anything 
 not finish):
 
 - a **Note** tells every current member of the Note's audience (members, or the named
-  tiers) except a fan W8 denies (blocked, restricted, deleted), once per Note, in events of
-  at most 500 recipients. Later publications of the same Note (edits) tell no one.
+  tiers) except a fan W8 denies (blocked, restricted, deleted) and a member who muted that
+  creator's Notes, once per Note, in events of at most 500 recipients. Later publications of the same Note (edits) tell no one.
   Followers and group Notes tell no one yet (see below).
 - a **reaction** tells the one fan whose reply it answers, unless W8 denies that fan or the
   reply was withdrawn.
@@ -139,7 +139,6 @@ Followers and group Notes render the same way in the thread, but followers are u
 until the reserved follow migration lands (`canonicalCoreContentFollows` is unavailable), and
 group Notes need the original-recipient reader; neither sends a notice yet. Voice and photo
 Notes carry no media here yet. There is no way to undo a reaction (the table is insert-only
-and no route exists). Two known gaps in who is pushed: a fan who muted a creator's Notes in
-the content module is still pushed (the mute is private to the fan and unreadable from the
-creator's session), and a reaction push can still go out after the fan withdrew the reply.
-Both are held in `tests/scenarios/lane-5/e5-4-known-gaps.mjs`; see the status file.
+and no route exists). One known gap in who is pushed: a reaction push can still go out after the fan withdrew the reply
+(the worker cannot read replies; the fan's own list hides it). It is held in
+`tests/scenarios/lane-5/e5-4-known-gaps.mjs`; see the status file.

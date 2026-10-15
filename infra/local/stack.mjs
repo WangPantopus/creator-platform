@@ -12,6 +12,8 @@
 //   node infra/local/stack.mjs reset  --lane 2     down, then up: a stack rebuilt from nothing
 //   node infra/local/stack.mjs stop   --lane 2     stop everything, keep the data
 //   node infra/local/stack.mjs down   --lane 2     remove everything this stack created
+//   node infra/local/stack.mjs catalogues check|snapshot|diff|write --lane 2 [tool options]
+//                                                  the reviewed catalogue pins (WP 2.9)
 //
 // Lane N owns ports 564N0 to 564N9 and containers named qelvora-laneN-*;
 // --base-port moves the range and --lane may be a label such as 3a.
@@ -40,13 +42,21 @@ const IMAGE = "pgvector/pgvector:pg17";
 /** The repository's documented loopback-only test constant for the database
  * administrator and the request role (tests and the working agreement use it). */
 const TEST_PASSWORD = "foundation-test-only";
+/** The Growth API login. The reviewed "incoming Growth" catalogue variants were
+ * captured with this name (a member of creator_runtime and growth_runtime, and
+ * nothing else), so a stack that uses it matches them and passes the migration
+ * checks with --growth. */
+const GROWTH_API_LOGIN = "creator_review_growth_api";
 const SYNTHETIC_REFERENCE =
   "synthetic-review-only-unapproved-processor-20261001";
 const MAYA = "20000000-0000-4000-8000-000000000001";
 const MAYA_ACCOUNT = "10000000-0000-4000-8000-000000000003";
 const DEVON = "20000000-0000-4000-8000-000000000002";
 const DEVON_ACCOUNT = "10000000-0000-4000-8000-000000000005";
-const TOTAL_MIGRATIONS = 114;
+/** The stack applies the whole registered graph. */
+const TOTAL_MIGRATIONS = JSON.parse(
+  readFileSync(join(root, "infra/migrations.json"), "utf8"),
+).migrations.length;
 
 class StackError extends Error {
   constructor(message, hint = "", exit = 1) {
@@ -74,7 +84,9 @@ function parse(argv) {
     else if (arg === "--web-env") options.webEnv.push(value());
     else if (arg === "--provider") options.provider = value();
     else if (arg === "--model-gateway") options.modelGateway = value();
+    else if (arg === "--claude-small") options.claudeSmall = value();
     else if (arg === "--growth") options.growth = true;
+    else if (arg === "--db-only") options.dbOnly = true;
     else if (arg === "--no-web") options.noWeb = true;
     else if (arg === "--no-ai") options.noAi = true;
     else if (arg === "--no-smoke") options.noSmoke = true;
@@ -508,8 +520,7 @@ async function bootstrapDatabase(plan, secrets, options) {
       W8_LEGACY_ROOT_MIGRATIONS: "false",
     });
   // The reviewed migration checks run while the history is incomplete. Once all
-  // of it is applied they are not repeated on every `up`: a later, deliberate
-  // addition such as the Growth API login would otherwise fail them.
+  // of it is applied they are not repeated on every `up`.
   const applied = async () =>
     (await psql(
       plan,
@@ -577,12 +588,12 @@ async function bootstrapDatabase(plan, secrets, options) {
     // roles and owns or is granted nothing itself (db/growth-api-pool.ts).
     await psql(
       plan,
-      `DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='growth_api') THEN
-         CREATE ROLE growth_api LOGIN INHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
-         GRANT creator_runtime, growth_runtime TO growth_api;
+      `DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='${GROWTH_API_LOGIN}') THEN
+         CREATE ROLE ${GROWTH_API_LOGIN} LOGIN INHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+         GRANT creator_runtime, growth_runtime TO ${GROWTH_API_LOGIN};
        END IF; END $$`,
     );
-    roles.push("growth_api");
+    roles.push(GROWTH_API_LOGIN);
   }
   const statements = roles.map((role) => {
     secrets.passwords[role] ??= randomBytes(18).toString("base64url");
@@ -642,6 +653,8 @@ async function providerFor(plan, options) {
     );
   if (options.modelGateway && provider !== "anthropic")
     throw new StackError("--model-gateway needs --provider anthropic.", "", 2);
+  if (options.claudeSmall && !["sonnet", "haiku"].includes(options.claudeSmall))
+    throw new StackError("--claude-small is sonnet (default) or haiku.", "", 2);
   if (provider === "openai") return { provider };
   if (!options.modelGateway)
     return {
@@ -779,7 +792,13 @@ async function writeBackendConfig(plan, secrets, options) {
     W3_DEVELOPMENT_ECONOMICS_FILE: plan.file("economics.json"),
     W3_DEVELOPMENT_INGESTION: `${MAYA}:${MAYA_ACCOUNT},${DEVON}:${DEVON_ACCOUNT}`,
     OPENAI_API_KEY: "sk-local-development-fake",
-    W2_SMALL_MODEL: claude ? "claude-haiku-5-5" : "gpt-4o-mini",
+    // The founder's choice is Sonnet 5.5 for every call; Haiku 5.5 is the cheaper option for the
+    // small route (guards, judges, extraction).
+    W2_SMALL_MODEL: claude
+      ? options.claudeSmall === "haiku"
+        ? "claude-haiku-5-5"
+        : "claude-sonnet-5-5"
+      : "gpt-4o-mini",
     W2_LARGE_MODEL: claude ? "claude-sonnet-5-5" : "gpt-4o",
     W2_EMBEDDING_MODEL: "text-embedding-3-small",
     W2_MODEL_RATES_JSON: rates,
@@ -795,7 +814,7 @@ async function writeBackendConfig(plan, secrets, options) {
     ...(options.growth
       ? {
           GROWTH_ENABLED: "true",
-          GROWTH_API_DATABASE_URL: roleUrl(plan, secrets, "growth_api"),
+          GROWTH_API_DATABASE_URL: roleUrl(plan, secrets, GROWTH_API_LOGIN),
           GROWTH_WORKER_DATABASE_URL: roleUrl(plan, secrets, "growth_worker"),
           GROWTH_ENCRYPTION_KEY: secrets.growthKey,
         }
@@ -1035,6 +1054,8 @@ async function up(plan, options) {
     await preflightPorts(plan, options);
     await ensureContainer(plan);
     await bootstrapDatabase(plan, secrets, options);
+    // Just the database, roles and seed: for work that brings its own host.
+    if (options.dbOnly) return;
     plan.webExtra = options.webEnv;
     const hash = await writeBackendConfig(plan, secrets, options);
     const backendRecord = owned.backend;
@@ -1083,6 +1104,15 @@ async function up(plan, options) {
       );
   });
   say();
+  if (options.dbOnly) {
+    say(
+      `READY  ${plan.name} database only  (${Math.round((Date.now() - began) / 1000)} s)`,
+    );
+    say(
+      `  database  postgresql://postgres:${TEST_PASSWORD}@127.0.0.1:${plan.ports.postgres}/${plan.database}`,
+    );
+    return;
+  }
   say(`READY  ${plan.name}  (${Math.round((Date.now() - began) / 1000)} s)`);
   await printAddresses(plan, options);
   if (!options.noSmoke) {
@@ -1358,16 +1388,48 @@ async function env(plan) {
   say(`QELVORA_FAKE_MODEL_URL=http://127.0.0.1:${plan.ports.model}`);
 }
 
-const help = `Usage: node infra/local/stack.mjs <up|status|smoke|env|logs|stop|down|reset> --lane N [options]
+const help = `Usage: node infra/local/stack.mjs <up|status|smoke|env|logs|stop|down|reset|catalogues> --lane N [options]
   --provider P    openai (default) or anthropic: Claude answers, against the local fake
   --model-gateway URL   with --provider anthropic: send Claude calls to the capped gateway (real model)
+  --claude-small haiku  with --provider anthropic: guards, judges and extraction on Haiku 5.5 (default: Sonnet 5.5 for every call)
   --lane N        lane number (ports 564N0-564N9) or a label such as 3a with --base-port
   --base-port P   first of ten ports (default 56400 + N*10)
-  up options      --growth  --no-web  --no-ai  --no-smoke  --ack-only  --require-reply  --env KEY=VALUE  --web-env KEY=VALUE
+  up options      --db-only  --growth  --no-web  --no-ai  --no-smoke  --ack-only  --require-reply  --env KEY=VALUE  --web-env KEY=VALUE
   down options    --keep-data
-  logs            logs backend|web|model [-n 80]`;
+  logs            logs backend|web|model [-n 80]
+  catalogues      check | snapshot --out F | diff --base F | write [--base F] [--dry-run] [--variant L]
+                  the reviewed catalogue pins against this stack's database (docs/lanes/status/lane-2-catalogue-pins.md)`;
+
+// ---------------------------------------------------- the reviewed catalogue pins
+/** Everything but --lane and --base-port belongs to the tool; its exit code is ours. */
+async function catalogues(rest) {
+  const own = [];
+  const forwarded = [];
+  for (let at = 0; at < rest.length; at += 1)
+    if (rest[at] === "--lane" || rest[at] === "--base-port")
+      own.push(rest[at], rest[(at += 1)]);
+    else forwarded.push(rest[at]);
+  const plan = planFor(parse(["catalogues", ...own]).options);
+  return new Promise((done) => {
+    const child = spawn(
+      process.execPath,
+      [
+        "--import",
+        "tsx",
+        "src/operations/catalogues/catalogue-pins.ts",
+        ...forwarded,
+        "--database-url",
+        adminUrl(plan),
+      ],
+      { cwd: join(root, "apps/backend"), stdio: "inherit" },
+    );
+    child.on("close", (code) => done(code ?? 3));
+  });
+}
 
 async function main() {
+  if (process.argv[2] === "catalogues")
+    process.exit(await catalogues(process.argv.slice(3)));
   const { command, options } = parse(process.argv.slice(2));
   if (command === "help" || command === "--help") return say(help);
   const plan = planFor(options);

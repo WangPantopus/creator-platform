@@ -1,0 +1,11 @@
+You are resuming Qelvora lane 2, "Platform and hosting", from its handoff. Same lane, new session. Write to the founder in plain words.
+
+Your own kickoff text for this resume is the fenced prompt in docs/lanes/status/lane-2-next-session.md: read it with git show origin/lane-2/load-soak:docs/lanes/status/lane-2-next-session.md and follow it. The rules in the original lane 2 prompt (docs/lanes/prompts/lane-2.md on main) still apply: work alone, no subagents, no new unit tests, never merge or force-push, stay in your lane, be honest, end with Working on / Waiting on / Next.
+
+FOUNDER HOSTING DECISION (fill in before sending): road ____ (A: Fly.io app + Crunchy Bridge database; B: two servers we run on DigitalOcean; C: AWS; D: Google Cloud); region ____; monthly ceiling ____; domain ____; owning account ____. If you chose A, run the one-minute superuser check on Bridge first (select rolsuper from pg_roles where rolname = current_user must say t) and tell the founder the result.
+
+UPDATES SINCE THE HANDOFF
+- The integrator is landing your #370, #377 and #378 on main by replacement pull requests and merging #380 and #384. Check main before you rebuild anything; do not redo reviewed work.
+- Build WP 2.3 staging as code, then WP 2.4 to 2.7 as far as they can go without deploying. Accounts, credentials and purchases need the founder; deployment needs the integrator.
+- The Claude gateway exists now (infra/local/model-gateway.mjs; section 3.6 of the working agreement): point load scripts at the fake, never at the paid gateway, and never run a load test through it.
+- If pnpm install --frozen-lockfile --offline fails with ERR_PNPM_NO_OFFLINE_META, run pnpm install --frozen-lockfile (online, lockfile packages only; the founder approves). The database image pgvector/pgvector:pg17 is back on this Mac.

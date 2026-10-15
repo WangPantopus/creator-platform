@@ -14,9 +14,11 @@ import {
   ReplySchema,
 } from "../../../apps/backend/src/modules/agent/model.ts";
 
-const apiKey = process.env.ANTHROPIC_API_KEY;
+// Through the capped gateway (preferred: no key in this process) or direct with a key.
+const gateway = process.env.QELVORA_MODEL_GATEWAY;
+const apiKey = gateway ? "via-the-gateway" : process.env.ANTHROPIC_API_KEY;
 if (!apiKey) {
-  console.error("ANTHROPIC_API_KEY is not set.");
+  console.error("Set QELVORA_MODEL_GATEWAY (preferred) or ANTHROPIC_API_KEY.");
   process.exit(2);
 }
 const rates = {
@@ -40,11 +42,14 @@ const rates = {
 const configuration = {
   apiKey,
   embeddingApiKey: process.env.OPENAI_API_KEY ?? "unset",
-  smallModel: "claude-haiku-5-5",
+  smallModel: "claude-sonnet-5-5",
   largeModel: "claude-sonnet-5-5",
   embeddingModel: "text-embedding-3-small",
   policyReference: "live-check",
   rates,
+  ...(gateway
+    ? { endpoints: { anthropic: `${gateway}/lane/integrator` } }
+    : {}),
 };
 const model = new AnthropicMessagesModel(configuration);
 const signal = new AbortController().signal;
@@ -151,17 +156,18 @@ await check(
   },
 );
 
-await check("L6 bad key maps to a provider failure", async () => {
-  const bad = new AnthropicMessagesModel({
-    ...configuration,
-    apiKey: "invalid",
+if (!gateway)
+  await check("L6 bad key maps to a provider failure", async () => {
+    const bad = new AnthropicMessagesModel({
+      ...configuration,
+      apiKey: "invalid",
+    });
+    const error = await failure(
+      bad.structured("x", ["y"], InputVerdict, "small", signal),
+    );
+    assert.equal(error.code, "provider_failed");
+    return `status ${(error.cause as { upstreamStatus: number }).upstreamStatus}`;
   });
-  const error = await failure(
-    bad.structured("x", ["y"], InputVerdict, "small", signal),
-  );
-  assert.equal(error.code, "provider_failed");
-  return `status ${(error.cause as { upstreamStatus: number }).upstreamStatus}`;
-});
 
 if (process.env.OPENAI_API_KEY)
   await check("L7 embeddings through OpenAI", async () => {
