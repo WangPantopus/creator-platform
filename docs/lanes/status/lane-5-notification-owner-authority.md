@@ -1,6 +1,10 @@
 # Decision pack: who may a notification worker ask?
 
-Lane 5, WP 5.2. For the founder, through the integrator. Needs one choice (below).
+Lane 5, WP 5.2. **Decided 2026-10-08: option A** (the founder). Built in `lane-5/notice-snapshots`:
+`modules/growth/notices.ts` (`GrowthNotices.emit` and `withdraw`, the reader and the dispatcher),
+the table in `modules/growth/migrations/pending_w7_notice_snapshot.sql`, export and erasure
+coverage, and scenarios `e5-4-owner-snapshots` (12 of 12). The owners' two calls are tickets to
+lanes 3 and 4 in [the status file](lane-5.md). The original analysis follows unchanged.
 
 ## What works, and why
 

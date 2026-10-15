@@ -11,6 +11,7 @@ import {
 import { Engagement } from "./engagement.js";
 import { GrowthExperiments } from "./experiments.js";
 import { GrowthRelay, type GrowthEventSources } from "./relay.js";
+import { GrowthNotices } from "./notices.js";
 import {
   growthPrivacyHook,
   type GrowthPrivacyScope,
@@ -99,6 +100,7 @@ export async function createGrowthRuntime(input: {
   const retention = new Retention(service, input.thanksPermission);
   const weeklyImpact = new WeeklyImpact(service, retention);
   const relay = new GrowthRelay(service);
+  const notices = new GrowthNotices(service);
   const engagement = new Engagement(service, input.installURLs);
   const experiments = new GrowthExperiments(service, input.experimentsEnabled);
   const postEntryContext = canonicalPostEntryContext(
@@ -203,6 +205,7 @@ export async function createGrowthRuntime(input: {
     retention,
     weeklyImpact,
     relay,
+    notices,
     engagement,
     experiments,
     postEntryContext,
