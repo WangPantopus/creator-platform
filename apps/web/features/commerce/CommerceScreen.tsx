@@ -1466,6 +1466,16 @@ function CommerceAccountScreen({
                       ? ` · ${money(chosenAmount, chosen.currency)} if accepted`
                       : ""}
                   </Button>
+                  {chosen && hasSpendingLimit && limit?.amount != null && (
+                    // What this month already counts (captures and open
+                    // holds), beside the limit it is checked against.
+                    <span className="qv-meta commerce-spend-line">
+                      {formatCopy("spendThisMonth", {
+                        spent: money(data.exposure?.total ?? 0, currency),
+                        limit: money(Number(limit.amount), currency),
+                      })}
+                    </span>
+                  )}
                   {checkout &&
                     chosen &&
                     chosenAvailable &&

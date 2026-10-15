@@ -79,6 +79,7 @@ export const copy = {
   "conversationDevelopmentPolicyNotice": "Use fictional content only. This development configuration does not represent provider approval or permission to serve real fans. Message retention may apply.",
   "sensitiveMemory": "Want me to remember this? Only if you say yes.",
   "spendLimit": "Set a monthly limit. You can change it any time; raising it takes 24 hours.",
+  "spendThisMonth": "This month · {spent} of your {limit} limit",
   "stepIn": "Ask {name} to step in",
   "includedInRequest": "Included in your request",
   "aiAuthor": "{name}'s AI",

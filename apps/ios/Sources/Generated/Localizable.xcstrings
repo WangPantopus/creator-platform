@@ -870,6 +870,17 @@
         }
       }
     },
+    "This month · {spent} of your {limit} limit": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This month · {spent} of your {limit} limit"
+          }
+        }
+      }
+    },
     "Ask {name} to step in": {
       "extractionState": "manual",
       "localizations": {
