@@ -4,6 +4,7 @@
 // compared before and after. Takes a few minutes. Run from the repository root:
 //   node tests/scenarios/lane-2/e2-1-cold-start.mjs [--lane 2] [--second 8]
 import { execFile, spawn } from "node:child_process";
+import { readFileSync } from "node:fs";
 import net from "node:net";
 import { promisify } from "node:util";
 import { reporter, sleep } from "./lib.mjs";
@@ -15,6 +16,9 @@ const flag = (name, fallback) => {
 const lane = flag("--lane", "2");
 const second = flag("--second", "8");
 const stackCli = "infra/local/stack.mjs";
+/** Every registered migration is applied, so the expected count follows the registry. */
+const registered = JSON.parse(readFileSync("infra/migrations.json", "utf8"))
+  .migrations.length;
 const { step, finish } = reporter();
 const exec = promisify(execFile);
 
@@ -102,7 +106,7 @@ step(
 const first = await counts(lane);
 step(
   "seeds and Maya's AI are in place",
-  first === "2/1/3/1/114",
+  first === `2/1/3/1/${registered}`,
   `profiles/team/ops/versions/migrations = ${first}`,
 );
 
