@@ -6,6 +6,7 @@ import {
   assertOutputPrivacyTaskCatalogForReview,
   assertPublicPrivacyTaskCatalogForReview,
   assertComparisonPrivacyTaskCatalogForReview,
+  assertContentPrivacyTaskCatalogForReview,
   assertPrivacyTaskCatalog,
 } from "../src/modules/trust/privacy-catalog.js";
 import {
@@ -44,6 +45,7 @@ export async function assertPrivacyWaveRoleSafety(
     domain: boolean;
     canonicalBeforeGeneration?: boolean;
     generationBeforeContent?: boolean;
+    contentBeforeOutput?: boolean;
     outputBeforePublic?: boolean;
     publicBeforeComparison?: boolean;
     comparisonBeforeNotices?: boolean;
@@ -127,6 +129,8 @@ export async function assertPrivacyWaveRoleSafety(
         await assertCanonicalPrivacyTaskCatalog(client);
       else if (installed.generationBeforeContent)
         await assertGenerationPrivacyTaskCatalogForReview(client);
+      else if (installed.contentBeforeOutput)
+        await assertContentPrivacyTaskCatalogForReview(client);
       else if (installed.outputBeforePublic)
         await assertOutputPrivacyTaskCatalogForReview(client);
       else if (installed.publicBeforeComparison)
