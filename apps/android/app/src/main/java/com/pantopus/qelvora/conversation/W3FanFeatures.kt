@@ -447,7 +447,12 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 IdentityStrip(state = if (current.control == APIThreadControl.HUMAN_ACTIVE) IdentityState.HUMAN else if (current.control == APIThreadControl.AI_ACTIVE) IdentityState.AI else IdentityState.PAUSED, name = current.creatorName)
                 }
             }
-            val messageLabel = if (current.control == APIThreadControl.HUMAN_ACTIVE) "Message ${current.creatorName}" else "Message ${current.creatorName}'s AI"
+            // The composer follows the design reference (`Composer`, WP 7.4 P3): while the
+            // creator is here the input is theirs and there is no step-in button; while the
+            // AI is paused the paused line takes the input's place and step-in stays.
+            val human = current.control == APIThreadControl.HUMAN_ACTIVE
+            val paused = current.control == APIThreadControl.AI_PAUSED
+            val messageLabel = copy(if (human) "replyToCreator" else "messageAI", "name" to current.creatorName)
             val input: @Composable (Modifier) -> Unit = { modifier ->
                 BasicTextField(value = draft, onValueChange = { updateInput(text = it.take(2000)) },
                     modifier = modifier.heightIn(min = 48.dp, max = if (compact && keyboardVisible) 96.dp else 160.dp)
@@ -470,9 +475,14 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             }
             val composer: @Composable () -> Unit = {
                 Column(Modifier.imePadding().padding(horizontal = if (horizontalControls) 4.dp else 16.dp, vertical = if (keyboardVisible && compact) 4.dp else 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    if (!current.canSend && !horizontalControls) Notice(title = "AI unavailable", children = current.unavailableReason ?: "Messaging is unavailable.")
-                    if (!keyboardVisible && !compact) Button(QelvoraCopy.text("stepIn", mapOf("name" to current.creatorName)), variant = ButtonVariant.MAYA, block = true, initial = creatorInitial(current.creatorName)) { session.open("/commerce/packet?creatorId=$creatorId") }
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.Bottom) { input(Modifier.weight(1f)); sendButton() }
+                    if (!current.canSend && !paused && !horizontalControls) Notice(title = "AI unavailable", children = current.unavailableReason ?: "Messaging is unavailable.")
+                    if (paused && !compact) Row(Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Glyph("pause", 16.dp, qColor("ink-muted"))
+                        BasicText(copy("aiPaused", "name" to current.creatorName), style = qText("label").copy(color = qColor("ink-muted")))
+                    }
+                    // In the compact layout the step-in button ends the thread instead (below).
+                    if (!human && !compact && (paused || !keyboardVisible)) Button(QelvoraCopy.text("stepIn", mapOf("name" to current.creatorName)), variant = ButtonVariant.MAYA, block = true, initial = creatorInitial(current.creatorName)) { session.open("/commerce/packet?creatorId=$creatorId") }
+                    if (!paused) Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.Bottom) { input(Modifier.weight(1f)); sendButton() }
                     if (!keyboardVisible && !compact) Row { privacyControls() }
                 }
             }
@@ -480,7 +490,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             LazyColumn(state = scroll, modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 if (horizontalControls) item {
                     Button(copy("aboutConversation"), variant = ButtonVariant.QUIET) { privacy = true }
-                    if (!current.canSend) Notice(title = "AI unavailable", children = current.unavailableReason ?: "Messaging is unavailable.")
+                    if (!current.canSend && !paused) Notice(title = "AI unavailable", children = current.unavailableReason ?: "Messaging is unavailable.")
                 }
                 if (compact) item { IdentityStrip(state = if (current.control == APIThreadControl.HUMAN_ACTIVE) IdentityState.HUMAN else if (current.control == APIThreadControl.AI_ACTIVE) IdentityState.AI else IdentityState.PAUSED, name = current.creatorName) }
                 item(key = "intro-offer") {
@@ -566,7 +576,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 item(key = "conversation-end") { Spacer(Modifier.height(1.dp)) }
                 if (compact && !keyboardVisible) item {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Button(QelvoraCopy.text("stepIn", mapOf("name" to current.creatorName)), variant = ButtonVariant.MAYA, block = true, initial = creatorInitial(current.creatorName)) { session.open("/commerce/packet?creatorId=$creatorId") }
+                        if (!human) Button(QelvoraCopy.text("stepIn", mapOf("name" to current.creatorName)), variant = ButtonVariant.MAYA, block = true, initial = creatorInitial(current.creatorName)) { session.open("/commerce/packet?creatorId=$creatorId") }
                         privacyControls()
                     }
                 }

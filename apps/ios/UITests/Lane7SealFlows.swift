@@ -47,11 +47,15 @@ final class Lane7SealFlows: XCTestCase {
     }
 
     /// S3.1: each creator's own letter on the step-in seal; Kiln Club is
-    /// human-active, so its Send is creator-colored and carries "K" too.
+    /// human-active, so its Send is creator-colored and carries "K", and there
+    /// is no step-in button (the composer states, P3).
     func testS01SealPerCreator() async throws {
         for (n, name) in [(1, "Maya"), (2, "Kiln Club"), (3, "Glazeco")] {
             try await open(thread(n))
-            XCTAssertTrue(button("Ask \(name) to step in").waitForExistence(timeout: 30))
+            if n == 2 {
+                XCTAssertTrue(app.textViews["Reply to Kiln Club"].waitForExistence(timeout: 30))
+                XCTAssertFalse(button("Ask Kiln Club to step in").exists)
+            } else { XCTAssertTrue(button("Ask \(name) to step in").waitForExistence(timeout: 30)) }
             capture("S1-\(name)")
         }
     }
@@ -89,15 +93,18 @@ final class Lane7SealFlows: XCTestCase {
         try await control("/content-size", body: ["size": "accessibility-extra-extra-extra-large"], port: 56475)
         for appearance in ["light", "night"] {
             try await open(thread(2), appearance: appearance)
-            let stepIn = button("Ask Kiln Club to step in")
-            XCTAssertTrue(stepIn.waitForExistence(timeout: 30))
-            for _ in 0..<10 where !stepIn.isHittable { app.swipeUp() }
+            let send = app.buttons["Send"]
+            XCTAssertTrue(send.waitForExistence(timeout: 30))
+            for _ in 0..<10 where !send.isHittable { app.swipeUp() }
             capture("S2-largest-\(appearance)")
             reveal("in this conversation now")
             capture("S2-largest-strip-\(appearance)")
         }
         try await open(thread(1))
-        XCTAssertTrue(button("Ask Maya to step in").waitForExistence(timeout: 30))
+        let stepIn = button("Ask Maya to step in")
+        XCTAssertTrue(stepIn.waitForExistence(timeout: 30))
+        reveal("Ask Maya to step in", up: false)
+        capture("S2-largest-step-in")
         reveal("Maya reacted to your reply")
         capture("S2-largest-reaction")
         try await control("/content-size", body: ["size": "large"], port: 56475)

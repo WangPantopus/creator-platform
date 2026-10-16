@@ -33,10 +33,20 @@ if (run("S1")) {
     [3, "Glazeco"],
   ]) {
     await open(thread(n));
-    await A.waitFor(`Ask ${name} to step in`, 30000);
+    // The creator is in Kiln Club's thread: Send carries the seal and there
+    // is no step-in button (the composer states, P3).
+    const human = n === 2;
+    await A.waitFor(
+      human ? `Reply to ${name}` : `Ask ${name} to step in`,
+      30000,
+    );
     await L.sleep(1000);
     L.screenshot("android", `S1-${name.replace(" ", "-")}`);
-    L.step("android", `S3.1 ${name} thread captured`, true);
+    L.step(
+      "android",
+      `S3.1 ${name} thread captured`,
+      !human || !A.texts().includes(`Ask ${name} to step in`),
+    );
   }
 }
 
@@ -76,7 +86,7 @@ if (run("S2")) {
   A.adb("shell", "settings", "put", "system", "font_scale", "2.0");
   for (const appearance of ["light", "night"]) {
     await open(thread(2), "devon", appearance);
-    await A.waitFor("Ask Kiln Club to step in", 30000);
+    await A.waitFor("Reply to Kiln Club", 30000);
     await L.sleep(1000);
     L.screenshot("android", `S2-largest-${appearance}`);
     L.step("android", `S3.2 largest ${appearance} captured`, true);
@@ -86,6 +96,8 @@ if (run("S2")) {
   }
   await open(thread(1));
   await A.waitFor("Ask Maya to step in", 30000);
+  await L.sleep(1000);
+  L.screenshot("android", "S2-largest-step-in");
   const chip = await reveal("Maya reacted to your reply");
   L.screenshot("android", "S2-largest-reaction");
   L.step("android", "S3.2 largest reaction chip", chip);

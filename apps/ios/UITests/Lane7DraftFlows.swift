@@ -35,7 +35,7 @@ final class Lane7StackDraftFlow: XCTestCase {
             XCTAssertEqual(result["plaintextFound"] as? Bool, false)
             print("LANE7 real storage: \(count) ciphertext files")
         }
-        let field = app.textViews.matching(NSPredicate(format: "label BEGINSWITH 'Message '")).firstMatch
+        let field = app.textViews.matching(NSPredicate(format: "label BEGINSWITH 'Message ' OR label BEGINSWITH 'Reply to '")).firstMatch
         func input(_ text: String) throws {
             XCTAssertTrue(field.waitForExistence(timeout: 30))
             let match = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", text), object: field)
@@ -206,8 +206,9 @@ final class Lane7DraftFlows: XCTestCase {
         app.launch(); app.launchArguments = arguments
         XCTAssertTrue(app.buttons["Send"].waitForExistence(timeout: 30))
     }
+    /// The composer: "Message {name}'s AI", or "Reply to {name}" while the creator is here.
     private func input() -> XCUIElement {
-        let predicate = NSPredicate(format: "label BEGINSWITH %@", "Message ")
+        let predicate = NSPredicate(format: "label BEGINSWITH %@ OR label BEGINSWITH %@", "Message ", "Reply to ")
         return app.textViews.matching(predicate).firstMatch
     }
     private func hasDraft(_ value: String) throws {
@@ -270,7 +271,7 @@ final class Lane7DraftFlows: XCTestCase {
         actor.tap()
     }
     private func emptyInput() {
-        let match = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == '' OR value BEGINSWITH 'Message '"), object: input())
+        let match = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == '' OR value BEGINSWITH 'Message ' OR value BEGINSWITH 'Reply to '"), object: input())
         XCTAssertEqual(XCTWaiter.wait(for: [match], timeout: 20), .completed)
     }
     private func waitRead(_ status: Int) async throws {

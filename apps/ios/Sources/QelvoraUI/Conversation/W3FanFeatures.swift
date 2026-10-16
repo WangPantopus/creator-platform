@@ -131,10 +131,21 @@ private struct W3ThreadScreen: View {
                         #endif
                         .onChange(of: model.pending?.key) { _, sent in if sent != nil { following = true; toEnd(proxy) } }
                 }
+                // The composer follows the design reference (`Composer`, WP 7.4 P3): while the
+                // creator is here the input is theirs and there is no step-in button; while the
+                // AI is paused the paused line takes the input's place and step-in stays.
+                let human = page.control == .human_active, paused = page.control == .ai_paused
                 VStack(spacing: QelvoraTokens.space3) {
-                    if !page.canSend { Notice(title: "AI unavailable", children: page.unavailableReason ?? "Messaging is unavailable.") }
-                    if !composerFocused && !compact { Button(QelvoraCopy.text("stepIn", values: ["name": page.creatorName]), variant: .maya, block: true, initial: creatorInitial(page.creatorName)) { session.open("/commerce/packet?creatorId=" + model.creatorId) } }
-                    HStack(alignment: .bottom, spacing: QelvoraTokens.space2) {
+                    if !page.canSend && !paused { Notice(title: "AI unavailable", children: page.unavailableReason ?? "Messaging is unavailable.") }
+                    if paused && !compact {
+                        HStack(spacing: QelvoraTokens.space2) {
+                            QelvoraGlyph(name: "pause", color: qColor("ink-muted", scheme))
+                            Text(QelvoraCopy.text("aiPaused", values: ["name": page.creatorName])).qText("label").foregroundStyle(qColor("ink-muted", scheme))
+                        }.frame(maxWidth: .infinity, alignment: .leading).accessibilityElement(children: .combine)
+                    }
+                    // In the compact layout the step-in button ends the thread instead (below).
+                    if !human && !compact && (paused || !composerFocused) { Button(QelvoraCopy.text("stepIn", values: ["name": page.creatorName]), variant: .maya, block: true, initial: creatorInitial(page.creatorName)) { session.open("/commerce/packet?creatorId=" + model.creatorId) } }
+                    if !paused { HStack(alignment: .bottom, spacing: QelvoraTokens.space2) {
                         TextEditor(text: Binding(get: { model.draft }, set: { model.draft = String($0.prefix(2000)) }))
                             .qText("body").scrollContentBackground(.hidden)
                             // A bounded scrolling editor avoids intrinsic-height
@@ -142,20 +153,21 @@ private struct W3ThreadScreen: View {
                             .frame(height: compact ? max(44, composerLineHeight) : min(120, composerLineHeight * 2))
                             .overlay(alignment: .topLeading) {
                                 if model.draft.isEmpty {
-                                    Text(page.control == .human_active ? "Message \(page.creatorName)…" : "Message \(page.creatorName)'s AI…")
+                                    Text(composerLabel(page))
                                         .qText("body").foregroundStyle(qColor("ink-muted", scheme))
                                         .lineLimit(1).padding(.leading, 5).padding(.top, 8)
                                         .allowsHitTesting(false).accessibilityHidden(true)
                                 }
                             }
-                            .padding(compact ? 4 : 12).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusMd))
-                            .accessibilityLabel(page.control == .human_active ? "Message \(page.creatorName)" : "Message \(page.creatorName)'s AI")
+                            .padding(compact ? 4 : 12).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusLg))
+                            .overlay(RoundedRectangle(cornerRadius: QelvoraTokens.radiusLg).stroke(qColor(human ? "maya-line" : "control-line", scheme), lineWidth: QelvoraTokens.hairline))
+                            .accessibilityLabel(composerLabel(page))
                             .focused($composerFocused)
                         // Send takes its one-line width first, as on Android; at the largest
                         // text the creator's seal otherwise split the word across two lines.
                         Button("Send", variant: page.control == .human_active ? .maya : .ai, initial: creatorInitial(page.creatorName), disabled: scenePhase != .active || privacy || source != nil || originalReply != nil || comparisonQuestion != nil || !page.canSend || model.offline || model.busy || model.pending != nil || !page.generationSequences.isEmpty || model.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) { Task { await model.send() } }
                             .layoutPriority(1)
-                    }
+                    } }
                     if !composerFocused && !compact { HStack { Button("Me and privacy", variant: .quiet) { privacy = true }; Button("Get support", variant: .quiet) { session.open("/support") } } }
                 }.padding(.horizontal, QelvoraTokens.space4).padding(.vertical, compact && composerFocused ? 4 : QelvoraTokens.space4).background(qColor("ground", scheme))
             } else {
@@ -211,6 +223,11 @@ private struct W3ThreadScreen: View {
             .sheet(item: $originalReply) { original in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original AI reply · version \(original.version)").qText("data-sm"); Text(original.text).qText("body").textSelection(.enabled) }.padding(16) } }
             .alert("Source unavailable", isPresented: Binding(get: { !sourceFailure.isEmpty }, set: { if !$0 { sourceFailure = "" } })) { SwiftUI.Button("Close") { sourceFailure = "" } } message: { Text(sourceFailure) }
     }
+    /// Whom the person is writing to: "Reply to {name}" while the creator is here,
+    /// otherwise "Message {name}'s AI" (the placeholder and the field's label).
+    private func composerLabel(_ page: W3Page) -> String {
+        QelvoraCopy.text(page.control == .human_active ? "replyToCreator" : "messageAI", values: ["name": page.creatorName])
+    }
     /// The thread's rows, the same in the lazy and the plain stack.
     @ViewBuilder private func threadRows(_ page: W3Page) -> some View {
         if compact { IdentityStrip(state: page.control == .human_active ? .human : page.control == .ai_active ? .ai : .paused, name: page.creatorName) }
@@ -239,7 +256,7 @@ private struct W3ThreadScreen: View {
         }
         if !model.failure.isEmpty { Notice(tone: .error, title: "Conversation status", children: model.failure) }
         if compact && !composerFocused {
-            Button(QelvoraCopy.text("stepIn", values: ["name": page.creatorName]), variant: .maya, block: true, initial: creatorInitial(page.creatorName)) { session.open("/commerce/packet?creatorId=" + model.creatorId) }
+            if page.control != .human_active { Button(QelvoraCopy.text("stepIn", values: ["name": page.creatorName]), variant: .maya, block: true, initial: creatorInitial(page.creatorName)) { session.open("/commerce/packet?creatorId=" + model.creatorId) } }
             Button("Me and privacy", variant: .quiet) { privacy = true }
             Button("Get support", variant: .quiet) { session.open("/support") }
         }

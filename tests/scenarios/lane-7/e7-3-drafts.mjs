@@ -302,9 +302,9 @@ const flows = {
     A.type("draft for Maya");
     await hasDraft("draft for Maya");
     A.openLink(`qelvora://app${kiln}`);
-    await A.waitFor("Message Kiln Club", 30000);
+    await A.waitFor("Reply to Kiln Club", 30000);
     assert.ok(!A.texts().includes("draft for Maya"));
-    await A.tap("Message Kiln Club");
+    await A.tap("Reply to Kiln Club");
     A.type("draft for Kiln");
     await hasDraft("draft for Kiln");
     A.key("BACK"); // dismiss the IME before the app's Back

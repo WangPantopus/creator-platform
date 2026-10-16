@@ -7,11 +7,14 @@ import * as L from "./lib.mjs";
 const THREADS = [
   { n: 1, name: "Maya", control: "ai_active", reason: null },
   { n: 2, name: "Kiln Club", control: "human_active", reason: null },
+  // While the AI is paused the composer shows the paused line in place of the
+  // input and no notice (the composer states, WP 7.4 P3).
   {
     n: 3,
     name: "Glazeco",
     control: "ai_paused",
-    reason: /AI messaging is paused in this conversation/u,
+    reason: /Glazeco's AI is paused/u,
+    absent: /AI messaging is paused in this conversation/u,
   },
   {
     n: 4,
@@ -65,10 +68,14 @@ for (const p of L.platforms(process.argv[2])) {
     const reason = t.reason
       ? await L.waitForText(p, t.reason, 8000)
       : { ok: true, text: screen.text };
+    const absent = !t.absent || !t.absent.test(reason.text);
     L.step(
       p,
       `S${t.n} ${t.name} (${t.control}${t.reason ? ", composer says why" : ""})`,
-      L.seen(entries, { status: 200 }).length > 0 && screen.ok && reason.ok,
+      L.seen(entries, { status: 200 }).length > 0 &&
+        screen.ok &&
+        reason.ok &&
+        absent,
     );
     L.screenshot(p, `state-${t.n}`);
   }
