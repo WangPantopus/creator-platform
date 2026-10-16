@@ -18,6 +18,8 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.graphics.SolidColor
@@ -30,6 +32,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
@@ -37,6 +40,7 @@ import com.pantopus.qelvora.generated.*
 import com.pantopus.qelvora.identity.FanFeatureRegistration
 import com.pantopus.qelvora.identity.FanSession
 import com.pantopus.qelvora.identity.NativeIntroOffer
+import com.pantopus.qelvora.identity.HarnessLaunch
 import com.pantopus.qelvora.ui.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -60,7 +64,10 @@ object W3FanFeatures {
     suspend fun clearPrivateState(context: android.content.Context) {
         ConversationRealtime.purge()
         ConversationOfflineStorage.purge(context)
-        ConversationResumeStorage(context).purge()
+        var failure: Exception? = null
+        try { ConversationDraftStorage(context).purge() } catch (current: Exception) { failure = current }
+        try { ConversationResumeStorage(context).purge() } catch (current: Exception) { failure = failure ?: current }
+        failure?.let { throw it }
     }
     fun registration(baseURL: String?) = FanFeatureRegistration(matches = {
         val path = it.substringBefore('?'); path == "/you" || path.startsWith("/threads/") || (path.startsWith("/creators/") && path.endsWith("/chat"))
@@ -83,7 +90,7 @@ object W3FanFeatures {
         else Notice(title = "Conversation unavailable", children = "Open this conversation from your account.")
     })
 }
-private data class PendingMessage(val key: String, val text: String, val sequence: Long, val destination: String, val uncertain: Boolean = false, val rejected: Boolean = false)
+private typealias PendingMessage = ConversationDraftStorage.Pending
 
 @Composable
 private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String, session: FanSession) {
@@ -92,6 +99,11 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     val accountId = session.session?.accountId ?: "signed-out"
     val context = LocalContext.current
     val resumeStorage = remember(context) { ConversationResumeStorage(context) }
+    val draftStorage = remember(context) { ConversationDraftStorage(context) }
+    var draftTicket by remember(baseURL, root, accountId) { mutableStateOf<ConversationDraftStorage.Ticket?>(null) }
+    var draftLease by remember(baseURL, root, accountId) { mutableStateOf<ConversationDraftStorage.Lease?>(null) }
+    var draftRevision by remember(baseURL, root, accountId) { mutableStateOf(0L) }
+    var refreshRevision by remember(baseURL, root, accountId) { mutableStateOf(0L) }
     val storageScope = "$baseURL/$root"
     var resumeActivated by remember(root, accountId) { mutableStateOf(false) }
     var page by remember(root, accountId) { mutableStateOf<ConversationPage?>(null) }
@@ -106,6 +118,10 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     var connectionRetry by remember(root, accountId) { mutableStateOf(0) }
     var busy by remember(root, accountId) { mutableStateOf(false) }
     var introOfferId by remember(root, accountId) { mutableStateOf<String?>(null) }
+    // C4 Notes and reactions, oldest first; memory only, cleared on conceal.
+    var presence by remember(root, accountId) { mutableStateOf<List<ThreadPresence>>(emptyList()) }
+    var presenceStale by remember(root, accountId) { mutableStateOf(true) }
+    var presenceRead by remember(root, accountId) { mutableStateOf(0L) }
     var privacy by remember(root, accountId) { mutableStateOf(false) }
     BackHandler(enabled = privacy) { privacy = false }
     var comparisonQuestion by remember(root, accountId) { mutableStateOf<ConversationMessage?>(null) }
@@ -116,6 +132,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         catch (failure: Exception) { if (failure is CancellationException) throw failure }
     }
     var source by remember(root, accountId) { mutableStateOf<Pair<String,String>?>(null) }
+    var sourceFailure by remember(root, accountId) { mutableStateOf("") }
     val lifecycleOwner = LocalLifecycleOwner.current
     var foreground by remember { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
     var offlineContext by remember(baseURL, root, accountId, session.session?.sessionId) { mutableStateOf<Long?>(null) }
@@ -124,17 +141,37 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     var viewRun by remember(baseURL, root, accountId) { mutableStateOf(0) }
     val presenceId = remember(root) { UUID.randomUUID().toString() }
     val scope = rememberCoroutineScope()
+    fun updateInput(text: String = draft, item: PendingMessage? = pending) {
+        draft = text; pending = item
+        val lease = draftLease ?: return
+        val saved = draftStorage.enqueue(ConversationDraftStorage.Value(text, item), lease, ++draftRevision)
+        scope.launch {
+            try { saved.await() }
+            catch (failure: Exception) {
+                if (failure is CancellationException) throw failure
+                if (draftLease?.ticket?.id == lease.ticket.id) error = "Reconnect to refresh. Your input is kept."
+            }
+        }
+    }
+    suspend fun saveDraftNow(): Boolean {
+        val lease = draftLease ?: return false
+        return draftStorage.save(ConversationDraftStorage.Value(draft, pending), lease, ++draftRevision)
+    }
     val scroll = rememberLazyListState()
     var positionedConversation by remember(root, accountId) { mutableStateOf(false) }
     var followingReply by remember(root, accountId) { mutableStateOf(true) }
     var positioningReply by remember(root, accountId) { mutableStateOf(false) }
-    // Observe completed user/accessibility scrolls, rather than treating a
-    // newly enlarged reply as a request to stop following it.
+    // Only a scroll that ended (the reader's or the screen reader's) decides
+    // whether the thread follows new rows. Rows arriving, growing or shifting
+    // (a notice above while reconnecting, a reply growing) never stop it: they
+    // used to, when they moved the first visible row with more rows below.
     LaunchedEffect(scroll) {
-        snapshotFlow { Triple(scroll.isScrollInProgress, scroll.firstVisibleItemIndex, scroll.firstVisibleItemScrollOffset) }.collect { (moving, _, _) ->
-            if (!moving && positionedConversation && !positioningReply) {
+        var wasMoving = false
+        snapshotFlow { scroll.isScrollInProgress }.collect { moving ->
+            if (wasMoving && !moving && positionedConversation && !positioningReply) {
                 followingReply = !scroll.canScrollForward
             }
+            wasMoving = moving
         }
     }
     DisposableEffect(lifecycleOwner) {
@@ -159,7 +196,20 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             else while (true) { pulse(true);delay(20000) }
         }
     }
-    fun conceal() { page = null; older = emptyList(); before = null; gate = null; source = null }
+    fun conceal() { page = null; older = emptyList(); before = null; gate = null; source = null; presence = emptyList(); presenceRead++; presenceStale = true }
+    /** C4: a read replaces the list only when it finishes; a refusal clears it;
+     * a network or server failure keeps the last complete list. Never touches
+     * the page, the draft, the delivery gate or the thread's denial path. */
+    suspend fun readPresence(run: Int) {
+        val ticket = ++presenceRead
+        try {
+            val items = client.presence(creatorId)
+            if (run == viewRun && ticket == presenceRead && foreground) presence = items
+        } catch (failure: Throwable) {
+            if (failure is CancellationException) throw failure
+            if (run == viewRun && ticket == presenceRead && failure is ConversationFailure && failure.status in 400..499) presence = emptyList()
+        }
+    }
     suspend fun showOffline() {
         val run = viewRun
         val lease = offlineContext
@@ -187,32 +237,58 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             ConversationOfflineStorage.purge(lease); if (offlineContext == lease) offlineContext = null
         }
     }
-    val fail: (Throwable) -> Unit = { failure ->
+    fun fail(failure: Throwable, threadDenied: Boolean = false) {
         if (failure is CancellationException) throw failure
         error = failure.message ?: "Reconnect to refresh. Your input is kept."
-        offline = true; transportReady = false
-        if (failure is ConversationFailure && failure.status in listOf(401,403,404)) { offlineShowing = false; offlineContext?.let { ConversationOfflineStorage.purge(it) }; offlineContext = null; page = null; older = emptyList(); before = null; draft = ""; pending = null; gate = null; source = null; privacy = false; transportReady = false; scope.launch { runCatching { resumeStorage.remove(accountId, storageScope) } } }
+        offline = true; transportReady = false; presenceStale = true
+        if (failure is ConversationFailure && failure.status in listOf(401,403,404)) {
+            val ticket = draftTicket; draftTicket = null; draftLease = null
+            if (ticket != null && (failure.status == 401 || threadDenied)) draftStorage.discardLater(ticket)
+            offlineShowing = false; offlineContext?.let { ConversationOfflineStorage.purge(it) }; offlineContext = null; page = null; older = emptyList(); before = null; presence = emptyList(); presenceRead++; draft = ""; pending = null; gate = null; source = null; privacy = false; transportReady = false; scope.launch { runCatching { resumeStorage.remove(accountId, storageScope) } }
+        }
         else scope.launch { showOffline() }
+    }
+    // A source or an original reply that cannot be read is said in a dialog, as on
+    // iOS. The thread stays: a refused passage (403 citation_unavailable) is not a
+    // refused thread, and the thread's own reads decide access.
+    fun sourceUnavailable(failure: Throwable) {
+        if (failure is CancellationException) throw failure
+        sourceFailure = "No longer accessible to you"
     }
     suspend fun refresh(propagateFailure: Boolean = false) {
         val run = viewRun
         if (!foreground || privacy || comparisonQuestion != null) return
+        val readRevision = ++refreshRevision
         try {
+            val currentDraft = draftLease?.let { draftStorage.current(it) } == true
+            if (draftTicket == null || !currentDraft) draftTicket = draftStorage.begin(baseURL, accountId, root)
+            val ticket = draftTicket
             if (!resumeActivated) {
                 try { resumeStorage.activate(accountId) } catch (failure: Exception) { if (failure is CancellationException) throw failure }
                 resumeActivated = true
             }
             val fresh = client.page(root)
-            if (run != viewRun || !foreground || privacy || comparisonQuestion != null) return
+            if (run != viewRun || readRevision != refreshRevision || !foreground || privacy || comparisonQuestion != null) return
+            if (page != null && page?.threadId != fresh.threadId) { page = null; older = emptyList(); before = null }
             if (fresh.cursor >= (page?.cursor ?: 0) && fresh.epoch >= (page?.epoch ?: 0) && fresh.revision >= (page?.revision ?: 0)) {
+                val reusableDraft = draftLease?.let { it.thread == fresh.threadId && draftStorage.current(it) } == true
+                if (!reusableDraft) {
+                    val opened = ticket?.let { draftStorage.open(it, fresh.threadId) }
+                    if (opened == null) { draftTicket = null; draftLease = null; draft = ""; pending = null; conceal(); return }
+                    if (run != viewRun || readRevision != refreshRevision || !foreground || privacy || comparisonQuestion != null) return
+                    draftLease = opened.lease
+                    val restored = opened.value?.pending?.let { if (it.rejected) it else it.copy(uncertain = true) }
+                    updateInput(opened.value?.text.orEmpty(), restored)
+                }
                 offlineShowing = false; page = fresh; if (before == null && older.isEmpty()) before = fresh.before
                 gate = ThreadDeliveryGate(fresh.threadId, fresh.cursor, fresh.epoch, fresh.generationSequences)
                 try { resumeStorage.save(accountId, storageScope, fresh.cursor, fresh.epoch) } catch (failure: Exception) { if (failure is CancellationException) throw failure }
                 offline = !transportReady; error = ""
-                pending?.let { item -> if (client.request("$root/messages/status", buildJsonObject { put("idempotencyKey", item.key) }).jsonObject["accepted"]?.jsonPrimitive?.boolean == true && pending?.key == item.key) { pending = null; if (draft.trim() == item.text) draft = "" } }
+                if (presenceStale) { presenceStale = false; val presenceRun = viewRun; scope.launch { readPresence(presenceRun) } }
+                pending?.let { item -> if (client.request("$root/messages/status", buildJsonObject { put("idempotencyKey", item.key) }).jsonObject["accepted"]?.jsonPrimitive?.boolean == true && pending?.key == item.key) { updateInput(if (draft.trim() == item.text) "" else draft, null) } }
             }
         } catch (failure: Throwable) {
-            if (run == viewRun) fail(failure)
+            if (run == viewRun && readRevision == refreshRevision) fail(failure, threadDenied = true)
             if (propagateFailure) throw failure
         }
     }
@@ -241,15 +317,23 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     suspend fun send(retry: Boolean = false) {
         val current = page ?: return
         if (busy || offline || !foreground || privacy || !current.canSend || (!retry && draft.isBlank())) return
-        val item = if (retry) pending ?: return else PendingMessage(UUID.randomUUID().toString(), draft.trim(), (current.messages.lastOrNull()?.sequence ?: 0) + 1, if(current.control == APIThreadControl.HUMAN_ACTIVE) "fan-replies" else "messages")
+        val item = if (retry) (pending ?: return).copy(uncertain = false, rejected = false) else PendingMessage(UUID.randomUUID().toString(), draft.trim(), (current.messages.lastOrNull()?.sequence ?: 0) + 1, if(current.control == APIThreadControl.HUMAN_ACTIVE) "fan-replies" else "messages")
         followingReply = true
-        pending = item; busy = true
+        updateInput(item = item); busy = true
         try {
+            if (!saveDraftNow()) return
             val path = item.destination
             val result = client.request("$root/$path", buildJsonObject { put("text", item.text); put("idempotencyKey", item.key); put("clientSequence", item.sequence) })
             if (path == "messages") client.json.decodeFromJsonElement<APIAcceptedMessage>(result) else client.json.decodeFromJsonElement<APIMessage>(result)
-            pending = null; if (draft.trim() == item.text) draft = ""; refresh()
-        } catch (failure: Throwable) { val uncertain = failure !is ConversationFailure || failure.status >= 500 || failure.status == 409; pending = item.copy(uncertain = uncertain, rejected = !uncertain); fail(failure) }
+            updateInput(if (draft.trim() == item.text) "" else draft, null); saveDraftNow(); refresh()
+        } catch (failure: Throwable) {
+            val uncertain = failure !is ConversationFailure || failure.status >= 500 || failure.status == 409
+            updateInput(item = item.copy(uncertain = uncertain, rejected = !uncertain))
+            // An answered input rejection does not close the live transport.
+            // Denials/conflicts still use the existing conceal/refresh path.
+            if (failure is ConversationFailure && failure.status in 400..499 && failure.status !in listOf(401,403,404,409)) error = failure.message.orEmpty()
+            else fail(failure)
+        }
         finally { busy = false }
     }
     LaunchedEffect(baseURL, root, accountId, foreground, privacy, comparisonQuestion != null, connectionRetry) {
@@ -283,7 +367,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             } catch (failure: Throwable) {
                 fail(failure)
                 if (failure is ConversationFailure && failure.status in listOf(401,403,404)) return@LaunchedEffect
-            } finally { transportReady = false; offline = true }
+            } finally { transportReady = false; offline = true; presenceStale = true }
             showOffline()
             delay(backoff + Random.nextLong(0, backoff / 4 + 1))
             backoff = minOf(15000L, backoff * 2)
@@ -299,10 +383,18 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 BasicText("AI comparisons", style = qText("display-lg").copy(color = qColor("ink")))
                 LazyColumn(Modifier.weight(1f, fill = false), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     item { BasicText("Your question", style = qText("data-sm").copy(color = qColor("ink"))); BasicText(question.text, style = qText("body").copy(color = qColor("ink"))) }
-                    item { ConversationComparisonChoice(client, root, question.id) }
+                    // Comparisons turned off while the choice was open: it closes, nothing is said.
+                    item { ConversationComparisonChoice(client, root, question.id) { comparisonQuestion = null; comparisonsAvailable = false } }
                 }
                 Button("Close", variant = ButtonVariant.QUIET) { comparisonQuestion = null }
             }
+        }
+    }
+    if (sourceFailure.isNotEmpty()) Dialog(onDismissRequest = { sourceFailure = "" }) {
+        Column(Modifier.background(qColor("ground")).padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            BasicText("Source unavailable", style = qText("display-md").copy(color = qColor("ink")), modifier = Modifier.semantics { heading() })
+            BasicText(sourceFailure, style = qText("body").copy(color = qColor("ink")))
+            Button("Close", variant = ButtonVariant.QUIET) { sourceFailure = "" }
         }
     }
     source?.let { passage -> Dialog(onDismissRequest = { source = null }) {
@@ -313,17 +405,43 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         }
     } }
     val current = page
-    BoxWithConstraints(Modifier.fillMaxSize().widthIn(max = 390.dp)) {
-    // Keep the actual conversation and its privacy notice reachable when
-    // enlarged text or the keyboard leaves too little room for fixed controls.
+    // C4: messages in server order with presence placed by time; memoized so a
+    // recomposition (a streamed sentence, a scroll) does not re-parse every time.
+    val timeline = remember(current?.messages, older, presence, before != null) {
+        current?.let { shown -> threadTimeline(older.filter { old -> shown.messages.none { it.id == old.id } } + shown.messages, presence, before != null) } ?: emptyList()
+    }
+    // WP 7.4 P8: the phone's count runs while this AI conversation is in front
+    // with its AI on; at each 3 hours the fixed line joins this thread once.
+    var reminderRevision by remember(root, accountId) { mutableStateOf(0) }
+    val counting = foreground && !privacy && comparisonQuestion == null && source == null && current?.control == APIThreadControl.AI_ACTIVE
+    val latestTimeline by rememberUpdatedState(timeline)
+    LaunchedEffect(counting, root, accountId) {
+        if (!counting || session.session?.accountId == null) return@LaunchedEffect
+        ConversationLongSession.configure(HarnessLaunch.longSession(context))
+        ConversationLongSession.begin(context, accountId)
+        try {
+            while (isActive) {
+                delay(ConversationLongSession.interval)
+                val shown = page ?: continue
+                if (ConversationLongSession.tick(context)) {
+                    ConversationLongSession.add(root, latestTimeline.lastOrNull()?.key, copy("longSession", "name" to shown.creatorName))
+                    reminderRevision++
+                }
+            }
+        } finally { ConversationLongSession.end(context) }
+    }
+    val rows = remember(timeline, reminderRevision) { withReminders(timeline, ConversationLongSession.lines(root)) }
+    BoxWithConstraints(Modifier.widthIn(max = 680.dp).fillMaxSize()) {
     val density = LocalDensity.current
-    // Keep the composer in the same composition when the IME opens. Moving
-    // the focused field between the fixed footer and list destroys its focus
-    // and immediately closes the keyboard again.
+    // The composer stays outside the list in every orientation. Only the
+    // header condenses; moving a focused field destroys the keyboard focus.
     val heightWithoutKeyboard = maxHeight + with(density) { WindowInsets.ime.getBottom(this).toDp() }
     val keyboardVisible = WindowInsets.ime.getBottom(density) > 0
-    val scrollControls = density.fontScale >= 1.5f || heightWithoutKeyboard < 480.dp
-    LaunchedEffect(current?.threadId, current?.messages?.lastOrNull(), pending?.key, scrollControls, maxHeight) {
+    val compact = density.fontScale >= 1.5f || heightWithoutKeyboard < 480.dp
+    val horizontalControls = maxHeight < 180.dp
+    // Presence arrives after the page: a reader still at the bottom stays there
+    // when its rows are placed, as iOS keeps its bottom anchor.
+    LaunchedEffect(current?.threadId, current?.messages?.lastOrNull(), pending?.key, compact, maxHeight, presence, reminderRevision) {
         if (current != null && followingReply && !scroll.isScrollInProgress) {
             positioningReply = true
             try {
@@ -341,45 +459,66 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             Button("Help and safety", variant = ButtonVariant.QUIET) { session.open("/support") }
         } else {
             val header: @Composable () -> Unit = {
+                if (compact) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    IconButton("back", copy("back"), onClick = { session.back() })
+                    Box(Modifier.weight(1f)) {
+                        if (current.control != APIThreadControl.AI_ACTIVE && current.control != APIThreadControl.HUMAN_ACTIVE) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Glyph("pause", 16.dp, qColor("ink-muted"))
+                            BasicText(copy("aiPaused", "name" to current.creatorName), style = qText("caption").copy(color = qColor("ink")))
+                        } else AuthorLabel(kind = if (current.control == APIThreadControl.HUMAN_ACTIVE) AuthorKind.HUMAN_CREATOR else AuthorKind.AI, name = current.creatorName)
+                    }
+                    if (!horizontalControls) IconButton("info", copy("aboutConversation"), onClick = { privacy = true })
+                } else {
                 ThreadHeader(name = current.creatorName, subtitle = "Official AI", live = !offline && current.control == APIThreadControl.HUMAN_ACTIVE, onBack = { session.back() }, onAbout = { privacy = true })
                 IdentityStrip(state = if (current.control == APIThreadControl.HUMAN_ACTIVE) IdentityState.HUMAN else if (current.control == APIThreadControl.AI_ACTIVE) IdentityState.AI else IdentityState.PAUSED, name = current.creatorName)
+                }
             }
-            val messageLabel = if (current.control == APIThreadControl.HUMAN_ACTIVE) "Message ${current.creatorName}" else "Message ${current.creatorName}'s AI"
+            // The composer follows the design reference (`Composer`, WP 7.4 P3): while the
+            // creator is here the input is theirs and there is no step-in button; while the
+            // AI is paused the paused line takes the input's place and step-in stays.
+            val human = current.control == APIThreadControl.HUMAN_ACTIVE
+            val paused = current.control == APIThreadControl.AI_PAUSED
+            val messageLabel = copy(if (human) "replyToCreator" else "messageAI", "name" to current.creatorName)
             val input: @Composable (Modifier) -> Unit = { modifier ->
-                BasicTextField(value = draft, onValueChange = { draft = it.take(2000) },
-                    modifier = modifier.heightIn(min = 48.dp, max = 160.dp)
+                BasicTextField(value = draft, onValueChange = { updateInput(text = it.take(2000)) },
+                    modifier = modifier.heightIn(min = 48.dp, max = if (compact && keyboardVisible) 96.dp else 160.dp)
                         .semantics { contentDescription = messageLabel }
                         .background(qColor("surface"), RoundedCornerShape(QelvoraTokens.radiusLg))
                         .border(QelvoraTokens.hairline, qColor(if (current.control == APIThreadControl.HUMAN_ACTIVE) "maya-line" else "control-line"), RoundedCornerShape(QelvoraTokens.radiusLg))
-                        .padding(QelvoraTokens.space3),
-                    textStyle = qText("body").copy(color = qColor("ink")), cursorBrush = SolidColor(qColor("ink")), maxLines = 5,
+                        .padding(if (horizontalControls) 8.dp else QelvoraTokens.space3),
+                    textStyle = qText("body").copy(color = qColor("ink")), cursorBrush = SolidColor(qColor("ink")), maxLines = if (compact && keyboardVisible) 1 else 5,
                     decorationBox = { field -> Box {
                         if (draft.isEmpty()) BasicText(messageLabel, modifier = Modifier.clearAndSetSemantics { }, style = qText("body").copy(color = qColor("ink-muted")))
                         field()
                     } })
             }
             val sendButton: @Composable () -> Unit = {
-                Button("Send", variant = if (current.control == APIThreadControl.HUMAN_ACTIVE) ButtonVariant.MAYA else ButtonVariant.AI, block = scrollControls, disabled = !current.canSend || offline || !foreground || busy || pending != null || current.generationSequences.isNotEmpty() || draft.isBlank()) { scope.launch { send() } }
+                Button("Send", variant = if (current.control == APIThreadControl.HUMAN_ACTIVE) ButtonVariant.MAYA else ButtonVariant.AI, initial = creatorInitial(current.creatorName), disabled = !current.canSend || offline || !foreground || busy || pending != null || current.generationSequences.isNotEmpty() || draft.isBlank()) { scope.launch { send() } }
             }
             val privacyControls: @Composable () -> Unit = {
                 Button("Me and privacy", variant = ButtonVariant.QUIET) { privacy = true }
                 Button("Get support", variant = ButtonVariant.QUIET) { session.open("/support") }
             }
             val composer: @Composable () -> Unit = {
-                Column(Modifier.imePadding().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    if (!current.canSend) Notice(title = "AI unavailable", children = current.unavailableReason ?: "Messaging is unavailable.")
-                    Button("Ask ${current.creatorName} to step in", variant = ButtonVariant.MAYA, block = true) { session.open("/commerce/packet?creatorId=$creatorId") }
-                    if (scrollControls) {
-                        BasicText(messageLabel, style = qText("label").copy(color = qColor("ink")))
-                        input(Modifier.fillMaxWidth())
-                        sendButton()
-                    } else Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { input(Modifier.weight(1f)); sendButton() }
-                    if (!keyboardVisible) { if (scrollControls) Column { privacyControls() } else Row { privacyControls() } }
+                Column(Modifier.imePadding().padding(horizontal = if (horizontalControls) 4.dp else 16.dp, vertical = if (keyboardVisible && compact) 4.dp else 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    if (!current.canSend && !paused && !horizontalControls) Notice(title = "AI unavailable", children = current.unavailableReason ?: "Messaging is unavailable.")
+                    if (paused && !compact) Row(Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Glyph("pause", 16.dp, qColor("ink-muted"))
+                        BasicText(copy("aiPaused", "name" to current.creatorName), style = qText("label").copy(color = qColor("ink-muted")))
+                    }
+                    // In the compact layout the step-in button ends the thread instead (below).
+                    if (!human && !compact && (paused || !keyboardVisible)) Button(QelvoraCopy.text("stepIn", mapOf("name" to current.creatorName)), variant = ButtonVariant.MAYA, block = true, initial = creatorInitial(current.creatorName)) { session.open("/commerce/packet?creatorId=$creatorId") }
+                    if (!paused) Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.Bottom) { input(Modifier.weight(1f)); sendButton() }
+                    if (!keyboardVisible && !compact) Row { privacyControls() }
                 }
             }
-            if (!scrollControls) header()
-            LazyColumn(state = scroll, modifier = Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                if (scrollControls) item { Column { header() } }
+            ThreadInputLayout(horizontalControls, header, composer) {
+            LazyColumn(state = scroll, modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                if (horizontalControls) item {
+                    Button(copy("aboutConversation"), variant = ButtonVariant.QUIET) { privacy = true }
+                    if (!current.canSend && !paused) Notice(title = "AI unavailable", children = current.unavailableReason ?: "Messaging is unavailable.")
+                }
+                if (compact) item { IdentityStrip(state = if (current.control == APIThreadControl.HUMAN_ACTIVE) IdentityState.HUMAN else if (current.control == APIThreadControl.AI_ACTIVE) IdentityState.AI else IdentityState.PAUSED, name = current.creatorName) }
                 item(key = "intro-offer") {
                     NativeIntroOffer(client, root, session, introOfferId, current.feedbackPolicy != null,
                         enabled = !busy && !offline && foreground && !privacy && comparisonQuestion == null && source == null)
@@ -392,8 +531,11 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                     try { val previous = client.page("$root?before=$before"); older = (previous.messages + older).distinctBy { it.id }.take(250); before = previous.before }
                     catch (failure: Throwable) { fail(failure) } finally { busy = false }
                 } } }
-                items(older.filter { old -> current.messages.none { it.id == old.id } } + current.messages, key = { it.id }) { message ->
-                    if (message.recording == null) ConversationMessageRow(message, current.creatorName, current.control, creatorId = current.creatorId, onLink = { session.open(it) }, connected = !offline && foreground, original = (older + current.messages).firstOrNull { it.id == message.correction?.originalMessageId && it.version == message.correction.originalVersion && it.authorKind == APIMessageAuthorKind.AI }, onOriginal = { message.correction?.let { correction -> scope.launch { try { val original = client.json.decodeFromJsonElement<ConversationMessage>(client.request("$root/messages/${correction.originalMessageId}")); if (original.id != correction.originalMessageId || original.version != correction.originalVersion || original.authorKind != APIMessageAuthorKind.AI) throw ConversationFailure(409, "The original reply changed."); source = "Original AI reply · version ${original.version}" to original.text } catch (failure: Throwable) { fail(failure) } } } }, onVerify = { message.signedActId?.let { session.open("/verify/$it") } }, onReport = { session.open("/support?creatorId=$creatorId" + if (message.authorKind == APIMessageAuthorKind.AI) "&messageId=${message.id}" else "") }, onForget = if (busy || offline) null else { { scope.launch { busy=true;try { client.request("$root/messages/${message.id}/dont-remember",buildJsonObject { put("expectedRevision",current.revision) });refresh() } catch(failure:Throwable) { fail(failure) } finally {busy=false} } } }, onCitation = { id -> scope.launch { try { val passage = client.request("$root/citations/$id").jsonObject; source = passage["title"]?.jsonPrimitive?.content.orEmpty() to passage["text"]?.jsonPrimitive?.content.orEmpty() } catch (failure: Throwable) { fail(failure) } } })
+                items(rows, key = { it.key }) { row ->
+                    if (row is ThreadRow.Reminder) SystemLine(row.text)
+                    else if (row is ThreadRow.Presence) PresenceRow(row.item) { session.open("/verify/$it") }
+                    else { val message = (row as ThreadRow.Message).message
+                    if (message.recording == null) ConversationMessageRow(message, current.creatorName, current.control, creatorId = current.creatorId, onLink = { session.open(it) }, connected = !offline && foreground, original = (older + current.messages).firstOrNull { it.id == message.correction?.originalMessageId && it.version == message.correction.originalVersion && it.authorKind == APIMessageAuthorKind.AI }, onOriginal = { message.correction?.let { correction -> scope.launch { try { val original = client.json.decodeFromJsonElement<ConversationMessage>(client.request("$root/messages/${correction.originalMessageId}")); if (original.id != correction.originalMessageId || original.version != correction.originalVersion || original.authorKind != APIMessageAuthorKind.AI) sourceFailure = "The original reply changed." else source = "Original AI reply · version ${original.version}" to original.text } catch (failure: Throwable) { sourceUnavailable(failure) } } } }, onVerify = { message.signedActId?.let { session.open("/verify/$it") } }, onReport = { session.open("/support?creatorId=$creatorId" + if (message.authorKind == APIMessageAuthorKind.AI) "&messageId=${message.id}" else "") }, onForget = if (busy || offline) null else { { scope.launch { busy=true;try { client.request("$root/messages/${message.id}/dont-remember",buildJsonObject { put("expectedRevision",current.revision) });refresh() } catch(failure:Throwable) { fail(failure) } finally {busy=false} } } }, onCitation = { id -> scope.launch { try { val passage = client.request("$root/citations/$id").jsonObject; source = passage["title"]?.jsonPrimitive?.content.orEmpty() to passage["text"]?.jsonPrimitive?.content.orEmpty() } catch (failure: Throwable) { sourceUnavailable(failure) } } })
                     if (comparisonsAvailable && message.authorKind == APIMessageAuthorKind.FAN && !message.offTheRecord && !current.offTheRecord && message.deliveryState in listOf(APIMessageDeliveryState.ACCEPTED, APIMessageDeliveryState.DELIVERED)) {
                         Button("AI comparison options", variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground, modifier = Modifier.testTag("comparison-options-${message.id}")) { comparisonQuestion = message }
                     }
@@ -455,15 +597,49 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                             }
                         }
                     }
-                }
-                pending?.let { pendingItem -> item { Message(kind = MessageKind.FAN, children = pendingItem.text, name = current.creatorName, delivery = if (pendingItem.rejected) Delivery.FAILED else if (pendingItem.uncertain) null else Delivery.PENDING); if (pendingItem.uncertain) { BasicText("Acceptance hasn't been confirmed. Retry checks the same message without a duplicate.", style = qText("caption").copy(color = qColor("ink"))); Button("Retry", variant = ButtonVariant.QUIET, disabled = busy || offline) { scope.launch { send(true) } } } else if (pendingItem.rejected) { BasicText("Not sent", style = qText("caption").copy(color = qColor("ink"))); Button("Keep editing", variant = ButtonVariant.QUIET) { draft = pendingItem.text; pending = null } } } }
+                } }
+                pending?.let { pendingItem -> item { Message(kind = MessageKind.FAN, children = pendingItem.text, name = current.creatorName, delivery = if (pendingItem.rejected) Delivery.FAILED else if (pendingItem.uncertain) null else Delivery.PENDING, onRetry = { scope.launch { send(true) } }); if (pendingItem.uncertain) { BasicText("Acceptance hasn't been confirmed. Retry checks the same message without a duplicate.", style = qText("caption").copy(color = qColor("ink"))); Button("Retry", variant = ButtonVariant.QUIET, disabled = busy || offline) { scope.launch { send(true) } } } else if (pendingItem.rejected) { BasicText("Not sent", style = qText("caption").copy(color = qColor("ink"))); Button("Keep editing", variant = ButtonVariant.QUIET, disabled = busy) { updateInput(pendingItem.text, null) } } } }
                 if (error.isNotEmpty()) item { Notice(title = "Conversation status", children = error) }
-                if (scrollControls) item { composer() }
                 item(key = "conversation-end") { Spacer(Modifier.height(1.dp)) }
+                if (compact && !keyboardVisible) item {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        if (!human) Button(QelvoraCopy.text("stepIn", mapOf("name" to current.creatorName)), variant = ButtonVariant.MAYA, block = true, initial = creatorInitial(current.creatorName)) { session.open("/commerce/packet?creatorId=$creatorId") }
+                        privacyControls()
+                    }
+                }
             }
-            if (!scrollControls) composer()
+            }
         }
     }
+    }
+}
+
+/** The same three children remain composed while the window changes shape.
+ * In a short window the author and input share one row instead of squeezing
+ * two rows below their readable/touchable sizes. */
+@Composable private fun ThreadInputLayout(horizontal: Boolean, header: @Composable () -> Unit,
+    composer: @Composable () -> Unit, history: @Composable () -> Unit) {
+    Layout(content = { Column { header() }; Box { composer() }; Box { history() } },
+        modifier = Modifier.fillMaxSize()) { children, constraints ->
+        val width = constraints.maxWidth; val height = constraints.maxHeight
+        val authorWidth = if (horizontal) (width * if (width > 600.dp.roundToPx()) 0.38f else 0.5f).toInt() else width
+        val author = children[0].measure(Constraints(minWidth = authorWidth, maxWidth = authorWidth, maxHeight = height))
+        val inputWidth = if (horizontal) width - authorWidth else width
+        val input = children[1].measure(Constraints(minWidth = inputWidth, maxWidth = inputWidth,
+            maxHeight = if (horizontal) height else (height - author.height).coerceAtLeast(0)))
+        val controlsHeight = if (horizontal) maxOf(author.height, input.height) else author.height + input.height
+        val messagesHeight = (height - controlsHeight).coerceAtLeast(0)
+        val messages = children[2].measure(Constraints.fixed(width, messagesHeight))
+        layout(width, height) {
+            if (horizontal) {
+                messages.placeRelative(0, 0)
+                author.placeRelative(0, messagesHeight + (controlsHeight - author.height) / 2)
+                input.placeRelative(authorWidth, messagesHeight + (controlsHeight - input.height) / 2)
+            } else {
+                author.placeRelative(0, 0); messages.placeRelative(0, author.height)
+                input.placeRelative(0, author.height + messagesHeight)
+            }
+        }
     }
 }
 
@@ -490,10 +666,27 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 if (message.authorKind != APIMessageAuthorKind.FAN) Button("Report", variant = ButtonVariant.QUIET, onClick = onReport)
                 if (message.authorKind == APIMessageAuthorKind.FAN) { if(message.offTheRecord) BasicText("Not used for memory",style=qText("caption").copy(color = qColor("ink"))) else Button("Don't remember this",variant=ButtonVariant.QUIET,disabled=onForget==null) { onForget?.invoke() } }
             } else {
-                BasicText(if (message.authorKind == APIMessageAuthorKind.HUMAN_BROADCAST) "Note from $name · audience details unavailable" else if (message.authorKind == APIMessageAuthorKind.HUMAN_REACTION) "$name reacted" else "Call with $name", style = qText("label").copy(color = qColor("ink")))
+                Row(horizontalArrangement = Arrangement.spacedBy(QelvoraTokens.authorGap), verticalAlignment = Alignment.CenterVertically) {
+                    if (message.authorKind == APIMessageAuthorKind.HUMAN_BROADCAST) Mark(AuthorKind.HUMAN_BROADCAST) else if (message.authorKind == APIMessageAuthorKind.HUMAN_REACTION) Mark(AuthorKind.HUMAN_REACTION)
+                    BasicText(if (message.authorKind == APIMessageAuthorKind.HUMAN_BROADCAST) "Note from $name · audience details unavailable" else if (message.authorKind == APIMessageAuthorKind.HUMAN_REACTION) "$name reacted" else "Call with $name", style = qText("label").copy(color = qColor("ink")))
+                }
                 BasicText(message.text, style = qText("body").copy(color = qColor("ink")))
                 if (message.signedActId != null) SignedMarker(name = name, onClick = onVerify)
             }
+        }
+    }
+}
+
+/** C4: a Note or reaction with the server's label, glyph and creator color.
+ * A Note is never answered through the thread composer. */
+@Composable private fun PresenceRow(item: ThreadPresence, onVerify: (String) -> Unit) {
+    when (item) {
+        is ThreadPresence.Note -> Box(Modifier.testTag("presence-note-${item.value.id}")) {
+            Note(item.value.text, name = item.value.creatorName, reply = false, label = item.value.authorLabel) { onVerify(item.value.signedActId) }
+        }
+        is ThreadPresence.Reaction -> Column(Modifier.testTag("presence-reaction-${item.value.id}"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            ReactionChip(item.value.creatorName, label = item.value.authorLabel)
+            SignedMarker(name = item.value.creatorName, onClick = { onVerify(item.value.signedActId) })
         }
     }
 }
@@ -503,6 +696,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     var audit by remember(client, root) { mutableStateOf<List<ConversationAudit>?>(null) }
     var usage by remember(client, root) { mutableStateOf<ConversationUsage?>(null) }
     var policy by remember(client, root) { mutableStateOf<ConversationCapabilities?>(null) }; var page by remember(client, root) { mutableStateOf<ConversationPage?>(null) }
+    var comparisonsOff by remember(client, root) { mutableStateOf(false) }
     val name = page?.creatorName ?: "this creator"
     val uriHandler = LocalUriHandler.current
     var error by remember(client, root) { mutableStateOf("") }; var busy by remember(client, root) { mutableStateOf(false) }
@@ -512,7 +706,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     val lifecycleOwner = LocalLifecycleOwner.current
     var foreground by remember(lifecycleOwner) { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
     val scope = rememberCoroutineScope()
-    fun conceal() { revision += 1; memory = null; audit = null; policy = null; page = null; usage = null; provenance = null; busy = false }
+    fun conceal() { revision += 1; memory = null; audit = null; policy = null; page = null; usage = null; provenance = null; busy = false; comparisonsOff = false }
     fun current(ticket: Int) = revision == ticket && foreground
     fun failed(failure: Throwable, fallback: String) {
         if (failure is CancellationException) throw failure
@@ -599,7 +793,8 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             if (policy?.providers == null) BasicText("AI provider consent is unavailable or has been withdrawn.", style = qText("body").copy(color = qColor("ink")))
             Button(if(page?.consentCurrent == true) "Withdraw AI provider consent" else "Agree to these AI providers", variant = ButtonVariant.SECONDARY, disabled = busy || (page?.consentCurrent != true && policy?.consentAvailable != true)) { scope.launch { consent() } }
         }
-        item { BasicText("AI comparisons", style = qText("display-md").copy(color = qColor("ink"))); ConversationComparisonChoice(client, root) }
+        // While comparisons are off (2026-10-08) the section is absent, with no placeholder.
+        if (policy?.comparisonsAvailable == true && !comparisonsOff) item { BasicText("AI comparisons", style = qText("display-md").copy(color = qColor("ink"))); ConversationComparisonChoice(client, root) { comparisonsOff = true } }
         item { BasicText("Time with this creator's AI",style=qText("display-md").copy(color = qColor("ink"))); if (usage == null) BasicText(if (error.isEmpty()) "Loading time history…" else "Time history unavailable.", style = qText("body").copy(color = qColor("ink"))); usage?.let { time -> BasicText(time.measurement + " Days are shown in UTC.",style=qText("caption").copy(color = qColor("ink")));BasicText("This week · ${time.days.sumOf { it.seconds }.toInt()/60} minutes",style=qText("body").copy(color = qColor("ink")));time.days.forEach { day -> BasicText("${day.day} · ${day.seconds.toInt()/60} minutes",style=qText("body").copy(color = qColor("ink"))) };if(!time.modeAvailable) BasicText("Companion mode time signals await the verified AI mode configuration.",style=qText("caption").copy(color = qColor("ink"))) } }
         item { BasicText("Who opened your conversations", style = qText("display-md").copy(color = qColor("ink"))); if (audit == null) BasicText(if (error.isEmpty()) "Loading opening history…" else "Opening history unavailable.", style = qText("body").copy(color = qColor("ink"))) else if (audit?.isEmpty() == true) BasicText("No logged openings.", style = qText("body").copy(color = qColor("ink"))) }
         items(audit.orEmpty(), key = { it.id }) { entry -> BasicText((if (entry.role == "creator") "$name's account" else if (entry.role == "ops") "Authorized safety account" else "Authorized team · ${entry.role}") + "\nAccount " + entry.readerAccountId + "\n" + entry.readAt, style = qText("body").copy(color = qColor("ink"))) }
@@ -608,6 +803,18 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
 }
 
 
+/** The fan's conversation with this creator, if any (every page of the account's threads). */
+private suspend fun existingThread(client: ConversationClient, creatorId: String): String? {
+    var cursor: String? = null
+    for (page in 0 until 20) {
+        val answer = try { client.request("account" + (cursor?.let { "?cursor=$it" } ?: "")).jsonObject }
+            catch (failure: Exception) { if (failure is CancellationException) throw failure; return null }
+        answer["threads"]?.jsonArray?.map { it.jsonObject }?.firstOrNull { it["creatorId"]?.jsonPrimitive?.content == creatorId }
+            ?.let { return it["fanId"]?.jsonPrimitive?.content }
+        cursor = answer["nextCursor"]?.takeUnless { it is JsonNull }?.jsonPrimitive?.content ?: return null
+    }
+    return null
+}
 @Composable private fun FirstConversation(baseURL: String, handle: String, session: FanSession) {
     val client = remember(baseURL,session.session?.accountId) { ConversationClient(baseURL,session::currentToken, session.session?.accountId) }
     val growth = remember(baseURL) { GrowthClient(baseURL) }
@@ -665,6 +872,17 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             require(Regex("[A-Za-z0-9_-]{1,100}").matches(handle))
             creator = growth.request("public/creators/$handle").getJSONObject("creator")
         } catch (failure: Throwable) { if (failure is CancellationException) throw failure; error = "This creator or the conversation service is unavailable." }
+        // Someone who already talks with this creator's AI goes straight to that
+        // conversation: a Note or reaction notice, and "Message {name}'s AI", link
+        // here. A link with a post's context keeps this screen, which carries it.
+        val creatorId = creator?.optString("id").orEmpty()
+        if (creatorId.isNotEmpty() && !contextPending && accountId != null) {
+            val fanId = existingThread(client, creatorId)
+            if (fanId != null && session.destination == target && session.session?.accountId == accountId) {
+                session.replace("/threads/$creatorId/$fanId")
+                return@LaunchedEffect
+            }
+        }
         try {
             capabilities = client.json.decodeFromJsonElement(client.request("capabilities", publicRead = true))
         } catch (failure: Throwable) { if (failure is CancellationException) throw failure; error = "This creator or the conversation service is unavailable." }
@@ -690,11 +908,15 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                     BasicText("WHO RUNS IT", style = qText("data-sm").copy(color = qColor("ink-muted")))
                     val policy = capabilities?.providers
                     if (policy?.verified == false) Notice(title=QelvoraCopy.text("conversationDevelopmentPolicyTitle"),children=QelvoraCopy.text("conversationDevelopmentPolicyNotice"))
+                    // The fixed consent sentence is a promise: only for a verified policy whose
+                    // every provider keeps and trains on nothing. Otherwise each provider's own line.
+                    val promise = policy != null && policy.verified && policy.providers.all { it.noTraining && it.noRetention }
+                    val providers = policy?.providers?.joinToString(", ") { it.name }.orEmpty()
                     if (policy == null) BasicText("AI providers and their verified processing terms are not configured yet.", style = qText("body").copy(color = qColor("ink")))
-                    else BasicText("This AI is powered by ${policy.providers.joinToString(", ") { it.name }}.", style = qText("body").copy(color = qColor("ink")))
+                    else BasicText(if (promise) QelvoraCopy.text("processorConsent", mapOf("name" to name, "providers" to providers)) else "This AI is powered by $providers.", style = qText("body").copy(color = qColor("ink")))
                     policy?.providers?.forEach { provider ->
                         Button(provider.name + " processing terms", variant = ButtonVariant.QUIET) { uriHandler.openUri(provider.termsUrl) }
-                        BasicText((if (provider.noTraining) "Doesn't train on your messages." else "Review message use in these terms.") + " " + (if (provider.noRetention) "Doesn't keep your messages." else "Review message retention in these terms."), style = qText("caption").copy(color = qColor("ink")))
+                        if (!promise) BasicText((if (provider.noTraining) "Doesn't train on your messages." else "Review message use in these terms.") + " " + (if (provider.noRetention) "Doesn't keep your messages." else "Review message retention in these terms."), style = qText("caption").copy(color = qColor("ink")))
                     }
                 }
                 Hairline()

@@ -327,6 +327,7 @@ object QelvoraCopy {
     "growthFindingCreators" to "Finding creators",
     "growthUsefulness" to "Usefulness",
     "growthNotifications" to "Notifications",
+    "growthUnread" to "Unread",
     "growthLeaving" to "Leaving",
     "growthRating" to "Rating",
     "growthSkipRating" to "Skip rating",
@@ -1081,7 +1082,13 @@ object QelvoraCopy {
     "growthImpactPeopleHelped" to "You helped {people} people this week.",
     "growthImpactThankYou" to "A THANK-YOU, SHARED WITH PERMISSION",
     "growthImpactWeekCounts" to "Counts are for this week only. Fans are never named here without their consent.",
-    "growthImpactNotAvailable" to "No weekly digest is available yet."
+    "growthImpactNotAvailable" to "No weekly digest is available yet.",
+    "pickerCreator" to "Creator",
+    "pickerConversation" to "Conversation",
+    "pickerChooseCreator" to "Choose a creator",
+    "pickerChooseConversation" to "Choose a conversation",
+    "pickerNoConversations" to "You have no conversations yet.",
+    "pickerConversationsFailed" to "Your conversations couldn't load."
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }

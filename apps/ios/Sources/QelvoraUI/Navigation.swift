@@ -160,7 +160,7 @@ public struct Sidebar: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: QelvoraTokens.token("author-gap")) {
             HStack(spacing: QelvoraTokens.token("space-3")) {
-                Avatar(initial: String(name.prefix(1)))
+                Avatar(initial: creatorInitial(name))
                 VStack(alignment: .leading, spacing: QelvoraTokens.token("space-1") / 2) {
                     Text(name).qText("body-strong")
                     Text(QelvoraCopy.studioName).qText("sidebar-brand", italic: true).foregroundStyle(qColor("ink-muted", scheme))

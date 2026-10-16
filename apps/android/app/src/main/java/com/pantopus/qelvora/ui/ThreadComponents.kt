@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -76,7 +77,7 @@ fun IdentityStrip(state: IdentityState = IdentityState.AI, name: String = "Maya"
     }
     Column(Modifier.background(fill).semantics { liveRegion = LiveRegionMode.Polite }) {
         Row(Modifier.fillMaxWidth().heightIn(min = T.stripMinHeight).padding(horizontal = T.space4, vertical = T.composerGap), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(T.composerGap)) {
-            if (human) Seal(name.take(1), T.glyphSize, true, onMaya = true) else Box(Modifier.size(T.glyphSize).border(T.hairline, leadInk, RoundedCornerShape(T.stripBoxRadius)), contentAlignment = Alignment.Center) { Glyph(when (state) { IdentityState.TEAM -> "team"; IdentityState.PAUSED -> "pause"; else -> "ring" }, T.space3, leadInk) }
+            if (human) Seal(creatorInitial(name), T.glyphSize, true, onMaya = true) else Box(Modifier.size(T.glyphSize).border(T.hairline, leadInk, RoundedCornerShape(T.stripBoxRadius)), contentAlignment = Alignment.Center) { Glyph(when (state) { IdentityState.TEAM -> "team"; IdentityState.PAUSED -> "pause"; else -> "ring" }, T.space3, leadInk) }
             BasicText(text, style = qText("label").copy(color = ink, fontWeight = FontWeight.Normal))
         }
         Hairline(color = qColor(if (human) "maya-line" else "line"))
@@ -88,7 +89,7 @@ fun ThreadHeader(name: String = "Maya", subtitle: String = copy("officialAISubti
     Column(Modifier.background(qColor("ground"))) {
         Row(Modifier.fillMaxWidth().padding(start = T.space1, end = T.space3, top = T.composerGap, bottom = T.composerGap), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(T.space3)) {
             IconButton("back", copy("back"), qColor("ink"), onBack)
-            Avatar(name.take(1), live)
+            Avatar(creatorInitial(name), live)
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(T.space1 / 2)) { TextLine(name, "title"); TextLine(if (live) copy("inConversation") else subtitle, "data-sm", if (live) "maya-ink" else "ink-muted") }
             IconButton("info", copy("aboutConversation"), onClick = onAbout)
         }
@@ -104,19 +105,21 @@ fun SystemLine(text: String = "", variant: SystemLineVariant = SystemLineVariant
         if (variant != SystemLineVariant.DATE) Box(Modifier.weight(1f).height(T.hairline).background(line))
         if (variant == SystemLineVariant.PRESENCE) {
             Row(Modifier.background(qColor("maya-surface"), CircleShape).padding(start = T.authorGap, end = T.space3, top = T.authorGap, bottom = T.authorGap), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(T.space2)) {
-                Seal(name.take(1), T.limitRadioSize, onMaya = true)
+                Seal(creatorInitial(name), T.limitRadioSize, onMaya = true)
                 TextLine(copy("takeover", "name" to name), "caption", "maya-accent", true)
                 time?.let { TextLine(it, "data-sm", "on-maya-muted") }
             }
-        } else TextLine(text, if (variant == SystemLineVariant.DATE) "data-sm" else "label", "ink-muted")
+        } else if (variant == SystemLineVariant.DATE) TextLine(text, "data-sm", "ink-muted")
+        // Centered between its rules, as the design and iOS draw it; it shows once a line wraps.
+        else BasicText(text, style = qText("label").copy(color = qColor("ink-muted"), textAlign = TextAlign.Center))
         Box(Modifier.weight(1f).height(T.hairline).background(line))
     }
 }
 
 @Composable
-fun ReactionChip(name: String = "Maya") {
+fun ReactionChip(name: String = "Maya", label: String? = null) {
     Row(Modifier.background(qColor("maya-surface"), CircleShape).padding(start = T.authorGap, end = T.space3, top = T.authorGap, bottom = T.authorGap), horizontalArrangement = Arrangement.spacedBy(T.space2), verticalAlignment = Alignment.CenterVertically) {
-        Seal(name.take(1), T.glyphSize, onMaya = true); Glyph("heart", T.authorLabelSize + T.hairline, qColor("maya-accent")); TextLine(copy("reaction", "name" to name), "caption", "on-maya", true)
+        Seal(creatorInitial(name), T.glyphSize, onMaya = true); Glyph("heart", T.authorLabelSize + T.hairline, qColor("maya-accent")); TextLine(label ?: copy("reaction", "name" to name), "caption", "on-maya", true)
     }
 }
 
@@ -189,7 +192,7 @@ fun StepIn(name: String = "Maya", disabled: Boolean = false, note: String? = nul
     Column(verticalArrangement = Arrangement.spacedBy(T.space1)) {
         val shape = RoundedCornerShape(T.radiusPill)
         Row(Modifier.height(T.touchTarget).background(qColor(if (disabled) "surface-sunken" else "maya-surface"), shape).border(T.hairline, qColor(if (disabled) "surface-sunken" else "maya-line"), shape).clickable(enabled = !disabled, role = Role.Button, onClick = onClick).padding(start = T.stripBoxRadius, end = T.space4), horizontalArrangement = Arrangement.spacedBy(T.space2), verticalAlignment = Alignment.CenterVertically) {
-            Seal(name.take(1), T.space8 - T.hairline * 2, onMaya = true)
+            Seal(creatorInitial(name), T.space8 - T.hairline * 2, onMaya = true)
             TextLine(copy("stepIn", "name" to name), "control-body", if (disabled) "ink-muted" else "on-maya", true)
         }
         if (disabled) TextLine(note ?: copy("fullyBooked", "name" to name), "caption", "ink-muted")
