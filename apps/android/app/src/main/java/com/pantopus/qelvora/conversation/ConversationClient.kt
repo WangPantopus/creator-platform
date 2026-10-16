@@ -41,15 +41,15 @@ fun ConversationMessage.publicAnswerDestination(creatorId: String): String? {
 @Serializable data class ConversationAgentVersion(val id: String, val hash: String)
 @Serializable data class ConversationFeedbackPolicy(val version: String, val notice: String)
 fun ConversationMessage.authorLabel(name: String): String = if (correction != null) QelvoraCopy.text("correctionAuthor",mapOf("name" to name)) else when(authorKind) {
-    APIMessageAuthorKind.FAN -> "You"
+    APIMessageAuthorKind.FAN -> QelvoraCopy.text("nativeYou")
     APIMessageAuthorKind.AI -> QelvoraCopy.text("aiAuthor",mapOf("name" to name))
     APIMessageAuthorKind.APPROVED_DRAFT -> QelvoraCopy.text("approvedAuthor",mapOf("name" to name))
-    APIMessageAuthorKind.TEAM -> QelvoraCopy.text("teamAuthor",mapOf("name" to name,"member" to (member ?: "Authorized team member")))
+    APIMessageAuthorKind.TEAM -> QelvoraCopy.text("teamAuthor",mapOf("name" to name,"member" to (member ?: QelvoraCopy.text("nativeAuthorizedTeamMember"))))
     APIMessageAuthorKind.HUMAN_CREATOR -> name
     APIMessageAuthorKind.HUMAN_CALL -> QelvoraCopy.text("callAuthor",mapOf("name" to name))
-    APIMessageAuthorKind.HUMAN_BROADCAST -> "Note from $name"
+    APIMessageAuthorKind.HUMAN_BROADCAST -> QelvoraCopy.text("nativeNoteFromNameAudienceDetailsUnavailable", mapOf("name" to name))
     APIMessageAuthorKind.HUMAN_REACTION -> QelvoraCopy.text("reaction",mapOf("name" to name))
-    APIMessageAuthorKind.SYSTEM -> "Conversation update"
+    APIMessageAuthorKind.SYSTEM -> QelvoraCopy.text("nativeConversationUpdate")
 }
 @Serializable data class ConversationPage(
     val threadId: String, val creatorId: String, val fanId: String, val creatorName: String, val fanHandle: String,
@@ -122,8 +122,8 @@ private object ConversationTransport {
 class ConversationClient(private val baseURL: String, private val token: () -> String?, private val expectedAccountId: String?) {
     val json = Json { ignoreUnknownKeys = true }
     suspend fun request(path: String, body: JsonObject? = null, publicRead: Boolean = false, area: String = "v1/conversations/"): JsonElement = withContext(Dispatchers.IO) {
-        if (!publicRead && expectedAccountId == null) throw ConversationFailure(401, "Reopen this page with your current account.")
-        val credential = if (publicRead) null else token() ?: throw ConversationFailure(401, "Your session ended. Continue with Pantopus again.")
+        if (!publicRead && expectedAccountId == null) throw ConversationFailure(401, QelvoraCopy.text("nativeReopenThisPageWithYourCurrent"))
+        val credential = if (publicRead) null else token() ?: throw ConversationFailure(401, QelvoraCopy.text("nativeYourSessionEndedContinueWith"))
         val timeout = if (body != null && path.endsWith("/comparison")) 65L else 15L
         val builder = Request.Builder().url(baseURL.trimEnd('/') + "/" + area + path)
             .header("Accept", "application/json").header("X-Correlation-Id", UUID.randomUUID().toString())
@@ -146,7 +146,7 @@ class ConversationClient(private val baseURL: String, private val token: () -> S
                                     while (true) {
                                         if (!continuation.isActive) throw java.io.InterruptedIOException("Conversation request cancelled")
                                         val count = stream.read(buffer); if (count < 0) break
-                                        if (output.size() + count > 1_000_000) throw ConversationFailure(503, "This conversation response is too large. Refresh to try again.")
+                                        if (output.size() + count > 1_000_000) throw ConversationFailure(503, QelvoraCopy.text("nativeThisConversationResponseIsToo"))
                                         output.write(buffer, 0, count)
                                     }
                                 }
@@ -158,16 +158,16 @@ class ConversationClient(private val baseURL: String, private val token: () -> S
                 })
             }
             coroutineContext.ensureActive()
-            if (!publicRead && token() != credential) throw ConversationFailure(401,"Your account changed. Open this conversation again.")
+            if (!publicRead && token() != credential) throw ConversationFailure(401,QelvoraCopy.text("nativeYourAccountChangedOpenThisConversation"))
             val value = runCatching { json.parseToJsonElement(text) }.getOrNull()
             if (status !in 200..299) {
                 val error = value?.jsonObject?.get("error")?.jsonObject
-                throw ConversationFailure(if (error?.get("code")?.jsonPrimitive?.content == "session_account_changed") 401 else status, error?.get("message")?.jsonPrimitive?.content ?: "This conversation is unavailable. Your input is kept.", error?.get("code")?.jsonPrimitive?.content)
+                throw ConversationFailure(if (error?.get("code")?.jsonPrimitive?.content == "session_account_changed") 401 else status, error?.get("message")?.jsonPrimitive?.content ?: QelvoraCopy.text("nativeThisConversationIsUnavailable"), error?.get("code")?.jsonPrimitive?.content)
             }
-            value ?: throw ConversationFailure(503, "Reconnect to refresh this conversation.")
+            value ?: throw ConversationFailure(503, QelvoraCopy.text("nativeReconnectToRefreshThisConversation"))
         } catch (failure: IOException) {
             coroutineContext.ensureActive()
-            throw ConversationFailure(503, "Reconnect to refresh. Your input is kept.")
+            throw ConversationFailure(503, QelvoraCopy.text("nativeReconnectToRefreshYourInputIsKept2"))
         } finally { call.cancel() }
     }
     suspend fun page(path: String): ConversationPage = json.decodeFromJsonElement(request(path))
@@ -178,7 +178,7 @@ class ConversationClient(private val baseURL: String, private val token: () -> S
         var before: String? = null
         repeat(20) {
             val cursor = before
-            if (cursor != null && !PRESENCE_CURSOR.matches(cursor)) throw ConversationFailure(502, "Reconnect to refresh this conversation.")
+            if (cursor != null && !PRESENCE_CURSOR.matches(cursor)) throw ConversationFailure(502, QelvoraCopy.text("nativeReconnectToRefreshThisConversation"))
             val page = request("$creatorId/presence?limit=50" + (cursor?.let { "&before=" + java.net.URLEncoder.encode(it, "UTF-8") } ?: ""), area = "v1/content/").jsonObject
             val decoded = page["items"]!!.jsonArray.mapNotNull { item ->
                 when (item.jsonObject["authorKind"]?.jsonPrimitive?.contentOrNull) {
@@ -194,5 +194,5 @@ class ConversationClient(private val baseURL: String, private val token: () -> S
     }
     suspend fun replay(path: String, cursor: Long): List<APIFrame> = json.decodeFromJsonElement(request("$path/events?cursor=$cursor"))
     fun frames(page: ConversationPage, cursor: Long) = ConversationRealtime.frames(
-        baseURL, expectedAccountId ?: throw ConversationFailure(401, "Reopen this page with your current account."), token, page, cursor)
+        baseURL, expectedAccountId ?: throw ConversationFailure(401, QelvoraCopy.text("nativeReopenThisPageWithYourCurrent")), token, page, cursor)
 }

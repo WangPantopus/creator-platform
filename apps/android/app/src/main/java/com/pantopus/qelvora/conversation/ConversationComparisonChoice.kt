@@ -1,5 +1,7 @@
 package com.pantopus.qelvora.conversation
 
+import com.pantopus.qelvora.generated.QelvoraCopy
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.*
@@ -63,7 +65,7 @@ import kotlinx.serialization.json.*
                 val fresh = client.json.decodeFromJsonElement<ConversationComparisonConsent>(client.request("$root/comparison-consent"))
                 if (current(ticket)) choice = fresh
             }
-        } catch (error: Exception) { if (error is CancellationException) throw error; if (current(ticket) && !unavailable(error)) failure = error.message ?: "Reconnect to view your comparison choice." }
+        } catch (error: Exception) { if (error is CancellationException) throw error; if (current(ticket) && !unavailable(error)) failure = error.message ?: QelvoraCopy.text("nativeReconnectToViewYourComparison") }
     }
     fun act(action: String) {
         val original = choice ?: return
@@ -74,7 +76,7 @@ import kotlinx.serialization.json.*
                 if (action == "include") {
                     if (messageId == null || !original.allowed) return@launch
                     val result = client.json.decodeFromJsonElement<ConversationComparisonResult>(client.request("$root/messages/$messageId/comparison", buildJsonObject {}))
-                    if (current(ticket)) status = if (result.included) "A general version of this question is saved for AI comparisons. You can withdraw your choice in Me and privacy." else "This question was not included. It did not pass the comparison privacy checks."
+                    if (current(ticket)) status = if (result.included) QelvoraCopy.text("nativeAGeneralVersionOfThisQuestion") else QelvoraCopy.text("nativeThisQuestionWasNotIncludedIt")
                 } else {
                     val input = buildJsonObject {
                         put("action", action)
@@ -83,10 +85,10 @@ import kotlinx.serialization.json.*
                     val fresh = client.json.decodeFromJsonElement<ConversationComparisonConsent>(client.request("$root/comparison-consent", input))
                     if (current(ticket)) {
                         choice = fresh
-                        status = if (action == "withdraw") "Your comparison choice is withdrawn. Saved comparison questions and text have been removed. Affected exports remain unavailable while their files are removed." else "Your comparison choice is saved. Choose a question in the conversation to include it."
+                        status = if (action == "withdraw") QelvoraCopy.text("nativeYourComparisonChoiceIsWithdrawn") else QelvoraCopy.text("nativeYourComparisonChoiceIsSavedChoose")
                     }
                 }
-            } catch (error: Exception) { if (error is CancellationException) throw error; if (current(ticket) && !unavailable(error)) failure = error.message ?: "The result could not be confirmed. Refresh your choice before continuing." }
+            } catch (error: Exception) { if (error is CancellationException) throw error; if (current(ticket) && !unavailable(error)) failure = error.message ?: QelvoraCopy.text("nativeTheResultCouldNotBeConfirmed") }
             finally { if (current(ticket)) busy = false }
         }
     }
@@ -94,19 +96,19 @@ import kotlinx.serialization.json.*
     LaunchedEffect(available) { if (available == false) onUnavailable() }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         if (failure.isNotEmpty()) {
-            Notice(title = "Comparison status", children = failure)
-            Button("Refresh comparison choice", variant = ButtonVariant.SECONDARY, disabled = busy) { operation = scope.launch { refresh() } }
+            Notice(title = QelvoraCopy.text("nativeComparisonStatus"), children = failure)
+            Button(QelvoraCopy.text("nativeRefreshComparisonChoice"), variant = ButtonVariant.SECONDARY, disabled = busy) { operation = scope.launch { refresh() } }
         }
-        if (choice == null && available != false && failure.isEmpty()) BasicText("Loading your comparison choice…", style = qText("body").copy(color = qColor("ink")))
+        if (choice == null && available != false && failure.isEmpty()) BasicText(QelvoraCopy.text("nativeLoadingYourComparisonChoice"), style = qText("body").copy(color = qColor("ink")))
         choice?.let { current ->
-            BasicText(if (current.allowed) "Allowed for this creator" else "Off · optional", style = qText("data-sm").copy(color = qColor("ink")))
-            BasicText(current.policy?.notice ?: "The current comparison notice is unavailable. No new questions can be included.", style = qText("body").copy(color = qColor("ink")))
-            if (current.allowed && current.expiresAt != null) BasicText("Your choice ends ${current.expiresAt}.", style = qText("caption").copy(color = qColor("ink")))
-            if (busy || status.isNotEmpty()) BasicText(if (busy) "Saving your comparison choice or checking this question…" else status, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }, style = qText("body").copy(color = qColor("ink")))
+            BasicText(if (current.allowed) QelvoraCopy.text("nativeAllowedForThisCreator") else QelvoraCopy.text("nativeOffOptional"), style = qText("data-sm").copy(color = qColor("ink")))
+            BasicText(current.policy?.notice ?: QelvoraCopy.text("nativeTheCurrentComparisonNoticeIs"), style = qText("body").copy(color = qColor("ink")))
+            if (current.allowed && current.expiresAt != null) BasicText(QelvoraCopy.text("nativeYourChoiceEndsDate", mapOf("date" to current.expiresAt)), style = qText("caption").copy(color = qColor("ink")))
+            if (busy || status.isNotEmpty()) BasicText(if (busy) QelvoraCopy.text("nativeSavingYourComparisonChoiceOr") else status, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }, style = qText("body").copy(color = qColor("ink")))
             if (current.allowed) {
-                if (messageId != null) Button("Include this question", variant = ButtonVariant.AI, disabled = busy, block = true) { act("include") }
-                Button("Withdraw comparison choice", variant = ButtonVariant.SECONDARY, disabled = busy, block = true) { act("withdraw") }
-            } else if (current.policy != null) Button("Allow questions for AI comparisons", variant = ButtonVariant.AI, disabled = busy, block = true) { act("allow") }
+                if (messageId != null) Button(QelvoraCopy.text("nativeIncludeThisQuestion"), variant = ButtonVariant.AI, disabled = busy, block = true) { act("include") }
+                Button(QelvoraCopy.text("nativeWithdrawComparisonChoice"), variant = ButtonVariant.SECONDARY, disabled = busy, block = true) { act("withdraw") }
+            } else if (current.policy != null) Button(QelvoraCopy.text("nativeAllowQuestionsForAIComparisons"), variant = ButtonVariant.AI, disabled = busy, block = true) { act("allow") }
         }
     }
 }

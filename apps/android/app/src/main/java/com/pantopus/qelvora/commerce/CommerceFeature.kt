@@ -1,5 +1,7 @@
 package com.pantopus.qelvora.commerce
 
+import com.pantopus.qelvora.generated.QelvoraCopy
+
 import android.content.Context
 import android.net.Uri
 import androidx.activity.ComponentActivity
@@ -121,7 +123,7 @@ object CommerceFanFeature {
     // Back leaves a step opened inside this screen first, then goes back through where the person came from.
     val arrivalScreen = remember { screen }
     BackHandler(enabled = screen != arrivalScreen) { screen = arrivalScreen; detail = null }
-    var category by remember { mutableStateOf("Open") }; var creator by remember { mutableStateOf("") }
+    var category by remember { mutableStateOf(QelvoraCopy.text("nativeOpen")) }; var creator by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }; var failure by remember { mutableStateOf("") }; var notice by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }; var choice by remember { mutableStateOf<String?>(null) }; var reminders by remember { mutableStateOf(false) }
     var summary by remember { mutableStateOf("") }; var info by remember { mutableStateOf("") }; var selectedMode by remember { mutableStateOf<String?>(null) }
@@ -159,7 +161,7 @@ object CommerceFanFeature {
     suspend fun report(error: Exception) {
         if (error is CancellationException) throw error
         if (!privateReady()) return
-        failure = if (error is CommerceFailure) error.message else "Reconnect to refresh. Your input is kept; actions are unavailable while offline."
+        failure = if (error is CommerceFailure) error.message else QelvoraCopy.text("nativeReconnectToRefreshYourInputIs")
         if (error !is CommerceFailure || error.status >= 500 || error.status == 401 || error.status == 409) commerceAvailable = false
         if (error is CommerceFailure && (error.code == "session_account_changed" || error.code == "session_view_changed")) {
             data = null; detail = null; access = null; amount = ""; choice = null; summary = ""; info = ""; keys.clear(); notice = ""; session.refresh()
@@ -167,7 +169,7 @@ object CommerceFanFeature {
     }
     suspend fun refresh(allowBusy: Boolean = false) {
         if (!privateReady() || (busy && !allowBusy)) return
-        val client = api ?: run { failure = "Commerce is not connected yet."; return }; busy = true
+        val client = api ?: run { failure = QelvoraCopy.text("nativeCommerceIsNotConnectedYetReconnect"); return }; busy = true
         try {
             val accountId = session.session?.accountId
             val current = client.overview()
@@ -176,7 +178,7 @@ object CommerceFanFeature {
             current.limits.firstOrNull { it.currency == current.policy.currency }?.let { limit ->
                 if (limit.version != limitVersion) {
                     val pending = limit.effective_at != null
-                    choice = if (if (pending) limit.pending_none == true else limit.explicit_none) "No limit" else "Choose an amount"
+                    choice = if (if (pending) limit.pending_none == true else limit.explicit_none) QelvoraCopy.text("noLimit") else QelvoraCopy.text("nativeChooseAnAmount")
                     amount = (if (pending) limit.pending_amount else limit.amount)?.toBigDecimal()?.movePointLeft(java.util.Currency.getInstance(limit.currency).defaultFractionDigits)?.stripTrailingZeros()?.toPlainString().orEmpty()
                     reminders = limit.reminders_on; limitVersion = limit.version
                 }
@@ -243,144 +245,144 @@ object CommerceFanFeature {
     }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = if (screen == "packet") 20.dp else 16.dp).padding(top = 20.dp, bottom = 36.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            if (screen != "requests") Button("Back", ButtonVariant.QUIET) {
+            if (screen != "requests") Button(QelvoraCopy.text("back"), ButtonVariant.QUIET) {
                 if (screen != arrivalScreen) { screen = arrivalScreen; detail = null }
                 else session.back()
             }
-            Button("Refresh", ButtonVariant.QUIET, disabled = refreshDisabled) { scope.launch { retry() } }
+            Button(QelvoraCopy.text("nativeRefresh"), ButtonVariant.QUIET, disabled = refreshDisabled) { scope.launch { retry() } }
         }
-        if (!visible) Notice(title = "Account status", children = "Reconnect to check your account. Your unsaved input is kept.")
-        if (visible && failure.isNotEmpty()) Notice("error", "Connection status", failure)
-        if (visible && notice.isNotEmpty()) Notice(title = "Saved", children = notice)
+        if (!visible) Notice(title = QelvoraCopy.text("nativeAccountStatus"), children = QelvoraCopy.text("nativeReconnectToCheckYourAccountYour"))
+        if (visible && failure.isNotEmpty()) Notice("error", QelvoraCopy.text("nativeConnectionStatus"), failure)
+        if (visible && notice.isNotEmpty()) Notice(title = QelvoraCopy.text("nativeSaved"), children = notice)
         val current = data.takeIf { visible }
-        if (visible && current == null) { CommerceText(if (busy) "Loading commerce…" else "This information is unavailable", "display-md") }
+        if (visible && current == null) { CommerceText(if (busy) QelvoraCopy.text("nativeLoadingCommerce") else QelvoraCopy.text("nativeThisInformationIsUnavailable"), "display-md") }
         else if (visible && current != null) when (screen) {
             "spending" -> {
-                CommerceText("Spending and time", "display-md")
+                CommerceText(QelvoraCopy.text("nativeSpendingAndTime"), "display-md")
                 BasicText(commerceMoney(current.exposure?.captured ?: 0, current.policy.currency), style = qText("data-lg").copy(fontSize = 44.sp, lineHeight = 48.sp, color = qColor("ink")))
-                CommerceText("Charged this UTC calendar month", "caption")
-                current.exposure?.month?.let { CommerceText("$it · UTC", "data-sm") }
+                CommerceText(QelvoraCopy.text("nativeChargedThisUTCCalendarMonth"), "caption")
+                current.exposure?.month?.let { CommerceText(QelvoraCopy.text("nativeMonthUTC", mapOf("month" to it)), "data-sm") }
                 val limit = current.limits.firstOrNull { it.currency == current.policy.currency }
                 CommercePanel {
-                    CommerceRow("Current limit", limit?.let { if (it.explicit_none) "No limit" else commerceMoney(it.amount?.toLongOrNull() ?: 0, it.currency) } ?: "Choose before your first paid action")
-                    CommerceRow("Held, not charged", commerceMoney(current.exposure?.held ?: 0, current.policy.currency))
-                    current.exposure?.refunded?.let { CommerceRow("Refunds recorded", commerceMoney(it, current.policy.currency)) }
-                    limit?.effective_at?.let { CommerceText("Your increase takes effect ${commerceWhen(it)}.", "caption") }
+                    CommerceRow(QelvoraCopy.text("nativeCurrentLimit"), limit?.let { if (it.explicit_none) QelvoraCopy.text("noLimit") else commerceMoney(it.amount?.toLongOrNull() ?: 0, it.currency) } ?: QelvoraCopy.text("nativeChooseBeforeYourFirstPaidAction"))
+                    CommerceRow(QelvoraCopy.text("nativeHeldNotCharged"), commerceMoney(current.exposure?.held ?: 0, current.policy.currency))
+                    current.exposure?.refunded?.let { CommerceRow(QelvoraCopy.text("nativeRefundsRecorded"), commerceMoney(it, current.policy.currency)) }
+                    limit?.effective_at?.let { CommerceText(QelvoraCopy.text("nativeYourIncreaseTakesEffectDate", mapOf("date" to commerceWhen(it))), "caption") }
                 }
-                SpendLimit(options = listOf("Choose an amount", "No limit"), selected = choice, remindersOn = limit?.reminders_on, onSelect = { spendingEdited = true; choice = it })
-                if (choice == "Choose an amount") CommerceField("Monthly amount in ${current.policy.currency}", amount, { spendingEdited = true; amount = it }, keyboardType = KeyboardType.Decimal)
-                Button(if (reminders) "Reminders at 50% and 100% · on" else "Reminders at 50% and 100% · off", ButtonVariant.QUIET, block = true) { spendingEdited = true; reminders = !reminders }
-                CommerceText("Increases take 24 hours. Decreases are immediate and affect new requests. Existing obligations remain.", "caption")
-                Button(if (commandInFlight) "Saving…" else "Save limit", ButtonVariant.SECONDARY, block = true, disabled = commandDisabled || choice == null) { scope.launch {
-                    try { val value = if (choice == "No limit") null else commerceMinor(amount, current.policy.currency); mutate("spend-limit", buildJsonObject { put("currency", current.policy.currency); put("amount", value?.let { JsonPrimitive(it) } ?: JsonNull); put("explicitNone", choice == "No limit"); put("remindersOn", reminders) }, "Your spending choice is saved.") } catch (error: Exception) { report(error) }
+                SpendLimit(options = listOf(QelvoraCopy.text("nativeChooseAnAmount"), QelvoraCopy.text("noLimit")), selected = choice, remindersOn = limit?.reminders_on, onSelect = { spendingEdited = true; choice = it })
+                if (choice == QelvoraCopy.text("nativeChooseAnAmount")) CommerceField(QelvoraCopy.text("nativeMonthlyAmountInCurrency", mapOf("currency" to current.policy.currency)), amount, { spendingEdited = true; amount = it }, keyboardType = KeyboardType.Decimal)
+                Button(if (reminders) QelvoraCopy.text("nativeRemindersAt50And100On") else QelvoraCopy.text("nativeRemindersAt50And100Off"), ButtonVariant.QUIET, block = true) { spendingEdited = true; reminders = !reminders }
+                CommerceText(QelvoraCopy.text("nativeIncreasesTake24HoursDecreases"), "caption")
+                Button(if (commandInFlight) QelvoraCopy.text("nativeSaving") else QelvoraCopy.text("nativeSaveLimit"), ButtonVariant.SECONDARY, block = true, disabled = commandDisabled || choice == null) { scope.launch {
+                    try { val value = if (choice == QelvoraCopy.text("noLimit")) null else commerceMinor(amount, current.policy.currency); mutate("spend-limit", buildJsonObject { put("currency", current.policy.currency); put("amount", value?.let { JsonPrimitive(it) } ?: JsonNull); put("explicitNone", choice == QelvoraCopy.text("noLimit")); put("remindersOn", reminders) }, QelvoraCopy.text("nativeYourSpendingChoiceIsSaved")) } catch (error: Exception) { report(error) }
                 } }
-                current.spendingNotices.forEach { notice -> CommerceText("You’ve reached ${notice.threshold}% of your monthly limit.") }
-                Notice(title = "AI time", children = "Your time summary is unavailable until conversation activity is connected.")
+                current.spendingNotices.forEach { notice -> CommerceText(QelvoraCopy.text("nativeYouveReachedThresholdOfYourMonthly", mapOf("threshold" to notice.threshold.toString()))) }
+                Notice(title = QelvoraCopy.text("nativeAITime"), children = QelvoraCopy.text("nativeYourTimeSummaryIsUnavailable"))
             }
             "access", "packet" -> {
-                val name = current.creators.firstOrNull { it.id == creator }?.display_name ?: "the creator"; val modes = current.modes.filter { it.creator_id == creator }
-                CommerceText(if (screen == "access") "Access" else "Included in your request", "display-md")
+                val name = current.creators.firstOrNull { it.id == creator }?.display_name ?: QelvoraCopy.text("nativeTheCreator"); val modes = current.modes.filter { it.creator_id == creator }
+                CommerceText(if (screen == "access") QelvoraCopy.text("navAccess") else QelvoraCopy.text("includedInRequest"), "display-md")
                 if (screen == "access") {
                     current.creators.forEach { owner -> Button(owner.display_name, ButtonVariant.QUIET, block = true) { creator = owner.id } }
                     val currentAccess = access?.takeIf { value -> value.creatorId == creator && value.fanId == current.fan?.id && accessReceivedAt?.plusSeconds(5)?.isAfter(accessNow) == true && (value.validUntil == null || runCatching { Instant.parse(value.validUntil).isAfter(accessNow) }.getOrDefault(false)) }
                     val can = currentAccess?.let { value -> listOf(
-                        if (value.capabilities.contains("ai_message")) if (value.allowance.available > 0) "Message this AI." else "Your AI allowance is used for this period." else "",
-                        if (value.capabilities.contains("note")) "Read included notes." else "",
-                        if (value.capabilities.contains("request")) "Request available services." else ""
-                    ).filter { it.isNotEmpty() }.joinToString(" ").ifEmpty { "Read your existing conversations." } } ?: "Current access is unavailable. Refresh to try again."
-                    val labels = mapOf("membership" to "Membership", "comp" to "Gifted access", "commitment" to "Accepted service", "pass_slot" to "Pass AI reach", "trial" to "Conversation trial")
-                    val included = currentAccess?.sources?.map { labels[it.source] ?: "Current access" }?.distinct()?.sorted()?.joinToString(", ")?.ifEmpty { "No included access for this creator." } ?: "Benefits cannot be confirmed."
+                        if (value.capabilities.contains("ai_message")) if (value.allowance.available > 0) QelvoraCopy.text("nativeMessageThisAI") else QelvoraCopy.text("nativeYourAIAllowanceIsUsedFor") else "",
+                        if (value.capabilities.contains("note")) QelvoraCopy.text("nativeReadIncludedNotes") else "",
+                        if (value.capabilities.contains("request")) QelvoraCopy.text("nativeRequestAvailableServices") else ""
+                    ).filter { it.isNotEmpty() }.joinToString(" ").ifEmpty { QelvoraCopy.text("nativeReadYourExistingConversations") } } ?: QelvoraCopy.text("nativeCurrentAccessIsUnavailableRefresh")
+                    val labels = mapOf("membership" to QelvoraCopy.text("nativeMembership"), "comp" to QelvoraCopy.text("nativeGiftedAccess"), "commitment" to QelvoraCopy.text("nativeAcceptedService"), "pass_slot" to QelvoraCopy.text("nativePassAIReach"), "trial" to QelvoraCopy.text("nativeConversationTrial"))
+                    val included = currentAccess?.sources?.map { labels[it.source] ?: QelvoraCopy.text("nativeCurrentAccess") }?.distinct()?.sorted()?.joinToString(", ")?.ifEmpty { QelvoraCopy.text("nativeNoIncludedAccessForThisCreator") } ?: QelvoraCopy.text("nativeBenefitsCannotBeConfirmed")
                     val paid = current.memberships.filter { it.creator_id == creator && it.state in listOf("active", "grace", "cancelled") && runCatching { Instant.parse(it.period_end).isAfter(accessNow) }.getOrDefault(false) }
                     val availableModes = modes.filter { it.state == "offered" && it.used + it.reserved < it.weekly_limit }
-                    val changes = (paid.map { "${it.name}: ${if (it.cancel_at_end || it.state == "cancelled") "ends" else "renews"} ${commerceWhen(it.period_end)}" } + (currentAccess?.sources?.filter { it.source != "membership" }?.map { "${labels[it.source] ?: "Access"} ends ${commerceWhen(it.validUntil)}" } ?: emptyList())).joinToString("; ")
-                    AccessLines(name, can, included, if (availableModes.isEmpty()) "No human modes are currently available." else availableModes.joinToString(", ") { it.title }, changes.ifEmpty { "Access refreshes from the server." })
-                } else { CommerceText("Change anything; nothing is sent until you do."); IncludeList(summary, name = name, onSummary = { summary = it }) }
-                ModeList(modes.map { RequestMode(it.title, "${it.delivery_hours} h · ${maxOf(0, it.weekly_limit - it.used - it.reserved)} left", it.amount?.toLongOrNull()?.let { value -> commerceMoney(value, it.currency) } ?: "Price unavailable", selectedMode == it.id, it.state != "offered" || it.used + it.reserved >= it.weekly_limit) }) { index -> selectedMode = modes[index].id }
-                if (screen == "access") { Button("Ask $name to step in", ButtonVariant.SECONDARY, block = true, disabled = modes.none { it.state == "offered" && it.used + it.reserved < it.weekly_limit }) { screen = "packet" }; Button("Manage membership", ButtonVariant.QUIET, block = true) { screen = "membership" } }
+                    val changes = (paid.map { "${it.name}: ${if (it.cancel_at_end || it.state == "cancelled") "ends" else "renews"} ${commerceWhen(it.period_end)}" } + (currentAccess?.sources?.filter { it.source != "membership" }?.map { "${labels[it.source] ?: QelvoraCopy.text("navAccess")} ends ${commerceWhen(it.validUntil)}" } ?: emptyList())).joinToString("; ")
+                    AccessLines(name, can, included, if (availableModes.isEmpty()) QelvoraCopy.text("nativeNoHumanModesAreCurrentlyAvailable") else availableModes.joinToString(", ") { it.title }, changes.ifEmpty { QelvoraCopy.text("nativeAccessRefreshesFromTheServer") })
+                } else { CommerceText(QelvoraCopy.text("nativeChangeAnythingNothingIsSentUntil")); IncludeList(summary, name = name, onSummary = { summary = it }) }
+                ModeList(modes.map { RequestMode(it.title, QelvoraCopy.text("nativeHoursHRemainingLeft", mapOf("hours" to it.delivery_hours.toString(), "remaining" to maxOf(0, it.weekly_limit - it.used - it.reserved).toString())), it.amount?.toLongOrNull()?.let { value -> commerceMoney(value, it.currency) } ?: QelvoraCopy.text("nativePriceUnavailable"), selectedMode == it.id, it.state != "offered" || it.used + it.reserved >= it.weekly_limit) }) { index -> selectedMode = modes[index].id }
+                if (screen == "access") { Button(QelvoraCopy.text("stepIn", mapOf("name" to name)), ButtonVariant.SECONDARY, block = true, disabled = modes.none { it.state == "offered" && it.used + it.reserved < it.weekly_limit }) { screen = "packet" }; Button(QelvoraCopy.text("nativeManageMembership"), ButtonVariant.QUIET, block = true) { screen = "membership" } }
                 else {
                     // WP 7.4 P9: the chosen mode's terms, as the web packet shows them; its
                     // decision time is the deadline. The ETA line waits on lane 4's summary.
-                    modes.firstOrNull { it.id == selectedMode }?.let { mode -> TermsBlock(name, mode.amount?.toLongOrNull()?.let { value -> commerceMoney(value, mode.currency) } ?: "Price unavailable", "${mode.decision_hours} h") }
-                    Notice(title = "Payment unavailable", children = "Paid written and voice requests are unavailable in this native app. Your draft stays on this screen."); Button("Send request", ButtonVariant.SECONDARY, block = true, disabled = true) {}
+                    modes.firstOrNull { it.id == selectedMode }?.let { mode -> TermsBlock(name, mode.amount?.toLongOrNull()?.let { value -> commerceMoney(value, mode.currency) } ?: QelvoraCopy.text("nativePriceUnavailable"), "${mode.decision_hours} h") }
+                    Notice(title = QelvoraCopy.text("nativePaymentUnavailable"), children = QelvoraCopy.text("nativePaidWrittenAndVoiceRequestsAre")); Button(QelvoraCopy.text("nativeSendRequest"), ButtonVariant.SECONDARY, block = true, disabled = true) {}
                 }
             }
-            "checkout" -> Notice(title = "Payment unavailable", children = "Paid written and voice requests are unavailable in this native app.")
+            "checkout" -> Notice(title = QelvoraCopy.text("nativePaymentUnavailable"), children = QelvoraCopy.text("nativePaidWrittenAndVoiceRequestsAreUnavailable"))
             "status" -> detail?.let { value ->
                 val packet = value.packet
-                val name = current.creators.firstOrNull { it.id == packet.creator_id }?.display_name ?: "the creator"
+                val name = current.creators.firstOrNull { it.id == packet.creator_id }?.display_name ?: QelvoraCopy.text("nativeTheCreator")
                 CommerceText(packet.snapshot.title, "display-md"); RequestStatus(reqId = commerceID(packet.id), mode = packet.snapshot.title, price = commerceMoney(packet.snapshot.amount, packet.snapshot.currency), outcome = commerceOutcome(packet))
-                CommerceRow("Decision deadline", commerceWhen(packet.decision_at)); CommerceRow("Bank authorization expires", commerceWhen(packet.hold_expires_at)); value.commitment?.let { CommerceRow("Delivery deadline", commerceWhen(it.due_at)) }
+                CommerceRow(QelvoraCopy.text("nativeDecisionDeadline"), commerceWhen(packet.decision_at)); CommerceRow(QelvoraCopy.text("nativeBankAuthorizationExpires"), commerceWhen(packet.hold_expires_at)); value.commitment?.let { CommerceRow(QelvoraCopy.text("nativeDeliveryDeadline"), commerceWhen(it.due_at)) }
                 value.callTransport?.let { transport ->
-                    Notice(title = "System · call status", children = if (transport.state == "closed_unresolved") "The call room closed after neither participant joined during the arrival window. The service outcome remains unresolved. Recorded ${commerceWhen(transport.recordedAt)}. Check the current receipt for billing status." else "Current call status is unavailable. Your recorded receipt remains available.")
+                    Notice(title = QelvoraCopy.text("nativeSystemCallStatus"), children = if (transport.state == "closed_unresolved") QelvoraCopy.text("nativeTheCallRoomClosedAfterNeither", mapOf("time" to commerceWhen(transport.recordedAt))) else QelvoraCopy.text("nativeCurrentCallStatusIsUnavailable"))
                 }
                 if (packet.state == "more_info") {
-                    CommerceText(packet.question ?: "The creator asked for more information."); CommerceField("Your answer", info, { info = it }, 4)
-                    Button("Send answer", ButtonVariant.SECONDARY, block = true, disabled = commandDisabled || info.isBlank()) { scope.launch { mutate("packets/${packet.id}/info", buildJsonObject { put("version", packet.version); put("text", info) }, "Your answer is saved.") } }
+                    CommerceText(packet.question ?: QelvoraCopy.text("nativeTheCreatorAskedForMoreInformation")); CommerceField(QelvoraCopy.text("nativeYourAnswer"), info, { info = it }, 4)
+                    Button(QelvoraCopy.text("nativeSendAnswer"), ButtonVariant.SECONDARY, block = true, disabled = commandDisabled || info.isBlank()) { scope.launch { mutate("packets/${packet.id}/info", buildJsonObject { put("version", packet.version); put("text", info) }, QelvoraCopy.text("nativeYourAnswerIsSaved")) } }
                 }
-                if (packet.state in listOf("submitting", "submitted", "more_info", "offer_pending")) Button("Withdraw request", ButtonVariant.SECONDARY, block = true, disabled = commandDisabled) { scope.launch { mutate("packets/${packet.id}/withdraw", buildJsonObject { put("version", packet.version) }, "Hold release is being confirmed.") } }
-                if (packet.payment_state in listOf("unknown", "requires_action")) Notice(title = "Payment processing", children = "The provider must confirm payment. No completion is inferred from this screen.")
+                if (packet.state in listOf("submitting", "submitted", "more_info", "offer_pending")) Button(QelvoraCopy.text("nativeWithdrawRequest"), ButtonVariant.SECONDARY, block = true, disabled = commandDisabled) { scope.launch { mutate("packets/${packet.id}/withdraw", buildJsonObject { put("version", packet.version) }, QelvoraCopy.text("nativeHoldReleaseIsBeingConfirmed")) } }
+                if (packet.payment_state in listOf("unknown", "requires_action")) Notice(title = QelvoraCopy.text("nativePaymentProcessing"), children = QelvoraCopy.text("nativeTheProviderMustConfirmPayment"))
                 if (value.commitment?.delivered_at != null && value.commitment.state in listOf("delivered", "refunded", "resolved")) {
                     val signedActId = value.commitment.evidence?.signedActId ?: value.commitment.accept_act_id
                     val label = when (value.commitment.evidence?.authorKind) {
-                        "approved_draft" -> "Prepared by AI · approved by $name"
-                        "human_creator" -> "${packet.snapshot.title} · personally fulfilled by $name"
-                        "human_call" -> "Personal call · provider-confirmed outcome"
-                        "system" -> "System delivery notice"
-                        else -> "Delivery recorded"
+                        "approved_draft" -> QelvoraCopy.text("approvedAuthor", mapOf("name" to name))
+                        "human_creator" -> QelvoraCopy.text("nativeTitlePersonallyFulfilledByName", mapOf("title" to packet.snapshot.title, "name" to name))
+                        "human_call" -> QelvoraCopy.text("nativePersonalCallProviderConfirmed")
+                        "system" -> QelvoraCopy.text("nativeSystemDeliveryNotice")
+                        else -> QelvoraCopy.text("nativeDeliveryRecorded")
                     }
                     val refund = value.ledger.filter { it.kind == "refund" && it.currency == packet.snapshot.currency }.sumOf { it.amount.toLong() }
-                    val rows = listOf("Charged" to commerceMoney(packet.snapshot.amount, packet.snapshot.currency), "Delivered" to commerceWhen(value.commitment.delivered_at)) + if (refund > 0) listOf("Refund confirmed" to commerceMoney(refund, packet.snapshot.currency)) else emptyList()
+                    val rows = listOf(QelvoraCopy.text("nativeCharged") to commerceMoney(packet.snapshot.amount, packet.snapshot.currency), QelvoraCopy.text("nativeDelivered") to commerceWhen(value.commitment.delivered_at)) + if (refund > 0) listOf(QelvoraCopy.text("nativeRefundConfirmed") to commerceMoney(refund, packet.snapshot.currency)) else emptyList()
                     if (signedActId != null) Receipt(name = name, reqId = commerceID(packet.id), title = packet.snapshot.title, rows = rows, label = label, onVerify = { session.destination = "/verify/$signedActId" })
-                    else CommercePanel { CommerceText("Receipt", "receipt-title"); rows.forEach { (label, amount) -> CommerceRow(label, amount) }; CommerceText(label, "caption") }
-                    if (value.commitment.state == "delivered" || value.share?.fan_choice == true) Button(if (value.share?.fan_choice == true) "Revoke sharing" else "Allow sharing without your handle", ButtonVariant.SECONDARY, block = true, disabled = commandDisabled || (!packet.snapshot.shareable && value.share?.fan_choice != true) || value.share?.revoked_at != null) { scope.launch { mutate("packets/${packet.id}/share", buildJsonObject { put("version", value.share?.version ?: 1); put("enabled", value.share?.fan_choice != true); put("handleDisplay", "hidden") }, "Your sharing choice is saved.") } }
+                    else CommercePanel { CommerceText(QelvoraCopy.text("receipt"), "receipt-title"); rows.forEach { (label, amount) -> CommerceRow(label, amount) }; CommerceText(label, "caption") }
+                    if (value.commitment.state == "delivered" || value.share?.fan_choice == true) Button(if (value.share?.fan_choice == true) QelvoraCopy.text("nativeRevokeSharing") else QelvoraCopy.text("nativeAllowSharingWithoutYourHandle"), ButtonVariant.SECONDARY, block = true, disabled = commandDisabled || (!packet.snapshot.shareable && value.share?.fan_choice != true) || value.share?.revoked_at != null) { scope.launch { mutate("packets/${packet.id}/share", buildJsonObject { put("version", value.share?.version ?: 1); put("enabled", value.share?.fan_choice != true); put("handleDisplay", "hidden") }, QelvoraCopy.text("nativeYourSharingChoiceIsSaved")) } }
                 }
             }
             "membership" -> {
-                CommerceText("Manage membership", "display-md")
-                if (current.memberships.isEmpty()) CommerceText("No memberships yet")
-                current.memberships.forEach { member -> CommercePanel { CommerceText(member.name, "title"); CommerceRow("Status", member.state); CommerceRow("Access until", commerceWhen(member.period_end)); CommerceRow("Billing provider", member.provider) } }
+                CommerceText(QelvoraCopy.text("nativeManageMembership"), "display-md")
+                if (current.memberships.isEmpty()) CommerceText(QelvoraCopy.text("nativeNoMembershipsYet"))
+                current.memberships.forEach { member -> CommercePanel { CommerceText(member.name, "title"); CommerceRow(QelvoraCopy.text("nativeStatus"), member.state); CommerceRow(QelvoraCopy.text("nativeAccessUntil"), commerceWhen(member.period_end)); CommerceRow(QelvoraCopy.text("nativeBillingProvider"), member.provider) } }
                 val accountId=session.session?.accountId
                 if(current.capabilities.storePurchasesAvailable && api!=null && accountId!=null) StoreMembershipPane(context,accountId,api,current.tiers.filter {it.state=="active"}.mapNotNull {it.catalog.google},available=!commandDisabled) {refresh()}
                 else {
-                    Notice(title = "Purchase and restore unavailable", children = "Store products must be configured and verified by the server before access is granted.")
+                    Notice(title = QelvoraCopy.text("nativePurchaseAndRestoreUnavailable"), children = QelvoraCopy.text("nativeStoreProductsMustBeConfigured"))
                     if(current.memberships.any {it.provider=="google"}) key(accountId) {StoreSubscriptionManagement(context)}
                 }
-                CommerceText("Unused memberships cancelled within seven days qualify for a full refund. Later refunds follow the remaining paid period; store refunds follow that store's process.", "caption")
+                CommerceText(QelvoraCopy.text("nativeUnusedMembershipsCancelledWithin"), "caption")
             }
             "pass" -> {
-                CommerceText("Your pass", "display-md")
-                if (!current.policy.passEnabled) Notice(title = "Pass is unavailable", children = "Memberships are the current way to deepen access. The pass is not open yet.")
+                CommerceText(QelvoraCopy.text("nativeYourPass"), "display-md")
+                if (!current.policy.passEnabled) Notice(title = QelvoraCopy.text("nativePassIsUnavailable"), children = QelvoraCopy.text("nativeMembershipsAreTheCurrentWayTo"))
                 if(current.policy.passEnabled) current.pass.firstOrNull()?.let { pass ->
                     val passCurrent = pass.state in listOf("active", "cancelled") && runCatching { Instant.parse(pass.cycle_end.take(10) + "T00:00:00Z").isAfter(accessNow) }.getOrDefault(false)
-                    CommerceText("${pass.used + pass.reserved} of ${pass.allowance} shared AI cost units used or reserved.")
+                    CommerceText(QelvoraCopy.text("nativeUsedOfAllowanceSharedAICost", mapOf("used" to (pass.used + pass.reserved).toString(), "allowance" to pass.allowance.toString())))
                     current.passChoices.creators.forEach { candidate -> Row(Modifier.fillMaxWidth().heightIn(min=48.dp).toggleable(passSelection.contains(candidate.id),role=Role.Checkbox) { selected -> passSelection=if(selected)passSelection+candidate.id else passSelection-candidate.id }.padding(12.dp),horizontalArrangement=Arrangement.spacedBy(12.dp)) { Box(Modifier.size(T.checkboxSize).background(if(passSelection.contains(candidate.id))qColor("ink") else qColor("surface"),RoundedCornerShape(T.radiusTail)).border(T.hairline,qColor("control-line"),RoundedCornerShape(T.radiusTail)),contentAlignment=Alignment.Center) {if(passSelection.contains(candidate.id))Glyph("check",T.space4,qColor("surface"))}; CommerceText(candidate.display_name) } }
                     val occupied=current.slots.filter { it.cycle_start==pass.cycle_start && it.state in listOf("active","draft_next","ended_readable","replaced") }.map { it.position }.toSet().size
-                    if(occupied<pass.slot_capacity) Button("Fill available slots",ButtonVariant.SECONDARY,block=true,disabled=commandDisabled || !passCurrent || passSelection.isEmpty() || passSelection.size>pass.slot_capacity-occupied) { scope.launch { mutate("pass/initial",buildJsonObject {put("version",pass.version);putJsonArray("creatorIds") {passSelection.sorted().forEach {add(it)}}},"Your current choices are saved.") } }
-                    Button("Save next month’s choices",ButtonVariant.SECONDARY,block=true,disabled=commandDisabled || !passCurrent || passSelection.size>pass.slot_capacity) { scope.launch { mutate("pass/draft",buildJsonObject {put("version",pass.version);putJsonArray("creatorIds") {passSelection.sorted().forEach {add(it)}}},"Your next-month draft is saved.") } }
-                    CommerceText("Complete all ${pass.slot_capacity} choices. An incomplete draft carries forward your current selection.","caption")
+                    if(occupied<pass.slot_capacity) Button(QelvoraCopy.text("nativeFillAvailableSlots"),ButtonVariant.SECONDARY,block=true,disabled=commandDisabled || !passCurrent || passSelection.isEmpty() || passSelection.size>pass.slot_capacity-occupied) { scope.launch { mutate("pass/initial",buildJsonObject {put("version",pass.version);putJsonArray("creatorIds") {passSelection.sorted().forEach {add(it)}}},QelvoraCopy.text("nativeYourCurrentChoicesAreSaved")) } }
+                    Button(QelvoraCopy.text("nativeSaveNextMonthsChoices"),ButtonVariant.SECONDARY,block=true,disabled=commandDisabled || !passCurrent || passSelection.size>pass.slot_capacity) { scope.launch { mutate("pass/draft",buildJsonObject {put("version",pass.version);putJsonArray("creatorIds") {passSelection.sorted().forEach {add(it)}}},QelvoraCopy.text("nativeYourNextMonthDraftIsSaved")) } }
+                    CommerceText(QelvoraCopy.text("nativeCompleteAllSlotcapacityChoices", mapOf("slotCapacity" to pass.slot_capacity.toString())),"caption")
                 }
                 current.slots.forEach { slot -> CommercePanel {
-                    CommerceRow(slot.display_name, slot.state.replace('_', ' ')); CommerceText("Through ${commerceWhen(slot.ends_at)}", "caption")
+                    CommerceRow(slot.display_name, slot.state.replace('_', ' ')); CommerceText(QelvoraCopy.text("nativeThroughDate", mapOf("date" to commerceWhen(slot.ends_at))), "caption")
                     if(current.policy.passEnabled && current.passChoices.replaceableSlotIds.contains(slot.id)) current.pass.firstOrNull()?.let { pass ->
-                        CommerceText("Free replacement", "label")
+                        CommerceText(QelvoraCopy.text("nativeFreeReplacement"), "label")
                         current.passChoices.creators.filter { candidate -> current.slots.none { it.state=="active" && it.creator_id==candidate.id } }.forEach { candidate -> Button(candidate.display_name,ButtonVariant.QUIET,block=true) {replacement=candidate.id} }
-                        Button("Replace unavailable creator",ButtonVariant.SECONDARY,block=true,disabled=commandDisabled || replacement.isEmpty()) { scope.launch { mutate("pass/slots/${slot.id}/replace",buildJsonObject {put("version",pass.version);put("creatorId",replacement)},"Your replacement is saved.") } }
+                        Button(QelvoraCopy.text("nativeReplaceUnavailableCreator"),ButtonVariant.SECONDARY,block=true,disabled=commandDisabled || replacement.isEmpty()) { scope.launch { mutate("pass/slots/${slot.id}/replace",buildJsonObject {put("version",pass.version);put("creatorId",replacement)},QelvoraCopy.text("nativeYourReplacementIsSaved")) } }
                     }
                 } }
-                CommerceText("A pass grants AI reach. Separate memberships grant tier depth and do not consume a slot.")
+                CommerceText(QelvoraCopy.text("nativeAPassGrantsAIReachSeparate"))
             }
             else -> {
-                CommerceText("Requests", "display-lg"); Segmented(listOf("Open", "Delivered", "Closed"), category) { category = it }
+                CommerceText(QelvoraCopy.text("navRequests"), "display-lg"); Segmented(listOf(QelvoraCopy.text("nativeOpen"), QelvoraCopy.text("nativeDelivered"), QelvoraCopy.text("nativeClosed")), category) { category = it }
                 val visible = current.packets.filter { commerceRequestCategory(it) == category }
-                if (visible.isEmpty()) CommerceText(if (current.packets.isEmpty()) "No requests here. Requests appear after you send them." else "No requests here. Choose another category to view your requests and retained receipts.")
+                if (visible.isEmpty()) CommerceText(QelvoraCopy.text("nativeNoRequestsHere") + ". " + if (current.packets.isEmpty()) QelvoraCopy.text("nativeRequestsAppearAfterYouSendThem") else QelvoraCopy.text("nativeChooseAnotherCategoryToViewYour"))
                 visible.forEach { packet ->
                     RequestStatus(reqId = commerceID(packet.id), mode = packet.snapshot.title, price = commerceMoney(packet.snapshot.amount, packet.snapshot.currency), outcome = commerceOutcome(packet))
-                    Button("View request", ButtonVariant.SECONDARY, block = true, disabled = busy || !ready) { scope.launch { try { busy = true; val value = api?.detail(packet.id); if (privateReady()) { detail = value; screen = "status" } } catch (error: Exception) { report(error) } finally { busy = false } } }
+                    Button(QelvoraCopy.text("nativeViewRequest"), ButtonVariant.SECONDARY, block = true, disabled = busy || !ready) { scope.launch { try { busy = true; val value = api?.detail(packet.id); if (privateReady()) { detail = value; screen = "status" } } catch (error: Exception) { report(error) } finally { busy = false } } }
                 }
-                Button("Spending and time", ButtonVariant.SECONDARY, block = true) { screen = "spending" }
-                Button("Creator access", ButtonVariant.SECONDARY, block = true) { screen = "access" }
-                Button("Manage membership", ButtonVariant.QUIET, block = true) { screen = "membership" }
-                Button("Your pass", ButtonVariant.QUIET, block = true) { screen = "pass" }
+                Button(QelvoraCopy.text("nativeSpendingAndTime"), ButtonVariant.SECONDARY, block = true) { screen = "spending" }
+                Button(QelvoraCopy.text("nativeCreatorAccess"), ButtonVariant.SECONDARY, block = true) { screen = "access" }
+                Button(QelvoraCopy.text("nativeManageMembership"), ButtonVariant.QUIET, block = true) { screen = "membership" }
+                Button(QelvoraCopy.text("nativeYourPass"), ButtonVariant.QUIET, block = true) { screen = "pass" }
             }
         }
     }
@@ -392,8 +394,8 @@ object CommerceFanFeature {
 private fun commerceWhen(value: String?): String = value?.let { runCatching { DateTimeFormatter.ofPattern("MMM d, uuuu HH:mm").withZone(ZoneId.systemDefault()).format(Instant.parse(it)) }.getOrDefault(it) } ?: "—"
 private fun commerceID(value: String) = "REQ-" + value.take(8).uppercase()
 private fun commerceRequestCategory(packet: CommercePacket): String = when {
-    packet.delivered_at != null || packet.commitment_state == "delivered" -> "Delivered"
-    packet.state in listOf("draft", "declined", "withdrawn", "expired") || packet.commitment_state in listOf("refunded", "resolved") -> "Closed"
-    else -> "Open"
+    packet.delivered_at != null || packet.commitment_state == "delivered" -> QelvoraCopy.text("nativeDelivered")
+    packet.state in listOf("draft", "declined", "withdrawn", "expired") || packet.commitment_state in listOf("refunded", "resolved") -> QelvoraCopy.text("nativeClosed")
+    else -> QelvoraCopy.text("nativeOpen")
 }
-private fun commerceOutcome(packet: CommercePacket): String = mapOf("released" to "Hold released · nothing charged", "failed" to "Payment failed · nothing charged", "unknown" to "Confirming payment", "requires_action" to "Payment authentication needed", "refund_pending" to "Refund processing", "refunded" to "Refund confirmed")[packet.payment_state] ?: if (packet.delivered_at != null || packet.commitment_state == "delivered") "Delivered" else packet.state.replace('_', ' ')
+private fun commerceOutcome(packet: CommercePacket): String = mapOf("released" to QelvoraCopy.text("nativeHoldReleasedNothingCharged"), "failed" to QelvoraCopy.text("nativePaymentFailedNothingCharged"), "unknown" to QelvoraCopy.text("nativeConfirmingPayment"), "requires_action" to QelvoraCopy.text("nativePaymentAuthenticationNeeded"), "refund_pending" to QelvoraCopy.text("nativeRefundProcessing"), "refunded" to QelvoraCopy.text("nativeRefundConfirmed"))[packet.payment_state] ?: if (packet.delivered_at != null || packet.commitment_state == "delivered") QelvoraCopy.text("nativeDelivered") else packet.state.replace('_', ' ')

@@ -73,10 +73,10 @@ object W3FanFeatures {
         val path = it.substringBefore('?'); path == "/you" || path.startsWith("/threads/") || (path.startsWith("/creators/") && path.endsWith("/chat"))
     }, screen = { session ->
         val parts = Uri.parse(session.destination).pathSegments
-        if (baseURL == null) Notice(title = "Conversation unavailable", children = "Reconnect to open this conversation from your account.")
+        if (baseURL == null) Notice(title = QelvoraCopy.text("nativeConversationUnavailable"), children = QelvoraCopy.text("nativeReconnectToOpenThisConversation"))
         else if (parts.size == 3 && parts[0] == "threads") {
             val valid = runCatching { UUID.fromString(parts[1]); UUID.fromString(parts[2]); true }.getOrDefault(false)
-            if (valid) ConversationScreen(baseURL, parts[1], parts[2], session) else Notice(title = "Conversation unavailable", children = "Open this conversation from your account.")
+            if (valid) ConversationScreen(baseURL, parts[1], parts[2], session) else Notice(title = QelvoraCopy.text("nativeConversationUnavailable"), children = QelvoraCopy.text("nativeOpenThisConversationFromYour"))
         } else if (parts.size == 3 && parts[0] == "creators" && parts[2] == "chat") key(session.session?.accountId, session.session?.sessionId, session.destination) { FirstConversation(baseURL, parts[1], session) }
         else if (Uri.parse(session.destination).path == "/you") {
             val destination = Uri.parse(session.destination)
@@ -87,7 +87,7 @@ object W3FanFeatures {
                 ConversationPrivacy(client, "$creatorId/$fanId", onBack = { session.back() }, onData = { session.open("/support/privacy") }, onSupport = { session.open("/support") })
             } else ConversationAccount(baseURL, session)
         }
-        else Notice(title = "Conversation unavailable", children = "Open this conversation from your account.")
+        else Notice(title = QelvoraCopy.text("nativeConversationUnavailable"), children = QelvoraCopy.text("nativeOpenThisConversationFromYour"))
     })
 }
 private typealias PendingMessage = ConversationDraftStorage.Pending
@@ -149,7 +149,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             try { saved.await() }
             catch (failure: Exception) {
                 if (failure is CancellationException) throw failure
-                if (draftLease?.ticket?.id == lease.ticket.id) error = "Reconnect to refresh. Your input is kept."
+                if (draftLease?.ticket?.id == lease.ticket.id) error = QelvoraCopy.text("nativeReconnectToRefreshYourInputIsKept")
             }
         }
     }
@@ -239,7 +239,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     }
     fun fail(failure: Throwable, threadDenied: Boolean = false) {
         if (failure is CancellationException) throw failure
-        error = failure.message ?: "Reconnect to refresh. Your input is kept."
+        error = failure.message ?: QelvoraCopy.text("nativeReconnectToRefreshYourInputIsKept")
         offline = true; transportReady = false; presenceStale = true
         if (failure is ConversationFailure && failure.status in listOf(401,403,404)) {
             val ticket = draftTicket; draftTicket = null; draftLease = null
@@ -253,7 +253,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     // refused thread, and the thread's own reads decide access.
     fun sourceUnavailable(failure: Throwable) {
         if (failure is CancellationException) throw failure
-        sourceFailure = "No longer accessible to you"
+        sourceFailure = QelvoraCopy.text("sourceUnavailable")
     }
     suspend fun refresh(propagateFailure: Boolean = false) {
         val run = viewRun
@@ -357,7 +357,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                                     refresh(propagateFailure = true)
                                 }
                                 is ConversationRealtimeEvent.Frame -> {
-                                    val delivery = gate ?: throw ConversationFailure(503, "Reconnect to refresh this conversation.")
+                                    val delivery = gate ?: throw ConversationFailure(503, QelvoraCopy.text("nativeReconnectToRefreshThisConversation"))
                                     if (delivery.receive(event.value).isNotEmpty()) refresh(propagateFailure = true)
                                 }
                             }
@@ -380,28 +380,28 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     comparisonQuestion?.let { question ->
         androidx.compose.ui.window.Dialog(onDismissRequest = { comparisonQuestion = null }) {
             Column(Modifier.background(qColor("surface"), RoundedCornerShape(24.dp)).padding(20.dp)) {
-                BasicText("AI comparisons", style = qText("display-lg").copy(color = qColor("ink")))
+                BasicText(QelvoraCopy.text("nativeAIComparisons"), style = qText("display-lg").copy(color = qColor("ink")))
                 LazyColumn(Modifier.weight(1f, fill = false), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    item { BasicText("Your question", style = qText("data-sm").copy(color = qColor("ink"))); BasicText(question.text, style = qText("body").copy(color = qColor("ink"))) }
+                    item { BasicText(QelvoraCopy.text("nativeYourQuestion"), style = qText("data-sm").copy(color = qColor("ink"))); BasicText(question.text, style = qText("body").copy(color = qColor("ink"))) }
                     // Comparisons turned off while the choice was open: it closes, nothing is said.
                     item { ConversationComparisonChoice(client, root, question.id) { comparisonQuestion = null; comparisonsAvailable = false } }
                 }
-                Button("Close", variant = ButtonVariant.QUIET) { comparisonQuestion = null }
+                Button(QelvoraCopy.text("close"), variant = ButtonVariant.QUIET) { comparisonQuestion = null }
             }
         }
     }
     if (sourceFailure.isNotEmpty()) Dialog(onDismissRequest = { sourceFailure = "" }) {
         Column(Modifier.background(qColor("ground")).padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            BasicText("Source unavailable", style = qText("display-md").copy(color = qColor("ink")), modifier = Modifier.semantics { heading() })
+            BasicText(QelvoraCopy.text("nativeSourceUnavailable"), style = qText("display-md").copy(color = qColor("ink")), modifier = Modifier.semantics { heading() })
             BasicText(sourceFailure, style = qText("body").copy(color = qColor("ink")))
-            Button("Close", variant = ButtonVariant.QUIET) { sourceFailure = "" }
+            Button(QelvoraCopy.text("close"), variant = ButtonVariant.QUIET) { sourceFailure = "" }
         }
     }
     source?.let { passage -> Dialog(onDismissRequest = { source = null }) {
         Column(Modifier.background(qColor("ground")).padding(16.dp)) {
-            BasicText("Original source", style = qText("data-sm").copy(color = qColor("ink")))
+            BasicText(QelvoraCopy.text("nativeOriginalSource"), style = qText("data-sm").copy(color = qColor("ink")))
             LazyColumn(Modifier.weight(1f, fill = false), verticalArrangement = Arrangement.spacedBy(16.dp)) { item { BasicText(passage.first, style = qText("display-md").copy(color = qColor("ink"))); SelectionContainer { BasicText(passage.second, style = qText("body").copy(color = qColor("ink"))) } } }
-            Button("Close", variant = ButtonVariant.QUIET) { source = null }
+            Button(QelvoraCopy.text("close"), variant = ButtonVariant.QUIET) { source = null }
         }
     } }
     val current = page
@@ -454,9 +454,9 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     }
     Column(Modifier.fillMaxSize().background(qColor("ground"))) {
         if (current == null) {
-            Notice(title = "Conversation unavailable", children = if (error.isEmpty()) "Loading your messages…" else error)
-            Button("Refresh", variant = ButtonVariant.SECONDARY) { connectionRetry++ }
-            Button("Help and safety", variant = ButtonVariant.QUIET) { session.open("/support") }
+            Notice(title = QelvoraCopy.text("nativeConversationUnavailable"), children = if (error.isEmpty()) QelvoraCopy.text("nativeLoadingYourMessages") else error)
+            Button(QelvoraCopy.text("nativeRefresh"), variant = ButtonVariant.SECONDARY) { connectionRetry++ }
+            Button(QelvoraCopy.text("nativeHelpAndSafety"), variant = ButtonVariant.QUIET) { session.open("/support") }
         } else {
             val header: @Composable () -> Unit = {
                 if (compact) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -469,7 +469,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                     }
                     if (!horizontalControls) IconButton("info", copy("aboutConversation"), onClick = { privacy = true })
                 } else {
-                ThreadHeader(name = current.creatorName, subtitle = "Official AI", live = !offline && current.control == APIThreadControl.HUMAN_ACTIVE, onBack = { session.back() }, onAbout = { privacy = true })
+                ThreadHeader(name = current.creatorName, subtitle = QelvoraCopy.text("nativeOfficialAI"), live = !offline && current.control == APIThreadControl.HUMAN_ACTIVE, onBack = { session.back() }, onAbout = { privacy = true })
                 IdentityStrip(state = if (current.control == APIThreadControl.HUMAN_ACTIVE) IdentityState.HUMAN else if (current.control == APIThreadControl.AI_ACTIVE) IdentityState.AI else IdentityState.PAUSED, name = current.creatorName)
                 }
             }
@@ -493,15 +493,15 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                     } })
             }
             val sendButton: @Composable () -> Unit = {
-                Button("Send", variant = if (current.control == APIThreadControl.HUMAN_ACTIVE) ButtonVariant.MAYA else ButtonVariant.AI, initial = creatorInitial(current.creatorName), disabled = !current.canSend || offline || !foreground || busy || pending != null || current.generationSequences.isNotEmpty() || draft.isBlank()) { scope.launch { send() } }
+                Button(QelvoraCopy.text("nativeSend"), variant = if (current.control == APIThreadControl.HUMAN_ACTIVE) ButtonVariant.MAYA else ButtonVariant.AI, initial = creatorInitial(current.creatorName), disabled = !current.canSend || offline || !foreground || busy || pending != null || current.generationSequences.isNotEmpty() || draft.isBlank()) { scope.launch { send() } }
             }
             val privacyControls: @Composable () -> Unit = {
-                Button("Me and privacy", variant = ButtonVariant.QUIET) { privacy = true }
-                Button("Get support", variant = ButtonVariant.QUIET) { session.open("/support") }
+                Button(QelvoraCopy.text("nativeMeAndPrivacy"), variant = ButtonVariant.QUIET) { privacy = true }
+                Button(QelvoraCopy.text("nativeGetSupport"), variant = ButtonVariant.QUIET) { session.open("/support") }
             }
             val composer: @Composable () -> Unit = {
                 Column(Modifier.imePadding().padding(horizontal = if (horizontalControls) 4.dp else 16.dp, vertical = if (keyboardVisible && compact) 4.dp else 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    if (!current.canSend && !paused && !horizontalControls) Notice(title = "AI unavailable", children = current.unavailableReason ?: "Messaging is unavailable.")
+                    if (!current.canSend && !paused && !horizontalControls) Notice(title = QelvoraCopy.text("nativeAIUnavailable"), children = current.unavailableReason ?: QelvoraCopy.text("nativeMessagingIsUnavailable"))
                     if (paused && !compact) Row(Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Glyph("pause", 16.dp, qColor("ink-muted"))
                         BasicText(copy("aiPaused", "name" to current.creatorName), style = qText("label").copy(color = qColor("ink-muted")))
@@ -516,17 +516,17 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             LazyColumn(state = scroll, modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 if (horizontalControls) item {
                     Button(copy("aboutConversation"), variant = ButtonVariant.QUIET) { privacy = true }
-                    if (!current.canSend && !paused) Notice(title = "AI unavailable", children = current.unavailableReason ?: "Messaging is unavailable.")
+                    if (!current.canSend && !paused) Notice(title = QelvoraCopy.text("nativeAIUnavailable"), children = current.unavailableReason ?: QelvoraCopy.text("nativeMessagingIsUnavailable"))
                 }
                 if (compact) item { IdentityStrip(state = if (current.control == APIThreadControl.HUMAN_ACTIVE) IdentityState.HUMAN else if (current.control == APIThreadControl.AI_ACTIVE) IdentityState.AI else IdentityState.PAUSED, name = current.creatorName) }
                 item(key = "intro-offer") {
                     NativeIntroOffer(client, root, session, introOfferId, current.feedbackPolicy != null,
                         enabled = !busy && !offline && foreground && !privacy && comparisonQuestion == null && source == null)
                 }
-                item { BasicText("Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.", style = qText("caption").copy(color = qColor("ink"))) }
-                if (offline) item { Notice(title = "You're offline", children = "Saved conversation is available briefly while its reading permission is current. Reconnect to send.") }
-                if (current.offTheRecord) item { SystemLine(text = "Off the record · the AI keeps no memory from this conversation.") }
-                if (before != null) item { Button("Earlier messages", variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground) { scope.launch {
+                item { BasicText(QelvoraCopy.text("conversationAccess"), style = qText("caption").copy(color = qColor("ink"))) }
+                if (offline) item { Notice(title = QelvoraCopy.text("nativeYoureOffline"), children = QelvoraCopy.text("nativeYoureSeeingASavedConversation")) }
+                if (current.offTheRecord) item { SystemLine(text = QelvoraCopy.text("nativeOffTheRecordTheAIKeeps")) }
+                if (before != null) item { Button(QelvoraCopy.text("nativeEarlierMessages"), variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground) { scope.launch {
                     busy = true
                     try { val previous = client.page("$root?before=$before"); older = (previous.messages + older).distinctBy { it.id }.take(250); before = previous.before }
                     catch (failure: Throwable) { fail(failure) } finally { busy = false }
@@ -535,9 +535,9 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                     if (row is ThreadRow.Reminder) SystemLine(row.text)
                     else if (row is ThreadRow.Presence) PresenceRow(row.item) { session.open("/verify/$it") }
                     else { val message = (row as ThreadRow.Message).message
-                    if (message.recording == null) ConversationMessageRow(message, current.creatorName, current.control, creatorId = current.creatorId, onLink = { session.open(it) }, connected = !offline && foreground, original = (older + current.messages).firstOrNull { it.id == message.correction?.originalMessageId && it.version == message.correction.originalVersion && it.authorKind == APIMessageAuthorKind.AI }, onOriginal = { message.correction?.let { correction -> scope.launch { try { val original = client.json.decodeFromJsonElement<ConversationMessage>(client.request("$root/messages/${correction.originalMessageId}")); if (original.id != correction.originalMessageId || original.version != correction.originalVersion || original.authorKind != APIMessageAuthorKind.AI) sourceFailure = "The original reply changed." else source = "Original AI reply · version ${original.version}" to original.text } catch (failure: Throwable) { sourceUnavailable(failure) } } } }, onVerify = { message.signedActId?.let { session.open("/verify/$it") } }, onReport = { session.open("/support?creatorId=$creatorId" + if (message.authorKind == APIMessageAuthorKind.AI) "&messageId=${message.id}" else "") }, onForget = if (busy || offline) null else { { scope.launch { busy=true;try { client.request("$root/messages/${message.id}/dont-remember",buildJsonObject { put("expectedRevision",current.revision) });refresh() } catch(failure:Throwable) { fail(failure) } finally {busy=false} } } }, onCitation = { id -> scope.launch { try { val passage = client.request("$root/citations/$id").jsonObject; source = passage["title"]?.jsonPrimitive?.content.orEmpty() to passage["text"]?.jsonPrimitive?.content.orEmpty() } catch (failure: Throwable) { sourceUnavailable(failure) } } })
+                    if (message.recording == null) ConversationMessageRow(message, current.creatorName, current.control, creatorId = current.creatorId, onLink = { session.open(it) }, connected = !offline && foreground, original = (older + current.messages).firstOrNull { it.id == message.correction?.originalMessageId && it.version == message.correction.originalVersion && it.authorKind == APIMessageAuthorKind.AI }, onOriginal = { message.correction?.let { correction -> scope.launch { try { val original = client.json.decodeFromJsonElement<ConversationMessage>(client.request("$root/messages/${correction.originalMessageId}")); if (original.id != correction.originalMessageId || original.version != correction.originalVersion || original.authorKind != APIMessageAuthorKind.AI) sourceFailure = QelvoraCopy.text("nativeTheOriginalReplyChanged") else source = QelvoraCopy.text("nativeOriginalAIReplyVersionVersion", mapOf("version" to original.version.toString())) to original.text } catch (failure: Throwable) { sourceUnavailable(failure) } } } }, onVerify = { message.signedActId?.let { session.open("/verify/$it") } }, onReport = { session.open("/support?creatorId=$creatorId" + if (message.authorKind == APIMessageAuthorKind.AI) "&messageId=${message.id}" else "") }, onForget = if (busy || offline) null else { { scope.launch { busy=true;try { client.request("$root/messages/${message.id}/dont-remember",buildJsonObject { put("expectedRevision",current.revision) });refresh() } catch(failure:Throwable) { fail(failure) } finally {busy=false} } } }, onCitation = { id -> scope.launch { try { val passage = client.request("$root/citations/$id").jsonObject; source = passage["title"]?.jsonPrimitive?.content.orEmpty() to passage["text"]?.jsonPrimitive?.content.orEmpty() } catch (failure: Throwable) { sourceUnavailable(failure) } } })
                     if (comparisonsAvailable && message.authorKind == APIMessageAuthorKind.FAN && !message.offTheRecord && !current.offTheRecord && message.deliveryState in listOf(APIMessageDeliveryState.ACCEPTED, APIMessageDeliveryState.DELIVERED)) {
-                        Button("AI comparison options", variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground, modifier = Modifier.testTag("comparison-options-${message.id}")) { comparisonQuestion = message }
+                        Button(QelvoraCopy.text("nativeAIComparisonOptions"), variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground, modifier = Modifier.testTag("comparison-options-${message.id}")) { comparisonQuestion = message }
                     }
                     message.recording?.let { recording ->
                         val asset = recording.asset
@@ -552,15 +552,15 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                                 onVerify = { session.open("/verify/${message.signedActId}") })
                         } else {
                             BasicText(message.authorLabel(current.creatorName), style = qText("label").copy(color = qColor("ink")))
-                            BasicText("This recording is unavailable for this conversation.", style = qText("caption").copy(color = qColor("ink")))
+                            BasicText(QelvoraCopy.text("nativeThisRecordingIsUnavailableFor"), style = qText("caption").copy(color = qColor("ink")))
                             if (message.signedActId != null) SignedMarker(current.creatorName) { session.open("/verify/${message.signedActId}") }
                         }
-                        Button("Report", variant = ButtonVariant.QUIET) { session.open("/support?creatorId=$creatorId") }
+                        Button(QelvoraCopy.text("report"), variant = ButtonVariant.QUIET) { session.open("/support?creatorId=$creatorId") }
                     }
                     val version = message.agentVersion
                     val policy = current.feedbackPolicy
                     if (message.feedback != null && policy == null && version != null) {
-                        Button("Remove my response", variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground) { scope.launch {
+                        Button(QelvoraCopy.text("nativeRemoveMyResponse"), variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground) { scope.launch {
                             busy = true
                             try {
                                 client.request("$root/messages/${message.id}/feedback", buildJsonObject {
@@ -589,17 +589,17 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                                     } catch (failure: Throwable) { fail(failure) } finally { busy = false }
                                 }
                             } }
-                            Button(QelvoraCopy.text("thisHelped"), variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground, modifier = Modifier.semantics { stateDescription = if (message.feedback == "helpful") "Selected" else "Not selected" }) { respond("helpful") }
-                            Button("Not helpful", variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground, modifier = Modifier.semantics { stateDescription = if (message.feedback == "not_helpful") "Selected" else "Not selected" }) { respond("not_helpful") }
+                            Button(QelvoraCopy.text("thisHelped"), variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground, modifier = Modifier.semantics { stateDescription = if (message.feedback == "helpful") QelvoraCopy.text("nativeSelected") else QelvoraCopy.text("nativeNotSelected") }) { respond("helpful") }
+                            Button(QelvoraCopy.text("nativeNotHelpful"), variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground, modifier = Modifier.semantics { stateDescription = if (message.feedback == "not_helpful") QelvoraCopy.text("nativeSelected") else QelvoraCopy.text("nativeNotSelected") }) { respond("not_helpful") }
                             if (message.feedback != null) {
-                                BasicText("Your response is saved.", style = qText("caption").copy(color = qColor("ink")))
-                                Button("Remove my response", variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground) { respond(null) }
+                                BasicText(QelvoraCopy.text("nativeYourResponseIsSaved"), style = qText("caption").copy(color = qColor("ink")))
+                                Button(QelvoraCopy.text("nativeRemoveMyResponse"), variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground) { respond(null) }
                             }
                         }
                     }
                 } }
-                pending?.let { pendingItem -> item { Message(kind = MessageKind.FAN, children = pendingItem.text, name = current.creatorName, delivery = if (pendingItem.rejected) Delivery.FAILED else if (pendingItem.uncertain) null else Delivery.PENDING, onRetry = { scope.launch { send(true) } }); if (pendingItem.uncertain) { BasicText("Acceptance hasn't been confirmed. Retry checks the same message without a duplicate.", style = qText("caption").copy(color = qColor("ink"))); Button("Retry", variant = ButtonVariant.QUIET, disabled = busy || offline) { scope.launch { send(true) } } } else if (pendingItem.rejected) { BasicText("Not sent", style = qText("caption").copy(color = qColor("ink"))); Button("Keep editing", variant = ButtonVariant.QUIET, disabled = busy) { updateInput(pendingItem.text, null) } } } }
-                if (error.isNotEmpty()) item { Notice(title = "Conversation status", children = error) }
+                pending?.let { pendingItem -> item { Message(kind = MessageKind.FAN, children = pendingItem.text, name = current.creatorName, delivery = if (pendingItem.rejected) Delivery.FAILED else if (pendingItem.uncertain) null else Delivery.PENDING, onRetry = { scope.launch { send(true) } }); if (pendingItem.uncertain) { BasicText(QelvoraCopy.text("nativeAcceptanceHasntBeenConfirmed"), style = qText("caption").copy(color = qColor("ink"))); Button(QelvoraCopy.text("retry"), variant = ButtonVariant.QUIET, disabled = busy || offline) { scope.launch { send(true) } } } else if (pendingItem.rejected) { Button(QelvoraCopy.text("nativeKeepEditing"), variant = ButtonVariant.QUIET, disabled = busy) { updateInput(pendingItem.text, null) } } } }
+                if (error.isNotEmpty()) item { Notice(title = QelvoraCopy.text("nativeConversationStatus"), children = error) }
                 item(key = "conversation-end") { Spacer(Modifier.height(1.dp)) }
                 if (compact && !keyboardVisible) item {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -651,24 +651,24 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 val destination = message.publicAnswerDestination(creatorId)
                 if (destination != null) Box(Modifier.fillMaxWidth().heightIn(min = 48.dp)
                     .clickable(enabled = connected, role = Role.Button) { onLink(destination) }
-                    .semantics(mergeDescendants = true) { contentDescription = "System update: Answered publicly. Open answer" },
+                    .semantics(mergeDescendants = true) { contentDescription = QelvoraCopy.text("nativeSystemUpdateAnsweredPublicly") },
                     contentAlignment = Alignment.Center) { SystemLine(text = message.text) }
                 else SystemLine(text = message.text)
             }
             else if (message.correction != null && original != null) {
                 Correction(text = message.text, name = name, aiText = original.text, onVerify = onVerify)
-                Button("Report", variant = ButtonVariant.QUIET, onClick = onReport)
+                Button(QelvoraCopy.text("report"), variant = ButtonVariant.QUIET, onClick = onReport)
             }
             else if (kind != null) {
-                Message(kind = kind, children = message.text, name = name, member = message.member ?: "Authorized team member", delivery = if (message.deliveryState == APIMessageDeliveryState.GENERATING) if (message.text.isEmpty()) Delivery.ACCEPTED else Delivery.STREAMING else if (message.deliveryState == APIMessageDeliveryState.INTERRUPTED) Delivery.INTERRUPTED else null, live = connected && message.correction == null && message.authorKind == APIMessageAuthorKind.HUMAN_CREATOR && control == APIThreadControl.HUMAN_ACTIVE, actions = false, onVerify = onVerify, citation = if (message.citations.isEmpty()) null else { { message.citations.forEach { id -> CitationChip(title = "Source", meta = "Read the original passage", onOpen = { onCitation(id) }) } } })
-                if (message.correction != null) { BasicText(QelvoraCopy.text("correctionAuthor", mapOf("name" to name)), style = qText("label").copy(color = qColor("ink"))); Button("Original AI reply · version ${message.correction.originalVersion}", variant = ButtonVariant.QUIET, onClick = onOriginal) }
+                Message(kind = kind, children = message.text, name = name, member = message.member ?: QelvoraCopy.text("nativeAuthorizedTeamMember"), delivery = if (message.deliveryState == APIMessageDeliveryState.GENERATING) if (message.text.isEmpty()) Delivery.ACCEPTED else Delivery.STREAMING else if (message.deliveryState == APIMessageDeliveryState.INTERRUPTED) Delivery.INTERRUPTED else null, live = connected && message.correction == null && message.authorKind == APIMessageAuthorKind.HUMAN_CREATOR && control == APIThreadControl.HUMAN_ACTIVE, actions = false, onVerify = onVerify, citation = if (message.citations.isEmpty()) null else { { message.citations.forEach { id -> CitationChip(title = QelvoraCopy.text("source"), meta = QelvoraCopy.text("nativeReadTheOriginalPassage"), onOpen = { onCitation(id) }) } } })
+                if (message.correction != null) { BasicText(QelvoraCopy.text("correctionAuthor", mapOf("name" to name)), style = qText("label").copy(color = qColor("ink"))); Button(QelvoraCopy.text("nativeOriginalAIReplyVersionVersion", mapOf("version" to message.correction.originalVersion.toString())), variant = ButtonVariant.QUIET, onClick = onOriginal) }
                 if (message.deliveryState == APIMessageDeliveryState.FAILED) BasicText(QelvoraCopy.text("conversationReplyUnavailable"), style = qText("caption").copy(color = qColor("ink")))
-                if (message.authorKind != APIMessageAuthorKind.FAN) Button("Report", variant = ButtonVariant.QUIET, onClick = onReport)
-                if (message.authorKind == APIMessageAuthorKind.FAN) { if(message.offTheRecord) BasicText("Not used for memory",style=qText("caption").copy(color = qColor("ink"))) else Button("Don't remember this",variant=ButtonVariant.QUIET,disabled=onForget==null) { onForget?.invoke() } }
+                if (message.authorKind != APIMessageAuthorKind.FAN) Button(QelvoraCopy.text("report"), variant = ButtonVariant.QUIET, onClick = onReport)
+                if (message.authorKind == APIMessageAuthorKind.FAN) { if(message.offTheRecord) BasicText(QelvoraCopy.text("nativeNotUsedForMemory"),style=qText("caption").copy(color = qColor("ink"))) else Button(QelvoraCopy.text("nativeDontRememberThis"),variant=ButtonVariant.QUIET,disabled=onForget==null) { onForget?.invoke() } }
             } else {
                 Row(horizontalArrangement = Arrangement.spacedBy(QelvoraTokens.authorGap), verticalAlignment = Alignment.CenterVertically) {
                     if (message.authorKind == APIMessageAuthorKind.HUMAN_BROADCAST) Mark(AuthorKind.HUMAN_BROADCAST) else if (message.authorKind == APIMessageAuthorKind.HUMAN_REACTION) Mark(AuthorKind.HUMAN_REACTION)
-                    BasicText(if (message.authorKind == APIMessageAuthorKind.HUMAN_BROADCAST) "Note from $name · audience details unavailable" else if (message.authorKind == APIMessageAuthorKind.HUMAN_REACTION) "$name reacted" else "Call with $name", style = qText("label").copy(color = qColor("ink")))
+                    BasicText(if (message.authorKind == APIMessageAuthorKind.HUMAN_BROADCAST) QelvoraCopy.text("nativeNoteFromNameAudienceDetailsUnavailable", mapOf("name" to name)) else if (message.authorKind == APIMessageAuthorKind.HUMAN_REACTION) "$name reacted" else QelvoraCopy.text("nativeCallWithName", mapOf("name" to name)), style = qText("label").copy(color = qColor("ink")))
                 }
                 BasicText(message.text, style = qText("body").copy(color = qColor("ink")))
                 if (message.signedActId != null) SignedMarker(name = name, onClick = onVerify)
@@ -697,7 +697,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     var usage by remember(client, root) { mutableStateOf<ConversationUsage?>(null) }
     var policy by remember(client, root) { mutableStateOf<ConversationCapabilities?>(null) }; var page by remember(client, root) { mutableStateOf<ConversationPage?>(null) }
     var comparisonsOff by remember(client, root) { mutableStateOf(false) }
-    val name = page?.creatorName ?: "this creator"
+    val name = page?.creatorName ?: QelvoraCopy.text("nativeThisCreator")
     val uriHandler = LocalUriHandler.current
     var error by remember(client, root) { mutableStateOf("") }; var busy by remember(client, root) { mutableStateOf(false) }
     var provenance by remember(client, root) { mutableStateOf<ConversationMessage?>(null) }
@@ -733,7 +733,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             val freshPage = client.page(root)
             val freshUsage: ConversationUsage = client.json.decodeFromJsonElement(client.request("$root/usage"))
             if (current(ticket)) { memory = freshMemory; audit = freshAudit; policy = freshPolicy; page = freshPage; usage = freshUsage }
-        } catch (failure: Throwable) { if (failure is CancellationException) throw failure; if (current(ticket)) failed(failure, "Reconnect to refresh your privacy settings.") }
+        } catch (failure: Throwable) { if (failure is CancellationException) throw failure; if (current(ticket)) failed(failure, QelvoraCopy.text("nativeReconnectToRefreshYourPrivacy")) }
     }
     suspend fun change(fallback: String, run: suspend () -> Unit) {
         if (busy || !foreground || page == null || memory == null) return
@@ -747,58 +747,58 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         try {
             val message: ConversationMessage = client.json.decodeFromJsonElement(client.request("$root/messages/${item.provenanceMessageId}"))
             if (current(ticket) && memory?.items?.any { it.id == item.id } == true) provenance = message
-        } catch (failure: Throwable) { if (failure is CancellationException) throw failure; if (current(ticket)) failed(failure, "This source message is unavailable.") }
+        } catch (failure: Throwable) { if (failure is CancellationException) throw failure; if (current(ticket)) failed(failure, QelvoraCopy.text("nativeThisSourceMessageIsUnavailable")) }
     }
     suspend fun decide(item: ConversationMemory, action: String) {
         val snapshot = memory ?: return
-        change("This change could not be saved.") { client.request("$root/memory/${item.id}", buildJsonObject { put("action", action); put("expectedRevision", snapshot.revision); if (action == "edit") put("text", text) }) }
+        change(QelvoraCopy.text("nativeThisChangeCouldNotBeSaved")) { client.request("$root/memory/${item.id}", buildJsonObject { put("action", action); put("expectedRevision", snapshot.revision); if (action == "edit") put("text", text) }) }
     }
     suspend fun preferences(offTheRecord: Boolean, introShared: Boolean) {
         val snapshot = memory ?: return
-        change("This setting could not be saved.") { client.request("$root/preferences", buildJsonObject { put("offTheRecord",offTheRecord); put("introShared",introShared); put("expectedRevision",snapshot.revision) }) }
+        change(QelvoraCopy.text("nativeThisChangeCouldNotBeSaved")) { client.request("$root/preferences", buildJsonObject { put("offTheRecord",offTheRecord); put("introShared",introShared); put("expectedRevision",snapshot.revision) }) }
     }
     suspend fun consent() {
         val currentPolicy = policy?.providers ?: return
         val accepted = page?.consentCurrent != true
-        change("Consent could not be saved.") { client.request("$root/consent", buildJsonObject { put("version",currentPolicy.version); put("accepted",accepted) }) }
+        change(QelvoraCopy.text("nativeConsentCouldNotBeSaved")) { client.request("$root/consent", buildJsonObject { put("version",currentPolicy.version); put("accepted",accepted) }) }
     }
     provenance?.let { message -> Dialog(onDismissRequest={provenance=null}) { Column(Modifier.background(qColor("ground")).padding(16.dp)) {
-        BasicText("Where this came from",style=qText("title").copy(color = qColor("ink")));BasicText(message.authorLabel(name),style=qText("label").copy(color = qColor("ink")))
+        BasicText(QelvoraCopy.text("nativeWhereThisCameFrom"),style=qText("title").copy(color = qColor("ink")));BasicText(message.authorLabel(name),style=qText("label").copy(color = qColor("ink")))
         LazyColumn(Modifier.weight(1f,fill=false)) { item { SelectionContainer { BasicText(message.text,style=qText("body").copy(color = qColor("ink"))) } } }
-        BasicText(message.createdAt,style=qText("data-sm").copy(color = qColor("ink")));Button("Close",variant=ButtonVariant.QUIET) {provenance=null}
+        BasicText(message.createdAt,style=qText("data-sm").copy(color = qColor("ink")));Button(QelvoraCopy.text("close"),variant=ButtonVariant.QUIET) {provenance=null}
     } } }
     LaunchedEffect(client, root, foreground) { if (foreground) refresh() else conceal() }
     LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.fillMaxSize().background(qColor("ground"))) {
-        item { Button("Back", variant = ButtonVariant.QUIET, onClick = onBack); BasicText("Me and privacy", style = qText("title").copy(color = qColor("ink"))); if (error.isNotEmpty()) { Notice(title = "Privacy status", children = error); Button("Try again", variant = ButtonVariant.SECONDARY, disabled = busy) { scope.launch { refresh() } } } }
-        item { BasicText("What $name's AI remembers", style = qText("display-md").copy(color = qColor("ink"))); if (memory == null) BasicText(if (error.isEmpty()) "Loading your memories…" else "Memories unavailable.", style = qText("body").copy(color = qColor("ink"))); if (memory?.items?.isEmpty() == true) BasicText("No memories. The AI asks before remembering.", style = qText("body").copy(color = qColor("ink"))) }
+        item { Button(QelvoraCopy.text("back"), variant = ButtonVariant.QUIET, onClick = onBack); BasicText(QelvoraCopy.text("nativeMeAndPrivacy"), style = qText("title").copy(color = qColor("ink"))); if (error.isNotEmpty()) { Notice(title = QelvoraCopy.text("nativePrivacyStatus"), children = error); Button(QelvoraCopy.text("nativeTryAgain"), variant = ButtonVariant.SECONDARY, disabled = busy) { scope.launch { refresh() } } } }
+        item { BasicText(QelvoraCopy.text("nativeWhatNamesAIRemembers", mapOf("name" to name)), style = qText("display-md").copy(color = qColor("ink"))); if (memory == null) BasicText(if (error.isEmpty()) QelvoraCopy.text("nativeLoadingYourMemories") else QelvoraCopy.text("nativeMemoriesUnavailable"), style = qText("body").copy(color = qColor("ink"))); if (memory?.items?.isEmpty() == true) BasicText(QelvoraCopy.text("nativeNoMemoriesTheAIAsksBefore"), style = qText("body").copy(color = qColor("ink"))) }
         items(memory?.items.orEmpty(), key = { it.id }) { item -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            BasicText(if (item.state == "proposed") "Want me to remember this? Only if you say yes." else "Remembered · ${item.kind}", style = qText("data-sm").copy(color = qColor("ink")))
-            if (editing == item.id) { BasicTextField(text, { text = it.take(2000) }, textStyle = qText("body").copy(color = qColor("ink")), cursorBrush = SolidColor(qColor("ink"))); Button("Save proposal", variant = ButtonVariant.SECONDARY, disabled = busy || text.isBlank()) { scope.launch { decide(item, "edit") } } } else BasicText(item.text, style = qText("body").copy(color = qColor("ink")))
-            if (item.sensitiveCategory != null) BasicText("Sensitive item · agreeing applies only to this exact memory.", style = qText("caption").copy(color = qColor("ink")))
-            Button("View where this came from",variant=ButtonVariant.QUIET) { scope.launch { source(item) } }
-            Row { if (item.state == "proposed") Button("Remember", variant = ButtonVariant.SECONDARY, disabled = busy || memory?.offTheRecord == true) { scope.launch { decide(item, "accept") } }; Button("Edit", variant = ButtonVariant.QUIET, disabled = busy) { editing = item.id; text = item.text }; Button(if (item.state == "proposed") "Don't remember" else "Delete", variant = ButtonVariant.QUIET, disabled = busy) { scope.launch { decide(item, "delete") } } }
-            if (item.kind == "open_loop" && item.state == "remembered") Button("Resolved", variant = ButtonVariant.QUIET, disabled = busy) { scope.launch { decide(item, "resolve") } }
+            BasicText(if (item.state == "proposed") QelvoraCopy.text("sensitiveMemory") else if (item.kind == "open_loop") (if (item.state == "resolved") QelvoraCopy.text("nativeResolvedOpenLoop") else QelvoraCopy.text("nativeOpenLoop")) else if (item.kind == "summary") QelvoraCopy.text("summary") else QelvoraCopy.text("nativeRemembered"), style = qText("data-sm").copy(color = qColor("ink")))
+            if (editing == item.id) { BasicTextField(text, { text = it.take(2000) }, textStyle = qText("body").copy(color = qColor("ink")), cursorBrush = SolidColor(qColor("ink"))); Button(QelvoraCopy.text("nativeSaveProposal"), variant = ButtonVariant.SECONDARY, disabled = busy || text.isBlank()) { scope.launch { decide(item, "edit") } } } else BasicText(item.text, style = qText("body").copy(color = qColor("ink")))
+            if (item.sensitiveCategory != null) BasicText(QelvoraCopy.text("nativeSensitiveItemAgreeingApplies"), style = qText("caption").copy(color = qColor("ink")))
+            Button(QelvoraCopy.text("nativeViewWhereThisCameFrom"),variant=ButtonVariant.QUIET) { scope.launch { source(item) } }
+            Row { if (item.state == "proposed") Button(QelvoraCopy.text("remember"), variant = ButtonVariant.SECONDARY, disabled = busy || memory?.offTheRecord == true) { scope.launch { decide(item, "accept") } }; Button(QelvoraCopy.text("edit"), variant = ButtonVariant.QUIET, disabled = busy) { editing = item.id; text = item.text }; Button(if (item.state == "proposed") QelvoraCopy.text("nativeDontRemember") else QelvoraCopy.text("nativeDelete"), variant = ButtonVariant.QUIET, disabled = busy) { scope.launch { decide(item, "delete") } } }
+            if (item.kind == "open_loop" && item.state == "remembered") Button(QelvoraCopy.text("nativeResolved"), variant = ButtonVariant.QUIET, disabled = busy) { scope.launch { decide(item, "resolve") } }
         } }
         item {
-            BasicText("Off the record", style = qText("display-md").copy(color = qColor("ink")))
-            BasicText("The AI keeps no memory from it. It remains visible to the creator and their team, and you can delete it.", style = qText("body").copy(color = qColor("ink")))
-            Button(if (memory?.offTheRecord == true) "Turn off off-the-record" else "Turn on off-the-record", variant = ButtonVariant.SECONDARY, disabled = busy || memory == null) { scope.launch { preferences(memory?.offTheRecord != true, memory?.introShared == true) } }
-            Button(if (memory?.introShared == true) "Stop sharing my intro" else "Share my intro with this creator's AI", variant = ButtonVariant.QUIET, disabled = busy || memory == null) { scope.launch { preferences(memory?.offTheRecord == true,memory?.introShared != true) } }
-            BasicText("AI providers", style = qText("display-md").copy(color = qColor("ink")))
+            BasicText(QelvoraCopy.text("nativeOffTheRecord"), style = qText("display-md").copy(color = qColor("ink")))
+            BasicText(QelvoraCopy.text("nativeTheAIKeepsNoMemoryFrom"), style = qText("body").copy(color = qColor("ink")))
+            Button(if (memory?.offTheRecord == true) QelvoraCopy.text("nativeTurnOffOffTheRecord") else QelvoraCopy.text("nativeTurnOnOffTheRecord"), variant = ButtonVariant.SECONDARY, disabled = busy || memory == null) { scope.launch { preferences(memory?.offTheRecord != true, memory?.introShared == true) } }
+            Button(if (memory?.introShared == true) QelvoraCopy.text("nativeStopSharingMyIntro") else QelvoraCopy.text("nativeShareMyIntroWithThisCreators"), variant = ButtonVariant.QUIET, disabled = busy || memory == null) { scope.launch { preferences(memory?.offTheRecord == true,memory?.introShared != true) } }
+            BasicText(QelvoraCopy.text("nativeAIProviders"), style = qText("display-md").copy(color = qColor("ink")))
             if (policy?.providers?.verified == false) Notice(title=QelvoraCopy.text("conversationDevelopmentPolicyTitle"),children=QelvoraCopy.text("conversationDevelopmentPolicyNotice"))
             policy?.providers?.providers?.forEach { provider ->
-                Button(provider.name + " processing terms", variant = ButtonVariant.QUIET) { uriHandler.openUri(provider.termsUrl) }
-                BasicText((if(provider.noTraining) "Doesn't train on your messages." else "Review message use in these terms.") + " " + (if(provider.noRetention) "Doesn't keep your messages." else "Review message retention in these terms."), style = qText("caption").copy(color = qColor("ink")))
+                Button(QelvoraCopy.text("nativeProviderProcessingTerms", mapOf("provider" to provider.name)), variant = ButtonVariant.QUIET) { uriHandler.openUri(provider.termsUrl) }
+                BasicText((if(provider.noTraining) QelvoraCopy.text("nativeDoesntTrainOnYourMessages") else QelvoraCopy.text("nativeReviewMessageUseInTheseTerms")) + " " + (if(provider.noRetention) QelvoraCopy.text("nativeDoesntKeepYourMessages") else QelvoraCopy.text("nativeReviewMessageRetentionInThese")), style = qText("caption").copy(color = qColor("ink")))
             }
-            if (policy?.providers == null) BasicText("AI provider consent is unavailable or has been withdrawn.", style = qText("body").copy(color = qColor("ink")))
-            Button(if(page?.consentCurrent == true) "Withdraw AI provider consent" else "Agree to these AI providers", variant = ButtonVariant.SECONDARY, disabled = busy || (page?.consentCurrent != true && policy?.consentAvailable != true)) { scope.launch { consent() } }
+            if (policy?.providers == null) BasicText(QelvoraCopy.text("nativeAIProviderConsentIsUnavailable"), style = qText("body").copy(color = qColor("ink")))
+            Button(if(page?.consentCurrent == true) QelvoraCopy.text("nativeWithdrawAIProviderConsent") else QelvoraCopy.text("nativeAgreeToTheseAIProviders"), variant = ButtonVariant.SECONDARY, disabled = busy || (page?.consentCurrent != true && policy?.consentAvailable != true)) { scope.launch { consent() } }
         }
         // While comparisons are off (2026-10-08) the section is absent, with no placeholder.
-        if (policy?.comparisonsAvailable == true && !comparisonsOff) item { BasicText("AI comparisons", style = qText("display-md").copy(color = qColor("ink"))); ConversationComparisonChoice(client, root) { comparisonsOff = true } }
-        item { BasicText("Time with this creator's AI",style=qText("display-md").copy(color = qColor("ink"))); if (usage == null) BasicText(if (error.isEmpty()) "Loading time history…" else "Time history unavailable.", style = qText("body").copy(color = qColor("ink"))); usage?.let { time -> BasicText(time.measurement + " Days are shown in UTC.",style=qText("caption").copy(color = qColor("ink")));BasicText("This week · ${time.days.sumOf { it.seconds }.toInt()/60} minutes",style=qText("body").copy(color = qColor("ink")));time.days.forEach { day -> BasicText("${day.day} · ${day.seconds.toInt()/60} minutes",style=qText("body").copy(color = qColor("ink"))) };if(!time.modeAvailable) BasicText("Companion mode time signals await the verified AI mode configuration.",style=qText("caption").copy(color = qColor("ink"))) } }
-        item { BasicText("Who opened your conversations", style = qText("display-md").copy(color = qColor("ink"))); if (audit == null) BasicText(if (error.isEmpty()) "Loading opening history…" else "Opening history unavailable.", style = qText("body").copy(color = qColor("ink"))) else if (audit?.isEmpty() == true) BasicText("No logged openings.", style = qText("body").copy(color = qColor("ink"))) }
-        items(audit.orEmpty(), key = { it.id }) { entry -> BasicText((if (entry.role == "creator") "$name's account" else if (entry.role == "ops") "Authorized safety account" else "Authorized team · ${entry.role}") + "\nAccount " + entry.readerAccountId + "\n" + entry.readAt, style = qText("body").copy(color = qColor("ink"))) }
-        item { BasicText("This shows when an authorized account opened a conversation, not that a person read every message.", style = qText("caption").copy(color = qColor("ink"))); Button("Export or delete my data", variant = ButtonVariant.SECONDARY, block = true, onClick = onData); Button("Help and safety", variant = ButtonVariant.QUIET, onClick = onSupport) }
+        if (policy?.comparisonsAvailable == true && !comparisonsOff) item { BasicText(QelvoraCopy.text("nativeAIComparisons"), style = qText("display-md").copy(color = qColor("ink"))); ConversationComparisonChoice(client, root) { comparisonsOff = true } }
+        item { BasicText(QelvoraCopy.text("nativeTimeWithThisCreatorsAI"),style=qText("display-md").copy(color = qColor("ink"))); if (usage == null) BasicText(if (error.isEmpty()) QelvoraCopy.text("nativeLoadingTimeHistory") else QelvoraCopy.text("nativeTimeHistoryUnavailable"), style = qText("body").copy(color = qColor("ink"))); usage?.let { time -> BasicText(QelvoraCopy.text("nativeMeasurementDaysAreShownInUTC", mapOf("measurement" to time.measurement)),style=qText("caption").copy(color = qColor("ink")));BasicText(QelvoraCopy.text("nativeThisWeekMinutesMinutes", mapOf("minutes" to (time.days.sumOf { it.seconds }.toInt() / 60).toString())),style=qText("body").copy(color = qColor("ink")));time.days.forEach { day -> BasicText(QelvoraCopy.text("nativeDayMinutesMinutes", mapOf("day" to day.day, "minutes" to (day.seconds.toInt() / 60).toString())),style=qText("body").copy(color = qColor("ink"))) };if(!time.modeAvailable) BasicText(QelvoraCopy.text("nativeCompanionModeTimeSignalsAwait"),style=qText("caption").copy(color = qColor("ink"))) } }
+        item { BasicText(QelvoraCopy.text("nativeWhoOpenedYourConversations"), style = qText("display-md").copy(color = qColor("ink"))); if (audit == null) BasicText(if (error.isEmpty()) QelvoraCopy.text("nativeLoadingOpeningHistory") else QelvoraCopy.text("nativeOpeningHistoryUnavailable"), style = qText("body").copy(color = qColor("ink"))) else if (audit?.isEmpty() == true) BasicText(QelvoraCopy.text("nativeNoLoggedOpenings"), style = qText("body").copy(color = qColor("ink"))) }
+        items(audit.orEmpty(), key = { it.id }) { entry -> BasicText((if (entry.role == "creator") QelvoraCopy.text("nativeNamesAccount", mapOf("name" to name)) else if (entry.role == "ops") QelvoraCopy.text("nativeAuthorizedSafetyAccount") else QelvoraCopy.text("nativeAuthorizedTeamRole", mapOf("role" to entry.role))) + "\n" + QelvoraCopy.text("nativeAccountId", mapOf("id" to entry.readerAccountId)) + "\n" + entry.readAt, style = qText("body").copy(color = qColor("ink"))) }
+        item { BasicText(QelvoraCopy.text("nativeThisShowsWhenAnAuthorizedAccount"), style = qText("caption").copy(color = qColor("ink"))); Button(QelvoraCopy.text("nativeExportOrDeleteMyData"), variant = ButtonVariant.SECONDARY, block = true, onClick = onData); Button(QelvoraCopy.text("nativeHelpAndSafety"), variant = ButtonVariant.QUIET, onClick = onSupport) }
     }
 }
 
@@ -871,7 +871,7 @@ private suspend fun existingThread(client: ConversationClient, creatorId: String
         try {
             require(Regex("[A-Za-z0-9_-]{1,100}").matches(handle))
             creator = growth.request("public/creators/$handle").getJSONObject("creator")
-        } catch (failure: Throwable) { if (failure is CancellationException) throw failure; error = "This creator or the conversation service is unavailable." }
+        } catch (failure: Throwable) { if (failure is CancellationException) throw failure; error = QelvoraCopy.text("nativeThisCreatorOrTheConversation") }
         // Someone who already talks with this creator's AI goes straight to that
         // conversation: a Note or reaction notice, and "Message {name}'s AI", link
         // here. A link with a post's context keeps this screen, which carries it.
@@ -885,65 +885,65 @@ private suspend fun existingThread(client: ConversationClient, creatorId: String
         }
         try {
             capabilities = client.json.decodeFromJsonElement(client.request("capabilities", publicRead = true))
-        } catch (failure: Throwable) { if (failure is CancellationException) throw failure; error = "This creator or the conversation service is unavailable." }
+        } catch (failure: Throwable) { if (failure is CancellationException) throw failure; error = QelvoraCopy.text("nativeThisCreatorOrTheConversation") }
     }
-    val name = creator?.optString("name").orEmpty().ifBlank { "the creator" }
+    val name = creator?.optString("name").orEmpty().ifBlank { QelvoraCopy.text("nativeTheCreator") }
     LazyColumn(Modifier.fillMaxSize().widthIn(max = 390.dp).background(qColor("ground")), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 36.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
         item {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                IconButton("back", "Back", qColor("ink")) { session.back() }
-                BasicText("1 OF 1", style = qText("data-sm").copy(color = qColor("ink-muted")))
+                IconButton("back", QelvoraCopy.text("back"), qColor("ink")) { session.back() }
+                BasicText(QelvoraCopy.text("native1OF1"), style = qText("data-sm").copy(color = qColor("ink-muted")))
             }
         }
         item {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 AuthorLabel(kind = AuthorKind.AI, name = name)
-                BasicText("Before your first message", style = qText("display-lg").copy(color = qColor("ink")))
+                BasicText(QelvoraCopy.text("nativeBeforeYourFirstMessage"), style = qText("display-lg").copy(color = qColor("ink")))
             }
         }
         item {
             val shape = RoundedCornerShape(QelvoraTokens.radiusLg)
             Column(Modifier.fillMaxWidth().background(qColor("surface"), shape).clip(shape).border(QelvoraTokens.hairline, qColor("line"), shape)) {
                 Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    BasicText("WHO RUNS IT", style = qText("data-sm").copy(color = qColor("ink-muted")))
+                    BasicText(QelvoraCopy.text("nativeWHORUNSIT"), style = qText("data-sm").copy(color = qColor("ink-muted")))
                     val policy = capabilities?.providers
                     if (policy?.verified == false) Notice(title=QelvoraCopy.text("conversationDevelopmentPolicyTitle"),children=QelvoraCopy.text("conversationDevelopmentPolicyNotice"))
                     // The fixed consent sentence is a promise: only for a verified policy whose
                     // every provider keeps and trains on nothing. Otherwise each provider's own line.
                     val promise = policy != null && policy.verified && policy.providers.all { it.noTraining && it.noRetention }
                     val providers = policy?.providers?.joinToString(", ") { it.name }.orEmpty()
-                    if (policy == null) BasicText("AI providers and their verified processing terms are not configured yet.", style = qText("body").copy(color = qColor("ink")))
-                    else BasicText(if (promise) QelvoraCopy.text("processorConsent", mapOf("name" to name, "providers" to providers)) else "This AI is powered by $providers.", style = qText("body").copy(color = qColor("ink")))
+                    if (policy == null) BasicText(QelvoraCopy.text("nativeAIProvidersAndTheirVerifiedProcessing"), style = qText("body").copy(color = qColor("ink")))
+                    else BasicText(if (promise) QelvoraCopy.text("processorConsent", mapOf("name" to name, "providers" to providers)) else QelvoraCopy.text("nativeThisAIIsPoweredByProviders", mapOf("providers" to providers)), style = qText("body").copy(color = qColor("ink")))
                     policy?.providers?.forEach { provider ->
-                        Button(provider.name + " processing terms", variant = ButtonVariant.QUIET) { uriHandler.openUri(provider.termsUrl) }
-                        if (!promise) BasicText((if (provider.noTraining) "Doesn't train on your messages." else "Review message use in these terms.") + " " + (if (provider.noRetention) "Doesn't keep your messages." else "Review message retention in these terms."), style = qText("caption").copy(color = qColor("ink")))
+                        Button(QelvoraCopy.text("nativeProviderProcessingTerms", mapOf("provider" to provider.name)), variant = ButtonVariant.QUIET) { uriHandler.openUri(provider.termsUrl) }
+                        if (!promise) BasicText((if (provider.noTraining) QelvoraCopy.text("nativeDoesntTrainOnYourMessages") else QelvoraCopy.text("nativeReviewMessageUseInTheseTerms")) + " " + (if (provider.noRetention) QelvoraCopy.text("nativeDoesntKeepYourMessages") else QelvoraCopy.text("nativeReviewMessageRetentionInThese")), style = qText("caption").copy(color = qColor("ink")))
                     }
                 }
                 Hairline()
                 Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    BasicText("WHO CAN READ IT", style = qText("data-sm").copy(color = qColor("ink-muted")))
-                    BasicText(capabilities?.accessDisclosure ?: "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.", style = qText("body").copy(color = qColor("ink")))
+                    BasicText(QelvoraCopy.text("nativeWHOCANREADIT"), style = qText("data-sm").copy(color = qColor("ink-muted")))
+                    BasicText(capabilities?.accessDisclosure ?: QelvoraCopy.text("conversationAccess"), style = qText("body").copy(color = qColor("ink")))
                 }
                 Hairline()
                 Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    BasicText("WHAT IT REMEMBERS", style = qText("data-sm").copy(color = qColor("ink-muted")))
-                    BasicText("Only what you agree to. It asks first, and you can see and delete every memory in You.", style = qText("body").copy(color = qColor("ink")))
+                    BasicText(QelvoraCopy.text("nativeWHATITREMEMBERS"), style = qText("data-sm").copy(color = qColor("ink-muted")))
+                    BasicText(QelvoraCopy.text("nativeOnlyWhatYouAgreeToIt"), style = qText("body").copy(color = qColor("ink")))
                 }
             }
         }
-        if(error.isNotEmpty()) item { Notice(title="Conversation unavailable",children=error) }
+        if(error.isNotEmpty()) item { Notice(title=QelvoraCopy.text("nativeConversationUnavailable"),children=error) }
         if(contextPending) item {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 postContext?.takeIf { foreground && !session.checkingSession && contextSessionId == sessionId && contextDestination == target && it.creatorId == creator?.optString("id") }?.let { post ->
                     ContextCard(QelvoraCopy.text("growthFromAPost"), post.title) { session.open("/creators/$handle/chat") }
                 }
-                Notice(title="Post context unavailable",children=contextFailure.ifEmpty { "This post's conversation context is not connected yet. Remove the post context to continue to the current AI provider review." })
+                Notice(title=QelvoraCopy.text("nativePostContextUnavailable"),children=contextFailure.ifEmpty { QelvoraCopy.text("nativeThisPostsConversationContext") })
                 Button(QelvoraCopy.text("removeContext"), variant=ButtonVariant.QUIET, block=true) { session.open("/creators/$handle/chat") }
             }
         }
         item {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Button("Start with $name's AI",variant=ButtonVariant.AI,size="lg",block=true,disabled=busy || !foreground || session.checkingSession || creator == null || contextPending || capabilities?.generationAvailable != true || capabilities?.consentAvailable != true) { scope.launch {
+            Button(QelvoraCopy.text("nativeStartWithNamesAI", mapOf("name" to name)),variant=ButtonVariant.AI,size="lg",block=true,disabled=busy || !foreground || session.checkingSession || creator == null || contextPending || capabilities?.generationAvailable != true || capabilities?.consentAvailable != true) { scope.launch {
                 if (busy || !foreground || contextPending || session.destination != target || capabilities?.generationAvailable != true || capabilities?.consentAvailable != true) return@launch
                 val policy=capabilities?.providers ?: return@launch
                 val selectedCreator=creator ?: return@launch
@@ -954,9 +954,9 @@ private suspend fun existingThread(client: ConversationClient, creatorId: String
                     val page=capture.client.beginConversation(capture.expectedAccountId, capture.sessionId, APIConversationBeginConversation(selectedCreator.getString("id"),policy.version,APIConversationBeginConversationAccessNoticeAccepted,key))
                     if (!foreground || !capture.isCurrent() || page.creatorId != selectedCreator.getString("id") || runCatching { UUID.fromString(page.fanId) }.isFailure) return@launch
                     session.replace("/threads/${page.creatorId}/${page.fanId}")
-                } catch(failure: Throwable) { if(failure is CancellationException) throw failure;if(foreground && capture.isCurrent()) error="Reconnect to try again. No message was sent." } finally {busy=false}
+                } catch(failure: Throwable) { if(failure is CancellationException) throw failure;if(foreground && capture.isCurrent()) error=QelvoraCopy.text("nativeReconnectToTryAgainNoMessage") } finally {busy=false}
             } }
-            Button("Not now",variant=ButtonVariant.QUIET,block=true) { session.back() }
+            Button(QelvoraCopy.text("nativeNotNow"),variant=ButtonVariant.QUIET,block=true) { session.back() }
             }
         }
     }
@@ -1009,7 +1009,7 @@ private suspend fun existingThread(client: ConversationClient, creatorId: String
             if (revision == currentRevision && foreground && session.session?.accountId == accountId && session.session?.sessionId == sessionId && session.destination == destination && session.currentToken() == token && overview?.fan?.id == fresh["fan"]?.jsonObject?.get("id")?.jsonPrimitive?.content)
                 commerce = overview
         }
-        catch(failure:Throwable) { if(failure is CancellationException) throw failure; if(revision == currentRevision && foreground) error=failure.message ?: "Reconnect to open You." }
+        catch(failure:Throwable) { if(failure is CancellationException) throw failure; if(revision == currentRevision && foreground) error=failure.message ?: QelvoraCopy.text("nativeReconnectToOpenYou") }
         finally { if (revision == currentRevision) loading = false }
     }
     LaunchedEffect(client, foreground) { if (foreground) refresh(cursor) else conceal() }
@@ -1017,59 +1017,59 @@ private suspend fun existingThread(client: ConversationClient, creatorId: String
     val overview = commerce
     val largeText = LocalDensity.current.fontScale >= 1.5f
     val limit = overview?.limits?.firstOrNull { it.currency == overview.policy.currency }
-    val limitDetail = if (overview == null) "Currently unavailable" else if (limit == null) "Choose your limit" else if (limit.explicit_none) "No limit" else limit.amount?.toLongOrNull()?.let { "of your ${commerceMoney(it, limit.currency)} limit" } ?: "Limit unavailable"
+    val limitDetail = if (overview == null) QelvoraCopy.text("nativeCurrentlyUnavailable") else if (limit == null) QelvoraCopy.text("nativeChooseYourLimit") else if (limit.explicit_none) QelvoraCopy.text("noLimit") else limit.amount?.toLongOrNull()?.let { QelvoraCopy.text("nativeOfYourAmountLimit", mapOf("amount" to commerceMoney(it, limit.currency))) } ?: QelvoraCopy.text("nativeLimitUnavailable")
     val privacyIndex = if (error.isNotEmpty()) 5 else 4
     LazyColumn(Modifier.fillMaxSize().widthIn(max = 390.dp).background(qColor("ground")), state = scroll, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 28.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
         item {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                BasicText(fan?.get("handle")?.jsonPrimitive?.content?.let { "@$it" } ?: "You", style = qText("display-lg").copy(color = qColor("ink")))
-                BasicText(if (session.session?.mode == APISessionMode.DEVELOPMENT) "Synthetic local account · development" else "Signed in with Pantopus", style = qText("caption").copy(color = qColor("ink-muted")))
+                BasicText(fan?.get("handle")?.jsonPrimitive?.content?.let { "@$it" } ?: QelvoraCopy.text("nativeYou"), style = qText("display-lg").copy(color = qColor("ink")))
+                BasicText(if (session.session?.mode == APISessionMode.DEVELOPMENT) QelvoraCopy.text("nativeSyntheticLocalAccountDevelopment") else QelvoraCopy.text("nativeSignedInWithPantopus"), style = qText("caption").copy(color = qColor("ink-muted")))
             }
         }
-        if(error.isNotEmpty()) item { Notice(title = "Account unavailable", children = error) }
+        if(error.isNotEmpty()) item { Notice(title = QelvoraCopy.text("nativeAccountUnavailable"), children = error) }
         item {
             if (largeText) {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    AccountMetric("THIS MONTH", overview?.exposure?.let { commerceMoney(it.captured, it.currency) } ?: "—", limitDetail, Modifier.fillMaxWidth())
-                    AccountMetric("MEMBERSHIPS", overview?.memberships?.size?.toString() ?: "—", if(overview == null) "Currently unavailable" else "Saved memberships", Modifier.fillMaxWidth())
+                    AccountMetric(QelvoraCopy.text("nativeTHISMONTH"), overview?.exposure?.let { commerceMoney(it.captured, it.currency) } ?: "—", limitDetail, Modifier.fillMaxWidth())
+                    AccountMetric(QelvoraCopy.text("nativeMEMBERSHIPS"), overview?.memberships?.size?.toString() ?: "—", if(overview == null) QelvoraCopy.text("nativeCurrentlyUnavailable") else QelvoraCopy.text("nativeSavedMemberships"), Modifier.fillMaxWidth())
                 }
             } else {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Top) {
-                    AccountMetric("THIS MONTH", overview?.exposure?.let { commerceMoney(it.captured, it.currency) } ?: "—", limitDetail, Modifier.weight(1f))
-                    AccountMetric("MEMBERSHIPS", overview?.memberships?.size?.toString() ?: "—", if(overview == null) "Currently unavailable" else "Saved memberships", Modifier.weight(1f))
+                    AccountMetric(QelvoraCopy.text("nativeTHISMONTH"), overview?.exposure?.let { commerceMoney(it.captured, it.currency) } ?: "—", limitDetail, Modifier.weight(1f))
+                    AccountMetric(QelvoraCopy.text("nativeMEMBERSHIPS"), overview?.memberships?.size?.toString() ?: "—", if(overview == null) QelvoraCopy.text("nativeCurrentlyUnavailable") else QelvoraCopy.text("nativeSavedMemberships"), Modifier.weight(1f))
                 }
             }
         }
         item {
             Panel(Modifier.fillMaxWidth(), padding = 0.dp, gap = 0.dp) {
-                AccountRow("Me and privacy", "Memories, who opened your conversations, consents") { scope.launch { scroll.scrollToItem(privacyIndex) } }; Hairline()
-                AccountRow("Spending and time", "Your limit, receipts, time with each AI") { session.open("/commerce/spending") }; Hairline()
-                AccountRow("Memberships", "Manage your memberships") { session.open("/commerce/membership") }; Hairline()
-                AccountRow("Notifications", "Push and email, per creator, quiet hours") { session.open("/notifications/settings") }; Hairline()
-                AccountRow("Receipts", "Your purchases and deliveries") { session.open("/commerce/requests") }; Hairline()
-                AccountRow("Help and safety", "Report, block, crisis support") { session.open("/support") }
+                AccountRow(QelvoraCopy.text("nativeMeAndPrivacy"), QelvoraCopy.text("nativeMemoriesWhoOpenedYourConversations")) { scope.launch { scroll.scrollToItem(privacyIndex) } }; Hairline()
+                AccountRow(QelvoraCopy.text("nativeSpendingAndTime"), QelvoraCopy.text("nativeYourLimitReceiptsTimeWithEach")) { session.open("/commerce/spending") }; Hairline()
+                AccountRow(QelvoraCopy.text("nativeMemberships"), QelvoraCopy.text("nativeManageYourMemberships")) { session.open("/commerce/membership") }; Hairline()
+                AccountRow(QelvoraCopy.text("growthNotifications"), QelvoraCopy.text("nativePushAndEmailPerCreatorQuiet")) { session.open("/notifications/settings") }; Hairline()
+                AccountRow(QelvoraCopy.text("nativeReceipts"), QelvoraCopy.text("nativeYourPurchasesAndDeliveries")) { session.open("/commerce/requests") }; Hairline()
+                AccountRow(QelvoraCopy.text("nativeHelpAndSafety"), QelvoraCopy.text("nativeReportBlockCrisisSupport")) { session.open("/support") }
             }
         }
         item {
-            BasicText("Your intro", style = qText("title").copy(color = qColor("ink")))
-            BasicText(if (fan != null) fan["intro"]?.jsonPrimitive?.contentOrNull ?: "You haven’t added an intro yet." else if (error.isEmpty()) "Loading your account…" else "Your intro is unavailable.", style = qText("body").copy(color = qColor("ink")))
-            Button("Edit handle and intro", variant = ButtonVariant.QUIET) { session.open("/identity/account") }
+            BasicText(QelvoraCopy.text("nativeYourIntro"), style = qText("title").copy(color = qColor("ink")))
+            BasicText(if (fan != null) fan["intro"]?.jsonPrimitive?.contentOrNull ?: QelvoraCopy.text("nativeYouHaventAddedAnIntroYet") else if (error.isEmpty()) QelvoraCopy.text("nativeLoadingYourAccount") else QelvoraCopy.text("nativeYourIntroIsUnavailable"), style = qText("body").copy(color = qColor("ink")))
+            Button(QelvoraCopy.text("nativeEditHandleAndIntro"), variant = ButtonVariant.QUIET) { session.open("/identity/account") }
         }
-        item { BasicText("Me and privacy",style=qText("display-md").copy(color = qColor("ink")));BasicText(QelvoraCopy.text("conversationAccess"),style=qText("caption").copy(color = qColor("ink")));BasicText("Memory and conversation access by creator",style=qText("body").copy(color = qColor("ink"))) }
-        if (account != null && account?.get("threads")?.jsonArray?.isEmpty() == true) item { BasicText("No conversations yet.",style=qText("body").copy(color = qColor("ink"))) }
+        item { BasicText(QelvoraCopy.text("nativeMeAndPrivacy"),style=qText("display-md").copy(color = qColor("ink")));BasicText(QelvoraCopy.text("conversationAccess"),style=qText("caption").copy(color = qColor("ink")));BasicText(QelvoraCopy.text("nativeMemoryAndConversationAccessBy"),style=qText("body").copy(color = qColor("ink"))) }
+        if (account != null && account?.get("threads")?.jsonArray?.isEmpty() == true) item { BasicText(QelvoraCopy.text("nativeNoConversationsYet"),style=qText("body").copy(color = qColor("ink"))) }
         account?.get("threads")?.jsonArray?.forEach { element -> val thread=element.jsonObject
             item {
                 Button(thread["name"]!!.jsonPrimitive.content,variant=ButtonVariant.QUIET,block=true) { session.open("/threads/${thread["creatorId"]!!.jsonPrimitive.content}/${thread["fanId"]!!.jsonPrimitive.content}") }
-                Button("Memory and access · " + thread["name"]!!.jsonPrimitive.content,variant=ButtonVariant.QUIET,block=true) { session.open("/you?creatorId=${thread["creatorId"]!!.jsonPrimitive.content}&fanId=${thread["fanId"]!!.jsonPrimitive.content}") }
+                Button(QelvoraCopy.text("nativeMemoryAndAccess") + " · " + thread["name"]!!.jsonPrimitive.content,variant=ButtonVariant.QUIET,block=true) { session.open("/you?creatorId=${thread["creatorId"]!!.jsonPrimitive.content}&fanId=${thread["fanId"]!!.jsonPrimitive.content}") }
             }
         }
         item {
-            if (loading) BasicText("Loading your conversations…",style=qText("caption").copy(color = qColor("ink")))
-            account?.get("nextCursor")?.jsonPrimitive?.contentOrNull?.let { next -> Button("More conversations",variant=ButtonVariant.QUIET,disabled=loading || error.isNotEmpty()) { scope.launch { refresh(next) } } }
-            if (cursor != null) Button("Back to first page",variant=ButtonVariant.QUIET,disabled=loading) { scope.launch { refresh() } }
-            if (error.isNotEmpty()) Button("Try again",variant=ButtonVariant.QUIET,disabled=loading) { scope.launch { refresh(cursor) } }
+            if (loading) BasicText(QelvoraCopy.text("nativeLoadingYourConversations"),style=qText("caption").copy(color = qColor("ink")))
+            account?.get("nextCursor")?.jsonPrimitive?.contentOrNull?.let { next -> Button(QelvoraCopy.text("nativeMoreConversations"),variant=ButtonVariant.QUIET,disabled=loading || error.isNotEmpty()) { scope.launch { refresh(next) } } }
+            if (cursor != null) Button(QelvoraCopy.text("nativeBackToFirstPage"),variant=ButtonVariant.QUIET,disabled=loading) { scope.launch { refresh() } }
+            if (error.isNotEmpty()) Button(QelvoraCopy.text("nativeTryAgain"),variant=ButtonVariant.QUIET,disabled=loading) { scope.launch { refresh(cursor) } }
         }
-        item { Button("Export or delete my data",variant=ButtonVariant.SECONDARY,block=true) { session.open("/support/privacy") } }
+        item { Button(QelvoraCopy.text("nativeExportOrDeleteMyData"),variant=ButtonVariant.SECONDARY,block=true) { session.open("/support/privacy") } }
     }
 }
 

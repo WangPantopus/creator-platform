@@ -22,10 +22,12 @@ struct W3Message: Decodable, Identifiable, Sendable {
     }
     func authorLabel(name: String) -> String {
         if correction != nil { return QelvoraCopy.text("correctionAuthor", values: ["name": name]) }
-        if let kind = AuthorKind(rawValue: authorKind.rawValue) { return kind.label(name: name, audience: "audience details unavailable", member: member ?? "Authorized team member") }
-        if authorKind == .fan { return "You" }
+        // A Note never arrives as a thread message (C4); the fallback names no audience, as the row does.
+        if authorKind == .human_broadcast { return QelvoraCopy.text("nativeNoteFromNameAudienceDetailsUnavailable", values: ["name": name]) }
+        if let kind = AuthorKind(rawValue: authorKind.rawValue) { return kind.label(name: name, audience: "", member: member ?? QelvoraCopy.text("nativeAuthorizedTeamMember")) }
+        if authorKind == .fan { return QelvoraCopy.text("nativeYou") }
         if authorKind == .human_call { return QelvoraCopy.text("callAuthor", values: ["name":name]) }
-        return "Conversation update"
+        return QelvoraCopy.text("nativeConversationUpdate")
     }
 }
 struct W3Page: Decodable, Sendable {
@@ -160,24 +162,24 @@ actor W3ConversationClient {
         request.setValue(UUID().uuidString.lowercased(), forHTTPHeaderField: "X-Correlation-Id")
         let requestCredential = publicRead ? nil : try await credentials.read()
         if !publicRead {
-            guard let accountId = expectedAccountId, UUID(uuidString: accountId) != nil else { throw W3Failure(message: "Reopen this page with your current account.", status: 401) }
-            guard let token = requestCredential else { throw W3Failure(message: "Your session ended. Continue with Pantopus again.", status: 401) }
+            guard let accountId = expectedAccountId, UUID(uuidString: accountId) != nil else { throw W3Failure(message: QelvoraCopy.text("nativeReopenThisPageWithYourCurrent"), status: 401) }
+            guard let token = requestCredential else { throw W3Failure(message: QelvoraCopy.text("nativeYourSessionEndedContinueWith"), status: 401) }
             request.setValue("Bearer " + token, forHTTPHeaderField: "Authorization")
             request.setValue(accountId, forHTTPHeaderField: "X-Expected-Account-Id")
         }
         if body != nil { request.setValue("application/json", forHTTPHeaderField: "Content-Type") }
         let (data, response) = try await session.data(for: request)
-        if !publicRead { guard try await credentials.read() == requestCredential else { throw W3Failure(message:"Your account changed. Open this conversation again.", status:401) } }
-        guard data.count <= 1_000_000 else { throw W3Failure(message:"This conversation response is too large. Refresh to try again.",status:503) }
+        if !publicRead { guard try await credentials.read() == requestCredential else { throw W3Failure(message:QelvoraCopy.text("nativeYourAccountChangedOpenThisConversation"), status:401) } }
+        guard data.count <= 1_000_000 else { throw W3Failure(message:QelvoraCopy.text("nativeThisConversationResponseIsToo"),status:503) }
         guard let response = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
         guard (200..<300).contains(response.statusCode) else {
             let error = try? JSONDecoder().decode(W3ErrorEnvelope.self, from: data).error
-            throw W3Failure(message: error?.message ?? "Reconnect to refresh. Your input is kept.", status: error?.code == "session_account_changed" ? 401 : response.statusCode, code: error?.code)
+            throw W3Failure(message: error?.message ?? QelvoraCopy.text("nativeThisConversationIsUnavailable"), status: error?.code == "session_account_changed" ? 401 : response.statusCode, code: error?.code)
         }
         return data
     }
     func realtime(page: W3Page) async throws -> W3Realtime.Lease {
-        guard let accountId = expectedAccountId else { throw W3Failure(message: "Reopen this page with your current account.", status: 401) }
+        guard let accountId = expectedAccountId else { throw W3Failure(message: QelvoraCopy.text("nativeReopenThisPageWithYourCurrent"), status: 401) }
         return try await W3Realtime.shared.subscribe(baseURL: baseURL, accountId: accountId, page: page)
     }
 
@@ -229,7 +231,7 @@ final class W3ThreadModel: ObservableObject {
             do { _ = try await W3DraftStorage.shared.save(value, lease: lease, revision: revision) }
             catch {
                 guard let self, self.draftLease?.ticket.id == lease.ticket.id else { return }
-                self.failure = "Reconnect to refresh. Your input is kept on this screen."
+                self.failure = QelvoraCopy.text("nativeReconnectToRefreshYourInputIsKept")
             }
         }
     }
@@ -505,6 +507,6 @@ final class W3ThreadModel: ObservableObject {
                 if let oldTicket, failure.status == 401 || threadDenied { Task { try? await W3DraftStorage.shared.discard(oldTicket) } }
                 offlineShowing = false; let oldContext = offlineContext; offlineContext = nil; if let oldContext { Task { await W3OfflineStorage.shared.purge(oldContext) } }; authorizationDenied = true; page = nil; older = []; before = nil; presence = []; presenceRead += 1; presenceStale = true; draft = ""; pending = nil; introOfferId = nil; introOfferChecked = false; gate = nil; resumeActivated = false; Task { await W3ResumeStorage.shared.remove(accountId: accountId, scope: storageScope) }
             }
-        } else { offline = true; failure = "Reconnect to refresh. Your input is kept on this screen." }
+        } else { offline = true; failure = QelvoraCopy.text("nativeReconnectToRefreshYourInputIsKept") }
     }
 }

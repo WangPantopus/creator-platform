@@ -44,11 +44,11 @@ private final class TrustPublicRedirectGuard: NSObject, URLSessionTaskDelegate, 
     }
     fileprivate func bytes(_ path: String, body: Data? = nil, binary: Bool = false) async throws -> Data {
         if body != nil || !["capabilities", "help", "status"].contains(path) {
-            guard let capture else { throw TrustClientError(message: "Refresh your account before continuing.", reference: nil) }
+            guard let capture else { throw TrustClientError(message: QelvoraCopy.text("nativeRefreshYourAccountBeforeContinuing2"), reference: nil) }
             do { return try await capture.trustBytes("/v1/trust/" + path, body: body, binary: binary).body }
             catch let failure as CreatorAPIError {
                 let detail = try? JSONDecoder().decode(TrustFailure.self, from: failure.body)
-                throw TrustClientError(message: detail?.error.message ?? "Reconnect and try again.", reference: detail?.error.correlationId)
+                throw TrustClientError(message: detail?.error.message ?? QelvoraCopy.text("nativeReconnectAndTryAgain"), reference: detail?.error.correlationId)
             }
         }
         guard let url = URL(string: "/v1/trust/" + path, relativeTo: baseURL) else { throw URLError(.badURL) }
@@ -67,12 +67,12 @@ private final class TrustPublicRedirectGuard: NSObject, URLSessionTaskDelegate, 
         try Task.checkCancellation()
         guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
             let failure = try? JSONDecoder().decode(TrustFailure.self, from: data)
-            throw TrustClientError(message: failure?.error.message ?? "Reconnect and try again.", reference: failure?.error.correlationId)
+            throw TrustClientError(message: failure?.error.message ?? QelvoraCopy.text("nativeReconnectAndTryAgain"), reference: failure?.error.correlationId)
         }
         return data
     }
 }
-private struct TrustClientError: LocalizedError { let message: String; let reference: String?; var errorDescription: String? { message + (reference.map { " Reference " + $0 } ?? "") } }
+private struct TrustClientError: LocalizedError { let message: String; let reference: String?; var errorDescription: String? { reference.map { QelvoraCopy.text("nativeMessageReferenceReference", values: ["message": message, "reference": $0]) } ?? message } }
 
 /// Support/privacy composition uses established controls; final phone composition remains a recorded design gap.
 public struct TrustFanFeature: View {
@@ -128,18 +128,18 @@ public struct TrustFanFeature: View {
     public static func registration(baseURL: URL?) -> FanFeatureRegistration { FanFeatureRegistration(matches: { $0.hasPrefix("/support") || $0.hasPrefix("/trust") }, allowsSignedOut: { $0.hasPrefix("/trust") }, screen: { model in
         return AnyView(TrustFanFeature(baseURL: baseURL, model: model).id([model.session?.accountId ?? "signed-out", model.session?.sessionId ?? "no-session"]))
     }) }
-    private var title: String { route.contains("privacy") ? "Your data" : route.contains("access") ? "Case access history" : route.contains("feedback") ? "Optional product feedback" : route.hasPrefix("/trust") ? "Crisis help protocol" : "Help and reports" }
+    private var title: String { route.contains("privacy") ? QelvoraCopy.text("nativeYourData") : route.contains("access") ? QelvoraCopy.text("nativeCaseAccessHistory") : route.contains("feedback") ? QelvoraCopy.text("nativeOptionalProductFeedback") : route.hasPrefix("/trust") ? QelvoraCopy.text("nativeCrisisHelpProtocol") : QelvoraCopy.text("nativeHelpAndReports") }
     public var body: some View {
         ScrollView { VStack(alignment: .leading, spacing: 16) {
             Text(title).qText("display-md")
-            Text("Reports are available without paid access. Case evidence is limited to what you report.").qText("body")
+            Text(QelvoraCopy.text("nativeReportsAreAvailableWithoutPaid")).qText("body")
             navigation
-            if busy { ProgressView().accessibilityLabel("Loading") }
-            if !error.isEmpty { Notice(tone: .error, title: "Could not complete", children: error) }
-            if privateVisible && !result.isEmpty { Notice(title: "Saved", children: result) }
-            if !privateVisible && !route.hasPrefix("/trust") { Notice(title: "Account unavailable", children: "Refresh your account before continuing. Unsaved input stays in this account view.") }
+            if busy { ProgressView().accessibilityLabel(QelvoraCopy.text("nativeLoading")) }
+            if !error.isEmpty { Notice(tone: .error, title: QelvoraCopy.text("nativeCouldNotComplete"), children: error) }
+            if privateVisible && !result.isEmpty { Notice(title: QelvoraCopy.text("nativeSaved"), children: result) }
+            if !privateVisible && !route.hasPrefix("/trust") { Notice(title: QelvoraCopy.text("nativeAccountUnavailable"), children: QelvoraCopy.text("nativeRefreshYourAccountBeforeContinuingUnsaved")) }
             if route.contains("privacy") { privacy } else if route.contains("access") { accessHistory } else if route.contains("feedback") { feedback } else if route.hasPrefix("/trust") { crisisHelp } else { support }
-            Button("Refresh", variant: .secondary, block: true, disabled: busy || model.checkingSession || model.busy) { refreshOperation?.cancel(); refreshOperation = Task { await model.refresh() } }
+            Button(QelvoraCopy.text("nativeRefresh"), variant: .secondary, block: true, disabled: busy || model.checkingSession || model.busy) { refreshOperation?.cancel(); refreshOperation = Task { await model.refresh() } }
         }.padding(16) }.foregroundStyle(qColor("ink", scheme)).background(qColor("ground", scheme))
         .task(id: route + (privateReady ? "|ready" : "|unavailable")) { await load() }
         .onChange(of: privateReady) { _, ready in if !ready { operation?.cancel(); suspendPrivateResults(keepConfirmation: privateVisible && model.checkingSession) } }
@@ -147,75 +147,75 @@ public struct TrustFanFeature: View {
         .onChange(of: route) { _, _ in operation?.cancel(); clearPrivateResults() }
         .onDisappear { operation?.cancel(); refreshOperation?.cancel(); clearPrivateResults() }
         .onChange(of: [kind, reason, creatorID, messageID, requestID, threadID, scope, proof]) { _, _ in commandKey = UUID().uuidString }
-        .confirmationDialog("Delete this data scope?", isPresented: $confirmingDelete, titleVisibility: .visible) {
-            SwiftUI.Button("Request deletion", role: .destructive) { run { await privacyCommand("delete") } }.disabled(privateDisabled)
-            SwiftUI.Button("Keep data", role: .cancel) {}
-        } message: { Text("Access closes immediately. Purging waits for every domain. Retained records are disclosed in job progress. Store subscriptions must be canceled separately.") }
+        .confirmationDialog(QelvoraCopy.text("nativeDeleteThisDataScope"), isPresented: $confirmingDelete, titleVisibility: .visible) {
+            SwiftUI.Button(QelvoraCopy.text("nativeRequestDeletion"), role: .destructive) { run { await privacyCommand("delete") } }.disabled(privateDisabled)
+            SwiftUI.Button(QelvoraCopy.text("nativeKeepData"), role: .cancel) {}
+        } message: { Text(QelvoraCopy.text("nativeAccessClosesImmediatelyPurging")) }
     }
     @ViewBuilder private var navigation: some View {
         if dynamicTypeSize.isAccessibilitySize {
             VStack(alignment: .leading, spacing: 8) {
-                Button("Support", variant: .quiet, block: true) { model.open("/support") }
-                Button("Your data", variant: .quiet, block: true) { model.open("/support/privacy") }
-                Button("Access history", variant: .quiet, block: true) { model.open("/support/access") }
-                Button("Feedback", variant: .quiet, block: true) { model.open("/support/feedback") }
-                Button("Crisis help", variant: .quiet, block: true) { model.open("/trust/crisis") }
+                Button(QelvoraCopy.text("nativeSupport"), variant: .quiet, block: true) { model.open("/support") }
+                Button(QelvoraCopy.text("nativeYourData"), variant: .quiet, block: true) { model.open("/support/privacy") }
+                Button(QelvoraCopy.text("nativeAccessHistory"), variant: .quiet, block: true) { model.open("/support/access") }
+                Button(QelvoraCopy.text("nativeFeedback"), variant: .quiet, block: true) { model.open("/support/feedback") }
+                Button(QelvoraCopy.text("nativeCrisisHelp"), variant: .quiet, block: true) { model.open("/trust/crisis") }
             }
         } else {
-            HStack { Button("Support", variant: .quiet) { model.open("/support") }; Button("Your data", variant: .quiet) { model.open("/support/privacy") } }
-            HStack { Button("Access history", variant: .quiet) { model.open("/support/access") }; Button("Feedback", variant: .quiet) { model.open("/support/feedback") } }
-            Button("Crisis help", variant: .quiet) { model.open("/trust/crisis") }
+            HStack { Button(QelvoraCopy.text("nativeSupport"), variant: .quiet) { model.open("/support") }; Button(QelvoraCopy.text("nativeYourData"), variant: .quiet) { model.open("/support/privacy") } }
+            HStack { Button(QelvoraCopy.text("nativeAccessHistory"), variant: .quiet) { model.open("/support/access") }; Button(QelvoraCopy.text("nativeFeedback"), variant: .quiet) { model.open("/support/feedback") } }
+            Button(QelvoraCopy.text("nativeCrisisHelp"), variant: .quiet) { model.open("/trust/crisis") }
         }
     }
     private var support: some View { VStack(alignment: .leading, spacing: 16) {
-        Picker("Report type", selection: $kind) { Text("Support request").tag("support"); Text("Report AI message").tag("ai_report"); Text("Abuse report").tag("abuse"); Text("Block creator").tag("block"); Text("Crisis help").tag("crisis") }.pickerStyle(.menu)
+        Picker(QelvoraCopy.text("nativeReportType"), selection: $kind) { Text(QelvoraCopy.text("nativeSupportRequest")).tag("support"); Text(QelvoraCopy.text("nativeReportAIMessage")).tag("ai_report"); Text(QelvoraCopy.text("nativeAbuseReport")).tag("abuse"); Text(QelvoraCopy.text("nativeBlockCreator")).tag("block"); Text(QelvoraCopy.text("nativeCrisisHelp")).tag("crisis") }.pickerStyle(.menu)
         if kind == "ai_report" || kind == "abuse" || kind == "block" { conversationPicker(thread: false) }
-        if kind == "ai_report" { field("AI message ID", $messageID) }
-        if kind == "support" { field("Request ID (optional)", $requestID) }
+        if kind == "ai_report" { field(QelvoraCopy.text("nativeAIMessageID"), $messageID) }
+        if kind == "support" { field(QelvoraCopy.text("nativeRequestIDOptional"), $requestID) }
         if kind == "crisis" { crisisHelp }
-        field("What happened?", $reason, multiline: true)
-        Button(kind == "block" ? "Block creator" : "Send report", variant: .secondary, block: true, disabled: privateDisabled || reason.trimmingCharacters(in: .whitespacesAndNewlines).count < 12 || (kind == "support" && !requestID.isEmpty && UUID(uuidString: requestID) == nil) || (kind == "block" && UUID(uuidString: creatorID) == nil) || (kind == "ai_report" && (UUID(uuidString: creatorID) == nil || UUID(uuidString: messageID) == nil))) { run { await report() } }
-        Text("Your cases").qText("title")
-        if privateVisible { ForEach(cases) { item in VStack(alignment: .leading, spacing: 8) { Text("CASE-\(item.number) · \(item.kind.replacingOccurrences(of: "_", with: " ")) · \(item.state)").qText("body-strong"); if item.state == "resolved" { Button("Appeal CASE-\(item.number)", variant: .secondary, disabled: privateDisabled || reason.count < 12) { run { await appeal(item) } } } } }
-        Text("Trust inbox").qText("title")
+        field(QelvoraCopy.text("nativeWhatHappened"), $reason, multiline: true)
+        Button(kind == "block" ? QelvoraCopy.text("nativeBlockCreator") : QelvoraCopy.text("nativeSendReport"), variant: .secondary, block: true, disabled: privateDisabled || reason.trimmingCharacters(in: .whitespacesAndNewlines).count < 12 || (kind == "support" && !requestID.isEmpty && UUID(uuidString: requestID) == nil) || (kind == "block" && UUID(uuidString: creatorID) == nil) || (kind == "ai_report" && (UUID(uuidString: creatorID) == nil || UUID(uuidString: messageID) == nil))) { run { await report() } }
+        Text(QelvoraCopy.text("nativeYourCases")).qText("title")
+        if privateVisible { ForEach(cases) { item in VStack(alignment: .leading, spacing: 8) { Text(QelvoraCopy.text("nativeCASENumberKindState", values: ["number": String(item.number), "kind": item.kind.replacingOccurrences(of: "_", with: " "), "state": item.state])).qText("body-strong"); if item.state == "resolved" { Button(QelvoraCopy.text("nativeAppealCASENumber", values: ["number": String(item.number)]), variant: .secondary, disabled: privateDisabled || reason.count < 12) { run { await appeal(item) } } } } }
+        Text(QelvoraCopy.text("nativeTrustInbox")).qText("title")
         ForEach(notices) { item in VStack(alignment: .leading, spacing: 8) { Text(item.type.replacingOccurrences(of: "_", with: " ")).qText("label"); Text(item.reason).qText("body") } } }
     } }
     private var crisisHelp: some View { VStack(alignment: .leading, spacing: 16) {
-        Text(help?.emergencyMessage ?? "If you are in immediate danger, contact local emergency services. An AI cannot provide emergency help.").qText("body-strong")
-        Text("Reports do not require paid access. Urgent cases need a staffed safety responder. This service does not claim continuous emergency monitoring or a guaranteed response time.").qText("body")
-        if let help { if help.resources.isEmpty { Text("Regional help resources are not configured in this environment.").qText("caption") }; ForEach(Array(help.resources.enumerated()), id: \.offset) { _, item in if let url = URL(string: item.url), url.scheme == "https" { Link(item.name + " · " + item.region, destination: url) }; if let phone = item.phone { Text(phone).qText("body") } } }
+        Text(help?.emergencyMessage ?? QelvoraCopy.text("nativeIfYouAreInImmediateDanger")).qText("body-strong")
+        Text(QelvoraCopy.text("nativeReportsDoNotRequirePaidAccess")).qText("body")
+        if let help { if help.resources.isEmpty { Text(QelvoraCopy.text("nativeRegionalHelpResourcesAreNotConfigured")).qText("caption") }; ForEach(Array(help.resources.enumerated()), id: \.offset) { _, item in if let url = URL(string: item.url), url.scheme == "https" { Link(item.name + " · " + item.region, destination: url) }; if let phone = item.phone { Text(phone).qText("body") } } }
     } }
     private var accessHistory: some View { VStack(alignment: .leading, spacing: 16) {
-        Text("These records show when an authorized operations account opened your case evidence and its purpose. Opening a case does not mean someone read every word.").qText("body")
-        if privateVisible { if history.isEmpty && !busy { Text("No case accesses yet.").qText("caption") }
+        Text(QelvoraCopy.text("nativeTheseRecordsShowWhenAnAuthorized")).qText("body")
+        if privateVisible { if history.isEmpty && !busy { Text(QelvoraCopy.text("nativeNoCaseAccessesYet")).qText("caption") }
         ForEach(Array(history.enumerated()), id: \.offset) { _, item in VStack(alignment: .leading, spacing: 8) { Text(item.action.replacingOccurrences(of: "_", with: " ") + " · " + item.created_at).qText("caption"); Text(item.purpose).qText("body") } } }
     } }
     private var feedback: some View { VStack(alignment: .leading, spacing: 16) {
-        Text("Your answers help evaluate usefulness and clear authorship. They do not affect access, ranking or payment. Feedback is retained for 90 days and included in account deletion.").qText("body")
-        Picker("Was the conversation useful?", selection: $useful) { Text("Choose an answer").tag("unanswered"); Text("Yes").tag("yes"); Text("No").tag("no") }
-        Picker("Was it clear who wrote each message?", selection: $authorship) { Text("Choose an answer").tag("unanswered"); Text("Yes").tag("yes"); Text("No").tag("no") }
-        field("Anything to improve? (optional)", $feedbackComment, multiline: true)
-        SwiftUI.Toggle("I agree to share these answers for product feedback.", isOn: $feedbackConsent)
-        Button("Send feedback", variant: .secondary, block: true, disabled: privateDisabled || !feedbackConsent || useful == "unanswered" || authorship == "unanswered") { run { if await perform("feedback", ["consent": true, "cohort": "unspecified", "useful": useful == "yes", "authorshipClear": authorship == "yes", "comment": String(feedbackComment.prefix(2000))]) != nil { result = "Your feedback is saved."; feedbackConsent = false; feedbackComment = "" } } }
+        Text(QelvoraCopy.text("nativeYourAnswersHelpEvaluateUsefulness")).qText("body")
+        Picker(QelvoraCopy.text("nativeWasTheConversationUseful"), selection: $useful) { Text(QelvoraCopy.text("nativeChooseAnAnswer")).tag("unanswered"); Text(QelvoraCopy.text("nativeYes")).tag("yes"); Text(QelvoraCopy.text("nativeNo")).tag("no") }
+        Picker(QelvoraCopy.text("nativeWasItClearWhoWroteEach"), selection: $authorship) { Text(QelvoraCopy.text("nativeChooseAnAnswer")).tag("unanswered"); Text(QelvoraCopy.text("nativeYes")).tag("yes"); Text(QelvoraCopy.text("nativeNo")).tag("no") }
+        field(QelvoraCopy.text("nativeAnythingToImproveOptional"), $feedbackComment, multiline: true)
+        SwiftUI.Toggle(QelvoraCopy.text("nativeIAgreeToShareTheseAnswers"), isOn: $feedbackConsent)
+        Button(QelvoraCopy.text("nativeSendFeedback"), variant: .secondary, block: true, disabled: privateDisabled || !feedbackConsent || useful == "unanswered" || authorship == "unanswered") { run { if await perform("feedback", ["consent": true, "cohort": "unspecified", "useful": useful == "yes", "authorshipClear": authorship == "yes", "comment": String(feedbackComment.prefix(2000))]) != nil { result = QelvoraCopy.text("nativeYourFeedbackIsSaved"); feedbackConsent = false; feedbackComment = "" } } }
     } }
     private var privacy: some View { VStack(alignment: .leading, spacing: 16) {
-        Text("Export and deletion are separate from canceling store billing. A job finishes only after every data domain acknowledges it.").qText("body")
-        Link("Manage Apple subscriptions", destination: URL(string: "https://apps.apple.com/account/subscriptions")!)
+        Text(QelvoraCopy.text("nativeExportAndDeletionAreSeparate")).qText("body")
+        Link(QelvoraCopy.text("nativeManageAppleSubscriptions"), destination: URL(string: "https://apps.apple.com/account/subscriptions")!)
         privacyScope
         privacyVerification
-        Button("Request export", variant: .secondary, block: true, disabled: privacyDisabled) { run { await privacyCommand("export") } }
-        Button("Request deletion", variant: .secondary, block: true, disabled: privacyDisabled) { confirmingDelete = true }
+        Button(QelvoraCopy.text("nativeRequestExport"), variant: .secondary, block: true, disabled: privacyDisabled) { run { await privacyCommand("export") } }
+        Button(QelvoraCopy.text("nativeRequestDeletion"), variant: .secondary, block: true, disabled: privacyDisabled) { confirmingDelete = true }
         privacyJobs
     } }
     @ViewBuilder private var privacyScope: some View {
-        Picker("Data scope", selection: $scope) { Text("Account").tag("account"); Text("Creator").tag("creator"); Text("Conversation").tag("thread") }.pickerStyle(.menu).frame(minHeight: 44).contentShape(Rectangle())
+        Picker(QelvoraCopy.text("nativeDataScope"), selection: $scope) { Text(QelvoraCopy.text("nativeAccount")).tag("account"); Text(QelvoraCopy.text("pickerCreator")).tag("creator"); Text(QelvoraCopy.text("nativeConversation")).tag("thread") }.pickerStyle(.menu).frame(minHeight: 44).contentShape(Rectangle())
         if scope != "account" { conversationPicker(thread: scope == "thread") }
     }
     @ViewBuilder private var privacyVerification: some View {
-        if capability?.localDevelopment == true { Text("Synthetic local account: type LOCAL DEVELOPMENT to confirm.").qText("caption"); field("Local confirmation", $proof) }
-        else if capability?.verificationMethod == "current_session" { Text("Your sign-in must be recent. Continue with Pantopus again if asked to verify your account.").qText("caption") }
-        else if capability?.actorVerification == "configured" { field("Account verification receipt", $proof) }
-        else { Text("Fresh account verification must be connected before requesting data changes.").qText("caption") }
+        if capability?.localDevelopment == true { Text(QelvoraCopy.text("nativeSyntheticLocalAccountTypeLOCAL")).qText("caption"); field(QelvoraCopy.text("nativeLocalConfirmation"), $proof) }
+        else if capability?.verificationMethod == "current_session" { Text(QelvoraCopy.text("nativeYourSignInMustBeRecent")).qText("caption") }
+        else if capability?.actorVerification == "configured" { field(QelvoraCopy.text("nativeAccountVerificationReceipt"), $proof) }
+        else { Text(QelvoraCopy.text("nativeFreshAccountVerificationMust")).qText("caption") }
     }
     @ViewBuilder private var privacyJobs: some View {
         if privateVisible {
@@ -226,20 +226,20 @@ public struct TrustFanFeature: View {
     @ViewBuilder private func privacyJobRow(_ job: TrustJob) -> some View {
         let state = job.state.replacingOccurrences(of: "_", with: " ")
         let title = job.kind + " · " + job.scope + " · " + state
-        let label = job.kind + ", " + job.scope + ", " + state + ", requested " + job.created_at + ", job " + job.id
-        Text("Requested " + job.created_at).qText("caption")
+        let label = QelvoraCopy.text("nativeKindScopeStateRequestedCreatedat", values: ["kind": job.kind, "scope": job.scope, "state": state, "createdAt": job.created_at, "id": job.id])
+        Text(QelvoraCopy.text("nativeRequestedTime", values: ["time": job.created_at])).qText("caption")
         Button(title, variant: .quiet, block: true, disabled: privateDisabled) { run { await jobDetail(job.id) } }
             .accessibilityLabel(label)
             .accessibilityIdentifier("privacy-job-" + job.id)
     }
     @ViewBuilder private func jobProgress(_ job: TrustJob) -> some View {
-        Text("Job " + job.id).qText("caption")
+        Text(QelvoraCopy.text("nativeJobId", values: ["id": job.id])).qText("caption")
         ForEach(job.tasks ?? []) { task in Text(taskDescription(task)).qText("body") }
         ForEach(job.retained ?? []) { item in retainedRecord(item) }
-        if job.state != "complete" { Button("Retry incomplete domains", variant: .secondary, block: true, disabled: privateDisabled) { run { await retry(job.id) } } }
+        if job.state != "complete" { Button(QelvoraCopy.text("nativeRetryIncompleteDomains"), variant: .secondary, block: true, disabled: privateDisabled) { run { await retry(job.id) } } }
         if job.state == "complete" && job.kind == "export" {
-            Button("Prepare export", variant: .secondary, block: true, disabled: privateDisabled) { run { await download(job.id) } }
-            if privateReady, let exportPayload { ShareLink("Share your export", item: exportPayload, preview: SharePreview("Your creator data")) }
+            Button(QelvoraCopy.text("nativePrepareExport"), variant: .secondary, block: true, disabled: privateDisabled) { run { await download(job.id) } }
+            if privateReady, let exportPayload { ShareLink(QelvoraCopy.text("nativeShareYourExport"), item: exportPayload, preview: SharePreview(QelvoraCopy.text("nativeYourCreatorData"))) }
         }
     }
     private func taskDescription(_ task: TrustTask) -> String {
@@ -248,9 +248,9 @@ public struct TrustFanFeature: View {
     }
     private func retainedRecord(_ item: TrustRetained) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Retained: " + item.category.replacingOccurrences(of: "_", with: " ")).qText("label")
+            Text("Retained: \(item.category.replacingOccurrences(of: "_", with: " "))").qText("label")
             Text(item.reason).qText("body")
-            if let until = item.until { Text("Until " + until).qText("caption") }
+            if let until = item.until { Text(QelvoraCopy.text("nativeUntilDate", values: ["date": until])).qText("caption") }
         }
     }
     private var privacyDisabled: Bool { privateDisabled || capability?.actorVerification != "configured" || (capability?.localDevelopment == true ? proof != "LOCAL DEVELOPMENT" : capability?.verificationMethod != "current_session" && proof.isEmpty) || (scope != "account" && UUID(uuidString: creatorID) == nil) || (scope == "thread" && UUID(uuidString: threadID) == nil) }
@@ -283,7 +283,7 @@ public struct TrustFanFeature: View {
                         else { ForEach(uniqueCreators(conversations), id: \.creatorId) { item in Text(item.name).tag(item.creatorId) } }
                     }.pickerStyle(.menu).frame(minHeight: 44).contentShape(Rectangle()).accessibilityIdentifier(thread ? "picker-conversation" : "picker-creator")
                 }
-            } else { ProgressView().accessibilityLabel("Loading") }
+            } else { ProgressView().accessibilityLabel(QelvoraCopy.text("nativeLoading")) }
         }
         .onChange(of: threadID) { _, id in if let match = conversations?.first(where: { $0.id == id }) { creatorID = match.creatorId } }
     }
@@ -332,7 +332,7 @@ public struct TrustFanFeature: View {
     // degraded host can refuse those while help stays available. A failed capability
     // read clears the old value so data requests cannot submit on stale verification.
     private func load() async {
-        guard let client else { error = "The trust service is not configured."; return }
+        guard let client else { error = QelvoraCopy.text("nativeTheTrustServiceIsNotConfigured"); return }
         let epoch = beginWork(); defer { finishWork(epoch) }
         var failure: Error?
         do { let value: TrustHelp = try await client.request("help"); guard !Task.isCancelled, workEpoch == epoch else { return }; help = value } catch { guard !Task.isCancelled, workEpoch == epoch else { return }; failure = error }
@@ -378,10 +378,10 @@ public struct TrustFanFeature: View {
         catch { if !Task.isCancelled && privateReady && workEpoch == epoch { self.error = error.localizedDescription }; return nil }
     }
     private func report() async {
-        if kind == "block" { if await perform("blocks", ["creatorId": creatorID.lowercased(), "reason": reason, "idempotencyKey": commandKey]) != nil { result = "Your block is saved. Enforcement in connected domains follows their current denial checks."; reason = ""; await load() }; return }
-        var input: [String: Any] = ["kind": kind, "reason": reason, "idempotencyKey": commandKey]; if kind != "support" && !creatorID.isEmpty { input["creatorId"] = creatorID.lowercased() }; if kind == "ai_report" { input["messageId"] = messageID.lowercased() }; if kind == "support" && !requestID.isEmpty { input["requestId"] = requestID.lowercased() }; if let ack = await perform("reports", input) { result = "CASE-\(ack.number ?? 0) is saved. No provider action is implied."; reason = ""; await load() }
+        if kind == "block" { if await perform("blocks", ["creatorId": creatorID.lowercased(), "reason": reason, "idempotencyKey": commandKey]) != nil { result = QelvoraCopy.text("nativeYourBlockIsSavedEnforcementIn"); reason = ""; await load() }; return }
+        var input: [String: Any] = ["kind": kind, "reason": reason, "idempotencyKey": commandKey]; if kind != "support" && !creatorID.isEmpty { input["creatorId"] = creatorID.lowercased() }; if kind == "ai_report" { input["messageId"] = messageID.lowercased() }; if kind == "support" && !requestID.isEmpty { input["requestId"] = requestID.lowercased() }; if let ack = await perform("reports", input) { result = QelvoraCopy.text("nativeCASENumberIsSavedNoProvider", values: ["number": String(ack.number ?? 0)]); reason = ""; await load() }
     }
-    private func appeal(_ item: TrustCase) async { if await perform("cases/" + item.id + "/appeals", ["version": item.version, "reason": reason, "idempotencyKey": commandKey]) != nil { result = "Your appeal is saved for a different reviewer."; reason = ""; await load() } }
+    private func appeal(_ item: TrustCase) async { if await perform("cases/" + item.id + "/appeals", ["version": item.version, "reason": reason, "idempotencyKey": commandKey]) != nil { result = QelvoraCopy.text("nativeYourAppealIsSavedForA"); reason = ""; await load() } }
     private func privacyCommand(_ kind: String) async {
         guard let origin = client?.baseURL.absoluteString, let account = model.session?.accountId else { return }
         let deletionScope = scope, creator = creatorID.lowercased(), thread = threadID.lowercased()
@@ -397,7 +397,7 @@ public struct TrustFanFeature: View {
         })
         if purge.failed { await model.purge(); return }
         if let ack {
-            result = "Request saved; inspect each domain's progress."; await load()
+            result = QelvoraCopy.text("nativeRequestSavedInspectEachDomains"); await load()
             if let id = ack.id { await jobDetail(id) }
         }
     }
@@ -421,6 +421,6 @@ public struct TrustFanFeature: View {
         do { let capture = try await capture(); guard let client else { return }; let original = TrustClient(baseURL: client.baseURL, capture: capture); let payload = try await original.bytes("privacy/jobs/" + id + "/download", binary: true); try Task.checkCancellation(); guard privateReady, workEpoch == epoch else { return }; exportPayload = TrustExport(data: payload, capture: capture, model: model); error = "" }
         catch { if !Task.isCancelled && privateReady && workEpoch == epoch { exportPayload = nil; self.error = error.localizedDescription } }
     }
-    private func retry(_ id: String) async { if await perform("privacy/jobs/" + id + "/retry", [:]) != nil { result = "Incomplete domains queued again."; await jobDetail(id) } }
+    private func retry(_ id: String) async { if await perform("privacy/jobs/" + id + "/retry", [:]) != nil { result = QelvoraCopy.text("nativeIncompleteDomainsQueuedAgain"); await jobDetail(id) } }
 }
 @MainActor private final class PurgeOutcome { var failed = false }

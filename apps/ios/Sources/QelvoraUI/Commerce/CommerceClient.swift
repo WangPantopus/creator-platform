@@ -78,7 +78,7 @@ private struct CommerceErrorEnvelope: Decodable { struct Failure: Decodable { le
         try Task.checkCancellation()
         guard ready, let original = await model.captureRequest(from: destination, maximumResponseBytes: 4_194_304, timeoutSeconds: 15),
               original.expectedAccountId == accountId, original.sessionId == sessionId, ready else {
-            throw CommerceFailure(message: "Refresh your account before continuing. Your input is kept.", status: 503)
+            throw CommerceFailure(message: QelvoraCopy.text("nativeRefreshYourAccountBeforeContinuing"), status: 503)
         }
         do {
             let response = try await original.commerceBytes("/v1/commerce/" + path, body: body)
@@ -92,7 +92,7 @@ private struct CommerceErrorEnvelope: Decodable { struct Failure: Decodable { le
             guard await original.isCurrent(), ready else { throw CancellationError() }
             if let failure = error as? CreatorAPIError {
                 let detail = try? JSONDecoder().decode(CommerceErrorEnvelope.self, from: failure.body).error
-                throw CommerceFailure(message: detail?.message ?? "This action is unavailable. Your input is kept.", status: failure.status, code: detail?.code)
+                throw CommerceFailure(message: detail?.message ?? QelvoraCopy.text("nativeThisActionIsUnavailableYourInput"), status: failure.status, code: detail?.code)
             }
             throw error
         }
@@ -111,9 +111,9 @@ enum CommerceAmount {
     static func parse(_ text: String, _ currency: String) throws -> Int64 {
         let digits = digits(currency)
         guard text.range(of: "^\\d+(?:\\.\\d{0,\(digits)})?$", options: .regularExpression) != nil,
-              let value = Decimal(string: text, locale: Locale(identifier: "en_US_POSIX")) else { throw CommerceFailure(message: "Enter a valid amount.", status: 400) }
+              let value = Decimal(string: text, locale: Locale(identifier: "en_US_POSIX")) else { throw CommerceFailure(message: QelvoraCopy.text("nativeEnterAValidAmount"), status: 400) }
         let scaled = value * pow(Decimal(10), digits)
-        guard scaled <= Decimal(9_007_199_254_740_991), scaled >= 0 else { throw CommerceFailure(message: "This amount is too large.", status: 400) }
+        guard scaled <= Decimal(9_007_199_254_740_991), scaled >= 0 else { throw CommerceFailure(message: QelvoraCopy.text("nativeThisAmountIsTooLarge"), status: 400) }
         return NSDecimalNumber(decimal: scaled).int64Value
     }
 }
