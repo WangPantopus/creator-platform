@@ -18,6 +18,7 @@ import {
   closeDb,
   ensureMaya,
   flag,
+  openFan,
   percentile,
   reporter,
   sleep,
@@ -33,10 +34,7 @@ const { chromium } = createRequire(
 
 await call(MODEL, "POST", "/__control", { body: { mode: "ok", delayMs: 700 } });
 step("Maya's AI is live", true, await ensureMaya(20_000_000));
-const [fan] = await sql(
-  "SELECT id::text FROM creator.fan_profile WHERE account_id=$1",
-  [ACTORS.fanOne],
-);
+const { fan } = await openFan(ACTORS.fanOne, "a7fan");
 const threadPath = `/threads/${MAYA_CREATOR_ID}/${fan.id}`;
 const apiPage = `/api/conversations/${MAYA_CREATOR_ID}/${fan.id}`;
 
