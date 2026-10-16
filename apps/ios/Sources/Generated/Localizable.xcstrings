@@ -650,13 +650,13 @@
         }
       }
     },
-    "Charged only when {name} accepts. If she declines or {deadline} pass, nothing is charged.": {
+    "Charged only when {name} accepts. If {name} declines or {deadline} pass, nothing is charged.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Charged only when {name} accepts. If she declines or {deadline} pass, nothing is charged."
+            "value": "Charged only when {name} accepts. If {name} declines or {deadline} pass, nothing is charged."
           }
         }
       }
@@ -2806,13 +2806,13 @@
         }
       }
     },
-    "If she declines or {deadline} pass": {
+    "If {name} declines or {deadline} pass": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "If she declines or {deadline} pass"
+            "value": "If {name} declines or {deadline} pass"
           }
         }
       }

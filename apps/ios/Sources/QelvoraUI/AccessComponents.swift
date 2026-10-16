@@ -363,7 +363,7 @@ public struct TermsBlock: View {
   public var body: some View {
     VStack(alignment: .leading, spacing: 0) {
       row(QelvoraCopy.text("ifAccepts", values: ["name": name]), price)
-      row(QelvoraCopy.text("ifDeclines", values: ["deadline": deadline]), "$0.00")
+      row(QelvoraCopy.text("ifDeclines", values: ["name": name, "deadline": deadline]), "$0.00")
       VStack(alignment: .leading, spacing: QelvoraTokens.token("author-gap")) {
         chargeRule.qText("control-body")
         Text(QelvoraCopy.text("pendingHold")).qText("caption").foregroundStyle(

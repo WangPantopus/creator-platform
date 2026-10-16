@@ -295,9 +295,14 @@ object CommerceFanFeature {
                     val changes = (paid.map { "${it.name}: ${if (it.cancel_at_end || it.state == "cancelled") "ends" else "renews"} ${commerceWhen(it.period_end)}" } + (currentAccess?.sources?.filter { it.source != "membership" }?.map { "${labels[it.source] ?: "Access"} ends ${commerceWhen(it.validUntil)}" } ?: emptyList())).joinToString("; ")
                     AccessLines(name, can, included, if (availableModes.isEmpty()) "No human modes are currently available." else availableModes.joinToString(", ") { it.title }, changes.ifEmpty { "Access refreshes from the server." })
                 } else { CommerceText("Change anything; nothing is sent until you do."); IncludeList(summary, name = name, onSummary = { summary = it }) }
-                ModeList(modes.map { RequestMode(it.title, "${it.delivery_hours} h · ${maxOf(0, it.weekly_limit - it.used - it.reserved)} left", it.amount?.toLongOrNull()?.let { value -> commerceMoney(value, it.currency) } ?: "Price not set", selectedMode == it.id, it.state != "offered" || it.used + it.reserved >= it.weekly_limit) }) { index -> selectedMode = modes[index].id }
+                ModeList(modes.map { RequestMode(it.title, "${it.delivery_hours} h · ${maxOf(0, it.weekly_limit - it.used - it.reserved)} left", it.amount?.toLongOrNull()?.let { value -> commerceMoney(value, it.currency) } ?: "Price unavailable", selectedMode == it.id, it.state != "offered" || it.used + it.reserved >= it.weekly_limit) }) { index -> selectedMode = modes[index].id }
                 if (screen == "access") { Button("Ask $name to step in", ButtonVariant.SECONDARY, block = true, disabled = modes.none { it.state == "offered" && it.used + it.reserved < it.weekly_limit }) { screen = "packet" }; Button("Manage membership", ButtonVariant.QUIET, block = true) { screen = "membership" } }
-                else { Notice(title = "Payment unavailable", children = "Paid written and voice requests are unavailable in this native app. Your draft stays on this screen."); Button("Send request", ButtonVariant.SECONDARY, block = true, disabled = true) {} }
+                else {
+                    // WP 7.4 P9: the chosen mode's terms, as the web packet shows them; its
+                    // decision time is the deadline. The ETA line waits on lane 4's summary.
+                    modes.firstOrNull { it.id == selectedMode }?.let { mode -> TermsBlock(name, mode.amount?.toLongOrNull()?.let { value -> commerceMoney(value, mode.currency) } ?: "Price unavailable", "${mode.decision_hours} h") }
+                    Notice(title = "Payment unavailable", children = "Paid written and voice requests are unavailable in this native app. Your draft stays on this screen."); Button("Send request", ButtonVariant.SECONDARY, block = true, disabled = true) {}
+                }
             }
             "checkout" -> Notice(title = "Payment unavailable", children = "Paid written and voice requests are unavailable in this native app.")
             "status" -> detail?.let { value ->
