@@ -1245,11 +1245,15 @@ export class TrustService {
       ).rows,
     }));
   }
+  /** A reviewer sees their own records; a supervisor sees every reviewer's
+   * records in the queues they supervise, with who made each one (O1,
+   * founder 2026-10-16). Row security decides which records a supervisor can
+   * read (`audit_supervisor_read`). */
   async opsAudits(actor: Actor) {
     return this.store.actor(actor, async (client) => {
       const member = (
-        await client.query(
-          "SELECT queues FROM creator_trust.ops_member WHERE account_id=$1 AND revoked_at IS NULL AND expires_at>now()",
+        await client.query<{ queues: string[]; supervisor: boolean }>(
+          "SELECT queues,supervisor FROM creator_trust.ops_member WHERE account_id=$1 AND revoked_at IS NULL AND expires_at>now()",
           [actor.accountId],
         )
       ).rows[0];
@@ -1259,9 +1263,10 @@ export class TrustService {
           "Access audits need an active operations role.",
         );
       return {
+        scope: member.supervisor ? ("supervisor" as const) : ("own" as const),
         items: (
           await client.query(
-            "SELECT a.id,a.case_id,a.action,a.created_at,a.correlation_id,c.queue FROM creator_trust.access_audit a JOIN creator_trust.safety_case c ON c.id=a.case_id WHERE a.actor_account_id=$1 AND c.queue=ANY($2) ORDER BY a.created_at DESC,a.id DESC LIMIT 100",
+            `SELECT a.id,a.case_id,a.action,a.created_at,a.correlation_id,c.queue,a.actor_account_id AS reviewer,a.actor_account_id=$1 AS mine FROM creator_trust.access_audit a JOIN creator_trust.safety_case c ON c.id=a.case_id WHERE ${member.supervisor ? "" : "a.actor_account_id=$1 AND "}c.queue=ANY($2) ORDER BY a.created_at DESC,a.id DESC LIMIT 100`,
             [actor.accountId, member.queues],
           )
         ).rows,
