@@ -263,6 +263,9 @@ export async function sweep() {
       s6,
     );
     const s7 = [];
+    const delivered = new Set(
+      commitments.filter((c) => c.delivered_at).map((c) => c.packet_id),
+    );
     for (const c of capacity) {
       const mine = packets.filter(
         (p) =>
@@ -270,7 +273,13 @@ export async function sweep() {
           p.capacity_window.getTime() === c.window_start.getTime(),
       );
       const reserved = mine.filter((p) => LIVE.includes(p.state)).length;
-      const used = mine.filter((p) => p.state === "accepted").length;
+      // A request refunded in full because it was not delivered gives its
+      // slot back (decision 2).
+      const used = mine.filter(
+        (p) =>
+          p.state === "accepted" &&
+          !(p.payment_state === "refunded" && !delivered.has(p.id)),
+      ).length;
       if (c.reserved !== reserved || c.used !== used)
         s7.push(
           `mode ${c.mode_id}: reserved ${c.reserved}/used ${c.used}, requests say ${reserved}/${used}`,
@@ -282,7 +291,7 @@ export async function sweep() {
     }
     check(
       "S7",
-      "capacity in use equals open plus accepted requests (INV-10)",
+      "capacity in use equals open plus accepted, unrefunded requests (INV-10)",
       s7,
       `${capacity.length} capacity rows`,
     );

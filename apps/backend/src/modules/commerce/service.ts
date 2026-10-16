@@ -2679,6 +2679,21 @@ export class CommerceService {
                 )
               ).rows[0]!;
               const full = BigInt(refunded.amount) >= BigInt(p.snapshot.amount);
+              // An accepted request refunded in full because it was not
+              // delivered gives back the slot it used in its week (the
+              // founder's decision 2). Once: when it becomes refunded.
+              if (
+                full &&
+                p.state === "accepted" &&
+                p.payment_state !== "refunded" &&
+                !(
+                  await client.query(
+                    "SELECT 1 FROM creator.commerce_commitment WHERE packet_id=$1 AND delivered_at IS NOT NULL",
+                    [p.id],
+                  )
+                ).rowCount
+              )
+                await this.freeUsedSlot(client, p);
               await client.query(
                 "UPDATE creator.commerce_packet SET payment_state=$2,version=version+1 WHERE id=$1",
                 [p.id, full ? "refunded" : "captured"],
@@ -3235,6 +3250,23 @@ export class CommerceService {
   private async releaseCapacity(client: PoolClient, p: PacketRow) {
     const r = await client.query(
       "UPDATE creator.commerce_capacity SET reserved=reserved-1,version=version+1 WHERE mode_id=$1 AND window_start=$2 AND reserved>0 RETURNING mode_id",
+      [p.mode_id, p.capacity_window],
+    );
+    invariant(
+      r.rowCount === 1,
+      "capacity_inconsistent",
+      "Capacity needs reconciliation.",
+    );
+  }
+  /** An accepted request refunded in full because it was not delivered no
+   * longer uses its slot in its week's window (the founder's decision 2). */
+  private async freeUsedSlot(client: PoolClient, p: PacketRow) {
+    await client.query(
+      "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true)",
+      [p.creator_id, p.fan_id],
+    );
+    const r = await client.query(
+      "UPDATE creator.commerce_capacity SET used=used-1,version=version+1 WHERE mode_id=$1 AND window_start=$2 AND used>0 RETURNING mode_id",
       [p.mode_id, p.capacity_window],
     );
     invariant(

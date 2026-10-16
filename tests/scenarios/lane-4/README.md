@@ -59,7 +59,7 @@ processor's record, and checks:
 | S4  | Refunds never exceed captures                                                                                                                            |
 | S5  | The ledger is append-only: the trigger is live and every row an earlier sweep saw is unchanged                                                           |
 | S6  | Held, released and captured amounts reconcile exactly, and match the processor                                                                           |
-| S7  | Capacity in use equals the open plus accepted requests (INV-10)                                                                                          |
+| S7  | Capacity in use equals the open plus accepted requests, less those refunded in full undelivered (INV-10, decision 2)                                     |
 | S8  | No closed request still has a hold, in the ledger or at the processor                                                                                    |
 | S9  | Only the creator's own signed reply completes a commitment (INV-09)                                                                                      |
 

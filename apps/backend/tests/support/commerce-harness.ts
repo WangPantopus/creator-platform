@@ -723,8 +723,9 @@ export class World {
         state: string;
         payment_state: string;
         accepted_act_id: string | null;
+        delivered: boolean;
       }>(
-        "SELECT id,state,payment_state,accepted_act_id FROM creator.commerce_packet WHERE creator_id=$1",
+        "SELECT p.id,p.state,p.payment_state,p.accepted_act_id,EXISTS(SELECT 1 FROM creator.commerce_commitment c WHERE c.packet_id=p.id AND c.delivered_at IS NOT NULL) AS delivered FROM creator.commerce_packet p WHERE p.creator_id=$1",
         [this.creator.id],
       )
     ).rows;
@@ -742,7 +743,13 @@ export class World {
     let used = 0;
     for (const packet of packets) {
       if (slotStates.includes(packet.state)) reserved += 1;
-      if (packet.state === "accepted") used += 1;
+      // A request refunded in full because it was not delivered gives its
+      // slot back (decision 2).
+      if (
+        packet.state === "accepted" &&
+        !(packet.payment_state === "refunded" && !packet.delivered)
+      )
+        used += 1;
       const ledger = await this.ledger(packet.id);
       const total = (kind: string) =>
         ledger
