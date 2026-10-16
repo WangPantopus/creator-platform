@@ -1,6 +1,20 @@
 # Lane 7: Phone apps (iOS and Android) status
 
-Updated: 2026-10-09, by the resumed lane 7 session (one session, both platforms).
+Updated: 2026-10-15, by the resumed lane 7 session (one session, both platforms).
+
+## Resume update (2026-10-15)
+
+- #379 (WP 7.2) is merged. The founder **accepted the compact persistent author header**; `origin/main`
+  through `7ca3982fe` is merged into `lane-7/keyboard-drafts` (#401), which is ready for review.
+- The Mac had restarted: the lane's simulator, emulator and build caches were gone. Both devices
+  were recreated with the same names from installed runtimes (the simulator has a new id; the iOS
+  runner now finds it by name). Gradle's pinned 8.9 wrapper was fetched before asking (reported);
+  with the founder's yes, the pinned iOS packages (~150 MB) and Android dependencies (+254 MB).
+- The post-merge D6 rerun found a WP 7.3 defect (a session check could cancel an already-sent
+  deletion, leaving the encrypted draft); fixed on both apps and proven with a held-answer race
+  (D6R). Details: [WP 7.3](lane-7-keyboard-drafts.md).
+- WP 7.4 has started on `lane-7/notes-reactions` (stacked on #401): the shared spec and the C4
+  harness update first.
 
 ## Resume update (2026-10-09)
 
@@ -26,11 +40,11 @@ Updated: 2026-10-09, by the resumed lane 7 session (one session, both platforms)
   arbitration fix (`NativeBackSwipe`) passed N5, N1 and the full iOS run. It also
   preserves vertical scrolling at the edge; screenshots and API checks corroborate it.
 
-Working on: Clean handoff on `lane-7/keyboard-drafts`, [draft PR 401](https://github.com/WangPantopus/creator-platform/pull/401); see [handoff](lane-7-handoff.md) and [WP 7.3 spec/results](lane-7-keyboard-drafts.md). WP 7.2 is complete and PR 379 is ready. WP 7.3 operated layout, lifecycle, recovery and real thread-deletion checks pass on both platforms; final local regression gates also pass (exact counts/skips in `artifacts/lane-7/7-3-gates.txt`).
+Working on: WP 7.4 piece P1 (C4 Notes and reactions in the thread) on `lane-7/notes-reactions`, stacked on [#401](https://github.com/WangPantopus/creator-platform/pull/401); the spec is [lane-7-rendering-parity.md](lane-7-rendering-parity.md) on that branch.
 
-Waiting on: Founder approval of the compact persistent author label in constrained layouts (charter 4.2); keep WP 7.3 draft until answered. GitHub connection for the app's CI reader. Four earlier defaults remain in [navigation](lane-7-navigation.md). Backend domain erasure is blocked/retrying; see the lane 1/domain-owner ticket in the 7.3 report.
+Waiting on: Nothing for #401. For WP 7.4: founder decisions on the unread word, the 3-hour reminder rule and the comparison copy removal (listed in the spec). GitHub connection for the app's CI reader. Backend domain erasure is still blocked/retrying (lane 1 ticket).
 
-Next: Resolve the header decision when answered; otherwise continue independent WP 7.4, then 7.10, 7.11, 7.8, 7.12. WP 7.5/7.6/7.7/7.9 wait on C1, domain, credentials, accounts and icon art.
+Next: Finish WP 7.4 piece by piece (P1 C4 first), then stop and report. 7.10, 7.11, 7.8 and 7.12 wait for "Next for lane 7". WP 7.5/7.6/7.7/7.9 wait on C1, domain, credentials, accounts and icon art.
 
 ## Resume here
 

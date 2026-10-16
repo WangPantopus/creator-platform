@@ -3,6 +3,11 @@
 This is a continuation, not a new start. The founder requested a clean handoff.
 Read this alongside `lane-7.md`, `lane-7-keyboard-drafts.md` and the harness runbook.
 
+**Resumed 2026-10-15.** #379 merged; the compact header was accepted; main is merged into
+#401, which is ready for review after a post-merge D6 defect was fixed. Devices and caches were
+recreated after a restart. Current state and next steps live in `lane-7.md`; the sections below
+are the 2026-10-09 handoff, kept as history.
+
 Open PRs: [379](https://github.com/WangPantopus/creator-platform/pull/379) (ready, navigation) and [401](https://github.com/WangPantopus/creator-platform/pull/401) (draft, keyboard/drafts; stacked on 379).
 Final implementation/evidence commit: `0b0ae6984`; the later handoff commit changes
 only documentation. All local gates passed. CI reader still requires GitHub connection.
@@ -29,7 +34,7 @@ only documentation. All local gates passed. CI reader still requires GitHub conn
 
 ## Required decision and limits
 
-The compact persistent author header is **not approved**. Charter 4.2 says the
+(Resolved 2026-10-15: the founder accepted it.) The compact persistent author header was **not yet approved** at this handoff. Charter 4.2 says the
 identity strip never scrolls away. Current constrained layouts keep author words
 and glyph fixed, with the full sentence in the message scroller. Recommended:
 accept that compact presentation. Keep the WP 7.3 PR draft until answered.

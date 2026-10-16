@@ -2,11 +2,12 @@
 
 ## State
 
-Clean handoff on `lane-7/keyboard-drafts`. The branch includes main through `21b3d4836`. PR 379 remains open and ready for WP 7.2.
-WP 7.3 is [draft PR 401](https://github.com/WangPantopus/creator-platform/pull/401), pending the header decision. Operated
-recovery, real thread deletion, layout and final local gates all pass as recorded.
-
-The compact persistent author header awaits the founder's decision below. Storage and recovery verification is finished; the next independent work is WP 7.4. No new unit or snapshot tests.
+Ready for review, 2026-10-15. **The founder accepted the compact persistent author header**
+(constrained layouts keep the author word and glyph fixed and the full identity sentence in the
+scroller). #379 (WP 7.2) is merged; `origin/main` through `7ca3982fe` is merged into this branch
+without a rebase. The merge changed no lane 7 source, so only the gates it could affect were rerun
+(below). The rerun of D6 found a real defect in this pull request's deletion purge, now fixed on
+both apps and proven with a race on demand (see "Post-merge rerun"). No new unit or snapshot tests.
 
 ## Shared behavior spec
 
@@ -50,6 +51,7 @@ local API/PostgreSQL, with synthetic development identity and model edges.
 | D4R | Tap Retry directly on a rejected message: accepted once with the original key                                                             | pass: rejection fix; two POSTs, one key, one acceptance           | pass: same-key Retry accepts once and clears ciphertext                             |
 | D5  | Sign out, same/wrong account, fresh 401/403/404 and recreated physical thread: old input absent                                           | pass: all cases, including recreated physical thread              | pass: sign-out, account switch, fresh denials and physical replacement              |
 | D6  | Real API restart/send accepted once; accepted thread deletion removes ciphertext; Back/restart cannot resurrect it                        | pass: cancellation, send once, exact database scope, purge/denial | pass: cancellation, send once, exact database scope, purge/denial                   |
+| D6R | D6 with the API's answer to the deletion held 9 s (delay-proxy.mjs): a session check runs mid-command; draft still removed                | pass with the fix (four checks in the hold); pre-fix not run      | pass with the fix (three checks in the hold); pre-fix build fails as predicted      |
 | D7  | Existing 2000-character boundary; ciphertext lacks marker; restart restores; no backup/upload                                             | pass                                                              | pass: 2004 native input clips to 2000; encrypted restart, no POST                   |
 | D7U | Emoji and RTL input survives process restart without premature upload                                                                     | pass: emoji, Hebrew and Arabic restored; no POST                  | pass: emoji/RTL input, encrypted restart and no POST                                |
 | D8  | Edit newer text while an older send is pending: old send accepted once, newer draft survives                                              | pass with bounded editor, one message POST                        | pass: older send accepted once; newer input survives restart                        |
@@ -174,13 +176,41 @@ job is blocked after immediate denial and local draft removal. Observed task cod
 This does not invalidate the app's accepted-scope cleanup proof; complete backend
 erasure is not proved and must not be reported as complete.
 
-## Founder flag: compact persistent authorship
+## Founder decision: compact persistent authorship (accepted 2026-10-15)
 
-[Charter 4.2](../00-charter.md) says, “The identity strip at the top of a thread never
-scrolls away.” The verified constrained layout keeps the existing author label and
-glyph fixed and puts the full identity sentence in the message scroller. The
-recommended default is this compact fixed author label. Approval is pending before
-accepting that presentation; no wording changes are proposed.
+[Charter 4.2](../00-charter.md) says, "The identity strip at the top of a thread never
+scrolls away." In constrained layouts (largest text, landscape, split screen) both apps keep the
+author word and glyph fixed and put the full identity sentence in the message scroller. The
+founder accepted this presentation on 2026-10-15. No wording changed.
+
+## Post-merge rerun (2026-10-15)
+
+Gates the merge could affect, all on the merged branch: generated files, the 51-check contract,
+root typecheck, both apps' existing suites, release builds with the hook scan, and D6 on the real
+stack (the backend behind it changed). Exact counts are in `artifacts/lane-7/7-3-gates.txt`; the
+D6 attempts, failures and fixes are in `artifacts/lane-7/7-3-real-stack-run.txt`.
+
+- **Defect found and fixed (both apps).** A routine session check flips "private ready", and the
+  Trust screen cancels its running operation when that happens. A confirmed deletion already sent
+  was cancelled with it: the API accepted the deletion, but the app never saw the answer, never
+  showed "Request saved" and never removed the encrypted draft (it would only go when the thread
+  was next opened and refused). Now a command with local consequences finishes once sent
+  (Android `NonCancellable`, iOS an unstructured `Task`) and purges the original account's matching
+  drafts on a 2xx; only showing the answer still waits for the session checks. Removing the
+  original account's own drafts after its accepted deletion is safe even if the view changed.
+- **The race on demand (D6R).** `delay-proxy.mjs` holds the API's answer to the deletion for 9 s
+  while the API itself answers at once. The pre-fix Android build left the ciphertext behind; the
+  fixed builds removed it on both apps, with three (Android) and four (iOS) session checks logged
+  inside the hold. iOS pre-fix: not run.
+- **Runner fixes, not product changes.** adb dropped characters from a long burst (now typed in
+  chunks); taps landed in the ~100 ms a session check disables actions (runners now wait for an
+  enabled control and retry a tap that had no effect, same idempotency key); Send was tapped while
+  a relaunched thread was still connecting (correctly disabled; the app never resends by itself).
+- **For WP 7.8.** The Trust screen disables its controls for each session check, about every 4 s
+  on Android and 2 to 4 s on iOS, so a person's tap is occasionally ignored. This is the identity
+  heartbeat WP 7.8 reduces; recorded there, not changed here.
+- **Parity finding.** On the denied-thread screen the Refresh button is centered on iOS and
+  left-aligned on Android (pre-existing). Words and order match. To fix in the WP 7.4 pass.
 
 ## Run it
 
@@ -196,6 +226,11 @@ platform's app before resetting the shared fake API. Rebuild after source change
   The runner requires every selected flow to pass with zero skips.
 - With both apps stopped: `node tests/scenarios/lane-7/harness-connections.mjs`.
   This resets the fake and checks actual HTTP/WS subscription cleanup.
+- D6R, the deletion race on demand: on a fresh stack start `node tests/scenarios/lane-7/delay-proxy.mjs`
+  (127.0.0.1:56476 in front of the API on 56471), then run D6 below with
+  `LANE7_APP_API=http://127.0.0.1:56476` (Android directly; iOS for `prepare-ios`). Each D6 or D6R
+  deletes its thread: rebuild the stack with `node infra/local/stack.mjs reset --lane 7 --no-web
+--growth --ack-only --provider anthropic` before the next one.
 - Real stack: `stack-drafts.mjs android`, or
   `stack-drafts.mjs prepare-ios <scratch/fixture.json>` followed by the iOS runner's
   `--draft-stack` with `LANE7_STACK_FIXTURE=<scratch/fixture.json>`. The fixture

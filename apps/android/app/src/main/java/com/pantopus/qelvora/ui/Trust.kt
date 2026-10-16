@@ -298,10 +298,14 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
             error = failure?.let { it.message ?: "Reconnect and try again." } ?: ""
         } finally { finishWork(epoch) }
     }
-    suspend fun perform(path: String, input: JsonObject): JsonObject? {
+    // A command with local consequences (`accepted`) finishes once sent, even if
+    // a routine session check cancels this screen's work meanwhile: the server
+    // may already have accepted it. Only showing the answer depends on the
+    // checks after it.
+    suspend fun perform(path: String, input: JsonObject, accepted: (suspend () -> Unit)? = null): JsonObject? {
         if (client == null || busy || !trustReady(model)) return null
         val epoch = beginWork()
-        return try { val value = capturedClient().request(path, input); currentCoroutineContext().ensureActive(); if (!trustReady(model) || workEpoch != epoch) throw CancellationException("Your original account view changed."); error = ""; key = UUID.randomUUID().toString(); value }
+        return try { val sender = capturedClient(); val value = if (accepted == null) sender.request(path, input) else withContext(kotlinx.coroutines.NonCancellable) { sender.request(path, input).also { accepted() } }; currentCoroutineContext().ensureActive(); if (!trustReady(model) || workEpoch != epoch) throw CancellationException("Your original account view changed."); error = ""; key = UUID.randomUUID().toString(); value }
         catch (cancelled: CancellationException) { throw cancelled }
         catch (failure: Exception) { if (trustReady(model) && workEpoch == epoch) error = failure.message ?: "Reconnect and try again."; null }
         finally { finishWork(epoch) }
@@ -327,18 +331,18 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
         val account = model.session?.accountId ?: return
         val deletionScope = scope; val creator = creatorId.lowercase(); val thread = threadId.lowercase()
         val input = buildJsonObject { put("kind", action); put("scope", deletionScope); put("proof", if (verificationMethod == "current_session") "CURRENT_SESSION" else proof); put("idempotencyKey", key); if (deletionScope != "account") put("creatorId", creator); if (deletionScope == "thread") put("threadId", thread) }
-        perform("privacy/jobs", input)?.let {
-            if (action == "delete") {
-                try {
-                    withContext(kotlinx.coroutines.NonCancellable) {
-                        com.pantopus.qelvora.conversation.ConversationDraftStorage(context).purge(origin, account,
-                            creator = if (deletionScope == "account") null else creator,
-                            thread = if (deletionScope == "thread") thread else null)
-                    }
-                } catch (_: Exception) { model.purge(); return }
-            }
-            result = "Request saved; inspect each domain's progress."; load(); jobDetail(it.text("id"))
-        }
+        // An accepted deletion removes the original account's matching drafts
+        // even if the account view changes before the answer is shown.
+        var purgeFailed = false
+        val saved = perform("privacy/jobs", input, accepted = if (action != "delete") null else ({
+            try {
+                com.pantopus.qelvora.conversation.ConversationDraftStorage(context).purge(origin, account,
+                    creator = if (deletionScope == "account") null else creator,
+                    thread = if (deletionScope == "thread") thread else null)
+            } catch (_: Exception) { purgeFailed = true }
+        }))
+        if (purgeFailed) { model.purge(); return }
+        saved?.let { result = "Request saved; inspect each domain's progress."; load(); jobDetail(it.text("id")) }
     }
 
     LaunchedEffect(route, privateReady, model.error) {

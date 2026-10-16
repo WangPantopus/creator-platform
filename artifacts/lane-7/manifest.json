@@ -56,8 +56,8 @@
   },
   {
     "path": "artifacts/lane-7/7-3-gates.txt",
-    "sha256": "bc398c73921b44c20cb8fb0ae4214c8b35267e3d8c0098190d987eac4c9e757d",
-    "bytes": 2233
+    "sha256": "42303d7fb581689ee1497cbba39ee4e2e39dda0ed43dbdf011b2f4d82c10f90d",
+    "bytes": 5223
   },
   {
     "path": "artifacts/lane-7/7-3-ios-deleted-thread.jpg",
@@ -76,7 +76,7 @@
   },
   {
     "path": "artifacts/lane-7/7-3-real-stack-run.txt",
-    "sha256": "e4f7031410e6d13b0c07093fb2bad307097840bd7a29a5837f339615e6358851",
-    "bytes": 4449
+    "sha256": "ca43901c81cd8f3e45189095cc5e826a70715d6279d8bcdca418c7871bf09c6b",
+    "bytes": 7156
   }
 ]
