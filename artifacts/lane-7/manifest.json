@@ -46,8 +46,8 @@
   },
   {
     "path": "artifacts/lane-7/7-3-android-run.txt",
-    "sha256": "5d6a3be24af69daa24a0feba74b0ea1482490864a1e1cbb9742927622620a304",
-    "bytes": 3434
+    "sha256": "bc7072b3a20297769ab2db7319579950ae92e2782e191af46526b93165b1ddc5",
+    "bytes": 3667
   },
   {
     "path": "artifacts/lane-7/7-3-android-split-landscape.jpg",
@@ -56,8 +56,8 @@
   },
   {
     "path": "artifacts/lane-7/7-3-gates.txt",
-    "sha256": "42303d7fb581689ee1497cbba39ee4e2e39dda0ed43dbdf011b2f4d82c10f90d",
-    "bytes": 5223
+    "sha256": "e2cbb26dd0df1eff2a73dfd2d79d1491f46e7a8bb7c70f29ea9e4453c3222246",
+    "bytes": 5483
   },
   {
     "path": "artifacts/lane-7/7-3-ios-deleted-thread.jpg",
@@ -71,8 +71,8 @@
   },
   {
     "path": "artifacts/lane-7/7-3-ios-run.txt",
-    "sha256": "bab9125a95a6203390dfc5867ac69b02c957057af1c37d311ee56acc251f0e74",
-    "bytes": 3229
+    "sha256": "2b2d49d6f7e7652fa7da61a97cfeb57d30e6f742ee9e495a9d9e92d366d449c6",
+    "bytes": 4223
   },
   {
     "path": "artifacts/lane-7/7-3-real-stack-run.txt",

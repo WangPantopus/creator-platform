@@ -343,6 +343,55 @@ const flows = {
     }
     await noSends();
   },
+  // D3T: a very tall row at the largest font, scrolled up thirty times; the
+  // app must stay idle afterwards (iOS spun at 100% CPU here before a fix).
+  async D3T() {
+    await fresh();
+    const long =
+      "Glaze notes for the long weekend, with every kiln detail. ".repeat(12);
+    await L.harness("POST", "/__harness/threads/maya/reply", {
+      text: `🔥 שלום עולם · ${long}مرحبا`,
+    });
+    A.adb("shell", "settings", "put", "system", "font_scale", "2.0");
+    L.launch("android");
+    await A.waitFor("Send", 30000);
+    for (let step = 0; step < 30; step += 1) {
+      A.swipe(540, 700, 540, 1500, 600);
+      assert.ok(
+        A.screen().length > 0,
+        `the app answers after drag ${step + 1}`,
+      );
+    }
+    await L.sleep(5000);
+    const pid = A.adb("shell", "pidof", bundle).trim();
+    const samples = [];
+    for (let i = 0; i < 5; i += 1) {
+      const row = A.adb(
+        "shell",
+        "top",
+        "-b",
+        "-n",
+        "1",
+        "-p",
+        pid,
+        "-o",
+        "%CPU",
+      )
+        .trim()
+        .split("\n")
+        .at(-1);
+      samples.push(Number.parseFloat(row));
+      await L.sleep(1000);
+    }
+    samples.sort((a, b) => a - b);
+    assert.ok(
+      samples[2] < 50,
+      `idle CPU after scrolling: ${samples.join(", ")}`,
+    );
+    L.screenshot("android", "D3T-largest-tall-row-after-scrolling");
+    A.adb("shell", "settings", "put", "system", "font_scale", "1.0");
+    pass(`thirty drags at the largest font; idle CPU median ${samples[2]}%`);
+  },
   async D3S() {
     await fresh();
     await typeDraft("Split screen draft");

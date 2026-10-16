@@ -47,6 +47,7 @@ local API/PostgreSQL, with synthetic development identity and model edges.
 | D3  | Largest text in Light/Night portrait and landscape: readable fixed author label/glyph and full composer/Send                              | pass, screenshots reviewed; header approval pending               | pass, screenshots reviewed; targets at least 48dp; header approval pending          |
 | D3I | Android three-button navigation at largest text in both orientations                                                                      | not applicable                                                    | pass; navigation mode/font/rotation restored afterward                              |
 | D3S | Split screen where supported: input preserved and keyboard clear                                                                          | not supported on the owned iPhone simulator                       | pass: both orientations at normal/largest text; return to full screen, no POST      |
+| D3T | Largest text with a very tall row; scroll up thirty times: the app keeps answering and goes idle                                          | pass after the freeze fix (failed before: 100% CPU loop)          | pass: idle CPU median 3.5%                                                          |
 | D4  | Accepted send clears; rejection survives restart; pre-acceptance drop retries same key; accepted/lost response restarts without duplicate | pass with rejection-handling correction                           | pass: acceptance, rejection, both loss paths and original key                       |
 | D4R | Tap Retry directly on a rejected message: accepted once with the original key                                                             | pass: rejection fix; two POSTs, one key, one acceptance           | pass: same-key Retry accepts once and clears ciphertext                             |
 | D5  | Sign out, same/wrong account, fresh 401/403/404 and recreated physical thread: old input absent                                           | pass: all cases, including recreated physical thread              | pass: sign-out, account switch, fresh denials and physical replacement              |
@@ -206,6 +207,15 @@ D6 attempts, failures and fixes are in `artifacts/lane-7/7-3-real-stack-run.txt`
   chunks); taps landed in the ~100 ms a session check disables actions (runners now wait for an
   enabled control and retry a tap that had no effect, same idempotency key); Send was tapped while
   a relaunched thread was still connecting (correctly disabled; the app never resends by itself).
+- **Freeze found and fixed (iOS, this PR).** At the largest text, a very tall row (a long
+  message or Note) plus scrolling up pinned the app's main thread at 100% CPU in a SwiftUI layout
+  loop: the bottom scroll anchor kept re-adjusting while the lazy stack re-estimated the tall rows,
+  and the app never recovered. `main` was responsive with the same drags (median 25% CPU); this
+  branch was not (median 99.9%). D3 had passed because its thread had no very tall row. Moving the
+  compact controls or the in-list identity strip out of the lazy stack did not help. In the compact
+  layout (accessibility sizes, short landscape) the thread now uses a plain stack with exact sizes;
+  the normal layout stays lazy. New scenario D3T (thirty drags) passes on both apps; D1 and D3
+  pass again on iOS; a 54-message thread opens in 2.2 s at the largest text and idles at 0 to 1%.
 - **For WP 7.8.** The Trust screen disables its controls for each session check, about every 4 s
   on Android and 2 to 4 s on iOS, so a person's tap is occasionally ignored. This is the identity
   heartbeat WP 7.8 reduces; recorded there, not changed here.
@@ -217,7 +227,7 @@ D6 attempts, failures and fixes are in `artifacts/lane-7/7-3-real-stack-run.txt`
 Use the harness runbook, owned devices and serial heavy-build lock. Stop the other
 platform's app before resetting the shared fake API. Rebuild after source changes.
 
-- Android: `LANE7_OUT=<scratch> node scripts/with-heavy-build-lock.mjs --owner LANE-7 -- node tests/scenarios/lane-7/e7-3-drafts.mjs D1 D2 D3 D3I D4 D4R D5 D7 D7U D8`.
+- Android: `LANE7_OUT=<scratch> node scripts/with-heavy-build-lock.mjs --owner LANE-7 -- node tests/scenarios/lane-7/e7-3-drafts.mjs D1 D2 D3 D3T D3I D4 D4R D5 D7 D7U D8`.
   D7 and D7U also need the debug Android test APK installed. Its opt-in instrumentation
   uses the real text-input action because adb hardware-key mapping cannot type RTL
   and emoji; the external journey then kills/relaunches and checks files/API state.

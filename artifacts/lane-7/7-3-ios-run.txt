@@ -45,3 +45,17 @@ The runner fails unless every selected flow passes and none is skipped.
 Header presentation awaits founder approval: compact fixed author label/glyph;
 full identity sentence in the scroller. Charter 4.2 requires the full strip fixed.
 Physical-device/store installation and forced filesystem-write interruption: not run.
+
+2026-10-15, post-merge. Header decision: accepted by the founder.
+D3T, new (a very tall row at the largest text, scrolled up 30 times): found an
+iOS freeze this PR introduced. The app's main thread spun at 100% CPU in a
+SwiftUI layout loop (ScrollViewAdjustedState.adjustOffsetIfNeeded re-adjusting
+the bottom anchor while the LazyVStack re-estimated very tall rows) and did not
+recover; XCTest reported "main thread busy for 30.0s". Same drags on main:
+responsive, median 25% CPU; on this branch before the fix: median 99.9%.
+Bisected: moving the compact controls or the in-list identity strip out of the
+lazy stack did not help. Fix: in the compact layout (accessibility text sizes,
+short landscape) the thread uses a plain VStack with exact sizes; the normal
+layout stays lazy. After the fix: D3T 30 drags pass, median 24% CPU while
+dragging; D1, D3 and D3T pass in one run (3 passed, 0 skipped). A 54-message
+thread at the largest text opens and subscribes in 2.2 s and idles at 0-1% CPU.

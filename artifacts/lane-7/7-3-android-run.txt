@@ -48,3 +48,7 @@ above live IME. Draft remains, 299-byte ciphertext, no message POST. Largest
 landscape split screenshot reviewed. Full-screen Light/Night/both orientations
 also pass after the banner fix. Real API deletion also passed; see 7-3-real-stack-run.txt. Final gates are recorded separately.
 Forced filesystem-write interruption and cancellation at deletion ack: not run.
+
+2026-10-15, post-merge. D3T (parity check for the iOS freeze): 30 drags with a
+very tall row at font scale 2.0; app answers after each; idle CPU median 3.5%
+afterwards. Android was not affected (LazyColumn, no bottom anchor). Pass.

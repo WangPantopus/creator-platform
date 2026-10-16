@@ -364,6 +364,28 @@ final class Lane7DraftFlows: XCTestCase {
         }
         try await noSends()
     }
+    /// D3T: a very tall row at the largest text, scrolled up thirty times. A
+    /// lazy stack under the bottom anchor never settled here and the app spun
+    /// at 100% CPU; each step must answer within XCTest's 30 s snapshot limit.
+    func testD03TallRowScroll() async throws {
+        try await fresh()
+        let long = String(repeating: "Glaze notes for the long weekend, with every kiln detail. ", count: 12)
+        _ = try await control("/__harness/threads/maya/reply", body: ["text": "🔥 שלום עולם · " + long + "مرحبا"])
+        _ = try await control("/content-size", body: ["size": "accessibility-extra-extra-extra-large"], port: 56475)
+        app.terminate(); app.launchArguments = arguments + ["--return-to", maya]; app.launch(); app.launchArguments = arguments
+        XCTAssertTrue(app.buttons["Send"].waitForExistence(timeout: 30))
+        let origin = app.coordinate(withNormalizedOffset: .zero)
+        for step in 1...30 {
+            let area = app.scrollViews.firstMatch.frame
+            origin.withOffset(CGVector(dx: area.midX, dy: area.minY + area.height * 0.2)).press(forDuration: 0.05,
+                thenDragTo: origin.withOffset(CGVector(dx: area.midX, dy: area.minY + area.height * 0.8)), withVelocity: .slow, thenHoldForDuration: 0.2)
+            XCTAssertTrue(app.buttons["Send"].exists, "the app answers after drag \(step)")
+        }
+        try await Task.sleep(for: .seconds(5))
+        XCTAssertTrue(app.buttons["Send"].exists, "the app is idle and answering after the drags")
+        capture("D3T-largest-tall-row-after-scrolling")
+        _ = try await control("/content-size", body: ["size": "large"], port: 56475)
+    }
     func testD04SendRecovery() async throws {
         try await fresh()
         input().tap(); input().typeText("accepted draft"); app.buttons["Send"].tap()
