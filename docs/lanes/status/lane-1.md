@@ -21,6 +21,9 @@ Open:
 - WP 1.7 (second part), deletion and export for Apple and Google accounts: tokens revoked at the
   provider, identities deleted, the account closed; D2's working default (founder, 2026-10-15);
   section 8 of `lane-1-deletion.md`: #454 (`lane-1/signin-deletion`, on main).
+- E1.5 for a creator who signs in with Apple: sign-in, verification, a passkey, a signed and
+  published Note and its public page, with edges: #458 (`lane-1/e1-5-apple-creator`, on main,
+  a scenario only).
 
 Next: WP 1.6 second part after the founder's answers (automatic allowing of clean Note replies,
 lifting a pause). After #439's migration is registered, its signing reads use the plain column
@@ -30,6 +33,8 @@ Blocked on:
 
 - Counsel's confirmation of the 18+ method, and the policy page for younger people (WP 1.9) that
   the adults-only page should link to.
+- The founder's approval of sign-in wording for option D (#458): Apple and Google users still read
+  "Continue with Pantopus" when a session ends; proposed replacements are in #458.
 - The founder's ops decisions in `lane-1-ops.md` (#440): P1 (open paid requests on a pause), P2
   (lifting a pause), R1 (when a Note reply is clean), O1 (supervisor-wide audit wording), O2
   (adding ops reviewers).
@@ -63,7 +68,10 @@ Scenarios:
 - E1.8 for Apple and Google accounts (#454), 2026-10-15: `e1-8-sign-in-delete.mjs` 26 of 26, its
   restart steps 5 of 5; identity's erasure runs behind a labelled stand-in for the domains of
   lanes 2 to 5. Unchanged: E1.1 to E1.4, `e1-8-delete.mjs`, `e1-8-edges.mjs` 16 of 16.
-- E1.5 signing a Note end to end with a Qelvora creator, E1.7, E1.9 to E1.11: not run yet.
+- E1.5 with an Apple creator (#458), 2026-10-15: `e1-5-apple-creator.mjs` 15 pass, 1 not run (a
+  follower reading a followers Note: following needs the creator's page published by the AI
+  publication worker, which development stacks do not run, and growth).
+- E1.7, E1.9 to E1.11: not run yet.
 
 Tickets to other lanes:
 
