@@ -2342,7 +2342,13 @@ export class CommerceService {
             "share_changed",
             { commitmentId: c.id },
           );
-          return { commitmentId: c.id };
+          // The grant is what a share card is made from (growth's createShare);
+          // its version is the one the next sharing choice must name.
+          return {
+            commitmentId: c.id,
+            grantId: grant.id,
+            version: grant.version,
+          };
         },
       ),
     );
