@@ -46,6 +46,24 @@ to add the space to the message but not to the frame.
 - Native threads paint sentence frames against C5 as built in lane 3's #482 (still open): if lane 3
   changes the frame before it merges, the apps follow.
 
-## Scenarios and results
+## Scenarios and results (fake API; synthetic identities and data; the real apps), at the handoff
 
-See "WP 7.8 results" below and the pull request.
+`node tests/scenarios/lane-7/e7-8-polling.mjs [ios|android] [P1 P2 P3 P4]`, on this branch's build.
+
+| ID | What | iOS | Android |
+| --- | --- | --- | --- |
+| P1 | Requests in 60 s, Maya's thread open and idle | 35 (was 49): 29 offline lease, 3 presence pulse, 2 session, 1 page. **Fails the target** (12) | 36 (was 51): 30 offline lease, 3 pulse, 2 session, 1 page. **Fails the target** |
+| P2 | An answer of three sentences streams into the open thread | 2 page fetches (the asking message and the answer's end); the sentences read as the server wrote them: pass | the same: pass |
+| P3 | Offline: labelled saved thread, no send, bounded retries, a reply made meanwhile appears once | not run | not run |
+| P4 | A minute in the background: no request | not run | not run |
+| Gates | compile, unit and snapshot suites, the fake's contract check | test build, `swift test` 18/18, contract 64/64 | compile, unit and Paparazzi 19/19 |
+
+**What P1 found: the offline reading lease is most of what is left.** The server's policy is
+`conversation-offline-five-seconds-v1` (`apps/backend/src/modules/conversation/offline.ts`): a saved
+copy may be read for five seconds after it was issued, so both apps fetch `…/offline` every 2 s to
+always hold one (30 a minute; it was already there in the 49/51). Proposed default for the next
+session: renew from the lease's own `expiresAt` (about one second before it ends) instead of a fixed
+2 s, on both apps; that is about 15 a minute with five-second leases and falls by itself if the
+lease grows. Ticket to lane 3 and a question for the founder: a longer lease (for example 60 s)
+would bring a thread down to about 6 requests a minute, at the cost of a saved copy readable for
+longer after the network goes.

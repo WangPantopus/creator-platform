@@ -363,7 +363,7 @@ private struct W3ThreadScreen: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: QelvoraLayout.authorGap) {
                     if message.authorKind == .human_broadcast { Mark(kind: .humanBroadcast) } else if message.authorKind == .human_reaction { Mark(kind: .humanReaction) }
-                    Text(message.authorKind == .human_broadcast ? QelvoraCopy.text("nativeNoteFromNameAudienceDetailsUnavailable", values: ["name": page.creatorName]) : message.authorKind == .human_reaction ? "\(page.creatorName) reacted" : QelvoraCopy.text("nativeCallWithName", values: ["name": page.creatorName])).qText("label")
+                    Text(message.authorKind == .human_broadcast ? QelvoraCopy.text("nativeNoteFromNameAudienceDetailsUnavailable", values: ["name": page.creatorName]) : message.authorKind == .human_reaction ? QelvoraCopy.text("nativeNameReacted", values: ["name": page.creatorName]) : QelvoraCopy.text("nativeCallWithName", values: ["name": page.creatorName])).qText("label")
                 }
                 Text(message.text).qText("body")
                 if let act = message.signedActId { SignedMarker(name: page.creatorName) { session.open("/verify/" + act) } }
@@ -631,7 +631,7 @@ private struct W3PrivacyScreen: View {
             if let usage {
                 Text(QelvoraCopy.text("nativeMeasurementDaysAreShownInUTC", values: ["measurement": usage.measurement])).qText("caption")
                 Text(QelvoraCopy.text("nativeThisWeekMinutesMinutes", values: ["minutes": String(Int(usage.days.reduce(0) { $0 + $1.seconds } / 60))])).qText("body")
-                ForEach(usage.days, id: \.day) { day in HStack { Text(day.day).qText("data-sm"); Spacer(); Text("\(Int(day.seconds / 60)) minutes").qText("body") } }
+                ForEach(usage.days, id: \.day) { day in HStack { Text(day.day).qText("data-sm"); Spacer(); Text(QelvoraCopy.text("nativeMinutesMinutes", values: ["minutes": String(Int(day.seconds / 60))])).qText("body") } }
                 if !usage.modeAvailable { Text(QelvoraCopy.text("nativeCompanionModeTimeSignalsAwait")).qText("caption") }
             }
             // While comparisons are off (2026-10-08) the section is absent, with no placeholder.

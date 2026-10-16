@@ -56,7 +56,26 @@ The wording closest to the web's was taken; otherwise the more complete one.
 
 ### Scenarios and results (fake API; synthetic identities and data; the real apps)
 
-See the results table in the WP 7.10 pull request and in "WP 7.10 results" below.
+| ID | What | iOS | Android |
+| --- | --- | --- | --- |
+| C1 to C5 | `node tests/scenarios/lane-7/e7-10-copy.mjs`: no literal user-facing text (113 files), every key exists (994 looked up), no forbidden word in the 1,135 values used, no possessive product name | pass | pass |
+| C1, C4 negative | A planted literal ("Talk to our chatbot now") and a planted value ("Keep chatting to unlock VIP") | both caught | both caught |
+| E7.1 sign-in H1 to H12 | `e7-1-signin.mjs` | not run (handoff) | 12/12 pass |
+| E7.1 F1, F2 | `e7-1-first-conversation.mjs` | not run (handoff) | 2/2 pass |
+| E7.1 S1 to S8, E1, L1 to L5 | `e7-1-states.mjs` | 14/14 pass | 14/14 pass |
+| E7.4 suites | composer, citations, consent, comparison, pickers, packet, notifications, chat link, adults, presence (R1.1 to R1.12, D3T) | not run (handoff) | 10, 4, 7, 7, 8, 3, 9, 2, 6, 35: all pass |
+| E7.4 seal, long session; E7.2 navigation; E7.3 drafts | | not run (handoff) | not run (handoff) |
+| Gates | unit and snapshot suites (no image changed), lint, test build, typecheck, generate check, prettier | `swift test` 18/18, test build | unit and Paparazzi 19/19, lint 0 errors |
+
+Runs on the first 7.10 commit; the follow-up commit (the 12 template literals below) was compiled
+and its gates rerun on both apps, not operated. The first iOS states run used the app the previous
+session had installed and failed every step; with this build installed all 14 passed.
+
+**The follow-up.** A word set apart by spaces is spoken even in lower case (" at {time}"), so the
+scan now flags it, and the first pass had missed 12 template literals that way: the author label's
+" at {time}", "{name} reacted", "{count} members", "Retained: {category}", "{time} UTC", a membership
+that "ends" or "renews", and the minutes of a day (Android now draws that row as iOS does: the day,
+then its minutes).
 
 ### Parity defects found, not fixed here (structure, not words)
 
@@ -139,3 +158,14 @@ Each keeps its own keys until it is fixed; 7.11 takes the ones that are about co
   multi-select, which the design's include list draws as checkboxes). The pass is not open yet.
 - **Case and job lines** read the server's words ("ai report", "queued", "legal hold") on both
   apps; turning them into sentences needs copy for every state.
+
+### WP 7.11 results so far (2026-10-16, at the handoff)
+
+| ID | What | iOS | Android |
+| --- | --- | --- | --- |
+| A1 | Contrast of the text tokens and the sending bubble, both themes (`e7-11-accessibility.mjs A1`, from the tokens) | the same tokens: pass when computed by hand (all text pairs 4.5:1 or more; sending bubble 5.57:1 Light, 6.72:1 Night) | not run as a script |
+| A2 to A5 | Authorship first, switches, named choices, the largest text (`e7-11-accessibility.mjs`; iOS `ios-navigation.mjs <xctestrun> --a11y`) | written, compiled, not run | written, not run |
+| Gates | compile (the iOS test build includes the flows), unit and snapshot suites, the copy scan | test build, `swift test` 18/18 | compile, unit and Paparazzi 19/19 (no image changed) |
+
+The next session runs A1 to A5 on both apps, the pickers suite (it now taps the names), and the
+regression on the top of the stack.

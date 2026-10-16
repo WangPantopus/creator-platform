@@ -12772,17 +12772,6 @@
         }
       }
     },
-    "{day} · {minutes} minutes": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "{day} · {minutes} minutes"
-          }
-        }
-      }
-    },
     "Decision deadline": {
       "extractionState": "manual",
       "localizations": {
@@ -17278,6 +17267,105 @@
           "stringUnit": {
             "state": "translated",
             "value": "You’ve reached {threshold}% of your monthly limit."
+          }
+        }
+      }
+    },
+    "{count} members": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{count} members"
+          }
+        }
+      }
+    },
+    "{label} at {time}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{label} at {time}"
+          }
+        }
+      }
+    },
+    "{label} ends {date}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{label} ends {date}"
+          }
+        }
+      }
+    },
+    "{minutes} minutes": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{minutes} minutes"
+          }
+        }
+      }
+    },
+    "{name}: ends {date}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{name}: ends {date}"
+          }
+        }
+      }
+    },
+    "{name} reacted": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{name} reacted"
+          }
+        }
+      }
+    },
+    "{name}: renews {date}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{name}: renews {date}"
+          }
+        }
+      }
+    },
+    "Retained: {category}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retained: {category}"
+          }
+        }
+      }
+    },
+    "{time} UTC": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{time} UTC"
           }
         }
       }

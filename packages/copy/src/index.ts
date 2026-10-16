@@ -1181,7 +1181,6 @@ export const copy = {
   "nativeDEVELOPMENTSIGNIN": "DEVELOPMENT SIGN-IN",
   "nativeDataScope": "Data scope",
   "nativeDataScopeScope": "Data scope: {scope}",
-  "nativeDayMinutesMinutes": "{day} · {minutes} minutes",
   "nativeDecisionDeadline": "Decision deadline",
   "nativeDelete": "Delete",
   "nativeDeleteThisDataScope": "Delete this data scope?",
@@ -1600,6 +1599,15 @@ export const copy = {
   "nativeYoureOffline": "You're offline",
   "nativeYoureSeeingASavedConversation": "You're seeing a saved conversation with a short reading lease. Reconnect to send.",
   "nativeYouveReachedThresholdOfYourMonthly": "You’ve reached {threshold}% of your monthly limit.",
+  "nativeCountMembers": "{count} members",
+  "nativeLabelAtTime": "{label} at {time}",
+  "nativeLabelEndsDate": "{label} ends {date}",
+  "nativeMinutesMinutes": "{minutes} minutes",
+  "nativeNameEndsDate": "{name}: ends {date}",
+  "nativeNameReacted": "{name} reacted",
+  "nativeNameRenewsDate": "{name}: renews {date}",
+  "nativeRetainedCategory": "Retained: {category}",
+  "nativeTimeUTC": "{time} UTC",
   "nativeOpenStudio": "Open {studio}"
 } as const;
 export type CopyKey = keyof typeof copy;

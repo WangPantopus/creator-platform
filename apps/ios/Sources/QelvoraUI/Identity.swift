@@ -93,7 +93,7 @@ public struct AuthorLabel: View {
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(words + (time.map { " at \($0)" } ?? ""))
+        .accessibilityLabel(time.map { QelvoraCopy.text("nativeLabelAtTime", values: ["label": words, "time": $0]) } ?? words)
     }
 }
 

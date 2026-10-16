@@ -1184,7 +1184,6 @@
   <string name="native_d_e_v_e_l_o_p_m_e_n_t_s_i_g_n_i_n" formatted="false">DEVELOPMENT SIGN-IN</string>
   <string name="native_data_scope" formatted="false">Data scope</string>
   <string name="native_data_scope_scope" formatted="false">Data scope: {scope}</string>
-  <string name="native_day_minutes_minutes" formatted="false">{day} · {minutes} minutes</string>
   <string name="native_decision_deadline" formatted="false">Decision deadline</string>
   <string name="native_delete" formatted="false">Delete</string>
   <string name="native_delete_this_data_scope" formatted="false">Delete this data scope?</string>
@@ -1603,5 +1602,14 @@
   <string name="native_youre_offline" formatted="false">You\'re offline</string>
   <string name="native_youre_seeing_a_saved_conversation" formatted="false">You\'re seeing a saved conversation with a short reading lease. Reconnect to send.</string>
   <string name="native_youve_reached_threshold_of_your_monthly" formatted="false">You’ve reached {threshold}% of your monthly limit.</string>
+  <string name="native_count_members" formatted="false">{count} members</string>
+  <string name="native_label_at_time" formatted="false">{label} at {time}</string>
+  <string name="native_label_ends_date" formatted="false">{label} ends {date}</string>
+  <string name="native_minutes_minutes" formatted="false">{minutes} minutes</string>
+  <string name="native_name_ends_date" formatted="false">{name}: ends {date}</string>
+  <string name="native_name_reacted" formatted="false">{name} reacted</string>
+  <string name="native_name_renews_date" formatted="false">{name}: renews {date}</string>
+  <string name="native_retained_category" formatted="false">Retained: {category}</string>
+  <string name="native_time_u_t_c" formatted="false">{time} UTC</string>
   <string name="native_open_studio" formatted="false">Open {studio}</string>
 </resources>
