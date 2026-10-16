@@ -215,7 +215,7 @@ private struct W3ThreadScreen: View {
             .sheet(item: $originalReply) { original in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original AI reply · version \(original.version)").qText("data-sm"); Text(original.text).qText("body").textSelection(.enabled) }.padding(16) } }
             .alert("Source unavailable", isPresented: Binding(get: { !sourceFailure.isEmpty }, set: { if !$0 { sourceFailure = "" } })) { SwiftUI.Button("Close") { sourceFailure = "" } } message: { Text(sourceFailure) }
     }
-    /// The thread's rows, the same in the lazy and the plain stack.
+    /// The thread's rows, in one plain stack at every text size.
     @ViewBuilder private func threadRows(_ page: W3Page) -> some View {
         if compact { IdentityStrip(state: page.control == .human_active ? .human : page.control == .ai_active ? .ai : .paused, name: page.creatorName) }
         if let offerId = model.introOfferId, session.session?.fan != nil, page.feedbackPolicy != nil {
