@@ -131,6 +131,11 @@
   <string name="page_unavailable_body" formatted="false">Nothing you saved was changed. Try again in a moment.</string>
   <string name="adult_only_title" formatted="false">This app is for adults</string>
   <string name="adult_only_body" formatted="false">This app is available to adults aged 18 and over.</string>
+  <string name="underage_link" formatted="false">What we keep, and what we don\'t</string>
+  <string name="underage_policy_title" formatted="false">If you\'re under 18</string>
+  <string name="underage_policy_opening" formatted="false">This app is only for adults aged 18 and over, so we didn\'t open an account for you.</string>
+  <string name="underage_policy_not_kept" formatted="false">We never store a date of birth, and we erased the email address your Apple or Google sign-in shared with us.</string>
+  <string name="underage_policy_kept" formatted="false">We keep two things: that the age check said under 18, and a scrambled code made from your sign-in, so the same sign-in can\'t pass the age check later. Neither can be turned back into your name or email.</string>
   <string name="sign_in_with_apple" formatted="false">Continue with Apple</string>
   <string name="sign_in_with_google" formatted="false">Continue with Google</string>
   <string name="sign_in_age_title" formatted="false">Your date of birth</string>

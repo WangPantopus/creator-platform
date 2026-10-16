@@ -1409,6 +1409,61 @@
         }
       }
     },
+    "What we keep, and what we don't": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What we keep, and what we don't"
+          }
+        }
+      }
+    },
+    "If you're under 18": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "If you're under 18"
+          }
+        }
+      }
+    },
+    "This app is only for adults aged 18 and over, so we didn't open an account for you.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This app is only for adults aged 18 and over, so we didn't open an account for you."
+          }
+        }
+      }
+    },
+    "We never store a date of birth, and we erased the email address your Apple or Google sign-in shared with us.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We never store a date of birth, and we erased the email address your Apple or Google sign-in shared with us."
+          }
+        }
+      }
+    },
+    "We keep two things: that the age check said under 18, and a scrambled code made from your sign-in, so the same sign-in can't pass the age check later. Neither can be turned back into your name or email.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We keep two things: that the age check said under 18, and a scrambled code made from your sign-in, so the same sign-in can't pass the age check later. Neither can be turned back into your name or email."
+          }
+        }
+      }
+    },
     "Continue with Apple": {
       "extractionState": "manual",
       "localizations": {
