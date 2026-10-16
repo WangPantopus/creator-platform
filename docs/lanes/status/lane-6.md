@@ -1,9 +1,28 @@
 # Lane 6: Creator Studio (web) status
 
-Updated: 2026-10-15, by the lane 6 session resumed from the 2026-10-09 handoff.
+Updated: 2026-10-16, at the handoff of the session that did WP 6.2.
 
 Working on: nothing. WP 6.2 (Today and the Note composer) is done in #443 on
-`lane-6/today-note`; the session stopped for the founder's review, as asked.
+`lane-6/today-note` (CI 5 of 5 green, mergeable, 2026-10-16). The founder's next go is WP 6.9.
+
+## Resume here
+
+- **Prompt for the next session:** [lane-6-resume-prompt.md](lane-6-resume-prompt.md). It has the
+  start-up steps, the WP 6.9 facts (every 4-second timer by file and line, and the 5-second
+  authority lease that makes removing them a safety-posture question for the founder), the traps
+  and the ports.
+- **Verified at handoff:** `lane-6/today-note` is pushed; its last code commit is 2a4013e20 (later commits are notes only) and it includes `main` at
+  dea51a4ff; the working tree is clean; the lane 6 stack is down; nothing of this session runs.
+- **Reuse, do not redo:** the E6.1 captures for `main` and for #443 (Chrome 155.0.8059.84) are
+  saved outside the repo in the cache folder the prompt names, with a README; the E6.2 scripts
+  run on a fresh stack in this order: note, ceremony, tabs, audience, today.
+- **Waiting on others:** the integrator's tab bar change (ticket below) and their approval of the
+  `config/navigation.json` addition. When the tab bar change is on `main`, mark Today as the
+  current tab on Notes and in the composer (`Studio.tsx`, the `active` mapping) and rerun E6.1:
+  every screen's tab bar will differ, by design.
+- **Deliberately not done:** WP 6.3 onwards; the composer's label preview fix
+  (`notes/Compose.tsx:536`, finding 4 below); the tickets lanes 2 and 5 sent to lane 6 (listed
+  under Next).
 
 Waiting on: the integrator: the tab bar ticket below, and approval of the small additive change
 to `config/navigation.json`.
