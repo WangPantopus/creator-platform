@@ -75,3 +75,7 @@ iOS: existing UI 6 = 2 pass, 4 skipped by design, 0 failures; Release build
 succeeded, all five markers 0, CreatorAPIURL empty; swift test 18 pass.
 Changed scenario scripts pass prettier and eslint.
 App PR check reader: requires the founder's GitHub connection; CI not inspected.
+After the iOS freeze fix (W3FanFeatures.swift, compact layout): iOS existing
+UI 6 = 2 pass, 4 skipped by design, 0 failures; Release build succeeded, all
+five markers 0, CreatorAPIURL empty; swift test 18 pass. Android unchanged by
+that fix; D3T passes there.

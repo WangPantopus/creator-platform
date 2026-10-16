@@ -50,6 +50,7 @@ const flows = presence
           D1: "testD01Lifecycle",
           D2: "testD02IndependentThreads",
           D3: "testD03LargestText",
+          D3T: "testD03TallRowScroll",
           D4: "testD04SendRecovery",
           D4R: "testD04RejectedRetry",
           D5: "testD05AuthorizationAndReplacement",

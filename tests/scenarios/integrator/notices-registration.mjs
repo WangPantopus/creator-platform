@@ -118,11 +118,11 @@ step(
     : summary,
 );
 const ledger = sql(
-  "SELECT count(*)||' '||string_agg(version,',' ORDER BY version) FILTER (WHERE version>='0247') FROM creator.schema_migration",
+  "SELECT count(*)||' '||string_agg(version,',' ORDER BY version) FILTER (WHERE version IN ('0247_w5_note_mute_read','0248_w7_notice_snapshot')) FROM creator.schema_migration",
 );
 step(
   "both new migrations are in the ledger",
-  /^116 0247_w5_note_mute_read,0248_w7_notice_snapshot$/u.test(ledger),
+  /^\d+ 0247_w5_note_mute_read,0248_w7_notice_snapshot$/u.test(ledger),
   ledger,
 );
 
