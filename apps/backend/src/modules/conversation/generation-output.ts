@@ -548,16 +548,18 @@ export class PreparedGenerationConversationOutput {
 
   /** The pipeline callback resolves only after the original W1 COMMIT. It
    * never commits locally or performs provider I/O on a held SQL connection. */
+  /** Resolves with the cursor the append left in this same transaction, only
+   * after W1's COMMIT of it; a lost COMMIT acknowledgment rejects instead. */
   async deliver(
     task: GenerationTask,
     sentence: ApprovedGenerationSentence,
     signal?: AbortSignal,
-  ): Promise<void> {
-    await this.identity.withGeneration(
+  ): Promise<number> {
+    return this.identity.withGeneration(
       task,
-      async (client, scope) => {
-        await this.appendInTransaction(client, scope, sentence);
-      },
+      async (client, scope) =>
+        (await this.appendInTransaction(client, scope, sentence)).scope
+          .lastSequence,
       signal,
     );
   }

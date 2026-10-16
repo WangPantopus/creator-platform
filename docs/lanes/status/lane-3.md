@@ -1,10 +1,44 @@
 # Lane 3: AI engine status
 
-Updated: 2026-10-15, by the lane 3 session
-Working on: nothing open; finding 15 #451, finding 8 #455, finding 9 decided (lane 4 ticket, #456)
-Done: merged A1 #411, A3 #426, A6a #434, A6b #433 (its code and migration 0251 through the registration #442). Open: A6c #436, A6 hold sizing #438, B2 #441, A2 #444, B9 #446
-Next: the migration proposals for findings 8, 9 and 15, then the next work package in the founder's order
+Updated: 2026-10-16, by the lane 3 session (handoff)
+Working on: nothing in flight. Last done: A4 (fewer transactions), #464
+Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464
+Next: the founder picks the next work package; remaining: A5 (safety sign-off), A7 (C5 frames), B1 (price rule), B3 citations, B4 retrieval (recommended next), B5 memory, B7 consent text, B8 My AI publish flow
 Blocked on: nothing. Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
+
+## Resume here (handoff 2026-10-16)
+
+- Worktree `.claude/worktrees/lane-3-ai-engine-696dd4`, branch `lane-3/a4-fewer-transactions`, clean and
+  pushed. Every open lane 3 branch carries this status text with its own section; merge main into a
+  branch when GitHub reports a conflict and take the newest status text.
+- Tools: node and pnpm from the Codex runtime (`NB=$HOME/.cache/codex-runtimes/codex-primary-runtime/dependencies;
+export PATH=$NB/node/bin:$NB/bin/fallback:$PATH npm_config_manage_package_manager_versions=false`).
+- Stack: lane 3's container `qelvora-lane3-postgres` is stopped with its data (pg_stat_statements on).
+  `node infra/local/stack.mjs up --lane 3 --no-ai --no-smoke` restarts it (add `--no-web` for backend
+  only); `sh tests/scenarios/lane-3/fresh-stack.sh` rebuilds from nothing in about a minute (needed
+  before E3A.5 kills and after any crash, finding 17). Test DB:
+  `eval "$(node infra/local/stack.mjs env --lane 3 | grep '^CREATOR_TEST_DATABASE_URL=' | sed 's/^/export /')"`,
+  then `(cd apps/backend && pnpm exec vitest run)`; T-11 times out above host load about 20, rerun.
+- Real model: only through the founder's capped gateway (`--provider anthropic --model-gateway
+http://127.0.0.1:56499`; publish Maya on the fake first, then restart with the gateway). Lane 3 has
+  spent 124 calls, 304,174 micros.
+- Testing a pending SQL proposal: `catalogues snapshot --out F` on a fresh stack, apply the file by hand,
+  patch the `definitionChecksum` values in `infra/migrations/reviews/*.json`, `catalogues write --base F`,
+  restart, test, then `git checkout -- infra/migrations/reviews` (never commit pins; the integrator
+  regenerates them).
+- Waiting on others: the integrator registers #451 and reviews #455 and #464 (custody-adjacent); lane 4
+  takes finding 9's condition; lane 7 hides step-in natively (B9); lane 2 makes the model fake's reply
+  configurable.
+
+## A4: fewer transactions per answer
+
+Deliver returns its committed cursor (no readback transaction); one fresh read per admission (the
+second bookend dropped); the classifier admitted inside the preflight and the reply inside the
+retrieval read (released as a known zero if never used). No SQL change. Paired at load 7.3 and 7.7:
+first sentence p50 8.17 to 6.88 s, p95 9.60 to 8.20 s; worker statements 2,646 to 2,011; transactions
+23.5 to 19.6; worker database time 5.7 to 4.8 s. E3A.2 identical; E3A.4, E3A.6, A6a and A6b scenarios
+pass as on main; E3A.5's "admitted" kill point now lands during the classifier call and leaves its
+row `admitted` (exposure unchanged); 157 of 157 suites.
 
 ## How to measure
 
@@ -137,6 +171,9 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
 16. The output guard blocks a harmless answer with a dollar amount: "what is $5 plus $3?" was answered
     "$8" by the real model and withheld as `promise_or_sales` (the pattern `\$\s*\d` matches any
     amount). B1 (word boundaries and subject anchors).
+17. After E3A.5's kill and `stack.mjs up`, opening a new conversation fails with `403 ai_updating`
+    (`supportsPublishedEngine` false) until the next clean stop and up; same on main. Not
+    investigated; `e3a5-restart.mjs --after-lapse` fails its last step for this reason.
 
 ## A2: wake on accept
 
@@ -217,6 +254,7 @@ passing, on top of the existing boundary cases (all must pass). A first version 
 | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
 | E3A.1 measurement     | Main and A3 recorded above, 2026-10-15                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | `a1-measure.mjs` as above                         |
 | E3A.2 ★               | Pass on A3: identical visible text, authorship, citations and order for every answer main also delivered                                                                                                                                                                                                                                                                                                                                                                                                                     | `a1-measure.mjs --compare`                        |
+| E3A.1/E3A.2 A4        | Paired: first sentence p50 8.17 to 6.88 s, statements 2,646 to 2,011, transactions 23.5 to 19.6; visible output identical                                                                                                                                                                                                                                                                                                                                                                                                    | `a1-measure.mjs --compare`                        |
 | E3A.3                 | A2: claims 429 ms after accept (main 963 ms); the wakeup session killed before a send: answered (claimed in 404 ms) and the session returns; the backend killed with work accepted but unclaimed: answered once after the restart; burst of 30: 25 answered once, same as main; two workers: 2 of 10, none twice (main 1 of 10; finding 15)                                                                                                                                                                                  | `e3a3-wake.mjs`                                   |
 | E3A.4 ★               | A3: no AI sentence after any change in 27 runs (7 kinds of change, up to 4 timings). Takeover within 500 ms fails at some timings (finding 10, also on main). Deletion not run (finding 11)                                                                                                                                                                                                                                                                                                                                  | `e3a4-authority.mjs`, one case per fresh stack    |
 | E3A.5 ★               | A3: kill after admission passes; kill during the guard call leaves an uncertain cost (finding 7); kill after the first sentence never finishes (finding 9). Same on main                                                                                                                                                                                                                                                                                                                                                     | `e3a5-restart.mjs --at admitted\|guard\|sentence` |
