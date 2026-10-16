@@ -120,7 +120,7 @@ private struct W3ThreadScreen: View {
                 }
                 VStack(spacing: QelvoraTokens.space3) {
                     if !page.canSend { Notice(title: "AI unavailable", children: page.unavailableReason ?? "Messaging is unavailable.") }
-                    if !composerFocused && !compact { Button("Ask \(page.creatorName) to step in", variant: .maya, block: true) { session.open("/commerce/packet?creatorId=" + model.creatorId) } }
+                    if !composerFocused && !compact { Button(QelvoraCopy.text("stepIn", values: ["name": page.creatorName]), variant: .maya, block: true, initial: creatorInitial(page.creatorName)) { session.open("/commerce/packet?creatorId=" + model.creatorId) } }
                     HStack(alignment: .bottom, spacing: QelvoraTokens.space2) {
                         TextEditor(text: Binding(get: { model.draft }, set: { model.draft = String($0.prefix(2000)) }))
                             .qText("body").scrollContentBackground(.hidden)
@@ -138,7 +138,10 @@ private struct W3ThreadScreen: View {
                             .padding(compact ? 4 : 12).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusMd))
                             .accessibilityLabel(page.control == .human_active ? "Message \(page.creatorName)" : "Message \(page.creatorName)'s AI")
                             .focused($composerFocused)
-                        Button("Send", variant: page.control == .human_active ? .maya : .ai, disabled: scenePhase != .active || privacy || source != nil || originalReply != nil || comparisonQuestion != nil || !page.canSend || model.offline || model.busy || model.pending != nil || !page.generationSequences.isEmpty || model.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) { Task { await model.send() } }
+                        // Send takes its one-line width first, as on Android; at the largest
+                        // text the creator's seal otherwise split the word across two lines.
+                        Button("Send", variant: page.control == .human_active ? .maya : .ai, initial: creatorInitial(page.creatorName), disabled: scenePhase != .active || privacy || source != nil || originalReply != nil || comparisonQuestion != nil || !page.canSend || model.offline || model.busy || model.pending != nil || !page.generationSequences.isEmpty || model.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) { Task { await model.send() } }
+                            .layoutPriority(1)
                     }
                     if !composerFocused && !compact { HStack { Button("Me and privacy", variant: .quiet) { privacy = true }; Button("Get support", variant: .quiet) { session.open("/support") } } }
                 }.padding(.horizontal, QelvoraTokens.space4).padding(.vertical, compact && composerFocused ? 4 : QelvoraTokens.space4).background(qColor("ground", scheme))
@@ -222,7 +225,7 @@ private struct W3ThreadScreen: View {
         }
         if !model.failure.isEmpty { Notice(tone: .error, title: "Conversation status", children: model.failure) }
         if compact && !composerFocused {
-            Button("Ask \(page.creatorName) to step in", variant: .maya, block: true) { session.open("/commerce/packet?creatorId=" + model.creatorId) }
+            Button(QelvoraCopy.text("stepIn", values: ["name": page.creatorName]), variant: .maya, block: true, initial: creatorInitial(page.creatorName)) { session.open("/commerce/packet?creatorId=" + model.creatorId) }
             Button("Me and privacy", variant: .quiet) { privacy = true }
             Button("Get support", variant: .quiet) { session.open("/support") }
         }

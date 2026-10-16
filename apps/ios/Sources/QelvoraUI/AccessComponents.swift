@@ -20,9 +20,9 @@ public struct StepIn: View {
       SwiftUI.Button(action: action) {
         HStack(spacing: QelvoraTokens.token("space-2")) {
           if disabled {
-            Seal(initial: String(name.prefix(1)), size: QelvoraTokens.token("seal-step"))
+            Seal(initial: creatorInitial(name), size: QelvoraTokens.token("seal-step"))
           } else {
-            ThreadPlateSeal(initial: String(name.prefix(1)), size: QelvoraTokens.token("seal-step"))
+            ThreadPlateSeal(initial: creatorInitial(name), size: QelvoraTokens.token("seal-step"))
           }
           Text(QelvoraCopy.text("stepIn", values: ["name": name])).qText(
             "control-body", weight: .semibold)

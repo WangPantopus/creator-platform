@@ -54,10 +54,11 @@ struct ThreadPlateSeal: View {
   var live = false
   @Environment(\.colorScheme) private var scheme
   var body: some View {
+    // Fixed like Seal: the letter must not grow with Dynamic Type past its circle.
     Text(initial).font(
       .custom(
         QelvoraFonts.face("serif", italic: true),
-        size: (size * QelvoraTokens.token("seal-font-ratio")).rounded())
+        fixedSize: (size * QelvoraTokens.token("seal-font-ratio")).rounded())
     )
     .foregroundStyle(qColor("on-maya-accent", scheme)).frame(width: size, height: size)
     .background(qColor("maya-accent", scheme), in: Circle())
@@ -125,7 +126,7 @@ public struct IdentityStrip: View {
     HStack(spacing: QelvoraTokens.token("composer-gap")) {
       if state == .human {
         ThreadPlateSeal(
-          initial: String(name.prefix(1)), size: QelvoraTokens.token("seal-reaction"), live: true)
+          initial: creatorInitial(name), size: QelvoraTokens.token("seal-reaction"), live: true)
       } else {
         QelvoraGlyph(
           name: state == .team ? "team" : state == .paused ? "pause" : "ring",
@@ -205,7 +206,7 @@ public struct ThreadHeader: View {
       ThreadIconButton(
         glyph: "back", label: QelvoraCopy.text("back"), color: qColor("ink", scheme), action: onBack
       )
-      Avatar(initial: String(name.prefix(1)), live: live)
+      Avatar(initial: creatorInitial(name), live: live)
       VStack(alignment: .leading, spacing: QelvoraTokens.token("wave-gap")) {
         Text(name).qText("title")
         Text(
@@ -272,7 +273,7 @@ public struct SystemLine: View {
         if variant == .presence {
           HStack(spacing: QelvoraTokens.token("space-2")) {
             ThreadPlateSeal(
-              initial: String(name.prefix(1)), size: QelvoraTokens.token("seal-presence"))
+              initial: creatorInitial(name), size: QelvoraTokens.token("seal-presence"))
             Text(QelvoraCopy.text("takeover", values: ["name": name])).qText(
               "caption", weight: .semibold)
             if let time {
@@ -321,7 +322,7 @@ public struct ReactionChip: View {
   public init(name: String = "Maya", label: String? = nil) { self.name = name; self.label = label }
   public var body: some View {
     HStack(spacing: QelvoraTokens.token("author-gap")) {
-      ThreadPlateSeal(initial: String(name.prefix(1)), size: QelvoraTokens.token("seal-reaction"))
+      ThreadPlateSeal(initial: creatorInitial(name), size: QelvoraTokens.token("seal-reaction"))
       QelvoraGlyph(
         name: "heart", size: QelvoraTokens.token("glyph-caption"),
         color: qColor("maya-accent", scheme))

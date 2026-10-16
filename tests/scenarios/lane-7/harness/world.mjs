@@ -184,6 +184,21 @@ const CREATORS = [
       "Lena answers written replies within 3 days · 6 of 6 left this week.",
     membership: null,
   },
+  {
+    // WP 7.4 P3: a display name that starts with an emoji and a lowercase
+    // letter, so the seal must show "F" (the first letter, uppercased).
+    n: 8,
+    handle: "fernstudio",
+    name: "🌿 fern studio",
+    category: "Crafts",
+    mode: "companion",
+    state: "published",
+    topics: ["dyeing"],
+    bio: "Plant dyes for wool and linen.",
+    capacity:
+      "fern studio answers written replies within 3 days · 4 of 4 left this week.",
+    membership: null,
+  },
 ];
 
 /** One conversation per state. `rich` has every message kind the contract allows. */

@@ -63,7 +63,7 @@ fun Message(kind: MessageKind = MessageKind.AI, children: String = "", name: Str
                                 TextLine(children, "body", modifier = Modifier.clearAndSetSemantics { contentDescription = copy("preparedByAI") + " · " + copy("approvedBy", "name" to name) + ". " + children })
                             }
                             FlowRow(Modifier.fillMaxWidth().background(qColor("maya-surface")).padding(horizontal = QelvoraTokens.messagePadding, vertical = QelvoraTokens.composerGap), horizontalArrangement = Arrangement.spacedBy(QelvoraTokens.space2), verticalArrangement = Arrangement.spacedBy(QelvoraTokens.space1)) {
-                                Row(Modifier.heightIn(min = QelvoraTokens.space6).clearAndSetSemantics {}, horizontalArrangement = Arrangement.spacedBy(QelvoraTokens.space2), verticalAlignment = Alignment.CenterVertically) { Seal(initial = name.take(1), onMaya = true); TextLine(copy("approvedBy", "name" to name), "caption", "maya-accent", true) }
+                                Row(Modifier.heightIn(min = QelvoraTokens.space6).clearAndSetSemantics {}, horizontalArrangement = Arrangement.spacedBy(QelvoraTokens.space2), verticalAlignment = Alignment.CenterVertically) { Seal(initial = creatorInitial(name), onMaya = true); TextLine(copy("approvedBy", "name" to name), "caption", "maya-accent", true) }
                                 SignedMarker(name, time, onMaya = true, onClick = onVerify)
                             }
                         }
@@ -77,7 +77,7 @@ fun Message(kind: MessageKind = MessageKind.AI, children: String = "", name: Str
                         DraftTreatment.STACKED -> Column(Modifier.fillMaxWidth().clip(bubble).background(qColor("ai-surface")).border(QelvoraTokens.hairline, qColor("line"), bubble)) {
                             Column(Modifier.fillMaxWidth().background(qColor("ground")).padding(horizontal = QelvoraTokens.messagePadding, vertical = QelvoraTokens.space2)) {
                                 Row(Modifier.heightIn(min = QelvoraTokens.space5), horizontalArrangement = Arrangement.spacedBy(QelvoraTokens.space2), verticalAlignment = Alignment.CenterVertically) { Glyph("ring", QelvoraTokens.authorLabelSize + QelvoraTokens.hairline, qColor("ai-ink")); TextLine(copy("preparedByAI"), "caption", "ai-ink", true) }
-                                Row(Modifier.heightIn(min = QelvoraTokens.space5), horizontalArrangement = Arrangement.spacedBy(QelvoraTokens.space2), verticalAlignment = Alignment.CenterVertically) { Seal(name.take(1), QelvoraTokens.authorLabelSize + QelvoraTokens.hairline); TextLine(copy("approvedBy", "name" to name), "caption", "maya-ink", true); time?.let { TextLine("· $it", "data-sm", "ink-muted") } }
+                                Row(Modifier.heightIn(min = QelvoraTokens.space5), horizontalArrangement = Arrangement.spacedBy(QelvoraTokens.space2), verticalAlignment = Alignment.CenterVertically) { Seal(creatorInitial(name), QelvoraTokens.authorLabelSize + QelvoraTokens.hairline); TextLine(copy("approvedBy", "name" to name), "caption", "maya-ink", true); time?.let { TextLine("· $it", "data-sm", "ink-muted") } }
                             }
                             Hairline()
                             Column(Modifier.padding(horizontal = QelvoraTokens.messagePadding, vertical = QelvoraTokens.space3)) { TextLine(children, "body"); SignedMarker(name, time, onClick = onVerify) }

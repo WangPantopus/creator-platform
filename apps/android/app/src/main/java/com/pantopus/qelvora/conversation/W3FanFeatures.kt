@@ -443,7 +443,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                     } })
             }
             val sendButton: @Composable () -> Unit = {
-                Button("Send", variant = if (current.control == APIThreadControl.HUMAN_ACTIVE) ButtonVariant.MAYA else ButtonVariant.AI, disabled = !current.canSend || offline || !foreground || busy || pending != null || current.generationSequences.isNotEmpty() || draft.isBlank()) { scope.launch { send() } }
+                Button("Send", variant = if (current.control == APIThreadControl.HUMAN_ACTIVE) ButtonVariant.MAYA else ButtonVariant.AI, initial = creatorInitial(current.creatorName), disabled = !current.canSend || offline || !foreground || busy || pending != null || current.generationSequences.isNotEmpty() || draft.isBlank()) { scope.launch { send() } }
             }
             val privacyControls: @Composable () -> Unit = {
                 Button("Me and privacy", variant = ButtonVariant.QUIET) { privacy = true }
@@ -452,7 +452,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             val composer: @Composable () -> Unit = {
                 Column(Modifier.imePadding().padding(horizontal = if (horizontalControls) 4.dp else 16.dp, vertical = if (keyboardVisible && compact) 4.dp else 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     if (!current.canSend && !horizontalControls) Notice(title = "AI unavailable", children = current.unavailableReason ?: "Messaging is unavailable.")
-                    if (!keyboardVisible && !compact) Button("Ask ${current.creatorName} to step in", variant = ButtonVariant.MAYA, block = true) { session.open("/commerce/packet?creatorId=$creatorId") }
+                    if (!keyboardVisible && !compact) Button(QelvoraCopy.text("stepIn", mapOf("name" to current.creatorName)), variant = ButtonVariant.MAYA, block = true, initial = creatorInitial(current.creatorName)) { session.open("/commerce/packet?creatorId=$creatorId") }
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.Bottom) { input(Modifier.weight(1f)); sendButton() }
                     if (!keyboardVisible && !compact) Row { privacyControls() }
                 }
@@ -547,7 +547,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 item(key = "conversation-end") { Spacer(Modifier.height(1.dp)) }
                 if (compact && !keyboardVisible) item {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Button("Ask ${current.creatorName} to step in", variant = ButtonVariant.MAYA, block = true) { session.open("/commerce/packet?creatorId=$creatorId") }
+                        Button(QelvoraCopy.text("stepIn", mapOf("name" to current.creatorName)), variant = ButtonVariant.MAYA, block = true, initial = creatorInitial(current.creatorName)) { session.open("/commerce/packet?creatorId=$creatorId") }
                         privacyControls()
                     }
                 }

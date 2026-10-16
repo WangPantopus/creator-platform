@@ -31,6 +31,13 @@ public enum AuthorKind: String, CaseIterable, Sendable, Codable {
     }
 }
 
+/// A creator's seal letter: the first letter of the name, uppercased, or the
+/// first character when the name has no letter. The same rule on Android.
+public func creatorInitial(_ name: String) -> String {
+    if let letter = name.first(where: { $0.isLetter }) { return String(String(letter).uppercased().prefix(1)) }
+    return name.first.map { String($0) } ?? ""
+}
+
 public enum MessageKind: String, CaseIterable, Sendable, Codable {
     case fan, ai, team
     case humanCreator = "human_creator"
@@ -71,7 +78,7 @@ public struct AuthorLabel: View {
 
     public var body: some View {
         HStack(spacing: QelvoraLayout.authorGap) {
-            Mark(kind: kind, initial: String(name.prefix(1)), onMaya: onMaya)
+            Mark(kind: kind, initial: creatorInitial(name), onMaya: onMaya)
             if kind == .approvedDraft {
                 (Text(QelvoraCopy.text("preparedByAI")).foregroundColor(qColor("ai-ink", scheme)) + Text(" · " + QelvoraCopy.text("approvedBy", values: ["name": name])).foregroundColor(qColor(kind.colorToken(onMaya: onMaya), scheme)))
                     .qText("caption", weight: .semibold)
@@ -102,8 +109,9 @@ public struct Seal: View {
     }
 
     public var body: some View {
+        // A fixed-size mark: the letter must not grow with Dynamic Type past its circle.
         Text(initial)
-            .font(.custom(QelvoraFonts.face("serif", italic: true), size: (size * 0.62).rounded()))
+            .font(.custom(QelvoraFonts.face("serif", italic: true), fixedSize: (size * 0.62).rounded()))
             .foregroundStyle(qColor(onMaya ? "on-maya-accent" : "seal-ink", scheme))
             .frame(width: size, height: size)
             .background(qColor(onMaya ? "maya-accent" : "seal-fill", scheme), in: Circle())

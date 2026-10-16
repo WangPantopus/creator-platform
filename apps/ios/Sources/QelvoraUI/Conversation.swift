@@ -118,7 +118,7 @@ public struct Message: View {
             VStack(alignment: .leading, spacing: 0) {
                 VStack(alignment: .leading, spacing: 0) {
                     HStack(spacing: QelvoraTokens.space2) { QelvoraGlyph(name: "ring", size: QelvoraTokens.authorLabelSize + QelvoraTokens.hairline, color: qColor("ai-ink", scheme)); Text(QelvoraCopy.text("preparedByAI")).qText("caption", weight: .semibold).foregroundStyle(qColor("ai-ink", scheme)) }.frame(minHeight: QelvoraTokens.space5)
-                    HStack(spacing: QelvoraTokens.space2) { Seal(initial: String(name.prefix(1)), size: QelvoraTokens.authorLabelSize + QelvoraTokens.hairline); Text(QelvoraCopy.text("approvedBy", values: ["name": name])).qText("caption", weight: .semibold).foregroundStyle(qColor("maya-ink", scheme)); if let time { Text("· \(time)").qText("data-sm").foregroundStyle(qColor("ink-muted", scheme)) } }.frame(minHeight: QelvoraTokens.space5)
+                    HStack(spacing: QelvoraTokens.space2) { Seal(initial: creatorInitial(name), size: QelvoraTokens.authorLabelSize + QelvoraTokens.hairline); Text(QelvoraCopy.text("approvedBy", values: ["name": name])).qText("caption", weight: .semibold).foregroundStyle(qColor("maya-ink", scheme)); if let time { Text("· \(time)").qText("data-sm").foregroundStyle(qColor("ink-muted", scheme)) } }.frame(minHeight: QelvoraTokens.space5)
                 }.padding(.horizontal, QelvoraTokens.messagePadding).padding(.vertical, QelvoraTokens.space2).frame(maxWidth: .infinity, alignment: .leading).background(qColor("ground", scheme))
                 Text(children).qText("body").padding(QelvoraTokens.token("message-padding"))
                 SignedMarker(name: name, action: onVerify).padding(.horizontal, QelvoraTokens.token("message-padding"))
@@ -127,7 +127,7 @@ public struct Message: View {
     }
 
     private var approvalLabel: some View {
-        HStack(spacing: QelvoraTokens.space2) { Seal(initial: String(name.prefix(1)), onMaya: true); Text(QelvoraCopy.text("approvedBy", values: ["name": name])).qText("caption", weight: .semibold).foregroundStyle(qColor("maya-accent", scheme)) }.fixedSize()
+        HStack(spacing: QelvoraTokens.space2) { Seal(initial: creatorInitial(name), onMaya: true); Text(QelvoraCopy.text("approvedBy", values: ["name": name])).qText("caption", weight: .semibold).foregroundStyle(qColor("maya-accent", scheme)) }.fixedSize()
     }
 }
 

@@ -30,6 +30,23 @@ import androidx.compose.foundation.text.BasicText
 import com.pantopus.qelvora.R
 import com.pantopus.qelvora.generated.QelvoraTokens
 
+/** A creator's seal letter: the first letter of the name, uppercased, or the
+ * first character when the name has no letter. The same rule on iOS. */
+fun creatorInitial(name: String): String {
+    var i = 0
+    while (i < name.length) {
+        val cp = name.codePointAt(i)
+        if (Character.isLetter(cp)) {
+            val upper = String(Character.toChars(cp)).uppercase()
+            return String(Character.toChars(upper.codePointAt(0)))
+        }
+        i += Character.charCount(cp)
+    }
+    if (name.isEmpty()) return ""
+    val graphemes = java.text.BreakIterator.getCharacterInstance().apply { setText(name) }
+    return name.substring(0, graphemes.next())
+}
+
 @Composable
 fun Seal(initial: String = "M", size: Dp = 18.dp, live: Boolean = false, onMaya: Boolean = false) {
     val fill = qColor(if (onMaya) "maya-accent" else "seal-fill"); val ink = qColor(if (onMaya) "on-maya-accent" else "seal-ink"); val accent = qColor("maya-accent"); val ground = qColor("ground")
@@ -38,7 +55,7 @@ fun Seal(initial: String = "M", size: Dp = 18.dp, live: Boolean = false, onMaya:
             if (live) { drawCircle(accent, radius = this.size.width / 2 + 4.dp.toPx()); drawCircle(ground, radius = this.size.width / 2 + 3.dp.toPx()) }
             drawCircle(fill)
         }
-        BasicText(initial, style = TextStyle(color = ink, fontFamily = FontFamily(Font(R.font.newsreader_italic, style = FontStyle.Italic)), fontSize = (size.value * 0.62f).sp))
+        BasicText(initial, style = TextStyle(color = ink, fontFamily = FontFamily(Font(R.font.newsreader_italic, style = FontStyle.Italic)), fontSize = (size.value * 0.62f / androidx.compose.ui.platform.LocalDensity.current.fontScale).sp))
     }
 }
 
@@ -62,7 +79,7 @@ fun AuthorLabel(kind: AuthorKind = AuthorKind.AI, name: String = "Maya", audienc
     // `label`: a label the server built (C4 `authorLabel`), shown verbatim instead of one assembled here.
     val words = label ?: kind.label(name, audience, member)
     Row(Modifier.clearAndSetSemantics { contentDescription = words + (time?.let { " at $it" } ?: "") }, horizontalArrangement = Arrangement.spacedBy(QelvoraTokens.authorGap), verticalAlignment = Alignment.CenterVertically) {
-        Mark(kind, initial = name.take(1), onMaya = onMaya)
+        Mark(kind, initial = creatorInitial(name), onMaya = onMaya)
         val ai = qColor("ai-ink"); val creator = qColor(kind.colorToken(onMaya))
         val label = buildAnnotatedString {
             if (kind == AuthorKind.APPROVED_DRAFT) { withStyle(SpanStyle(color = ai)) { append(copy("preparedByAI")) }; withStyle(SpanStyle(color = creator)) { append(" · " + copy("approvedBy", "name" to name)) } }
