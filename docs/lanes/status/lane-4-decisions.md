@@ -66,3 +66,17 @@ percentile), rounded to hours or days.
 
 Alternative: count only accepts and declines. The range is then about Maya's decisions, but a
 creator who lets requests expire would look faster than fans experience her.
+
+## Decided
+
+### P1. A paused creator's open paid requests (lane 1's G1, #463): confirmed 2026-10-15
+
+The founder confirmed lane 1's proposed default, as built in #463. When ops pauses a creator or
+revokes her license:
+
+- **Requests she has not accepted** are released at once, and nothing is charged. They end with
+  the existing "expired" outcome, and the fan sees "Maya's queue didn't get to this · nothing
+  charged". It neither blames the creator nor reveals the ops action. There is no new copy and no
+  new end state.
+- **Accepted requests** keep their deadline, and refund if it passes. They are not refunded at
+  once, in case the pause is lifted (P2) and she delivers.
