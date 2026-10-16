@@ -1,10 +1,10 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-16, by the lane 3 session
-Working on: A7 (frames, C5), PR #482. Last done: B3 (citations), #477
-Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482
-Next: finding 5 (socket closes during answers), then A5, B8, B7, B5 memory; remaining: A5 (safety sign-off), A7 (C5 frames), B6 (provider), B7 consent text, B8 My AI publish flow
-Blocked on: nothing. Later: the founder's A5 safety sign-off, the embedding choice (B6), the real model for B1's model check and finding 13 (gateway)
+Working on: A5 (safety check after acknowledgment), PR #489. Last done: A7 (frames), #482
+Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482, A5 #489
+Next: B8 (My AI publish flow), B7 (consent text), B5 (memory, migrations), finding 5; B6 waits on the provider key and the embedding choice
+Blocked on: nothing. Later: the embedding choice (B6), the real model for B1's model check and finding 13 (gateway)
 
 ## Resume here (2026-10-16, B4)
 
@@ -34,6 +34,32 @@ http://127.0.0.1:56499`; publish Maya on the fake first, then restart with the g
 - E3B.4 needs the backend's OpenAI-host calls routed through its recording edge: rebuild with
   `sh tests/scenarios/lane-3/fresh-stack.sh --env QELVORA_FAKE_MODEL_URL=http://127.0.0.1:56438`
   (port 56438 is lane 3's; the scenario opens the edge itself and forwards to the fake on 56433).
+
+## A5: the model's safety check leaves the path before acknowledgment
+
+A fan's message is acknowledged after the synchronous check (`needsImmediateSafety`, which still
+answers its phrases at once with the fixed safety response). The model's check no longer runs before
+a message the AI will answer: the worker's classifier is that answer's first step and answers a
+crisis with the fixed safety response before anything else, as a free outcome. A message that would
+be refused (a reply already running, a human takeover, a paused AI, no allowance, AI unavailable)
+gets the model's check before the refusal, so safety never depends on access (INV-19). No SQL,
+engine or copy change.
+
+A5 scenario (`a5-ack-safety.mjs`, a scripted model edge whose classifier calls one hidden phrase a
+crisis that the synchronous check does not see), fresh stack each, model fake at 300 ms, load 10 to 13:
+
+| Case                                                    | Main                            | A5                                                                          |
+| ------------------------------------------------------- | ------------------------------- | --------------------------------------------------------------------------- |
+| Ordinary message acknowledged, p50 / p95                | 636 / 725 ms                    | 248 / 562 ms                                                                |
+| Crisis only the model recognises (fan will be answered) | safety response at ack (349 ms) | ack 159 ms, safety response first and alone at 3.35 s, reservation released |
+| Same, a reply already running (refused)                 | safety response                 | safety response                                                             |
+| Same, during a human takeover (refused)                 | safety response                 | safety response                                                             |
+| Crisis the synchronous check recognises                 | at ack, 190 ms, no generation   | at ack, 201 ms, no generation                                               |
+
+- The trade the founder's sign-off was about: a crisis only the model recognises now gets its safety
+  response about 3 s after the acknowledgment (the worker's first step) instead of at it; nothing
+  else is shown before it and it costs the fan nothing. Typecheck, format and generate checks pass;
+  backend suite 157 of 157.
 
 ## A7: the web thread paints sentences from their frames (contract C5)
 
@@ -284,6 +310,9 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
 
 ## Decisions
 
+- 2026-10-16, founder (proposed default, A5 safety sign-off): the model's safety check leaves the path
+  before acknowledgment for a message the AI will answer (the worker's classifier answers a crisis
+  first, free); a message that would be refused gets the check before the refusal (INV-19).
 - 2026-10-16, founder (proposed default, B1): the AI never states a price, also not one from the
   creator's own materials; an amount that is not a price ("$5 plus $3 is $8") is allowed. A fan in
   distress gets the existing safety refusal "I’m an AI. I can’t help with that here." instead of the
@@ -321,7 +350,9 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
    (`modules/agent/runtime.ts:282`), while the API schema allows 10,000. A 4xx other than 403 and a
    matching schema limit would be clearer. B9.
 5. The realtime gateway closed the fan's socket with 1013 about every 8 to 10 s during replies
-   (2-second authority deadline); a client must reconnect from its cursor. A7.
+   (2-second authority deadline); a client must reconnect from its cursor. A7. 2026-10-16: not
+   the replay's share lock on the thread row (replaying without it: closes 6 to 5, worker thread-lock
+   errors 10 to 12 over 20 answers); cause still open, the experiment is an unpushed local branch.
 6. The worker's `FOR UPDATE NOWAIT` on the thread row collides with the API's thread reads
    ("could not obtain lock on row in relation thread", several per run). A6.
 7. Any authority change while the model is streaming (takeover, pause, consent withdrawal, licence

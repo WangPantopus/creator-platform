@@ -1040,65 +1040,75 @@ export function conversationFeature(
           if (prior.generationId) feature.afterAcceptance?.(scope);
           return;
         }
-        if (!prior) {
-          const expected = await feature.conversations.safetyCheckpoint(scope);
-          let accepted: AcceptedMessage | null = null;
-          if (needsImmediateSafety(body.text)) {
-            accepted = await feature.conversations.sendSafety(
-              scope,
-              body,
-              expected,
-            );
-          } else if (feature.routeSafety && feature.policyAvailable(scope)) {
-            // A dropped request must not cancel a safety check already sent to
-            // the provider: its cost would stay unknown. The check runs to its
-            // own deadline; a fan who left still has nothing accepted.
-            const left = new AbortController();
-            const requestLeft = () =>
-              new DomainError(
-                "generation_cancelled",
-                "Generation was interrupted.",
-                503,
-              );
-            res.on("close", () => {
-              if (!res.writableEnded) left.abort();
-            });
-            await feature.routeSafety(
-              scope,
-              body.text,
-              AbortSignal.timeout(15000),
-              async (sentence) => {
-                invariant(
-                  sentence.safety === true && sentence.text === crisisText,
-                  "safety_invalid",
-                  "The platform safety response is unavailable.",
-                );
-                if (left.signal.aborted) throw requestLeft();
-                accepted = await feature.conversations.sendSafety(
-                  scope,
-                  body,
-                  expected,
-                );
-              },
-            );
-            if (left.signal.aborted) throw requestLeft();
-          }
-          if (accepted) {
-            feature.afterBoundary?.(scope, accepted.message.controlEpoch);
-            res.json(accepted);
-            return;
-          }
-        }
-        if (
-          !prior &&
-          (!feature.generationAvailable || !feature.policyAvailable(scope))
-        )
-          throw new DomainError(
-            "model_unconfigured",
-            "AI messaging is not connected yet.",
-            503,
+        const expected = await feature.conversations.safetyCheckpoint(scope);
+        const safely = (accepted: AcceptedMessage) => {
+          feature.afterBoundary?.(scope, accepted.message.controlEpoch);
+          res.json(accepted);
+        };
+        if (needsImmediateSafety(body.text))
+          return safely(
+            await feature.conversations.sendSafety(scope, body, expected),
           );
-        const accepted = await feature.conversations.send(scope, body);
+        // The model's safety check, for a message the AI will not answer. A
+        // dropped request must not cancel a check already sent to the
+        // provider: its cost would stay unknown (A6). The check runs to its
+        // own deadline; a fan who left still has nothing accepted.
+        const modelSafety = async () => {
+          if (!feature.routeSafety || !feature.policyAvailable(scope))
+            return null;
+          let accepted: AcceptedMessage | null = null;
+          const left = new AbortController();
+          const requestLeft = () =>
+            new DomainError(
+              "generation_cancelled",
+              "Generation was interrupted.",
+              503,
+            );
+          res.on("close", () => {
+            if (!res.writableEnded) left.abort();
+          });
+          await feature.routeSafety(
+            scope,
+            body.text,
+            AbortSignal.timeout(15000),
+            async (sentence) => {
+              invariant(
+                sentence.safety === true && sentence.text === crisisText,
+                "safety_invalid",
+                "The platform safety response is unavailable.",
+              );
+              if (left.signal.aborted) throw requestLeft();
+              accepted = await feature.conversations.sendSafety(
+                scope,
+                body,
+                expected,
+              );
+            },
+          );
+          if (left.signal.aborted) throw requestLeft();
+          return accepted;
+        };
+        // A5: a message the AI will answer is acknowledged after the
+        // synchronous check above; the worker's classifier runs first and
+        // answers a crisis with the fixed safety response before anything
+        // else. A message that would be refused (no allowance, a takeover, a
+        // paused AI, a reply in progress) gets the model's check before the
+        // refusal, so safety never depends on access (INV-19).
+        let accepted: AcceptedMessage;
+        try {
+          if (!feature.generationAvailable || !feature.policyAvailable(scope))
+            throw new DomainError(
+              "model_unconfigured",
+              "AI messaging is not connected yet.",
+              503,
+            );
+          accepted = await feature.conversations.send(scope, body);
+        } catch (refusal) {
+          const safe =
+            refusal instanceof DomainError ? await modelSafety() : null;
+          if (safe) return safely(safe);
+          throw refusal;
+        }
         res.json(accepted);
         if (accepted.generationId) feature.afterAcceptance?.(scope);
       });
