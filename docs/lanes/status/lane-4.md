@@ -2,7 +2,7 @@
 
 Updated: 2026-10-15 (evening, Pacific time), by the lane 4 session
 
-Working on: nothing in flight. Everything is in the open pull requests below.
+Working on: nothing in flight. Everything is in the open pull requests below. **The next session starts at [`lane-4-handoff.md`](lane-4-handoff.md)**: WP 4.12, the environment to reuse, and the traps.
 
 Open pull requests:
 
