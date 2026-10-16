@@ -7754,7 +7754,8 @@ public struct APIConversationConversationOfflineSnapshotPage: Codable, Sendable 
   public let `canSend`: Bool
   public let `unavailableReason`: String?
   public let `feedbackPolicy`: APIConversationConversationOfflineSnapshotPageFeedbackPolicy?
-  public init(threadId: String, creatorId: String, fanId: String, creatorName: String, fanHandle: String, control: APIConversationConversationOfflineSnapshotPageControl, epoch: Int, cursor: Int, revision: Int, generationSequences: [String: Int], messages: [APIConversationConversationOfflineSnapshotPageMessagesItem], before: Int? = nil, offTheRecord: Bool, introShared: Bool, consentCurrent: Bool, canSend: Bool, unavailableReason: String? = nil, feedbackPolicy: APIConversationConversationOfflineSnapshotPageFeedbackPolicy? = nil) {
+  public let `stepInAvailable`: Bool?
+  public init(threadId: String, creatorId: String, fanId: String, creatorName: String, fanHandle: String, control: APIConversationConversationOfflineSnapshotPageControl, epoch: Int, cursor: Int, revision: Int, generationSequences: [String: Int], messages: [APIConversationConversationOfflineSnapshotPageMessagesItem], before: Int? = nil, offTheRecord: Bool, introShared: Bool, consentCurrent: Bool, canSend: Bool, unavailableReason: String? = nil, feedbackPolicy: APIConversationConversationOfflineSnapshotPageFeedbackPolicy? = nil, stepInAvailable: Bool? = nil) {
     self.threadId = threadId
     self.creatorId = creatorId
     self.fanId = fanId
@@ -7773,6 +7774,7 @@ public struct APIConversationConversationOfflineSnapshotPage: Codable, Sendable 
     self.canSend = canSend
     self.unavailableReason = unavailableReason
     self.feedbackPolicy = feedbackPolicy
+    self.stepInAvailable = stepInAvailable
   }
   private enum CodingKeys: String, CodingKey {
     case `threadId`
@@ -7793,6 +7795,7 @@ public struct APIConversationConversationOfflineSnapshotPage: Codable, Sendable 
     case `canSend`
     case `unavailableReason`
     case `feedbackPolicy`
+    case `stepInAvailable`
   }
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -7814,6 +7817,7 @@ public struct APIConversationConversationOfflineSnapshotPage: Codable, Sendable 
     self.canSend = try container.decode(Bool.self, forKey: .canSend)
     self.unavailableReason = try container.decode(String?.self, forKey: .unavailableReason)
     self.feedbackPolicy = try container.decodeIfPresent(APIConversationConversationOfflineSnapshotPageFeedbackPolicy.self, forKey: .feedbackPolicy)
+    self.stepInAvailable = try container.decodeIfPresent(Bool.self, forKey: .stepInAvailable)
   }
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
@@ -7835,6 +7839,7 @@ public struct APIConversationConversationOfflineSnapshotPage: Codable, Sendable 
     try container.encode(canSend, forKey: .canSend)
     try container.encode(unavailableReason, forKey: .unavailableReason)
     try container.encodeIfPresent(feedbackPolicy, forKey: .feedbackPolicy)
+    try container.encodeIfPresent(stepInAvailable, forKey: .stepInAvailable)
   }
 }
 
@@ -8048,7 +8053,8 @@ public struct APIConversationConversationPage: Codable, Sendable {
   public let `canSend`: Bool
   public let `unavailableReason`: String?
   public let `feedbackPolicy`: APIConversationConversationPageFeedbackPolicy?
-  public init(threadId: String, creatorId: String, fanId: String, creatorName: String, fanHandle: String, control: APIConversationConversationPageControl, epoch: Int, cursor: Int, revision: Int, generationSequences: [String: Int], messages: [APIConversationConversationPageMessagesItem], before: Int? = nil, offTheRecord: Bool, introShared: Bool, consentCurrent: Bool, canSend: Bool, unavailableReason: String? = nil, feedbackPolicy: APIConversationConversationPageFeedbackPolicy? = nil) {
+  public let `stepInAvailable`: Bool?
+  public init(threadId: String, creatorId: String, fanId: String, creatorName: String, fanHandle: String, control: APIConversationConversationPageControl, epoch: Int, cursor: Int, revision: Int, generationSequences: [String: Int], messages: [APIConversationConversationPageMessagesItem], before: Int? = nil, offTheRecord: Bool, introShared: Bool, consentCurrent: Bool, canSend: Bool, unavailableReason: String? = nil, feedbackPolicy: APIConversationConversationPageFeedbackPolicy? = nil, stepInAvailable: Bool? = nil) {
     self.threadId = threadId
     self.creatorId = creatorId
     self.fanId = fanId
@@ -8067,6 +8073,7 @@ public struct APIConversationConversationPage: Codable, Sendable {
     self.canSend = canSend
     self.unavailableReason = unavailableReason
     self.feedbackPolicy = feedbackPolicy
+    self.stepInAvailable = stepInAvailable
   }
   private enum CodingKeys: String, CodingKey {
     case `threadId`
@@ -8087,6 +8094,7 @@ public struct APIConversationConversationPage: Codable, Sendable {
     case `canSend`
     case `unavailableReason`
     case `feedbackPolicy`
+    case `stepInAvailable`
   }
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -8108,6 +8116,7 @@ public struct APIConversationConversationPage: Codable, Sendable {
     self.canSend = try container.decode(Bool.self, forKey: .canSend)
     self.unavailableReason = try container.decode(String?.self, forKey: .unavailableReason)
     self.feedbackPolicy = try container.decodeIfPresent(APIConversationConversationPageFeedbackPolicy.self, forKey: .feedbackPolicy)
+    self.stepInAvailable = try container.decodeIfPresent(Bool.self, forKey: .stepInAvailable)
   }
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
@@ -8129,6 +8138,7 @@ public struct APIConversationConversationPage: Codable, Sendable {
     try container.encode(canSend, forKey: .canSend)
     try container.encode(unavailableReason, forKey: .unavailableReason)
     try container.encodeIfPresent(feedbackPolicy, forKey: .feedbackPolicy)
+    try container.encodeIfPresent(stepInAvailable, forKey: .stepInAvailable)
   }
 }
 

@@ -1235,9 +1235,14 @@ export function ConversationScreen({
             </button>
           </div>
         </form>
-        <Button variant="maya" href={`/commerce/packet?creatorId=${creatorId}`}>
-          Ask {page.creatorName} to step in
-        </Button>
+        {page.stepInAvailable !== false && (
+          <Button
+            variant="maya"
+            href={`/commerce/packet?creatorId=${creatorId}`}
+          >
+            Ask {page.creatorName} to step in
+          </Button>
+        )}
         <div className="conversation-actions">
           <a href={`/you?creatorId=${creatorId}&fanId=${fanId}`}>
             Me and privacy

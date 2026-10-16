@@ -26699,6 +26699,9 @@
                     "type": "null"
                   }
                 ]
+              },
+              "stepInAvailable": {
+                "type": "boolean"
               }
             },
             "required": [
@@ -27289,6 +27292,9 @@
                 "type": "null"
               }
             ]
+          },
+          "stepInAvailable": {
+            "type": "boolean"
           }
         },
         "required": [

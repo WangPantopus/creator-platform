@@ -176,7 +176,7 @@ export function watchFrames(token, fanId) {
 /** Publish Maya's AI through the real Studio API (as Maya) when it is not live.
  * The stack's own seed uses a $5 daily cap, which the Claude adapter's cost
  * hold exceeds (lane 3 finding), so this takes the cap as a fixture choice. */
-export async function ensureMaya(capMicros) {
+export async function ensureMaya(capMicros, overrides = {}) {
   const agent = `/v1/agent/${MAYA_CREATOR_ID}`;
   const { token } = await signIn(API, ACTORS.maya, "/studio/ai");
   const read = async () =>
@@ -202,6 +202,7 @@ export async function ensureMaya(capMicros) {
     sessionNudgeMinutes: 90,
     usefulnessCriteria: "Helpful, specific and honest about being an AI.",
     styleCriteria: "Warm, plain and short.",
+    ...overrides,
   };
   const must = (reply, status, what) => {
     if (reply.status !== status)
