@@ -1,8 +1,8 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-16, by the lane 3 session
-Working on: B4 (retrieval), PR B4_PR, draft until the founder decides its engine revision
-Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 B4_PR
+Working on: B4 (retrieval), PR #468, draft until the founder decides its engine revision
+Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468
 Next: after B4, the founder picks; remaining: A5 (safety sign-off), A7 (C5 frames), B1 (price rule), B3 citations, B5 memory, B7 consent text, B8 My AI publish flow
 Blocked on: the founder's decision on B4's engine revision (proposed default below). Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
 
