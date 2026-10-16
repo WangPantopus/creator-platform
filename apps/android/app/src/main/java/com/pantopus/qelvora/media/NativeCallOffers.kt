@@ -241,7 +241,7 @@ private fun NativeCallOffers(baseURL: String?, model: FanSession) {
             val zone = value.getString("fanTimeZone"); val slots = value.getJSONArray("slots")
             for (index in 0 until slots.length()) {
                 val slot = slots.getJSONObject(index); val id = slot.getString("id")
-                Button(display(slot.getString("startsAt"), zone) + if (chosen == id) " · Selected" else "", ButtonVariant.SECONDARY, block = true, disabled = busy || deadline?.current() != true || !canSelect || (offerDate(slot.getString("startsAt")) ?: 0) <= now) { chosen = id }
+                Button(if (chosen == id) QelvoraCopy.text("nativeTimeSelected", mapOf("time" to display(slot.getString("startsAt"), zone))) else display(slot.getString("startsAt"), zone), ButtonVariant.SECONDARY, block = true, disabled = busy || deadline?.current() != true || !canSelect || (offerDate(slot.getString("startsAt")) ?: 0) <= now) { chosen = id }
             }
             BasicText(QelvoraCopy.text("w6YourTime", mapOf("value1" to (zone).toString())), style = qText("caption").copy(color = qColor("ink-muted")))
             BasicText(QelvoraCopy.text("w6CreatorSTimeZone", mapOf("value1" to (value.getString("creatorTimeZone")).toString())), style = qText("caption").copy(color = qColor("ink-muted")))

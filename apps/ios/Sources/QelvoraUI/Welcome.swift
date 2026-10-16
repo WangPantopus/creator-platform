@@ -93,3 +93,26 @@ public struct Welcome: View {
         }
     }
 }
+
+/// The designed under-18 state (D-11): the policy and nothing else. No session
+/// exists and no part of the app opens from here, as on the web.
+public struct AdultsOnly: View {
+    @Environment(\.colorScheme) private var scheme
+    public init() {}
+    public var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: QelvoraTokens.token("welcome-gap")) {
+                Text(QelvoraCopy.brandName)
+                    .font(QelvoraFonts.font("serif", size: QelvoraTokens.token("welcome-wordmark"), italic: true))
+                Text(QelvoraCopy.text("adultOnlyTitle")).qText("display-lg").accessibilityAddTraits(.isHeader)
+                Text(QelvoraCopy.text("adultOnlyBody")).qText("body").foregroundStyle(qColor("ink-muted", scheme))
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, QelvoraTokens.token("space-6"))
+            .padding(.top, QelvoraTokens.token("welcome-top"))
+        }
+        .foregroundStyle(qColor("ink", scheme))
+        .background(qColor("ground", scheme))
+        .task { QelvoraFonts.register() }
+    }
+}

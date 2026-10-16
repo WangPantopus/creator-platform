@@ -7,6 +7,13 @@ import { Failure } from "../http.mjs";
 import { addMessage, copy, frame, ids, uid } from "../world.mjs";
 import { authenticate } from "./identity.mjs";
 
+const COMPARISON_POLICY = {
+  version: "comparison-fake-1",
+  notice:
+    "Synthetic comparison notice (lane 7 fake API): a general version of a question you choose may be compared across AI providers.",
+  processorPolicyVersion: "processors-fake-1",
+};
+
 const invalid = () =>
   new Failure(
     400,
@@ -126,9 +133,12 @@ function generate(world, thread, fanMessage, generationId) {
   const step = () => {
     if (thread.generation?.id !== generationId) return;
     if (thread.generation.sequence < sentences.length) {
-      const sentence = sentences[thread.generation.sequence];
+      // As the server writes it (C5): the message grows by exactly the frame's
+      // text, so a later sentence carries its own leading space.
+      const sentence =
+        (ai.text ? " " : "") + sentences[thread.generation.sequence];
       thread.generation.sequence += 1;
-      ai.text += (ai.text ? " " : "") + sentence;
+      ai.text += sentence;
       frame(
         thread,
         "sentence",
@@ -228,7 +238,7 @@ export function register(router) {
     generationAvailable: world.generationAvailable,
     firstConversationAvailable: true,
     correctionsAvailable: false,
-    comparisonsAvailable: false,
+    comparisonsAvailable: world.comparisonsAvailable,
     recordingDeliveryAvailable: false,
     offlineAvailable: world.policy.verified,
     accessDisclosure: copy("conversationAccess"),
@@ -342,6 +352,30 @@ export function register(router) {
           "This message is unavailable.",
         );
       return message;
+    },
+  );
+
+  // WP 7.4 P4: a cited passage, as the real route answers it: only an id that
+  // this thread's messages cite and whose post is still published; anything
+  // else gets the real refusal (403 citation_unavailable).
+  router.add(
+    "GET",
+    "/v1/conversations/:creatorId/:fanId/citations/:id",
+    (ctx) => {
+      const { thread } = ownThread(ctx);
+      const cited = thread.messages.some((m) =>
+        m.citations?.includes(ctx.params.id),
+      );
+      const post = ctx.world.creators
+        .get(thread.creatorId)
+        ?.posts?.find((p) => p.id === ctx.params.id && p.state === "published");
+      if (!cited || !post)
+        throw new Failure(
+          403,
+          "citation_unavailable",
+          "No longer accessible to you",
+        );
+      return { id: post.id, title: post.title, text: post.body };
     },
   );
 
@@ -559,6 +593,69 @@ export function register(router) {
     thread.revision += 1;
     return { consentCurrent: accepted };
   });
+
+  // AI comparisons (WP 7.4 P11). As in feature.ts, the switch is checked before
+  // the thread: while comparisons are off every call is refused with the same
+  // code and sentence the real server sends.
+  const comparison = (ctx) => {
+    if (!ctx.world.comparisonsAvailable)
+      throw new Failure(
+        403,
+        "comparison_unavailable",
+        "AI comparisons are not available yet.",
+      );
+    const { thread } = ownThread(ctx);
+    thread.comparison ??= {
+      allowed: false,
+      consentedAt: null,
+      expiresAt: null,
+    };
+    return thread;
+  };
+  const comparisonState = (thread) => ({
+    policy: COMPARISON_POLICY,
+    ...thread.comparison,
+  });
+  router.add(
+    "GET",
+    "/v1/conversations/:creatorId/:fanId/comparison-consent",
+    (ctx) => comparisonState(comparison(ctx)),
+  );
+  router.add(
+    "POST",
+    "/v1/conversations/:creatorId/:fanId/comparison-consent",
+    (ctx) => {
+      const thread = comparison(ctx);
+      const { action, policyVersion, consent } = ctx.body ?? {};
+      if (action === "withdraw")
+        thread.comparison = {
+          allowed: false,
+          consentedAt: null,
+          expiresAt: null,
+        };
+      else if (
+        action === "allow" &&
+        consent === true &&
+        policyVersion === COMPARISON_POLICY.version
+      ) {
+        const now = ctx.world.now();
+        thread.comparison = {
+          allowed: true,
+          consentedAt: new Date(now).toISOString(),
+          expiresAt: new Date(now + 180 * 86_400_000).toISOString(),
+        };
+      } else throw invalid();
+      return comparisonState(thread);
+    },
+  );
+  router.add(
+    "POST",
+    "/v1/conversations/:creatorId/:fanId/messages/:id/comparison",
+    (ctx) => {
+      const thread = comparison(ctx);
+      return { included: thread.comparison.allowed };
+    },
+  );
 
   router.add("GET", "/v1/conversations/:creatorId/:fanId/audit", (ctx) => {
     const { thread } = ownThread(ctx);

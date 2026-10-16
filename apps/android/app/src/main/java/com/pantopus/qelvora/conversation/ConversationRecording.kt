@@ -147,7 +147,7 @@ internal fun ConversationRecordingPlayer(baseURL: String, session: FanSession, d
                 if (currentActive && revision == attempt && player === current && client === api) checkedAt = started
             } catch (error: Exception) {
                 if (error is CancellationException) throw error
-                if (revision == attempt && player === current && client === api) { clear(); failure = "This recording is unavailable. Reopen the conversation to try again." }
+                if (revision == attempt && player === current && client === api) { clear(); failure = QelvoraCopy.text("nativeThisRecordingIsUnavailableReopen") }
             }
             delay(1000)
         }
@@ -156,9 +156,9 @@ internal fun ConversationRecordingPlayer(baseURL: String, session: FanSession, d
         if (!active) return@LaunchedEffect
         while (isActive) {
             val api = client
-            if (api != null && !api.isCurrent() && client === api) { clear(); failure = "Your session changed. Load this recording again." }
-            if (player != null && !fresh()) { clear(); failure = "This recording is unavailable. Reopen the conversation to try again." }
-            if (prepared) player?.let { current -> runCatching { position = current.currentPosition.toLong().coerceIn(0L, asset.durationMs ?: 0); playing = current.isPlaying }.onFailure { clear(); failure = "Playback could not continue. Try again." } }
+            if (api != null && !api.isCurrent() && client === api) { clear(); failure = QelvoraCopy.text("nativeYourSessionChangedLoadThisRecording") }
+            if (player != null && !fresh()) { clear(); failure = QelvoraCopy.text("nativeThisRecordingIsUnavailableReopen") }
+            if (prepared) player?.let { current -> runCatching { position = current.currentPosition.toLong().coerceIn(0L, asset.durationMs ?: 0); playing = current.isPlaying }.onFailure { clear(); failure = QelvoraCopy.text("nativePlaybackCouldNotContinueTryAgain") } }
             delay(500)
         }
     }
@@ -170,12 +170,12 @@ internal fun ConversationRecordingPlayer(baseURL: String, session: FanSession, d
             try {
                 if (client?.isCurrent() != true) {
                     discardBytes(); client = null; revision += 1; attempt = revision
-                    val capture = session.captureRequest(destination, maximumResponseBytes = 1_048_576, timeoutMs = 4000) ?: error("Your session ended.")
+                    val capture = session.captureRequest(destination, maximumResponseBytes = 1_048_576, timeoutMs = 4000) ?: error(QelvoraCopy.text("nativeYourSessionEnded"))
                     check(capture.expectedAccountId == accountId); ensureActive()
                     if (!currentActive || revision != attempt) return@launch
                     client = RecordingClient(URI(baseURL), capture, creatorId, fanId)
                 }
-                val api = client ?: error("Your session ended.")
+                val api = client ?: error(QelvoraCopy.text("nativeYourSessionEnded"))
                 val current = player; val file = proof
                 if (current != null && file != null && prepared) {
                     val started = api.assertCurrent(asset, file)
@@ -202,7 +202,7 @@ internal fun ConversationRecordingPlayer(baseURL: String, session: FanSession, d
                         val currentCapture = api.isCurrent()
                         if (revision == attempt && player === next && client === api) {
                             if (currentCapture && currentActive && fresh()) {
-                                runCatching { check(next.duration > 0); prepared = true; next.start(); playing = true; loading = false }.onFailure { clear(); failure = "Playback could not start. Try again." }
+                                runCatching { check(next.duration > 0); prepared = true; next.start(); playing = true; loading = false }.onFailure { clear(); failure = QelvoraCopy.text("w6PlaybackCouldNotStartTryAgain") }
                             } else clear()
                         } else runCatching { next.release() }
                     }
@@ -218,13 +218,13 @@ internal fun ConversationRecordingPlayer(baseURL: String, session: FanSession, d
                 next.setOnErrorListener { _, _, _ ->
                     scope.launch {
                         val currentCapture = api.isCurrent()
-                        if (revision == attempt && player === next && client === api) { clear(); failure = if (currentCapture && currentActive) "Playback could not start. Try again." else "Your session changed. Load this recording again." }
+                        if (revision == attempt && player === next && client === api) { clear(); failure = if (currentCapture && currentActive) QelvoraCopy.text("w6PlaybackCouldNotStartTryAgain") else QelvoraCopy.text("nativeYourSessionChangedLoadThisRecording") }
                     }; true
                 }
                 next.prepareAsync()
             } catch (error: Exception) {
                 if (error is CancellationException) throw error
-                if (revision == attempt) { clear(); failure = "Audio access could not be confirmed. Try again." }
+                if (revision == attempt) { clear(); failure = QelvoraCopy.text("nativeAudioAccessCouldNotBeConfirmed") }
             } finally { pendingBytes?.fill(0); if (revision == attempt) { load = null; if (player == null || prepared) loading = false } }
         }
     }
@@ -232,10 +232,10 @@ internal fun ConversationRecordingPlayer(baseURL: String, session: FanSession, d
     Column {
         VoiceNote(name = name, time = time, duration = elapsed(asset.durationMs ?: 0), playing = playing, playbackAvailable = active && !loading,
             waveform = asset.waveform, position = position.toDouble() / maxOf(1L, asset.durationMs ?: 0), onVerify = onVerify, onPlayPause = { command() })
-        BasicText(if (loading) "Loading recording…" else elapsed(position), style = qText("data-sm").copy(color = qColor("ink")))
+        BasicText(if (loading) QelvoraCopy.text("nativeLoadingRecording") else elapsed(position), style = qText("data-sm").copy(color = qColor("ink")))
         if (prepared) {
-            Button("Back 10 seconds", ButtonVariant.QUIET, disabled = !active || loading) { command(-10_000) }
-            Button("Forward 10 seconds", ButtonVariant.QUIET, disabled = !active || loading) { command(10_000) }
+            Button(QelvoraCopy.text("nativeBack10Seconds"), ButtonVariant.QUIET, disabled = !active || loading) { command(-10_000) }
+            Button(QelvoraCopy.text("nativeForward10Seconds"), ButtonVariant.QUIET, disabled = !active || loading) { command(10_000) }
         }
         if (failure.isNotEmpty()) BasicText(failure, style = qText("caption").copy(color = qColor("ink")))
     }
