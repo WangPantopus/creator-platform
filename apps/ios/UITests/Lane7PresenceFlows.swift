@@ -87,14 +87,12 @@ final class Lane7PresenceFlows: XCTestCase {
         return target
     }
 
+    /// Every row of the thread exists for XCUITest (a plain stack), so a row
+    /// that is nowhere in the tree is absent from the whole thread. A row on
+    /// its way out gets a few seconds.
     private func absent(_ contains: String) -> Bool {
-        let target = element(contains)
-        for direction in [true, false] {
-            for _ in 0..<30 {
-                if target.exists { return false }
-                drag(up: direction)
-            }
-        }
+        let target = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", contains)).firstMatch
+        for _ in 0..<12 where target.exists { usleep(250_000) }
         return !target.exists
     }
 
