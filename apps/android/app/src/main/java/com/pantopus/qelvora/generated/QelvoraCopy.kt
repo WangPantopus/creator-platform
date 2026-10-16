@@ -1100,7 +1100,17 @@ object QelvoraCopy {
     "growthImpactPeopleHelped" to "You helped {people} people this week.",
     "growthImpactThankYou" to "A THANK-YOU, SHARED WITH PERMISSION",
     "growthImpactWeekCounts" to "Counts are for this week only. Fans are never named here without their consent.",
-    "growthImpactNotAvailable" to "No weekly digest is available yet."
+    "growthImpactNotAvailable" to "No weekly digest is available yet.",
+    "creatorAiFaqTitle" to "QUESTIONS FANS ASK YOU",
+    "creatorAiFaqIntro" to "Write the questions your fans ask, with the answer you expect. Before a new version replaces the live one, it must answer at least {percent}% of them the way you expect.",
+    "creatorAiFaqQuestion" to "Question",
+    "creatorAiFaqAnswer" to "The answer you expect",
+    "creatorAiFaqAdd" to "Add a question",
+    "creatorAiFaqRemove" to "Remove question {number}",
+    "creatorAiFaqCount" to "{count} of {max} questions",
+    "creatorAiFaqMinimum" to "Write at least {min} to replace the live version.",
+    "creatorAiFaqDuplicate" to "This question is already on the list.",
+    "creatorAiFaqEmpty" to "No questions yet."
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }

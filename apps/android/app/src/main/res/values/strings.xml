@@ -1102,4 +1102,14 @@
   <string name="growth_impact_thank_you" formatted="false">A THANK-YOU, SHARED WITH PERMISSION</string>
   <string name="growth_impact_week_counts" formatted="false">Counts are for this week only. Fans are never named here without their consent.</string>
   <string name="growth_impact_not_available" formatted="false">No weekly digest is available yet.</string>
+  <string name="creator_ai_faq_title" formatted="false">QUESTIONS FANS ASK YOU</string>
+  <string name="creator_ai_faq_intro" formatted="false">Write the questions your fans ask, with the answer you expect. Before a new version replaces the live one, it must answer at least {percent}% of them the way you expect.</string>
+  <string name="creator_ai_faq_question" formatted="false">Question</string>
+  <string name="creator_ai_faq_answer" formatted="false">The answer you expect</string>
+  <string name="creator_ai_faq_add" formatted="false">Add a question</string>
+  <string name="creator_ai_faq_remove" formatted="false">Remove question {number}</string>
+  <string name="creator_ai_faq_count" formatted="false">{count} of {max} questions</string>
+  <string name="creator_ai_faq_minimum" formatted="false">Write at least {min} to replace the live version.</string>
+  <string name="creator_ai_faq_duplicate" formatted="false">This question is already on the list.</string>
+  <string name="creator_ai_faq_empty" formatted="false">No questions yet.</string>
 </resources>
