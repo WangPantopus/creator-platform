@@ -141,19 +141,20 @@ public struct Note: View {
     public var reply: Bool
     public var replyId: String
     public var retracted: Bool
+    public var label: String?
     public var onVerify: () -> Void
     @State private var replyText = ""
     @Environment(\.colorScheme) private var scheme
 
-    public init(children: String, name: String = "Maya", audience: String = "Kiln Club members", audienceSize: String? = nil, time: String? = nil, media: String? = nil, reply: Bool = true, replyId: String = "qelvora-note-reply", retracted: Bool = false, onVerify: @escaping () -> Void = {}) {
-        self.children = children; self.name = name; self.audience = audience; self.audienceSize = audienceSize; self.time = time; self.media = media; self.reply = reply; self.replyId = replyId; self.retracted = retracted; self.onVerify = onVerify
+    public init(children: String, name: String = "Maya", audience: String = "Kiln Club members", audienceSize: String? = nil, time: String? = nil, media: String? = nil, reply: Bool = true, replyId: String = "qelvora-note-reply", retracted: Bool = false, label: String? = nil, onVerify: @escaping () -> Void = {}) {
+        self.children = children; self.name = name; self.audience = audience; self.audienceSize = audienceSize; self.time = time; self.media = media; self.reply = reply; self.replyId = replyId; self.retracted = retracted; self.label = label; self.onVerify = onVerify
     }
     public var body: some View {
         if retracted {
             Text(QelvoraCopy.text("noteRemoved", values: ["name": name])).qText("label").foregroundStyle(qColor("ink-muted", scheme)).padding(QelvoraTokens.token("message-padding")).frame(maxWidth: .infinity, alignment: .leading).overlay(RoundedRectangle(cornerRadius: QelvoraTokens.token("space-4")).stroke(qColor("line", scheme), style: StrokeStyle(lineWidth: 1, dash: [QelvoraTokens.token("space-1")])))
         } else {
             VStack(spacing: 0) {
-                AuthorLabel(kind: .humanBroadcast, name: name, audience: audience, time: time, onMaya: true)
+                AuthorLabel(kind: .humanBroadcast, name: name, audience: audience, time: time, onMaya: true, label: label)
                     .padding(.leading, QelvoraTokens.token("space-4"))
                     .padding(.trailing, QelvoraTokens.token("welcome-bottom"))
                     .padding(.vertical, QelvoraTokens.textStyles["label"]!.size)

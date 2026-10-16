@@ -315,15 +315,18 @@ public struct SystemLine: View {
 
 public struct ReactionChip: View {
   public var name: String
+  /// The server's label (C4 `authorLabel`), shown verbatim when present.
+  public var label: String?
   @Environment(\.colorScheme) private var scheme
-  public init(name: String = "Maya") { self.name = name }
+  public init(name: String = "Maya", label: String? = nil) { self.name = name; self.label = label }
   public var body: some View {
     HStack(spacing: QelvoraTokens.token("author-gap")) {
       ThreadPlateSeal(initial: String(name.prefix(1)), size: QelvoraTokens.token("seal-reaction"))
       QelvoraGlyph(
         name: "heart", size: QelvoraTokens.token("glyph-caption"),
         color: qColor("maya-accent", scheme))
-      Text(QelvoraCopy.text("reaction", values: ["name": name])).qText("caption", weight: .semibold)
+      Text(label ?? QelvoraCopy.text("reaction", values: ["name": name])).qText(
+        "caption", weight: .semibold)
     }.foregroundStyle(qColor("on-maya", scheme)).padding(.leading, QelvoraTokens.token("space-1"))
       .padding(.trailing, QelvoraTokens.token("space-3")).padding(
         .vertical, QelvoraTokens.token("space-1")

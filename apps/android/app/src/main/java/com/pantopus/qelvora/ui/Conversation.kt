@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -89,14 +90,15 @@ fun Message(kind: MessageKind = MessageKind.AI, children: String = "", name: Str
 }
 
 @Composable
-fun Note(children: String, name: String = "Maya", audience: String = "Kiln Club members", audienceSize: String? = null, time: String? = null, media: String? = null, reply: Boolean = true, replyId: String = "qelvora-note-reply", retracted: Boolean = false, onVerify: () -> Unit = {}) {
+fun Note(children: String, name: String = "Maya", audience: String = "Kiln Club members", audienceSize: String? = null, time: String? = null, media: String? = null, reply: Boolean = true, replyId: String = "qelvora-note-reply", retracted: Boolean = false, label: String? = null, onVerify: () -> Unit = {}) {
     var replyText by remember { mutableStateOf("") }
     val shape = RoundedCornerShape(QelvoraTokens.space4, QelvoraTokens.radiusTail, QelvoraTokens.space4, QelvoraTokens.space4)
     if (retracted) { BasicText(QelvoraCopy.text("noteRemoved", mapOf("name" to name)), Modifier.fillMaxWidth().dashedBorder(qColor("line"), QelvoraTokens.radiusLg).padding(QelvoraTokens.messagePadding), qText("label").copy(color = qColor("ink-muted"))); return }
     val ground = qColor("ground"); val foldInk = androidx.compose.ui.graphics.Color.White.copy(alpha = QelvoraTokens.noteFoldOpacity)
     Box(Modifier.fillMaxWidth().qShadow("shadow-plate", QelvoraTokens.space4).clip(shape).background(qColor("maya-surface"))) {
         Column {
-            Box(Modifier.fillMaxWidth().padding(start = QelvoraTokens.space4, end = QelvoraTokens.welcomeBottom, top = QelvoraTokens.authorLabelSize, bottom = QelvoraTokens.authorLabelSize)) { AuthorLabel(AuthorKind.HUMAN_BROADCAST, name, audience, time = time, onMaya = true) }
+            // The head's hairline rule, as the web Note (.qv-note__head) and iOS draw it.
+            Box(Modifier.fillMaxWidth().drawBehind { val rule = QelvoraTokens.hairline.toPx(); drawLine(androidx.compose.ui.graphics.Color.White.copy(alpha = QelvoraTokens.capacityRuleOpacity), Offset(0f, size.height - rule / 2), Offset(size.width, size.height - rule / 2), rule) }.padding(start = QelvoraTokens.space4, end = QelvoraTokens.welcomeBottom, top = QelvoraTokens.authorLabelSize, bottom = QelvoraTokens.authorLabelSize)) { AuthorLabel(AuthorKind.HUMAN_BROADCAST, name, audience, time = time, onMaya = true, label = label) }
             Column(Modifier.fillMaxWidth().padding(QelvoraTokens.space4), verticalArrangement = Arrangement.spacedBy(QelvoraTokens.messagePadding)) {
                 BasicText(children, style = qText("voice-lg").copy(color = qColor("on-maya")))
                 if (media != null) Row(Modifier.fillMaxWidth().height(QelvoraTokens.noteMediaHeight).dashedBorder(androidx.compose.ui.graphics.Color.White.copy(alpha = QelvoraTokens.noteMediaOpacity), QelvoraTokens.segmentRadius), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) { Glyph("image", QelvoraTokens.limitRadioSize, qColor("on-maya-muted")); Spacer(Modifier.width(QelvoraTokens.space2)); BasicText(media, style = qText("label").copy(color = qColor("on-maya-muted"))) }

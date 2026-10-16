@@ -3,7 +3,9 @@
 // the world (faults, clock, model switch, the creator showing up). The real
 // API has none of it.
 import { Failure } from "../http.mjs";
-import { addMessage, copy, seed } from "../world.mjs";
+import { randomUUID } from "node:crypto";
+import { addMessage, copy, publishNote, react, seed } from "../world.mjs";
+import { presenceItem } from "./content.mjs";
 import { sendToAi } from "./conversation.mjs";
 
 const ID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gu;
@@ -123,6 +125,23 @@ export function register(router) {
       account: world.accounts.get(n.accountId).key,
       read: n.readAt !== null,
     })),
+    // C4 presence, by creator: what each account may currently see.
+    presence: [...world.presence.entries()].map(([creatorId, p]) => ({
+      creator: world.creators.get(creatorId).handle,
+      notes: p.notes.length,
+      published: p.notes.filter((n) => n.published).length,
+      visible: Object.fromEntries(
+        [...world.accounts.values()].map((a) => [
+          a.key,
+          p.notes.filter((n) => n.published && n.visibleTo.has(a.id)).length,
+        ]),
+      ),
+      reactions: p.reactions.map((r) => ({
+        id: r.id,
+        account: world.accounts.get(r.fanAccountId).key,
+        replyAvailable: r.replyAvailable,
+      })),
+    })),
     threads: [...world.threads.values()].map((t) => ({
       creator: world.creators.get(t.creatorId).handle,
       account: world.accounts.get(t.fanAccountId).key,
@@ -182,26 +201,65 @@ export function register(router) {
     return { ok: true };
   });
 
-  // The person shows up in a thread while it is open.
-  const first = (thread) => thread.creatorName;
-  router.add("POST", "/__harness/threads/:handle/note", (ctx) =>
-    addMessage(
-      ctx.world,
-      threadOf(ctx),
-      "human_broadcast",
-      String(ctx.body?.text ?? "A new Note: the glaze clinic moved to 6pm."),
-      {},
-    ),
-  );
+  // The person shows up. A Note or a reaction is never a thread message (C4):
+  // it is published once and the thread reads it from /v1/content/.../presence,
+  // so nothing is pushed to an open screen.
+  router.add("POST", "/__harness/threads/:handle/note", (ctx) => {
+    const thread = threadOf(ctx);
+    const creator = ctx.world.creators.get(thread.creatorId);
+    const note = publishNote(ctx.world, creator, {
+      text: String(
+        ctx.body?.text ?? "A new Note: the glaze clinic moved to 6pm.",
+      ),
+      audience: ctx.body?.audience,
+      visibleTo: ctx.body?.visible === false ? [] : [thread.fanAccountId],
+    });
+    return presenceItem(creator, note);
+  });
+  // Maya reacts to the fan's own reply to her newest Note that fan may see.
   router.add("POST", "/__harness/threads/:handle/reaction", (ctx) => {
     const thread = threadOf(ctx);
-    return addMessage(
-      ctx.world,
-      thread,
-      "human_reaction",
-      copy("reaction", { name: first(thread) }),
-      {},
+    const creator = ctx.world.creators.get(thread.creatorId);
+    const note = ctx.world.presence
+      .get(creator.id)
+      ?.notes.filter((n) => n.visibleTo.has(thread.fanAccountId))
+      .at(-1);
+    if (!note)
+      throw new Failure(404, "harness_no_note", "No Note this fan may see.");
+    const account = ctx.world.accounts.get(thread.fanAccountId);
+    return presenceItem(
+      creator,
+      react(ctx.world, creator, note, account, {
+        reaction: ctx.body?.reaction,
+      }),
     );
+  });
+  // Eligibility changes take effect on the next read (the fan leaves a tier,
+  // a Note is withdrawn, a reply is withdrawn), as on the real server.
+  router.add("POST", "/__harness/threads/:handle/presence", (ctx) => {
+    const thread = threadOf(ctx);
+    const presence = ctx.world.presence.get(thread.creatorId);
+    if (!presence) throw new Failure(404, "harness_no_presence", "No Notes.");
+    let changed = 0;
+    for (const note of presence.notes) {
+      if (ctx.body?.noteId && note.id !== ctx.body.noteId) continue;
+      if (typeof ctx.body?.visible === "boolean") {
+        if (ctx.body.visible) note.visibleTo.add(thread.fanAccountId);
+        else note.visibleTo.delete(thread.fanAccountId);
+        changed += 1;
+      }
+      if (typeof ctx.body?.published === "boolean") {
+        note.published = ctx.body.published;
+        changed += 1;
+      }
+    }
+    if (typeof ctx.body?.replyAvailable === "boolean")
+      for (const reaction of presence.reactions)
+        if (reaction.fanAccountId === thread.fanAccountId) {
+          reaction.replyAvailable = ctx.body.replyAvailable;
+          changed += 1;
+        }
+    return { changed };
   });
   router.add("POST", "/__harness/threads/:handle/reply", (ctx) =>
     addMessage(
@@ -261,5 +319,25 @@ export function register(router) {
       thread.consentVersion = ctx.world.policy.version;
     thread.revision += 1;
     return { ok: true };
+  });
+  // A deleted/recreated conversation keeps its route but has a new physical
+  // identity. Used with the app stopped; it must never inherit the old draft.
+  router.add("POST", "/__harness/threads/:handle/recreate", (ctx) => {
+    const thread = threadOf(ctx);
+    if (thread.listeners.size || thread.generation)
+      throw new Failure(
+        409,
+        "harness_thread_active",
+        "Stop the app and generation first.",
+      );
+    thread.id = randomUUID();
+    thread.messages = [];
+    thread.frames = [];
+    thread.idempotency.clear();
+    thread.memory = [];
+    thread.cursor = 0;
+    thread.epoch = 0;
+    thread.revision = 1;
+    return { id: thread.id };
   });
 }

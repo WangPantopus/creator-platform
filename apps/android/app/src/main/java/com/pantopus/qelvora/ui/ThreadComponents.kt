@@ -114,9 +114,9 @@ fun SystemLine(text: String = "", variant: SystemLineVariant = SystemLineVariant
 }
 
 @Composable
-fun ReactionChip(name: String = "Maya") {
+fun ReactionChip(name: String = "Maya", label: String? = null) {
     Row(Modifier.background(qColor("maya-surface"), CircleShape).padding(start = T.authorGap, end = T.space3, top = T.authorGap, bottom = T.authorGap), horizontalArrangement = Arrangement.spacedBy(T.space2), verticalAlignment = Alignment.CenterVertically) {
-        Seal(name.take(1), T.glyphSize, onMaya = true); Glyph("heart", T.authorLabelSize + T.hairline, qColor("maya-accent")); TextLine(copy("reaction", "name" to name), "caption", "on-maya", true)
+        Seal(name.take(1), T.glyphSize, onMaya = true); Glyph("heart", T.authorLabelSize + T.hairline, qColor("maya-accent")); TextLine(label ?: copy("reaction", "name" to name), "caption", "on-maya", true)
     }
 }
 

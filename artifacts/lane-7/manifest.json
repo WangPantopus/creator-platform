@@ -33,5 +33,70 @@
     "path": "artifacts/lane-7/7-2-real-stack-run.txt",
     "sha256": "9ab47923fb823fbaf5c5c27eb0cab3736d0fb8666daaaee8433f7044f2240523",
     "bytes": 3332
+  },
+  {
+    "path": "artifacts/lane-7/7-3-android-deleted-thread.jpg",
+    "sha256": "608c13bf7de443a3dede7fc6d4d443cf34507588df7ec02d9ca5f22734bef218",
+    "bytes": 35256
+  },
+  {
+    "path": "artifacts/lane-7/7-3-android-largest-landscape.jpg",
+    "sha256": "8dbbad1b60158eeb18b600ade0733ca084dfadba749f7f6e97e8a6827b9ac0b8",
+    "bytes": 85163
+  },
+  {
+    "path": "artifacts/lane-7/7-3-android-run.txt",
+    "sha256": "bc7072b3a20297769ab2db7319579950ae92e2782e191af46526b93165b1ddc5",
+    "bytes": 3667
+  },
+  {
+    "path": "artifacts/lane-7/7-3-android-split-landscape.jpg",
+    "sha256": "b20fb55ff19d6dac3e2b73b181720a8774d3819ba155136d6cb5f12dade18114",
+    "bytes": 93641
+  },
+  {
+    "path": "artifacts/lane-7/7-3-gates.txt",
+    "sha256": "e2cbb26dd0df1eff2a73dfd2d79d1491f46e7a8bb7c70f29ea9e4453c3222246",
+    "bytes": 5483
+  },
+  {
+    "path": "artifacts/lane-7/7-3-ios-deleted-thread.jpg",
+    "sha256": "6f7bbf7f72beb68b5d0645749e6a4a60df1acf351ebda7c0ce1170a2cf7e8afd",
+    "bytes": 39340
+  },
+  {
+    "path": "artifacts/lane-7/7-3-ios-largest-landscape.jpg",
+    "sha256": "d52b7470cd9ff433553c8dec943782a6b57b3b71072cae8cf57fb96cf14582e4",
+    "bytes": 90317
+  },
+  {
+    "path": "artifacts/lane-7/7-3-ios-run.txt",
+    "sha256": "2b2d49d6f7e7652fa7da61a97cfeb57d30e6f742ee9e495a9d9e92d366d449c6",
+    "bytes": 4223
+  },
+  {
+    "path": "artifacts/lane-7/7-3-real-stack-run.txt",
+    "sha256": "4bccfaa987f5cd539ee4d434f2a67dd8ee37b13231166f6944ed921be05ab647",
+    "bytes": 7464
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p1-pair-light.jpg",
+    "sha256": "6061c8ca3b9975ece27d5284820c955e0463e565d9fd2222cc031793987b1359",
+    "bytes": 99631
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p1-pair-gray.jpg",
+    "sha256": "c95d25062b2fd6e8008b46d42acb45200718591dff7a1413e6264543fa4a08f5",
+    "bytes": 95308
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p1-largest-night.jpg",
+    "sha256": "ab4189c4e474e4e22570f261f786f51ce14d04937ed08f9fc56d6e1fc2bc40ee",
+    "bytes": 110210
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p1-run.txt",
+    "sha256": "3ff83748da9eb4d0664b867ccba0da77e6b4108e5c0ced891726413d1c0e1a35",
+    "bytes": 3104
   }
 ]
