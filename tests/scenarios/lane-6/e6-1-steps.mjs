@@ -261,7 +261,7 @@ export const steps = [
         name: "reconnect",
         loaded: "REPLIES",
         setMode: "outage",
-        act: (p) => p.clock.runFor(4100), // the next 4-second role check sees the outage
+        act: (p) => p.clock.runFor(4100), // the stream's next check sees the outage
         ready: "Reconnect to Studio",
       },
       {
@@ -269,8 +269,9 @@ export const steps = [
         setMode: "default",
         act: async (p) => {
           await btn(p, "Check connection and roles").click();
-          await p.waitForLoadState("networkidle"); // finish the role check first
-          await p.clock.runFor(4100); // then Notes reads again on its own 4-second check
+          // The live stream answers, then Notes reads once (WP 6.9: no timer).
+          await p.getByText("Reconnect to Studio").waitFor({ state: "hidden" });
+          await p.clock.runFor(4100);
         },
         ready: "REPLIES",
       },

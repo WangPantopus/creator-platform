@@ -2,13 +2,25 @@
 // Passes only when every shot has the same pixels, /api calls, console messages and Tab order,
 // and the polling cadence is exactly the same. Exits 1 and says what differs otherwise.
 // --subset compares only the shots the AFTER run has (for a run limited with --only).
+// --across-6.9 compares a capture from before WP 6.9 (4-second polling) with one after it (the
+// live stream): pixels, console, Tab order and every write must still match exactly; the role
+// check, the badge read and the stream itself are set aside, reads compare as sets, and a read the
+// old timers made that the stream no longer needs is listed as "no longer polled", not a failure.
 import { readFile, writeFile } from "node:fs/promises";
 import { PNG } from "pngjs";
 
 const [before, after] = process.argv
   .slice(2)
   .filter((a) => !a.startsWith("--"));
-const subset = process.argv.includes("--subset");
+const subset = process.argv.includes("--subset"),
+  across = process.argv.includes("--across-6.9");
+// The calls WP 6.9 replaced: the role check and badge (now in the stream) and the stream.
+const replaced =
+  /^GET \/api\/studio\/(?:live(?:\?|$)|session$|[0-9a-f-]{36}\/queue\?filter=all&limit=1$)/u;
+// Reads that only the 4-second timers repeated; the stream asks for them only on a change.
+const polled =
+  /^GET \/api\/(?:content\/[0-9a-f-]{36}\/studio(?:\/replies|\/thanks)?|studio\/[0-9a-f-]{36}\/(?:threads|team)|commerce-approvals\/|conversations\/)/u;
+const polledOnly = [];
 if (!before || !after)
   throw new Error("usage: e6-1-compare.mjs BEFORE_DIR AFTER_DIR");
 const load = async (dir) =>
@@ -23,6 +35,10 @@ const same = (x, y) => JSON.stringify(x) === JSON.stringify(y);
 // are covered by the later shots, where time is paused, and by the polling cadence.
 // Writes (anything but GET) compare in order, exactly.
 const splitCalls = (list, first) => {
+  if (across) {
+    list = list.filter((e) => !replaced.test(e.call));
+    first = true;
+  }
   const line = (e) =>
     JSON.stringify({ ...e, status: e.status === "aborted" ? 200 : e.status });
   const reads = list
@@ -106,7 +122,26 @@ for (const shot of a.shots) {
     if (problem) problems.push(`${shot.key}: screenshot ${problem}`);
     else noisy.push(`${shot.key}: ${noise}`);
   }
-  if (!sameCalls(shot.requests, other.requests, shot.first))
+  let callsMatch = sameCalls(shot.requests, other.requests, shot.first);
+  if (across && !callsMatch) {
+    const [p, q] = [
+      splitCalls(shot.requests, true),
+      splitCalls(other.requests, true),
+    ];
+    const gone = p.reads.filter((r) => !q.reads.includes(r)),
+      added = q.reads.filter((r) => !p.reads.includes(r));
+    if (
+      same(p.writes, q.writes) &&
+      !added.length &&
+      gone.every((r) => polled.test(JSON.parse(r).call))
+    ) {
+      polledOnly.push(
+        `${shot.key}: ${gone.map((r) => JSON.parse(r).call).join(", ")}`,
+      );
+      callsMatch = true;
+    }
+  }
+  if (!callsMatch)
     problems.push(
       `${shot.key}: /api calls differ at ${callDiff(shot.requests, other.requests, shot.first)}`,
     );
@@ -120,7 +155,7 @@ for (const shot of a.shots) {
     );
   if (
     exact &&
-    sameCalls(shot.requests, other.requests, shot.first) &&
+    callsMatch &&
     same(shot.tabs, other.tabs) &&
     same(shot.console, other.console)
   )
@@ -128,8 +163,12 @@ for (const shot of a.shots) {
 }
 for (const key of byKey.keys())
   if (!a.shots.some((s) => s.key === key)) problems.push(`${key}: extra after`);
+if (across)
+  console.log(
+    `cadence over 20 s on Notes (not compared across WP 6.9): before ${JSON.stringify(a.cadence)}, after ${JSON.stringify(b.cadence)}`,
+  );
 for (const [theme, counts] of Object.entries(
-  subset && !b.cadence.light ? {} : a.cadence,
+  across || (subset && !b.cadence.light) ? {} : a.cadence,
 )) {
   for (const call of new Set([
     ...Object.keys(counts),
@@ -146,6 +185,10 @@ console.log(
 if (noisy.length)
   console.log(
     `${noisy.length} shot(s) equal within rendering tolerance (at most 64 pixels, at most 8/255):\n  ${noisy.join("\n  ")}`,
+  );
+if (polledOnly.length)
+  console.log(
+    `${polledOnly.length} shot(s) where only reads the old timers repeated are gone (no longer polled):\n  ${polledOnly.join("\n  ")}`,
   );
 for (const p of problems) console.log(`DIFF ${p}`);
 console.log(

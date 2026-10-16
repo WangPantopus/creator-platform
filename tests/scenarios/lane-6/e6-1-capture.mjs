@@ -116,11 +116,14 @@ async function warmUp() {
     `/studio/${maya}/notes`,
     "/api/platform/identity/session",
     "/api/studio/session",
+    "/api/studio/live",
     `/api/content/${maya}/studio`,
     `/api/commerce-approvals/creators/${maya}/fans/${fan}/drafts`,
     `/api/w6/creators/${maya}/call-availability`,
   ])
-    await fetch(`${web}${path}`, { headers }).catch(() => {});
+    await fetch(`${web}${path}`, { headers })
+      .then((r) => r.body?.cancel()) // the live stream would stay open
+      .catch(() => {});
 }
 await warmUp();
 

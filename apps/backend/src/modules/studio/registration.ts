@@ -3,6 +3,7 @@ import { Router } from "express";
 import { z } from "zod";
 import type { FeatureRegistration } from "../../app.js";
 import type { StudioService } from "./service.js";
+import { studioLive } from "./live.js";
 
 export function studioFeature(service: StudioService): FeatureRegistration {
   return {
@@ -14,6 +15,9 @@ export function studioFeature(service: StudioService): FeatureRegistration {
       router.use(contentActorGuard(actorFor));
       router.get("/session", async (req, res) =>
         res.json(await service.session(await actorFor(req))),
+      );
+      router.get("/live", async (req, res) =>
+        studioLive(service, await actorFor(req), req, res),
       );
       router.post("/invitations/:id/accept", async (req, res) =>
         res.json(

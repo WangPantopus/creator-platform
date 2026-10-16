@@ -3,6 +3,7 @@
 // E6.1 run. Run it with: node --import tsx tests/scenarios/lane-6/fixture-api.mjs
 // Control: GET /__mode?mode=default|empty|outage, GET /__delay?ms=N[&match=regex] (slow answers),
 // GET /__log, GET /__log/clear.
+import { createHash } from "node:crypto";
 import { createServer } from "node:http";
 import { SessionSchema } from "../../../packages/api/src/identity.ts";
 import {
@@ -196,6 +197,98 @@ const routes = [
   ],
   [route("POST", `content/${U}/replies/${U}/(?:read|reaction)`), () => ok()],
 ];
+// Studio's live stream (backend modules/studio/live.ts): every 2 s a frame with a
+// fingerprint of the open screen's reads, answered by the routes above; the stand-in
+// outage ends the stream as a refused check would, and each stream renews at 30 s.
+const answer = (path) => {
+  const url = new URL(`http://x/${path}`);
+  const p = url.pathname.slice(1);
+  for (const [[method, re], handler] of routes) {
+    const m = method === "GET" && p.match(re);
+    if (m) return handler(m, url.searchParams)[1];
+  }
+};
+function liveStream(req, res, q) {
+  const opened = Date.now(),
+    creator = F.studioSession.creators.find((c) => c.id === q.get("creator"));
+  const reads = () => {
+    const c = creator?.id,
+      fan = q.get("fan"),
+      page = new URLSearchParams(
+        [
+          ["filter", q.get("filter")],
+          ["cursor", q.get("cursor")],
+        ].filter(([, v]) => v),
+      );
+    return {
+      notes: [
+        `content/${c}/studio`,
+        ...(creator?.owned || creator?.roles.includes("triage")
+          ? [`content/${c}/studio/replies?${page}`]
+          : []),
+      ],
+      threads: [`studio/${c}/threads`],
+      thread: [
+        `studio/${c}/threads/${fan}`,
+        `studio/${c}/threads/${fan}/draft`,
+      ],
+      team: [`studio/${c}/team`],
+      thanks: [`content/${c}/studio/thanks`],
+    }[q.get("view")];
+  };
+  const frame = (first) => {
+    const t = Date.now() - opened,
+      view = creator && reads();
+    return {
+      t,
+      session: "fixture",
+      ...(first ? { state: F.studioSession } : {}),
+      ...(creator
+        ? {
+            badge:
+              creator.owned || creator.roles.includes("triage")
+                ? queueFor(new URLSearchParams("filter=all&limit=1")).requests
+                : null,
+          }
+        : {}),
+      ...(view
+        ? {
+            view: {
+              digest: createHash("sha256")
+                .update(JSON.stringify(view.map(answer)))
+                .digest("base64url")
+                .slice(0, 16),
+            },
+          }
+        : {}),
+    };
+  };
+  res.writeHead(200, {
+    "Content-Type": "text/event-stream; charset=utf-8",
+    "Cache-Control": "no-store, no-transform",
+  });
+  const send = (value) => res.write(`data: ${JSON.stringify(value)}\n\n`);
+  send(frame(true));
+  const timer = setInterval(() => {
+    const t = Date.now() - opened;
+    if (mode === "outage") {
+      send({
+        t,
+        end: "error",
+        error: {
+          status: 503,
+          code: "service_unavailable",
+          message: "The stand-in API is paused for this check.",
+        },
+      });
+      return stop();
+    }
+    if (t >= 30_000) return (send({ t, end: "renew" }), stop());
+    send(frame(false));
+  }, 2000);
+  const stop = () => (clearInterval(timer), res.end());
+  res.on("close", () => clearInterval(timer));
+}
 const server = createServer(async (req, res) => {
   const url = new URL(req.url, "http://127.0.0.1");
   const send = (status, value) => (
@@ -237,6 +330,22 @@ const server = createServer(async (req, res) => {
     });
   if (delay.ms && delay.match.test(path))
     await new Promise((resolve) => setTimeout(resolve, delay.ms));
+  // As the backend's query check: a screen read needs a creator, a thread a fan.
+  const q = url.searchParams;
+  if (
+    req.method === "GET" &&
+    path === "studio/live" &&
+    ((q.get("view") && !q.get("creator")) ||
+      (q.get("view") === "thread") !== Boolean(q.get("fan")))
+  )
+    return send(400, {
+      error: {
+        code: "invalid_request",
+        message: "The request does not match the API contract.",
+      },
+    });
+  if (req.method === "GET" && path === "studio/live")
+    return liveStream(req, res, url.searchParams);
   for (const [[method, re], handler] of routes) {
     const m = method === req.method && path.match(re);
     if (m) return send(...handler(m, url.searchParams, body));

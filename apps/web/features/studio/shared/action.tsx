@@ -1,12 +1,12 @@
 "use client";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Notice } from "@qelvora/ui-web";
 export function useAction() {
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [notice, setNotice] = useState("");
   const pending = useRef(false);
-  const run = async (work: () => Promise<void>) => {
+  const run = useCallback(async (work: () => Promise<void>) => {
     if (pending.current) return;
     pending.current = true;
     setBusy(true);
@@ -22,16 +22,23 @@ export function useAction() {
       pending.current = false;
       setBusy(false);
     }
-  };
+  }, []);
   return { busy, error, notice, setNotice, run };
 }
-export function Feedback({ action }: { action: ReturnType<typeof useAction> }) {
+/** `error` is a refusal from Studio's live stream, shown like an action's. */
+export function Feedback({
+  action,
+  error,
+}: {
+  action: ReturnType<typeof useAction>;
+  error?: string;
+}) {
   return (
     <>
-      {action.error && (
+      {(action.error || error) && (
         <div>
           <Notice tone="error" title="Action status">
-            {action.error}
+            {action.error || error}
           </Notice>
         </div>
       )}

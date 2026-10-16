@@ -17,6 +17,62 @@ const allow = {
     "u",
   ),
 };
+const liveQuery = new Set(["creator", "view", "fan", "filter", "cursor"]);
+/** Studio's live stream passes through unbuffered; the backend validates the
+ * query and closes each stream after 30 seconds. */
+export async function studioLiveProxy(request: NextRequest) {
+  if ([...request.nextUrl.searchParams.keys()].some((k) => !liveQuery.has(k)))
+    return Response.json(
+      { error: { message: "This endpoint is unavailable." } },
+      { status: 404 },
+    );
+  const expectedAccount = request.headers.get("x-qelvora-expected-account");
+  const expectedSession = request.headers.get("X-Expected-Session-Id");
+  try {
+    const response = await platformFetch(
+      `/v1/studio/live${request.nextUrl.search}`,
+      {
+        headers: {
+          ...(expectedAccount
+            ? { "x-qelvora-expected-account": expectedAccount }
+            : {}),
+          ...(expectedSession
+            ? { "X-Expected-Session-Id": expectedSession }
+            : {}),
+        },
+        signal: request.signal,
+      },
+      true,
+      65_000,
+    );
+    if (
+      !response.ok ||
+      !response.body ||
+      !response.headers.get("content-type")?.startsWith("text/event-stream")
+    )
+      return Response.json(await response.json(), {
+        status: response.ok ? 503 : response.status,
+        headers: { "Cache-Control": "no-store" },
+      });
+    return new Response(response.body, {
+      headers: {
+        "Content-Type": "text/event-stream; charset=utf-8",
+        "Cache-Control": "no-store, no-transform",
+        "X-Accel-Buffering": "no",
+      },
+    });
+  } catch {
+    return Response.json(
+      {
+        error: {
+          code: "service_unavailable",
+          message: "Reconnect to continue. Your input is kept.",
+        },
+      },
+      { status: 503, headers: { "Cache-Control": "no-store" } },
+    );
+  }
+}
 export function studioProxy(
   domain: "studio" | "content" | "commerce-approvals",
 ) {
