@@ -1,12 +1,14 @@
-// E6.9 part 3: a background tab, a sleeping page, a stalled server and an idle minute.
+// E6.9 part 3: a background tab, a sleeping page, a stalled or crashed server, a stream
+// that never answers, and an idle minute.
 // Maya's owner (development actor three) in Chrome at 390 px; a fan (actor one)
 // through the real API. Fakes: the development identity, the model fake, and in
 // E6.9-6 the browser's background signal (headless Chrome always reports a page as
 // visible, so the script sets document.hidden and sends visibilitychange). E6.9-7
 // stops Chrome and all its processes for 20 s as a sleeping laptop would, and E6.9-8
 // stops the stack's backend process for about 10 s (SIGSTOP, then SIGCONT) once no AI
-// reply is in flight. E6.9-13 holds a database lock (a slow database stand-in). E6.9-12
-// stops the backend and starts it again with `stack.mjs up` (about a minute).
+// reply is in flight. E6.9-13 holds a database lock (a slow database stand-in), E6.9-14
+// holds the stream's requests in the browser's network layer, and E6.9-12 kills the
+// backend and starts it again with `stack.mjs up` (about a minute).
 //   node tests/scenarios/lane-6/e6-9-recover.mjs
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
@@ -158,19 +160,16 @@ await step(
 );
 await step(
   "E6.9-13",
-  "opening Studio while its roles check hangs: told within 6 s, then shown",
+  "opening Studio while its roles check is blocked: told, then shown",
   async () => {
-    // A stand-in for a slow database: the roles check waits on a held lock
-    // for 12 s while the page itself (served without that table) loads.
+    // A slow database stand-in: Studio's roles check reads team invitations,
+    // which stay locked for 12 s; sign-in and the page itself do not.
     const second = await owner.context.newPage();
-    const held = L.lockFor("creator.team_membership", 12_000);
+    const held = L.lockFor("creator.team_invitation", 12_000);
     await new Promise((r) => setTimeout(r, 300));
     const from = Date.now();
     await second.goto(`${WEB}/studio/${MAYA}/notes`);
-    await second
-      .getByText("Reconnect to continue.", { exact: false })
-      .first()
-      .waitFor({ timeout: 15_000 });
+    await second.getByText("Studio unavailable").waitFor({ timeout: 15_000 });
     const told = Date.now() - from;
     await held;
     const shown = await until(
@@ -182,6 +181,35 @@ await step(
     await second.close();
     expect(told <= 8_000, `told after ${told} ms`);
     return `told after ${told} ms (page load included); Notes ${shown} ms after the lock ended`;
+  },
+);
+await step(
+  "E6.9-14",
+  "a stream that never answers: told after 5 s, then shown",
+  async () => {
+    // The network (the outer edge) holds every stream request for 12 s.
+    const second = await owner.context.newPage(),
+      held = [];
+    await second.route("**/api/studio/live*", (route) => held.push(route));
+    const from = Date.now();
+    await second.goto(`${WEB}/studio/${MAYA}/notes`);
+    await second
+      .getByText("Reconnect to continue.", { exact: false })
+      .first()
+      .waitFor({ timeout: 15_000 });
+    const told = Date.now() - from;
+    await new Promise((r) => setTimeout(r, Math.max(0, 12_000 - told)));
+    await second.unroute("**/api/studio/live*");
+    for (const route of held) await route.continue().catch(() => undefined);
+    const shown = await until(
+      second,
+      () => second.getByText(/^REPLIES ·/u).isVisible(),
+      20_000,
+      "Notes after the network let go",
+    );
+    await second.close();
+    expect(told >= 5_000 && told <= 9_000, `told after ${told} ms`);
+    return `told after ${told} ms (page load included), ${held.length} attempts held; Notes ${shown} ms after release`;
   },
 );
 await step(
@@ -209,13 +237,16 @@ await step(
 );
 await step(
   "E6.9-12",
-  "a backend restart: Studio hides, then returns by itself",
+  "a backend crash and restart: Studio hides, then returns by itself",
   async () => {
     await A.goto(`${WEB}/studio/${MAYA}/notes`);
     await A.getByText(/^REPLIES ·/u).waitFor({ timeout: 30_000 });
     await A.evaluate(() => (window.e69 = "same page"));
     const file = `${process.env.TMPDIR}/qelvora-stack/lane6/pids.json`;
+    // A crash, not a graceful stop: a stopping backend keeps answering the
+    // open stream while it drains, so Studio rightly stays.
     execFileSync("kill", [
+      "-KILL",
       String(JSON.parse(readFileSync(file, "utf8")).backend.pid),
     ]);
     const hid = await until(
