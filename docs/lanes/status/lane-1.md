@@ -37,8 +37,9 @@ Blocked on:
 
 - Counsel's confirmation of the 18+ method, and the policy page for younger people (WP 1.9) that
   the adults-only page should link to.
-- The founder's approval of four more lane 1 strings that still say Pantopus (setup step label,
-  privacy page link and help line, ops sign-in link); proposed in #461.
+- The founder's approval of five lane 1 lines that assume a shared Pantopus account (the setup
+  page's proof step, the privacy and trust pages, the terms page); proposed in #461. The four
+  approved later on 2026-10-15 are in #461.
 - The founder's ops decisions in `lane-1-ops.md` (#440): P1 (open paid requests on a pause), P2
   (lifting a pause), R1 (when a Note reply is clean), O1 (supervisor-wide audit wording), O2
   (adding ops reviewers).
