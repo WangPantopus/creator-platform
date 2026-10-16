@@ -2,7 +2,8 @@
 // same way on both. The harness (harness/server.mjs) must be running.
 //   node tests/scenarios/lane-7/run-app.mjs ios|android [--actor devon] [--reset]
 //        [--to /threads/<creator>/<fan>] [--appearance light|night] [--shot out.png]
-// Other commands: `shot ios|android <out.png>`, `stop ios|android`.
+// Other commands: `shot ios|android <out.png>`, `stop ios|android`,
+// `background ios|android [ms]` (to the background and back to the front).
 import { execFileSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 
@@ -29,9 +30,12 @@ const udid = () => {
   return device.udid;
 };
 
-// `ios` and `android` take options straight after them; `shot` and `stop` take the platform first.
+// `ios` and `android` take options straight after them; `shot`, `stop` and
+// `background` take the platform first.
 const [command, ...rest] = process.argv.slice(2);
-const platform = ["shot", "stop"].includes(command) ? rest.shift() : command;
+const platform = ["shot", "stop", "background"].includes(command)
+  ? rest.shift()
+  : command;
 const option = (name) =>
   rest.includes(name) ? rest[rest.indexOf(name) + 1] : undefined;
 const shot = (target, file) => {
@@ -45,6 +49,28 @@ if (command === "shot") shot(platform, rest[0]);
 else if (command === "stop") {
   if (platform === "ios") run("xcrun", ["simctl", "terminate", udid(), BUNDLE]);
   else adb("shell", "am", "force-stop", BUNDLE);
+} else if (command === "background") {
+  // Sends the app to the background and brings it back, as switching apps does.
+  const ms = Number(rest[0] ?? 2000);
+  const pause = () => new Promise((resolve) => setTimeout(resolve, ms));
+  if (platform === "ios") {
+    const id = udid();
+    run("xcrun", ["simctl", "launch", id, "com.apple.Preferences"]);
+    await pause();
+    run("xcrun", ["simctl", "launch", id, BUNDLE]);
+  } else {
+    adb("shell", "input", "keyevent", "KEYCODE_HOME");
+    await pause();
+    adb(
+      "shell",
+      "monkey",
+      "-p",
+      BUNDLE,
+      "-c",
+      "android.intent.category.LAUNCHER",
+      "1",
+    );
+  }
 } else if (command === "ios" || command === "android") {
   const actor = option("--actor");
   const to = option("--to");

@@ -160,13 +160,17 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     var positionedConversation by remember(root, accountId) { mutableStateOf(false) }
     var followingReply by remember(root, accountId) { mutableStateOf(true) }
     var positioningReply by remember(root, accountId) { mutableStateOf(false) }
-    // Observe completed user/accessibility scrolls, rather than treating a
-    // newly enlarged reply as a request to stop following it.
+    // Only a scroll that ended (the reader's or the screen reader's) decides
+    // whether the thread follows new rows. Rows arriving, growing or shifting
+    // (a notice above while reconnecting, a reply growing) never stop it: they
+    // used to, when they moved the first visible row with more rows below.
     LaunchedEffect(scroll) {
-        snapshotFlow { Triple(scroll.isScrollInProgress, scroll.firstVisibleItemIndex, scroll.firstVisibleItemScrollOffset) }.collect { (moving, _, _) ->
-            if (!moving && positionedConversation && !positioningReply) {
+        var wasMoving = false
+        snapshotFlow { scroll.isScrollInProgress }.collect { moving ->
+            if (wasMoving && !moving && positionedConversation && !positioningReply) {
                 followingReply = !scroll.canScrollForward
             }
+            wasMoving = moving
         }
     }
     DisposableEffect(lifecycleOwner) {
