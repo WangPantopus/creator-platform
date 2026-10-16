@@ -18,6 +18,19 @@ function immutable<T>(value: T): T {
   return value;
 }
 type Phase = "idle" | "signing" | "publishing" | "unknown";
+/** The owner refused a publication because its signature is no longer usable
+ * (older than five minutes, a revoked key, or changed creator authority). The
+ * owner checks it in the publishing transaction, so nothing was published and
+ * the creator can review and sign again. A lost response, or a signature
+ * already used, stays unknown: that publication may have happened. */
+export function signatureRefused(failure: unknown): boolean {
+  return (
+    typeof failure === "object" &&
+    failure !== null &&
+    "code" in failure &&
+    failure.code === "signed_act_required"
+  );
+}
 /** The domain supplies its canonical command and exact review projection. Publication
  * must consume the returned signature in that domain's transaction. */
 export function SignedActReview({
@@ -220,7 +233,11 @@ export function SignedActReview({
       }
     } catch (failure) {
       if (publishing) {
-        if (sameView()) {
+        if (sameView() && signatureRefused(failure)) {
+          phaseNow.current = "idle";
+          setPhase("idle");
+          setError("Signing could not complete. No publication was started.");
+        } else if (sameView()) {
           phaseNow.current = "unknown";
           setPhase("unknown");
           setError(
