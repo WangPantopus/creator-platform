@@ -1183,7 +1183,7 @@ export class TrustService {
     if (!proof.success || age < -30_000 || age >= 300_000)
       throw new DomainError(
         "fresh_verification_required",
-        "Continue with Pantopus again before downloading personal data.",
+        "Sign in again before downloading your data.",
         401,
       );
   }

@@ -68,7 +68,7 @@ async function projectedDenial(
   if (!authority || authority.accountId !== actor.accountId)
     throw new DomainError(
       "content_session_required",
-      "Continue with Pantopus for this action.",
+      "Sign in for this action.",
       401,
     );
   // Call before positive family/domain locks. The canonical caller holds its
@@ -285,7 +285,7 @@ export function trustPublicPacketDenial() {
     )
       throw new DomainError(
         "content_session_required",
-        "Continue with Pantopus for this content.",
+        "Sign in to see this content.",
         401,
       );
     await assertCurrentSession(client, actor.accountId);

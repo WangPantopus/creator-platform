@@ -569,7 +569,7 @@ export function CreatorSetup({ initial }: { initial: Session }) {
                       const updated = await action("session");
                       setCreator(updated.creator);
                       setNotice(
-                        "Recovery started. Reconnect your Pantopus account, then submit fresh external creator proof.",
+                        "Recovery started. Sign in again, then submit fresh creator proof.",
                       );
                     })
                   }
