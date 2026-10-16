@@ -103,10 +103,12 @@ final class Lane7AccessibilityFlows: XCTestCase {
         XCTAssertEqual(record.value as? String, "0")
         record.tap()
         XCTAssertTrue(record.waitForValue("1"))
-        XCTAssertEqual(try await offTheRecord(), true)
+        let on = try await offTheRecord()
+        XCTAssertEqual(on, true, "the server has it on")
         record.tap()
         XCTAssertTrue(record.waitForValue("0"))
-        XCTAssertEqual(try await offTheRecord(), false)
+        let off = try await offTheRecord()
+        XCTAssertEqual(off, false, "and off again")
         let intro = app.switches["Share my intro with this creator's AI"]
         reveal(intro)
         XCTAssertTrue(intro.exists)
@@ -138,7 +140,7 @@ final class Lane7AccessibilityFlows: XCTestCase {
         reveal(type); type.tap()
         for name in ["Support request", "Report AI message", "Abuse report", "Block creator", "Crisis help"] { XCTAssertTrue(app.buttons[name].waitForExistence(timeout: 10), name) }
         app.buttons["Abuse report"].tap()
-        XCTAssertTrue(NSPredicate(format: "label CONTAINS 'Abuse report' OR value CONTAINS 'Abuse report'").evaluate(with: type))
+        XCTAssertTrue((type.label + " " + String(describing: type.value ?? "")).contains("Abuse report"), "the picker says the chosen type")
         try await open("/support/privacy", waitFor: "Your data")
         let scope = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Data scope")).firstMatch
         reveal(scope); scope.tap()
