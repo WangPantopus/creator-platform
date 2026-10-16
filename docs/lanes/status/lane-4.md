@@ -1,8 +1,8 @@
 # Lane 4: Money status
 
-Updated: 2026-10-16 (early morning, Pacific time), by the lane 4 session
+Updated: 2026-10-16 (Pacific time, late morning), by the lane 4 session
 
-Working on: nothing in flight. WP 4.12 is done: the backend field (#467) and the copy the founder approved (#474, decisions 6 and 7). Also open: #469 (the public summary hides a paused creator) and #470 (scenarios retire their offers). Everything else waits on a decision or another lane. A new session starts at [`lane-4-handoff.md`](lane-4-handoff.md).
+Working on: nothing in flight. On 2026-10-16 the founder told lane 4 to take the proposed default for every open decision, so decisions 1, 2, 4 and 5 are built (#485, #486, #484, #487), and 3, #467's fallback and the reminder timing need no change ([`lane-4-decisions.md`](lane-4-decisions.md)). "1 hours" is fixed in #476. What is left waits on Stripe test keys, Q16 (a legal retention period) or other lanes. A new session starts at [`lane-4-handoff.md`](lane-4-handoff.md).
 
 Open pull requests:
 
@@ -15,11 +15,16 @@ Open pull requests:
 | #450 | `lane-4/inbox-outage-fresh`        | `e4-3-inbox-outage` makes its own inbox login (the integrator's ticket)                                                                                                                                                                                               | —                                                                                       |
 | #459 | `lane-4/share-card-owners` (draft) | Lane 5's ticket: share cards. Commerce answers growth's `shareSource` (the fan's session) and `shareStatus` (no session, through one narrow definer function); proven through growth's real routes                                                                    | **migration registration** and five regenerated catalogue pins; review by lanes 1 and 3 |
 | #453 | `lane-4/request-notices`           | Lane 5's ticket: request notices recorded in growth's notice table, handed to growth and withdrawn; one commitment reminder to the creator; proven end to end                                                                                                         | production composition waits on the two authorities below                               |
-| #467 | `lane-4/more-info-question`        | WP 4.12: `decide` takes a separate `question` for `more_info`, so the Studio's reply draft never reaches the fan as a question; `text` alone still works for older clients (proposed default)                                                                         | founder: keep or refuse the `text` fallback; lane 6: WP 6.6 sends `question`            |
+| #467 | `lane-4/more-info-question`        | WP 4.12: `decide` takes a separate `question` for `more_info`, so the Studio's reply draft never reaches the fan as a question; `text` alone still works for older clients (taken as the proposed default, 2026-10-16)                                                | lane 6: WP 6.6 sends `question`                                                         |
 | #469 | `lane-4/summary-paused-creator`    | WP 4.9: the public summary asks lane 1's public creator check first; a paused, suspended or revoked creator reads like an unknown one (404), 503 when the check cannot answer; `run.mjs` runs Maya-pausing scenarios only by name                                     | integrator: pass the restoration-gated check in production                              |
 | #470 | `lane-4/scenario-offers-retire`    | Scenarios: each scenario takes the offers it made off offer when it ends, so leftovers no longer pile up past the 20 the summary lists                                                                                                                                | —                                                                                       |
 | #474 | `lane-4/approved-copy`             | WP 4.12: the approved copy. After "Let AI answer" the fan reads "{name} suggests asking {name}'s AI · nothing charged" with an "Ask {name}'s AI" button; "Answer by" while a question waits; the Offers table says "Within {deadline} of accepting, or a full refund" | —                                                                                       |
 | #463 | `lane-4/settle-departure`          | Lane 1's ticket (G1): `settleDeparture`. A paused creator's requests not yet accepted are released (nothing charged), accepted ones keep their deadline; the pause case resolves; proven through lane 1's real ops decision                                           | integrator: compose it in `server.ts` (P1 confirmed)                                    |
+| #476 | `lane-4/deadline-one-hour`         | WP 4.9: a 1-hour offer reads "1 hour", not "1 hours": the public summary's sentence and the fan's two offer lists on the web                                                                                                                                          | —                                                                                       |
+| #484 | `lane-4/ending-no-hold`            | WP 4.6, decision 4: a request that is being released or has ended never gets a new hold; it closes as never held once no earlier try can still reach the processor (first try, or five minutes after its release began)                                               | —                                                                                       |
+| #485 | `lane-4/refund-room`               | WP 4.3, decision 1: a refunded payment gives its room under the monthly limit back (`exposure.returned`); the web's spending headline shows what counts                                                                                                               | tickets to lanes 3 and 7 (the same headline)                                            |
+| #486 | `lane-4/refund-slot`               | WP 4.9, decision 2: a request refunded because it was not delivered frees its weekly slot; the money suite's conservation check and the sweep's S7 count the same way                                                                                                 | an existing stack needs a `reset` (slots from earlier refunds)                          |
+| #487 | `lane-4/decides-in`                | WP 4.9, decision 5: the public summary's "{name} usually decides in {range}" from the creator's decision record                                                                                                                                                       | **migration registration** and regenerated catalogue pins                               |
 
 Merged on main: #408, #410, #416, #418, #421, #423, #424, #427, #428, #429. #410's migration was registered through #442.
 
@@ -42,11 +47,9 @@ Blocked on:
   - compose the commerce scheduler and its notification route in `server.ts` (#416), and give the #425 login's pool an `error` listener. Until then the stock host expires and refunds requests on its own only while the development side process runs;
   - register #425's migration.
 - **The founder:**
-  - the five decisions in `lane-4-decisions.md`: refunds and the monthly limit; refunds and weekly slots; one signature for accept and send; never placing a hold for a request that is already ending; whether expired requests count toward "usually decides in";
-  - Stripe test keys (WP 4.7);
-  - #467: keep accepting `text` alone as the question for older clients until WP 6.6 ships (built), or refuse it now;
-  - Q16, what happens to a fan's money records and open requests when the fan deletes their account (retention and refunds). Lane 1's deletion work waits on it, and so does the privacy registration that request notices need in production (#453);
-  - when the commitment reminder fires: proposed as the smaller of 24 hours and a quarter of the delivery window (#453);
+  - Stripe test keys (WP 4.7), through the approved secret channel;
+  - Q16, what happens to a fan's money records and open requests when the fan deletes their account. Its retention period is a legal question, for counsel; lane 4 proposes a default for the product part in `lane-4-decisions.md`. Lane 1's deletion work waits on it, and so does the privacy registration that request notices need in production (#453);
+  - every other decision was taken as the proposed default on 2026-10-16 (`lane-4-decisions.md`); veto any of them in its pull request;
 - **Lane 1 (W8):** a worker denial for commerce notices, so that a background publisher can check who may be told (#453).
 - **Lane 3:** the `afterHumanReply` hook (C3), for automatic delivery (WP 4.4).
 - **Lanes 1 and 7:** WP 4.8 (native handoff, E4.14).
@@ -75,7 +78,7 @@ Scenarios, all on the lane 4 stack with the fake processor. Run `node tests/scen
   - E4.9 when ops pauses a creator (#469): the public summary hides her offers, reads like an unknown creator, answers 503 when lane 1's check cannot answer, and shows her offers again once the pause is lifted; a fan who blocked her reads her as unavailable (`e4-9-paused-creator`, run by its full name, then reset the stack);
   - E4.2 "Ask for more information" (#467): a question in its own field, blank and too long refused, one pending at a time, a repeat key and a race, wrong people, two rounds of answers, then the accept (`e4-2-more-info`).
 - **Scenario data no longer builds up** once #470 lands: each scenario retires the offers it made. Before that, after about 20 runs on one stack `e4-9-public-summary` cannot find its own offer (the summary lists the 20 cheapest); pause the leftovers or reset the stack.
-- **Waiting on a decision:** E4.8 after a refund (decision 1); E4.9, whether a refund frees a slot (decision 2).
+- **Decisions taken on 2026-10-16:** E4.8 after a refund (decision 1, `e4-8-refund-room`, #485); E4.9, a refund frees its slot (decision 2, `e4-9-refund-slot` and `e4-9-capacity` E4.9-6, #486); no hold for a request that is ending (decision 4, `e4-10-ending-no-hold`, #484); "usually decides in" (decision 5, `e4-9-decides-in`, #487); "1 hour" in the summary and on the web (`e4-9-public-summary` E4.9-12 and `e4-9-offer-hours-web`, #476).
 - **Not run:** E4.13 (needs the keys); E4.14 (needs lanes 1 and 7).
 
 Findings (each fixed or reported in the pull requests above):
@@ -94,7 +97,10 @@ Findings (each fixed or reported in the pull requests above):
 - The public summary listed a paused creator's offers and capacity (#469).
 - On the development stack another creator gets 503 `scope_denial_unavailable`, not 403, on every one of Maya's Studio routes, reads included; nothing moves (#467, ticket to lane 1).
 - At 320 px the request card's title and price line (`qv-meta`, no wrap) is wider than the window when an offer's title is long (#474, ticket to lane 6).
-- The backend's `deadlinePhrase` (`modules/commerce/public-summary.ts`) says "1 hours" for a 1-hour offer (lane 4 to fix).
+- The backend's `deadlinePhrase` (`modules/commerce/public-summary.ts`) said "1 hours" for a 1-hour offer, and so did the fan's two offer lists on the web (#476).
+- A hold retry's lease (30 s) is shorter than the time an earlier try's call can still be in flight, so "the processor holds nothing" is only trusted five minutes after the release began (#484).
+- `e4-8-limits` assumed fan three had no capture this month. After `e4-9-capacity` refunds one, the old rule still counted it, so the scenario failed on any stack that had run the suite before. Decision 1 removes that (#485).
+- On a stack that refunded requests before #486, those requests still hold their (past) slots, and the sweep's S7 names their windows until a `reset`.
 
 Ports and containers:
 
@@ -104,6 +110,7 @@ Ports and containers:
 
 Tickets to other lanes:
 
+- **Integrator:** register #487's migration (`schema-decision-record.sql`) and regenerate the catalogue pins it changes (its grants on `creator_profile` and `fan_profile`). #453 and #463 both add to `payments/development-work-index.ts` at the same two places; whichever merges second needs both additions kept (lane 4 will do it on its branch once the first merges).
 - **Integrator, `server.ts`:**
   - in production, pass the restoration-gated `holdPublicCreatorNegativeAuthority` as the public summary's check, the third argument of `commerceFeature(service, extended, publicCreator)` (`features.ts:56`); without it lane 1's plain check is used (#469);
   - compose `createDevelopmentCommerceRecovery` and mount `createStripeInboxRouter` before `express.json` (#416);
@@ -131,5 +138,8 @@ Tickets to other lanes:
 - **Lane 6 (Studio offers):** the mode command takes an optional `eligibility: [] | ["request"]`; leaving it out keeps the current value (#429).
 - **Lane 6 (WP 6.6, "Ask for more information"):** send `{ action: "more_info", question, version, idempotencyKey }` to `POST /v1/studio/{creatorId}/packets/{packetId}/decide`, and stop spreading the reply draft `text` into every decision (`features/studio/requests/PacketDetail.tsx:87`). Refusals: `question_required`, `question_pending`, `stale_request`, `decision_expired`, `authorization_expiring`, `idempotency_conflict` (403), and `invalid_request` (400, over 8,000 characters). While a second question waits, `fan_answer` is still the earlier answer. Full API in #467.
 - **Lane 7:** the `modeMembersOnly` copy is there if the phone apps show offers (#429).
+- **Lane 7 (decision 1, #485):** the Spending screens' headline should show what counts toward the limit, `exposure.captured − exposure.returned`, not `captured` (`CommerceFeature.swift`, `CommerceFeature.kt`). Both decoders ignore the new field until then.
+- **Lane 3 (decision 1, #485):** the account page's "THIS MONTH … of your $60 limit" (`features/conversation/AccountScreen.tsx`) should show `exposure.captured − exposure.returned`.
+- **Lane 5 (decision 5, #487):** the public summary's `reliability` reads "Maya usually decides in 6 to 40 hours" once the decision record is registered; show it beside the capacity line, and nothing (not `EtaLine`'s default) while it is `""`.
 - **Lane 7:** the founder approved decision 6: show `declinedForAi` (with an "Ask {name}'s AI" action), the decline line and `moreInfoAnswerBy` on the request screens. The keys are in the generated copy once #474 lands; today both apps read "Hold released · nothing charged" for every released request (`CommerceFeature.swift`, `CommerceFeature.kt`, `outcome`).
 - **Lane 6:** the request card's title and price line (`packages/ui-web` RequestStatus, `qv-meta`) does not wrap, so a long offer title makes a 320 px page scroll sideways (358 px with "WRITTEN REPLY (3 DAYS) · $50.00") (#474).
