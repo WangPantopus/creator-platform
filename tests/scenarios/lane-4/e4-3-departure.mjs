@@ -213,15 +213,24 @@ await step(
         [accepted],
       )
     )[0];
+    // Every accepted request Maya still owes keeps its deadline: this
+    // scenario's, and any an earlier scenario left on the stack.
+    const owed = (
+      await sql(
+        "SELECT count(*)::int AS n FROM creator.commerce_packet p JOIN creator.commerce_commitment c ON c.packet_id=p.id WHERE p.creator_id=$1 AND p.state='accepted' AND c.state IN ('due','in_progress')",
+        [CREATOR.maya],
+      )
+    )[0].n;
     expect(
       receipt?.settlement?.waiting === 0 &&
-        receipt.settlement.accepted === 1 &&
+        receipt.settlement.accepted === owed &&
+        owed >= 1 &&
         commitment.state === "due" &&
         commitment.due_at.getTime() === dueBefore.getTime() &&
         (await packetRow(accepted)).state === "accepted",
       `${JSON.stringify(receipt?.settlement)} ${JSON.stringify(commitment)}`,
     );
-    return `${resolved.state}; settlement ${JSON.stringify(receipt.settlement)}; the placing request ended ${(await packetRow(placing)).state}; the accepted one still due at the same time`;
+    return `${resolved.state}; settlement ${JSON.stringify(receipt.settlement)} (${owed} accepted request(s) Maya still owes); the placing request ended ${(await packetRow(placing)).state}; the accepted one still due at the same time`;
   },
 );
 await step(
