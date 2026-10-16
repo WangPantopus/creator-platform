@@ -108,3 +108,7 @@ Final plain D6 on the final code, fresh stack: Android PASS; iOS PASS
 (ios-navigation-1792108690862.xcresult, 1 passed, 0 skipped) and verify-ios
 PASS. Both final denied screens reviewed: identical words; the Refresh button is
 centered on iOS and left-aligned on Android (pre-existing; a parity finding).
+After merging main through dea51a4ff (#442: the sign-in and money migration
+wave and trust privacy catalogs; the stack now installs 58 wave migrations,
+was 55), on a fresh stack with the freeze fix: Android D6 PASS; iOS D6 PASS and
+verify-ios PASS; still one deletion job, one tombstone, eight domain tasks.

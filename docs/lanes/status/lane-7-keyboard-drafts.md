@@ -2,7 +2,7 @@
 
 ## State
 
-Ready for review, 2026-10-15. **The founder accepted the compact persistent author header**
+Ready for review, 2026-10-15 (main merged through `dea51a4ff`; D6 rerun on the new migration wave: pass on both). **The founder accepted the compact persistent author header**
 (constrained layouts keep the author word and glyph fixed and the full identity sentence in the
 scroller). #379 (WP 7.2) is merged; `origin/main` through `7ca3982fe` is merged into this branch
 without a rebase. The merge changed no lane 7 source, so only the gates it could affect were rerun
