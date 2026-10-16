@@ -77,3 +77,9 @@ P7.3), the gates, and what was not run. Nothing here is the real backend.
 
 `7-4-p4-run.txt` records the survey, the Android defect before and after, the operated flows on both
 apps against the fake API (P4.1 to P4.3), the iOS freeze found on the way, and what was not run.
+
+## WP 7.4, the iOS thread freeze (#471)
+
+`7-4-freeze-run.txt` records the freeze's signature in samples (with the first fix, and on
+`lane-7/status-7-4`), the presence, draft, seal, citation and E7.1 flows on the final build, the
+gates, and what was not run. Fake API; nothing here is the real backend.
