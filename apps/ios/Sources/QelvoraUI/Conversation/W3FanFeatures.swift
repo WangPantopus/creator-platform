@@ -58,6 +58,10 @@ private struct W3ThreadScreen: View {
     @State private var originalReply: W3Message?
     @State private var sourceFailure = ""
     @State private var connectionRetry = 0
+    /// The reader is at the newest row: the thread follows new rows only then.
+    @State private var following = true
+    /// After "Earlier messages", the row that was first stays where it was.
+    @State private var keepInPlace: String?
     @FocusState private var composerFocused: Bool
     @ScaledMetric(relativeTo: .body) private var composerLineHeight: CGFloat = 24
     @Environment(\.dynamicTypeSize) private var textSize
@@ -103,20 +107,29 @@ private struct W3ThreadScreen: View {
                             else { LazyVStack(alignment: .leading, spacing: QelvoraTokens.space4) { threadRows(page) } }
                         }.padding(.horizontal, QelvoraTokens.space4).padding(.vertical, QelvoraTokens.space4)
                     }.textSelection(.enabled)
-                        // Open at the current reply and keep bottom-anchored
-                        // content growth visible. SwiftUI preserves a reader's
-                        // deliberate scroll away from that default position.
-                        .defaultScrollAnchor(.bottom)
+                        .coordinateSpace(name: "thread-scroll")
+                        // Open at the newest row and follow new rows while the reader is
+                        // there, explicitly, as Android does. Under a bottom anchor
+                        // (`defaultScrollAnchor(.bottom)`) a lazy stack could re-measure its
+                        // rows forever when the keyboard left while Notes arrived.
+                        .onChange(of: model.page == nil, initial: true) { _, missing in
+                            if !missing { following = true; toEnd(proxy) }
+                        }
+                        .onChange(of: tail(page)) { if following { toEnd(proxy) } }
+                        .onChange(of: compact) { toEnd(proxy) }
+                        .onChange(of: model.older.count) {
+                            if let id = keepInPlace { keepInPlace = nil; proxy.scrollTo(id, anchor: .top) }
+                        }
                         .scrollDismissesKeyboard(.interactively)
                         #if os(iOS)
                         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardDidShowNotification)) { _ in
                             // The default anchor does not follow the viewport
                             // contraction when the software keyboard appears.
                             // Align after that OS transition, only when editing.
-                            if composerFocused { proxy.scrollTo("conversation-end", anchor: .bottom) }
+                            if composerFocused { toEnd(proxy) }
                         }
                         #endif
-                        .onChange(of: model.pending?.key) { _, sent in if sent != nil { proxy.scrollTo("conversation-end", anchor: .bottom) } }
+                        .onChange(of: model.pending?.key) { _, sent in if sent != nil { following = true; toEnd(proxy) } }
                 }
                 VStack(spacing: QelvoraTokens.space3) {
                     if !page.canSend { Notice(title: "AI unavailable", children: page.unavailableReason ?? "Messaging is unavailable.") }
@@ -208,7 +221,7 @@ private struct W3ThreadScreen: View {
         Text("Conversations with a creator’s AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.").qText("caption").padding(12).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusMd))
         if model.offline { Notice(tone: .offline, title: "You're offline", children: "You're seeing a saved conversation with a short reading lease. Reconnect to send.") }
         if page.offTheRecord { SystemLine(children: "Off the record · the AI keeps no memory from this conversation.") }
-        if model.before != nil { Button("Earlier messages", variant: .quiet, disabled: model.busy || model.offline) { Task { await model.earlier() } } }
+        if model.before != nil { Button("Earlier messages", variant: .quiet, disabled: model.busy || model.offline) { keepInPlace = model.timeline(page).first?.id; Task { await model.earlier() } } }
         ForEach(model.timeline(page)) { entry in
             switch entry {
             case .message(let message): row(message, page: page).id(message.id)
@@ -230,6 +243,20 @@ private struct W3ThreadScreen: View {
             Button("Get support", variant: .quiet) { session.open("/support") }
         }
         Color.clear.frame(height: 1).id("conversation-end")
+            // At the newest row when this marker is within the visible part of the
+            // thread. Changes only when that answer changes, not on every frame.
+            .onGeometryChange(for: Bool.self) { geometry in
+                let visible = geometry.bounds(of: .named("thread-scroll"))?.height ?? 0
+                return geometry.frame(in: .named("thread-scroll")).minY <= visible + 40
+            } action: { atEnd in following = atEnd }
+            .onDisappear { following = false }
+    }
+    /// The thread's newest end, below the last row.
+    private func toEnd(_ proxy: ScrollViewProxy) { proxy.scrollTo("conversation-end", anchor: .bottom) }
+    /// What changes at the newest end of the thread: rows, a reply growing, a send, a notice.
+    private func tail(_ page: W3Page) -> String {
+        let last = page.messages.last
+        return "\(page.messages.count)|\(last?.id ?? "")|\(last?.text.count ?? 0)|\(model.presence.count)|\(model.pending?.key ?? "")|\(model.failure.isEmpty)|\(model.offline)"
     }
     @ViewBuilder private func row(_ message: W3Message, page: W3Page) -> some View {
         if message.authorKind == .system {
