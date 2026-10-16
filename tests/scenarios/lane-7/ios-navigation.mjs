@@ -43,6 +43,7 @@ const flows = presence
       R7: "testR07EarlierMessagesRevealOlderNotes",
       R8: "testR08LongUnicodeNoteLargestText",
       R9: "testR09NothingOnDisk",
+      R10: "testR10LargestTextOpensAtBottom",
     }
   : draftStack
     ? { D6: "testD06RealSendAndDeletion" }

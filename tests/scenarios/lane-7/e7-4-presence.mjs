@@ -2,7 +2,7 @@
 // the lane 7 fake API. iOS runs the same flows as XCUITest (Lane7PresenceFlows,
 // through ios-navigation.mjs --presence). Each step looks at the screen (the
 // accessibility tree) and behind it (the fake's request log and state).
-//   node tests/scenarios/lane-7/e7-4-presence.mjs [R1 R4 R5 R8 R9]
+//   node tests/scenarios/lane-7/e7-4-presence.mjs [R1 R4 R5 R7 R8 R9 R10]
 // Needs the debug APK built for http://127.0.0.1:56473 and installed.
 import { execFileSync } from "node:child_process";
 import * as A from "./android-ui.mjs";
@@ -45,6 +45,27 @@ async function find(label, up = true) {
       await L.sleep(500);
     }
   return seen() ?? null;
+}
+/** Two labels on one screen, the first above the second: find the first,
+ * bring it toward the middle, then drag a little at a time until the second
+ * shows too. */
+async function above(upper, lower) {
+  const node = await find(upper);
+  if (!node) return false;
+  if (node.y < 1000) {
+    A.swipe(540, 1000, 540, 2000 - node.y);
+    await L.sleep(500);
+  }
+  for (let i = 0; i < 8; i += 1) {
+    const nodes = A.screen();
+    const at = (label) =>
+      nodes.find((n) => n.text.includes(label) || n.desc.includes(label))?.y ??
+      -1;
+    if (at(upper) >= 0 && at(lower) >= 0) return at(upper) < at(lower);
+    A.swipe(540, 1300, 540, 1000); // a small drag up shows what is below
+    await L.sleep(500);
+  }
+  return false;
 }
 const visible = (label) =>
   A.screen().some((n) => n.text.includes(label) || n.desc.includes(label));
@@ -96,24 +117,19 @@ if (run("R1")) {
     rows.map((r) => r.items).join(",") === "2,0,2",
   );
   const reply = await find("send me a photo of the tile", false);
-  const reaction = await find(REACTION);
-  const note = await find(NOTE);
-  const draft = await find("I bisque to cone 04");
-  const nodes = A.screen();
-  const y = (label) =>
-    nodes.find((n) => n.text.includes(label) || n.desc.includes(label))?.y ??
-    -1;
+  // Each neighbor pair on one screen: all four rows need not fit on one.
+  const pairs = [];
+  for (const [upper, lower] of [
+    ["I bisque to cone 04", NOTE],
+    [NOTE, "The Friday glaze clinic"],
+    ["The Friday glaze clinic", REACTION],
+  ])
+    pairs.push(await above(upper, lower));
   L.step(
     "android",
     "R1.1 order",
-    reply &&
-      reaction &&
-      note &&
-      draft &&
-      y("I bisque to cone 04") < y(NOTE) &&
-      y(NOTE) < y("The Friday glaze clinic") &&
-      y("The Friday glaze clinic") < y(REACTION),
-    `draft ${y("I bisque to cone 04")} < label ${y(NOTE)} < body ${y("The Friday glaze clinic")} < reaction ${y(REACTION)}`,
+    reply && pairs.every(Boolean),
+    `draft < label < body < reaction: ${pairs.join(", ")}`,
   );
   L.step(
     "android",
@@ -429,6 +445,23 @@ if (run("R8")) {
     L.screenshot("android", `R8-label-largest-${appearance}`);
     A.adb("shell", "settings", "put", "system", "font_scale", "1.0");
   }
+}
+
+if (run("R10")) {
+  // R1.12: at the largest text the thread's own controls are its last rows.
+  // Presence arrives after the page, and the thread still opens at its
+  // bottom: the last row is on screen without scrolling.
+  A.adb("shell", "settings", "put", "system", "font_scale", "2.0");
+  await fresh();
+  const rows = await reads(3);
+  L.step(
+    "android",
+    "R1.12 largest text opens at the bottom after presence arrives",
+    rows.length === 3 && visible("Get support"),
+    `${rows.length} reads`,
+  );
+  L.screenshot("android", "R10-largest-opens-at-bottom");
+  A.adb("shell", "settings", "put", "system", "font_scale", "1.0");
 }
 
 stop();

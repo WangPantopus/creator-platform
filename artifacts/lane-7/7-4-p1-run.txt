@@ -32,3 +32,13 @@ stay hidden until "Earlier messages" loads, then appear: Android pass; iOS pass
 (its test now flings to the top of the page; slow drags did not reach it).
 Not run: R1.10 (sign-out to another fan); R1.11 (a Note published through the
 real content API: needs a signed act and membership rows).
+2026-10-15, found by the P3 seal flows: Android lost the bottom of the thread
+when presence arrived after the page. At font scale 2.0, where the thread's
+own controls are its last rows, the step-in button was pushed off screen;
+iOS keeps its bottom anchor. Fix: Android scrolls to the bottom again when
+presence changes, only while the reader is still at the bottom. New R1.12
+(R10 in both runners): Android failed before the fix and passes after it;
+iOS pass. Android full rerun after the fix: all steps pass (R1.1's order check
+now compares neighboring rows one pair per screen; it had relied on where the
+list happened to stop). Android gates: unit tests, snapshot verify, lint, 9
+device tests, release build. iOS app code is unchanged; its R10 passes.

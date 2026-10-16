@@ -285,6 +285,22 @@ final class Lane7PresenceFlows: XCTestCase {
         try await control("/content-size", body: ["size": "large"], port: 56475)
     }
 
+    /// R1.12: at the largest text the thread's own controls are its last rows.
+    /// Presence arrives after the page, and the thread still opens at its
+    /// bottom: the last row is on screen without scrolling.
+    func testR10LargestTextOpensAtBottom() async throws {
+        try await fresh()
+        try await control("/content-size", body: ["size": "accessibility-extra-extra-extra-large"], port: 56475)
+        try await control("/__harness/log/clear", body: [:])
+        app.terminate(); app.launchArguments = arguments + ["--return-to", thread]; app.launch(); app.launchArguments = arguments
+        XCTAssertTrue(app.buttons["Send"].waitForExistence(timeout: 30))
+        _ = try await reads(3)
+        let last = app.buttons["Get support"]
+        XCTAssertTrue(last.exists && last.isHittable, "the thread opened at its bottom after presence arrived")
+        capture("R10-largest-opens-at-bottom")
+        try await control("/content-size", body: ["size": "large"], port: 56475)
+    }
+
     /// R1.9: presence lives in memory only; nothing is written to the app's data.
     func testR09NothingOnDisk() async throws {
         try await fresh()
