@@ -4,17 +4,12 @@ Updated: 2026-10-15, by the lane 1 session (Claude Opus 5.5)
 
 Working on: nothing in flight. WP 1.6 continues once the founder answers P1, P2 and R1.
 
-Done (open, not merged):
+Merged: #406 (WP 1.1, the option D decision pack), #407 (WP 1.4, contract C1 and its stub), #409
+(WP 1.7, identity and media finish a fan's deletion), #431 (WP 1.2, the sign-in backend; its
+migration registered as `0249_w1_qelvora_sign_in` in #442) and #432 (WP 1.3, web sign-in).
 
-- WP 1.1, the option D sign-in decision pack: #406 (`lane-1/signin-decision-pack`).
-- WP 1.4, contract C1 and its stub server: #407 (`lane-1/c1-contract`). Web sign-in moved to
-  `/v1/identity/web/start` and `/web/complete` while building WP 1.2.
-- WP 1.2, the Qelvora sign-in backend (Apple and Google, the 18+ gate): #431
-  (`lane-1/sign-in-backend`, stacked on #407). Founder confirmed option D, the 18+ method and a
-  Qelvora-specific id on 2026-10-15. Pending migration `pending-qelvora-sign-in.sql`, to register.
-- WP 1.3, web sign-in pages (Apple and Google, the age screen, the adults-only page, a fresh
-  sign-in for creator passkeys): #432 (`lane-1/web-sign-in`, stacked on #431). Founder approved
-  the wording on 2026-10-15.
+Open:
+
 - WP 1.5, signing fixes: the shared signing panel recovers when a publication is refused; decisions
   on recovery and Android 8 and 9 in `lane-1-signing.md`: #437 (`lane-1/signing-fix`, on main).
 - WP 1.5, a lost passkey retires and past signatures stay valid; a compromised one revokes (founder,
@@ -23,11 +18,13 @@ Done (open, not merged):
 - WP 1.6 (first part), the ops console proven end to end; reviewers cannot review their own cases;
   stuck effects show why; findings and decisions in `lane-1-ops.md`: #440 (`lane-1/ops-console`, on
   main).
-- WP 1.7 (lane 1 part), identity and media finish a fan's deletion, plus the findings for every
-  other domain: #409 (`lane-1/deletion-completeness`). E1.8 still fails on lanes 3, 4 and 5.
+- WP 1.7 (second part), deletion and export for Apple and Google accounts: tokens revoked at the
+  provider, identities deleted, the account closed; D2's working default (founder, 2026-10-15);
+  section 8 of `lane-1-deletion.md`: #454 (`lane-1/signin-deletion`, on main).
 
 Next: WP 1.6 second part after the founder's answers (automatic allowing of clean Note replies,
-lifting a pause), then deletion with option D once #409 merges.
+lifting a pause). After #439's migration is registered, its signing reads use the plain column
+and the identity export adds `retired_at`.
 
 Blocked on:
 
@@ -36,9 +33,9 @@ Blocked on:
 - The founder's ops decisions in `lane-1-ops.md` (#440): P1 (open paid requests on a pause), P2
   (lifting a pause), R1 (when a Note reply is clean), O1 (supervisor-wide audit wording), O2
   (adding ops reviewers).
-- The founder's deletion decisions D1 to D4 ([deletion findings, section 4](lane-1-deletion.md)
-  on #409): creator signature retention, sign-in after deletion, how long the redacted fan record
-  is kept, and Q16.
+- The founder's deletion decisions D1, D3 and D4 ([deletion findings, section 4](lane-1-deletion.md)):
+  creator signature retention, how long the redacted fan record is kept, and Q16. D2 (sign-in
+  after deletion) runs on its proposed default until the founder says otherwise.
 - Real Apple and Google tokens need the founder's Apple and Google client ids and the domain
   (Q09); until then the scenarios use `tests/scenarios/lane-1/fake-provider.mjs`.
 - A Qelvora account cannot open a conversation on a development host (lane 3's provider policy),
@@ -63,6 +60,9 @@ Scenarios:
   retired key refused, fresh proof, compromised revokes), twice.
 - E1.6 (#440), 2026-10-15: `e1-6-ops.mjs` 24 pass, pause completion fails (lane 4), unpause not
   run; `e1-6-console.mjs` 8 of 8.
+- E1.8 for Apple and Google accounts (#454), 2026-10-15: `e1-8-sign-in-delete.mjs` 26 of 26, its
+  restart steps 5 of 5; identity's erasure runs behind a labelled stand-in for the domains of
+  lanes 2 to 5. Unchanged: E1.1 to E1.4, `e1-8-delete.mjs`, `e1-8-edges.mjs` 16 of 16.
 - E1.5 signing a Note end to end with a Qelvora creator, E1.7, E1.9 to E1.11: not run yet.
 
 Tickets to other lanes:
@@ -72,8 +72,7 @@ Tickets to other lanes:
 - Lane 4, `modules/commerce/operations.ts`: deletion per Q16 (#409).
 - Lane 5, `modules/content/privacy.ts`: a fan's Note replies and thanks; `modules/growth/lifecycle.ts`:
   conversation-scope and creator-scope deletion (#409).
-- Integrator: register `pending-qelvora-sign-in.sql` and regenerate the pins (reach diff in #431);
-  compose a Qelvora host (`IDENTITY_ADAPTER=qelvora` in `config.ts`, `QelvoraSignIn` as the identity
+- Integrator: compose a Qelvora host (`IDENTITY_ADAPTER=qelvora` in `config.ts`, `QelvoraSignIn` as the identity
   in `server.ts`); a trusted-proxy setting so the start limit sees the client's address (#431).
 - Lane 3, the development provider policy: Qelvora accounts get `providers_unconfigured`; staging
   and the exit demo need a verified policy or an allowance for fake-provider accounts (#431).
@@ -81,7 +80,10 @@ Tickets to other lanes:
   without it (#440).
 - Lane 3: "resume" for a paused agent; and a creator's trust action times out while their AI holds
   the profile row in a generation transaction (#440).
-- Integrator: register `pending-passkey-retirement.sql` with #439 (T-34 needs the column).
+- Integrator: register `pending-passkey-retirement.sql` with #439 (signing tolerates the missing
+  column, so CI passes before it).
+- Integrator, `operations/local-server.ts`: pass `identitySignIn` to `createPrivacyConsumers`, or
+  Apple and Google accounts with a stored token block there (#454).
 - Lane 6, `features/studio/notes/Compose.tsx`: clear the pending publication when a retry is refused
   with `signed_act_required` (verified patch in `lane-1-signing.md`, #437).
 - Integrator, `config/navigation.json`: exempt `studio/setup` from the fan-handle step (#432).
