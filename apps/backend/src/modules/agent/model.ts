@@ -18,6 +18,9 @@ import {
 } from "./response-usage.js";
 import type { Usage } from "../../../../../packages/api/src/agent/contracts.js";
 
+/** Request framing beyond the plain text: system wrapper, structured-output
+ * schema and message envelope. Generous, so a bounded call stays bounded. */
+export const CALL_OVERHEAD_TOKENS = 4096;
 export const ReplySchema = z.strictObject({
   sentences: z
     .array(
@@ -112,6 +115,59 @@ export const JudgeVerdict = z.strictObject({
   usefulness: z.number(),
   style: z.number(),
 });
+/** One provider call a generation run can make, for sizing its cost hold. */
+export type BoundedCall = Readonly<{
+  /** "either": decided during the run, so priced at the dearer route. */
+  route: "small" | "large" | "either" | "embedding";
+  /** Upper bound on billed input tokens: UTF-8 bytes bound tokens. */
+  inputTokens: number;
+}>;
+
+/** Strict price of bounded calls: each at its own model's highest input rate
+ * (fresh, cached or cache-write) plus the request overhead, and every model
+ * call at its full output cap. Null when any needed rate is missing. */
+export function priceBoundedCalls(
+  models: Readonly<{
+    smallModel: string;
+    largeModel: string;
+    embeddingModel: string;
+  }>,
+  rates: Readonly<Record<string, ModelRate>> | undefined,
+  calls: readonly BoundedCall[],
+  outputTokenCap: number,
+): number | null {
+  const input = (rate: ModelRate) =>
+    Math.max(
+      rate.inputMicrosPerMillion,
+      rate.cachedInputMicrosPerMillion ?? 0,
+      rate.cacheWriteMicrosPerMillion ?? 0,
+    );
+  let micros = 0;
+  for (const call of calls) {
+    const names =
+      call.route === "either"
+        ? [models.smallModel, models.largeModel]
+        : [
+            call.route === "small"
+              ? models.smallModel
+              : call.route === "large"
+                ? models.largeModel
+                : models.embeddingModel,
+          ];
+    const priced = names.map((name) => rates?.[name]);
+    if (priced.some((rate) => !rate)) return null;
+    const inRate = Math.max(...priced.map((rate) => input(rate!)));
+    const outRate = Math.max(
+      ...priced.map((rate) => rate!.outputMicrosPerMillion),
+    );
+    micros +=
+      (call.inputTokens + CALL_OVERHEAD_TOKENS) * inRate +
+      (call.route === "embedding" ? 0 : outputTokenCap * outRate);
+  }
+  const total = Math.ceil(micros / 1_000_000);
+  return Number.isSafeInteger(total) && total > 0 ? total : null;
+}
+
 export interface AgentModel {
   readonly fingerprint: string;
   /** Exact pre-tokenizer fingerprint, only for the unchanged provider transport
@@ -122,6 +178,17 @@ export interface AgentModel {
   /** Plain-text assembly budget, not a provider billing receipt. */
   countContextTokens(text: string, route: "small" | "large"): number;
   maximumRunCostMicros(prefixBytes: number): number | null;
+  /** Upper bound for one call outside a generation hold: its input bytes as
+   * tokens plus a fixed request overhead, and its full output cap, at the
+   * highest configured rates. Used only to bound a call whose cost is unknown. */
+  maximumCallCostMicros?(inputBytes: number): number | null;
+  /** Billed-token ceiling of a context budget measured in this model's
+   * countContextTokens units. */
+  contextTokenCeiling?(budget: number): number;
+  /** Strict upper bound for a generation run made of exactly these calls. */
+  maximumBoundedRunCostMicros?(calls: readonly BoundedCall[]): number | null;
+  /** The output cap every model call carries (thinking included). */
+  readonly outputTokenCap?: number;
   reply(
     instructions: string,
     context: string[],
@@ -174,6 +241,36 @@ export class OpenAIResponsesModel implements AgentModel {
           );
         },
       )
+    );
+  }
+  readonly outputTokenCap = 2000;
+  /** Budget units are js-tiktoken tokens (bytes on older revisions). */
+  contextTokenCeiling(budget: number) {
+    return budget;
+  }
+  maximumBoundedRunCostMicros(calls: readonly BoundedCall[]) {
+    if (!this.pricingConfigured) return null;
+    return priceBoundedCalls(
+      this.configuration,
+      this.configuration.rates,
+      calls,
+      this.outputTokenCap,
+    );
+  }
+  maximumCallCostMicros(inputBytes: number) {
+    if (!this.pricingConfigured) return null;
+    const rates = Object.values(this.configuration.rates!);
+    const input = Math.max(
+      ...rates.flatMap((r) => [
+        r.inputMicrosPerMillion,
+        r.cachedInputMicrosPerMillion ?? 0,
+        r.cacheWriteMicrosPerMillion ?? 0,
+      ]),
+    );
+    const output = Math.max(...rates.map((r) => r.outputMicrosPerMillion));
+    // Every call caps its output at 2000 tokens; UTF-8 bytes bound tokens.
+    return Math.ceil(
+      ((inputBytes + CALL_OVERHEAD_TOKENS) * input + 2000 * output) / 1_000_000,
     );
   }
   maximumRunCostMicros(prefixBytes: number) {

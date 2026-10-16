@@ -1026,20 +1026,30 @@ export function conversationFeature(
               expected,
             );
           } else if (feature.routeSafety && feature.policyAvailable(scope)) {
-            const abort = new AbortController();
+            // A dropped request must not cancel a safety check already sent to
+            // the provider: its cost would stay unknown. The check runs to its
+            // own deadline; a fan who left still has nothing accepted.
+            const left = new AbortController();
+            const requestLeft = () =>
+              new DomainError(
+                "generation_cancelled",
+                "Generation was interrupted.",
+                503,
+              );
             res.on("close", () => {
-              if (!res.writableEnded) abort.abort();
+              if (!res.writableEnded) left.abort();
             });
             await feature.routeSafety(
               scope,
               body.text,
-              AbortSignal.any([abort.signal, AbortSignal.timeout(15000)]),
+              AbortSignal.timeout(15000),
               async (sentence) => {
                 invariant(
                   sentence.safety === true && sentence.text === crisisText,
                   "safety_invalid",
                   "The platform safety response is unavailable.",
                 );
+                if (left.signal.aborted) throw requestLeft();
                 accepted = await feature.conversations.sendSafety(
                   scope,
                   body,
@@ -1047,6 +1057,7 @@ export function conversationFeature(
                 );
               },
             );
+            if (left.signal.aborted) throw requestLeft();
           }
           if (accepted) {
             feature.afterBoundary?.(scope, accepted.message.controlEpoch);
