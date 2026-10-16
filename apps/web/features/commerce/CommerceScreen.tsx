@@ -611,6 +611,10 @@ function CommerceAccountScreen({
     [whole, setWhole] = useState(false),
     [filter, setFilter] = useState("Open");
   const pending = useRef(new Map<string, string>());
+  /** The request being sent and the card it was first sent with. */
+  const submission = useRef<{ draft: string; paymentMethodId: string } | null>(
+    null,
+  );
   const [membershipTier, setMembershipTier] = useState<string | null>(null);
   const [editingModeId, setEditingModeId] = useState<string | null>(null);
   const [editingTierId, setEditingTierId] = useState<string | null>(null);
@@ -1518,7 +1522,7 @@ function CommerceAccountScreen({
                               throw new Error(
                                 "This request is unavailable. Return to review its current access, limit and capacity.",
                               );
-                            const result = await command("packets", {
+                            const draft = {
                               creatorId: activeCreator,
                               fanId: data.fan!.id,
                               modeId: chosen.id,
@@ -1538,9 +1542,26 @@ function CommerceAccountScreen({
                                 accessNoticeVersion:
                                   disclosure.accessNoticeVersion,
                               },
-                              paymentMethodId,
+                            };
+                            // A lost answer can leave this exact request already
+                            // sent, with the card it first used. A retry of the same
+                            // request reuses that card, so it is the same command
+                            // with the same key: the server returns the first result
+                            // and no second hold is ever placed. A new card is used
+                            // only for a changed request.
+                            const signature = JSON.stringify(draft);
+                            if (submission.current?.draft !== signature)
+                              submission.current = {
+                                draft: signature,
+                                paymentMethodId,
+                              };
+                            const result = await command("packets", {
+                              ...draft,
+                              paymentMethodId:
+                                submission.current.paymentMethodId,
                             });
                             if (result?.packet?.id) {
+                              submission.current = null;
                               setCheckout(false);
                               window.location.assign(
                                 `/commerce/status?packetId=${result.packet.id}`,
