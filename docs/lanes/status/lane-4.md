@@ -2,21 +2,22 @@
 
 Updated: 2026-10-16 (early morning, Pacific time), by the lane 4 session
 
-Working on: WP 4.12. The backend field for "Ask for more information" is #467; the fan and Offers copy waits on the founder (decisions 6 and 7 in [`lane-4-decisions.md`](lane-4-decisions.md)). Next: the public summary stops listing a paused creator's offers, through lane 1's existing public creator check. A new session starts at [`lane-4-handoff.md`](lane-4-handoff.md).
+Working on: WP 4.12. The backend field for "Ask for more information" is #467; the fan and Offers copy waits on the founder (decisions 6 and 7 in [`lane-4-decisions.md`](lane-4-decisions.md)). The public summary stops listing a paused creator's offers in #469. Next: scenarios retire the offers they make. A new session starts at [`lane-4-handoff.md`](lane-4-handoff.md).
 
 Open pull requests:
 
-| PR   | Branch                             | What                                                                                                                                                                                                                        | Needs                                                                                   |
-| ---- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| #425 | `lane-4/inbox-login` (draft)       | WP 4.2: the non-owner login that claims processor notifications                                                                                                                                                             | **migration registration** (a new login role)                                           |
-| #447 | `lane-4/status-refresh`            | This status file                                                                                                                                                                                                            | —                                                                                       |
-| #448 | `lane-4/share-grant-id`            | Lane 5's ticket: the share call returns the grant id growth's `createShare` takes                                                                                                                                           | —                                                                                       |
-| #449 | `lane-4/summary-members-only`      | WP 4.9: the public summary marks members-only offers; its headline describes an offer any fan can ask for                                                                                                                   | lane 5 to show `modeMembersOnly`                                                        |
-| #450 | `lane-4/inbox-outage-fresh`        | `e4-3-inbox-outage` makes its own inbox login (the integrator's ticket)                                                                                                                                                     | —                                                                                       |
-| #459 | `lane-4/share-card-owners` (draft) | Lane 5's ticket: share cards. Commerce answers growth's `shareSource` (the fan's session) and `shareStatus` (no session, through one narrow definer function); proven through growth's real routes                          | **migration registration** and five regenerated catalogue pins; review by lanes 1 and 3 |
-| #453 | `lane-4/request-notices`           | Lane 5's ticket: request notices recorded in growth's notice table, handed to growth and withdrawn; one commitment reminder to the creator; proven end to end                                                               | production composition waits on the two authorities below                               |
-| #467 | `lane-4/more-info-question`        | WP 4.12: `decide` takes a separate `question` for `more_info`, so the Studio's reply draft never reaches the fan as a question; `text` alone still works for older clients (proposed default)                               | founder: keep or refuse the `text` fallback; lane 6: WP 6.6 sends `question`            |
-| #463 | `lane-4/settle-departure`          | Lane 1's ticket (G1): `settleDeparture`. A paused creator's requests not yet accepted are released (nothing charged), accepted ones keep their deadline; the pause case resolves; proven through lane 1's real ops decision | integrator: compose it in `server.ts` (P1 confirmed)                                    |
+| PR   | Branch                             | What                                                                                                                                                                                                                              | Needs                                                                                   |
+| ---- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| #425 | `lane-4/inbox-login` (draft)       | WP 4.2: the non-owner login that claims processor notifications                                                                                                                                                                   | **migration registration** (a new login role)                                           |
+| #447 | `lane-4/status-refresh`            | This status file                                                                                                                                                                                                                  | —                                                                                       |
+| #448 | `lane-4/share-grant-id`            | Lane 5's ticket: the share call returns the grant id growth's `createShare` takes                                                                                                                                                 | —                                                                                       |
+| #449 | `lane-4/summary-members-only`      | WP 4.9: the public summary marks members-only offers; its headline describes an offer any fan can ask for                                                                                                                         | lane 5 to show `modeMembersOnly`                                                        |
+| #450 | `lane-4/inbox-outage-fresh`        | `e4-3-inbox-outage` makes its own inbox login (the integrator's ticket)                                                                                                                                                           | —                                                                                       |
+| #459 | `lane-4/share-card-owners` (draft) | Lane 5's ticket: share cards. Commerce answers growth's `shareSource` (the fan's session) and `shareStatus` (no session, through one narrow definer function); proven through growth's real routes                                | **migration registration** and five regenerated catalogue pins; review by lanes 1 and 3 |
+| #453 | `lane-4/request-notices`           | Lane 5's ticket: request notices recorded in growth's notice table, handed to growth and withdrawn; one commitment reminder to the creator; proven end to end                                                                     | production composition waits on the two authorities below                               |
+| #467 | `lane-4/more-info-question`        | WP 4.12: `decide` takes a separate `question` for `more_info`, so the Studio's reply draft never reaches the fan as a question; `text` alone still works for older clients (proposed default)                                     | founder: keep or refuse the `text` fallback; lane 6: WP 6.6 sends `question`            |
+| #469 | `lane-4/summary-paused-creator`    | WP 4.9: the public summary asks lane 1's public creator check first; a paused, suspended or revoked creator reads like an unknown one (404), 503 when the check cannot answer; `run.mjs` runs Maya-pausing scenarios only by name | integrator: pass the restoration-gated check in production                              |
+| #463 | `lane-4/settle-departure`          | Lane 1's ticket (G1): `settleDeparture`. A paused creator's requests not yet accepted are released (nothing charged), accepted ones keep their deadline; the pause case resolves; proven through lane 1's real ops decision       | integrator: compose it in `server.ts` (P1 confirmed)                                    |
 
 Merged on main: #408, #410, #416, #418, #421, #423, #424, #427, #428, #429. #410's migration was registered through #442.
 
@@ -70,6 +71,7 @@ Scenarios, all on the lane 4 stack with the fake processor. Run `node tests/scen
   - E4.9, except refunds and slots, and including the public summary;
   - E4.10: lost answers, outages, a busy account and card declines;
   - E4.12, including the guard and who can ask;
+  - E4.9 when ops pauses a creator (#469): the public summary hides her offers, reads like an unknown creator, answers 503 when lane 1's check cannot answer, and shows her offers again once the pause is lifted; a fan who blocked her reads her as unavailable (`e4-9-paused-creator`, run by its full name, then reset the stack);
   - E4.2 "Ask for more information" (#467): a question in its own field, blank and too long refused, one pending at a time, a repeat key and a race, wrong people, two rounds of answers, then the accept (`e4-2-more-info`).
 - **Scenario data builds up.** Each scenario leaves its offer on offer. After about 20 runs on one stack, `e4-9-public-summary` cannot find its own offer, because the summary lists the 20 cheapest. Pause the leftovers or reset the stack; a fix (scenarios retire their offers) is planned.
 - **Waiting on a decision:** E4.8 after a refund (decision 1); E4.9, whether a refund frees a slot (decision 2).
@@ -88,6 +90,7 @@ Findings (each fixed or reported in the pull requests above):
 - Team replies are unavailable on the development stack (`503 scope_denial_unconfigured`).
 - A new database function is executable by PUBLIC by default. That changes the usage-expiry catalogue pin and stops the backend from starting, so lane 4's migrations revoke it.
 - The Studio sent its reply draft as the question for "Ask for more information" (#467).
+- The public summary listed a paused creator's offers and capacity (#469).
 - On the development stack another creator gets 503 `scope_denial_unavailable`, not 403, on every one of Maya's Studio routes, reads included; nothing moves (#467, ticket to lane 1).
 
 Ports and containers:
@@ -99,6 +102,7 @@ Ports and containers:
 Tickets to other lanes:
 
 - **Integrator, `server.ts`:**
+  - in production, pass the restoration-gated `holdPublicCreatorNegativeAuthority` as the public summary's check, the third argument of `commerceFeature(service, extended, publicCreator)` (`features.ts:56`); without it lane 1's plain check is used (#469);
   - compose `createDevelopmentCommerceRecovery` and mount `createStripeInboxRouter` before `express.json` (#416);
   - give the #425 login's pool an `error` listener;
   - register #425;
@@ -111,14 +115,14 @@ Tickets to other lanes:
 - **Lane 1:**
   - a W8 worker denial for commerce notices (`creator, fan, recipient`), in the pattern of the publication and media worker denials (#453);
   - the production work index needs `departureScopes(creatorId)` for `settleDeparture` (#463);
-  - the public summary (C8) must stop listing a paused creator's offers. Lane 1's check already exists on main: `trustPublicCreatorDenial()` (`modules/trust/scope-restriction.ts`, migration 0086) answers `denied` while a `pause_creator` or `revoke_license` restriction is active. Lane 4 will use it from the public summary. Please confirm it is the authority for a creator's public commerce, and tell lane 4 before changing its meaning or signature;
+  - the public summary (C8) must stop listing a paused creator's offers. Lane 1's check already exists on main: `trustPublicCreatorDenial()` (`modules/trust/scope-restriction.ts`, migration 0086) answers `denied` while a `pause_creator` or `revoke_license` restriction is active. Lane 4 uses it from the public summary (#469). Please confirm it is the authority for a creator's public commerce, and tell lane 4 before changing its meaning or signature;
   - another creator gets 503 `scope_denial_unavailable` instead of 403 on Maya's Studio routes on the development stack (W8 interactive denial behind the Studio's `content.role` check, `trust/scope-restriction.ts:91`); nothing moves, but the answer reads as an outage (#467);
   - review #459's signature checks against `matchesThreadAct` (and #439), and add a W8 negative authority for public share cards;
   - an operations case or console list for money escalations (`refund_escalated` events, `resolution_required` commitments) (#421);
   - optionally, a distinct `signed_act_expired` code (C3).
 - **Lane 2:** pass `COMMERCE_INBOX_DATABASE_URL` for #425's login to the scheduler's host. The stack resets every login role's password on `up`, so the URL has to come from the stack.
 - **Lane 5:**
-  - the public summary (`GET /v1/commerce/creators/:creatorId/summary`, #427) is ready to use, and #449 marks members-only offers (`membersOnly`);
+  - the public summary (`GET /v1/commerce/creators/:creatorId/summary`, #427) is ready to use, and #449 marks members-only offers (`membersOnly`). After #469 it answers 404 `creator_unavailable` for a creator ops has paused (as for an unknown one), and 503 when lane 1's check cannot answer: show the page's own paused or unavailable state, not an error;
   - request notices now arrive as your stand-in described (#453). An entry for `commitment_due` in `growth/owners.ts` would let a signed-in creator get commerce's live answer. Without it, the recorded state is used, which works;
   - share cards work through your routes once #459 is composed. Finding: `growth.share` is unique on `(grant_id, source_version)`, so after a fan hides their handle no new card can be made for the same reply (409); decide whether that is intended.
 - **Lane 6 (Studio offers):** the mode command takes an optional `eligibility: [] | ["request"]`; leaving it out keeps the current value (#429).
