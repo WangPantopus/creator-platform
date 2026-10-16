@@ -31,7 +31,7 @@ depends on the machine's load (see "Things to know"); `smoke --require-reply` ma
 
 | Part                        | Address (lane 2)         | Notes                                                                                                                                             |
 | --------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| PostgreSQL 17 with pgvector | `127.0.0.1:56420`        | Container `qelvora-lane2-postgres`, volume `qelvora-lane2-pgdata`. All 116 registered migrations, the seed, a password on every login role        |
+| PostgreSQL 17 with pgvector | `127.0.0.1:56420`        | Container `qelvora-lane2-postgres`, volume `qelvora-lane2-pgdata`. All 119 registered migrations, the seed, a password on every login role        |
 | Backend                     | `http://127.0.0.1:56421` | The real `server.ts`, development identity, trust runtime, Maya's AI live. The generation, trust and usage-expiry workers run inside this process |
 | Web                         | `http://localhost:56422` | `next dev`, pointed at that backend                                                                                                               |
 | Model fake                  | `127.0.0.1:56423`        | Stands in for the model provider (see below)                                                                                                      |
