@@ -634,6 +634,32 @@ export class PreparedGenerationProviderAccounting {
     }
   }
 
+  async *withAdmittedStreamUsage(
+    task: GenerationTask,
+    attempt: GenerationProviderAttempt,
+    admitted: GenerationProviderAdmission,
+    signal: AbortSignal,
+    call: () => AsyncIterable<StreamProposal>,
+    onAdmission?: (call: GenerationProviderCall) => void,
+  ): AsyncIterable<StreamProposal> {
+    let usage = this.unknownUsage();
+    let sourceFailure: { cause: unknown } | undefined;
+    try {
+      onAdmission?.(this.issuedCall(admitted, task, attempt));
+      signal.throwIfAborted();
+      for await (const proposal of call()) {
+        if ("usage" in proposal) usage = proposal.usage;
+        yield proposal;
+      }
+    } catch (error) {
+      sourceFailure = { cause: error };
+      if (error instanceof ProviderResponseError) usage = error.usage;
+      throw error;
+    } finally {
+      await this.finishRetainingFailure(admitted, usage, sourceFailure);
+    }
+  }
+
   async *withStreamUsage(
     task: GenerationTask,
     attempt: GenerationProviderAttempt,

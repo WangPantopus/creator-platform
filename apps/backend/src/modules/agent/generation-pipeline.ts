@@ -91,6 +91,8 @@ type Run = {
   replyCall?: GenerationProviderCall;
   /** The classifier call admitted inside the preflight (A4), until used. */
   preadmitted?: GenerationProviderAdmission;
+  /** The reply call admitted inside the retrieval read (A4), until used. */
+  preadmittedReply?: GenerationProviderAdmission;
   nextSequence: number;
   live: boolean;
 };
@@ -582,17 +584,31 @@ export class PreparedGenerationPipeline {
                 },
               );
             },
-            withStreamUsage: (call) =>
-              this.accounting.withStreamUsage(
-                task,
-                current.attempt,
-                signal,
-                call,
-                bookend,
-                (admitted) => {
-                  current.replyCall = admitted;
-                },
-              ),
+            withStreamUsage: (call) => {
+              const preadmitted = current.preadmittedReply;
+              current.preadmittedReply = undefined;
+              return preadmitted
+                ? this.accounting.withAdmittedStreamUsage(
+                    task,
+                    current.attempt,
+                    preadmitted,
+                    signal,
+                    call,
+                    (admitted) => {
+                      current.replyCall = admitted;
+                    },
+                  )
+                : this.accounting.withStreamUsage(
+                    task,
+                    current.attempt,
+                    signal,
+                    call,
+                    bookend,
+                    (admitted) => {
+                      current.replyCall = admitted;
+                    },
+                  );
+            },
             retrieve: async () => {
               const embedding = await this.retrieval.embedAcceptedMessage(
                 task,
@@ -600,22 +616,36 @@ export class PreparedGenerationPipeline {
                 signal,
                 bookend,
               );
-              const retrieved = await this.identity.withGeneration(
-                task,
-                async (client, scope) => {
-                  const facts = await this.current(client, scope, current);
-                  const value = await this.retrieval.currentInTransaction(
-                    client,
-                    scope,
-                    embedding,
-                    facts,
-                  );
-                  // The fresh reader already completes its own authority and
-                  // input bookends before returning this immutable value.
-                  return value;
-                },
-                signal,
-              );
+              const { value: retrieved, reply } =
+                await this.identity.withGeneration(
+                  task,
+                  async (client, scope) => {
+                    const facts = await this.current(client, scope, current);
+                    const value = await this.retrieval.currentInTransaction(
+                      client,
+                      scope,
+                      embedding,
+                      facts,
+                    );
+                    // The engine's next call is always the reply: admit it on
+                    // this same fresh read instead of in its own transaction.
+                    // The fresh reader already completes its own authority and
+                    // input bookends before returning this immutable value.
+                    return {
+                      value,
+                      reply: await this.accounting.admitInTransaction(
+                        client,
+                        scope,
+                        current.attempt,
+                        "reply",
+                        facts,
+                      ),
+                    };
+                  },
+                  signal,
+                );
+              // Only a committed admission is held for the reply.
+              current.preadmittedReply = reply;
               current.embedding = embedding;
               current.retrieval = retrieved;
               return {
@@ -714,10 +744,11 @@ export class PreparedGenerationPipeline {
     } finally {
       if (run) run.live = false;
       try {
-        // An admitted classifier call the engine never made sent no request.
-        const unused = run?.preadmitted;
-        if (run) run.preadmitted = undefined;
-        if (unused) await this.accounting.releaseUnused(unused);
+        // An admitted call the engine never made sent no request.
+        const unused = [run?.preadmitted, run?.preadmittedReply];
+        if (run) run.preadmitted = run.preadmittedReply = undefined;
+        for (const admitted of unused)
+          if (admitted) await this.accounting.releaseUnused(admitted);
       } finally {
         this.running.delete(key);
       }
