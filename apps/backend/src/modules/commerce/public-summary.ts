@@ -19,12 +19,16 @@ export type CommercePublicOffer = Readonly<{
   left: number;
   /** When a fully booked offer opens again (the next weekly window). */
   opensAt: string | null;
+  /** Only members whose tier includes requests can ask (T-07): show
+   * `modeMembersOnly` beside it. */
+  membersOnly: boolean;
 }>;
 export type CommercePublicSummary = Readonly<{
   creatorId: string;
   offers: readonly CommercePublicOffer[];
   /** "{name} answers {mode} within {deadline} · {n} of {cap} left this week."
-   * for the first offer, or "" when nothing is offered. */
+   * for the first offer any fan can ask for (the first offer when all are for
+   * members), or "" when nothing is offered. */
   capacity: string;
   /** "{name} usually decides in {range}" needs the creator's decision record,
    * which waits for its migration: "" until then, never an invented range. */
@@ -83,11 +87,12 @@ export async function commercePublicSummary(
         currency: string;
         delivery_hours: number;
         weekly_limit: number;
+        eligibility: string[];
         used: number;
         reserved: number;
         window_end: Date;
       }>(
-        `SELECT m.id,m.kind,m.title,m.amount,m.currency,m.delivery_hours,m.weekly_limit,
+        `SELECT m.id,m.kind,m.title,m.amount,m.currency,m.delivery_hours,m.weekly_limit,m.eligibility,
           coalesce(c.used,0) AS used,coalesce(c.reserved,0) AS reserved,
           (date_trunc('week',now() AT TIME ZONE 'UTC')+interval '7 days') AT TIME ZONE 'UTC' AS window_end
          FROM creator.commerce_mode m
@@ -113,9 +118,10 @@ export async function commercePublicSummary(
         cap: m.weekly_limit,
         left,
         opensAt: left === 0 ? m.window_end.toISOString() : null,
+        membersOnly: m.eligibility.length > 0,
       });
     });
-    const first = offers[0];
+    const first = offers.find((o) => !o.membersOnly) ?? offers[0];
     const capacity = first
       ? formatCopy("capacity", {
           name: creator.display_name,
