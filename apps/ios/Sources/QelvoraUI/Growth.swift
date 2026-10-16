@@ -414,7 +414,7 @@ public struct GrowthFanFeature: View {
               ) { Button(QelvoraCopy.text("navDiscover"), variant: .secondary) { open("/discover") } }
             }
           } else if route.hasPrefix("/invite/"), let invitation {
-            Seal(initial: String(invitation.creator.name.prefix(1)), size: 56)
+            Seal(initial: creatorInitial(invitation.creator.name), size: 56)
             Text(QelvoraCopy.text("growthInvitedYouIn", values: ["name": invitation.creator.name])).qText("display-lg")
             Text(QelvoraCopy.text("growthAFirstConversationOfAbout24HoursNoCardNeeded")).qText("body")
             Button(QelvoraCopy.text("growthAcceptInvitation"), variant: .ai, block: true) {
@@ -469,7 +469,7 @@ public struct GrowthFanFeature: View {
                   QelvoraGlyph(name: "back", color: qColor("ink", scheme))
                     .frame(width: 44, height: 44)
                 }.buttonStyle(.plain).accessibilityLabel(goBack == nil || backTarget == "/creators/" + creator.handle ? QelvoraCopy.text("growthBackToSPage", values: ["name": creator.name]) : QelvoraCopy.text("back"))
-                Avatar(initial: String(creator.name.prefix(1)))
+                Avatar(initial: creatorInitial(creator.name))
                 VStack(alignment: .leading, spacing: 2) {
                   Text(creator.name).qText("body-strong")
                   Text(QelvoraCopy.text("growthPostPublic")).qText("data-sm").foregroundStyle(
