@@ -18,6 +18,8 @@ android {
         versionName = "0.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "CREATOR_API_URL", "\"${providers.gradleProperty("creatorApiUrl").getOrElse("").replace("\\", "\\\\").replace("\"", "\\\"")}\"")
+        // WP 7.12: the web origin that serves the Studio (an https origin; empty hides the link).
+        buildConfigField("String", "CREATOR_WEB_URL", "\"${providers.gradleProperty("creatorWebUrl").getOrElse("").replace("\\", "\\\\").replace("\"", "\\\"")}\"")
         buildConfigField("boolean", "CREATOR_PUSH_ENABLED", if (providers.gradleProperty("creatorPushEnabled").orNull == "true") "true" else "false")
         listOf("creatorFirebaseApplicationId" to "CREATOR_FIREBASE_APPLICATION_ID", "creatorFirebaseProjectId" to "CREATOR_FIREBASE_PROJECT_ID", "creatorFirebaseSenderId" to "CREATOR_FIREBASE_SENDER_ID", "creatorFirebaseApiKey" to "CREATOR_FIREBASE_API_KEY").forEach { (property, field) ->
             val value = providers.gradleProperty(property).getOrElse("")

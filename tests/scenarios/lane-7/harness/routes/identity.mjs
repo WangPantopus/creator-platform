@@ -44,6 +44,16 @@ export function authenticate(ctx, { refreshing = false } = {}) {
       "Your account changed. Reopen this page to continue.",
     );
   ctx.entry.account = account.key;
+  // C1: an account flagged under 18 after sign-in loses its session on the
+  // next request, with the same final answer sign-in gives.
+  if (account.adult === false) {
+    session.revoked = true;
+    throw new Failure(
+      403,
+      "adult_eligibility_required",
+      "This app is available to adults aged 18 and over.",
+    );
+  }
   return { session, account, token };
 }
 
@@ -66,6 +76,12 @@ const view = (session, account) => ({
 });
 
 export function register(router) {
+  // WP 7.12: stands in for the web Studio, so a browser's visit is in the log.
+  // The real page shows the Studio signed in, or its sign-in returning there.
+  router.add("GET", "/studio/:creatorId", ({ params }) => ({
+    page: "web Studio (lane 7 fake)",
+    creatorId: params.creatorId,
+  }));
   router.add("GET", "/v1/identity/capabilities", ({ world }) => ({
     signInAvailable: true,
     localAccountsAllowed: false,

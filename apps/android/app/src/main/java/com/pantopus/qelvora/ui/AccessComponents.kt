@@ -83,7 +83,7 @@ fun IncludeList(summary: String = "", items: List<IncludeItem> = emptyList(), ed
 fun TermsBlock(name: String = "Maya", price: String = "$25.00", deadline: String = "48 h", draftNote: Boolean = true) {
     val shape = RoundedCornerShape(T.radiusLg)
     Column(Modifier.background(qColor("surface"), shape).border(T.hairline, qColor("line"), shape)) {
-        listOf(copy("ifAccepts", "name" to name) to price, copy("ifDeclines", "deadline" to deadline) to "$0.00").forEach { (label, value) ->
+        listOf(copy("ifAccepts", "name" to name) to price, copy("ifDeclines", "name" to name, "deadline" to deadline) to "$0.00").forEach { (label, value) ->
             Row(Modifier.fillMaxWidth().padding(horizontal = T.messagePadding, vertical = T.space3), horizontalArrangement = Arrangement.spacedBy(T.space3)) { TextLine(label.uppercase(), "mono-caption", "ink-muted", modifier = Modifier.weight(1f)); TextLine(value, "mono-caption") }
             Hairline()
         }

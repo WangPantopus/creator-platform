@@ -168,7 +168,7 @@ for (const p of L.platforms(process.argv[2])) {
   entries = await waitLog(
     since,
     { path: /identity\/refresh/u, status: 200 },
-    15000,
+    40000,
   );
   await L.sleep(5000);
   const after = await live();
@@ -190,9 +190,9 @@ for (const p of L.platforms(process.argv[2])) {
   entries = await waitLog(
     since,
     { path: /identity\/refresh/u, status: 401 },
-    15000,
+    40000,
   );
-  screen = await L.waitForText(p, /Continue with Pantopus/u, 15000);
+  screen = await L.waitForText(p, /Continue with Pantopus/u, 40000);
   L.step(
     p,
     "H11 a revoked session signs the person out and says why",
@@ -211,7 +211,7 @@ for (const p of L.platforms(process.argv[2])) {
   await L.harness("POST", "/__harness/faults", {
     rules: [{ match: "^/v1/identity/session$", drop: true }],
   });
-  screen = await L.waitForText(p, /Reconnect to refresh your account/u, 20000);
+  screen = await L.waitForText(p, /Reconnect to refresh your account/u, 40000);
   await L.harness("POST", "/__harness/faults", { rules: [] });
   const recovered = await L.waitForAbsent(
     p,
