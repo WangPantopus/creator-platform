@@ -5,8 +5,11 @@ Updated: 2026-10-15, by the lane 6 session resumed from the 2026-10-09 handoff.
 Working on: nothing. WP 6.2 (Today and the Note composer) is done in #443 on
 `lane-6/today-note`; the session stopped for the founder's review, as asked.
 
-Waiting on: the founder's yes on the new copy and on Today's place in the tab bar, and the
-integrator's approval of the small additive change to `config/navigation.json`.
+Waiting on: the founder's decision on Today's place in the tab bar, and the integrator's
+approval of the small additive change to `config/navigation.json`.
+
+Decided: the founder approved the new Today and composer copy in #443 as proposed (2026-10-15,
+in chat: "The new Today and composer copy in #443 is approved as proposed.").
 
 ## Done
 
