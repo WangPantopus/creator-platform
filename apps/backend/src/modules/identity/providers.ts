@@ -218,3 +218,65 @@ export async function exchangeCode(
   );
   return parsed.success ? parsed.data : null;
 }
+
+/** Ends the app's authorization at the provider with the refresh token it
+ * issued to `clientId`. Apple answers 200 even for a token that is already
+ * invalid (RFC 7009), so only a 200 counts there; Google answers 400
+ * invalid_token for one, which counts as done. A network failure, 429 or 5xx
+ * is the provider being unavailable; any other refusal means this host's
+ * provider configuration is wrong and retrying alone cannot fix it. */
+export async function revokeToken(
+  settings: ProviderSettings,
+  input: { token: string; clientId: string },
+): Promise<void> {
+  let response: Response;
+  try {
+    response = await fetch(settings.endpoints.revoke, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Accept: "application/json",
+      },
+      body: new URLSearchParams(
+        settings.provider === "apple"
+          ? {
+              client_id: input.clientId,
+              client_secret: settings.clientSecret(input.clientId),
+              token: input.token,
+              token_type_hint: "refresh_token",
+            }
+          : { token: input.token },
+      ),
+      signal: AbortSignal.timeout(8000),
+      cache: "no-store",
+    });
+  } catch (cause) {
+    throw new DomainError(
+      "identity_provider_unavailable",
+      "The sign-in provider is unavailable right now.",
+      503,
+      { cause },
+    );
+  }
+  if (response.status >= 500 || response.status === 429)
+    throw new DomainError(
+      "identity_provider_unavailable",
+      "The sign-in provider is unavailable right now.",
+      503,
+    );
+  if (response.ok) return;
+  const error = z
+    .object({ error: z.string().max(200) })
+    .safeParse(await response.json().catch(() => ({})));
+  if (
+    settings.provider === "google" &&
+    response.status === 400 &&
+    error.data?.error === "invalid_token"
+  )
+    return;
+  throw new DomainError(
+    "identity_provider_revocation_refused",
+    `The ${settings.provider} provider refused to revoke a token (${response.status} ${error.data?.error ?? "no error code"}).`,
+    503,
+  );
+}

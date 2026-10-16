@@ -1,6 +1,7 @@
 import type { Pool, PoolClient } from "pg";
 import type { PrivacyHook } from "./contracts.js";
 import { identityPrivacyHook } from "./identity-privacy-hook.js";
+import type { QelvoraSignIn } from "../identity/qelvora-sign-in.js";
 import { conversationPrivacyAuthority } from "./conversation-privacy-authority.js";
 import {
   conversationPrivacyHook,
@@ -165,6 +166,9 @@ export function createPrivacyConsumers(input: {
   privacyArtifacts?: PrivacyArtifactStore;
   /** Real current restoration on the owner's held client, never a pool check. */
   assertRestoredInTransaction?: (client: PoolClient) => Promise<void>;
+  /** The host's Apple and Google sign-in, resolved per task. Without it a
+   * Qelvora account's export or erasure is blocked, never done halfway. */
+  identitySignIn?: () => QelvoraSignIn | undefined;
   conversationRetention?: ConversationPrivacyRetention;
   /** Prepared owner instances; the coordinator fixes the pool, actual task
    * authority and reviewed retention after spreading these owner ports. */
@@ -230,6 +234,7 @@ export function createPrivacyConsumers(input: {
       input.runtimePool,
       input.coordinatorPool,
       input.assertRestoredInTransaction,
+      input.identitySignIn,
     ),
     {
       domain: "conversation",
