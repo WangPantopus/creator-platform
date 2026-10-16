@@ -1,8 +1,8 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-16, by the lane 3 session
-Working on: nothing unblocked is left. Last done: finding 6 (the settlement retries a locked thread row), PR on `lane-3/f6-terminal-lock-retry`
-Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482, A5 #489, B5 #490, B5 web #491, finding 18 #492, finding 5 #494, finding 6 (`lane-3/f6-terminal-lock-retry`)
+Working on: nothing unblocked is left. Last done: finding 6 (the settlement retries a locked thread row), #495
+Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482, A5 #489, B5 #490, B5 web #491, finding 18 #492, finding 5 #494, finding 6 #495
 Next: B8 after #441 and #446 merge; B6 waits on the provider key and the embedding choice; the real-model halves (B4, B1, finding 13) when the gateway is up
 Blocked on: nothing. Later: the embedding choice (B6), the real model for B1's model check and finding 13 (gateway)
 
@@ -491,7 +491,7 @@ SHARE` on the thread row, which waits for the generation transaction writing tha
 6. The worker's `FOR UPDATE NOWAIT` on the thread row collides with the API's thread reads
    ("could not obtain lock on row in relation thread", several per run). Opening a stage already
    retried the refusal; the settlement did not, so a refused completion waited for lease recovery and
-   ended a fully streamed answer interrupted about 64 s later. Fixed on `lane-3/f6-terminal-lock-retry`
+   ended a fully streamed answer interrupted about 64 s later. Fixed by #495
    (no migration; see "Finding 6" above).
 7. Any authority change while the model is streaming (takeover, pause, consent withdrawal, licence
    lapse, block, AI pause, sign-out) leaves a provider-cost row with no cost (the aborted stream),
