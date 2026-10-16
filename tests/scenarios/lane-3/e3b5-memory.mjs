@@ -386,6 +386,34 @@ advise(
   `${replies.length - afterNo} reply calls seen`,
 );
 
+// 5b. "Don't remember this" on one message removes that message and its
+// answer from the AI's context; the rest of the history stays.
+await say("My secret glaze ingredient is lithium carbonate.");
+const secret = (await call(API, "GET", fan.thread, { token: fan.token })).json;
+const secretMessage = secret.messages.findLast(
+  (m) => m.authorKind === "fan" && m.text.includes("lithium carbonate"),
+);
+const forgot = await call(
+  API,
+  "POST",
+  `${fan.thread}/messages/${secretMessage?.id}/dont-remember`,
+  { token: fan.token, body: { expectedRevision: secret.revision } },
+);
+const afterForget = replies.length;
+await say("What should I glaze next?");
+const forgetContext = replies
+  .slice(afterForget)
+  .map((r) => r.input)
+  .join("");
+step(
+  "don't remember this removes only that message from the AI's context",
+  forgot.status === 200 &&
+    forgetContext.length > 0 &&
+    !forgetContext.includes("lithium carbonate") &&
+    forgetContext.includes("I sell my mugs at a weekend market."),
+  `${forgot.status}`,
+);
+
 // 6. Duplicates write one row.
 const counts = await sql(
   "SELECT semantic_key, count(*)::int AS n FROM creator.memory WHERE fan_id=$1 GROUP BY semantic_key HAVING count(*)>1",
