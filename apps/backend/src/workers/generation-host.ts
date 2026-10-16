@@ -8,6 +8,7 @@ import {
 import type { HostUsageAccounting } from "../modules/trust/usage-accounting-host.js";
 import { reviewedGenerationWorkerCustody } from "./generation-custody.js";
 import { GenerationWorker } from "./generation.js";
+import { GenerationWake } from "./generation-wake.js";
 
 /** Canonical loopback development host. The original worker owns execution;
  * this host owns its pool, admission lifetime and complete shutdown drain. */
@@ -79,6 +80,7 @@ export async function createDevelopmentGenerationHost(
     console.error("An idle generation connection failed and was discarded.");
   });
   let active = false;
+  let wake: GenerationWake | undefined;
   let done: Promise<void> | undefined;
   let closing: Promise<void> | undefined;
   const isRunning = () => active && !controller.signal.aborted;
@@ -99,18 +101,28 @@ export async function createDevelopmentGenerationHost(
         "Start the fully prepared original generation worker exactly once.",
       );
       active = true;
-      done = worker.run(controller.signal, (pass) => {
-        if (
-          pass.completed ||
-          pass.failed ||
-          pass.deferred ||
-          pass.recovered ||
-          pass.failures.length
-        )
-          process.stdout.write(
-            JSON.stringify({ event: "generation_pass", ...pass }) + "\n",
-          );
-      });
+      // Accepted work wakes the worker; the poll remains the fallback.
+      wake = new GenerationWake(env.GENERATION_DATABASE_URL!, () =>
+        worker.wake(),
+      );
+      wake.start();
+      const listening = wake;
+      done = worker.run(
+        controller.signal,
+        (pass) => {
+          if (
+            pass.completed ||
+            pass.failed ||
+            pass.deferred ||
+            pass.recovered ||
+            pass.failures.length
+          )
+            process.stdout.write(
+              JSON.stringify({ event: "generation_pass", ...pass }) + "\n",
+            );
+        },
+        () => listening.listening,
+      );
       void done.then(
         () => {
           active = false;
@@ -136,6 +148,7 @@ export async function createDevelopmentGenerationHost(
         } catch (cause) {
           failures.push(cause);
         }
+        await wake?.close();
         try {
           await workerPool.end();
         } catch (cause) {

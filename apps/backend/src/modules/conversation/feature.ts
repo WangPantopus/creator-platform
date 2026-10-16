@@ -30,7 +30,11 @@ import {
   SendMessageSchema,
   type AcceptedMessage,
 } from "@qelvora/api";
-import { needsImmediateSafety, crisisText } from "../agent/pipeline.js";
+import {
+  needsImmediateSafety,
+  crisisText,
+  fallback,
+} from "../agent/pipeline.js";
 import { z } from "zod";
 import { capabilitySnapshot } from "../access/commerce.js";
 import type { ConversationWellbeing } from "./wellbeing.js";
@@ -342,6 +346,23 @@ export class ConversationFeature {
         this.policyAvailable(scope) &&
         t.processor_consent_version === this.policy.version,
     );
+    // The latest AI turn decides whether the thread may show the way to the
+    // creator's paid attention: never right after the crisis response or a
+    // companion safety refusal (INV-19, INV-21). Both texts are written only
+    // by the server; the expert fallback ("You can ask … directly") keeps it.
+    // An answer that has no sentence yet does not count, so the button cannot
+    // flash back while the next reply might still be the crisis response.
+    const latestAi =
+      (
+        await client.query<{ text: string }>(
+          "SELECT text FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND author_kind='ai' AND text<>'' ORDER BY sequence DESC LIMIT 1",
+          [scope.threadId, scope.creatorId, scope.fanId],
+        )
+      ).rows[0]?.text ?? "";
+    const stepInAvailable = !(
+      latestAi.includes(crisisText) ||
+      latestAi.includes(fallback("companion", t.display_name))
+    );
     const capabilities = await capabilitySnapshot(client, scope);
     const hasAccess =
       capabilities.capabilities.includes("ai_message") &&
@@ -380,11 +401,14 @@ export class ConversationFeature {
             : t.control !== "ai_active"
               ? "AI messaging is paused in this conversation."
               : !hasAccess
-                ? "Your AI access or allowance is unavailable. You can still ask the creator to step in."
+                ? stepInAvailable
+                  ? "Your AI access or allowance is unavailable. You can still ask the creator to step in."
+                  : "Your AI access or allowance is unavailable."
                 : null,
       feedbackPolicy: this.lineage
         ? await this.lineage.policy(scope, client)
         : null,
+      stepInAvailable,
     };
   }
   async offline(actor: Actor, creatorId: string, fanId: string) {
@@ -1016,54 +1040,75 @@ export function conversationFeature(
           if (prior.generationId) feature.afterAcceptance?.(scope);
           return;
         }
-        if (!prior) {
-          const expected = await feature.conversations.safetyCheckpoint(scope);
-          let accepted: AcceptedMessage | null = null;
-          if (needsImmediateSafety(body.text)) {
-            accepted = await feature.conversations.sendSafety(
-              scope,
-              body,
-              expected,
-            );
-          } else if (feature.routeSafety && feature.policyAvailable(scope)) {
-            const abort = new AbortController();
-            res.on("close", () => {
-              if (!res.writableEnded) abort.abort();
-            });
-            await feature.routeSafety(
-              scope,
-              body.text,
-              AbortSignal.any([abort.signal, AbortSignal.timeout(15000)]),
-              async (sentence) => {
-                invariant(
-                  sentence.safety === true && sentence.text === crisisText,
-                  "safety_invalid",
-                  "The platform safety response is unavailable.",
-                );
-                accepted = await feature.conversations.sendSafety(
-                  scope,
-                  body,
-                  expected,
-                );
-              },
-            );
-          }
-          if (accepted) {
-            feature.afterBoundary?.(scope, accepted.message.controlEpoch);
-            res.json(accepted);
-            return;
-          }
-        }
-        if (
-          !prior &&
-          (!feature.generationAvailable || !feature.policyAvailable(scope))
-        )
-          throw new DomainError(
-            "model_unconfigured",
-            "AI messaging is not connected yet.",
-            503,
+        const expected = await feature.conversations.safetyCheckpoint(scope);
+        const safely = (accepted: AcceptedMessage) => {
+          feature.afterBoundary?.(scope, accepted.message.controlEpoch);
+          res.json(accepted);
+        };
+        if (needsImmediateSafety(body.text))
+          return safely(
+            await feature.conversations.sendSafety(scope, body, expected),
           );
-        const accepted = await feature.conversations.send(scope, body);
+        // The model's safety check, for a message the AI will not answer. A
+        // dropped request must not cancel a check already sent to the
+        // provider: its cost would stay unknown (A6). The check runs to its
+        // own deadline; a fan who left still has nothing accepted.
+        const modelSafety = async () => {
+          if (!feature.routeSafety || !feature.policyAvailable(scope))
+            return null;
+          let accepted: AcceptedMessage | null = null;
+          const left = new AbortController();
+          const requestLeft = () =>
+            new DomainError(
+              "generation_cancelled",
+              "Generation was interrupted.",
+              503,
+            );
+          res.on("close", () => {
+            if (!res.writableEnded) left.abort();
+          });
+          await feature.routeSafety(
+            scope,
+            body.text,
+            AbortSignal.timeout(15000),
+            async (sentence) => {
+              invariant(
+                sentence.safety === true && sentence.text === crisisText,
+                "safety_invalid",
+                "The platform safety response is unavailable.",
+              );
+              if (left.signal.aborted) throw requestLeft();
+              accepted = await feature.conversations.sendSafety(
+                scope,
+                body,
+                expected,
+              );
+            },
+          );
+          if (left.signal.aborted) throw requestLeft();
+          return accepted;
+        };
+        // A5: a message the AI will answer is acknowledged after the
+        // synchronous check above; the worker's classifier runs first and
+        // answers a crisis with the fixed safety response before anything
+        // else. A message that would be refused (no allowance, a takeover, a
+        // paused AI, a reply in progress) gets the model's check before the
+        // refusal, so safety never depends on access (INV-19).
+        let accepted: AcceptedMessage;
+        try {
+          if (!feature.generationAvailable || !feature.policyAvailable(scope))
+            throw new DomainError(
+              "model_unconfigured",
+              "AI messaging is not connected yet.",
+              503,
+            );
+          accepted = await feature.conversations.send(scope, body);
+        } catch (refusal) {
+          const safe =
+            refusal instanceof DomainError ? await modelSafety() : null;
+          if (safe) return safely(safe);
+          throw refusal;
+        }
         res.json(accepted);
         if (accepted.generationId) feature.afterAcceptance?.(scope);
       });
