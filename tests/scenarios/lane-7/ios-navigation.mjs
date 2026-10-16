@@ -40,6 +40,7 @@ const flows = presence
       R1: "testR01NotesAndReactionsInPlace",
       R4: "testR04NewNoteAfterForegroundAndReconnect",
       R5: "testR05EligibilityAndFailures",
+      R7: "testR07EarlierMessagesRevealOlderNotes",
       R8: "testR08LongUnicodeNoteLargestText",
       R9: "testR09NothingOnDisk",
     }

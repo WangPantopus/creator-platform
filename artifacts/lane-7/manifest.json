@@ -78,5 +78,25 @@
     "path": "artifacts/lane-7/7-3-real-stack-run.txt",
     "sha256": "4bccfaa987f5cd539ee4d434f2a67dd8ee37b13231166f6944ed921be05ab647",
     "bytes": 7464
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p1-pair-light.jpg",
+    "sha256": "6061c8ca3b9975ece27d5284820c955e0463e565d9fd2222cc031793987b1359",
+    "bytes": 99631
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p1-pair-gray.jpg",
+    "sha256": "c95d25062b2fd6e8008b46d42acb45200718591dff7a1413e6264543fa4a08f5",
+    "bytes": 95308
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p1-largest-night.jpg",
+    "sha256": "ab4189c4e474e4e22570f261f786f51ce14d04937ed08f9fc56d6e1fc2bc40ee",
+    "bytes": 110210
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p1-run.txt",
+    "sha256": "0ca98257aca5de0009a588e4e06417a24c88d1a6cb9a506d26c7573a5e207ae9",
+    "bytes": 2348
   }
 ]

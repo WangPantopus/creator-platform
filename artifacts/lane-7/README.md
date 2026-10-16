@@ -27,3 +27,14 @@ model provider are synthetic. It includes the cold-link failure and successful f
 
 `7-2-gates.txt` records local native suites, release-hook absence, the harness contract check,
 and repository gates. Expected skips and checks not run are named explicitly.
+
+## WP 7.4 P1 (Notes and reactions in the thread, C4)
+
+| File                       | What it shows                                                                                                                                                                                                                                            |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `7-4-p1-pair-light.jpg`    | Maya's thread in Light, iOS left, Android right: the all-members Note (broadcast glyph, the server's label "Maya · to all members", the body, "Signed by Maya") and the reaction chip (heart, "Maya reacted to your reply") between the messages by time |
+| `7-4-p1-pair-gray.jpg`     | The same pair in grayscale: word and glyph still say who is speaking without color                                                                                                                                                                       |
+| `7-4-p1-largest-night.jpg` | Night at the largest text: a long Note with emoji, Hebrew and Arabic, its label reachable on both apps                                                                                                                                                   |
+
+`7-4-p1-run.txt` records the operated runs on both apps against the fake API (R1.1 to R1.9, D3T), the
+62-check contract run, and what was not run. Nothing here is the real backend.

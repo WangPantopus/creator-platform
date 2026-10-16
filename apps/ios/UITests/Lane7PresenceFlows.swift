@@ -227,6 +227,40 @@ final class Lane7PresenceFlows: XCTestCase {
         capture("R5-note-no-longer-eligible")
     }
 
+    /// R1.7: a thread longer than one page (the fake pages at 50 messages): a
+    /// Note older than the oldest loaded message waits for "Earlier messages".
+    func testR07EarlierMessagesRevealOlderNotes() async throws {
+        try await fresh()
+        try await control("/__harness/flags", body: ["replyDelayMs": 0, "sentenceDelayMs": 0])
+        func mayaThread() async throws -> [String: Any] {
+            let state = try await control("/__harness/state") as! [String: Any]
+            return (state["threads"] as! [[String: Any]]).first { $0["creator"] as? String == "maya" && $0["account"] as? String == "devon" }!
+        }
+        // Each ask waits for its reply: an ask during a reply is refused.
+        for i in 1...30 {
+            try await control("/__harness/threads/maya/ask", body: ["text": "Question \(i) about glaze thickness on stoneware."])
+            for _ in 0..<50 { if try await mayaThread()["generating"] as? Bool != true { break }; try await Task.sleep(for: .milliseconds(100)) }
+        }
+        let length = (try await mayaThread()["messages"] as! [Any]).count
+        XCTAssertGreaterThan(length, 50, "the thread is longer than one page: \(length)")
+        try await control("/__harness/flags", body: ["replyDelayMs": 500, "sentenceDelayMs": 450])
+        try await control("/__harness/log/clear", body: [:])
+        app.terminate(); app.launchArguments = arguments + ["--return-to", thread]; app.launch(); app.launchArguments = arguments
+        XCTAssertTrue(app.buttons["Send"].waitForExistence(timeout: 30))
+        _ = try await reads(3)
+        XCTAssertTrue(absent(note), "older Notes wait for the earlier messages")
+        XCTAssertTrue(absent(reaction), "and so does the older reaction")
+        // The top of a 50-message page of tall rows: flings are fine for "go to the top".
+        let earlier = element("Earlier messages")
+        for _ in 0..<30 where !visible(earlier) { app.swipeDown() }
+        XCTAssertTrue(visible(earlier), "Earlier messages at the top of the page")
+        earlier.tap()
+        try await Task.sleep(for: .seconds(2))
+        find(note)
+        find(reaction, up: false)
+        capture("R7-revealed-with-earlier-messages")
+    }
+
     /// R1.8: a long Note with emoji and right-to-left text, largest text, Light and Night.
     func testR08LongUnicodeNoteLargestText() async throws {
         try await fresh()
@@ -239,7 +273,12 @@ final class Lane7PresenceFlows: XCTestCase {
             XCTAssertTrue(app.buttons["Send"].waitForExistence(timeout: 30))
             find("🔥 שלום עולם", up: false)
             capture("R8-long-unicode-largest-\(mode)")
-            find(note)
+            // The long Note is the newest: its own label is the bottom-most one
+            // (every row exists in the largest-text layout, so firstMatch is the oldest).
+            let labels = app.descendants(matching: .any).matching(NSPredicate(format: "label == %@", note))
+            let own = labels.element(boundBy: max(0, labels.count - 1))
+            for _ in 0..<40 where !visible(own) { drag(up: true) }
+            XCTAssertTrue(visible(own), "the long Note's label is reachable at the largest text")
             capture("R8-label-largest-\(mode)")
         }
         appearance = "light"

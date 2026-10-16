@@ -40,11 +40,11 @@ Updated: 2026-10-15, by the resumed lane 7 session (one session, both platforms)
   arbitration fix (`NativeBackSwipe`) passed N5, N1 and the full iOS run. It also
   preserves vertical scrolling at the edge; screenshots and API checks corroborate it.
 
-Working on: WP 7.4 piece P1 (C4 Notes and reactions in the thread) on `lane-7/notes-reactions`, stacked on [#401](https://github.com/WangPantopus/creator-platform/pull/401); the spec is [lane-7-rendering-parity.md](lane-7-rendering-parity.md) on that branch.
+Working on: WP 7.4 piece P1 (C4 Notes and reactions in the thread), branch `lane-7/notes-reactions`, stacked on [#401](https://github.com/WangPantopus/creator-platform/pull/401) (ready for review). Spec and results: [lane-7-rendering-parity.md](lane-7-rendering-parity.md).
 
-Waiting on: Nothing for #401. For WP 7.4: founder decisions on the unread word, the 3-hour reminder rule and the comparison copy removal (listed in the spec). GitHub connection for the app's CI reader. Backend domain erasure is still blocked/retrying (lane 1 ticket).
+Waiting on: For WP 7.4: founder decisions on the unread word, the 3-hour reminder rule and the comparison copy removal (in the spec). Backend domain erasure is still blocked/retrying (lane 1 ticket).
 
-Next: Finish WP 7.4 piece by piece (P1 C4 first), then stop and report. 7.10, 7.11, 7.8 and 7.12 wait for "Next for lane 7". WP 7.5/7.6/7.7/7.9 wait on C1, domain, credentials, accounts and icon art.
+Next: The remaining WP 7.4 pieces in the spec's order (P2 notification rows, P3 step-in seal and composer states with the clipped seal initial at the largest text, then P4 to P9); P10 waits on the share-card contract and a domain. 7.10, 7.11, 7.8 and 7.12 wait for "Next for lane 7". WP 7.5/7.6/7.7/7.9 wait on C1, domain, credentials, accounts and icon art.
 
 ## Resume here
 
@@ -71,15 +71,16 @@ Next: Finish WP 7.4 piece by piece (P1 C4 first), then stop and report. 7.10, 7.
 
 The original 7.1 flows and full 7.2 matrix use the fake API. A focused 7.2 flow also passed on the real stack, as recorded in the navigation report. Both devices need debug builds installed; the harness starts itself if none is running.
 
-| ID                                                                    | Result                                                                                                           | Command                                                                  |
-| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| Contract check, 51 checks                                             | pass                                                                                                             | `pnpm exec tsx tests/scenarios/lane-7/harness/check-contract.mjs`        |
-| H1 to H12 sign-in, session end, network drop                          | pass on iOS and Android                                                                                          | `node tests/scenarios/lane-7/e7-1-signin.mjs [ios\|android]`             |
-| S1 to S8 states and switches, E1 server error, L1 to L5 live delivery | pass on iOS and Android                                                                                          | `node tests/scenarios/lane-7/e7-1-states.mjs [ios\|android]`             |
-| F1 to F2 first conversation                                           | pass on both (Android by script; iOS by hand through the simulator tool)                                         | `node tests/scenarios/lane-7/e7-1-first-conversation.mjs [ios\|android]` |
-| Request rate, thread open and idle (WP 7.8 "before")                  | iOS 49 a minute, Android 51 a minute                                                                             | `node tests/scenarios/lane-7/baseline-requests.mjs both 60`              |
-| N1 to N21 navigation (WP 7.2)                                         | Android: 21 of 21 pass. iOS: 13 XCUITest flows pass, plus prior manual results ([details](lane-7-navigation.md)) | `node tests/scenarios/lane-7/e7-2-navigation.mjs [N1 ...]`               |
-| Release builds contain none of the hook                               | pass, both; repeated for 7.2                                                                                     | `artifacts/lane-7/7-2-gates.txt`                                         |
+| ID                                                                                   | Result                                                                                                           | Command                                                                                          |
+| ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Contract check, 62 checks (11 for C4 presence)                                       | pass                                                                                                             | `pnpm exec tsx tests/scenarios/lane-7/harness/check-contract.mjs`                                |
+| H1 to H12 sign-in, session end, network drop                                         | pass on iOS and Android                                                                                          | `node tests/scenarios/lane-7/e7-1-signin.mjs [ios\|android]`                                     |
+| S1 to S8 states and switches, E1 server error, L1 to L5 live delivery                | pass on iOS and Android                                                                                          | `node tests/scenarios/lane-7/e7-1-states.mjs [ios\|android]`                                     |
+| F1 to F2 first conversation                                                          | pass on both (Android by script; iOS by hand through the simulator tool)                                         | `node tests/scenarios/lane-7/e7-1-first-conversation.mjs [ios\|android]`                         |
+| Request rate, thread open and idle (WP 7.8 "before")                                 | iOS 49 a minute, Android 51 a minute                                                                             | `node tests/scenarios/lane-7/baseline-requests.mjs both 60`                                      |
+| R1.1 to R1.9 Notes and reactions (WP 7.4 P1, R1.7 included; R1.10 and R1.11 not run) | pass on iOS and Android                                                                                          | `node tests/scenarios/lane-7/e7-4-presence.mjs`; iOS `ios-navigation.mjs <xctestrun> --presence` |
+| N1 to N21 navigation (WP 7.2)                                                        | Android: 21 of 21 pass. iOS: 13 XCUITest flows pass, plus prior manual results ([details](lane-7-navigation.md)) | `node tests/scenarios/lane-7/e7-2-navigation.mjs [N1 ...]`                                       |
+| Release builds contain none of the hook                                              | pass, both; repeated for 7.2                                                                                     | `artifacts/lane-7/7-2-gates.txt`                                                                 |
 
 Existing suites for 7.1 (Android unit and Paparazzi 19, Lint 0 errors, instrumentation 8 with 4 skipped by design; iOS `swift test` 18, UI tests 6 with 4 skipped by design): `./gradlew :app:testDebugUnitTest :app:verifyPaparazziDebug :app:lintDebug`; `swift test`; `xcodebuild test`. The 7.2 run of these is recorded in [lane-7-navigation.md](lane-7-navigation.md).
 

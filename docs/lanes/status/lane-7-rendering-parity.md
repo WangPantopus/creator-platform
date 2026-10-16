@@ -7,19 +7,19 @@ carries an iOS and an Android result.
 WP 7.4 has twelve pieces. Each piece is its own pull request, in the order below. A piece that
 waits on a contract or a founder decision says so, keeps today's behavior and moves on.
 
-| Piece | Rule set | Source | State |
-| --- | --- | --- | --- |
-| P1 | Notes and reactions in the thread | C4 (lane 5), `GET /v1/content/{creatorId}/presence` | This spec; first pull request |
-| P2 | Notification rows: glyph, color, time, unread | `GET /v1/growth/notifications` (C4 notices, lane 5) | Next |
-| P3 | Step-in seal and the composer states | Conversation page (`control`, `canSend`, `unavailableReason`) | Paused and human: buildable. Trial, ended, capacity: no contract (ticket to lane 3) |
-| P4 | Citations | Message `citations` (ids) and the creator's posts | To survey |
-| P5 | Named pickers instead of raw ids | `GET /v1/conversations/account` (`threads[].name`) | Buildable, no contract change |
-| P6 | Explicit provider consent | Capabilities `providers`, `POST .../consent` | To survey |
-| P7 | 18+ confirmation | C1 (lane 1) age screen and `adult_eligibility_required` | Overlaps WP 7.5; to survey |
-| P8 | The 3-hour reminder | No server signal; client rule proposed | Needs a founder decision on the rule |
-| P9 | Packet terms block and ETA line | `chargeRule`, `pendingHold`, `decisionEta`; lane 4's public summary `reliability` | ETA waits on lane 4's decision record (empty until then); Q04 keeps payment on the web |
-| P10 | Share sheet for the card | Lane 5 share card (needs lanes 1, 3, 4) | Waits on the share-card contract |
-| P11 | Remove "AI comparisons are not available yet." | Comparison stays installed and off (2026-10-08) | Copy change: founder approval |
+| Piece | Rule set                                       | Source                                                                            | State                                                                                  |
+| ----- | ---------------------------------------------- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| P1    | Notes and reactions in the thread              | C4 (lane 5), `GET /v1/content/{creatorId}/presence`                               | This spec; first pull request                                                          |
+| P2    | Notification rows: glyph, color, time, unread  | `GET /v1/growth/notifications` (C4 notices, lane 5)                               | Next                                                                                   |
+| P3    | Step-in seal and the composer states           | Conversation page (`control`, `canSend`, `unavailableReason`)                     | Paused and human: buildable. Trial, ended, capacity: no contract (ticket to lane 3)    |
+| P4    | Citations                                      | Message `citations` (ids) and the creator's posts                                 | To survey                                                                              |
+| P5    | Named pickers instead of raw ids               | `GET /v1/conversations/account` (`threads[].name`)                                | Buildable, no contract change                                                          |
+| P6    | Explicit provider consent                      | Capabilities `providers`, `POST .../consent`                                      | To survey                                                                              |
+| P7    | 18+ confirmation                               | C1 (lane 1) age screen and `adult_eligibility_required`                           | Overlaps WP 7.5; to survey                                                             |
+| P8    | The 3-hour reminder                            | No server signal; client rule proposed                                            | Needs a founder decision on the rule                                                   |
+| P9    | Packet terms block and ETA line                | `chargeRule`, `pendingHold`, `decisionEta`; lane 4's public summary `reliability` | ETA waits on lane 4's decision record (empty until then); Q04 keeps payment on the web |
+| P10   | Share sheet for the card                       | Lane 5 share card (needs lanes 1, 3, 4)                                           | Waits on the share-card contract                                                       |
+| P11   | Remove "AI comparisons are not available yet." | Comparison stays installed and off (2026-10-08)                                   | Copy change: founder approval                                                          |
 
 ## P1: Notes and reactions in the thread (C4)
 
@@ -87,21 +87,41 @@ all-members Note, a tier Note this fan is not in, a reaction to the fan's own re
 older Notes to make several pages, one of them empty. Control calls add a Note or reaction, change
 a Note's eligibility, and make the presence route fail.
 
-### Scenarios (each on iOS and Android, Light and Night, largest text where it says)
+### Scenarios and results (fake API; synthetic identities and data; real apps, HTTP, paging, layout)
 
-| ID | Steps | Expected |
-| --- | --- | --- |
-| R1.1 | Open Maya's thread as Devon | The Note and the reaction sit between the messages by time; label word, glyph and creator color; "Signed by Maya" opens the verification page; a tier Note Devon is not in never shows; older Notes sit above the first message |
-| R1.2 | Behind the screen: the fake's request log | Three reads (limit 50), the empty middle page followed, each `before` exactly the previous `nextBefore`, items 2, 0, 2 |
-| R1.3 | Screen reader order; grayscale | The label is its own accessibility element, read immediately before the body; word and glyph say who is speaking without color |
-| R1.4 | Publish a Note while the thread is open; send from another device (a frame); background and return; then publish a reaction and drop the live connection | No read on the frame; one read on return (the Note appears); one read after the reconnect |
-| R1.5 | Make the Notes ineligible, then a read | The Notes are gone; the reaction stays |
-| R1.6 | After a dropped live connection, the presence read gets 500, a 20 s hold (past the 15 s timeout), a dropped request, then 403 | 500 and timeout: one request, the last list stays; drop: Notes stay; 403: one request, the list clears, the thread and Send untouched |
-| R1.7 | Earlier messages | Not run yet: Maya's fixture fits one page; needs a longer thread fixture |
-| R1.8 | A long Note with emoji, Hebrew and Arabic at the largest text, Light and Night | Wraps, nothing clipped, label findable |
-| R1.9 | Behind the screen: the app's files after a read and a background | No file contains Note text (iOS: the whole data container; Android: every app file) |
-| R1.10 | Sign out, sign in as Priya | Not run yet |
-| R1.11 | Real stack: a Note published through the real content API | Not run: publishing a Note needs a signed act (passkey ceremony) and membership rows; lane 5's own host does this |
+| ID    | Steps                                                                                                                   | Expected                                                                                                                                                                            | iOS                                                                                                  | Android                                         |
+| ----- | ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| R1.1  | Open Maya's thread as Devon                                                                                             | Note and reaction between the messages by time; label word, glyph and creator color; "Signed by Maya"; a tier Note Devon is not in never shows; older Notes above the first message | pass                                                                                                 | pass                                            |
+| R1.2  | The fake's request log                                                                                                  | Three reads at limit 50, the empty middle page followed, each `before` exactly the previous `nextBefore`, items 2, 0, 2                                                             | pass                                                                                                 | pass                                            |
+| R1.3  | Accessibility order; grayscale capture                                                                                  | The label is one element read immediately before the body; word and glyph say who is speaking without color                                                                         | pass (first labelled element of the Note)                                                            | pass (label node directly before the body node) |
+| R1.4  | New Note while open; a message frame; background and return; new reaction and a dropped live connection                 | No read on the frame; one read (3 pages) on return, the Note appears; one more after the reconnect                                                                                  | pass (3, 3, 6, 9 requests)                                                                           | pass (3, 3, 6, 9 requests)                      |
+| R1.5  | Notes made ineligible, then a read                                                                                      | Notes gone, the reaction stays; a good read follows every page                                                                                                                      | pass                                                                                                 | pass                                            |
+| R1.6  | After a dropped live connection the read gets a 500, a 20 s hold (past the 15 s timeout), a dropped request, then a 403 | 500 and timeout: one request, list kept; drop: Notes stay; 403: one request, list cleared, thread and Send untouched                                                                | pass                                                                                                 | pass                                            |
+| R1.7  | A thread longer than one page (66 messages; the fake pages at 50), then "Earlier messages"                              | Older Notes and the reaction wait until the messages around them load, then appear in place                                                                                         | pass                                                                                                 | pass                                            |
+| R1.8  | Long Note with emoji, Hebrew and Arabic; largest text; Light and Night                                                  | Wraps, nothing clipped, its label reachable                                                                                                                                         | pass                                                                                                 | pass                                            |
+| R1.9  | The app's files after a read and a background                                                                           | No file contains Note text                                                                                                                                                          | pass (20 files in the data container, 0 hits)                                                        | pass (10 files, 0 hits)                         |
+| R1.10 | Sign out, sign in as Priya                                                                                              | No Note from Devon's session                                                                                                                                                        | not run                                                                                              | not run                                         |
+| R1.11 | Real stack: a Note published through the real content API                                                               | Appears in the real thread                                                                                                                                                          | not run: a Note is a signed act (passkey ceremony) with membership rows; lane 5's own host does that | not run                                         |
+| D3T   | Largest text, a very tall row, thirty upward drags (guards the WP 7.3 freeze with presence rows present)                | The app answers and goes idle                                                                                                                                                       | pass                                                                                                 | pass (idle CPU 0%)                              |
+
+Commands: `node tests/scenarios/lane-7/e7-4-presence.mjs [R1 R4 R5 R7 R9 R8]` (Android) and
+`node tests/scenarios/lane-7/ios-navigation.mjs <built.xctestrun> --presence [R1 R4 R5 R7 R8 R9]` (iOS,
+with `ios-link-driver.mjs` running). `pnpm exec tsx tests/scenarios/lane-7/harness/check-contract.mjs`
+checks the fake's presence answers against `ThreadPresencePage` (62 checks).
+
+### What the runs found (and what changed because of them)
+
+- **Android lacked the Note head's hairline rule** that iOS and the web Note (`.qv-note__head`) draw.
+  Added; the four Note snapshots were re-recorded (only those four images change pixels).
+- **iOS parsed every timestamp with a regex and a new date formatter on every render.** Replaced by
+  a fixed-format parser checked against Foundation (offsets, fractions, invalid input). Android
+  memoizes the merged timeline instead of rebuilding it on each recomposition.
+- **A dropped connection is not a clean "keep" test on iOS**: URLSession retries a dropped GET by
+  itself (Android's client never retries), so the keep rule is proven with a 500 and a timeout.
+- **Going to the background clears presence by design** (the whole thread is concealed), so "keep
+  the last list" is only observable within one foreground session.
+- **The WP 7.3 largest-text freeze** (a very tall row plus scrolling up) first showed up in R8; it
+  is fixed in #401 and guarded by D3T.
 
 ## P2 to P11: the rules, written before the code
 

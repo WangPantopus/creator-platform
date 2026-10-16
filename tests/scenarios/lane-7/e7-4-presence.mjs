@@ -292,6 +292,74 @@ if (run("R5")) {
   L.screenshot("android", "R5-note-no-longer-eligible");
 }
 
+if (run("R7")) {
+  // A thread longer than one page (the fake pages at 50 messages): a Note older
+  // than the oldest loaded message waits until "Earlier messages" loads them.
+  await L.harness("POST", "/__harness/reset");
+  await L.harness("POST", "/__harness/flags", {
+    replyDelayMs: 0,
+    sentenceDelayMs: 0,
+  });
+  // Each ask waits for its reply: an ask during a reply is refused.
+  for (let i = 1; i <= 30; i += 1) {
+    await L.harness("POST", "/__harness/threads/maya/ask", {
+      text: `Question ${i} about glaze thickness on stoneware.`,
+    });
+    for (let w = 0; w < 50; w += 1) {
+      const thread = (await L.state()).threads.find(
+        (t) => t.creator === "maya" && t.account === "devon",
+      );
+      if (!thread.generating) break;
+      await L.sleep(100);
+    }
+  }
+  const length = (await L.state()).threads.find(
+    (t) => t.creator === "maya" && t.account === "devon",
+  ).messages.length;
+  L.step(
+    "android",
+    "R1.7 thread longer than one page",
+    length > 50,
+    `${length} messages`,
+  );
+  await L.harness("POST", "/__harness/flags", {
+    replyDelayMs: 500,
+    sentenceDelayMs: 450,
+  });
+  await L.harness("POST", "/__harness/log/clear");
+  L.launch(
+    "android",
+    "--reset",
+    "--actor",
+    "devon",
+    "--to",
+    THREAD,
+    "--appearance",
+    "light",
+  );
+  await A.waitFor("Send", 30000);
+  await reads(3);
+  L.step(
+    "android",
+    "R1.7 older Notes wait for earlier messages",
+    !(await find(NOTE)) && !(await find(REACTION, false)),
+  );
+  await find("Earlier messages");
+  await A.tap("Earlier messages");
+  await L.sleep(2000);
+  L.step(
+    "android",
+    "R1.7 earlier messages reveal the Note",
+    Boolean(await find(NOTE)),
+  );
+  L.step(
+    "android",
+    "R1.7 and the reaction",
+    Boolean(await find(REACTION, false)),
+  );
+  L.screenshot("android", "R7-revealed-with-earlier-messages");
+}
+
 if (run("R9")) {
   // Nothing from presence is written to the app's storage (memory only).
   await fresh();
