@@ -158,3 +158,14 @@ Each keeps its own keys until it is fixed; 7.11 takes the ones that are about co
   multi-select, which the design's include list draws as checkboxes). The pass is not open yet.
 - **Case and job lines** read the server's words ("ai report", "queued", "legal hold") on both
   apps; turning them into sentences needs copy for every state.
+
+### WP 7.11 results so far (2026-10-16, at the handoff)
+
+| ID | What | iOS | Android |
+| --- | --- | --- | --- |
+| A1 | Contrast of the text tokens and the sending bubble, both themes (`e7-11-accessibility.mjs A1`, from the tokens) | the same tokens: pass when computed by hand (all text pairs 4.5:1 or more; sending bubble 5.57:1 Light, 6.72:1 Night) | not run as a script |
+| A2 to A5 | Authorship first, switches, named choices, the largest text (`e7-11-accessibility.mjs`; iOS `ios-navigation.mjs <xctestrun> --a11y`) | written, compiled, not run | written, not run |
+| Gates | compile (the iOS test build includes the flows), unit and snapshot suites, the copy scan | test build, `swift test` 18/18 | compile, unit and Paparazzi 19/19 (no image changed) |
+
+The next session runs A1 to A5 on both apps, the pickers suite (it now taps the names), and the
+regression on the top of the stack.
