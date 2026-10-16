@@ -1,7 +1,7 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-15, by the lane 3 session
-Working on: the migration proposals: finding 15 open (#451), finding 8 fixed without a migration (#455), finding 9 proposed to lane 4 (founder question)
+Working on: nothing open; finding 15 #451, finding 8 #455, finding 9 decided (lane 4 ticket, #456)
 Done: merged A1 #411, A3 #426, A6a #434, A6b #433 (its code and migration 0251 through the registration #442). Open: A6c #436, A6 hold sizing #438, B2 #441, A2 #444, B9 #446
 Next: the migration proposals for findings 8, 9 and 15, then the next work package in the founder's order
 Blocked on: nothing. Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
@@ -53,6 +53,9 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
 
 ## Decisions
 
+- 2026-10-15, founder: finding 9 (a crash once a sentence is stored) is fixed by lane 4's one
+  condition in `creator.generation_typed_original_allowance_receipt`; the crashed, partly delivered
+  answer keeps the fan's reservation held like any unknown receipt (#456, ticket to lane 4).
 - 2026-10-15, founder: "Ask Maya to step in" is hidden after the crisis response and the companion
   safety refusal, kept after the expert fallback, and back with the next ordinary answer; with no
   allowance and step-in hidden, the unavailable line drops its step-in sentence. B9 (#446).
@@ -100,8 +103,9 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
    unknown and the fan's reservation stays held (the existing unknown-receipt rule, 0237/0238); Maya's
    next answer is delivered. The lane 3 alternative (the journal seal closing orphaned calls as
    completed with an unknown cost) needs a new journal-owned function, a seal change, two custody
-   updates and more pins, so it is not proposed. Waiting on the founder: lane 4's condition, and the
-   fan-allowance effect (a crashed answer's reservation stays held as for any unknown receipt).
+   updates and more pins, so it is not proposed. Founder decision 2026-10-15: lane 4 takes the
+   one-condition fix, and a crashed, partly delivered answer keeps the fan's reservation held like
+   any unknown receipt.
 10. "Takeover visible within 500 ms" fails when the takeover waits behind a worker transaction: main up
     to 2.3 s, A3 up to 1.2 s. A4.
 11. Account deletion cannot be requested with the development identity (it needs a Pantopus-mode
