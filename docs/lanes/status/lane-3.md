@@ -1,9 +1,9 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-15, by the lane 3 session
-Working on: A2 (wake on accept). B2 is open as #441, its defaults approved by the founder 2026-10-15
-Done: merged A1 #411, A3 #426, A6a #434. Open: A6b #433, A6c #436, A6 hold sizing #438, B2 #441
-Next: B9. Findings 8 and 9 need migrations (W1 lease release; crash recovery with lane 4), proposed for the next migration wave
+Working on: A2 (wake on accept), branch `lane-3/a2-wake-on-accept`. B2 #441 open, its defaults approved by the founder 2026-10-15
+Done: merged A1 #411, A3 #426, A6a #434. Open: A6b #433, A6c #436, A6 hold sizing #438, B2 #441, A2
+Next: B9. Findings 8, 9 and 15 need migrations (W1 lease release; crash recovery with lane 4; the workspace lock), proposed for the next migration wave
 Blocked on: nothing. Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
 
 ## How to measure
@@ -109,6 +109,41 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
     creator whose sources do not cover a question therefore fails that FAQ entry however good the
     expected answer is (three of Maya's five with the real model). Founder decision 2026-10-15: the
     FAQ stays a check only; a creator adds sources that cover the questions.
+15. Two workers on one database lose most answers: 1 of 10 (main) and 2 of 10 (A2) messages from 5
+    fans were answered; the rest fail before any sentence, and none is answered twice. Two causes.
+    The W2 admission SQL locks the creator's `ai_workspace` row with `FOR UPDATE NOWAIT`
+    (`generation_begin_agent_attempt`, `generation_open_provider_usage`,
+    `generation_agent_journal_receipt`; migrations 0097 and 0105), so two answers for one creator at
+    once fail. And a worker that loses a claim race reconciles the task the winner is answering, so
+    their `NOWAIT` thread locks collide (finding 6). Skipping that reconciliation when the task is no
+    longer pending removes the second cause (tried, not opened) but not the first. Fix: a short lock
+    wait instead of `NOWAIT` on the workspace row (a migration), then the skip. A6. The development
+    host runs one worker per backend today.
+
+## A2: wake on accept
+
+The fan's accepting transaction sends `pg_notify('creator_generation_queued', '')` (delivered only
+on commit, carrying nothing). The development host keeps one `LISTEN` session on the worker login,
+reconnects with backoff and wakes the worker after every reconnect. A wakeup during a pass runs one
+more pass. While the session listens the idle wait is 5 s instead of 1 s; without it, the old 1 s
+poll. Fresh stack each, model fake at 300 ms, on main with A1, A3 and A6a (2026-10-15):
+
+| Measure                                    | Main (1 s poll)  | A2                |
+| ------------------------------------------ | ---------------- | ----------------- |
+| Accept to claim, 8 messages, p50 / p95     | 963 / 2,482 ms   | 429 / 824 ms      |
+| Idle worker: statements a second (30 s)    | 63.8             | 15.7              |
+| Idle worker: database time a second (30 s) | 112.0 ms         | 23.6 ms           |
+| Idle passes in 30 s                        | 20               | 5                 |
+| A1 harness, 8 messages: first sentence p50 | 12.2 s (load 20) | 8.4 s (load 10.5) |
+| Burst of 30 (5 fans), answered once        | 25 (in 506 s)    | 25 (in 344 s)     |
+| Two workers, 10 messages, answered once    | 1 (none twice)   | 2 (none twice)    |
+
+Before A3 merged (same harness): accept to claim 809 / 818 ms on main, 371 / 568 ms on A2; idle
+72.1 and 15.7 statements a second. The end-to-end first-sentence difference is mostly host load.
+What remains of accept to claim is the pass's own work before the claim (the recovery check and
+discovery), which A4 can shrink. The burst failures are the same kinds on both: an answer
+interrupted by the thread lock (finding 6) and admissions refused while earlier failed answers
+still hold the creator's budget (main's hold envelope; #433 and #438 fix it).
 
 ## B2: the FAQ publish check
 
@@ -141,6 +176,7 @@ passing, on top of the existing boundary cases (all must pass). A first version 
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
 | E3A.1 measurement     | Main and A3 recorded above, 2026-10-15                                                                                                                                                                                                                                                                                                                                                                    | `a1-measure.mjs` as above                         |
 | E3A.2 ★               | Pass on A3: identical visible text, authorship, citations and order for every answer main also delivered                                                                                                                                                                                                                                                                                                  | `a1-measure.mjs --compare`                        |
+| E3A.3                 | A2: claims 429 ms after accept (main 963 ms); the wakeup session killed before a send: answered (claimed in 404 ms) and the session returns; the backend killed with work accepted but unclaimed: answered once after the restart; burst of 30: 25 answered once, same as main; two workers: 2 of 10, none twice (main 1 of 10; finding 15)                                                               | `e3a3-wake.mjs`                                   |
 | E3A.4 ★               | A3: no AI sentence after any change in 27 runs (7 kinds of change, up to 4 timings). Takeover within 500 ms fails at some timings (finding 10, also on main). Deletion not run (finding 11)                                                                                                                                                                                                               | `e3a4-authority.mjs`, one case per fresh stack    |
 | E3A.5 ★               | A3: kill after admission passes; kill during the guard call leaves an uncertain cost (finding 7); kill after the first sentence never finishes (finding 9). Same on main                                                                                                                                                                                                                                  | `e3a5-restart.mjs --at admitted\|guard\|sentence` |
 | E3A.6 ★               | Distressed message gets the safe response first: pass. Hard-block half not run (needs the real model)                                                                                                                                                                                                                                                                                                     | `e3a6-safety.mjs`                                 |
