@@ -105,6 +105,9 @@ This is recorded as **"taken as the proposed default"** and can be vetoed.
 - **Integrator:** optionally pass `sessions.resolve` to `studioFeature` (as `integration.ts`
   passes `resolveSession` to `attachRealtime`) so the stream re-resolves the session every 2
   seconds; lane 6 then adds the per-tick call (a few lines).
+- **Integrator (optional):** `GET /v1/studio/live` is not in `packages/api/src/openapi.ts`; it
+  answers `text/event-stream`, and adding it regenerates shared and native code that #443 also
+  changes.
 - **Lane 3:** when the realtime gateway grows past thread subscriptions (ADR-7), Studio's live
   view can become a subscription there; the frame format is in `modules/studio/live.ts`.
 - **Lane 3 (found while testing):** pausing the backend process for about 10 seconds while an AI

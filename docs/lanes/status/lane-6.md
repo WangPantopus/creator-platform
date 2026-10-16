@@ -16,8 +16,9 @@ of #443's version, so whichever of the two merges second takes this file as it i
   posture taken as the default, and the tickets are in [lane-6-wp-6-9.md](lane-6-wp-6-9.md).
 - **Reuse, do not redo:** the E6.1 "before" captures for `main` are in
   `$HOME/.cache/qelvora-lane6/e6-1/` (README there); the "after" capture of WP 6.9 is saved there
-  too (folder `pr-6-9-<commit>`). Compare across WP 6.9 with `e6-1-compare.mjs --across-6.9`;
-  once WP 6.9 is on `main`, compare as usual against a capture that includes it.
+  too (folder `pr-6-9-5f14221ae`). Compare across WP 6.9 with `e6-1-compare.mjs --across-6.9`;
+  once WP 6.9 is on `main`, compare as usual against a capture that includes it. A local branch
+  `scratch/6.9-with-443` (never pushed) holds this branch merged with #443; it passed E6.2.
 - **Waiting on others:** the integrator's tab bar change (ticket below; not on `main` at
   dea51a4ff, so the one-line "Today is the current tab on Notes and the composer" change is
   not made yet); approval of the `config/navigation.json` addition in #443; and the WP 6.9
@@ -87,9 +88,63 @@ Blocked on: nothing for 6.9. The exact audience reach needs W4's narrow count (h
 Against the lane 6 stack (`node infra/local/stack.mjs up --lane 6 --provider anthropic --growth`),
 real Chrome 155 at 390 px, real backend and PostgreSQL. Fakes: the development identity, the
 model fake, team rows standing in for lane 1's invitation, and where named the browser's
-background signal. Load average during the runs: E69_LOAD.
+background signal. Load average during the runs: 7 to 19 (the shared Mac).
 
-E69_RESULTS
+Commands: `node tests/scenarios/lane-6/e6-9-idle.mjs`, `e6-9-live.mjs`, `e6-9-recover.mjs`.
+
+- **E6.9-1, no polling** (idle 30 s per screen, requests a minute): before, on `main` at
+  dea51a4ff: Notes 74, Threads 64, an open thread 80, Team 64, Thanks 64, Requests 48, the
+  Studio picker 32. After: 16 to 18 on every screen, all of it lane 1's identity check (7 or 8
+  every 30 s) and at most one stream renewal. 7/7.
+- **Updates still arrive** (`e6-9-live.mjs`, 6/6): a fan's message shows in an open thread in
+  0.5 to 1.4 s on the same page; Team shows a member added (0.5 s) and removed (2.0 s); a removed
+  team member's Studio hides in 0.2 to 0.8 s with no private section left in the page; a restored
+  role returns in about 2.5 s and a changed role (triage to drafting) hides replies in about 1.7
+  s; signing out everywhere from another device leaves an open Studio for sign-in in 2.8 to 3.5 s
+  (lane 1's check); the stream refuses a signed-out visitor (401), an unknown parameter (404) and
+  a thread without a fan (400).
+- **Reconnect and background** (`e6-9-recover.mjs`, 7/7): a background tab makes no Studio
+  request in 20 s and on return reads exactly once (stream, Notes, replies) and shows Notes in
+  0.3 to 0.5 s (stand-in: the browser's background signal); after Chrome slept 20 s (all its
+  processes stopped; proven by its timers) a message sent meanwhile shows 1.1 to 1.8 s after
+  waking; a backend paused for 10 s hides Studio after 4.4 to 4.8 s and brings it back 0.3 s
+  after it resumes, with the unsent draft kept; a killed backend hides Studio in 0.5 s and it
+  returns on the same page when the backend is back; a roles check blocked by a database lock
+  says so 2.7 s after opening and shows Notes 2.5 s after the lock ends; a stream the network
+  holds says to reconnect after 5.8 s (page load plus the 5-second first-answer deadline) and
+  shows Notes 2 s after release; an idle 65 s renews the stream twice, reads nothing and never
+  hides.
+- **Stream plumbing:** closing 4 streams released 4 backend connections within 5 s; through a
+  production server (`next build`, `next start`) frames arrive every 2 s, uncompressed although
+  the client accepts gzip; the web production build passes.
+- **E6.1 across WP 6.9** (`e6-1-compare.mjs <main capture> <after> --across-6.9`, Chrome
+  155.0.8059.84, full run on 5f14221ae from a clean copy): 82 shots, 61 identical, 15 within
+  tolerance, 2 that differ only by reads the old timers made (`suspended/reconnect`), and 6
+  differences, each explained: `suspended/reconnect` in Light and Night logs no failed requests
+  (the old polls logged three 503s; the stream reports the outage inside one open request);
+  `workspace/list` differs in 123 to 141 pixels by at most 1/255; `requests/filter-due` differs
+  in 13 to 15 pixels on the edge of the Requests badge (up to 60/255; same number, size and
+  colour). A focused rerun repeats both exactly; the likely cause is that the badge and the list
+  are now drawn in one pass instead of after a second request (not proven). Saved for reuse in
+  `$HOME/.cache/qelvora-lane6/e6-1/pr-6-9-5f14221ae`.
+- **E6.2 with #443** (a local merge of this branch and `lane-6/today-note`, never pushed, on a
+  fresh stack): `e6-2-note` 10/10, `e6-2-ceremony` 5/5, `e6-2-tabs` 3/3, `e6-2-audience` 6/6
+  plus the known limit, `e6-2-today` 10/10; on the same code `e6-9-idle` 7/7 and `e6-9-live`
+  6/6.
+- Checks: `pnpm --filter @qelvora/web typecheck`, `pnpm --filter @qelvora/backend typecheck`,
+  eslint and prettier on every changed file, `pnpm generate:check`.
+
+Found and fixed while testing (details in [lane-6-wp-6-9.md](lane-6-wp-6-9.md)): the Studio
+picker asked the stream for a screen read without a creator; a discarded read was counted as
+done; an early "sleep" step did not sleep. Found, not ours: pausing the backend during an AI
+reply stops lane 3's generation worker and the whole backend (ticket below).
+
+Not run: real Touch ID and real phones (Safari on iOS, Chrome on Android), a real background
+tab (Playwright keeps every page visible; the step stands in for the browser's signal), the
+badge changing on a new request (needs lane 4's request flow; the count rides every frame and
+was observed over the API), `tests/visual` (needs Playwright's own Chromium), the backend
+integration suite (it does not cover Studio). Not verified against a real Pantopus identity
+(development identity only).
 
 ## Scenarios (E6.2, 2026-10-15)
 
@@ -169,6 +224,10 @@ through the C4 read every thread uses.
 - **Integrator (WP 6.9, optional):** pass `sessions.resolve` to `studioFeature`, as
   `integration.ts` passes `resolveSession` to `attachRealtime`, so the Studio stream re-resolves
   the session every 2 seconds; lane 6 then adds the per-tick call.
+- **Integrator (WP 6.9, optional):** `GET /v1/studio/live` is not in
+  `packages/api/src/openapi.ts` (it answers `text/event-stream`; the frame is described in
+  `apps/backend/src/modules/studio/live.ts`). Adding it regenerates the shared and native code,
+  which #443 also changes, so lane 6 left it to you.
 - **Lane 3 (WP 6.9):** when the realtime gateway carries more than thread subscriptions (ADR-7),
   Studio's live view can move onto it; the frame format is in `modules/studio/live.ts`.
 - **Lane 3 (found in E6.9):** a 10-second pause of the backend process during an AI reply made
