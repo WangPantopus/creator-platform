@@ -37,12 +37,21 @@ export type GenerationWorkerPass = Readonly<{
 const code = (cause: unknown) =>
   cause instanceof DomainError ? cause.code : "generation_worker_unavailable";
 
+/** Between passes without a wakeup. Accepted work wakes the worker at once
+ * while its wakeup session listens; this interval then covers only lease
+ * expiry, terminal recovery and deferred work. Without a session the worker
+ * polls as often as before wakeups existed. */
+const IDLE_LISTENING_MS = 5000;
+const IDLE_POLLING_MS = 1000;
+
 /** Serial executor for the original one-connection generation authority. It
  * claims only when ready to execute; no accepted lease waits in a JS queue.
  * Provider I/O, durable output and final cost settlement remain owner work. */
 export class GenerationWorker {
   private busy = false;
   private lifetime = false;
+  private woken = false;
+  private sleeping?: AbortController;
   private readonly recovery: GenerationTerminalRecovery;
 
   private constructor(private readonly owners: Owners) {
@@ -244,11 +253,19 @@ export class GenerationWorker {
     return this.pass(signal, limit);
   }
 
+  /** Asks for a pass now. A wakeup during a pass runs one more pass right
+   * after it; it never interrupts a pass or carries work of its own. */
+  wake(): void {
+    this.woken = true;
+    this.sleeping?.abort();
+  }
+
   /** The owning host must abort and await this promise before closing pools.
    * No timeout race abandons an in-flight provider receipt or held COMMIT. */
   async run(
     signal: AbortSignal,
     onPass?: (result: GenerationWorkerPass) => void,
+    listening: () => boolean = () => false,
   ): Promise<void> {
     invariant(
       !this.lifetime && !this.busy && !requestAuthority.getStore(),
@@ -258,12 +275,22 @@ export class GenerationWorker {
     this.lifetime = true;
     try {
       while (!signal.aborted) {
+        this.woken = false;
         const result = await this.pass(signal, 20);
         onPass?.(result);
+        if (this.woken) continue;
+        const sleeping = new AbortController();
+        this.sleeping = sleeping;
         try {
-          await delay(1000, undefined, { signal });
+          await delay(
+            listening() ? IDLE_LISTENING_MS : IDLE_POLLING_MS,
+            undefined,
+            { signal: AbortSignal.any([signal, sleeping.signal]) },
+          );
         } catch (cause) {
-          if (!signal.aborted) throw cause;
+          if (!signal.aborted && !sleeping.signal.aborted) throw cause;
+        } finally {
+          this.sleeping = undefined;
         }
       }
     } catch (cause) {
