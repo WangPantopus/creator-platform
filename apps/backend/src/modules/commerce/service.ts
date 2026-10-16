@@ -3494,6 +3494,22 @@ export class CommerceService {
           "commitment_resolution",
         );
       }
+      // One reminder for the creator per accepted request, when the smaller
+      // of 24 hours and a quarter of the delivery window is left. It changes
+      // no money and no state; the creator's notice is made from it.
+      const reminders = (
+        await client.query<PacketRow>(
+          `SELECT p.* FROM creator.commerce_packet p
+           JOIN creator.commerce_commitment c ON c.packet_id=p.id
+            AND c.creator_id=p.creator_id AND c.fan_id=p.fan_id
+           WHERE c.state IN ('due','in_progress') AND c.due_at>now() AND p.accepted_at IS NOT NULL
+            AND c.due_at-least(interval '24 hours',(c.due_at-p.accepted_at)/4)<=now()
+            AND NOT EXISTS(SELECT 1 FROM creator.commerce_event e WHERE e.aggregate_id=p.id AND e.type='commitment_due')
+           ORDER BY c.due_at,c.id LIMIT 50 FOR UPDATE OF p SKIP LOCKED`,
+        )
+      ).rows;
+      for (const p of reminders)
+        await this.event(client, p, "commitment_due", { packetId: p.id });
       return ids;
     });
     for (const id of effects) await this.runEffect(actor, id);
