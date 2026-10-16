@@ -25,6 +25,12 @@ import {
 import { canonical, contentHash } from "../../core/canonical.js";
 import { DomainError } from "../../core/errors.js";
 import { responseLanguage } from "./language.js";
+import {
+  MEMORY_EXTRACTION_INSTRUCTIONS,
+  MEMORY_ITEM_LIMIT,
+  MEMORY_SENSITIVITY_INSTRUCTIONS,
+  MEMORY_TEXT_UNITS,
+} from "./memory-proposals.js";
 import type { StreamProposal } from "./streaming.js";
 import {
   LegacyOutputVerdict,
@@ -614,7 +620,12 @@ export function maximumGenerationCalls(input: {
         bytes(RUN_CLASSIFIER_INSTRUCTIONS) +
         bytes(canonical({ message: input.message })),
     },
-    { route: "embedding", inputTokens: bytes(input.message) },
+    // Revision 15 embeds the previous fan turn (at most PREVIOUS_TURN_LIMIT
+    // code points, four UTF-8 bytes each) and "\n\n" before the message.
+    {
+      route: "embedding",
+      inputTokens: bytes(input.message) + 2 + 4 * PREVIOUS_TURN_LIMIT,
+    },
     {
       route: "either",
       inputTokens:
@@ -632,6 +643,24 @@ export function maximumGenerationCalls(input: {
     calls.push({
       route: "small",
       inputTokens: guardFixed + i * (sentence + disclosures),
+    });
+  // After an ordinary answer, one memory extraction quotes the exchange (the
+  // message and the delivered sentences, joined by spaces) and one sensitivity
+  // call per extracted item quotes that item.
+  calls.push({
+    route: "small",
+    inputTokens:
+      bytes(MEMORY_EXTRACTION_INSTRUCTIONS) +
+      bytes(JSON.stringify([`fan: ${input.message}`, "ai: "])) +
+      SENTENCE_LIMIT * (sentence + disclosures + 1),
+  });
+  for (let i = 0; i < MEMORY_ITEM_LIMIT; i++)
+    calls.push({
+      route: "small",
+      inputTokens:
+        bytes(MEMORY_SENSITIVITY_INSTRUCTIONS) +
+        bytes(JSON.stringify({ text: "" })) +
+        MEMORY_TEXT_UNITS * ESCAPED_BYTES_PER_UNIT,
     });
   return calls;
 }

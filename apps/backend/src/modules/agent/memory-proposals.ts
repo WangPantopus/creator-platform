@@ -18,17 +18,21 @@ const categories = [
   "union",
   "financial_hardship",
 ] as const;
+/** At most this many items per extraction, each at most this many UTF-16
+ * units; the creator's cost hold bounds the memory calls by them. */
+export const MEMORY_ITEM_LIMIT = 5;
+export const MEMORY_TEXT_UNITS = 500;
 export const MemoryExtraction = z.strictObject({
   items: z
     .array(
       z.strictObject({
         kind: z.enum(["fact", "open_loop"]),
-        text: z.string().max(500),
+        text: z.string().max(MEMORY_TEXT_UNITS),
         semanticKey: z.string().max(120),
         sensitiveCategory: z.enum(categories).nullable(),
       }),
     )
-    .max(5),
+    .max(MEMORY_ITEM_LIMIT),
 });
 export const MemorySensitivity = z.strictObject({
   category: z.enum(categories).nullable(),
