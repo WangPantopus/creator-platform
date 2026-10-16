@@ -19,10 +19,16 @@ final class Lane7SealFlows: XCTestCase {
         XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200, path)
     }
 
-    private func open(_ path: String, actor: String = "devon", appearance: String = "light", reset: Bool = true) async throws {
+    /// Every flow skips before it calls anything: CI runs this target with no
+    /// harness and no link driver.
+    private func optIn() throws {
         guard ProcessInfo.processInfo.environment["LANE7_SEAL"] == "1" else {
             throw XCTSkip("Opt in with LANE7_SEAL=1 against lane 7's disposable harness.")
         }
+    }
+
+    private func open(_ path: String, actor: String = "devon", appearance: String = "light", reset: Bool = true) async throws {
+        try optIn()
         continueAfterFailure = false
         app.terminate()
         if reset { try await control("/__harness/reset", body: [:]) }
@@ -79,6 +85,7 @@ final class Lane7SealFlows: XCTestCase {
     /// the step-in button and Send, the in-thread "is here" line (Kiln Club)
     /// and a reaction chip (Maya).
     func testS02LargestText() async throws {
+        try optIn()
         try await control("/content-size", body: ["size": "accessibility-extra-extra-extra-large"], port: 56475)
         for appearance in ["light", "night"] {
             try await open(thread(2), appearance: appearance)

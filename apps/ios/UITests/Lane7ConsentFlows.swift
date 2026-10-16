@@ -22,10 +22,16 @@ final class Lane7ConsentFlows: XCTestCase {
         return try JSONSerialization.jsonObject(with: data)
     }
 
-    private func consent(_ flags: [String: Any]? = nil, appearance: String = "light") async throws {
+    /// Every flow skips before it calls anything: CI runs this target with no
+    /// harness and no link driver.
+    private func optIn() throws {
         guard ProcessInfo.processInfo.environment["LANE7_CONSENT"] == "1" else {
             throw XCTSkip("Opt in with LANE7_CONSENT=1 against lane 7's disposable harness.")
         }
+    }
+
+    private func consent(_ flags: [String: Any]? = nil, appearance: String = "light") async throws {
+        try optIn()
         continueAfterFailure = false
         app.terminate()
         try await control("/__harness/reset", body: [:])
@@ -119,6 +125,7 @@ final class Lane7ConsentFlows: XCTestCase {
 
     /// P6.5: largest text, Night: the sentence in full.
     func testC05LargestTextNight() async throws {
+        try optIn()
         try await control("/content-size", body: ["size": "accessibility-extra-extra-extra-large"], port: 56475)
         try await consent(appearance: "night")
         XCTAssertTrue(text(promise).exists)
