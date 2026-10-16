@@ -26,8 +26,10 @@ export type CommercePublicSummary = Readonly<{
   /** "{name} answers {mode} within {deadline} · {n} of {cap} left this week."
    * for the first offer, or "" when nothing is offered. */
   capacity: string;
-  /** "{name} usually decides in {range}" needs the creator's decision record,
-   * which waits for its migration: "" until then, never an invented range. */
+  /** "{name} usually decides in {range}" from the creator's decision record
+   * (the founder's decision 5): the middle half of how long fans waited over
+   * the last 90 days, once there are five outcomes. "" before that, and until
+   * the record's migration is registered: never an invented range. */
   reliability: string;
   /** Changes whenever any field above changes. */
   version: string;
@@ -94,6 +96,21 @@ export async function commercePublicSummary(
         [creatorId],
       )
     ).rows;
+    // The decision record exists once its migration is registered
+    // (schema-decision-record.sql); it answers only the range, and only with
+    // five outcomes or more.
+    const record = (
+      await client.query<{ present: boolean }>(
+        "SELECT to_regprocedure('creator.commerce_decision_range(uuid)') IS NOT NULL AS present",
+      )
+    ).rows[0]!.present
+      ? (
+          await client.query<{ low_seconds: number; high_seconds: number }>(
+            "SELECT low_seconds,high_seconds FROM creator.commerce_decision_range($1)",
+            [creatorId],
+          )
+        ).rows[0]
+      : undefined;
     await client.query("COMMIT");
     const offers = rows.map((m) => {
       // A slot can be taken by a request and returned by the creator's limit
@@ -121,12 +138,18 @@ export async function commercePublicSummary(
           cap: first.cap,
         })
       : "";
+    const reliability = record
+      ? formatCopy("decisionEta", {
+          name: creator.display_name,
+          range: decisionRange(record.low_seconds, record.high_seconds),
+        })
+      : "";
     return Object.freeze({
       creatorId,
       offers,
       capacity,
-      reliability: "",
-      version: contentHash({ offers, capacity, reliability: "" }),
+      reliability,
+      version: contentHash({ offers, capacity, reliability }),
       computedAt: new Date().toISOString(),
     });
   } catch (error) {
@@ -135,4 +158,18 @@ export async function commercePublicSummary(
   } finally {
     client.release();
   }
+}
+
+/** The middle half of a creator's decision times in words: hours while the
+ * slower end is under 48 hours, whole days beyond ("3 to 10 hours", "1 to 2
+ * days", "2 days"), never under one hour or one day. */
+export function decisionRange(lowSeconds: number, highSeconds: number) {
+  const hours = highSeconds < 48 * 3600;
+  const unit = hours ? 3600 : 86400;
+  const low = Math.max(1, Math.round(lowSeconds / unit));
+  const high = Math.max(1, Math.round(highSeconds / unit));
+  const word = hours ? "hour" : "day";
+  return low === high
+    ? `${low} ${word}${low === 1 ? "" : "s"}`
+    : `${low} to ${high} ${word}s`;
 }
