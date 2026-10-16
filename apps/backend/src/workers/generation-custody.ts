@@ -214,5 +214,9 @@ export async function reviewedGenerationWorkerCustody(
       ...custody.accounting,
       consumers: custody.accounting.consumers.map(replaced),
     },
+    context: {
+      ...custody.context,
+      consumer: replaced(custody.context.consumer),
+    },
   });
 }
