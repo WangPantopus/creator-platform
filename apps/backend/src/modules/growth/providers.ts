@@ -8,6 +8,7 @@ import {
 } from "./notifications.js";
 import type { GrowthService } from "./service.js";
 import { notificationEmail, notificationDigest } from "./email.js";
+import { submitWebPush, type WebPushConfiguration } from "./web-push.js";
 
 export interface EmailTransport {
   send(input: {
@@ -29,6 +30,7 @@ export interface NotificationProviderConfiguration {
     authorization: () => Promise<string>;
   };
   fcm?: { projectId: string; accessToken: () => Promise<string> };
+  webPush?: WebPushConfiguration;
   email?: {
     transport: EmailTransport;
     unsubscribeUrl: (accountId: string) => Promise<string>;
@@ -88,7 +90,11 @@ export class NativeDeliveryProvider implements DeliveryProvider {
           let reserved = false;
           try {
             if (
-              device.platform === "ios" ? !this.config.apns : !this.config.fcm
+              device.platform === "ios"
+                ? !this.config.apns
+                : device.platform === "web"
+                  ? !this.config.webPush
+                  : !this.config.fcm
             )
               throw new Error("push_provider_unconfigured");
             await this.beginReceipt(input.idempotencyKey, registrationHash);
@@ -104,7 +110,37 @@ export class NativeDeliveryProvider implements DeliveryProvider {
             );
             if (!current) throw new DeliveryFailure(1);
             signal.throwIfAborted();
-            if (device.platform === "ios") {
+            if (device.platform === "web") {
+              const response = await submitWebPush(
+                this.config.webPush!,
+                token,
+                input.notificationId,
+                signal,
+                () => {
+                  sending = true;
+                },
+              );
+              await response.body?.cancel();
+              if (response.status === 404 || response.status === 410)
+                throw new InvalidDeviceToken("device_token_invalid");
+              if (response.status !== 201) {
+                if (response.status < 400)
+                  throw new Error("provider_outcome_unknown");
+                const retryAfter = response.headers.get("retry-after");
+                const delay =
+                  retryAfter && /^\d+$/u.test(retryAfter)
+                    ? Number(retryAfter)
+                    : 60;
+                throw new DeliveryFailure(
+                  Math.max(60, Math.min(86400, delay)),
+                  response.status < 500 &&
+                    ![401, 403, 429].includes(response.status),
+                );
+              }
+              receipts.push(
+                `webpush:${input.idempotencyKey}:${registrationHash.slice(0, 32)}`,
+              );
+            } else if (device.platform === "ios") {
               const id = createHash("sha256")
                 .update(`${input.idempotencyKey}:${device.installation_id}`)
                 .digest("hex")
@@ -291,6 +327,10 @@ export class NativeDeliveryProvider implements DeliveryProvider {
     return Promise.race([Promise.resolve().then(() => work(signal)), timeout]);
   }
   private authorization(platform: string) {
+    if (platform === "web") {
+      if (!this.config.webPush) throw new Error("web_push_unconfigured");
+      return Promise.resolve("");
+    }
     if (platform === "ios") {
       const config = this.config.apns;
       if (!config) throw new Error("apns_unconfigured");
