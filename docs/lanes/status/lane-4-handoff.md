@@ -1,4 +1,4 @@
-# Lane 4: handoff, 2026-10-16 (Pacific time, late morning)
+# Lane 4: handoff, 2026-10-16 (Pacific time, afternoon)
 
 This is where the next lane 4 session starts. Read it first, then `lane-4.md` (status, pull requests,
 tickets) and `lane-4-decisions.md` (the founder's decisions). Both are in this directory, on branch
@@ -8,35 +8,18 @@ tickets) and `lane-4-decisions.md` (the founder's decisions). Both are in this d
 
 Nothing is in flight. Every lane 4 branch is pushed, and the working tree is clean.
 
-**Merged on main:** #408, #410, #416, #418, #421, #423, #424, #427, #428, #429.
+**Merged on main:** #408, #410, #416, #418, #421, #423, #424, #427, #428, #429; and on 2026-10-16, at the founder's request (a rehearsed batch: static gates, the 100 money tests and all 30 lane 4 scenario files on the merged tree), #448, #449, #450, #463, #467, #469, #470, #474, #476, #484, #485 and #486.
 
 **Open:**
 
-| PR           | Branch                          | What                                                                                    | Waits on                                                                     |
-| ------------ | ------------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| #425 (draft) | `lane-4/inbox-login`            | Non-owner login that claims processor notifications                                     | migration registration                                                       |
-| #447         | `lane-4/status-refresh`         | Status, decisions and this handoff                                                      | merge                                                                        |
-| #448         | `lane-4/share-grant-id`         | The share call returns `grantId` and `version`                                          | merge                                                                        |
-| #449         | `lane-4/summary-members-only`   | The public summary marks `membersOnly`                                                  | merge                                                                        |
-| #450         | `lane-4/inbox-outage-fresh`     | `e4-3-inbox-outage` makes its own inbox login                                           | merge                                                                        |
-| #453         | `lane-4/request-notices`        | Request notices recorded, handed to growth and withdrawn; one `commitment_due` reminder | integrator wiring; production also needs a W8 worker denial (lane 1) and Q16 |
-| #459 (draft) | `lane-4/share-card-owners`      | Share cards: `shareSource` / `shareStatus`                                              | migration registration, five catalogue pins, reviews by lanes 1 and 3        |
-| #463         | `lane-4/settle-departure`       | `settleDeparture`, a paused creator's open requests (P1 confirmed)                      | integrator wiring                                                            |
-| #467         | `lane-4/more-info-question`     | WP 4.12: a separate `question` field for "Ask for more information"                     | lane 6's WP 6.6                                                              |
-| #469         | `lane-4/summary-paused-creator` | The public summary stops listing a paused creator's offers (lane 1's existing check)    | merge; the integrator passes the restoration-gated check in production       |
-| #470         | `lane-4/scenario-offers-retire` | Scenarios retire the offers they make                                                   | merge                                                                        |
-| #474         | `lane-4/approved-copy`          | WP 4.12: the copy the founder approved (decisions 6 and 7)                              | merge                                                                        |
-| #476         | `lane-4/deadline-one-hour`      | A 1-hour offer reads "1 hour" (public summary, the fan's offer lists on the web)        | merge                                                                        |
-| #484         | `lane-4/ending-no-hold`         | Decision 4: no new hold for a request that is already ending                            | merge                                                                        |
-| #485         | `lane-4/refund-room`            | Decision 1: a refund gives its room under the monthly limit back                        | merge; tickets to lanes 3 and 7                                              |
-| #486         | `lane-4/refund-slot`            | Decision 2: a request refunded because it was not delivered frees its slot              | merge; an existing stack needs a `reset`                                     |
-| #487         | `lane-4/decides-in`             | Decision 5: "usually decides in" from the decision record                               | migration registration and regenerated catalogue pins                        |
-
-At handoff all of them were mergeable, and none had a failing check. The native and visual CI jobs
-were still queued on the newest ones. Every pair of open lane 4 branches merges cleanly except #453
-with #463: both add to `payments/development-work-index.ts` at the same two places (a query after
-`DUE`, a method after `dueScopes`). Whichever merges second needs both additions kept; do that on
-its branch (merge main, keep both, rerun its scenario).
+| PR           | Branch                     | What                                                                                    | Waits on                                                              |
+| ------------ | -------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| #425 (draft) | `lane-4/inbox-login`       | Non-owner login that claims processor notifications                                     | migration registration                                                |
+| #447         | `lane-4/status-refresh`    | Status, decisions and this handoff                                                      | merge                                                                 |
+| #453         | `lane-4/request-notices`   | Request notices recorded, handed to growth and withdrawn; one `commitment_due` reminder | green CI, then merge (main merged in, #463's conflict resolved)       |
+| #510         | `lane-4/departure-history` | `e4-3-departure` counts every accepted request Maya still owes                          | green CI, then merge                                                  |
+| #459 (draft) | `lane-4/share-card-owners` | Share cards: `shareSource` / `shareStatus`                                              | migration registration, five catalogue pins, reviews by lanes 1 and 3 |
+| #487         | `lane-4/decides-in`        | Decision 5: "usually decides in" from the decision record                               | migration registration and regenerated catalogue pins                 |
 
 **Decided:**
 
@@ -54,7 +37,7 @@ legal question; lane 4 proposed a default only for the product part (`lane-4-dec
 Everything left waits on keys, Q16 or other lanes. When CI or a review reports on a lane 4 pull
 request, fix it on that branch, with evidence. Otherwise:
 
-1. **#453 or #463 merges:** resolve the other one as above.
+1. **#453 and #510:** merge them once their CI is green, if this session did not.
 2. **Stripe test keys arrive:**
    - run WP 4.7 (E4.13);
    - extend decision 1 to memberships and the pass. Their refunds can be matched exactly:
@@ -69,8 +52,8 @@ request, fix it on that branch, with evidence. Otherwise:
 ## Environment: the stack is running; reuse it
 
 The lane 4 stack is **running** from the desktop app's worktree `lane-4-money-117d77` (under the
-repository's `.claude/worktrees`), which is on `lane-4/status-refresh` (main's code). It was reset
-for #487's evidence and has run a few scenarios since.
+repository's `.claude/worktrees`), which is on `lane-4/status-refresh`. Its backend runs main's code
+as of the merges of 2026-10-16 (`911c95940`), and it was freshly reset after the last scenario.
 
 - PostgreSQL `qelvora-lane4-postgres` on 56440, 119 migrations, without #487's stand-in migration
   (the scenario removes it);
@@ -128,6 +111,7 @@ for #487's evidence and has run a few scenarios since.
   - Before #470, `e4-9-public-summary` fails once more than 20 cheaper offers pile up.
 
   Reset the stack, or retire the leftover offers (pause them through the mode command, as #470 does).
+
 - **Scenarios that pause Maya** (`e4-9-paused-creator` from #469; `e4-3-departure` from #463) leave
   her paused. Run them by full name, then reset.
 - **#487's migration changes catalogue pins.** Apply it only after the backend has started, and
