@@ -345,6 +345,30 @@ export function register(router) {
     },
   );
 
+  // WP 7.4 P4: a cited passage, as the real route answers it: only an id that
+  // this thread's messages cite and whose post is still published; anything
+  // else gets the real refusal (403 citation_unavailable).
+  router.add(
+    "GET",
+    "/v1/conversations/:creatorId/:fanId/citations/:id",
+    (ctx) => {
+      const { thread } = ownThread(ctx);
+      const cited = thread.messages.some((m) =>
+        m.citations?.includes(ctx.params.id),
+      );
+      const post = ctx.world.creators
+        .get(thread.creatorId)
+        ?.posts?.find((p) => p.id === ctx.params.id && p.state === "published");
+      if (!cited || !post)
+        throw new Failure(
+          403,
+          "citation_unavailable",
+          "No longer accessible to you",
+        );
+      return { id: post.id, title: post.title, text: post.body };
+    },
+  );
+
   router.add("GET", "/v1/conversations/:creatorId/:fanId/offline", (ctx) => {
     const { world, req } = ctx;
     const { thread, account, session } = ownThread(ctx);

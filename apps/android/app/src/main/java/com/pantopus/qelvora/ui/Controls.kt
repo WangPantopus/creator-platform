@@ -35,11 +35,11 @@ fun Button(title: String, variant: ButtonVariant = ButtonVariant.AI, size: Strin
         if (block) controlModifier = controlModifier.fillMaxWidth()
         controlModifier = Modifier.alpha(if (disabled) .55f else 1f).then(controlModifier).background(fill, shape)
         if (variant in listOf(ButtonVariant.SECONDARY, ButtonVariant.MAYA)) controlModifier = controlModifier.border(1.dp, qColor(if (variant == ButtonVariant.MAYA) "maya-line" else "control-line"), shape)
-        Row(controlModifier.clickable(enabled = !disabled, role = Role.Button, onClick = onClick).padding(horizontal = if (variant == ButtonVariant.QUIET) QelvoraTokens.space3 else QelvoraTokens.space5), horizontalArrangement = Arrangement.spacedBy(QelvoraTokens.space2 + QelvoraTokens.space1 / 2), verticalAlignment = Alignment.CenterVertically) {
-            if (block) Spacer(Modifier.weight(1f))
+        // Centered, not between two weighted spacers: a label that nearly fills the
+        // button at the largest text would slide into the seal's gap (iOS keeps it).
+        Row(controlModifier.clickable(enabled = !disabled, role = Role.Button, onClick = onClick).padding(horizontal = if (variant == ButtonVariant.QUIET) QelvoraTokens.space3 else QelvoraTokens.space5), horizontalArrangement = Arrangement.spacedBy(QelvoraTokens.space2 + QelvoraTokens.space1 / 2, Alignment.CenterHorizontally), verticalAlignment = Alignment.CenterVertically) {
             if (variant == ButtonVariant.MAYA) Seal(initial, QelvoraTokens.welcomeGap, onMaya = true)
             BasicText(title, style = qText(if (size == "lg") "button-lg" else "body-strong").copy(color = ink))
-            if (block) Spacer(Modifier.weight(1f))
         }
         if (disabled && disabledReason != null) BasicText(disabledReason, style = qText("caption").copy(color = qColor("ink-muted")))
     }

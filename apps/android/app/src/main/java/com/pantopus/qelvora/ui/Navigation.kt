@@ -105,7 +105,7 @@ fun Sidebar(name: String = "Maya", active: String = QelvoraCopy.text("navRequest
     Row(Modifier.width(T.sidebarWidth).heightIn(min = T.sidebarMinHeight).background(qColor("surface"))) {
         Column(Modifier.weight(1f).padding(horizontal = T.space3, vertical = T.space5), verticalArrangement = Arrangement.spacedBy(T.authorGap)) {
             Row(Modifier.padding(start = T.space2, end = T.space2, bottom = T.space4), horizontalArrangement = Arrangement.spacedBy(T.space3), verticalAlignment = Alignment.CenterVertically) {
-                Avatar(initial = name.take(1))
+                Avatar(initial = creatorInitial(name))
                 Column(verticalArrangement = Arrangement.spacedBy(T.space1 / 2)) {
                     BasicText(name, style = qText("body-strong").copy(color = qColor("ink")))
                     BasicText(QelvoraCopy.studioName, style = qText("sidebar-brand").copy(color = qColor("ink-muted"), fontStyle = FontStyle.Italic))

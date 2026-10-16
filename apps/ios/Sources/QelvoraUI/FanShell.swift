@@ -97,6 +97,9 @@ public final class FanSession: ObservableObject {
     @Published public private(set) var arrival: ArrivalContext?
     @Published public private(set) var actors: [APIIdentityCapabilitiesDevelopmentActorsItem] = []
     @Published public private(set) var localPurgeFailed = false
+    /// D-11: an account found under 18 (at sign-in, or flagged later) loses
+    /// access. The session ends here too and only the adults-only state shows.
+    @Published public private(set) var adultOnly = false
     @Published public private(set) var purgingPrivateState = false
     public let api: CreatorAPIClient?
     private let storage: SecureSessionStorage
@@ -276,6 +279,7 @@ public final class FanSession: ObservableObject {
             guard observedCredential == token else {
                 session = nil; error = "Your session changed. Refresh your account before continuing."; return
             }
+            if Self.adultRefusal(failure) { if await purge() { adultOnly = true }; return }
             if failure.status == 401 {
                 if !busy { refreshingSession = false; await refreshCredentials() }
                 else { if await purge() { error = "Your session ended. Continue with Pantopus again." } }
@@ -311,7 +315,8 @@ public final class FanSession: ObservableObject {
             guard installing == generation else { return }
             destination = result.returnTo; choosingDevelopmentActor = false
             await refresh()
-        } catch { self.error = Self.message(error) }
+        } catch let failure as CreatorAPIError where Self.adultRefusal(failure) { if await purge() { adultOnly = true } }
+        catch { self.error = Self.message(error) }
         #endif
     }
     public func saveHandle(_ handle: String, intro: String) async -> Bool {
@@ -387,7 +392,7 @@ public final class FanSession: ObservableObject {
             guard current == generation else { return }
             generation += 1; rotatingCredential = false; await refresh()
         }
-        catch let failure as CreatorAPIError { guard current == generation, !Task.isCancelled else { return }; if failure.status == 401 { if await purge() { error = Self.message(failure) } } else { error = Self.message(failure) } }
+        catch let failure as CreatorAPIError { guard current == generation, !Task.isCancelled else { return }; if Self.adultRefusal(failure) { if await purge() { adultOnly = true } } else if failure.status == 401 { if await purge() { error = Self.message(failure) } } else { error = Self.message(failure) } }
         catch { guard current == generation, !Task.isCancelled else { return }; self.error = "Session refresh could not complete. Reconnect and try again." }
     }
     @discardableResult public func purge() async -> Bool {
@@ -465,6 +470,10 @@ public final class FanSession: ObservableObject {
         destination = target.path
         return true
     }
+    /// The server's final under-18 answer (C1): 403 adult_eligibility_required.
+    static func adultRefusal(_ failure: CreatorAPIError) -> Bool {
+        failure.status == 403 && (try? JSONDecoder().decode(APIError.self, from: failure.body))?.error.code == "adult_eligibility_required"
+    }
     static func message(_ error: Error) -> String { if let failure = error as? CreatorAPIError, let result = try? JSONDecoder().decode(APIError.self, from: failure.body) { return result.error.message }; return "This action could not complete. Reconnect and try again." }
 }
 
@@ -506,7 +515,9 @@ public struct FanAppShell: View {
                     shellNotices
                 }
             }
-            if model.choosingDevelopmentActor {
+            if model.adultOnly {
+                AdultsOnly()
+            } else if model.choosingDevelopmentActor {
                 ScrollView { VStack(spacing: 16) {
                     Notice(title: "Development identity", children: "Synthetic isolated accounts. Pantopus production sign-in is not connected.")
                     ForEach(model.actors, id: \.id) { actor in Button(actor.label, variant: .secondary, block: true, disabled: model.busy) { Task { await model.selectActor(actor.id) } } }
