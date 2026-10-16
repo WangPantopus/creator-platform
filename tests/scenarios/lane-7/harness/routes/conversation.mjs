@@ -133,9 +133,12 @@ function generate(world, thread, fanMessage, generationId) {
   const step = () => {
     if (thread.generation?.id !== generationId) return;
     if (thread.generation.sequence < sentences.length) {
-      const sentence = sentences[thread.generation.sequence];
+      // As the server writes it (C5): the message grows by exactly the frame's
+      // text, so a later sentence carries its own leading space.
+      const sentence =
+        (ai.text ? " " : "") + sentences[thread.generation.sequence];
       thread.generation.sequence += 1;
-      ai.text += (ai.text ? " " : "") + sentence;
+      ai.text += sentence;
       frame(
         thread,
         "sentence",

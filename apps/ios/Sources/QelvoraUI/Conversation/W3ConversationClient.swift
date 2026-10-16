@@ -4,7 +4,7 @@ import OSLog
 
 struct W3Message: Decodable, Identifiable, Sendable {
     let id: String; let threadId: String; let authorKind: APIMessageAuthorKind
-    let text: String; let deliveryState: APIMessageDeliveryState; let controlEpoch: Int
+    var text: String; var deliveryState: APIMessageDeliveryState; let controlEpoch: Int
     let sequence: Int; let signedActId: String?; let citations: [String]
     let createdAt: String; let member: String?; let offTheRecord: Bool; let version: Int
     let agentVersion: W3AgentVersion?; let feedback: String?
@@ -32,8 +32,8 @@ struct W3Message: Decodable, Identifiable, Sendable {
 }
 struct W3Page: Decodable, Sendable {
     let threadId: String; let creatorId: String; let fanId: String; let creatorName: String; let fanHandle: String
-    let control: APIThreadControl; let epoch: Int; let cursor: Int; let revision: Int
-    let generationSequences: [String: Int]; let messages: [W3Message]; let before: Int?
+    let control: APIThreadControl; let epoch: Int; var cursor: Int; let revision: Int
+    var generationSequences: [String: Int]; var messages: [W3Message]; let before: Int?
     let offTheRecord: Bool; let introShared: Bool; let consentCurrent: Bool; let canSend: Bool; let unavailableReason: String?
     let feedbackPolicy: W3FeedbackPolicy?
 }
@@ -399,7 +399,9 @@ final class W3ThreadModel: ObservableObject {
                                     transportReady = true; delay = 1
                                     await refresh()
                                 case .frame(let frame):
-                                    if try !(gate?.receive(frame).isEmpty ?? true) { await refresh() }
+                                    // C5: paint what the frames carry; refetch only for the rest.
+                                    let ready = try gate?.receive(frame) ?? []
+                                    if !ready.map(paint).allSatisfy({ $0 }) { await refresh() }
                                 }
                                 if authorizationDenied { break }
                             }
@@ -415,6 +417,32 @@ final class W3ThreadModel: ObservableObject {
             do { try await Task.sleep(for: .seconds(delay + Double.random(in: 0...0.5))) }
             catch { return }
             delay = min(15, delay * 2)
+        }
+    }
+    /// Contract C5, as the web thread does it: an approved AI sentence is
+    /// appended to its message the moment its frame arrives. The answer's end
+    /// marks the message and asks for one refetch for what frames do not carry
+    /// (citations, version, feedback); any other frame asks for a refetch.
+    /// The delivery gate has already dropped duplicates, stale epochs and gaps.
+    private func paint(_ frame: APIFrame) -> Bool {
+        guard var next = page, frame.threadId == next.threadId, frame.epoch == next.epoch,
+              frame.authorKind == .ai, let generation = frame.generationId else { return false }
+        let at = next.messages.firstIndex { $0.id == frame.messageId }
+        switch frame.kind {
+        case .sentence:
+            if let at { next.messages[at].text += frame.text; next.messages[at].deliveryState = .generating }
+            else {
+                next.messages.append(W3Message(id: frame.messageId, threadId: frame.threadId, authorKind: .ai, text: frame.text, deliveryState: .generating, controlEpoch: frame.epoch, sequence: (next.messages.last?.sequence ?? 0) + 1, signedActId: nil, citations: [], createdAt: ISO8601DateFormatter().string(from: Date()), member: nil, offTheRecord: next.offTheRecord, version: 1, agentVersion: nil, feedback: nil, correction: nil, recording: nil, authorAccountId: nil, systemLink: nil))
+            }
+            next.generationSequences[generation] = frame.sequence; next.cursor = frame.cursor
+            page = next
+            return true
+        case .delivered, .interrupted:
+            if let at { next.messages[at].deliveryState = frame.kind == .delivered ? .delivered : .interrupted }
+            next.generationSequences.removeValue(forKey: generation); next.cursor = frame.cursor
+            page = next
+            return false
+        default: return false
         }
     }
     func send(retry: Bool = false) async {

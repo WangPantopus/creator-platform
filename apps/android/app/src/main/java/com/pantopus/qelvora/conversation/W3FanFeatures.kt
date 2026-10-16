@@ -197,6 +197,32 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         }
     }
     fun conceal() { page = null; older = emptyList(); before = null; gate = null; source = null; presence = emptyList(); presenceRead++; presenceStale = true }
+    /** Contract C5, as the web thread does it: an approved AI sentence is appended
+     *  to its message the moment its frame arrives. The answer's end marks the
+     *  message and asks for one refetch for what frames do not carry (citations,
+     *  version, feedback); any other frame asks for a refetch. The delivery gate
+     *  has already dropped duplicates, stale epochs and gaps. */
+    fun paint(frame: APIFrame): Boolean {
+        val current = page ?: return false
+        val generation = frame.generationId
+        if (frame.threadId != current.threadId || frame.epoch != current.epoch || frame.authorKind != APIFrameAuthorKind.AI || generation == null) return false
+        val at = current.messages.indexOfFirst { it.id == frame.messageId }
+        return when (frame.kind) {
+            APIFrameKind.SENTENCE -> {
+                val messages = if (at >= 0) current.messages.toMutableList().also { it[at] = it[at].copy(text = it[at].text + frame.text, deliveryState = APIMessageDeliveryState.GENERATING) }
+                    else current.messages + ConversationMessage(frame.messageId, frame.threadId, APIMessageAuthorKind.AI, frame.text, APIMessageDeliveryState.GENERATING, frame.epoch, (current.messages.lastOrNull()?.sequence ?: 0) + 1, citations = emptyList(), createdAt = java.time.Instant.now().toString(), offTheRecord = current.offTheRecord, version = 1)
+                page = current.copy(messages = messages, cursor = frame.cursor, generationSequences = current.generationSequences + (generation to frame.sequence))
+                true
+            }
+            APIFrameKind.DELIVERED, APIFrameKind.INTERRUPTED -> {
+                val state = if (frame.kind == APIFrameKind.DELIVERED) APIMessageDeliveryState.DELIVERED else APIMessageDeliveryState.INTERRUPTED
+                val messages = if (at >= 0) current.messages.toMutableList().also { it[at] = it[at].copy(deliveryState = state) } else current.messages
+                page = current.copy(messages = messages, cursor = frame.cursor, generationSequences = current.generationSequences - generation)
+                false
+            }
+            else -> false
+        }
+    }
     /** C4: a read replaces the list only when it finishes; a refusal clears it;
      * a network or server failure keeps the last complete list. Never touches
      * the page, the draft, the delivery gate or the thread's denial path. */
@@ -346,7 +372,8 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 val current = page
                 val currentGate = gate
                 if (current != null && currentGate != null && error.isEmpty()) coroutineScope {
-                    val metadata = launch { while (isActive) { delay(15000); refresh(propagateFailure = true) } }
+                    // A safety net for what sends no frame; frames carry the rest (WP 7.8: was 15 s).
+                    val metadata = launch { while (isActive) { delay(60_000); refresh(propagateFailure = true) } }
                     try {
                         // A cursor without cached content is not a checkpoint.
                         // The freshly authorized atomic page is the resume base.
@@ -358,7 +385,9 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                                 }
                                 is ConversationRealtimeEvent.Frame -> {
                                     val delivery = gate ?: throw ConversationFailure(503, QelvoraCopy.text("nativeReconnectToRefreshThisConversation"))
-                                    if (delivery.receive(event.value).isNotEmpty()) refresh(propagateFailure = true)
+                                    // C5: paint what the frames carry; refetch only for the rest.
+                                    val ready = delivery.receive(event.value)
+                                    if (ready.isNotEmpty() && !ready.map { paint(it) }.all { it }) refresh(propagateFailure = true)
                                 }
                             }
                         }

@@ -42,7 +42,7 @@ final class Lane7AdultFlows: XCTestCase {
 
     /// The adults-only state and nothing else: no retry, help, sign-in or tabs.
     private func onlyAdultsState(file: StaticString = #filePath, line: UInt = #line) {
-        XCTAssertTrue(label(title).waitForExistence(timeout: 20), "the title", file: file, line: line)
+        XCTAssertTrue(label(title).waitForExistence(timeout: 40), "the title", file: file, line: line)
         XCTAssertTrue(label(body).exists, "the body", file: file, line: line)
         for extra in ["Retry", "Crisis help", "Continue with Pantopus", "Home", "Discover"] {
             XCTAssertFalse(app.buttons[extra].exists, "also shown: \(extra)", file: file, line: line)

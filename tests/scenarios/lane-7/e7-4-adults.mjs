@@ -40,7 +40,7 @@ async function flagged(appearance = "light") {
   );
   await A.waitFor("Your people", 30000);
   await L.harness("POST", "/__harness/accounts/devon", { adult: false });
-  await A.waitFor(TITLE, 20000);
+  await A.waitFor(TITLE, 40000);
 }
 
 if (run("A1")) {
@@ -82,7 +82,7 @@ if (run("A2")) {
   L.launch("android", "--reset", "--to", "/");
   await A.tap("Continue with Pantopus", 30000);
   await A.tap("Harness: an account under 18 (refused)", 30000);
-  await A.waitFor(TITLE, 20000);
+  await A.waitFor(TITLE, 40000);
   const shown = only();
   L.step(
     "android",

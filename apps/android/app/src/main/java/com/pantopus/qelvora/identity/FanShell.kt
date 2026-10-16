@@ -504,7 +504,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
     BackHandler(enabled = model.choosingActor) { model.choosingActor = false }
     BackHandler(enabled = !model.choosingActor && model.canGoBack && (model.session != null || signedOutScreen)) { model.back() }
     LaunchedEffect(model.destination) { model.loadArrival() }
-    LaunchedEffect(model, foreground) { if (foreground) { HarnessLaunch.resetIfRequested(context, model); model.refresh(); HarnessLaunch.signInIfRequested(context, model); while (true) { delay(4000); if (!model.choosingActor && !model.busy && (model.session != null || model.hasSavedCredential)) model.refresh() } } }
+    LaunchedEffect(model, foreground) { if (foreground) { HarnessLaunch.resetIfRequested(context, model); model.refresh(); HarnessLaunch.signInIfRequested(context, model); while (true) { delay(30_000); if (!model.choosingActor && !model.busy && (model.session != null || model.hasSavedCredential)) model.refresh() } } }
     LaunchedEffect(model.session?.sessionId, model.checkingSession, foreground) {
         if (foreground && !model.checkingSession) GrowthPush.refresh(context)
     }

@@ -206,7 +206,8 @@ private struct W3ThreadScreen: View {
             }
             .task(id: "\(scenePhase)-\(privacy)-\(source != nil)-\(originalReply != nil || comparisonQuestion != nil)") {
                 if scenePhase == .active && !privacy && source == nil && originalReply == nil && comparisonQuestion == nil {
-                    while !Task.isCancelled { try? await Task.sleep(for: .seconds(15)); if !Task.isCancelled { await model.refresh() } }
+                    // A safety net for what sends no frame; frames carry the rest (WP 7.8: was 15 s).
+                    while !Task.isCancelled { try? await Task.sleep(for: .seconds(60)); if !Task.isCancelled { await model.refresh() } }
                 }
             }
             .onChange(of: scenePhase) { _, value in

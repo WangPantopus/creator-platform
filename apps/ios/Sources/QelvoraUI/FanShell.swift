@@ -590,8 +590,10 @@ public struct FanAppShell: View {
                 #if DEBUG
                 await DebugHarness.signInIfRequested(model)
                 #endif
+                // WP 7.8: the session is checked at launch, on return to the front and
+                // every 30 s (it was every 4 s); a refused request is seen at once.
                 while !Task.isCancelled {
-                    do { try await Task.sleep(for: .seconds(4)) } catch { return }
+                    do { try await Task.sleep(for: .seconds(30)) } catch { return }
                     guard !Task.isCancelled else { return }
                     if !model.busy && !model.choosingDevelopmentActor && (model.session != nil || model.hasSavedCredential) { await model.refresh() }
                 }
