@@ -4304,7 +4304,8 @@ data class APIConversationConversationOfflineSnapshotPage(
   val `canSend`: Boolean,
   @Required
   val `unavailableReason`: String? = null,
-  val `feedbackPolicy`: APIConversationConversationOfflineSnapshotPageFeedbackPolicy? = null
+  val `feedbackPolicy`: APIConversationConversationOfflineSnapshotPageFeedbackPolicy? = null,
+  val `stepInAvailable`: Boolean? = null
 )
 
 @Serializable
@@ -4427,7 +4428,8 @@ data class APIConversationConversationPage(
   val `canSend`: Boolean,
   @Required
   val `unavailableReason`: String? = null,
-  val `feedbackPolicy`: APIConversationConversationPageFeedbackPolicy? = null
+  val `feedbackPolicy`: APIConversationConversationPageFeedbackPolicy? = null,
+  val `stepInAvailable`: Boolean? = null
 )
 
 @Serializable

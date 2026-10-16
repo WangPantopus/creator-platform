@@ -186,7 +186,6 @@ export function ComparisonChoice({
           </button>
         </>
       )}
-      {available === false && <p>AI comparisons are not available yet.</p>}
       {!choice && available !== false && !failure && (
         <p role="status">Loading your comparison choice…</p>
       )}

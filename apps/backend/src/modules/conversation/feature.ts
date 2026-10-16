@@ -30,7 +30,11 @@ import {
   SendMessageSchema,
   type AcceptedMessage,
 } from "@qelvora/api";
-import { needsImmediateSafety, crisisText } from "../agent/pipeline.js";
+import {
+  needsImmediateSafety,
+  crisisText,
+  fallback,
+} from "../agent/pipeline.js";
 import { z } from "zod";
 import { capabilitySnapshot } from "../access/commerce.js";
 import type { ConversationWellbeing } from "./wellbeing.js";
@@ -342,6 +346,23 @@ export class ConversationFeature {
         this.policyAvailable(scope) &&
         t.processor_consent_version === this.policy.version,
     );
+    // The latest AI turn decides whether the thread may show the way to the
+    // creator's paid attention: never right after the crisis response or a
+    // companion safety refusal (INV-19, INV-21). Both texts are written only
+    // by the server; the expert fallback ("You can ask … directly") keeps it.
+    // An answer that has no sentence yet does not count, so the button cannot
+    // flash back while the next reply might still be the crisis response.
+    const latestAi =
+      (
+        await client.query<{ text: string }>(
+          "SELECT text FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND author_kind='ai' AND text<>'' ORDER BY sequence DESC LIMIT 1",
+          [scope.threadId, scope.creatorId, scope.fanId],
+        )
+      ).rows[0]?.text ?? "";
+    const stepInAvailable = !(
+      latestAi.includes(crisisText) ||
+      latestAi.includes(fallback("companion", t.display_name))
+    );
     const capabilities = await capabilitySnapshot(client, scope);
     const hasAccess =
       capabilities.capabilities.includes("ai_message") &&
@@ -380,11 +401,14 @@ export class ConversationFeature {
             : t.control !== "ai_active"
               ? "AI messaging is paused in this conversation."
               : !hasAccess
-                ? "Your AI access or allowance is unavailable. You can still ask the creator to step in."
+                ? stepInAvailable
+                  ? "Your AI access or allowance is unavailable. You can still ask the creator to step in."
+                  : "Your AI access or allowance is unavailable."
                 : null,
       feedbackPolicy: this.lineage
         ? await this.lineage.policy(scope, client)
         : null,
+      stepInAvailable,
     };
   }
   async offline(actor: Actor, creatorId: string, fanId: string) {
