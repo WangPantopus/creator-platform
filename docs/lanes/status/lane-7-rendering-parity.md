@@ -12,10 +12,10 @@ waits on a contract or a founder decision says so, keeps today's behavior and mo
 | P1    | Notes and reactions in the thread              | C4 (lane 5), `GET /v1/content/{creatorId}/presence`                               | #452 (and its Android bottom fix)                                                                               |
 | P2    | Notification rows: glyph, color, time, unread  | `GET /v1/growth/notifications` (C4 notices, lane 5)                               | Next                                                                                                            |
 | P3    | Step-in seal and the composer states           | Conversation page (`control`, `canSend`, `unavailableReason`)                     | Seal: #457. Composer states: a founder decision (below); trial, ended, capacity: no contract (ticket to lane 3) |
-| P4    | Citations                                      | Message `citations` (ids) and the creator's posts                                 | To survey                                                                                                       |
+| P4    | Citations                                      | Message `citations` (ids) and the creator's posts                                 | Built: `lane-7/citation-refusal` (an Android fix); chip titles need lane 3                                      |
 | P5    | Named pickers instead of raw ids               | `GET /v1/conversations/account` (`threads[].name`)                                | Needs picker copy approved (proposed below)                                                                     |
 | P6    | Explicit provider consent                      | Capabilities `providers`, `POST .../consent`                                      | #460                                                                                                            |
-| P7    | 18+ confirmation                               | C1 (lane 1) age screen and `adult_eligibility_required`                           | The refusal: built, `lane-7/adults-only`. The age step itself: WP 7.5 (C1)                                      |
+| P7    | 18+ confirmation                               | C1 (lane 1) age screen and `adult_eligibility_required`                           | #462 (the refusal); the age step itself: WP 7.5 (C1)                                                            |
 | P8    | The 3-hour reminder                            | No server signal; client rule proposed                                            | Needs a founder decision on the rule                                                                            |
 | P9    | Packet terms block and ETA line                | `chargeRule`, `pendingHold`, `decisionEta`; lane 4's public summary `reliability` | Copy decision: `chargeRule` says "she" for every creator; ETA waits on lane 4; Q04 keeps payment on the web     |
 | P10   | Share sheet for the card                       | Lane 5 share card (needs lanes 1, 3, 4)                                           | Waits on the share-card contract                                                                                |
@@ -271,6 +271,62 @@ ends its session with the refusal, as `resolveSession` does.
 - The designed state offers nothing else, so it no longer shows "Crisis help" (the web's page has
   none either). Say if crisis help should stay on this screen.
 
+## P4: citations
+
+The survey: both apps draw each citation as the chip "Source · Read the original passage". The
+thread page carries only citation ids, so neither app can name the post (title, kind, length) as
+the design's chip does without one request per chip. A tap reads `GET …/citations/{id}` and shows
+the passage: "Original source", its title and its text.
+
+It found a defect on Android. The real API refuses a passage that is no longer readable with
+`403 citation_unavailable` ("No longer accessible to you"). Android handled that as a refused
+thread: the whole thread disappeared ("Conversation unavailable · No longer accessible to you")
+for about two seconds, then reloaded, and nothing said the source was unavailable. The same
+handler served the "Original AI reply" link. iOS says "Source unavailable" and keeps the thread.
+
+### Rules
+
+1. Each citation is the chip "Source · Read the original passage". A tap opens the passage in
+   place; closing returns to the same place in the thread.
+2. A passage that cannot be read, for any reason, is said in place: "Source unavailable · No
+   longer accessible to you", with Close. The thread, its draft and its live connection are
+   untouched: a refused passage is not a refused thread.
+3. The same for the original AI reply behind a correction, which also says "The original reply
+   changed." when it no longer matches.
+
+### Scenarios and results (fake API; synthetic identities and data; real apps)
+
+| ID   | Steps                                                    | Expected                                                                  | iOS     | Android                                       |
+| ---- | -------------------------------------------------------- | ------------------------------------------------------------------------- | ------- | --------------------------------------------- |
+| P4.1 | Devon types a draft in Maya's thread and taps a citation | The passage ("Why celadon pinholes"); closing returns to the thread       | pass    | pass                                          |
+| P4.2 | The passage is refused as the real API refuses it (403)  | "Source unavailable · No longer accessible to you"; thread and draft stay | pass    | pass (before the fix: the thread disappeared) |
+| P4.3 | The passage is missing (404)                             | The same                                                                  | pass    | pass                                          |
+| P4.4 | The original AI reply behind a correction is refused     | The same                                                                  | not run | not run (the fake has no corrections)         |
+
+Commands: `node tests/scenarios/lane-7/e7-4-citations.mjs [P1 P2 P3]` (Android) and
+`node tests/scenarios/lane-7/ios-navigation.mjs <built.xctestrun> --citations [P1 P2 P3]` (iOS).
+The fake now serves `…/citations/{id}` as the real route does: only an id the thread's messages
+cite, while its post is published; otherwise `403 citation_unavailable`.
+
+### What the runs found
+
+- **The Android defect above**, fixed here.
+- **Ticket to lane 3**: the design's chip names its source (title, kind, length); the thread page
+  carries only ids. Citation summaries on the page would let both apps name the source without a
+  request per chip.
+- **For WP 7.8**: while any dialog is open on the Android thread (a passage, or this message), the
+  thread fetches its offline lease again about once a second. Seen before this change too.
+- **An iOS freeze, found while writing these flows** (not caused by P4): typing a draft in Maya's
+  thread at normal text size and then swiping fast right away, while the thread is still placing
+  its Notes, sometimes froze the app (the main thread spun in SwiftUI's lazy stack measuring rows
+  under the bottom-anchored scroll position, as in the WP 7.3 largest-text freeze). Seen in 2 of
+  about 13 attempts with Notes rows present, 0 of 5 without. The bottom anchor is older than lane
+  7's current work (it is on `main`); Notes rows seem to make the loop likelier. Proposed fix, its
+  own pull request: scroll to the newest row explicitly instead of anchoring, as Android does, then
+  rerun the WP 7.3 draft flows, the P1 flows and D3T. These flows scroll with slow drags meanwhile.
+- **A small difference, by platform convention**: after the "Source unavailable" alert, iOS gives
+  the message box its focus back (the keyboard returns); Android's dialog does not.
+
 ## P2 to P11: the rules, written before the code
 
 Each becomes its own pull request with its own scenario table. What a piece cannot do yet is
@@ -301,8 +357,7 @@ the step-in button in every state (the web titles the notice "AI paused" when th
 apps say "AI unavailable"). Proposed: follow the reference, keep the server's sentence as the
 paused line's detail, and ticket lane 3 to do the same on the web.
 
-**P4 Citations.** To survey: both apps draw `CitationChip` from message `citations` today; the
-spec will state the label, the unavailable state and what a tap opens, the same on both.
+**P4 Citations.** Surveyed and fixed: see P4 above.
 
 **P5 Named pickers.** Support, report, block and deletion stop asking for a typed "Creator ID" or
 "Conversation ID". The person picks from their conversations by creator name
