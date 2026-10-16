@@ -61,7 +61,7 @@ object QelvoraCopy {
     "officialDisclaimer" to "Official means {name} authorized this AI. It does not mean she read your message.",
     "conversationAccess" to "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.",
     "packetAccess" to "{name} and her authorized team can separately review this AI conversation. Those accesses are logged.",
-    "chargeRule" to "Charged only when {name} accepts. If she declines or {deadline} pass, nothing is charged.",
+    "chargeRule" to "Charged only when {name} accepts. If {name} declines or {deadline} pass, nothing is charged.",
     "pendingHold" to "Your bank may show a pending hold for a few days.",
     "decisionEta" to "{name} usually decides in {range}",
     "draftNotice" to "{name} may answer with her AI's draft; you'll see that label.",
@@ -257,7 +257,7 @@ object QelvoraCopy {
     "editedByYou" to "Edited by you",
     "summary" to "Summary",
     "ifAccepts" to "If {name} accepts",
-    "ifDeclines" to "If she declines or {deadline} pass",
+    "ifDeclines" to "If {name} declines or {deadline} pass",
     "requestsAhead" to " · {count} requests ahead of you",
     "requestStatus" to "Request status",
     "writtenReply" to "Written reply",
@@ -327,6 +327,7 @@ object QelvoraCopy {
     "growthFindingCreators" to "Finding creators",
     "growthUsefulness" to "Usefulness",
     "growthNotifications" to "Notifications",
+    "growthUnread" to "Unread",
     "growthLeaving" to "Leaving",
     "growthRating" to "Rating",
     "growthSkipRating" to "Skip rating",
@@ -1081,7 +1082,13 @@ object QelvoraCopy {
     "growthImpactPeopleHelped" to "You helped {people} people this week.",
     "growthImpactThankYou" to "A THANK-YOU, SHARED WITH PERMISSION",
     "growthImpactWeekCounts" to "Counts are for this week only. Fans are never named here without their consent.",
-    "growthImpactNotAvailable" to "No weekly digest is available yet."
+    "growthImpactNotAvailable" to "No weekly digest is available yet.",
+    "pickerCreator" to "Creator",
+    "pickerConversation" to "Conversation",
+    "pickerChooseCreator" to "Choose a creator",
+    "pickerChooseConversation" to "Choose a conversation",
+    "pickerNoConversations" to "You have no conversations yet.",
+    "pickerConversationsFailed" to "Your conversations couldn't load."
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }

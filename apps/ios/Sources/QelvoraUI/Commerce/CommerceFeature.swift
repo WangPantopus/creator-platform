@@ -267,7 +267,12 @@ struct CommerceFeature: View {
             Text("Included in your request").qText("display-md")
             Text("Change anything; nothing is sent until you do.").qText("body")
             IncludeList(name: creatorName, summaryBinding: $summary, itemsBinding: $includeMessages, summaryIncluded: $includeSummary)
-            ModeList(modes: modes.map { mode in ModeItem(id: mode.id, title: mode.title, meta: "\(mode.delivery_hours) h · \(max(0, mode.weekly_limit - mode.used - mode.reserved)) left", price: mode.amount.flatMap(Int64.init).map { CommerceAmount.display($0, mode.currency) } ?? "Unset", selected: selectedMode == mode.id, disabled: mode.state != "offered" || mode.used + mode.reserved >= mode.weekly_limit) }, selection: $selectedMode)
+            ModeList(modes: modes.map { mode in ModeItem(id: mode.id, title: mode.title, meta: "\(mode.delivery_hours) h · \(max(0, mode.weekly_limit - mode.used - mode.reserved)) left", price: mode.amount.flatMap(Int64.init).map { CommerceAmount.display($0, mode.currency) } ?? "Price unavailable", selected: selectedMode == mode.id, disabled: mode.state != "offered" || mode.used + mode.reserved >= mode.weekly_limit) }, selection: $selectedMode)
+            // WP 7.4 P9: the chosen mode's terms, as the web packet shows them; its
+            // decision time is the deadline. The ETA line waits on lane 4's summary.
+            if let mode = modes.first(where: { $0.id == selectedMode }) {
+                TermsBlock(price: mode.amount.flatMap(Int64.init).map { CommerceAmount.display($0, mode.currency) } ?? "Price unavailable", deadline: "\(mode.decision_hours) h", name: creatorName)
+            }
             Notice(title: "Payment unavailable", children: "Paid written and voice requests are unavailable in this native app. Your draft stays on this screen.")
             Button("Send request", variant: .secondary, block: true, disabled: true) {}
         }

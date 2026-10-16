@@ -62,7 +62,7 @@
   <string name="official_disclaimer" formatted="false">Official means {name} authorized this AI. It does not mean she read your message.</string>
   <string name="conversation_access" formatted="false">Conversations with a creator\'s AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.</string>
   <string name="packet_access" formatted="false">{name} and her authorized team can separately review this AI conversation. Those accesses are logged.</string>
-  <string name="charge_rule" formatted="false">Charged only when {name} accepts. If she declines or {deadline} pass, nothing is charged.</string>
+  <string name="charge_rule" formatted="false">Charged only when {name} accepts. If {name} declines or {deadline} pass, nothing is charged.</string>
   <string name="pending_hold" formatted="false">Your bank may show a pending hold for a few days.</string>
   <string name="decision_eta" formatted="false">{name} usually decides in {range}</string>
   <string name="draft_notice" formatted="false">{name} may answer with her AI\'s draft; you\'ll see that label.</string>
@@ -258,7 +258,7 @@
   <string name="edited_by_you" formatted="false">Edited by you</string>
   <string name="summary" formatted="false">Summary</string>
   <string name="if_accepts" formatted="false">If {name} accepts</string>
-  <string name="if_declines" formatted="false">If she declines or {deadline} pass</string>
+  <string name="if_declines" formatted="false">If {name} declines or {deadline} pass</string>
   <string name="requests_ahead" formatted="false"> · {count} requests ahead of you</string>
   <string name="request_status" formatted="false">Request status</string>
   <string name="written_reply" formatted="false">Written reply</string>
@@ -328,6 +328,7 @@
   <string name="growth_finding_creators" formatted="false">Finding creators</string>
   <string name="growth_usefulness" formatted="false">Usefulness</string>
   <string name="growth_notifications" formatted="false">Notifications</string>
+  <string name="growth_unread" formatted="false">Unread</string>
   <string name="growth_leaving" formatted="false">Leaving</string>
   <string name="growth_rating" formatted="false">Rating</string>
   <string name="growth_skip_rating" formatted="false">Skip rating</string>
@@ -1083,4 +1084,10 @@
   <string name="growth_impact_thank_you" formatted="false">A THANK-YOU, SHARED WITH PERMISSION</string>
   <string name="growth_impact_week_counts" formatted="false">Counts are for this week only. Fans are never named here without their consent.</string>
   <string name="growth_impact_not_available" formatted="false">No weekly digest is available yet.</string>
+  <string name="picker_creator" formatted="false">Creator</string>
+  <string name="picker_conversation" formatted="false">Conversation</string>
+  <string name="picker_choose_creator" formatted="false">Choose a creator</string>
+  <string name="picker_choose_conversation" formatted="false">Choose a conversation</string>
+  <string name="picker_no_conversations" formatted="false">You have no conversations yet.</string>
+  <string name="picker_conversations_failed" formatted="false">Your conversations couldn\'t load.</string>
 </resources>

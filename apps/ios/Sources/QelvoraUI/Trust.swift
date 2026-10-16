@@ -26,6 +26,9 @@ private struct TrustAccess: Decodable { let case_id: String; let action: String;
 private struct TrustHelp: Decodable { struct Resource: Decodable { let region: String; let name: String; let url: String; let phone: String? }; let emergencyMessage: String; let resources: [Resource] }
 private struct TrustAck: Decodable { let id: String?; let number: Int?; let saved: Bool? }
 private struct TrustFailure: Decodable { struct Detail: Decodable { let message: String; let correlationId: String? }; let error: Detail }
+/// The person's conversations, by creator name (`GET /v1/conversations/account`).
+private struct TrustConversation: Decodable, Identifiable, Sendable { let id: String; let creatorId: String; let name: String }
+private struct TrustConversationPage: Decodable, Sendable { let threads: [TrustConversation]; let nextCursor: String? }
 
 private final class TrustPublicRedirectGuard: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
     func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping @Sendable (URLRequest?) -> Void) { completionHandler(nil) }
@@ -107,13 +110,18 @@ public struct TrustFanFeature: View {
     @State private var authorship = "unanswered"
     @State private var feedbackComment = ""
     @State private var feedbackConsent = false
+    /// The pickers' choices: nil until loaded; memory only, cleared with the account view.
+    @State private var conversations: [TrustConversation]?
+    @State private var conversationsFailed = false
     @Environment(\.colorScheme) private var scheme
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     public init(baseURL: URL?, model: FanSession) {
         client = baseURL.map { TrustClient(baseURL: $0) }; self.model = model
         let query = URLComponents(string: model.destination)?.queryItems ?? []
         let creator = query.first { $0.name == "creatorId" }?.value ?? "", message = query.first { $0.name == "messageId" }?.value ?? ""
-        if UUID(uuidString: creator) != nil && UUID(uuidString: message) != nil { _creatorID = State(initialValue: creator); _messageID = State(initialValue: message); _kind = State(initialValue: "ai_report") }
+        // Opened from a thread or a message: that creator is already chosen (as on Android).
+        if UUID(uuidString: creator) != nil { _creatorID = State(initialValue: creator.lowercased()) }
+        if UUID(uuidString: creator) != nil && UUID(uuidString: message) != nil { _messageID = State(initialValue: message); _kind = State(initialValue: "ai_report") }
         let request = query.first { $0.name == "requestId" }?.value ?? ""
         if UUID(uuidString: request) != nil { _requestID = State(initialValue: request) }
     }
@@ -134,7 +142,7 @@ public struct TrustFanFeature: View {
             Button("Refresh", variant: .secondary, block: true, disabled: busy || model.checkingSession || model.busy) { refreshOperation?.cancel(); refreshOperation = Task { await model.refresh() } }
         }.padding(16) }.foregroundStyle(qColor("ink", scheme)).background(qColor("ground", scheme))
         .task(id: route + (privateReady ? "|ready" : "|unavailable")) { await load() }
-        .onChange(of: privateReady) { _, ready in if !ready { operation?.cancel(); suspendPrivateResults() } }
+        .onChange(of: privateReady) { _, ready in if !ready { operation?.cancel(); suspendPrivateResults(keepConfirmation: privateVisible && model.checkingSession) } }
         .onChange(of: model.error) { _, error in if !error.isEmpty { operation?.cancel(); clearPrivateResults() } }
         .onChange(of: route) { _, _ in operation?.cancel(); clearPrivateResults() }
         .onDisappear { operation?.cancel(); refreshOperation?.cancel(); clearPrivateResults() }
@@ -161,7 +169,7 @@ public struct TrustFanFeature: View {
     }
     private var support: some View { VStack(alignment: .leading, spacing: 16) {
         Picker("Report type", selection: $kind) { Text("Support request").tag("support"); Text("Report AI message").tag("ai_report"); Text("Abuse report").tag("abuse"); Text("Block creator").tag("block"); Text("Crisis help").tag("crisis") }.pickerStyle(.menu)
-        if kind == "ai_report" || kind == "abuse" || kind == "block" { field("Creator ID", $creatorID) }
+        if kind == "ai_report" || kind == "abuse" || kind == "block" { conversationPicker(thread: false) }
         if kind == "ai_report" { field("AI message ID", $messageID) }
         if kind == "support" { field("Request ID (optional)", $requestID) }
         if kind == "crisis" { crisisHelp }
@@ -201,7 +209,7 @@ public struct TrustFanFeature: View {
     } }
     @ViewBuilder private var privacyScope: some View {
         Picker("Data scope", selection: $scope) { Text("Account").tag("account"); Text("Creator").tag("creator"); Text("Conversation").tag("thread") }.pickerStyle(.menu).frame(minHeight: 44).contentShape(Rectangle())
-        if scope != "account" { field("Creator ID", $creatorID) }; if scope == "thread" { field("Conversation ID", $threadID) }
+        if scope != "account" { conversationPicker(thread: scope == "thread") }
     }
     @ViewBuilder private var privacyVerification: some View {
         if capability?.localDevelopment == true { Text("Synthetic local account: type LOCAL DEVELOPMENT to confirm.").qText("caption"); field("Local confirmation", $proof) }
@@ -254,9 +262,60 @@ public struct TrustFanFeature: View {
     private func clearPrivateResults() {
         suspendPrivateResults()
         cases = []; notices = []; jobs = []; history = []; selectedJob = nil
-        capability = nil
+        capability = nil; conversations = nil; conversationsFailed = false
     }
-    private func suspendPrivateResults() { workEpoch += 1; busy = false; exportPayload = nil; confirmingDelete = false; result = ""; error = "" }
+    /// WP 7.4 P5: a creator or a conversation is picked by the creator's name,
+    /// never typed as an id. Nothing is chosen until the person chooses; a
+    /// screen opened from a thread arrives with that creator chosen.
+    @ViewBuilder private func conversationPicker(thread: Bool) -> some View {
+        let title = QelvoraCopy.text(thread ? "pickerConversation" : "pickerCreator")
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title).qText("label")
+            if conversationsFailed {
+                Text(QelvoraCopy.text("pickerConversationsFailed")).qText("body")
+                Button(QelvoraCopy.text("growthTryAgain"), variant: .secondary, disabled: privateDisabled) { run { await loadConversations() } }
+            } else if let conversations {
+                if conversations.isEmpty { Text(QelvoraCopy.text("pickerNoConversations")).qText("body") }
+                else {
+                    Picker(title, selection: thread ? $threadID : $creatorID) {
+                        Text(QelvoraCopy.text(thread ? "pickerChooseConversation" : "pickerChooseCreator")).tag("")
+                        if thread { ForEach(conversations) { item in Text(item.name).tag(item.id) } }
+                        else { ForEach(uniqueCreators(conversations), id: \.creatorId) { item in Text(item.name).tag(item.creatorId) } }
+                    }.pickerStyle(.menu).frame(minHeight: 44).contentShape(Rectangle()).accessibilityIdentifier(thread ? "picker-conversation" : "picker-creator")
+                }
+            } else { ProgressView().accessibilityLabel("Loading") }
+        }
+        .onChange(of: threadID) { _, id in if let match = conversations?.first(where: { $0.id == id }) { creatorID = match.creatorId } }
+    }
+    private func uniqueCreators(_ items: [TrustConversation]) -> [TrustConversation] {
+        var seen = Set<String>(); return items.filter { seen.insert($0.creatorId).inserted }
+    }
+    /// Every page of the person's conversations (at most 20 pages of 50).
+    private func loadConversations() async {
+        guard let client, let account = model.session?.accountId, privateReady else { return }
+        conversationsFailed = false
+        let api = W3ConversationClient(baseURL: client.baseURL, expectedAccountId: account)
+        do {
+            var all: [TrustConversation] = [], cursor: String?
+            for _ in 0..<20 {
+                let page: TrustConversationPage = try await api.request("account" + (cursor.map { "?cursor=" + $0 } ?? ""))
+                all += page.threads; cursor = page.nextCursor
+                if cursor == nil { break }
+            }
+            guard !Task.isCancelled, privateReady, model.session?.accountId == account else { return }
+            conversations = all
+            // An id this screen cannot name is never sent: a choice not among the
+            // person's conversations is cleared, and they choose again.
+            if !creatorID.isEmpty && !all.contains(where: { $0.creatorId == creatorID.lowercased() }) { creatorID = "" }
+            if !threadID.isEmpty && !all.contains(where: { $0.id == threadID.lowercased() }) { threadID = "" }
+        } catch {
+            guard !Task.isCancelled, privateReady, model.session?.accountId == account else { return }
+            conversations = nil; conversationsFailed = true
+        }
+    }
+    // The generic confirmation holds no authority; the action remains disabled
+    // and requires a fresh capture while a same-session check is in flight.
+    private func suspendPrivateResults(keepConfirmation: Bool = false) { workEpoch += 1; busy = false; exportPayload = nil; if !keepConfirmation { confirmingDelete = false }; result = ""; error = "" }
     private func beginWork() -> Int { workEpoch += 1; busy = true; return workEpoch }
     private func finishWork(_ epoch: Int) { if workEpoch == epoch { busy = false } }
     private func capture() async throws -> FanSessionRequestCapture {
@@ -299,11 +358,23 @@ public struct TrustFanFeature: View {
         } catch { guard !Task.isCancelled, privateReady, workEpoch == epoch else { return }; cases = []; notices = []; jobs = []; history = []; selectedJob = nil; exportPayload = nil; failure = failure ?? error }
         guard !Task.isCancelled, privateReady, workEpoch == epoch else { return }
         error = failure?.localizedDescription ?? ""
+        if !route.hasPrefix("/trust") && !route.contains("access") && !route.contains("feedback") { await loadConversations() }
     }
-    private func perform(_ path: String, _ input: [String: Any]) async -> TrustAck? {
+    /// A command with local consequences (`accepted`) finishes once sent, even if
+    /// a routine session check cancels this screen's work meanwhile: the server
+    /// may already have accepted it. Only showing the answer depends on the
+    /// checks after it.
+    private func perform(_ path: String, _ input: [String: Any], accepted: (@MainActor () async -> Void)? = nil) async -> TrustAck? {
         guard !privateDisabled else { return nil }
         let epoch = beginWork(); defer { finishWork(epoch) }
-        do { let client = try await capturedClient(); let ack: TrustAck = try await client.request(path, body: JSONSerialization.data(withJSONObject: input)); try Task.checkCancellation(); guard privateReady, workEpoch == epoch else { return nil }; error = ""; commandKey = UUID().uuidString; return ack }
+        do {
+            let client = try await capturedClient(), body = try JSONSerialization.data(withJSONObject: input)
+            let ack: TrustAck
+            if let accepted {
+                // Unstructured: a cancelled screen task cannot cancel it.
+                ack = try await Task { let value: TrustAck = try await client.request(path, body: body); await accepted(); return value }.value
+            } else { ack = try await client.request(path, body: body) }
+            try Task.checkCancellation(); guard privateReady, workEpoch == epoch else { return nil }; error = ""; commandKey = UUID().uuidString; return ack }
         catch { if !Task.isCancelled && privateReady && workEpoch == epoch { self.error = error.localizedDescription }; return nil }
     }
     private func report() async {
@@ -311,7 +382,26 @@ public struct TrustFanFeature: View {
         var input: [String: Any] = ["kind": kind, "reason": reason, "idempotencyKey": commandKey]; if kind != "support" && !creatorID.isEmpty { input["creatorId"] = creatorID.lowercased() }; if kind == "ai_report" { input["messageId"] = messageID.lowercased() }; if kind == "support" && !requestID.isEmpty { input["requestId"] = requestID.lowercased() }; if let ack = await perform("reports", input) { result = "CASE-\(ack.number ?? 0) is saved. No provider action is implied."; reason = ""; await load() }
     }
     private func appeal(_ item: TrustCase) async { if await perform("cases/" + item.id + "/appeals", ["version": item.version, "reason": reason, "idempotencyKey": commandKey]) != nil { result = "Your appeal is saved for a different reviewer."; reason = ""; await load() } }
-    private func privacyCommand(_ kind: String) async { var input: [String: Any] = ["kind": kind, "scope": scope, "proof": capability?.verificationMethod == "current_session" ? "CURRENT_SESSION" : proof, "idempotencyKey": commandKey]; if scope != "account" { input["creatorId"] = creatorID.lowercased() }; if scope == "thread" { input["threadId"] = threadID.lowercased() }; if let ack = await perform("privacy/jobs", input) { result = "Request saved; inspect each domain's progress."; await load(); if let id = ack.id { await jobDetail(id) } } }
+    private func privacyCommand(_ kind: String) async {
+        guard let origin = client?.baseURL.absoluteString, let account = model.session?.accountId else { return }
+        let deletionScope = scope, creator = creatorID.lowercased(), thread = threadID.lowercased()
+        var input: [String: Any] = ["kind": kind, "scope": deletionScope, "proof": capability?.verificationMethod == "current_session" ? "CURRENT_SESSION" : proof, "idempotencyKey": commandKey]
+        if deletionScope != "account" { input["creatorId"] = creator }
+        if deletionScope == "thread" { input["threadId"] = thread }
+        // An accepted deletion removes the original account's matching drafts
+        // even if the account view changes before the answer is shown.
+        let purge = PurgeOutcome()
+        let ack = await perform("privacy/jobs", input, accepted: kind != "delete" ? nil : {
+            do { try await W3DraftStorage.shared.purge(origin: origin, account: account, creator: deletionScope == "account" ? nil : creator, thread: deletionScope == "thread" ? thread : nil) }
+            catch { purge.failed = true }
+        })
+        if purge.failed { await model.purge(); return }
+        if let ack {
+            result = "Request saved; inspect each domain's progress."; await load()
+            if let id = ack.id { await jobDetail(id) }
+        }
+    }
+
     private func jobDetail(_ id: String) async {
         guard !privateDisabled else { return }
         let epoch = beginWork(); defer { finishWork(epoch) }
@@ -333,3 +423,4 @@ public struct TrustFanFeature: View {
     }
     private func retry(_ id: String) async { if await perform("privacy/jobs/" + id + "/retry", [:]) != nil { result = "Incomplete domains queued again."; await jobDetail(id) } }
 }
+@MainActor private final class PurgeOutcome { var failed = false }
