@@ -7,6 +7,7 @@ import partialRecoveryReview from "../../../infra/migrations/reviews/20261007-pa
 import recoveryReview from "../../../infra/migrations/reviews/20261007-generation-recovery.json" with { type: "json" };
 import comparisonReview from "../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
 import noticesReview from "../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
+import signInAndMoneyReview from "../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
 import { comparisonReaderCatalogue } from "../src/modules/conversation/comparison-feed.js";
 import { comparisonPrivacyCatalogue } from "../src/modules/conversation/comparison-privacy.js";
 import { comparisonArtifactCatalogue } from "../src/modules/trust/comparison-artifacts.js";
@@ -170,7 +171,8 @@ export async function assertGenerationWaveRoleSafety(
     | "generation-recovery"
     | "partial-generation-recovery"
     | "comparison"
-    | "notices",
+    | "notices"
+    | "sign-in-and-money",
 ) {
   if (
     purposeReview.schemaVersion !== 1 ||
@@ -182,11 +184,16 @@ export async function assertGenerationWaveRoleSafety(
     throw new WaveRoleSafetyError(
       "Generation-purpose wave review is unavailable.",
     );
-  const notices = extension === "notices";
+  const signInAndMoney = extension === "sign-in-and-money";
+  const notices = signInAndMoney || extension === "notices";
   const comparison = notices || extension === "comparison";
   // Every pinned catalogue lists every relation, so the newest installed
   // wave's review holds the current pins.
-  const head = notices ? noticesReview : comparisonReview;
+  const head = signInAndMoney
+    ? signInAndMoneyReview
+    : notices
+      ? noticesReview
+      : comparisonReview;
   const recovery =
     comparison ||
     extension === "generation-recovery" ||
@@ -327,6 +334,21 @@ export async function assertGenerationWaveRoleSafety(
           )
             throw new WaveRoleSafetyError(
               "Exact complete notices source graph is required.",
+            );
+      if (signInAndMoney)
+        for (const source of signInAndMoneyReview.sources)
+          if (
+            sha256(await readFile(new URL(source.path, repositoryRoot))) !==
+              source.checksum ||
+            !(
+              await client.query(
+                "SELECT 1 FROM creator.schema_migration WHERE version=$1 AND checksum=$2",
+                [source.version, source.checksum],
+              )
+            ).rowCount
+          )
+            throw new WaveRoleSafetyError(
+              "Exact complete sign-in and money source graph is required.",
             );
       if (
         contentHash(await comparisonReaderCatalogue(client)) !==

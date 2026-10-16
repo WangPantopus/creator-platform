@@ -34,6 +34,7 @@ export const FRESH_WAVES = [
   "20261007-partial-generation-recovery",
   "20261008-comparison",
   "20261015-notices",
+  "20261015-sign-in-and-money",
 ] as const;
 
 type Source = { version: string; path: string; checksum: string };
@@ -156,7 +157,7 @@ export async function installFullHost(input: FreshInstallInput) {
     }
     // The same final assertions scripts/migrate-trust.ts runs on any database
     // that holds the wave graph, plus the original business-row check.
-    await assertGenerationWaveRoleSafety(client, "notices");
+    await assertGenerationWaveRoleSafety(client, "sign-in-and-money");
     await assertPrivacyWaveRoleSafety(client, {
       privacy: true,
       domain: true,
@@ -165,6 +166,7 @@ export async function installFullHost(input: FreshInstallInput) {
       outputBeforePublic: false,
       publicBeforeComparison: false,
       comparisonBeforeNotices: false,
+      noticesBeforeSignInAndMoney: false,
     });
     const dataAfter = await waveDataDigest(client, tables);
     if (dataAfter.sha256 !== dataBefore.sha256 || dataAfter.rows !== 0)

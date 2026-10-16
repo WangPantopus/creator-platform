@@ -3,6 +3,7 @@ import generationPrivacyReview from "../../../../../infra/migrations/reviews/202
 import contentPrivacyReview from "../../../../../infra/migrations/reviews/20261007-content-privacy.json" with { type: "json" };
 import publicAIReview from "../../../../../infra/migrations/reviews/20261007-public-ai.json" with { type: "json" };
 import comparisonReview from "../../../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
+import noticesReview from "../../../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
 import { registeredContentPrivacyProfile } from "../../db/content-privacy-profile.js";
 import { registeredPublicAIProfile } from "../../db/public-ai-profile.js";
 import { contentHash } from "../../core/canonical.js";
@@ -384,6 +385,20 @@ export async function assertOriginalPrivacyFamilyComparisonCatalogForReview(
   await assertPurposeCatalogue(
     client,
     comparisonReview.originalFamilyProfiles.map((profile) => profile.sha256),
+    signal,
+  );
+}
+
+/** Fixed pre-sign-in-and-money operator metadata for the complete notices
+ * graph. This grants no task authority and accepts no runtime-selected profile. */
+export async function assertOriginalPrivacyFamilyNoticesCatalogForReview(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  await assertOriginalPrivacyFamilyCaller(client, signal);
+  await assertPurposeCatalogue(
+    client,
+    noticesReview.originalFamilyProfiles.map((profile) => profile.sha256),
     signal,
   );
 }

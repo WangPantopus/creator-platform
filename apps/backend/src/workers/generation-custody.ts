@@ -4,6 +4,7 @@ import { registeredContentPrivacyProfile } from "../db/content-privacy-profile.j
 import { registeredGenerationOutputProfile } from "../db/generation-output-profile.js";
 import { registeredPublicAIProfile } from "../db/public-ai-profile.js";
 import { registeredGenerationRecoveryProfile } from "../db/generation-recovery-profile.js";
+import { registeredComparisonProfile } from "../db/comparison-profile.js";
 import { invariant } from "../core/errors.js";
 import { generationPrivacySourcesRegistered } from "../db/generation-privacy-sources.js";
 import type { GenerationTerminalPurposeConsumer } from "../modules/identity/generation-scope.js";
@@ -24,6 +25,53 @@ function freeze<T extends object>(value: T): Readonly<T> {
 
 const baseline = freeze(review.custody);
 const withContentPrivacy = freeze(contentReview.custody);
+type Receipt = Readonly<{
+  migration: Readonly<{ version: string; checksum: string }>;
+  signature: string;
+  owner: string;
+  definitionChecksum: string;
+}>;
+
+/** A later registered wave that replaced a reviewed function's definition
+ * (the head review's generationDefinitions) also replaces its receipt: the
+ * source that installed it and its new definition. Owner and signature stay. */
+async function replacedDefinitions(signal?: AbortSignal) {
+  const head = await registeredComparisonProfile(signal);
+  const definitions =
+    head && "generationDefinitions" in head ? head.generationDefinitions : {};
+  return <T extends Receipt>(receipt: T): T => {
+    const definition = (
+      definitions as Readonly<
+        Record<
+          string,
+          Readonly<{
+            source: string;
+            owner: string;
+            definitionChecksum: string;
+          }>
+        >
+      >
+    )[receipt.signature];
+    if (!definition) return receipt;
+    const source = head?.sources.find(
+      (candidate) => candidate.version === definition.source,
+    );
+    invariant(
+      source && definition.owner === receipt.owner,
+      "generation_worker_custody_unavailable",
+      "A replaced generation definition requires its exact registered source.",
+    );
+    return Object.freeze({
+      ...receipt,
+      migration: Object.freeze({
+        version: source.version,
+        checksum: source.checksum,
+      }),
+      definitionChecksum: definition.definitionChecksum,
+    });
+  };
+}
+
 const terminalConsumer = (
   receipt: Omit<GenerationTerminalPurposeConsumer, "purpose">,
 ): GenerationTerminalPurposeConsumer =>
@@ -62,6 +110,7 @@ export async function reviewedGenerationWorkerCustody(
     "generation_worker_custody_unavailable",
     "The output repair requires the complete Content source graph.",
   );
+  const replaced = await replacedDefinitions(signal);
   signal?.throwIfAborted();
   const custody: GenerationWorkerCustody = {
     ...reviewed,
@@ -155,5 +204,15 @@ export async function reviewedGenerationWorkerCustody(
       ),
     },
   };
-  return freeze(custody);
+  return freeze({
+    ...custody,
+    identity: {
+      ...custody.identity,
+      consumers: custody.identity.consumers?.map(replaced),
+    },
+    accounting: {
+      ...custody.accounting,
+      consumers: custody.accounting.consumers.map(replaced),
+    },
+  });
 }
