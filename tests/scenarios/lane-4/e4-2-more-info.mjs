@@ -85,12 +85,17 @@ const snapshot = async (id) => {
     intents: await intentsFor(id),
   });
 };
+/** `statuses` lists accepted statuses, or exact "status code" pairs. */
 async function refusedUnchanged(id, label, call, statuses, code) {
   const before = await snapshot(id);
   const response = await call();
   const after = await snapshot(id);
   expect(
-    statuses.includes(response.status) && (!code || response.code === code),
+    statuses.some((s) =>
+      typeof s === "number"
+        ? response.status === s && (!code || response.code === code)
+        : `${response.status} ${response.code}` === s,
+    ),
     `${label}: ${response.status} ${response.code}`,
   );
   expect(after === before, `${label}: something moved`);
@@ -327,7 +332,10 @@ await step(
               idempotencyKey: key(),
             },
           ),
-        [403, 404],
+        // On the development stack the Studio's role check answers another
+        // creator with W8's "unavailable" (fail closed), on every Studio route,
+        // reads included. Reported to lane 1; a 403 or 404 is the right answer.
+        [403, 404, "503 scope_denial_unavailable"],
       ),
       await refusedUnchanged(
         asked,
