@@ -49,6 +49,23 @@ async function tapLabel(label) {
   A.tapAt(node.x, node.y);
   await L.sleep(800);
 }
+/** The button that holds a label (its smallest clickable parent): a label's
+ * own text node is always "enabled". */
+function holder(label) {
+  const nodes = A.screen();
+  const node = nodes.find((n) => n.text === label || n.desc === label);
+  if (!node) return null;
+  return nodes
+    .filter(
+      (n) =>
+        n.clickable &&
+        n.bounds[0] <= node.bounds[0] &&
+        n.bounds[1] <= node.bounds[1] &&
+        n.bounds[2] >= node.bounds[2] &&
+        n.bounds[3] >= node.bounds[3],
+    )
+    .sort((a, b) => a.w * a.h - b.w * b.h)[0];
+}
 const noTypedIds = (nodes = A.screen()) =>
   !nodes.some((n) => /Creator ID|Conversation ID/u.test(n.text + n.desc));
 async function sent() {
@@ -79,11 +96,11 @@ if (run("V1")) {
   await tapLabel("block");
   const prompt = Boolean(await reveal("Choose a creator"));
   await reason("Blocking this creator for the picker test.");
-  const holder = A.screen().find((n) => n.text === "Block creator");
+  const waiting = holder("Block creator");
   L.step(
     "android",
     "P5.1 Block: Creator, nothing chosen, no typed id, Block waits",
-    prompt && has("Creator") && noTypedIds() && holder && !holder.enabled,
+    prompt && has("Creator") && noTypedIds() && waiting && !waiting.enabled,
   );
   await tapLabel("Choose a creator");
   await tapLabel("Kiln Club");
@@ -178,7 +195,13 @@ if (run("V5")) {
   const failed = Boolean(await reveal("Your conversations couldn't load."));
   L.screenshot("android", "V5-failed");
   await L.harness("POST", "/__harness/faults", { rules: [] });
-  await tapLabel("Try again");
+  // The screen also reloads by itself after a routine session check, so the
+  // names may already be back; Try again while it is still offered.
+  const retry = A.screen().find((n) => n.text === "Try again");
+  if (retry) {
+    A.tapAt(retry.x, retry.y);
+    await L.sleep(800);
+  }
   const back = Boolean(await reveal("Choose a creator"));
   await tapLabel("Choose a creator");
   await tapLabel("Maya");
