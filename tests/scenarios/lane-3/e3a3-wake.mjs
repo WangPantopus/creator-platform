@@ -232,17 +232,18 @@ if (cases.includes("restart")) {
   // the restart. The kill lands between provider calls, so no cost is left
   // uncertain (lane 3 finding 3 on main) and before fan 1's first sentence
   // (finding 9).
-  await setModel({ mode: "ok", delayMs: 50 });
+  // Instant provider calls: an answer is then mostly database work between
+  // calls, so a moment with no call in flight is easy to catch.
+  await setModel({ mode: "ok", delayMs: 0 });
   const f1 = await fan(2);
   const f2 = await fan(3);
   const a = await send(f1, "Busy worker: why do glazes crawl?");
   const g1 = a.sent.json?.generationId;
   await claimedAfter(g1);
-  await sleep(3000);
   const b = await send(f2, "Queued behind it: do you sell test tiles?");
   const g2 = b.sent.json?.generationId;
   let killed = false;
-  for (let w = 0; w < 400 && !killed; w++) {
+  for (let w = 0; w < 4000 && !killed; w++) {
     const [s] = await sql(
       "SELECT (SELECT count(*)::int FROM creator.ai_usage WHERE generation_id=$1 AND provider_state='admitted') AS admitted, (SELECT last_sequence FROM creator.generation WHERE id=$1) AS seq, (SELECT state FROM creator.generation WHERE id=$2) AS queued",
       [g1, g2],
@@ -265,7 +266,7 @@ if (cases.includes("restart")) {
       if (!listening.includes(pids.backend?.pid)) break;
       process.kill(pids.backend.pid, "SIGKILL");
       killed = true;
-    } else await sleep(10);
+    } else await sleep(2);
   }
   const [at] = await sql(
     "SELECT (SELECT count(*)::int FROM creator.ai_usage WHERE generation_id=$1 AND provider_state='admitted') AS admitted, (SELECT state FROM creator.generation WHERE id=$2) AS queued, (SELECT lease_until IS NULL FROM creator.generation WHERE id=$2) AS unclaimed",
