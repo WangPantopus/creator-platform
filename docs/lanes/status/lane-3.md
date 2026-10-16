@@ -1,8 +1,8 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-16, by the lane 3 session (handoff)
-Working on: nothing in flight. Last done: A4 (fewer transactions), open as a PR from `lane-3/a4-fewer-transactions`
-Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 (see Resume here)
+Working on: nothing in flight. Last done: A4 (fewer transactions), #464
+Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464
 Next: the founder picks the next work package; remaining: A5 (safety sign-off), A7 (C5 frames), B1 (price rule), B3 citations, B4 retrieval (recommended next), B5 memory, B7 consent text, B8 My AI publish flow
 Blocked on: nothing. Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
 
@@ -26,7 +26,7 @@ http://127.0.0.1:56499`; publish Maya on the fake first, then restart with the g
   patch the `definitionChecksum` values in `infra/migrations/reviews/*.json`, `catalogues write --base F`,
   restart, test, then `git checkout -- infra/migrations/reviews` (never commit pins; the integrator
   regenerates them).
-- Waiting on others: the integrator registers #451 and reviews #455 and A4 (custody-adjacent); lane 4
+- Waiting on others: the integrator registers #451 and reviews #455 and #464 (custody-adjacent); lane 4
   takes finding 9's condition; lane 7 hides step-in natively (B9); lane 2 makes the model fake's reply
   configurable.
 
