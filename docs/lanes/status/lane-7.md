@@ -1,8 +1,72 @@
 # Lane 7: Phone apps (iOS and Android) status
 
-Updated: 2026-10-16 (evening), by the resumed lane 7 session (one session, both platforms).
+Updated: 2026-10-16 (night), by the resumed lane 7 session (one session, both platforms).
 
-## Handoff (2026-10-16, evening): resume here
+## Handoff (2026-10-16, night): resume here
+
+**WP 7.10, 7.11, 7.8 and 7.12 are built and in draft pull requests, stacked on the 7.4 stack**
+(#401 → … → #503). Merge order: the 7.4 stack, then #504 → #505 → #506 → #507 → this status PR.
+Never rebase: a fix on a lower branch is merged upward, branch by branch, and each is pushed.
+
+| PR                                                                | Branch                   | What                                        | State at the handoff                                                                                                   |
+| ----------------------------------------------------------------- | ------------------------ | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| [#504](https://github.com/WangPantopus/creator-platform/pull/504) | `lane-7/copy-lookups`    | 7.10 copy lookups (both apps)               | Proven on Android (13 suites, 133 steps), iOS E7.1 states, gates both; iOS E7.4 suites not run                         |
+| [#505](https://github.com/WangPantopus/creator-platform/pull/505) | `lane-7/accessibility`   | 7.11 accessibility pass                     | Compiled, gates pass; flows A2 to A5 written, not run                                                                  |
+| [#506](https://github.com/WangPantopus/creator-platform/pull/506) | `lane-7/polling-offline` | 7.8 polling, frames painted (C5), offline   | P2 passes on both; **P1 fails the target**: 35/36 a minute, 30 of them the offline lease (see below); P3, P4 not run |
+| [#507](https://github.com/WangPantopus/creator-platform/pull/507) | `lane-7/studio-link`     | 7.12 web Studio link                        | Z1, Z2 pass on both; Z3 (the real web) not run                                                                         |
+| this one                                                          | `lane-7/status-7-12`     | These notes and the resume prompt           |                                                                                                                        |
+
+Specs, decisions taken as the proposed default and results: [copy and accessibility](lane-7-copy-and-accessibility.md)
+(7.10, 7.11), [polling and offline](lane-7-polling-offline.md) (7.8), [the Studio link](lane-7-studio-link.md)
+(7.12). The next session's prompt: [lane-7-resume-prompt.md](lane-7-resume-prompt.md).
+
+**Next, in order** (each verified on both apps, results into its spec and pull request):
+
+1. Build the top of the stack (`lane-7/status-7-12`) on both apps, install, restart the fake and the
+   link driver from the new worktree, then run 7.11's A1 to A5 (`e7-11-accessibility.mjs`, iOS
+   `--a11y`) and 7.8's P3 and P4 (`e7-8-polling.mjs`). Fix on the branch that owns the code; merge
+   upward.
+2. 7.8, the offline lease: renew from the lease's own `expiresAt` (about a second before it ends)
+   instead of every 2 s, on both apps (`renewOffline` and its 2 s loop in Android `W3FanFeatures.kt`,
+   the lease loop in iOS `W3ConversationClient.swift`). Measure P1 again; set its limit to what that
+   gives (about 21 a minute with five-second leases) and say so.
+3. The regression on the top of the stack, both apps: E7.1 states and sign-in (H10 to H12 now wait up
+   to 40 s for the 30 s session check), every E7.4 suite (pickers now taps names), E7.2 navigation,
+   E7.3 drafts; then the gates (Android unit, Paparazzi, lint, connected, release; iOS test build,
+   existing UI tests, release, `swift test`, and `ci-skip-check.sh` for the new opt-in suites).
+4. Mark #504 to #507 ready, one by one, when their rows pass.
+5. Then the parity follow-ups found by 7.10 (privacy screen order and caption, access rows, empty
+   states, the access screen's mode lines, passkey errors; listed in the copy spec), each its own PR.
+
+**Found this session, for the founder**: the offline reading lease is a five-second server policy
+(`conversation-offline-five-seconds-v1`); a thread renews it every 2 s, 30 of the 36 requests a
+minute left. A longer lease (for example 60 s) would bring a thread to about 6 a minute, at the cost
+of a saved copy readable for longer after the network goes. Ticket to lane 3. `draftNotice` still
+says "her" (unchanged).
+
+**Shut down at the handoff** (the founder asked to free the Mac): the simulator `qelvora-lane7-ios`
+and the emulator `qelvora-lane7-android` are shut down (kept, not deleted); the fake API and the link
+driver are stopped; Gradle daemons stopped. Caches kept: `~/Library/Caches/qelvora-lane7/ios-dd`
+(iOS derived data), Gradle's, SwiftPM's. To start again: `xcrun simctl boot qelvora-lane7-ios`;
+`emulator -avd qelvora-lane7-android -port 5574 -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect`
+(background), then `adb -s emulator-5574 reverse tcp:56473 tcp:56473`; `node tests/scenarios/lane-7/harness/server.mjs --port 56473`
+and `node tests/scenarios/lane-7/ios-link-driver.mjs` (background, from the new worktree). The
+helper scripts in `~/Library/Caches/qelvora-lane7/diag/` (`env.sh`, `locked.sh` point `W` at the
+worktree; `ios-p3-build.sh` and `android-debug.sh` now pass `CREATOR_WEB_URL`, which 7.12 needs).
+
+**Traps learned this session** (also in "Traps" below):
+
+- The iOS `e7-1-*.mjs` scripts launch whatever app is installed on the simulator: after a build,
+  `xcrun simctl install <udid> <ios-dd>/Build/Products/Debug-iphonesimulator/QelvoraApp.app` first
+  (XCUITest suites install their own). The first iOS states run here used the previous session's app
+  and failed every step.
+- Android writes an intent's path as "/..." in `logcat` and `dumpsys`; Chrome's first run on the
+  emulator shows terms that a session must not accept, so 7.12 checks the VIEW intent, not the page.
+- The fake API runs old code until it is restarted (frames and `/studio` changed this session).
+- `git switch` between stacked branches changes `tests/scenarios/lane-7/*`: never while a run reads
+  them.
+
+## Handoff (2026-10-16, evening)
 
 **WP 7.4 is built, except P10** (it waits on the share-card contract). Every pull request is
 stacked on the one before; merge in this order. Never rebase: a fix on a lower branch is merged
@@ -147,11 +211,11 @@ Android) → this status update. The spec with every piece's rules and results:
   arbitration fix (`NativeBackSwipe`) passed N5, N1 and the full iOS run. It also
   preserves vertical scrolling at the edge; screenshots and API checks corroborate it.
 
-Working on: nothing; WP 7.4 is built and in review (see "Handoff" above).
+Working on: nothing running; 7.10, 7.11, 7.8 and 7.12 are in draft PRs #504 to #507 (see the night handoff above).
 
-Waiting on: review and merging of the stack; "Next for lane 7" for 7.10, 7.11, 7.8 and 7.12. Backend domain erasure is still blocked/retrying (lane 1 ticket).
+Waiting on: the next session (verification of #505 to #507); review and merging of the stack; the founder on the offline lease length. Backend domain erasure is still blocked/retrying (lane 1 ticket).
 
-Next: on "Next for lane 7", 7.10, 7.11, 7.8 and 7.12. WP 7.5/7.6/7.7/7.9 wait on C1, domain, credentials, accounts and icon art.
+Next: the five steps in the night handoff. WP 7.5/7.6/7.7/7.9 wait on C1, domain, credentials, accounts and icon art; P10 on the share-card contract.
 
 ## Resume here
 
@@ -206,6 +270,10 @@ The original 7.1 flows and full 7.2 matrix use the fake API. A focused 7.2 flow 
 | M1 to M3 the packet's terms (P9)                                                     | pass on both                                                                                                     | `e7-4-packet.mjs`; iOS `--packet`                                                                |
 | N1 to N21 navigation (WP 7.2)                                                        | Android: 21 of 21 pass. iOS: 13 XCUITest flows pass, plus prior manual results ([details](lane-7-navigation.md)) | `node tests/scenarios/lane-7/e7-2-navigation.mjs [N1 ...]`                                       |
 | Release builds contain none of the hook                                              | pass, both; repeated for 7.2                                                                                     | `artifacts/lane-7/7-2-gates.txt`                                                                 |
+| E7.10 C1 to C5: no literal user-facing text, keys exist, no forbidden word (WP 7.10)       | pass (both apps' sources; a planted literal and value are caught)                                                | `node tests/scenarios/lane-7/e7-10-copy.mjs`                                                      |
+| A1 to A5 accessibility (WP 7.11)                                                     | not run yet (written; A1's contrast computed by hand: pass)                                                      | `node tests/scenarios/lane-7/e7-11-accessibility.mjs`; iOS `ios-navigation.mjs <xctestrun> --a11y` |
+| P1 to P4 polling, frames, offline, background (WP 7.8)                               | P2 pass on both; P1 iOS 35, Android 36 a minute (target not met: the offline lease); P3, P4 not run              | `node tests/scenarios/lane-7/e7-8-polling.mjs [ios\|android] [P1 P2 P3 P4]`                       |
+| Z1, Z2 the web Studio link (WP 7.12)                                                 | pass on both                                                                                                     | `node tests/scenarios/lane-7/e7-12-studio-link.mjs`; iOS `--studio`                               |
 
 Existing suites for 7.1 (Android unit and Paparazzi 19, Lint 0 errors, instrumentation 8 with 4 skipped by design; iOS `swift test` 18, UI tests 6 with 4 skipped by design): `./gradlew :app:testDebugUnitTest :app:verifyPaparazziDebug :app:lintDebug`; `swift test`; `xcodebuild test`. The 7.2 run of these is recorded in [lane-7-navigation.md](lane-7-navigation.md).
 
