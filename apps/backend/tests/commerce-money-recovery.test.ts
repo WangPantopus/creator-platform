@@ -334,10 +334,11 @@ describeMoney("commerce money path: deadlines, crashes, races", () => {
       await world.assertConserved();
     });
 
-    it("OBSERVATION (INV-16, D-21): a refunded payment still counts against the monthly limit (product question)", async () => {
-      // The exposure total is captured plus held and ignores refunds, so an
-      // automatic refund for the creator's missed deadline leaves the fan's
-      // room for the month used up. Safe for the fan, but worth a decision.
+    it("INV-16, D-21 (decision 1): a refunded payment gives its room under the monthly limit back", async () => {
+      // A payment counts in the month it was captured, less what of it was
+      // refunded successfully (the founder's decision 1, 2026-10-16), so the
+      // automatic refund for the creator's missed deadline gives the fan's
+      // room for the month back.
       const world = await fixture.newWorld({ weeklyLimit: 3, limit: 7500 });
       const id = await accepted(world);
       await world.setDueAt(id, -60);
@@ -349,11 +350,10 @@ describeMoney("commerce money path: deadlines, crashes, races", () => {
       expect(overview.exposure).toMatchObject({
         captured: 5000,
         refunded: 5000,
-        total: 5000,
+        returned: 5000,
+        total: 0,
       });
-      await expect(world.submit()).rejects.toMatchObject({
-        code: "spend_limit",
-      });
+      await world.submitted();
     });
   });
 

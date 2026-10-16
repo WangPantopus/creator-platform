@@ -157,6 +157,8 @@ type Overview = {
     month: string;
     refunded: number;
     captured: number;
+    /** What of this month's payments was refunded: room given back. */
+    returned: number;
     held: number;
     total: number;
     currency: string;
@@ -1146,7 +1148,12 @@ function CommerceAccountScreen({
                       .toUpperCase()}
                   </span>
                   <div className="commerce-spend-total">
-                    {money(data.exposure?.captured ?? 0, currency)}
+                    {/* What counts toward the limit: a refund gives its room back. */}
+                    {money(
+                      (data.exposure?.captured ?? 0) -
+                        (data.exposure?.returned ?? 0),
+                      currency,
+                    )}
                   </div>
                   <p>
                     {limit?.explicit_none
