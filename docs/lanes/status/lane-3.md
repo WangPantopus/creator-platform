@@ -1,8 +1,8 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-16, by the lane 3 session
-Working on: B3 (citations), PR B3_PR. Last done: B1 (guard revision 16), #473 stacked on B4 #468
-Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 B3_PR
+Working on: B3 (citations), PR #477. Last done: B1 (guard revision 16), #473 stacked on B4 #468
+Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477
 Next: B5 memory (launch plan step 3), then A7, B8, A5, B7; remaining: A5 (safety sign-off), A7 (C5 frames), B6 (provider), B7 consent text, B8 My AI publish flow
 Blocked on: nothing. Later: the founder's A5 safety sign-off, the embedding choice (B6), the real model for B1's model check and finding 13 (gateway)
 
