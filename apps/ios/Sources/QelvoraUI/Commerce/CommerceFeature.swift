@@ -197,7 +197,7 @@ struct CommerceFeature: View {
     }
     private func requests(_ data: CommerceOverview) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(QelvoraCopy.text("navRequests")).qText("display-lg")
+            Text(QelvoraCopy.text("navRequests")).qText("display-lg").accessibilityAddTraits(.isHeader)
             HStack { ForEach([QelvoraCopy.text("nativeOpen"), QelvoraCopy.text("nativeDelivered"), QelvoraCopy.text("nativeClosed")], id: \.self) { label in Button(label, variant: .quiet) { category = label }.accessibilityAddTraits(category == label ? .isSelected : []) } }
             let visible = data.packets.filter { requestCategory($0) == category }
             if visible.isEmpty { EmptyState(title: QelvoraCopy.text("nativeNoRequestsHere"), body: data.packets.isEmpty ? QelvoraCopy.text("nativeRequestsAppearAfterYouSendThem") : QelvoraCopy.text("nativeChooseAnotherCategoryToViewYour")) }
@@ -213,7 +213,7 @@ struct CommerceFeature: View {
     }
     private func spending(_ data: CommerceOverview) -> some View {
         VStack(alignment: .leading, spacing: 24) {
-            Text(QelvoraCopy.text("nativeSpendingAndTime")).qText("display-md")
+            Text(QelvoraCopy.text("nativeSpendingAndTime")).qText("display-md").accessibilityAddTraits(.isHeader)
             Text(CommerceAmount.display(data.exposure?.captured ?? 0, data.policy.currency))
                 .modifier(QelvoraTextStyle(style: .init(family: "mono", size: 44, lineHeight: 48, weight: 400, letterSpacing: 0)))
             Text(QelvoraCopy.text("nativeChargedThisUTCCalendarMonth")).qText("caption")
@@ -228,7 +228,7 @@ struct CommerceFeature: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text(QelvoraCopy.text("nativeMonthlySpendingLimit")).qText("body-strong")
                 HStack { Button(QelvoraCopy.text("nativeChooseAnAmount"), variant: .secondary) { choice = "amount" }; Button(QelvoraCopy.text("noLimit"), variant: .secondary) { choice = "none" } }
-                if choice == "amount" { monthlyAmountField(data.policy.currency).padding(12).frame(minHeight: 48).background(qColor("surface", scheme)).accessibilityLabel(QelvoraCopy.text("nativeMonthlyAmount")) }
+                if choice == "amount" { monthlyAmountField(data.policy.currency).padding(12).frame(minHeight: 48).background(qColor("surface", scheme)).accessibilityLabel(QelvoraCopy.text("nativeMonthlyAmountInCurrency", values: ["currency": data.policy.currency])) }
                 Toggle(QelvoraCopy.text("nativeRemindMeAt50And100"), isOn: $reminders).qText("body")
                 Text(QelvoraCopy.text("nativeIncreasesTake24HoursDecreases")).qText("caption")
                 Button(commandInFlight ? QelvoraCopy.text("nativeSaving") : QelvoraCopy.text("nativeSaveLimit"), variant: .secondary, block: true, disabled: commandDisabled || choice.isEmpty) { launch {
@@ -248,7 +248,7 @@ struct CommerceFeature: View {
     }
     private func access(_ data: CommerceOverview) -> some View {
         VStack(alignment: .leading, spacing: 24) {
-            Text(QelvoraCopy.text("navAccess")).qText("display-md")
+            Text(QelvoraCopy.text("navAccess")).qText("display-md").accessibilityAddTraits(.isHeader)
             Picker(QelvoraCopy.text("pickerCreator"), selection: $creator) { ForEach(data.creators) { Text($0.display_name).tag($0.id) } }.pickerStyle(.menu)
             let paid = data.memberships.filter { $0.creator_id == creator && ["active", "grace", "cancelled"].contains($0.state) && (instant($0.period_end) ?? .distantPast) > accessNow }
             let availableModes = modes.filter { $0.state == "offered" && $0.used + $0.reserved < $0.weekly_limit }
@@ -264,7 +264,7 @@ struct CommerceFeature: View {
     }
     private func packet(_ data: CommerceOverview) -> some View {
         VStack(alignment: .leading, spacing: 24) {
-            Text(QelvoraCopy.text("includedInRequest")).qText("display-md")
+            Text(QelvoraCopy.text("includedInRequest")).qText("display-md").accessibilityAddTraits(.isHeader)
             Text(QelvoraCopy.text("nativeChangeAnythingNothingIsSentUntil")).qText("body")
             IncludeList(name: creatorName, summaryBinding: $summary, itemsBinding: $includeMessages, summaryIncluded: $includeSummary)
             ModeList(modes: modes.map { mode in ModeItem(id: mode.id, title: mode.title, meta: QelvoraCopy.text("nativeHoursHRemainingLeft", values: ["hours": String(mode.delivery_hours), "remaining": String(max(0, mode.weekly_limit - mode.used - mode.reserved))]), price: mode.amount.flatMap(Int64.init).map { CommerceAmount.display($0, mode.currency) } ?? QelvoraCopy.text("nativePriceUnavailable"), selected: selectedMode == mode.id, disabled: mode.state != "offered" || mode.used + mode.reserved >= mode.weekly_limit) }, selection: $selectedMode)
@@ -286,7 +286,7 @@ struct CommerceFeature: View {
         let name = overview?.creators.first { $0.id == packet.creator_id }?.display_name ?? QelvoraCopy.text("nativeTheCreator")
         let refund = detail.ledger.filter { $0.kind == "refund" && $0.currency == packet.snapshot.currency }.compactMap { Int64($0.amount) }.reduce(0, +)
         return VStack(alignment: .leading, spacing: 24) {
-            Text(packet.snapshot.title).qText("display-md")
+            Text(packet.snapshot.title).qText("display-md").accessibilityAddTraits(.isHeader)
             RequestStatus(reqId: reqID(packet.id), mode: packet.snapshot.title, price: CommerceAmount.display(packet.snapshot.amount, packet.snapshot.currency), outcome: outcome(packet))
             row(QelvoraCopy.text("nativeDecisionDeadline"), when(packet.decision_at)); row(QelvoraCopy.text("nativeBankAuthorizationExpires"), when(packet.hold_expires_at))
             if let commitment = detail.commitment { row(QelvoraCopy.text("nativeDeliveryDeadline"), when(commitment.due_at)) }
@@ -320,7 +320,7 @@ struct CommerceFeature: View {
     }
     private func membership(_ data: CommerceOverview) -> some View {
         VStack(alignment: .leading, spacing: 24) {
-            Text(QelvoraCopy.text("nativeManageMembership")).qText("display-md")
+            Text(QelvoraCopy.text("nativeManageMembership")).qText("display-md").accessibilityAddTraits(.isHeader)
             if data.memberships.isEmpty { EmptyState(title: QelvoraCopy.text("nativeNoMembershipsYet"), body: QelvoraCopy.text("nativeChooseAnAvailableMembershipOr")) }
             ForEach(data.memberships) { member in panel { Text(member.name).qText("title"); row(QelvoraCopy.text("nativeStatus"), member.state); row(QelvoraCopy.text("nativeAccessUntil"), when(member.period_end)); row(QelvoraCopy.text("nativeBillingProvider"), member.provider) } }
             let currentProducts = data.tiers.filter { $0.state == "active" }.compactMap { $0.catalog.apple?.productId }
@@ -337,7 +337,7 @@ struct CommerceFeature: View {
     }
     private func pass(_ data: CommerceOverview) -> some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text(QelvoraCopy.text("nativeYourPass")).qText("display-md")
+            Text(QelvoraCopy.text("nativeYourPass")).qText("display-md").accessibilityAddTraits(.isHeader)
             if !data.policy.passEnabled { EmptyState(title: QelvoraCopy.text("nativePassIsUnavailable"), body: QelvoraCopy.text("nativeMembershipsAreTheCurrentWayTo")) }
             if data.policy.passEnabled, let pass = data.pass.first {
                 let current = ["active", "cancelled"].contains(pass.state) && (instant(String(pass.cycle_end.prefix(10)) + "T00:00:00Z") ?? .distantPast) > accessNow

@@ -122,7 +122,8 @@ object ContentFanFeature {
 
 @Composable
 private fun ContentChoice(label: String, checked: Boolean, disabled: Boolean, change: (Boolean) -> Unit) {
-    Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).toggleable(value=checked,enabled=!disabled,role=Role.Checkbox,onValueChange=change).semantics { contentDescription = if (checked) QelvoraCopy.text("nativeLabelSelected", mapOf("label" to label)) else QelvoraCopy.text("nativeLabelNotSelected", mapOf("label" to label)) }.padding(vertical = 8.dp)) { QText(if (checked) "☑ " else "☐ ", "body"); QText(label, "body") }
+    // A switch, as iOS's toggle: TalkBack says the label, "switch" and the state once.
+    ToggleRow(label, checked, disabled, onChange = change)
 }
 @Composable
 private fun ContentInput(label: String, value: String, max: Int, change: (String) -> Unit) {

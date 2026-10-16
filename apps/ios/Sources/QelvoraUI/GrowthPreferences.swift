@@ -72,6 +72,7 @@ struct GrowthNotificationSettings: View {
         }.buttonStyle(.plain)
             .accessibilityLabel(accessibilityLabel ?? label)
             .accessibilityValue(QelvoraCopy.text(value.wrappedValue ? "growthOn" : "growthOff"))
+            .accessibilityAddTraits(.isToggle) // a switch, as Android's ToggleRow
     }
     private func preferenceField(_ field: Field, label: String, text: Binding<String>) -> some View {
         VStack(alignment: .leading, spacing: 8) {

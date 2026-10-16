@@ -30,11 +30,13 @@ public struct Message: View {
         VStack(alignment: kind == .fan ? .trailing : .leading, spacing: QelvoraLayout.authorGap) {
             switch kind {
             case .fan:
+                // Authorship first for screen readers too: the person's own message says "You".
                 Text(children).qText("body")
+                    .accessibilityLabel(QelvoraCopy.text("nativeYou") + ". " + children)
                     .padding(.horizontal, QelvoraTokens.token("message-padding"))
                     .padding(.vertical, QelvoraTokens.token("space-2") + QelvoraTokens.token("space-1") / 2)
                     .background(qColor("surface-sunken", scheme), in: BubbleShape(fan: true))
-                    .opacity(delivery == .pending ? 0.6 : 1)
+                    .opacity(delivery == .pending ? 0.7 : 1) // 0.6 gives 4.08:1 in Light; 0.7 keeps AA (5.57:1)
                 if delivery == .pending {
                     Text(QelvoraCopy.text("sending")).qText("caption").foregroundStyle(qColor("ink-muted", scheme))
                 } else if delivery == .failed {

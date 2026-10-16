@@ -233,7 +233,7 @@ private struct W3ThreadScreen: View {
             }
             .sheet(item: $comparisonQuestion) { question in
                 ScrollView { VStack(alignment: .leading, spacing: 16) {
-                    HStack { Text(QelvoraCopy.text("nativeAIComparisons")).qText("display-lg"); Spacer(); Button(QelvoraCopy.text("close"), variant: .quiet) { comparisonQuestion = nil } }
+                    HStack { Text(QelvoraCopy.text("nativeAIComparisons")).qText("display-lg").accessibilityAddTraits(.isHeader); Spacer(); Button(QelvoraCopy.text("close"), variant: .quiet) { comparisonQuestion = nil } }
                     Text(QelvoraCopy.text("nativeYourQuestion")).qText("data-sm")
                     Text(question.text).qText("body").padding(12).background(qColor("surface-sunken", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusLg))
                     // Comparisons turned off while the choice was open: it closes, nothing is said.
@@ -446,7 +446,7 @@ private struct W3FirstConversation: View {
                     }
                     VStack(alignment: .leading, spacing: 10) {
                         AuthorLabel(kind: .ai, name: creator?.name ?? QelvoraCopy.text("nativeTheCreator"))
-                        Text(QelvoraCopy.text("nativeBeforeYourFirstMessage")).qText("display-lg")
+                        Text(QelvoraCopy.text("nativeBeforeYourFirstMessage")).qText("display-lg").accessibilityAddTraits(.isHeader)
                     }
                     VStack(alignment: .leading, spacing: 0) {
                         disclosureSection(QelvoraCopy.text("nativeWHORUNSIT")) {
@@ -601,9 +601,9 @@ private struct W3PrivacyScreen: View {
     var body: some View {
         ScrollView { VStack(alignment: .leading, spacing: 28) {
             if let onBack { Button(QelvoraCopy.text("back"), variant: .quiet, action: onBack) }
-            Text(QelvoraCopy.text("nativeMeAndPrivacy")).qText("title")
+            Text(QelvoraCopy.text("nativeMeAndPrivacy")).qText("title").accessibilityAddTraits(.isHeader)
             if !failure.isEmpty { Notice(tone: .error, title: QelvoraCopy.text("nativePrivacyStatus"), children: failure); Button(QelvoraCopy.text("nativeTryAgain"), variant: .secondary, disabled: busy) { Task { await refresh() } } }
-            Text(QelvoraCopy.text("nativeWhatNamesAIRemembers", values: ["name": name])).qText("display-md")
+            Text(QelvoraCopy.text("nativeWhatNamesAIRemembers", values: ["name": name])).qText("display-md").accessibilityAddTraits(.isHeader)
             if memory == nil { Text(failure.isEmpty ? QelvoraCopy.text("nativeLoadingYourMemories") : QelvoraCopy.text("nativeMemoriesUnavailable")).qText("body") }
             if memory?.items.isEmpty == true { Text(QelvoraCopy.text("nativeNoMemoriesTheAIAsksBefore")).qText("body") }
             ForEach(memory?.items ?? []) { item in VStack(alignment: .leading, spacing: 12) {
@@ -616,16 +616,16 @@ private struct W3PrivacyScreen: View {
                 Button(QelvoraCopy.text("nativeViewWhereThisCameFrom"), variant: .quiet) { Task { await source(item) } }
             }.padding(16).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusLg)) }
             Text(QelvoraCopy.text("nativeTheCreatorAndTheirTeamCan")).qText("caption")
-            Text(QelvoraCopy.text("nativeWhoOpenedYourConversations")).qText("display-md")
+            Text(QelvoraCopy.text("nativeWhoOpenedYourConversations")).qText("display-md").accessibilityAddTraits(.isHeader)
             ForEach(audit ?? []) { entry in VStack(alignment: .leading) { Text(entry.role == "creator" ? QelvoraCopy.text("nativeNamesAccount", values: ["name": name]) : entry.role == "ops" ? QelvoraCopy.text("nativeAuthorizedSafetyAccount") : QelvoraCopy.text("nativeAuthorizedTeamRole", values: ["role": entry.role])).qText("label"); Text(QelvoraCopy.text("nativeAccountId", values: ["id": entry.readerAccountId])).qText("caption"); Text(entry.readAt).qText("data-sm") } }
             if let audit { if audit.isEmpty { Text(QelvoraCopy.text("nativeNoLoggedOpenings")).qText("body") } }
             else { Text(failure.isEmpty ? QelvoraCopy.text("nativeLoadingOpeningHistory") : QelvoraCopy.text("nativeOpeningHistoryUnavailable")).qText("body") }
             Text(QelvoraCopy.text("nativeThisShowsWhenAnAuthorizedAccount")).qText("caption")
-            Text(QelvoraCopy.text("nativeOffTheRecord")).qText("display-md")
+            Text(QelvoraCopy.text("nativeOffTheRecord")).qText("display-md").accessibilityAddTraits(.isHeader)
             Toggle(QelvoraCopy.text("nativeKeepThisConversationOffTheRecord"), isOn: Binding(get: { memory?.offTheRecord ?? false }, set: { value in Task { await preferences(offTheRecord: value, introShared: memory?.introShared ?? false) } })).disabled(busy || memory == nil)
             Text(QelvoraCopy.text("nativeTheAIKeepsNoMemoryFrom")).qText("caption")
             Toggle(QelvoraCopy.text("nativeShareMyIntroWithThisCreators"), isOn: Binding(get: { memory?.introShared ?? false }, set: { value in Task { await preferences(offTheRecord: memory?.offTheRecord ?? false, introShared: value) } })).disabled(busy || memory == nil)
-            Text(QelvoraCopy.text("nativeTimeWithThisCreatorsAI")).qText("display-md")
+            Text(QelvoraCopy.text("nativeTimeWithThisCreatorsAI")).qText("display-md").accessibilityAddTraits(.isHeader)
             if usage == nil { Text(failure.isEmpty ? QelvoraCopy.text("nativeLoadingTimeHistory") : QelvoraCopy.text("nativeTimeHistoryUnavailable")).qText("body") }
             if let usage {
                 Text(QelvoraCopy.text("nativeMeasurementDaysAreShownInUTC", values: ["measurement": usage.measurement])).qText("caption")
@@ -635,10 +635,10 @@ private struct W3PrivacyScreen: View {
             }
             // While comparisons are off (2026-10-08) the section is absent, with no placeholder.
             if caps?.comparisonsAvailable == true && !comparisonsOff {
-                Text(QelvoraCopy.text("nativeAIComparisons")).qText("display-md")
+                Text(QelvoraCopy.text("nativeAIComparisons")).qText("display-md").accessibilityAddTraits(.isHeader)
                 W3ComparisonChoice(client: client, root: root) { comparisonsOff = true }
             }
-            Text(QelvoraCopy.text("nativeAIProviders")).qText("display-md")
+            Text(QelvoraCopy.text("nativeAIProviders")).qText("display-md").accessibilityAddTraits(.isHeader)
             if caps?.providers?.verified == false { Notice(title: QelvoraCopy.text("conversationDevelopmentPolicyTitle"), children: QelvoraCopy.text("conversationDevelopmentPolicyNotice")) }
             if caps?.providers == nil { Text(QelvoraCopy.text("nativeAIProviderConsentIsUnavailable")).qText("body") }
             ForEach(caps?.providers?.providers ?? [], id: \.name) { provider in if let url = URL(string: provider.termsUrl) { Link(QelvoraCopy.text("nativeProviderProcessingTerms", values: ["provider": provider.name]), destination: url) } }
@@ -650,7 +650,7 @@ private struct W3PrivacyScreen: View {
             .onChange(of: scenePhase) { _, phase in if phase != .active { conceal() } }
             .onDisappear { conceal() }
             .refreshable { await refresh() }
-            .sheet(item: $provenance) { message in ScrollView { VStack(alignment: .leading, spacing: 16) { Text(QelvoraCopy.text("nativeWhereThisCameFrom")).qText("title"); Text(message.authorLabel(name:name)).qText("label"); Text(message.text).qText("body").textSelection(.enabled); Text(message.createdAt).qText("data-sm") }.padding(16) } }
+            .sheet(item: $provenance) { message in ScrollView { VStack(alignment: .leading, spacing: 16) { Text(QelvoraCopy.text("nativeWhereThisCameFrom")).qText("title").accessibilityAddTraits(.isHeader); Text(message.authorLabel(name:name)).qText("label"); Text(message.text).qText("body").textSelection(.enabled); Text(message.createdAt).qText("data-sm") }.padding(16) } }
     }
     private func conceal() {
         revision += 1; memory = nil; audit = nil; caps = nil; page = nil; usage = nil; provenance = nil; busy = false; comparisonsOff = false
@@ -753,12 +753,12 @@ private struct W3AccountScreen: View {
                         accountRow(QelvoraCopy.text("nativeHelpAndSafety"), detail: QelvoraCopy.text("nativeReportBlockCrisisSupport")) { session.open("/support") }
                     }
                     VStack(alignment: .leading, spacing: 12) {
-                        Text(QelvoraCopy.text("nativeYourIntro")).qText("title")
+                        Text(QelvoraCopy.text("nativeYourIntro")).qText("title").accessibilityAddTraits(.isHeader)
                         Text(account.map { $0.fan.intro ?? QelvoraCopy.text("nativeYouHaventAddedAnIntroYet") } ?? (failure.isEmpty ? QelvoraCopy.text("nativeLoadingYourAccount") : QelvoraCopy.text("nativeYourIntroIsUnavailable"))).qText("body")
                         Button(QelvoraCopy.text("nativeEditHandleAndIntro"), variant: .quiet) { session.open("/identity/account") }
                     }
                     VStack(alignment: .leading, spacing: 16) {
-                        Text(QelvoraCopy.text("nativeMeAndPrivacy")).qText("display-md")
+                        Text(QelvoraCopy.text("nativeMeAndPrivacy")).qText("display-md").accessibilityAddTraits(.isHeader)
                         Text(QelvoraCopy.text("conversationAccess")).qText("caption")
                         Text(QelvoraCopy.text("nativeMemoryAndConversationAccessBy")).qText("body")
                         if let account, account.threads.isEmpty { Text(QelvoraCopy.text("nativeNoConversationsYet")).qText("body") }

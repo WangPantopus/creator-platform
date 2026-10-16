@@ -16,6 +16,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -38,6 +39,7 @@ import kotlinx.serialization.json.*
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.UUID
+import androidx.compose.ui.semantics.heading
 
 private fun trustVisible(model: FanSession): Boolean = model.session != null && !model.busy && model.error.isEmpty() && !model.purgingPrivateState && !model.localPurgeFailed
 private fun trustReady(model: FanSession): Boolean = trustVisible(model) && !model.checkingSession
@@ -456,19 +458,21 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
         } else if (route.contains("feedback")) {
             TrustText(QelvoraCopy.text("nativeYourAnswersHelpEvaluateUsefulness"))
             TrustText(QelvoraCopy.text("nativeWasTheConversationUseful") + " " + (useful?.let { if(it) QelvoraCopy.text("nativeYes") else QelvoraCopy.text("nativeNo") } ?: QelvoraCopy.text("nativeChooseAnAnswer")),"label")
-            Row { Button(QelvoraCopy.text("nativeYes"),ButtonVariant.QUIET) { useful=true }; Button(QelvoraCopy.text("nativeNo"),ButtonVariant.QUIET) { useful=false } }
+            Row { Button(QelvoraCopy.text("nativeYes"),ButtonVariant.QUIET, modifier = Modifier.semantics { selected = useful == true }) { useful=true }; Button(QelvoraCopy.text("nativeNo"),ButtonVariant.QUIET, modifier = Modifier.semantics { selected = useful == false }) { useful=false } }
             TrustText(QelvoraCopy.text("nativeWasItClearWhoWroteEach") + " " + (authorship?.let { if(it) QelvoraCopy.text("nativeYes") else QelvoraCopy.text("nativeNo") } ?: QelvoraCopy.text("nativeChooseAnAnswer")),"label")
-            Row { Button(QelvoraCopy.text("nativeYes"),ButtonVariant.QUIET) { authorship=true }; Button(QelvoraCopy.text("nativeNo"),ButtonVariant.QUIET) { authorship=false } }
+            Row { Button(QelvoraCopy.text("nativeYes"),ButtonVariant.QUIET, modifier = Modifier.semantics { selected = authorship == true }) { authorship=true }; Button(QelvoraCopy.text("nativeNo"),ButtonVariant.QUIET, modifier = Modifier.semantics { selected = authorship == false }) { authorship=false } }
             TrustField(QelvoraCopy.text("nativeAnythingToImproveOptional"),feedbackComment,true) { feedbackComment=it }
-            Box(Modifier.semantics { role=Role.Checkbox; stateDescription=if(feedbackConsent) QelvoraCopy.text("nativeAgreed") else QelvoraCopy.text("nativeNotAgreed") }) { Button(if(feedbackConsent) QelvoraCopy.text("nativeAgreedToShareFeedback") else QelvoraCopy.text("nativeIAgreeToShareTheseAnswers"),ButtonVariant.QUIET,block=true) { feedbackConsent=!feedbackConsent } }
+            ToggleRow(QelvoraCopy.text("nativeIAgreeToShareTheseAnswers"), checked = feedbackConsent) { feedbackConsent = it }
             Button(QelvoraCopy.text("nativeSendFeedback"),ButtonVariant.SECONDARY,block=true,disabled=busy || !privateReady || !feedbackConsent || useful==null || authorship==null) { launchPrivate {
                 if (perform("feedback",buildJsonObject { put("consent",true); put("cohort","unspecified"); put("useful",useful==true); put("authorshipClear",authorship==true); put("comment",feedbackComment) }) != null) { result=QelvoraCopy.text("nativeYourFeedbackIsSaved"); feedbackConsent=false; feedbackComment="" }
             } }
         } else if (route.contains("privacy")) {
             TrustText(QelvoraCopy.text("nativeExportAndDeletionAreSeparate"))
             Button(QelvoraCopy.text("nativeManageGooglePlaySubscriptions"), ButtonVariant.SECONDARY, block = true) { context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://play.google.com/store/account/subscriptions"))) }
-            Row { listOf("account", "creator", "thread").forEach { value -> Button(value, ButtonVariant.QUIET) { scope = value } } }
-            TrustText(QelvoraCopy.text("nativeDataScopeScope", mapOf("scope" to scope)), "label")
+            // The same names as iOS's picker; the chosen one is announced as selected.
+            val scopes = mapOf("account" to QelvoraCopy.text("nativeAccount"), "creator" to QelvoraCopy.text("pickerCreator"), "thread" to QelvoraCopy.text("nativeConversation"))
+            Row { scopes.forEach { (value, name) -> Button(name, ButtonVariant.QUIET, modifier = Modifier.semantics { selected = scope == value }) { scope = value } } }
+            TrustText(QelvoraCopy.text("nativeDataScopeScope", mapOf("scope" to scopes.getValue(scope))), "label")
             if (scope != "account") conversationPicker(scope == "thread")
             if (local) { TrustText(QelvoraCopy.text("nativeSyntheticLocalAccountTypeLOCAL"), "caption"); TrustField(QelvoraCopy.text("nativeLocalConfirmation"), proof) { proof = it } }
             else if (verificationMethod == "current_session") TrustText(QelvoraCopy.text("nativeYourSignInMustBeRecent"), "caption")
@@ -505,8 +509,9 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
                 } }
             }
         } else {
-            listOf("support", "ai_report", "abuse", "block", "crisis").chunked(2).forEach { choices -> Row { choices.forEach { value -> Button(value.replace('_', ' '), ButtonVariant.QUIET) { kind = value } } } }
-            TrustText(QelvoraCopy.text("nativeReportTypeKind", mapOf("kind" to kind.replace('_', ' '))), "label")
+            val kinds = mapOf("support" to QelvoraCopy.text("nativeSupportRequest"), "ai_report" to QelvoraCopy.text("nativeReportAIMessage"), "abuse" to QelvoraCopy.text("nativeAbuseReport"), "block" to QelvoraCopy.text("nativeBlockCreator"), "crisis" to QelvoraCopy.text("nativeCrisisHelp"))
+            kinds.entries.chunked(2).forEach { choices -> Row { choices.forEach { (value, name) -> Button(name, ButtonVariant.QUIET, modifier = Modifier.semantics { selected = kind == value }) { kind = value } } } }
+            TrustText(QelvoraCopy.text("nativeReportTypeKind", mapOf("kind" to kinds.getValue(kind))), "label")
             if (kind == "ai_report" || kind == "abuse" || kind == "block") conversationPicker(false)
             if (kind == "ai_report") TrustField(QelvoraCopy.text("nativeAIMessageID"), messageId) { messageId = it }
             if (kind == "support") TrustField(QelvoraCopy.text("nativeRequestIDOptional"), requestId) { requestId = it }
@@ -551,7 +556,8 @@ private fun validTrustId(value: String) = runCatching { UUID.fromString(value).t
     if(help!=null && resources.isEmpty()) TrustText(QelvoraCopy.text("nativeRegionalHelpResourcesAreNotConfigured"),"caption")
     resources.forEach { item -> val resource=item.jsonObject; val uri=android.net.Uri.parse(resource.text("url")); if(uri.scheme=="https") Button(resource.text("name") + " · " + resource.text("region"),ButtonVariant.QUIET,block=true) { context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW,uri)) }; resource.text("phone").takeIf { it.isNotEmpty() }?.let { TrustText(it) } }
 }
-@Composable private fun TrustText(text: String, style: String = "body") { BasicText(text, style = qText(style).copy(color = qColor("ink"))) }
+// A screen or section title is a heading, as on iOS.
+@Composable private fun TrustText(text: String, style: String = "body") { BasicText(text, if (style.startsWith("display") || style == "title") Modifier.semantics { heading() } else Modifier, style = qText(style).copy(color = qColor("ink"))) }
 @Composable private fun TrustField(label: String, value: String, multiline: Boolean = false, changed: (String) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { TrustText(label, "label"); BasicTextField(value, { changed(it.take(if (multiline) 2000 else 2048)) }, Modifier.fillMaxWidth().heightIn(min = if (multiline) 96.dp else 48.dp).background(qColor("surface")).padding(12.dp).semantics { contentDescription = label }, textStyle = qText("body").copy(color = qColor("ink")), singleLine = !multiline) }
 }

@@ -553,7 +553,7 @@ public struct FanAppShell: View {
                     let feature = features.first(where: { $0.matches(model.destination) })
                     if model.destination == "/identity/account" || (model.destination == "/you" && feature == nil) {
                         ScrollView { VStack(alignment: .leading, spacing: 16) {
-                            Text(QelvoraCopy.text("nativeYourAccount")).qText("display-md")
+                            Text(QelvoraCopy.text("nativeYourAccount")).qText("display-md").accessibilityAddTraits(.isHeader)
                             if let handle = model.session?.fan?.handle { Text("@" + handle).qText("body") }
                             Button(QelvoraCopy.text(model.session?.fan == nil ? "identityChooseHandle" : "identityEditPublicProfile"), variant: .secondary, block: true) { model.destination = "/onboarding/handle" }
                             Button(QelvoraCopy.text("w5NativeTeamWorkspace"), variant: .secondary, block: true, disabled: model.busy || model.checkingSession || model.purgingPrivateState || model.localPurgeFailed || !model.error.isEmpty) { model.open("/studio/workspace") }

@@ -12068,28 +12068,6 @@
         }
       }
     },
-    "Agreed": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Agreed"
-          }
-        }
-      }
-    },
-    "Agreed to share feedback": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Agreed to share feedback"
-          }
-        }
-      }
-    },
     "Allow questions for AI comparisons": {
       "extractionState": "manual",
       "localizations": {
@@ -13377,28 +13355,6 @@
         }
       }
     },
-    "{label}, not selected": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "{label}, not selected"
-          }
-        }
-      }
-    },
-    "{label}, selected": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "{label}, selected"
-          }
-        }
-      }
-    },
     "Limit unavailable": {
       "extractionState": "manual",
       "localizations": {
@@ -13784,17 +13740,6 @@
         }
       }
     },
-    "Monthly amount": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Monthly amount"
-          }
-        }
-      }
-    },
     "Monthly amount in {currency}": {
       "extractionState": "manual",
       "localizations": {
@@ -14000,17 +13945,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "No requests here"
-          }
-        }
-      }
-    },
-    "Not agreed": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Not agreed"
           }
         }
       }
@@ -14554,17 +14488,6 @@
         }
       }
     },
-    "Public handle, a pseudonym is allowed": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Public handle, a pseudonym is allowed"
-          }
-        }
-      }
-    },
     "Purchase and restore unavailable": {
       "extractionState": "manual",
       "localizations": {
@@ -15034,28 +14957,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Remind me at 50% and 100%"
-          }
-        }
-      }
-    },
-    "Reminders at 50% and 100% · off": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reminders at 50% and 100% · off"
-          }
-        }
-      }
-    },
-    "Reminders at 50% and 100% · on": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reminders at 50% and 100% · on"
           }
         }
       }
@@ -15760,17 +15661,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Start with {name}'s AI"
-          }
-        }
-      }
-    },
-    "Stop sharing my intro": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Stop sharing my intro"
           }
         }
       }
@@ -16596,28 +16486,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Trust inbox"
-          }
-        }
-      }
-    },
-    "Turn off off-the-record": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Turn off off-the-record"
-          }
-        }
-      }
-    },
-    "Turn on off-the-record": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Turn on off-the-record"
           }
         }
       }

@@ -43,6 +43,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.serialization.json.*
+import androidx.compose.ui.semantics.heading
 
 private data class SpendingDraftOwner(val origin: String, val accountId: String, val sessionId: String, val route: String)
 private data class SpendingFormDraft(val amount: String, val choice: String?, val reminders: Boolean)
@@ -271,7 +272,7 @@ object CommerceFanFeature {
                 }
                 SpendLimit(options = listOf(QelvoraCopy.text("nativeChooseAnAmount"), QelvoraCopy.text("noLimit")), selected = choice, remindersOn = limit?.reminders_on, onSelect = { spendingEdited = true; choice = it })
                 if (choice == QelvoraCopy.text("nativeChooseAnAmount")) CommerceField(QelvoraCopy.text("nativeMonthlyAmountInCurrency", mapOf("currency" to current.policy.currency)), amount, { spendingEdited = true; amount = it }, keyboardType = KeyboardType.Decimal)
-                Button(if (reminders) QelvoraCopy.text("nativeRemindersAt50And100On") else QelvoraCopy.text("nativeRemindersAt50And100Off"), ButtonVariant.QUIET, block = true) { spendingEdited = true; reminders = !reminders }
+                ToggleRow(QelvoraCopy.text("nativeRemindMeAt50And100"), checked = reminders) { spendingEdited = true; reminders = it }
                 CommerceText(QelvoraCopy.text("nativeIncreasesTake24HoursDecreases"), "caption")
                 Button(if (commandInFlight) QelvoraCopy.text("nativeSaving") else QelvoraCopy.text("nativeSaveLimit"), ButtonVariant.SECONDARY, block = true, disabled = commandDisabled || choice == null) { scope.launch {
                     try { val value = if (choice == QelvoraCopy.text("noLimit")) null else commerceMinor(amount, current.policy.currency); mutate("spend-limit", buildJsonObject { put("currency", current.policy.currency); put("amount", value?.let { JsonPrimitive(it) } ?: JsonNull); put("explicitNone", choice == QelvoraCopy.text("noLimit")); put("remindersOn", reminders) }, QelvoraCopy.text("nativeYourSpendingChoiceIsSaved")) } catch (error: Exception) { report(error) }
@@ -387,7 +388,8 @@ object CommerceFanFeature {
         }
     }
 }
-@Composable private fun CommerceText(text: String, style: String = "body") { BasicText(text, style = qText(style).copy(color = qColor("ink"))) }
+// A screen title (a display style) is a heading, as on iOS.
+@Composable private fun CommerceText(text: String, style: String = "body") { BasicText(text, if (style.startsWith("display")) Modifier.semantics { heading() } else Modifier, style = qText(style).copy(color = qColor("ink"))) }
 @Composable private fun CommercePanel(content: @Composable ColumnScope.() -> Unit) { Column(Modifier.fillMaxWidth().background(qColor("surface"), RoundedCornerShape(12.dp)).border(1.dp, qColor("line"), RoundedCornerShape(12.dp)).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp), content = content) }
 @Composable private fun CommerceRow(label: String, value: String) { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) { Box(Modifier.weight(1f)) { CommerceText(label) }; Box(Modifier.weight(1f)) { CommerceText(value, "data-md") } } }
 @Composable private fun CommerceField(label: String, value: String, onChange: (String) -> Unit, lines: Int = 1, keyboardType: KeyboardType = KeyboardType.Text) { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { CommerceText(label, "label"); BasicTextField(value, onChange, Modifier.fillMaxWidth().heightIn(min = 48.dp).background(qColor("surface"), RoundedCornerShape(12.dp)).border(1.dp, qColor("control-line"), RoundedCornerShape(12.dp)).padding(12.dp).semantics { contentDescription = label }, textStyle = qText("body").copy(color = qColor("ink")), minLines = lines, keyboardOptions = KeyboardOptions(keyboardType = keyboardType)) } }

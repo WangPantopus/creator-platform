@@ -85,3 +85,57 @@ Each keeps its own keys until it is fixed; 7.11 takes the ones that are about co
   `ComparisonChoice.tsx`): the web's own literals for the same elements differ again (for example
   "… without sending a duplicate.", "It's still labeled, still visible …"). The native keys now
   exist in `config/copy.json`; using them would make the three surfaces say the same thing.
+
+## WP 7.11: accessibility
+
+### Rules
+
+1. **Who is speaking comes first.** VoiceOver and TalkBack reach an author label before the words
+   it covers: "Maya's AI at 14:32", then the reply; "Maya at …", then her message; "Maya · to all
+   members", then the Note; "Prepared by AI · approved by Maya. …" in one element; the team label
+   before the team's message. The person's own message is now announced "You. …" (it had no label,
+   so it could be heard as the previous author's words). Rows built from `authorLabel` keep it.
+2. **An on/off setting is a switch.** One label, the switch role and its state, the same words on
+   both apps: "Keep this conversation off the record", "Share my intro with this creator's AI",
+   "Remind me at 50% and 100%", "I agree to share these answers for product feedback.", a reply's
+   quote permission and handle, the Thanks choices, and every notification preference. Android
+   draws its switch with the tokens (`ToggleRow`); iOS keeps the system switch. Android used buttons
+   whose label changed ("Turn on off-the-record"), a checkbox whose state was spoken twice, or a
+   label with "· On".
+3. **A choice is named and says which one is chosen.** The report type and the data scope show
+   "Support request", "Abuse report", "Conversation" … on both apps (Android showed the server's ids,
+   "ai report", "thread"), and the chosen one is announced as selected. The feedback answers say
+   which is chosen.
+4. **Titles are headings.** Each screen's title and its section titles are headings on both apps:
+   You, Me and privacy (and its sections), Your account, Help and reports, Your cases, the requests,
+   spending, access, packet, membership and pass screens, "Before your first message".
+5. **Contrast.** Every text token pair the apps use is 4.5:1 or more in Light and Night, and the
+   control outlines 3:1 or more (checked from `design/handoff/tokens.json`, A1). A message that is
+   still sending was drawn at 60% opacity, 4.08:1 in Light; it is now 70% (5.57:1 Light, 6.72:1
+   Night) on both apps.
+6. **Nothing is read every second.** Countdowns and status lines keep "updates frequently" on iOS;
+   Android has no live region that repeats.
+7. **The largest text** keeps every switch above reachable, in Light and Night (A5, reviewed by eye).
+
+### Decisions taken as the proposed default (2026-10-16; the founder may veto any)
+
+- The person's own message is announced "You. {message}" (the existing `You`; no visible change).
+- On/off settings are switches on both apps, labelled with iOS's words (rule 2); Android's switch
+  is drawn with the tokens, so each platform's switch looks like its own.
+- The sending bubble is drawn at 70% instead of the design's 60% (rule 5). Ticket below.
+- Headings for the titles listed in rule 4; other display-styled text is left as it is.
+
+### Tickets
+
+- **Design system** (`design/design-system/project/components/bundle.css`) and **lane 6**
+  (`packages/ui-web/src/styles.css`, `.qv-msg--pending .qv-bubble { opacity: .6 }`): 60% gives
+  sending text 4.08:1 in Light, under AA; the apps use 70%.
+- **Lane 6** (`packages/ui-web/src/components.ts`, `Message` for `fan`): the web bubble has no
+  author for screen readers either; the apps say "You" first.
+
+### Found, not fixed (lane 7, later)
+
+- **Pass choices** are a checkbox row on Android and a switch on iOS (choosing creators is a
+  multi-select, which the design's include list draws as checkboxes). The pass is not open yet.
+- **Case and job lines** read the server's words ("ai report", "queued", "legal hold") on both
+  apps; turning them into sentences needs copy for every state.

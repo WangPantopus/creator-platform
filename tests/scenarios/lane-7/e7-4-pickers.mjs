@@ -93,7 +93,7 @@ async function reason(value) {
 
 if (run("V1")) {
   await open("/support");
-  await tapLabel("block");
+  await tapLabel("Block creator");
   const prompt = Boolean(await reveal("Choose a creator"));
   await reason("Blocking this creator for the picker test.");
   const waiting = holder("Block creator");
@@ -122,7 +122,7 @@ if (run("V1")) {
 
 if (run("V2")) {
   await open(`/support?creatorId=${MAYA}`);
-  await tapLabel("abuse");
+  await tapLabel("Abuse report");
   const named = Boolean(await reveal("Maya"));
   const nodes = A.screen();
   L.step(
@@ -145,7 +145,7 @@ if (run("V2")) {
 
 if (run("V3")) {
   await open("/support/privacy");
-  await tapLabel("thread");
+  await tapLabel("Conversation");
   const prompt = Boolean(await reveal("Choose a conversation"));
   L.step(
     "android",
@@ -177,7 +177,7 @@ if (run("V3")) {
 
 if (run("V4")) {
   await open("/support", "priya");
-  await tapLabel("abuse");
+  await tapLabel("Abuse report");
   const none = Boolean(await reveal("You have no conversations yet."));
   L.step(
     "android",
@@ -191,7 +191,7 @@ if (run("V5")) {
   await open("/support", "devon", [
     { match: "^/v1/conversations/account", status: 503 },
   ]);
-  await tapLabel("abuse");
+  await tapLabel("Abuse report");
   const failed = Boolean(await reveal("Your conversations couldn't load."));
   L.screenshot("android", "V5-failed");
   await L.harness("POST", "/__harness/faults", { rules: [] });

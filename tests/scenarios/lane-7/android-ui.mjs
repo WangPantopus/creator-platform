@@ -65,6 +65,11 @@ export function screen() {
       desc: unescape(attr("content-desc")),
       clickable: attr("clickable") === "true",
       enabled: attr("enabled") === "true",
+      // Role and state as TalkBack gets them (WP 7.11).
+      cls: attr("class"),
+      checkable: attr("checkable") === "true",
+      checked: attr("checked") === "true",
+      selected: attr("selected") === "true",
       bounds: [x1, y1, x2, y2],
       scrollable: attr("scrollable") === "true",
       x: Math.round((x1 + x2) / 2),

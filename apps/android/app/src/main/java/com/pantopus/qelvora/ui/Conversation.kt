@@ -34,7 +34,8 @@ fun Message(kind: MessageKind = MessageKind.AI, children: String = "", name: Str
         Column(Modifier.widthIn(max = if (fan) QelvoraTokens.fanMessageMaxWidth else QelvoraTokens.messageMaxWidth), verticalArrangement = Arrangement.spacedBy(QelvoraTokens.authorGap), horizontalAlignment = if (fan) Alignment.End else Alignment.Start) {
             when (kind) {
                 MessageKind.FAN -> {
-                    BasicText(children, Modifier.background(qColor("surface-sunken"), bubble).alpha(if (delivery == Delivery.PENDING) .6f else 1f).padding(horizontal = QelvoraTokens.messagePadding, vertical = QelvoraTokens.space2 + QelvoraTokens.space1 / 2), qText("body").copy(color = qColor("ink")))
+                    // Authorship first for screen readers too: the person's own message says "You".
+                    BasicText(children, Modifier.semantics { contentDescription = QelvoraCopy.text("nativeYou") + ". " + children }.background(qColor("surface-sunken"), bubble).alpha(if (delivery == Delivery.PENDING) .7f else 1f).padding(horizontal = QelvoraTokens.messagePadding, vertical = QelvoraTokens.space2 + QelvoraTokens.space1 / 2), qText("body").copy(color = qColor("ink")))
                     if (delivery == Delivery.PENDING) BasicText(QelvoraCopy.text("sending"), style = qText("caption").copy(color = qColor("ink-muted")))
                     else if (delivery == Delivery.FAILED) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(QelvoraTokens.space2)) { BasicText(QelvoraCopy.text("notSent"), style = qText("caption", true).copy(color = qColor("alert"))); Button(QelvoraCopy.text("retry"), ButtonVariant.QUIET, onClick = onRetry) }
                     else if (meta != null) BasicText(meta, style = qText("data-sm").copy(color = qColor("ink-muted")))

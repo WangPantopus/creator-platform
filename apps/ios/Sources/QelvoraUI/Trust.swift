@@ -131,7 +131,7 @@ public struct TrustFanFeature: View {
     private var title: String { route.contains("privacy") ? QelvoraCopy.text("nativeYourData") : route.contains("access") ? QelvoraCopy.text("nativeCaseAccessHistory") : route.contains("feedback") ? QelvoraCopy.text("nativeOptionalProductFeedback") : route.hasPrefix("/trust") ? QelvoraCopy.text("nativeCrisisHelpProtocol") : QelvoraCopy.text("nativeHelpAndReports") }
     public var body: some View {
         ScrollView { VStack(alignment: .leading, spacing: 16) {
-            Text(title).qText("display-md")
+            Text(title).qText("display-md").accessibilityAddTraits(.isHeader)
             Text(QelvoraCopy.text("nativeReportsAreAvailableWithoutPaid")).qText("body")
             navigation
             if busy { ProgressView().accessibilityLabel(QelvoraCopy.text("nativeLoading")) }
@@ -175,9 +175,9 @@ public struct TrustFanFeature: View {
         if kind == "crisis" { crisisHelp }
         field(QelvoraCopy.text("nativeWhatHappened"), $reason, multiline: true)
         Button(kind == "block" ? QelvoraCopy.text("nativeBlockCreator") : QelvoraCopy.text("nativeSendReport"), variant: .secondary, block: true, disabled: privateDisabled || reason.trimmingCharacters(in: .whitespacesAndNewlines).count < 12 || (kind == "support" && !requestID.isEmpty && UUID(uuidString: requestID) == nil) || (kind == "block" && UUID(uuidString: creatorID) == nil) || (kind == "ai_report" && (UUID(uuidString: creatorID) == nil || UUID(uuidString: messageID) == nil))) { run { await report() } }
-        Text(QelvoraCopy.text("nativeYourCases")).qText("title")
+        Text(QelvoraCopy.text("nativeYourCases")).qText("title").accessibilityAddTraits(.isHeader)
         if privateVisible { ForEach(cases) { item in VStack(alignment: .leading, spacing: 8) { Text(QelvoraCopy.text("nativeCASENumberKindState", values: ["number": String(item.number), "kind": item.kind.replacingOccurrences(of: "_", with: " "), "state": item.state])).qText("body-strong"); if item.state == "resolved" { Button(QelvoraCopy.text("nativeAppealCASENumber", values: ["number": String(item.number)]), variant: .secondary, disabled: privateDisabled || reason.count < 12) { run { await appeal(item) } } } } }
-        Text(QelvoraCopy.text("nativeTrustInbox")).qText("title")
+        Text(QelvoraCopy.text("nativeTrustInbox")).qText("title").accessibilityAddTraits(.isHeader)
         ForEach(notices) { item in VStack(alignment: .leading, spacing: 8) { Text(item.type.replacingOccurrences(of: "_", with: " ")).qText("label"); Text(item.reason).qText("body") } } }
     } }
     private var crisisHelp: some View { VStack(alignment: .leading, spacing: 16) {

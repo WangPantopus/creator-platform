@@ -549,7 +549,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                 Box(Modifier.weight(1f).fillMaxWidth()) {
                     val feature = features.firstOrNull { it.matches(model.destination) }
                     if (model.destination == "/identity/account" || (model.destination == "/you" && feature == null)) Column(Modifier.padding(16.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                        BasicText(QelvoraCopy.text("nativeYourAccount"), style = qText("display-md").copy(color = qColor("ink")))
+                        BasicText(QelvoraCopy.text("nativeYourAccount"), Modifier.semantics { heading() }, style = qText("display-md").copy(color = qColor("ink")))
                         model.session?.fan?.handle?.let { handle -> BasicText("@$handle", style = qText("body").copy(color = qColor("ink"))) }
                         Button(QelvoraCopy.text(if (model.session?.fan == null) "identityChooseHandle" else "identityEditPublicProfile"), ButtonVariant.SECONDARY, block = true) { model.destination = "/onboarding/handle" }
                         Button(QelvoraCopy.text("w5NativeTeamWorkspace"), ButtonVariant.SECONDARY, block = true, disabled = model.busy || model.checkingSession || model.purgingPrivateState || model.localPurgeFailed || model.error.isNotEmpty()) { model.open("/studio/workspace") }
@@ -586,7 +586,7 @@ private fun HandleForm(model: FanSession) {
                 BasicText(QelvoraCopy.text("nativeHowCreatorsWillKnowYou"), Modifier.semantics { heading() }, style = qText("display-lg").copy(color = qColor("ink")))
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     BasicText(QelvoraCopy.text("nativeHandle"), style = qText("caption", true).copy(color = qColor("ink-muted")))
-                    BasicTextField(handle, { handle = it.take(31) }, Modifier.fillMaxWidth().heightIn(min = 44.dp).background(qColor("surface"), RoundedCornerShape(12.dp)).border(1.dp, qColor("control-line"), RoundedCornerShape(12.dp)).padding(12.dp).semantics { contentDescription = QelvoraCopy.text("nativePublicHandleAPseudonymIsAllowed") }, textStyle = qText("body").copy(color = qColor("ink")), singleLine = true, keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrectEnabled = false))
+                    BasicTextField(handle, { handle = it.take(31) }, Modifier.fillMaxWidth().heightIn(min = 44.dp).background(qColor("surface"), RoundedCornerShape(12.dp)).border(1.dp, qColor("control-line"), RoundedCornerShape(12.dp)).padding(12.dp).semantics { contentDescription = QelvoraCopy.text("nativePublicHandle") + ". " + QelvoraCopy.text("nativeAPseudonymIsAllowedThreeTo") }, textStyle = qText("body").copy(color = qColor("ink")), singleLine = true, keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrectEnabled = false))
                     BasicText(QelvoraCopy.text("nativeCreatorsAndTheirTeamsSeeYour"), style = qText("caption").copy(color = qColor("ink-muted")))
                 }
                 if (model.session?.fan != null) {

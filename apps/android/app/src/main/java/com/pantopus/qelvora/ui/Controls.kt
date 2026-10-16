@@ -5,6 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
@@ -42,6 +44,19 @@ fun Button(title: String, variant: ButtonVariant = ButtonVariant.AI, size: Strin
             BasicText(title, style = qText(if (size == "lg") "button-lg" else "body-strong").copy(color = ink))
         }
         if (disabled && disabledReason != null) BasicText(disabledReason, style = qText("caption").copy(color = qColor("ink-muted")))
+    }
+}
+
+/** A setting that is on or off: one label (the same words as iOS's toggle) and the switch role,
+ *  so TalkBack says the label, "switch" and the state. The drawn switch is decorative. */
+@Composable
+fun ToggleRow(label: String, checked: Boolean, disabled: Boolean = false, spokenLabel: String? = null, onChange: (Boolean) -> Unit) {
+    val shape = RoundedCornerShape(QelvoraTokens.radiusPill)
+    Row(Modifier.fillMaxWidth().heightIn(min = QelvoraTokens.touchTarget).alpha(if (disabled) .55f else 1f).toggleable(value = checked, enabled = !disabled, role = Role.Switch, onValueChange = onChange).then(if (spokenLabel != null) Modifier.semantics(mergeDescendants = true) { contentDescription = spokenLabel } else Modifier).padding(vertical = QelvoraTokens.space2), horizontalArrangement = Arrangement.spacedBy(QelvoraTokens.space3), verticalAlignment = Alignment.CenterVertically) {
+        BasicText(label, Modifier.weight(1f), style = qText("body").copy(color = qColor("ink")))
+        Box(Modifier.size(QelvoraTokens.space12, QelvoraTokens.space6 + QelvoraTokens.space1).background(qColor(if (checked) "ink" else "surface-sunken"), shape).border(1.dp, qColor("control-line"), shape).padding(QelvoraTokens.space1 - QelvoraTokens.hairline), contentAlignment = if (checked) Alignment.CenterEnd else Alignment.CenterStart) {
+            Box(Modifier.size(QelvoraTokens.space5).background(qColor(if (checked) "ground" else "surface"), CircleShape).border(1.dp, qColor("control-line"), CircleShape))
+        }
     }
 }
 

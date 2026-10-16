@@ -1117,8 +1117,6 @@
   <string name="native_account_unavailable" formatted="false">Account unavailable</string>
   <string name="native_account_verification_receipt" formatted="false">Account verification receipt</string>
   <string name="native_agree_to_these_a_i_providers" formatted="false">Agree to these AI providers</string>
-  <string name="native_agreed" formatted="false">Agreed</string>
-  <string name="native_agreed_to_share_feedback" formatted="false">Agreed to share feedback</string>
   <string name="native_allow_questions_for_a_i_comparisons" formatted="false">Allow questions for AI comparisons</string>
   <string name="native_allow_sharing_without_your_handle" formatted="false">Allow sharing without your handle</string>
   <string name="native_allow_this_reply_to_be_quoted" formatted="false">Allow this reply to be quoted</string>
@@ -1239,8 +1237,6 @@
   <string name="native_keep_editing" formatted="false">Keep editing</string>
   <string name="native_keep_this_conversation_off_the_record" formatted="false">Keep this conversation off the record</string>
   <string name="native_kind_scope_state_requested_createdat" formatted="false">{kind}, {scope}, {state}, requested {createdAt}, job {id}</string>
-  <string name="native_label_not_selected" formatted="false">{label}, not selected</string>
-  <string name="native_label_selected" formatted="false">{label}, selected</string>
   <string name="native_limit_unavailable" formatted="false">Limit unavailable</string>
   <string name="native_load_photo" formatted="false">Load photo</string>
   <string name="native_load_recording" formatted="false">Load recording</string>
@@ -1277,7 +1273,6 @@
   <string name="native_message_this_a_i" formatted="false">Message this AI.</string>
   <string name="native_messaging_is_unavailable" formatted="false">Messaging is unavailable.</string>
   <string name="native_month_u_t_c" formatted="false">{month} · UTC</string>
-  <string name="native_monthly_amount" formatted="false">Monthly amount</string>
   <string name="native_monthly_amount_in_currency" formatted="false">Monthly amount in {currency}</string>
   <string name="native_monthly_spending_limit" formatted="false">Monthly spending limit</string>
   <string name="native_more_conversations" formatted="false">More conversations</string>
@@ -1297,7 +1292,6 @@
   <string name="native_no_memberships_yet" formatted="false">No memberships yet</string>
   <string name="native_no_memories_the_a_i_asks_before" formatted="false">No memories. The AI asks before remembering.</string>
   <string name="native_no_requests_here" formatted="false">No requests here</string>
-  <string name="native_not_agreed" formatted="false">Not agreed</string>
   <string name="native_not_helpful" formatted="false">Not helpful</string>
   <string name="native_not_now" formatted="false">Not now</string>
   <string name="native_not_selected" formatted="false">Not selected</string>
@@ -1348,7 +1342,6 @@
   <string name="native_private_reply" formatted="false">Private reply</string>
   <string name="native_provider_processing_terms" formatted="false">{provider} processing terms</string>
   <string name="native_public_handle" formatted="false">Public handle</string>
-  <string name="native_public_handle_a_pseudonym_is_allowed" formatted="false">Public handle, a pseudonym is allowed</string>
   <string name="native_purchase_and_restore_unavailable" formatted="false">Purchase and restore unavailable</string>
   <string name="native_purchase_cancelled_nothing_changed" formatted="false">Purchase cancelled. Nothing changed.</string>
   <string name="native_purchase_did_not_complete_check_the" formatted="false">Purchase did not complete. Check the App Store and try again.</string>
@@ -1392,8 +1385,6 @@
   <string name="native_remaining_of_limit_left_hours_h" formatted="false">{remaining} of {limit} left · {hours} h delivery</string>
   <string name="native_remembered" formatted="false">Remembered</string>
   <string name="native_remind_me_at50_and100" formatted="false">Remind me at 50% and 100%</string>
-  <string name="native_reminders_at50_and100_off" formatted="false">Reminders at 50% and 100% · off</string>
-  <string name="native_reminders_at50_and100_on" formatted="false">Reminders at 50% and 100% · on</string>
   <string name="native_remove_my_response" formatted="false">Remove my response</string>
   <string name="native_reopen_this_page_with_your_current" formatted="false">Reopen this page with your current account.</string>
   <string name="native_replace_unavailable_creator" formatted="false">Replace unavailable creator</string>
@@ -1462,7 +1453,6 @@
   <string name="native_spending_and_time" formatted="false">Spending and time</string>
   <string name="native_start_with_names_a_i" formatted="false">Start with {name}\'s AI</string>
   <string name="native_status" formatted="false">Status</string>
-  <string name="native_stop_sharing_my_intro" formatted="false">Stop sharing my intro</string>
   <string name="native_store_products_must_be_configured" formatted="false">Store products must be configured and verified by the server before access is granted.</string>
   <string name="native_store_settings_unavailable" formatted="false">Store settings unavailable</string>
   <string name="native_store_status" formatted="false">Store status</string>
@@ -1539,8 +1529,6 @@
   <string name="native_title_personally_fulfilled_by_name" formatted="false">{title} · personally fulfilled by {name}</string>
   <string name="native_trust_inbox" formatted="false">Trust inbox</string>
   <string name="native_try_again" formatted="false">Try again</string>
-  <string name="native_turn_off_off_the_record" formatted="false">Turn off off-the-record</string>
-  <string name="native_turn_on_off_the_record" formatted="false">Turn on off-the-record</string>
   <string name="native_unmute_notes_from_this_creator" formatted="false">Unmute Notes from this creator</string>
   <string name="native_until_date" formatted="false">Until {date}</string>
   <string name="native_unused_memberships_cancelled_within" formatted="false">Unused memberships cancelled within seven days qualify for a full refund. Later refunds follow the remaining paid period; store refunds follow that store\'s process.</string>

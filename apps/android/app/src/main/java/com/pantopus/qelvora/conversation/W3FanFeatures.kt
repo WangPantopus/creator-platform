@@ -380,7 +380,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     comparisonQuestion?.let { question ->
         androidx.compose.ui.window.Dialog(onDismissRequest = { comparisonQuestion = null }) {
             Column(Modifier.background(qColor("surface"), RoundedCornerShape(24.dp)).padding(20.dp)) {
-                BasicText(QelvoraCopy.text("nativeAIComparisons"), style = qText("display-lg").copy(color = qColor("ink")))
+                BasicText(QelvoraCopy.text("nativeAIComparisons"), Modifier.semantics { heading() }, style = qText("display-lg").copy(color = qColor("ink")))
                 LazyColumn(Modifier.weight(1f, fill = false), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     item { BasicText(QelvoraCopy.text("nativeYourQuestion"), style = qText("data-sm").copy(color = qColor("ink"))); BasicText(question.text, style = qText("body").copy(color = qColor("ink"))) }
                     // Comparisons turned off while the choice was open: it closes, nothing is said.
@@ -763,14 +763,14 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         change(QelvoraCopy.text("nativeConsentCouldNotBeSaved")) { client.request("$root/consent", buildJsonObject { put("version",currentPolicy.version); put("accepted",accepted) }) }
     }
     provenance?.let { message -> Dialog(onDismissRequest={provenance=null}) { Column(Modifier.background(qColor("ground")).padding(16.dp)) {
-        BasicText(QelvoraCopy.text("nativeWhereThisCameFrom"),style=qText("title").copy(color = qColor("ink")));BasicText(message.authorLabel(name),style=qText("label").copy(color = qColor("ink")))
+        BasicText(QelvoraCopy.text("nativeWhereThisCameFrom"), Modifier.semantics { heading() },style=qText("title").copy(color = qColor("ink")));BasicText(message.authorLabel(name),style=qText("label").copy(color = qColor("ink")))
         LazyColumn(Modifier.weight(1f,fill=false)) { item { SelectionContainer { BasicText(message.text,style=qText("body").copy(color = qColor("ink"))) } } }
         BasicText(message.createdAt,style=qText("data-sm").copy(color = qColor("ink")));Button(QelvoraCopy.text("close"),variant=ButtonVariant.QUIET) {provenance=null}
     } } }
     LaunchedEffect(client, root, foreground) { if (foreground) refresh() else conceal() }
     LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.fillMaxSize().background(qColor("ground"))) {
-        item { Button(QelvoraCopy.text("back"), variant = ButtonVariant.QUIET, onClick = onBack); BasicText(QelvoraCopy.text("nativeMeAndPrivacy"), style = qText("title").copy(color = qColor("ink"))); if (error.isNotEmpty()) { Notice(title = QelvoraCopy.text("nativePrivacyStatus"), children = error); Button(QelvoraCopy.text("nativeTryAgain"), variant = ButtonVariant.SECONDARY, disabled = busy) { scope.launch { refresh() } } } }
-        item { BasicText(QelvoraCopy.text("nativeWhatNamesAIRemembers", mapOf("name" to name)), style = qText("display-md").copy(color = qColor("ink"))); if (memory == null) BasicText(if (error.isEmpty()) QelvoraCopy.text("nativeLoadingYourMemories") else QelvoraCopy.text("nativeMemoriesUnavailable"), style = qText("body").copy(color = qColor("ink"))); if (memory?.items?.isEmpty() == true) BasicText(QelvoraCopy.text("nativeNoMemoriesTheAIAsksBefore"), style = qText("body").copy(color = qColor("ink"))) }
+        item { Button(QelvoraCopy.text("back"), variant = ButtonVariant.QUIET, onClick = onBack); BasicText(QelvoraCopy.text("nativeMeAndPrivacy"), Modifier.semantics { heading() }, style = qText("title").copy(color = qColor("ink"))); if (error.isNotEmpty()) { Notice(title = QelvoraCopy.text("nativePrivacyStatus"), children = error); Button(QelvoraCopy.text("nativeTryAgain"), variant = ButtonVariant.SECONDARY, disabled = busy) { scope.launch { refresh() } } } }
+        item { BasicText(QelvoraCopy.text("nativeWhatNamesAIRemembers", mapOf("name" to name)), Modifier.semantics { heading() }, style = qText("display-md").copy(color = qColor("ink"))); if (memory == null) BasicText(if (error.isEmpty()) QelvoraCopy.text("nativeLoadingYourMemories") else QelvoraCopy.text("nativeMemoriesUnavailable"), style = qText("body").copy(color = qColor("ink"))); if (memory?.items?.isEmpty() == true) BasicText(QelvoraCopy.text("nativeNoMemoriesTheAIAsksBefore"), style = qText("body").copy(color = qColor("ink"))) }
         items(memory?.items.orEmpty(), key = { it.id }) { item -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             BasicText(if (item.state == "proposed") QelvoraCopy.text("sensitiveMemory") else if (item.kind == "open_loop") (if (item.state == "resolved") QelvoraCopy.text("nativeResolvedOpenLoop") else QelvoraCopy.text("nativeOpenLoop")) else if (item.kind == "summary") QelvoraCopy.text("summary") else QelvoraCopy.text("nativeRemembered"), style = qText("data-sm").copy(color = qColor("ink")))
             if (editing == item.id) { BasicTextField(text, { text = it.take(2000) }, textStyle = qText("body").copy(color = qColor("ink")), cursorBrush = SolidColor(qColor("ink"))); Button(QelvoraCopy.text("nativeSaveProposal"), variant = ButtonVariant.SECONDARY, disabled = busy || text.isBlank()) { scope.launch { decide(item, "edit") } } } else BasicText(item.text, style = qText("body").copy(color = qColor("ink")))
@@ -780,11 +780,11 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             if (item.kind == "open_loop" && item.state == "remembered") Button(QelvoraCopy.text("nativeResolved"), variant = ButtonVariant.QUIET, disabled = busy) { scope.launch { decide(item, "resolve") } }
         } }
         item {
-            BasicText(QelvoraCopy.text("nativeOffTheRecord"), style = qText("display-md").copy(color = qColor("ink")))
-            BasicText(QelvoraCopy.text("nativeTheAIKeepsNoMemoryFrom"), style = qText("body").copy(color = qColor("ink")))
-            Button(if (memory?.offTheRecord == true) QelvoraCopy.text("nativeTurnOffOffTheRecord") else QelvoraCopy.text("nativeTurnOnOffTheRecord"), variant = ButtonVariant.SECONDARY, disabled = busy || memory == null) { scope.launch { preferences(memory?.offTheRecord != true, memory?.introShared == true) } }
-            Button(if (memory?.introShared == true) QelvoraCopy.text("nativeStopSharingMyIntro") else QelvoraCopy.text("nativeShareMyIntroWithThisCreators"), variant = ButtonVariant.QUIET, disabled = busy || memory == null) { scope.launch { preferences(memory?.offTheRecord == true,memory?.introShared != true) } }
-            BasicText(QelvoraCopy.text("nativeAIProviders"), style = qText("display-md").copy(color = qColor("ink")))
+            BasicText(QelvoraCopy.text("nativeOffTheRecord"), Modifier.semantics { heading() }, style = qText("display-md").copy(color = qColor("ink")))
+            ToggleRow(QelvoraCopy.text("nativeKeepThisConversationOffTheRecord"), checked = memory?.offTheRecord == true, disabled = busy || memory == null) { value -> scope.launch { preferences(value, memory?.introShared == true) } }
+            BasicText(QelvoraCopy.text("nativeTheAIKeepsNoMemoryFrom"), style = qText("caption").copy(color = qColor("ink")))
+            ToggleRow(QelvoraCopy.text("nativeShareMyIntroWithThisCreators"), checked = memory?.introShared == true, disabled = busy || memory == null) { value -> scope.launch { preferences(memory?.offTheRecord == true, value) } }
+            BasicText(QelvoraCopy.text("nativeAIProviders"), Modifier.semantics { heading() }, style = qText("display-md").copy(color = qColor("ink")))
             if (policy?.providers?.verified == false) Notice(title=QelvoraCopy.text("conversationDevelopmentPolicyTitle"),children=QelvoraCopy.text("conversationDevelopmentPolicyNotice"))
             policy?.providers?.providers?.forEach { provider ->
                 Button(QelvoraCopy.text("nativeProviderProcessingTerms", mapOf("provider" to provider.name)), variant = ButtonVariant.QUIET) { uriHandler.openUri(provider.termsUrl) }
@@ -794,9 +794,9 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             Button(if(page?.consentCurrent == true) QelvoraCopy.text("nativeWithdrawAIProviderConsent") else QelvoraCopy.text("nativeAgreeToTheseAIProviders"), variant = ButtonVariant.SECONDARY, disabled = busy || (page?.consentCurrent != true && policy?.consentAvailable != true)) { scope.launch { consent() } }
         }
         // While comparisons are off (2026-10-08) the section is absent, with no placeholder.
-        if (policy?.comparisonsAvailable == true && !comparisonsOff) item { BasicText(QelvoraCopy.text("nativeAIComparisons"), style = qText("display-md").copy(color = qColor("ink"))); ConversationComparisonChoice(client, root) { comparisonsOff = true } }
-        item { BasicText(QelvoraCopy.text("nativeTimeWithThisCreatorsAI"),style=qText("display-md").copy(color = qColor("ink"))); if (usage == null) BasicText(if (error.isEmpty()) QelvoraCopy.text("nativeLoadingTimeHistory") else QelvoraCopy.text("nativeTimeHistoryUnavailable"), style = qText("body").copy(color = qColor("ink"))); usage?.let { time -> BasicText(QelvoraCopy.text("nativeMeasurementDaysAreShownInUTC", mapOf("measurement" to time.measurement)),style=qText("caption").copy(color = qColor("ink")));BasicText(QelvoraCopy.text("nativeThisWeekMinutesMinutes", mapOf("minutes" to (time.days.sumOf { it.seconds }.toInt() / 60).toString())),style=qText("body").copy(color = qColor("ink")));time.days.forEach { day -> BasicText(QelvoraCopy.text("nativeDayMinutesMinutes", mapOf("day" to day.day, "minutes" to (day.seconds.toInt() / 60).toString())),style=qText("body").copy(color = qColor("ink"))) };if(!time.modeAvailable) BasicText(QelvoraCopy.text("nativeCompanionModeTimeSignalsAwait"),style=qText("caption").copy(color = qColor("ink"))) } }
-        item { BasicText(QelvoraCopy.text("nativeWhoOpenedYourConversations"), style = qText("display-md").copy(color = qColor("ink"))); if (audit == null) BasicText(if (error.isEmpty()) QelvoraCopy.text("nativeLoadingOpeningHistory") else QelvoraCopy.text("nativeOpeningHistoryUnavailable"), style = qText("body").copy(color = qColor("ink"))) else if (audit?.isEmpty() == true) BasicText(QelvoraCopy.text("nativeNoLoggedOpenings"), style = qText("body").copy(color = qColor("ink"))) }
+        if (policy?.comparisonsAvailable == true && !comparisonsOff) item { BasicText(QelvoraCopy.text("nativeAIComparisons"), Modifier.semantics { heading() }, style = qText("display-md").copy(color = qColor("ink"))); ConversationComparisonChoice(client, root) { comparisonsOff = true } }
+        item { BasicText(QelvoraCopy.text("nativeTimeWithThisCreatorsAI"), Modifier.semantics { heading() },style=qText("display-md").copy(color = qColor("ink"))); if (usage == null) BasicText(if (error.isEmpty()) QelvoraCopy.text("nativeLoadingTimeHistory") else QelvoraCopy.text("nativeTimeHistoryUnavailable"), style = qText("body").copy(color = qColor("ink"))); usage?.let { time -> BasicText(QelvoraCopy.text("nativeMeasurementDaysAreShownInUTC", mapOf("measurement" to time.measurement)),style=qText("caption").copy(color = qColor("ink")));BasicText(QelvoraCopy.text("nativeThisWeekMinutesMinutes", mapOf("minutes" to (time.days.sumOf { it.seconds }.toInt() / 60).toString())),style=qText("body").copy(color = qColor("ink")));time.days.forEach { day -> BasicText(QelvoraCopy.text("nativeDayMinutesMinutes", mapOf("day" to day.day, "minutes" to (day.seconds.toInt() / 60).toString())),style=qText("body").copy(color = qColor("ink"))) };if(!time.modeAvailable) BasicText(QelvoraCopy.text("nativeCompanionModeTimeSignalsAwait"),style=qText("caption").copy(color = qColor("ink"))) } }
+        item { BasicText(QelvoraCopy.text("nativeWhoOpenedYourConversations"), Modifier.semantics { heading() }, style = qText("display-md").copy(color = qColor("ink"))); if (audit == null) BasicText(if (error.isEmpty()) QelvoraCopy.text("nativeLoadingOpeningHistory") else QelvoraCopy.text("nativeOpeningHistoryUnavailable"), style = qText("body").copy(color = qColor("ink"))) else if (audit?.isEmpty() == true) BasicText(QelvoraCopy.text("nativeNoLoggedOpenings"), style = qText("body").copy(color = qColor("ink"))) }
         items(audit.orEmpty(), key = { it.id }) { entry -> BasicText((if (entry.role == "creator") QelvoraCopy.text("nativeNamesAccount", mapOf("name" to name)) else if (entry.role == "ops") QelvoraCopy.text("nativeAuthorizedSafetyAccount") else QelvoraCopy.text("nativeAuthorizedTeamRole", mapOf("role" to entry.role))) + "\n" + QelvoraCopy.text("nativeAccountId", mapOf("id" to entry.readerAccountId)) + "\n" + entry.readAt, style = qText("body").copy(color = qColor("ink"))) }
         item { BasicText(QelvoraCopy.text("nativeThisShowsWhenAnAuthorizedAccount"), style = qText("caption").copy(color = qColor("ink"))); Button(QelvoraCopy.text("nativeExportOrDeleteMyData"), variant = ButtonVariant.SECONDARY, block = true, onClick = onData); Button(QelvoraCopy.text("nativeHelpAndSafety"), variant = ButtonVariant.QUIET, onClick = onSupport) }
     }
@@ -898,7 +898,7 @@ private suspend fun existingThread(client: ConversationClient, creatorId: String
         item {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 AuthorLabel(kind = AuthorKind.AI, name = name)
-                BasicText(QelvoraCopy.text("nativeBeforeYourFirstMessage"), style = qText("display-lg").copy(color = qColor("ink")))
+                BasicText(QelvoraCopy.text("nativeBeforeYourFirstMessage"), Modifier.semantics { heading() }, style = qText("display-lg").copy(color = qColor("ink")))
             }
         }
         item {
@@ -1051,11 +1051,11 @@ private suspend fun existingThread(client: ConversationClient, creatorId: String
             }
         }
         item {
-            BasicText(QelvoraCopy.text("nativeYourIntro"), style = qText("title").copy(color = qColor("ink")))
+            BasicText(QelvoraCopy.text("nativeYourIntro"), Modifier.semantics { heading() }, style = qText("title").copy(color = qColor("ink")))
             BasicText(if (fan != null) fan["intro"]?.jsonPrimitive?.contentOrNull ?: QelvoraCopy.text("nativeYouHaventAddedAnIntroYet") else if (error.isEmpty()) QelvoraCopy.text("nativeLoadingYourAccount") else QelvoraCopy.text("nativeYourIntroIsUnavailable"), style = qText("body").copy(color = qColor("ink")))
             Button(QelvoraCopy.text("nativeEditHandleAndIntro"), variant = ButtonVariant.QUIET) { session.open("/identity/account") }
         }
-        item { BasicText(QelvoraCopy.text("nativeMeAndPrivacy"),style=qText("display-md").copy(color = qColor("ink")));BasicText(QelvoraCopy.text("conversationAccess"),style=qText("caption").copy(color = qColor("ink")));BasicText(QelvoraCopy.text("nativeMemoryAndConversationAccessBy"),style=qText("body").copy(color = qColor("ink"))) }
+        item { BasicText(QelvoraCopy.text("nativeMeAndPrivacy"), Modifier.semantics { heading() },style=qText("display-md").copy(color = qColor("ink")));BasicText(QelvoraCopy.text("conversationAccess"),style=qText("caption").copy(color = qColor("ink")));BasicText(QelvoraCopy.text("nativeMemoryAndConversationAccessBy"),style=qText("body").copy(color = qColor("ink"))) }
         if (account != null && account?.get("threads")?.jsonArray?.isEmpty() == true) item { BasicText(QelvoraCopy.text("nativeNoConversationsYet"),style=qText("body").copy(color = qColor("ink"))) }
         account?.get("threads")?.jsonArray?.forEach { element -> val thread=element.jsonObject
             item {
