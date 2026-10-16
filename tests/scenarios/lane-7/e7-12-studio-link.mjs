@@ -37,13 +37,16 @@ if (run("Z1")) {
   );
   if (link) {
     const since = (await L.log()).at(-1)?.n ?? 0;
+    A.adb("logcat", "-c");
     A.tapAt(link.x, link.y);
     await L.sleep(5000);
-    // The VIEW intent the system browser received (its first run may hold the page).
-    const activities = A.adb("shell", "dumpsys", "activity", "activities");
+    // The VIEW intent the system browser received. Android writes its path as
+    // "/..." in the log; the path itself shows in the fake's log once the
+    // browser loads the page (Chrome's first run holds it until accepted).
     const asked =
-      activities.includes(`127.0.0.1:56473${STUDIO}`) &&
-      /com\.android\.chrome/u.test(activities);
+      /act=android\.intent\.action\.VIEW dat=http:\/\/127\.0\.0\.1:56473\/\S* .*cmp=com\.android\.chrome/u.test(
+        A.adb("logcat", "-d"),
+      );
     const visits = L.seen(await L.log(since), {
       method: "GET",
       path: new RegExp(`^${STUDIO}$`, "u"),

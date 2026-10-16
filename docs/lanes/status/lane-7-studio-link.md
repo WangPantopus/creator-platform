@@ -30,6 +30,18 @@ phones. A creator who opens the fan app needs one way to their Studio.
 
 `GET /studio/:creatorId` answers for the web Studio, so a browser's visit shows in the request log.
 
-## Scenarios and results
+## Scenarios and results (fake API on 56473 standing in for the API and the web origin; synthetic identities)
 
-See the pull request.
+`node tests/scenarios/lane-7/e7-12-studio-link.mjs [Z1 Z2]` (Android) and
+`node tests/scenarios/lane-7/ios-navigation.mjs <xctestrun> --studio [Z1 Z2]` (iOS), on this branch's
+debug builds with `CREATOR_WEB_URL=http://127.0.0.1:56473`.
+
+| ID | What | iOS | Android |
+| --- | --- | --- | --- |
+| Z1 | Maya (a creator account) on Your account: "Open Qelvora Studio"; a tap opens the system browser at her Studio | pass: Safari in front; the web origin logged `GET /studio/c1000000-0000-4000-8000-000000000001` | pass: Chrome received `VIEW http://127.0.0.1:56473/...` from the app (Android writes the path as "/..."); Chrome's first run shows its terms, which this session does not accept, so the page did not load |
+| Z2 | Devon (a fan) on Your account | no link: pass | no link: pass |
+| Z3 | The web lands signed in, or at sign-in returning to the Studio | not run: no web app was running; the web route does this (`apps/web/app/studio/[creatorId]/[[...screen]]/page.tsx`) | not run |
+| Gates | compile (the iOS test build includes the flows) | test build | debug build |
+
+Not run: a release build (no web origin, so no link), and the real web app (lane 2's stack with
+`--web` would show Z3).
