@@ -2,7 +2,7 @@
 
 Updated: 2026-10-16, by the lane 3 session
 Working on: B5 (memory proposals), PR #490. Last done: A5 (safety check after acknowledgment), #489
-Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482, A5 #489, B5 #490, B5 web #491, finding 18 F18_PR
+Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482, A5 #489, B5 #490, B5 web #491, finding 18 #492
 Next: finding 5; B8 after #441 and #446 merge; B6 waits on the provider key and the embedding choice
 Blocked on: nothing. Later: the embedding choice (B6), the real model for B1's model check and finding 13 (gateway)
 
@@ -96,7 +96,7 @@ removes only what it names" therefore holds for proposals but not for context; t
 `creator.generation_conversation_context` (a migration) to drop only the excluded keys and the
 messages the fan marked.
 
-**Finding 18 fix (migration proposal, PR F18_PR, stacked on B5).** `pending_w3_generation_context_exclusions.sql`
+**Finding 18 fix (migration proposal, PR #492, stacked on B5).** `pending_w3_generation_context_exclusions.sql`
 replaces `creator.generation_conversation_context` with the live definition changed in one place:
 history, memory and intro load whenever the thread is not off the record; excluded memory keys and
 the messages the fan marked "don't remember this" (W3 already sets them and their answer off the
