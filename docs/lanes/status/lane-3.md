@@ -1,7 +1,7 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-15, by the lane 3 session
-Working on: the migration proposals: finding 15 open (#451), finding 8 fixed without a migration, finding 9 next
+Working on: nothing open; finding 15 #451, finding 8 #455, finding 9 decided (lane 4 ticket, #456)
 Done: merged A1 #411, A3 #426, A6a #434, A6b #433 (its code and migration 0251 through the registration #442). Open: A6c #436, A6 hold sizing #438, B2 #441, A2 #444, B9 #446
 Next: the migration proposals for findings 8, 9 and 15, then the next work package in the founder's order
 Blocked on: nothing. Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
@@ -53,6 +53,9 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
 
 ## Decisions
 
+- 2026-10-15, founder: finding 9 (a crash once a sentence is stored) is fixed by lane 4's one
+  condition in `creator.generation_typed_original_allowance_receipt`; the crashed, partly delivered
+  answer keeps the fan's reservation held like any unknown receipt (#456, ticket to lane 4).
 - 2026-10-15, founder: "Ask Maya to step in" is hidden after the crisis response and the companion
   safety refusal, kept after the expert fallback, and back with the next ordinary answer; with no
   allowance and step-in hidden, the unavailable line drops its step-in sentence. B9 (#446).
@@ -89,14 +92,20 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
    `reconciliation_allowed` for its own failed cursor; the worker now reconciles at once with the
    last cursor it committed (W1 accepts only the exact durable one): 2.0 to 3.7 s.
 9. After a crash once a sentence is stored, recovery fails every pass
-   (`generation_terminal_recovery_incomplete`; the database says "Complete actual typed
-   output/classifier provenance is unavailable" in `creator.generation_settle_typed_original_allowance`)
-   and the answer stays "generating" for good. Same on main and A3; lane 5 reported it too. Cause: the
-   killed reply call's usage row stays `provider_state='admitted'` (its finish never ran), and the W4
-   settlement requires every sentence's call to be `completed`. Fix, either: lane 3's journal seal
-   closes orphaned admitted calls as completed with an unknown cost (new update policy on `ai_usage`,
-   so more pinned catalogues change), or lane 4's settlement accepts an admitted call inside a sealed
-   unknown receipt (one condition in `0238`). Both need a migration.
+   (`generation_terminal_recovery_incomplete`: "Complete actual typed output/classifier provenance is
+   unavailable" in lane 4's `creator.generation_typed_original_allowance_receipt`) and the answer
+   stays "generating" for good (reproduced on main 2026-10-15). Cause: the killed reply call's usage
+   row stays `provider_state='admitted'`, and that W4 receipt requires every sentence's call to be
+   `completed`. Proposed fix (tested by hand on lane 3's stack, pins patched locally and restored):
+   one condition in that lane 4 function, accepting an `admitted` reply call only inside the exact
+   sealed unknown journal and never as crisis evidence (ticket below). Result: the first recovery
+   pass after the restart ends the answer `interrupted` with its sentence kept; the call's cost stays
+   unknown and the fan's reservation stays held (the existing unknown-receipt rule, 0237/0238); Maya's
+   next answer is delivered. The lane 3 alternative (the journal seal closing orphaned calls as
+   completed with an unknown cost) needs a new journal-owned function, a seal change, two custody
+   updates and more pins, so it is not proposed. Founder decision 2026-10-15: lane 4 takes the
+   one-condition fix, and a crashed, partly delivered answer keeps the fan's reservation held like
+   any unknown receipt.
 10. "Takeover visible within 500 ms" fails when the takeover waits behind a worker transaction: main up
     to 2.3 s, A3 up to 1.2 s. A4.
 11. Account deletion cannot be requested with the development identity (it needs a Pantopus-mode
@@ -225,13 +234,13 @@ Model gateway spend for lane 3 so far: 124 calls, 304,174 micros (/\_\_stats, 20
 
 ## Tickets to other lanes
 
-| To         | File                                                                                                                    | Change                                                                                                                                                                   | Why                                                                                                          |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| Lane 2     | `tests/scenarios/lane-2/seed-maya.mjs`                                                                                  | Seed a daily cap above the Claude run ceiling (for example 20,000,000) until hold sizing (#438) merges                                                                   | Finding 2: a `--provider anthropic` stack can never deliver a reply                                          |
-| Lane 7     | Thread screens (iOS, Android)                                                                                           | Hide "Ask Maya to step in" when the page's `stepInAvailable` is false (B9, generated models already carry it)                                                            | INV-19, INV-21: no way to paid attention right after a crisis response or safety refusal                     |
-| Lane 2     | `infra/local/fake-edge/model.mjs`                                                                                       | A control that sets the reply sentences (for example `{"reply": ["…"]}`)                                                                                                 | The guard can only be exercised with the real model today (B9's refusal case, E3B.1's corpus)                |
-| Lane 4     | `creator.generation_typed_original_allowance_receipt` (W4 commerce SQL)                                                 | Lock the creator's `ai_workspace` row without `NOWAIT`, as lane 3's pending `pending_w2_workspace_lock_wait.sql` does for its four functions                             | Finding 15: a Studio read at that moment fails the answer's settlement                                       |
-| Lane 4     | `modules/commerce/generation-audience.ts` (`assertCatalog`), `modules/commerce/generation-safety-terminal-catalogue.ts` | Wrap each check in `verifyInHeldTransaction(client, <its frozen custody object>, () => check)` from `modules/identity/generation-held-verification.ts` (after A3 merges) | 68 audience runs per answer; the safety terminal catalogue is about 1 s of the longest remaining transaction |
-| Lane 4     | `creator.generation_settle_typed_original_allowance` (W4 safety terminal settlement SQL)                                | Settle an interrupted answer that has stored output but no complete typed provenance, with lane 3 in A6                                                                  | Finding 9: a crash mid-answer is never recovered                                                             |
-| Integrator | `tests/scenarios/integrator/anthropic-adapter.mts` (case A6)                                                            | Expect a `ProviderResponseError` with a known zero usage for a non-2xx answer before any body (code, upstream status and the no-secret check are unchanged)              | A6a makes that error a known zero cost, as the brief decided; this case pinned the old behavior              |
-| Lane 1     | `modules/trust/restoration.ts` (`assertGenerationWorkerRestoredInTransaction`)                                          | The same wrapper, if W8 agrees its restoration facts cannot change inside one transaction                                                                                | 41 runs per answer                                                                                           |
+| To         | File                                                                                                                    | Change                                                                                                                                                                                                                                                                                                                                                | Why                                                                                                          |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Lane 2     | `tests/scenarios/lane-2/seed-maya.mjs`                                                                                  | Seed a daily cap above the Claude run ceiling (for example 20,000,000) until hold sizing (#438) merges                                                                                                                                                                                                                                                | Finding 2: a `--provider anthropic` stack can never deliver a reply                                          |
+| Lane 7     | Thread screens (iOS, Android)                                                                                           | Hide "Ask Maya to step in" when the page's `stepInAvailable` is false (B9, generated models already carry it)                                                                                                                                                                                                                                         | INV-19, INV-21: no way to paid attention right after a crisis response or safety refusal                     |
+| Lane 2     | `infra/local/fake-edge/model.mjs`                                                                                       | A control that sets the reply sentences (for example `{"reply": ["…"]}`)                                                                                                                                                                                                                                                                              | The guard can only be exercised with the real model today (B9's refusal case, E3B.1's corpus)                |
+| Lane 4     | `creator.generation_typed_original_allowance_receipt` (W4 commerce SQL)                                                 | Lock the creator's `ai_workspace` row without `NOWAIT`, as lane 3's pending `pending_w2_workspace_lock_wait.sql` does for its four functions                                                                                                                                                                                                          | Finding 15: a Studio read at that moment fails the answer's settlement                                       |
+| Lane 4     | `modules/commerce/generation-audience.ts` (`assertCatalog`), `modules/commerce/generation-safety-terminal-catalogue.ts` | Wrap each check in `verifyInHeldTransaction(client, <its frozen custody object>, () => check)` from `modules/identity/generation-held-verification.ts` (after A3 merges)                                                                                                                                                                              | 68 audience runs per answer; the safety terminal catalogue is about 1 s of the longest remaining transaction |
+| Lane 4     | `creator.generation_typed_original_allowance_receipt` (W4, the provenance check)                                        | Replace `OR u.provider_state IS DISTINCT FROM 'completed'` with `OR (u.provider_state IS DISTINCT FROM 'completed' AND NOT (u.provider_state='admitted' AND receipt.state='unknown' AND p.approval->>'kind'<>'crisis'))` (tested by hand: definition checksum 9e0c8329… → 6798d104…; pins `runtimeCatalogues.financial` and `purposeProfiles` change) | Finding 9: a crash once a sentence is stored is never recovered                                              |
+| Integrator | `tests/scenarios/integrator/anthropic-adapter.mts` (case A6)                                                            | Expect a `ProviderResponseError` with a known zero usage for a non-2xx answer before any body (code, upstream status and the no-secret check are unchanged)                                                                                                                                                                                           | A6a makes that error a known zero cost, as the brief decided; this case pinned the old behavior              |
+| Lane 1     | `modules/trust/restoration.ts` (`assertGenerationWorkerRestoredInTransaction`)                                          | The same wrapper, if W8 agrees its restoration facts cannot change inside one transaction                                                                                                                                                                                                                                                             | 41 runs per answer                                                                                           |
