@@ -98,5 +98,25 @@
     "path": "artifacts/lane-7/7-4-p1-run.txt",
     "sha256": "3ff83748da9eb4d0664b867ccba0da77e6b4108e5c0ced891726413d1c0e1a35",
     "bytes": 3104
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p3-names.jpg",
+    "sha256": "991164f9842efcd96f317e86792bb21bac7c99f68f6654ecf68af545d7fe4e52",
+    "bytes": 73838
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p3-largest-before.jpg",
+    "sha256": "a7003346edaa0a5a3b223c2d217cb1e348339652de105780eba82c57c478d1d8",
+    "bytes": 104326
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p3-largest-after.jpg",
+    "sha256": "3cb5f61e7e22f693d2f3b9ba49d7b496379258f1620721e15d5c7d4dfbe30c43",
+    "bytes": 100146
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p3-run.txt",
+    "sha256": "586c6c1b70f46e3b4f73efa81f4e8d864c61af8017200d03a6c3baa356e97b07",
+    "bytes": 2433
   }
 ]

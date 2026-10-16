@@ -38,3 +38,14 @@ and repository gates. Expected skips and checks not run are named explicitly.
 
 `7-4-p1-run.txt` records the operated runs on both apps against the fake API (R1.1 to R1.9, D3T), the
 62-check contract run, and what was not run. Nothing here is the real backend.
+
+## WP 7.4 P3 (the creator's seal)
+
+| File                        | What it shows                                                                                                                                 |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `7-4-p3-names.jpg`          | A first conversation with "🌿 fern studio", iOS left, Android right: the header avatar and the step-in seal show "F" (the emoji is skipped)   |
+| `7-4-p3-largest-before.jpg` | Before, at the largest text (iOS AX5, Android font scale 2.0): the "M" on the step-in seal grows past its circle on both apps                 |
+| `7-4-p3-largest-after.jpg`  | After, the same text sizes on Kiln Club's thread: "K" stays inside the circle on the step-in button and Send; "Send" stays on one line on iOS |
+
+`7-4-p3-run.txt` records the operated seal flows on both apps against the fake API (S3.1 to S3.3), the
+gates, and what was not run. Nothing here is the real backend.

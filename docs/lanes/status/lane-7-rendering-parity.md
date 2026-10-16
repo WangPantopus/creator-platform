@@ -132,6 +132,63 @@ checks the fake's presence answers against `ThreadPresencePage` (62 checks).
   P3 seal flows; R1.12 failed before the fix and passes after it. R1.1's order check now compares
   neighboring rows one pair per screen: it had relied on where the list happened to stop.
 
+## P3: the creator's seal
+
+The seal is the creator's mark: a circle in the creator color with the creator's initial. The
+composer states, the other half of P3 in the table, are the next pull request (below).
+
+### Rules
+
+1. **Whose letter.** Every seal, mark and avatar letter shows the creator's initial: the first
+   letter in the display name, uppercased. A leading emoji or symbol is skipped ("🌿 fern studio"
+   shows "F"); a name with no letter at all shows its first character, whole. One function on each
+   app (`creatorInitial`) serves the thread, Discover, navigation, access and studio components.
+   The written rule before this said "the step-in glyph when the name starts with no letter"; no
+   such glyph exists in the reference set, so the rule above replaces it.
+2. **Which buttons.** The step-in button (the `stepIn` copy, "Ask {name} to step in") carries the
+   seal with the thread creator's letter, and so does Send while the creator is in the thread
+   (`human_active`, when Send is creator-colored). These two are the person-colored buttons; the
+   step-in button still opens the packet.
+3. **A fixed letter.** The letter is drawn at a fixed size, 0.62 of its circle, and does not grow
+   with the text size. The words beside it grow and wrap.
+4. **Room at the largest text.** The seal keeps its 10-point gap to the label, and Send keeps its
+   word on one line: the message box gives up the width.
+
+### Scenarios and results (fake API; synthetic identities and data; real apps and layout)
+
+The seal is decorative (screen readers hear the button's words), so each step captures the screen
+and the captures were reviewed by eye.
+
+| ID   | Steps                                                                                                               | Expected                                                               | iOS                                             | Android                                                               |
+| ---- | ------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ----------------------------------------------- | --------------------------------------------------------------------- |
+| S3.1 | Devon opens Maya's, Kiln Club's (creator in the thread) and Glazeco's (AI paused) threads                           | "M", "K" and "G" on the step-in button; "K" on Kiln Club's Send too    | pass                                            | pass                                                                  |
+| S3.2 | Largest text, Light and Night: Kiln Club's step-in and Send, its in-thread "is here" line, and Maya's reaction chip | Each letter inside its circle; the gap to the label kept; "Send" whole | pass (AX5)                                      | pass (font scale 2.0)                                                 |
+| S3.3 | Priya searches Discover for "fern", opens "🌿 fern studio" and starts a first conversation                          | The header avatar and the step-in seal show "F"                        | pass                                            | pass                                                                  |
+| S3.4 | The existing component snapshots (iOS package tests; Android Paparazzi)                                             | Unchanged at normal text, or a change that is understood               | pass (18/18 package tests, snapshots unchanged) | five snapshots re-recorded: a full-width button's label moved 1 pixel |
+| S3.5 | A display name in a right-to-left script; a name with no letter                                                     | First letter; first character                                          | not run                                         | not run                                                               |
+
+Commands: `node tests/scenarios/lane-7/e7-4-seal.mjs [S1 S2 S3]` (Android) and
+`node tests/scenarios/lane-7/ios-navigation.mjs <built.xctestrun> --seal [S1 S2 S3]` (iOS, with
+`ios-link-driver.mjs` running). The fake has a creator named "🌿 fern studio" for S3.3.
+
+### What the runs found (and what changed because of them)
+
+- **Every seal showed "M".** The thread passed no initial to the step-in button or to Send, so both
+  used the control's default, and other seals took the name's first character, which splits an
+  emoji. Both apps now use `creatorInitial`.
+- **At the largest text the letter grew past its circle** on both apps (iOS scaled it with Dynamic
+  Type, Android with the font scale). Fixed on both, including iOS's second seal view (the "is
+  here" line, reaction chips, the human composer).
+- **Android squeezed the gap between the seal and the label** at the largest text: a block button
+  centered its content between two flexible spacers, so a label that nearly filled the button
+  slid into the gap. iOS keeps the gap. Android buttons now center with fixed spacing.
+- **iOS split "Send" across two lines** next to the seal at the largest text, because the message
+  box and Send shared the width. Send now takes its one-line width first, as on Android.
+- **The seal flows found a P1 defect on Android**: at the largest text the thread lost its bottom
+  when Notes and reactions arrived. Fixed in #452 (R1.12).
+- **Ticket to lane 6** (`packages/ui-web/src/components.ts`, `StepIn`): the web reference takes
+  `name.charAt(0)`, which for "🌿 fern studio" draws half of an emoji. The apps show "F".
+
 ## P2 to P11: the rules, written before the code
 
 Each becomes its own pull request with its own scenario table. What a piece cannot do yet is
@@ -146,11 +203,8 @@ screen readers is new copy: proposed key `growthUnread` = "Unread" (founder appr
 The fake's Note and reaction notices follow C4 (sender from `noteAudience`, destination
 `/creators/{handle}/chat`, the generic preview for a reaction).
 
-**P3 Step-in seal and composer states.** The plain "Ask {name} to step in" buttons become the
-StepIn control: the seal with the creator's initial (the first letter of the name, uppercased; the
-step-in glyph when the name starts with no letter) and the `stepIn` copy. It stays the only
-person-colored button and still opens the packet. Composer states the page can express are drawn
-from `control`: `ai_paused` shows the paused line with its glyph; `human_active` shows the
+**P3 Composer states** (the seal is built: see P3 above). Composer states the page can express are
+drawn from `control`: `ai_paused` shows the paused line with its glyph; `human_active` shows the
 creator-colored input with `replyToCreator`. Trial, ended and capacity have no server field (the
 page carries only `canSend` and a free-text `unavailableReason`); the apps keep the server's
 sentence and do not guess. Ticket to lane 3: a structured composer state on the conversation page.

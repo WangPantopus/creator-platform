@@ -47,7 +47,8 @@ async function reveal(label) {
   let last = "";
   for (let i = 0; i < 30; i += 1) {
     const nodes = A.screen();
-    const list = nodes.find((n) => n.scrollable);
+    // The tallest scroller: the development banner scrolls sideways too.
+    const list = nodes.filter((n) => n.scrollable).sort((x, y) => y.h - x.h)[0];
     const node = nodes.find(
       (n) => n.text.includes(label) || n.desc.includes(label),
     );
