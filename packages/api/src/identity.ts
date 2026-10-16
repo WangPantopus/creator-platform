@@ -224,8 +224,15 @@ export const PasskeyRegistrationSchema = z.strictObject({
   challengeId: z.uuid(),
   credential: z.json(),
 });
+/** "lost" retires a key and keeps its past signatures valid; "compromised"
+ * (the default) revokes it and marks its past signatures revoked. */
+export const KeyLossSchema = z.enum(["lost", "compromised"]);
 export const PasskeyRevocationSchema = z.strictObject({
   credentialId: z.string().min(1).max(2048),
+  loss: KeyLossSchema.optional(),
+});
+export const PasskeyRecoverySchema = z.strictObject({
+  loss: KeyLossSchema.optional(),
 });
 export const PasskeysSchema = z.strictObject({
   credentials: z
@@ -234,6 +241,8 @@ export const PasskeysSchema = z.strictObject({
         id: z.string(),
         createdAt: z.iso.datetime(),
         revoked: z.boolean(),
+        /** A lost key: it cannot sign, and its past signatures stay valid. */
+        retired: z.boolean(),
       }),
     )
     .max(100),
@@ -277,6 +286,7 @@ export const identitySchemas = {
   PasskeyOptions: PasskeyOptionsSchema,
   PasskeyRegistration: PasskeyRegistrationSchema,
   PasskeyRevocation: PasskeyRevocationSchema,
+  PasskeyRecovery: PasskeyRecoverySchema,
   Passkeys: PasskeysSchema,
   PublicSignature: PublicSignatureSchema,
 };

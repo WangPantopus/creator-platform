@@ -10,6 +10,8 @@ import { DomainError, invariant } from "../../core/errors.js";
 import type { Actor } from "./adapter.js";
 import { identityTransaction } from "./transaction.js";
 
+/** How a creator lost a passkey: decides what fans see on past signatures. */
+export type KeyLoss = "lost" | "compromised";
 export class PasskeyService {
   constructor(
     private readonly pool: Pool,
@@ -160,8 +162,11 @@ export class PasskeyService {
   }
   async list(actor: Actor) {
     return identityTransaction(this.pool, actor.accountId, async (client) => {
+      // retired_at is read through to_jsonb until pending-passkey-retirement.sql is
+      // registered: without the column no key can be retired, so every key counts
+      // as unretired. Lane 1 reads the column directly once it is registered.
       const credentials = await client.query(
-        'SELECT id,created_at AS "createdAt",revoked_at IS NOT NULL AS revoked FROM creator.passkey_credential WHERE account_id=$1 ORDER BY created_at DESC LIMIT 100',
+        `SELECT id,created_at AS "createdAt",revoked_at IS NOT NULL AS revoked,(to_jsonb(pc)->>'retired_at') IS NOT NULL AS retired FROM creator.passkey_credential pc WHERE account_id=$1 ORDER BY created_at DESC LIMIT 100`,
         [actor.accountId],
       );
       const profile = await client.query(
@@ -183,9 +188,23 @@ export class PasskeyService {
       return { done: true as const };
     });
   }
-  /** Self-revocation is always available; replacement still requires fresh identity and proof. */
-  async revoke(actor: Actor, credentialId: string) {
+  /** Self-revocation is always available; replacement still requires fresh
+   * identity and proof. A lost key is retired: it never signs again and its
+   * past signatures stay valid. A compromised key is revoked, and every
+   * signature it made shows as revoked (founder, 2026-10-15). */
+  async revoke(
+    actor: Actor,
+    credentialId: string,
+    loss: KeyLoss = "compromised",
+  ) {
     return identityTransaction(this.pool, actor.accountId, async (client) => {
+      if (loss === "lost") {
+        await client.query(
+          "UPDATE creator.passkey_credential SET retired_at=coalesce(retired_at,now()) WHERE id=$1 AND account_id=$2 AND revoked_at IS NULL",
+          [credentialId, actor.accountId],
+        );
+        return { done: true as const };
+      }
       await client.query(
         "UPDATE creator.passkey_credential SET revoked_at=now() WHERE id=$1 AND account_id=$2",
         [credentialId, actor.accountId],
@@ -197,8 +216,38 @@ export class PasskeyService {
       return { done: true as const };
     });
   }
-  async recover(actor: Actor) {
+  /** A lost device retires every key and asks for fresh proof before a new
+   * one; the creator stays verified and past signatures stay valid, because
+   * nothing was taken. A compromised device revokes every key and marks every
+   * past signature revoked, as no one can tell which ones were the creator's. */
+  async recover(actor: Actor, loss: KeyLoss = "compromised") {
     return identityTransaction(this.pool, actor.accountId, async (client) => {
+      if (loss === "lost") {
+        // The profile is locked first, as below; recovery_started_at alone
+        // requires a fresh sign-in and fresh proof before the next key.
+        const lost = await client.query(
+          "UPDATE creator.creator_profile SET recovery_started_at=now(),version=version+1 WHERE account_id=$1 RETURNING id,version",
+          [actor.accountId],
+        );
+        invariant(
+          lost.rows[0],
+          "creator_required",
+          "A creator profile is required for signing-key recovery.",
+        );
+        await client.query(
+          "UPDATE creator.passkey_credential SET retired_at=coalesce(retired_at,now()) WHERE account_id=$1 AND revoked_at IS NULL",
+          [actor.accountId],
+        );
+        await client.query(
+          "UPDATE creator.signed_challenge SET used_at=coalesce(used_at,now()) WHERE account_id=$1",
+          [actor.accountId],
+        );
+        await client.query(
+          "INSERT INTO creator.identity_event(account_id,kind,aggregate_id,version) VALUES($1,'creator_recovery_lost',$2,$3)",
+          [actor.accountId, lost.rows[0].id, lost.rows[0].version],
+        );
+        return { done: true as const };
+      }
       const result = await client.query(
         "UPDATE creator.creator_profile SET recovery_required=true,recovery_started_at=now(),verification='pending',version=version+1 WHERE account_id=$1 RETURNING id,version",
         [actor.accountId],
