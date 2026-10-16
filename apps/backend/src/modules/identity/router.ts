@@ -1,5 +1,18 @@
-import { Router, type Request } from "express";
-import { IdSchema, SessionSchema, PasskeyRevocationSchema } from "@qelvora/api";
+import { Router, type Request, type Response } from "express";
+import {
+  AgeConfirmationInputSchema,
+  CompleteIdentitySchema,
+  IdSchema,
+  IdentityProviderContinueSchema,
+  IdentityRedirectSchema,
+  IdentitySignInResultSchema,
+  NativeSignInCompleteSchema,
+  NativeSignInNonceSchema,
+  NativeSignInStartSchema,
+  SessionSchema,
+  PasskeyRevocationSchema,
+} from "@qelvora/api";
+import type { SignInStep } from "./qelvora-sign-in.js";
 import { DomainError } from "../../core/errors.js";
 import type { Actor } from "./adapter.js";
 import type { SessionService } from "./sessions.js";
@@ -23,6 +36,39 @@ export function bearer(req: Request) {
     );
   return token;
 }
+/** Sign-in starts per client per minute; completions are single use, so this
+ * bounds every attempt. A loopback caller (the web app's server on this host)
+ * may name the client with X-Forwarded-For. One process, in memory. */
+function signInLimiter(
+  limit = Number(process.env.QELVORA_SIGN_IN_STARTS_PER_MINUTE ?? 20),
+) {
+  const hits = new Map<string, number[]>();
+  return (req: Request, res: Response) => {
+    const remote = req.socket.remoteAddress ?? "unknown";
+    const forwarded = req.get("X-Forwarded-For")?.split(",")[0]?.trim();
+    const client =
+      ["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(remote) && forwarded
+        ? forwarded
+        : remote;
+    const now = Date.now();
+    const recent = (hits.get(client) ?? []).filter((at) => at > now - 60_000);
+    if (recent.length >= limit) {
+      res.setHeader(
+        "Retry-After",
+        String(Math.max(1, Math.ceil((recent[0]! + 60_000 - now) / 1000))),
+      );
+      throw new DomainError(
+        "rate_limited",
+        "Too many sign-in attempts. Wait a minute and try again.",
+        429,
+      );
+    }
+    hits.set(client, [...recent, now]);
+    if (hits.size > 10_000)
+      for (const [key, times] of hits)
+        if (!times.some((at) => at > now - 60_000)) hits.delete(key);
+  };
+}
 export function createIdentityRouter(
   runtime: IdentityRuntime,
   assertAllowed?: (actor: Actor) => Promise<void>,
@@ -38,9 +84,83 @@ export function createIdentityRouter(
       adultEligible: true,
       sessionId: resolved.sessionId,
       expiresAt: resolved.expiresAt,
-      mode: runtime.sessions.mode,
+      mode: resolved.mode,
     });
   };
+  const limit = signInLimiter();
+  /** C1's flat result. A session that cannot be shown is ended at once. */
+  const signInResult = async (step: SignInStep) => {
+    if (step.status === "age_required")
+      return IdentitySignInResultSchema.parse({
+        status: step.status,
+        completion: null,
+        ageConfirmation: {
+          ageContinuationId: step.ageContinuationId,
+          expiresAt: step.expiresAt,
+        },
+      });
+    try {
+      return IdentitySignInResultSchema.parse({
+        status: step.status,
+        completion: {
+          token: step.token,
+          returnTo: step.returnTo,
+          session: await session(step.token),
+        },
+        ageConfirmation: null,
+      });
+    } catch (error) {
+      await runtime.sessions.logout(step.token);
+      throw error;
+    }
+  };
+  router.post("/web/start", async (req, res) => {
+    limit(req, res);
+    res.json(
+      IdentityRedirectSchema.parse(
+        await runtime.sessions.startWeb(
+          IdentityProviderContinueSchema.parse(req.body),
+        ),
+      ),
+    );
+  });
+  router.post("/web/complete", async (req, res) =>
+    res.json(
+      await signInResult(
+        await runtime.sessions.completeWeb(
+          CompleteIdentitySchema.parse(req.body),
+        ),
+      ),
+    ),
+  );
+  router.post("/native/nonce", async (req, res) => {
+    limit(req, res);
+    res.json(
+      NativeSignInNonceSchema.parse(
+        await runtime.sessions.startNative(
+          NativeSignInStartSchema.parse(req.body),
+        ),
+      ),
+    );
+  });
+  router.post("/native/complete", async (req, res) =>
+    res.json(
+      await signInResult(
+        await runtime.sessions.completeNative(
+          NativeSignInCompleteSchema.parse(req.body),
+        ),
+      ),
+    ),
+  );
+  router.post("/age", async (req, res) =>
+    res.json(
+      await signInResult(
+        await runtime.sessions.confirmAge(
+          AgeConfirmationInputSchema.parse(req.body),
+        ),
+      ),
+    ),
+  );
   const actor = async (req: Request): Promise<Actor> =>
     currentActor
       ? currentActor(req)

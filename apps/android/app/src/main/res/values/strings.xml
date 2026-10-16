@@ -131,6 +131,14 @@
   <string name="page_unavailable_body" formatted="false">Nothing you saved was changed. Try again in a moment.</string>
   <string name="adult_only_title" formatted="false">This app is for adults</string>
   <string name="adult_only_body" formatted="false">This app is available to adults aged 18 and over.</string>
+  <string name="sign_in_with_apple" formatted="false">Continue with Apple</string>
+  <string name="sign_in_with_google" formatted="false">Continue with Google</string>
+  <string name="sign_in_age_title" formatted="false">Your date of birth</string>
+  <string name="sign_in_age_note" formatted="false">We keep only whether you can use the app, never the date.</string>
+  <string name="sign_in_age_continue" formatted="false">Continue</string>
+  <string name="sign_in_failed" formatted="false">This sign-in could not be completed. Start again.</string>
+  <string name="sign_in_unavailable" formatted="false">Sign-in is unavailable right now. Try again in a moment.</string>
+  <string name="sign_in_rate_limited" formatted="false">Too many sign-in attempts. Wait a minute and try again.</string>
   <string name="nav_home" formatted="false">Home</string>
   <string name="nav_discover" formatted="false">Discover</string>
   <string name="nav_requests" formatted="false">Requests</string>
