@@ -1,8 +1,8 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-16, by the lane 3 session
-Working on: B5 (memory proposals), PR B5_PR. Last done: A5 (safety check after acknowledgment), #489
-Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482, A5 #489, B5 B5_PR
+Working on: B5 (memory proposals), PR #490. Last done: A5 (safety check after acknowledgment), #489
+Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482, A5 #489, B5 #490
 Next: the in-thread memory prompt (B5 web), finding 18 (context exclusions), finding 5; B8 after #441 and #446 merge; B6 waits on the provider key and the embedding choice
 Blocked on: nothing. Later: the embedding choice (B6), the real model for B1's model check and finding 13 (gateway)
 
