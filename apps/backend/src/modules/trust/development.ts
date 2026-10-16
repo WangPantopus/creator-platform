@@ -351,6 +351,7 @@ export async function createDevelopmentTrust(
         runtimePool: runtime.pool,
         coordinatorPool: workerPool,
         commercePrivacy: COMMERCE_PRIVACY_CONFIGURATION,
+        identitySignIn: () => runtime.identity?.sessions.qelvora,
         ...options.consumers,
         content,
         agentExport,
