@@ -2,6 +2,7 @@
 // same way on both. The harness (harness/server.mjs) must be running.
 //   node tests/scenarios/lane-7/run-app.mjs ios|android [--actor devon] [--reset]
 //        [--to /threads/<creator>/<fan>] [--appearance light|night] [--shot out.png]
+//        [--long-session <reminder>,<break>]
 // Other commands: `shot ios|android <out.png>`, `stop ios|android`.
 import { execFileSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
@@ -49,6 +50,8 @@ else if (command === "stop") {
   const actor = option("--actor");
   const to = option("--to");
   const appearance = option("--appearance");
+  // WP 7.4 P8: the 3-hour reminder's two durations, in seconds ("20,6").
+  const longSession = option("--long-session");
   const reset = rest.includes("--reset");
   if (command === "ios") {
     const id = udid();
@@ -62,6 +65,7 @@ else if (command === "stop") {
       ...(actor ? ["--harness-actor", actor] : []),
       ...(to ? ["--return-to", to] : []),
       ...(appearance ? ["--appearance", appearance] : []),
+      ...(longSession ? ["--harness-long-session", longSession] : []),
     ];
     console.log(run("xcrun", ["simctl", "launch", id, BUNDLE, ...args]).trim());
   } else {
@@ -76,6 +80,9 @@ else if (command === "stop") {
       ...(actor ? ["--es", "harness_actor", quote(actor)] : []),
       ...(to ? ["--es", "return_to", quote(to)] : []),
       ...(appearance ? ["--es", "appearance", quote(appearance)] : []),
+      ...(longSession
+        ? ["--es", "harness_long_session", quote(longSession)]
+        : []),
     ];
     console.log(
       adb(
