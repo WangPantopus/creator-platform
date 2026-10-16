@@ -1,7 +1,7 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-15, by the lane 3 session
-Working on: the migration proposals for findings 15, 8 and 9
+Working on: the migration proposals: finding 15 open as a PR; findings 8 and 9 next
 Done: merged A1 #411, A3 #426, A6a #434, A6b #433 (its code and migration 0251 through the registration #442). Open: A6c #436, A6 hold sizing #438, B2 #441, A2 #444, B9 #446
 Next: the migration proposals for findings 8, 9 and 15, then the next work package in the founder's order
 Blocked on: nothing. Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
@@ -112,16 +112,19 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
     creator whose sources do not cover a question therefore fails that FAQ entry however good the
     expected answer is (three of Maya's five with the real model). Founder decision 2026-10-15: the
     FAQ stays a check only; a creator adds sources that cover the questions.
-15. Two workers on one database lose most answers: 1 of 10 (main) and 2 of 10 (A2) messages from 5
-    fans were answered; the rest fail before any sentence, and none is answered twice. Two causes.
-    The W2 admission SQL locks the creator's `ai_workspace` row with `FOR UPDATE NOWAIT`
-    (`generation_begin_agent_attempt`, `generation_open_provider_usage`,
-    `generation_agent_journal_receipt`; migrations 0097 and 0105), so two answers for one creator at
-    once fail. And a worker that loses a claim race reconciles the task the winner is answering, so
-    their `NOWAIT` thread locks collide (finding 6). Skipping that reconciliation when the task is no
-    longer pending removes the second cause (tried, not opened) but not the first. Fix: a short lock
-    wait instead of `NOWAIT` on the workspace row (a migration), then the skip. A6. The development
-    host runs one worker per backend today.
+15. Answers fail when anything else holds the creator's AI workspace row for a moment: the answer
+    path locked it with `FOR UPDATE NOWAIT` / `FOR SHARE NOWAIT` in four W2 functions
+    (`generation_agent_inputs`, `generation_begin_agent_attempt`, `generation_open_provider_usage`,
+    `generation_agent_journal_receipt`; 0096, 0251, 0097, 0105). With Maya's Studio reading her AI
+    state every 150 ms, main delivered 3 and 4 of 9 answers. Proposed migration
+    `pending_w2_workspace_lock_wait.sql` (branch `lane-3/f15-workspace-lock-wait`, pending registration): those four locks wait (the
+    worker's 1 s lock timeout bounds them) and 9 of 9 are delivered in three runs. Two workers on one
+    database still lose answers (1 or 2 of 10 on main and with the migration, none answered twice):
+    each answer holds the row until its W2 transaction ends, often over 1 s, so the other worker's
+    wait times out. That needs the admission in its own short transaction (a design change, A6), and
+    the worker's lost-claim reconciliation should skip a task another worker holds (tried, no effect
+    while the first cause remains). Lane 4's `generation_typed_original_allowance_receipt` has the same
+    `NOWAIT` (ticket).
 16. The output guard blocks a harmless answer with a dollar amount: "what is $5 plus $3?" was answered
     "$8" by the real model and withheld as `promise_or_sales` (the pattern `\$\s*\d` matches any
     amount). B1 (word boundaries and subject anchors).
@@ -209,6 +212,7 @@ passing, on top of the existing boundary cases (all must pass). A first version 
 | E3A.4 ★               | A3: no AI sentence after any change in 27 runs (7 kinds of change, up to 4 timings). Takeover within 500 ms fails at some timings (finding 10, also on main). Deletion not run (finding 11)                                                                                                                                                                                                                                                                                                                                  | `e3a4-authority.mjs`, one case per fresh stack    |
 | E3A.5 ★               | A3: kill after admission passes; kill during the guard call leaves an uncertain cost (finding 7); kill after the first sentence never finishes (finding 9). Same on main                                                                                                                                                                                                                                                                                                                                                     | `e3a5-restart.mjs --at admitted\|guard\|sentence` |
 | E3A.6 ★               | Distressed message gets the safe response first: pass. Hard-block half not run (needs the real model)                                                                                                                                                                                                                                                                                                                                                                                                                        | `e3a6-safety.mjs`                                 |
+| E3A.7 workspace lock  | Main: 3 and 4 of 9 answers while Studio reads every 150 ms (9 workspace refusals); with the pending migration 9 of 9 in three runs, no refusals, no deadlocks, E3A.2 identical. Two workers: 2 of 10 on main, 1 or 2 with the migration (finding 15)                                                                                                                                                                                                                                                                         | `e3a7-workspace-lock.mjs`                         |
 | A3 drift              | Pass on main and A3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | `a3-drift.mjs`                                    |
 | A6 hold bound         | Before: a $5 cap admits no Claude reply. After: hold $2.62 (Sonnet as small model) or $0.20 (Haiku); 10 of 10 replies delivered, spend at most 2.3% of the hold; one real reply cost $0.018 against a $2.62 hold                                                                                                                                                                                                                                                                                                             | `a6-hold-bound.mjs`                               |
 | A6c dropped request   | Before: a fan dropping the request during the safety check, or a timed-out check, locks the creator (4 of 7 fail). After: 7 of 7                                                                                                                                                                                                                                                                                                                                                                                             | `a6-ack-disconnect.mjs`                           |
@@ -226,6 +230,7 @@ Model gateway spend for lane 3 so far: 124 calls, 304,174 micros (/\_\_stats, 20
 | Lane 2     | `tests/scenarios/lane-2/seed-maya.mjs`                                                                                  | Seed a daily cap above the Claude run ceiling (for example 20,000,000) until hold sizing (#438) merges                                                                   | Finding 2: a `--provider anthropic` stack can never deliver a reply                                          |
 | Lane 7     | Thread screens (iOS, Android)                                                                                           | Hide "Ask Maya to step in" when the page's `stepInAvailable` is false (B9, generated models already carry it)                                                            | INV-19, INV-21: no way to paid attention right after a crisis response or safety refusal                     |
 | Lane 2     | `infra/local/fake-edge/model.mjs`                                                                                       | A control that sets the reply sentences (for example `{"reply": ["…"]}`)                                                                                                 | The guard can only be exercised with the real model today (B9's refusal case, E3B.1's corpus)                |
+| Lane 4     | `creator.generation_typed_original_allowance_receipt` (W4 commerce SQL)                                                 | Lock the creator's `ai_workspace` row without `NOWAIT`, as lane 3's pending `pending_w2_workspace_lock_wait.sql` does for its four functions                             | Finding 15: a Studio read at that moment fails the answer's settlement                                       |
 | Lane 4     | `modules/commerce/generation-audience.ts` (`assertCatalog`), `modules/commerce/generation-safety-terminal-catalogue.ts` | Wrap each check in `verifyInHeldTransaction(client, <its frozen custody object>, () => check)` from `modules/identity/generation-held-verification.ts` (after A3 merges) | 68 audience runs per answer; the safety terminal catalogue is about 1 s of the longest remaining transaction |
 | Lane 4     | `creator.generation_settle_typed_original_allowance` (W4 safety terminal settlement SQL)                                | Settle an interrupted answer that has stored output but no complete typed provenance, with lane 3 in A6                                                                  | Finding 9: a crash mid-answer is never recovered                                                             |
 | Integrator | `tests/scenarios/integrator/anthropic-adapter.mts` (case A6)                                                            | Expect a `ProviderResponseError` with a known zero usage for a non-2xx answer before any body (code, upstream status and the no-secret check are unchanged)              | A6a makes that error a known zero cost, as the brief decided; this case pinned the old behavior              |
