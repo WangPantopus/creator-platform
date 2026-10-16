@@ -68,6 +68,8 @@ export type GenerationProviderAttempt = Readonly<{
   modelFingerprint: string;
 }>;
 type Admitted = Readonly<{ id: string }>;
+/** A provider call admitted inside another held purpose (A4: the preflight). */
+export type GenerationProviderAdmission = Admitted;
 type Category = "reply" | "guardrail" | "memory";
 /** Nonsecret reference to one actually committed original provider admission.
  * Its private WeakMap binding, never these copied fields, supplies provenance. */
@@ -443,16 +445,17 @@ export class PreparedGenerationProviderAccounting {
     return this.identity.withGeneration(
       task,
       async (client, scope) => {
+        // One fresh read of the answer's authority and inputs precedes the
+        // admission; W1 still checks authority before its sole COMMIT, and
+        // every sentence's append re-checks its approval before and after.
         const facts = await bookend?.(client, scope);
-        const admitted = await this.openInTransaction(
+        return this.openInTransaction(
           client,
           scope,
           attempt,
           category,
           facts || undefined,
         );
-        await bookend?.(client, scope);
-        return admitted;
       },
       signal,
     );
@@ -546,6 +549,58 @@ export class PreparedGenerationProviderAccounting {
         writable: true,
       });
       throw unavailable;
+    }
+  }
+
+  /** Admits one call inside the caller's own held W1 purpose, with the same
+   * checks as a separate admission. The caller must use it once through
+   * withAdmittedUsage, or release it unused. */
+  async admitInTransaction(
+    client: PoolClient,
+    scope: GenerationTaskScope,
+    attempt: GenerationProviderAttempt,
+    category: Category,
+    licensedFacts?: GenerationAgentFacts,
+  ): Promise<GenerationProviderAdmission> {
+    return this.openInTransaction(
+      client,
+      scope,
+      attempt,
+      category,
+      licensedFacts,
+    );
+  }
+
+  /** An admitted call that was never made sent no request: a known zero. */
+  async releaseUnused(admitted: GenerationProviderAdmission): Promise<void> {
+    await this.finish(admitted, {
+      ...this.unknownUsage(),
+      costMicros: 0,
+    });
+  }
+
+  async withAdmittedUsage<T extends { usage: Usage }>(
+    task: GenerationTask,
+    attempt: GenerationProviderAttempt,
+    admitted: GenerationProviderAdmission,
+    signal: AbortSignal,
+    call: () => Promise<T>,
+    onAdmission?: (call: GenerationProviderCall) => void,
+  ): Promise<T> {
+    let usage = this.unknownUsage();
+    let sourceFailure: { cause: unknown } | undefined;
+    try {
+      onAdmission?.(this.issuedCall(admitted, task, attempt));
+      signal.throwIfAborted();
+      const result = await call();
+      usage = result.usage;
+      return result;
+    } catch (error) {
+      sourceFailure = { cause: error };
+      if (error instanceof ProviderResponseError) usage = error.usage;
+      throw error;
+    } finally {
+      await this.finishRetainingFailure(admitted, usage, sourceFailure);
     }
   }
 

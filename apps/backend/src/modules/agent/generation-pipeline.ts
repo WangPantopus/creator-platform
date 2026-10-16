@@ -29,6 +29,7 @@ import {
 import {
   PreparedGenerationProviderAccounting,
   type GenerationProviderAttempt,
+  type GenerationProviderAdmission,
   type GenerationProviderCall,
 } from "./generation-provider-usage.js";
 import {
@@ -88,6 +89,8 @@ type Run = {
   retrieval?: GenerationRuntimeContext;
   classifierCall?: GenerationProviderCall;
   replyCall?: GenerationProviderCall;
+  /** The classifier call admitted inside the preflight (A4), until used. */
+  preadmitted?: GenerationProviderAdmission;
   nextSequence: number;
   live: boolean;
 };
@@ -459,6 +462,15 @@ export class PreparedGenerationPipeline {
             scope,
             facts,
           );
+          // The engine's first call is always the input classifier: admit it
+          // here, on this same fresh read, instead of in a transaction of its own.
+          const preadmitted = await this.accounting.admitInTransaction(
+            client,
+            scope,
+            attempt,
+            "guardrail",
+            facts,
+          );
           await this.metadata.assertCurrentInTransaction(
             client,
             scope,
@@ -476,6 +488,7 @@ export class PreparedGenerationPipeline {
             facts,
             metadata,
             attempt,
+            preadmitted,
             nextSequence: 0,
             live: true,
           };
@@ -501,20 +514,13 @@ export class PreparedGenerationPipeline {
           proof,
           current.replyCall,
         );
-        await output.deliver(task, approved, signal);
-        await this.identity.withGeneration(
-          task,
-          async (client, scope) => {
-            invariant(
-              scope.lastSequence === approved.sequence,
-              "generation_output_not_committed",
-              "The actual original writer must commit this exact ordered cursor.",
-            );
-            // deliver() already validates approval before/after append and
-            // resolves only after the original W1 COMMIT. This read confirms
-            // that committed cursor; it does not repeat the whole input read.
-          },
-          signal,
+        // deliver() validates approval before and after the append and
+        // resolves only after the original W1 COMMIT, with the cursor that
+        // same transaction committed; no second W1 transaction re-reads it.
+        invariant(
+          (await output.deliver(task, approved, signal)) === approved.sequence,
+          "generation_output_not_committed",
+          "The actual original writer must commit this exact ordered cursor.",
         );
         firstApprovedMs ??= Math.round(performance.now() - started);
         emitted++;
@@ -548,8 +554,23 @@ export class PreparedGenerationPipeline {
             onSentence: emit,
           },
           {
-            withUsage: (call, stage) =>
-              this.accounting.withUsage(
+            withUsage: (call, stage) => {
+              const preadmitted =
+                stage === "classifier" ? current.preadmitted : undefined;
+              if (preadmitted) {
+                current.preadmitted = undefined;
+                return this.accounting.withAdmittedUsage(
+                  task,
+                  current.attempt,
+                  preadmitted,
+                  signal,
+                  call,
+                  (admitted) => {
+                    current.classifierCall = admitted;
+                  },
+                );
+              }
+              return this.accounting.withUsage(
                 task,
                 current.attempt,
                 "guardrail",
@@ -559,7 +580,8 @@ export class PreparedGenerationPipeline {
                 (admitted) => {
                   if (stage === "classifier") current.classifierCall = admitted;
                 },
-              ),
+              );
+            },
             withStreamUsage: (call) =>
               this.accounting.withStreamUsage(
                 task,
@@ -655,19 +677,10 @@ export class PreparedGenerationPipeline {
           },
           current.classifierCall,
         );
-        await output.deliver(task, approved, signal);
-        await this.identity.withGeneration(
-          task,
-          async (client, scope) => {
-            invariant(
-              scope.lastSequence === approved.sequence,
-              "generation_output_not_committed",
-              "The original safety output must commit its exact ordered cursor.",
-            );
-            // The original writer already checked approval at both append
-            // bookends and committed before this current cursor observation.
-          },
-          signal,
+        invariant(
+          (await output.deliver(task, approved, signal)) === approved.sequence,
+          "generation_output_not_committed",
+          "The original safety output must commit its exact ordered cursor.",
         );
         firstApprovedMs ??= Math.round(performance.now() - started);
         emitted++;
@@ -700,7 +713,14 @@ export class PreparedGenerationPipeline {
       throw cause;
     } finally {
       if (run) run.live = false;
-      this.running.delete(key);
+      try {
+        // An admitted classifier call the engine never made sent no request.
+        const unused = run?.preadmitted;
+        if (run) run.preadmitted = undefined;
+        if (unused) await this.accounting.releaseUnused(unused);
+      } finally {
+        this.running.delete(key);
+      }
     }
   }
 }
