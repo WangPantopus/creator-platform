@@ -2,6 +2,62 @@
 
 Updated: 2026-10-16, by the resumed lane 7 session (one session, both platforms).
 
+## Handoff (2026-10-16): resume here
+
+**Pull requests, stacked; merge in this order.** Never rebase: a fix on a lower branch is merged
+upward, branch by branch, and each is pushed.
+
+| PR                                                                | Branch                    | What                                                    |
+| ----------------------------------------------------------------- | ------------------------- | ------------------------------------------------------- |
+| [#401](https://github.com/WangPantopus/creator-platform/pull/401) | `lane-7/keyboard-drafts`  | WP 7.3 keyboard and drafts                              |
+| [#452](https://github.com/WangPantopus/creator-platform/pull/452) | `lane-7/notes-reactions`  | P1 Notes and reactions, Android keeps the bottom        |
+| [#457](https://github.com/WangPantopus/creator-platform/pull/457) | `lane-7/step-in-seal`     | P3 the creator's seal                                   |
+| [#460](https://github.com/WangPantopus/creator-platform/pull/460) | `lane-7/provider-consent` | P6 the provider sentence                                |
+| [#462](https://github.com/WangPantopus/creator-platform/pull/462) | `lane-7/adults-only`      | P7 the under-18 state                                   |
+| [#465](https://github.com/WangPantopus/creator-platform/pull/465) | `lane-7/citation-refusal` | P4 a refused source on Android                          |
+| [#466](https://github.com/WangPantopus/creator-platform/pull/466) | `lane-7/status-7-4`       | Status, decisions, these notes                          |
+| [#471](https://github.com/WangPantopus/creator-platform/pull/471) | `lane-7/thread-freeze`    | The iOS freeze fix, **draft**: newest branch, work here |
+
+**CI at handoff.** #457, #460 and #462 got opt-in fixes for their new iOS flows (CI runs every UI
+test with nothing listening; a flow must skip before any call); the new runs were pending. #457's
+Android job was cut off at 50 minutes (the same code passed on #460). #401's iOS check was re-run
+(CI's simulator failed to launch the app; not code). Auto-fix reports failures; never poll CI.
+
+**In flight: #471.** Verified: the build, and the freeze reproduction froze 0 of 10 rounds (2 of
+about 13 before). To do, in this order, then record the results in #471 and the spec and mark it
+ready (if a flow fails, run it on `lane-7/status-7-4` too, to tell a regression from an old
+problem):
+
+1. `node tests/scenarios/lane-7/ios-navigation.mjs <xctestrun> --presence` (R1 to R10).
+2. `… --drafts D1 D2 D3 D3T D4 D4R D5 D7 D7U D8`, then `… --seal` and `… --citations`.
+3. `node tests/scenarios/lane-7/e7-1-states.mjs ios` (L1 to L5, a streamed reply stays in view).
+4. The iOS gates: existing UI tests, release build, `swift test` (`p3-gates.sh` runs them).
+
+The freeze reproduction lives outside the repository in `~/Library/Caches/qelvora-lane7/diag/`:
+copy `Lane7FreezeDiag.swift` into `apps/ios/UITests/` only while running `run-freeze.sh presence`,
+and delete it before committing.
+
+**Then WP 7.4, decided 2026-10-16** (rules in [the spec](lane-7-rendering-parity.md)), each its own
+pull request stacked on the newest branch, both apps, operated flows, gates: P11 remove the
+comparison placeholder; P3 the composer states per the design; P2 notification rows with "Unread"
+(new key `growthUnread` in `config/copy.json`); P5 named pickers (approved words, new keys); P8 the
+3-hour reminder (approved rule); P9 the packet terms (change `chargeRule` and `ifDeclines` in
+`config/copy.json` to the approved wording, regenerate, ticket the integrator for the brief). Then
+stop and report. 7.10, 7.11, 7.8 and 7.12 wait for "Next for lane 7".
+
+**Warm resources, left running for reuse.** Simulator `qelvora-lane7-ios`
+(925D2C3D-510E-4E1E-B5B0-52335B122ECF) booted; emulator `qelvora-lane7-android` (`emulator-5574`)
+running headless with the debug app for the fake installed (if not:
+`emulator -avd qelvora-lane7-android -port 5574 -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect`);
+the fake API on 56473 and the iOS link driver on 56475, started from this worktree (check
+`curl -s http://127.0.0.1:56473/__harness/health`; restart them after editing harness files). Build
+caches: iOS derived data `~/Library/Caches/qelvora-lane7/ios-dd` (built for the fake on #471's
+branch), Gradle `~/.gradle` (offline builds work), node_modules installed. Helper scripts in
+`~/Library/Caches/qelvora-lane7/diag/`: `env.sh` (toolchain PATH, `W`, `SP`; no secrets),
+`ios-p3-build.sh` (iOS test build for the fake), `locked.sh` (the heavy-build lock, with retry),
+`ci-skip-check.sh` (runs suites the way CI does), `p3-gates.sh` (both apps' gates),
+`p1fix-gates.sh` (Android gates), `manifest-update.mjs` (the artifact manifest).
+
 ## WP 7.4 stop and report (2026-10-16)
 
 Every WP 7.4 piece that needed no decision is built, proven on both apps against the fake API, and
@@ -67,11 +123,11 @@ Android) → this status update. The spec with every piece's rules and results:
   arbitration fix (`NativeBackSwipe`) passed N5, N1 and the full iOS run. It also
   preserves vertical scrolling at the edge; screenshots and API checks corroborate it.
 
-Working on: nothing; WP 7.4 is stopped for the report. Six pull requests are open and stacked (#401, #452, #457, #460, #462, #465), plus this status update.
+Working on: #471, the iOS freeze fix (draft): its regression flows are next (see "Handoff" above).
 
-Waiting on: the founder's decisions listed above, the review of the stack, and "Next for lane 7". Backend domain erasure is still blocked/retrying (lane 1 ticket).
+Waiting on: review and merging of the stack; "Next for lane 7" for 7.10, 7.11, 7.8 and 7.12. Backend domain erasure is still blocked/retrying (lane 1 ticket).
 
-Next: the iOS freeze fix (its own pull request); then the WP 7.4 pieces the decisions unblock (P2, P3 composer states, P5, P8, P9, P11). 7.10, 7.11, 7.8 and 7.12 wait for "Next for lane 7". WP 7.5/7.6/7.7/7.9 wait on C1, domain, credentials, accounts and icon art.
+Next: finish #471; then WP 7.4 P11, P3 composer states, P2, P5, P8 and P9, as decided. WP 7.5/7.6/7.7/7.9 wait on C1, domain, credentials, accounts and icon art.
 
 ## Resume here
 
