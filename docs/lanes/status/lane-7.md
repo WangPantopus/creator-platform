@@ -1,6 +1,20 @@
 # Lane 7: Phone apps (iOS and Android) status
 
-Updated: 2026-10-09, by the resumed lane 7 session (one session, both platforms).
+Updated: 2026-10-15, by the resumed lane 7 session (one session, both platforms).
+
+## Resume update (2026-10-15)
+
+- #379 (WP 7.2) is merged. The founder **accepted the compact persistent author header**; `origin/main`
+  through `7ca3982fe` is merged into `lane-7/keyboard-drafts` (#401), which is ready for review.
+- The Mac had restarted: the lane's simulator, emulator and build caches were gone. Both devices
+  were recreated with the same names from installed runtimes (the simulator has a new id; the iOS
+  runner now finds it by name). Gradle's pinned 8.9 wrapper was fetched before asking (reported);
+  with the founder's yes, the pinned iOS packages (~150 MB) and Android dependencies (+254 MB).
+- The post-merge D6 rerun found a WP 7.3 defect (a session check could cancel an already-sent
+  deletion, leaving the encrypted draft); fixed on both apps and proven with a held-answer race
+  (D6R). Details: [WP 7.3](lane-7-keyboard-drafts.md).
+- WP 7.4 has started on `lane-7/notes-reactions` (stacked on #401): the shared spec and the C4
+  harness update first.
 
 ## Resume update (2026-10-09)
 
@@ -26,19 +40,19 @@ Updated: 2026-10-09, by the resumed lane 7 session (one session, both platforms)
   arbitration fix (`NativeBackSwipe`) passed N5, N1 and the full iOS run. It also
   preserves vertical scrolling at the edge; screenshots and API checks corroborate it.
 
-Working on: WP 7.2 publication, PR 379. Local verification is complete: Android 21/21 and iOS 13/13 fake-API flows, both focused real-stack flows, native regression suites, release builds/hook checks, contract check and repository gates. The two iOS defects found during operation (row tap during Back; cold creator link skipping Discover) are fixed and rerun.
+Working on: WP 7.4 piece P1 (C4 Notes and reactions in the thread), branch `lane-7/notes-reactions`, stacked on [#401](https://github.com/WangPantopus/creator-platform/pull/401) (ready for review). Spec and results: [lane-7-rendering-parity.md](lane-7-rendering-parity.md).
 
-Waiting on: GitHub connection for the app's CI reader; CI has not been inspected. This does not block the next local work. Four flags with defaults remain in [lane-7-navigation.md](lane-7-navigation.md).
+Waiting on: For WP 7.4: founder decisions on the unread word, the 3-hour reminder rule and the comparison copy removal (in the spec). Backend domain erasure is still blocked/retrying (lane 1 ticket).
 
-Next, in order: 7.3 keyboard, insets, rotation and drafts; 7.4 rendering parity (C4 is on main); 7.10 copy lookups; 7.11 accessibility; 7.8 polling/offline; 7.12 web Studio link. Waiting, not started: 7.5 (C1), 7.6/7.7 (domain and credentials), 7.9 (accounts and icon art).
+Next: The remaining WP 7.4 pieces in the spec's order (P2 notification rows, P3 step-in seal and composer states with the clipped seal initial at the largest text, then P4 to P9); P10 waits on the share-card contract and a domain. 7.10, 7.11, 7.8 and 7.12 wait for "Next for lane 7". WP 7.5/7.6/7.7/7.9 wait on C1, domain, credentials, accounts and icon art.
 
 ## Resume here
 
-1. Continue in the authorized warm lane 7 worktree. Verify branch/status and read PR 379 for new comments; PR 369 is merged. Do not rebase or merge a PR. Main was merged into navigation at `678484ade`.
-2. WP 7.1 and WP 7.2 verification are done; do not repeat them without a new change or failure. The exact results, earlier manual checks and checks not run are in [lane-7-navigation.md](lane-7-navigation.md). E7.2's draft restoration is still WP 7.3.
-3. Start WP 7.3 on its own branch/PR. The founder authorized this default (state it in the PR and keep going): drafts stay on the device only, encrypted, bound to the account and thread, cleared on send, sign-out, data deletion or when the conversation goes away, and never uploaded. Preserve an unconfirmed send's existing idempotency key across restart; check acceptance without automatically sending again.
-4. Baselines for 7.3: iOS truncates the header, composer and tab labels at the largest text size; Android's identity strip scrolls away. Main now hides tabs inside a thread, so operate the current build before choosing layout changes. See `artifacts/lane-7/7-1-largest-text.png`.
-5. This session continues into 7.3. Its own devices, fake API and link driver may still be running; verify ownership before starting/stopping anything. The real stack is stopped with its disposable lane 7 data kept for reuse. Use [lane-7-harness.md](lane-7-harness.md), keep native jobs serial, and rebuild when changing API origins.
+1. Read [lane-7-handoff.md](lane-7-handoff.md) first after the founder rules. It supersedes the old mid-navigation handoff and records the exact next work, evidence, limits and traps.
+2. Resume the authorized warm worktree on `lane-7/keyboard-drafts`. Fetch, verify clean status and inspect PR metadata/reviews. PR 369 is merged; PR 379 remains ready/open with no review comments at the handoff check. Main through `21b3d4836` is merged. Never rebase or merge a PR.
+3. WP 7.1/7.2 are done. WP 7.3 proves E7.2's draft restoration. Do not repeat completed matrices without a relevant change or failure. If the compact header is rejected, change only the presentation on both apps and rerun D1/D3 and Android D3I/D3S; storage/recovery need no blanket rerun.
+4. Approved draft policy: device only, encrypted, account/thread bound; cleared on accepted send, sign-out, accepted deletion or conversation removal; unsent input never uploaded. Pending sends keep their existing idempotency key; restart checks acceptance and never automatically sends again.
+5. Final generic gates build with an empty API origin and Android instrumentation uninstalls the app. Before the next operated flow, rebuild/install debug for the fake (or explicit debug override). Use the [harness runbook](lane-7-harness.md), own devices and serial heavy-build lock. The machine-specific cache pointer is in the handoff memory.
 
 ## Traps that cost time (so you do not pay twice)
 
@@ -57,18 +71,19 @@ Next, in order: 7.3 keyboard, insets, rotation and drafts; 7.4 rendering parity 
 
 The original 7.1 flows and full 7.2 matrix use the fake API. A focused 7.2 flow also passed on the real stack, as recorded in the navigation report. Both devices need debug builds installed; the harness starts itself if none is running.
 
-| ID                                                                    | Result                                                                                                           | Command                                                                  |
-| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| Contract check, 51 checks                                             | pass                                                                                                             | `pnpm exec tsx tests/scenarios/lane-7/harness/check-contract.mjs`        |
-| H1 to H12 sign-in, session end, network drop                          | pass on iOS and Android                                                                                          | `node tests/scenarios/lane-7/e7-1-signin.mjs [ios\|android]`             |
-| S1 to S8 states and switches, E1 server error, L1 to L5 live delivery | pass on iOS and Android                                                                                          | `node tests/scenarios/lane-7/e7-1-states.mjs [ios\|android]`             |
-| F1 to F2 first conversation                                           | pass on both (Android by script; iOS by hand through the simulator tool)                                         | `node tests/scenarios/lane-7/e7-1-first-conversation.mjs [ios\|android]` |
-| Request rate, thread open and idle (WP 7.8 "before")                  | iOS 49 a minute, Android 51 a minute                                                                             | `node tests/scenarios/lane-7/baseline-requests.mjs both 60`              |
-| N1 to N21 navigation (WP 7.2)                                         | Android: 21 of 21 pass. iOS: 13 XCUITest flows pass, plus prior manual results ([details](lane-7-navigation.md)) | `node tests/scenarios/lane-7/e7-2-navigation.mjs [N1 ...]`               |
-| Release builds contain none of the hook                               | pass, both; repeated for 7.2                                                                                     | `artifacts/lane-7/7-2-gates.txt`                                         |
+| ID                                                                                   | Result                                                                                                           | Command                                                                                          |
+| ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Contract check, 62 checks (11 for C4 presence)                                       | pass                                                                                                             | `pnpm exec tsx tests/scenarios/lane-7/harness/check-contract.mjs`                                |
+| H1 to H12 sign-in, session end, network drop                                         | pass on iOS and Android                                                                                          | `node tests/scenarios/lane-7/e7-1-signin.mjs [ios\|android]`                                     |
+| S1 to S8 states and switches, E1 server error, L1 to L5 live delivery                | pass on iOS and Android                                                                                          | `node tests/scenarios/lane-7/e7-1-states.mjs [ios\|android]`                                     |
+| F1 to F2 first conversation                                                          | pass on both (Android by script; iOS by hand through the simulator tool)                                         | `node tests/scenarios/lane-7/e7-1-first-conversation.mjs [ios\|android]`                         |
+| Request rate, thread open and idle (WP 7.8 "before")                                 | iOS 49 a minute, Android 51 a minute                                                                             | `node tests/scenarios/lane-7/baseline-requests.mjs both 60`                                      |
+| R1.1 to R1.9 Notes and reactions (WP 7.4 P1, R1.7 included; R1.10 and R1.11 not run) | pass on iOS and Android                                                                                          | `node tests/scenarios/lane-7/e7-4-presence.mjs`; iOS `ios-navigation.mjs <xctestrun> --presence` |
+| N1 to N21 navigation (WP 7.2)                                                        | Android: 21 of 21 pass. iOS: 13 XCUITest flows pass, plus prior manual results ([details](lane-7-navigation.md)) | `node tests/scenarios/lane-7/e7-2-navigation.mjs [N1 ...]`                                       |
+| Release builds contain none of the hook                                              | pass, both; repeated for 7.2                                                                                     | `artifacts/lane-7/7-2-gates.txt`                                                                 |
 
 Existing suites for 7.1 (Android unit and Paparazzi 19, Lint 0 errors, instrumentation 8 with 4 skipped by design; iOS `swift test` 18, UI tests 6 with 4 skipped by design): `./gradlew :app:testDebugUnitTest :app:verifyPaparazziDebug :app:lintDebug`; `swift test`; `xcodebuild test`. The 7.2 run of these is recorded in [lane-7-navigation.md](lane-7-navigation.md).
 
 ## Tickets and observations
 
-Tickets to other lanes: none. Observations for the integrator (not tickets, because the files are lane 7's): `xcodebuild` rewrites `apps/ios/Package.resolved`, so every local iOS build leaves it modified and it must not be committed; the release `Info.plist` keeps `NSAllowsLocalNetworking`, a 7.9 item. The decisions the brief lists (minSdk, stripping the call permissions and services, icon art, export-compliance answer) are needed by 7.9.
+Ticket to lane 1/trust integration and domain owners: local thread-deletion jobs deny access immediately but domain erasure remains blocked/retrying; files, errors and requested follow-up are in [the 7.3 report](lane-7-keyboard-drafts.md). Observations for the integrator (not tickets, because the files are lane 7's): `xcodebuild` rewrites `apps/ios/Package.resolved`, so every local iOS build leaves it modified and it must not be committed; the release `Info.plist` keeps `NSAllowsLocalNetworking`, a 7.9 item. The decisions the brief lists (minSdk, stripping the call permissions and services, icon art, export-compliance answer) are needed by 7.9.
