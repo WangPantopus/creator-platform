@@ -803,6 +803,18 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
 }
 
 
+/** The fan's conversation with this creator, if any (every page of the account's threads). */
+private suspend fun existingThread(client: ConversationClient, creatorId: String): String? {
+    var cursor: String? = null
+    for (page in 0 until 20) {
+        val answer = try { client.request("account" + (cursor?.let { "?cursor=$it" } ?: "")).jsonObject }
+            catch (failure: Exception) { if (failure is CancellationException) throw failure; return null }
+        answer["threads"]?.jsonArray?.map { it.jsonObject }?.firstOrNull { it["creatorId"]?.jsonPrimitive?.content == creatorId }
+            ?.let { return it["fanId"]?.jsonPrimitive?.content }
+        cursor = answer["nextCursor"]?.takeUnless { it is JsonNull }?.jsonPrimitive?.content ?: return null
+    }
+    return null
+}
 @Composable private fun FirstConversation(baseURL: String, handle: String, session: FanSession) {
     val client = remember(baseURL,session.session?.accountId) { ConversationClient(baseURL,session::currentToken, session.session?.accountId) }
     val growth = remember(baseURL) { GrowthClient(baseURL) }
@@ -860,6 +872,17 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             require(Regex("[A-Za-z0-9_-]{1,100}").matches(handle))
             creator = growth.request("public/creators/$handle").getJSONObject("creator")
         } catch (failure: Throwable) { if (failure is CancellationException) throw failure; error = "This creator or the conversation service is unavailable." }
+        // Someone who already talks with this creator's AI goes straight to that
+        // conversation: a Note or reaction notice, and "Message {name}'s AI", link
+        // here. A link with a post's context keeps this screen, which carries it.
+        val creatorId = creator?.optString("id").orEmpty()
+        if (creatorId.isNotEmpty() && !contextPending && accountId != null) {
+            val fanId = existingThread(client, creatorId)
+            if (fanId != null && session.destination == target && session.session?.accountId == accountId) {
+                session.replace("/threads/$creatorId/$fanId")
+                return@LaunchedEffect
+            }
+        }
         try {
             capabilities = client.json.decodeFromJsonElement(client.request("capabilities", publicRead = true))
         } catch (failure: Throwable) { if (failure is CancellationException) throw failure; error = "This creator or the conversation service is unavailable." }

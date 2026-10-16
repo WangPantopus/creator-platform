@@ -23,6 +23,8 @@ const comparison = ids[0] === "--comparison";
 if (comparison) ids.shift();
 const composer = ids[0] === "--composer";
 if (composer) ids.shift();
+const chatLink = ids[0] === "--chat-link";
+if (chatLink) ids.shift();
 const notifications = ids[0] === "--notifications";
 if (notifications) ids.shift();
 const pickers = ids[0] === "--pickers";
@@ -57,15 +59,17 @@ const suite = presence
                   ? "Lane7ComparisonFlows"
                   : composer
                     ? "Lane7ComposerFlows"
-                    : notifications
-                      ? "Lane7NotificationFlows"
-                      : pickers
-                        ? "Lane7PickerFlows"
-                        : longSession
-                          ? "Lane7LongSessionFlows"
-                          : packet
-                            ? "Lane7PacketFlows"
-                            : "Lane7NavigationFlows";
+                    : chatLink
+                      ? "Lane7ChatLinkFlows"
+                      : notifications
+                        ? "Lane7NotificationFlows"
+                        : pickers
+                          ? "Lane7PickerFlows"
+                          : longSession
+                            ? "Lane7LongSessionFlows"
+                            : packet
+                              ? "Lane7PacketFlows"
+                              : "Lane7NavigationFlows";
 const optInVariable = presence
   ? "LANE7_PRESENCE"
   : draftStack
@@ -86,15 +90,17 @@ const optInVariable = presence
                   ? "LANE7_COMPARISON"
                   : composer
                     ? "LANE7_COMPOSER"
-                    : notifications
-                      ? "LANE7_NOTIFICATIONS"
-                      : pickers
-                        ? "LANE7_PICKERS"
-                        : longSession
-                          ? "LANE7_LONG_SESSION"
-                          : packet
-                            ? "LANE7_PACKET"
-                            : "LANE7_NAVIGATION";
+                    : chatLink
+                      ? "LANE7_CHAT_LINK"
+                      : notifications
+                        ? "LANE7_NOTIFICATIONS"
+                        : pickers
+                          ? "LANE7_PICKERS"
+                          : longSession
+                            ? "LANE7_LONG_SESSION"
+                            : packet
+                              ? "LANE7_PACKET"
+                              : "LANE7_NAVIGATION";
 const flows = presence
   ? {
       R1: "testR01NotesAndReactionsInPlace",
@@ -163,50 +169,55 @@ const flows = presence
                         Q4: "testQ04LiveChangesKeepTheDraft",
                         Q5: "testQ05LargestTextNight",
                       }
-                    : notifications
+                    : chatLink
                       ? {
-                          U1: "testU01RowsSaySenderPreviewTimeUnread",
-                          U2: "testU02NoteOpensThreadAndIsRead",
-                          U3: "testU03ReactionOpensThread",
-                          U4: "testU04LargestTextNight",
+                          H1: "testH01ExistingConversationOpens",
+                          H2: "testH02NoConversationKeepsFirstScreen",
                         }
-                      : pickers
+                      : notifications
                         ? {
-                            V1: "testV01BlockByName",
-                            V2: "testV02OpenedFromThreadShowsName",
-                            V3: "testV03ExportOneConversation",
-                            V4: "testV04NoConversations",
-                            V5: "testV05ListFailsThenRetries",
+                            U1: "testU01RowsSaySenderPreviewTimeUnread",
+                            U2: "testU02NoteOpensThreadAndIsRead",
+                            U3: "testU03ReactionOpensThread",
+                            U4: "testU04LargestTextNight",
                           }
-                        : longSession
+                        : pickers
                           ? {
-                              T1: "testT01OnceThenAgain",
-                              T2: "testT02AcrossCreators",
-                              T3: "testT03LongBreakResets",
-                              T4: "testT04ShortBreakKeeps",
-                              T5: "testT05CreatorHereOrPausedDoesNotCount",
+                              V1: "testV01BlockByName",
+                              V2: "testV02OpenedFromThreadShowsName",
+                              V3: "testV03ExportOneConversation",
+                              V4: "testV04NoConversations",
+                              V5: "testV05ListFailsThenRetries",
                             }
-                          : packet
+                          : longSession
                             ? {
-                                M1: "testM01MayaWrittenReply",
-                                M2: "testM02KilnClubVoiceNote",
-                                M3: "testM03LargestTextNight",
+                                T1: "testT01OnceThenAgain",
+                                T2: "testT02AcrossCreators",
+                                T3: "testT03LongBreakResets",
+                                T4: "testT04ShortBreakKeeps",
+                                T5: "testT05CreatorHereOrPausedDoesNotCount",
                               }
-                            : {
-                                N1: "testN01ThreadBackAndGesture",
-                                N2: "testN02ConsentIsReplaced",
-                                N5: "testN05AccountBack",
-                                N6: "testN06NotificationTrailAndLabel",
-                                N8: "testN08ColdLink",
-                                N13: "testN13AccountChangeClearsTrail",
-                                N14: "testN14UnknownLink",
-                                N15: "testN15RepeatedLinkAndQuickBack",
-                                N16: "testN16LinkWhilePrivacyIsOpen",
-                                N17: "testN17TrailBoundary",
-                                N19: "testN19NewFanBack",
-                                N20: "testN20EditProfileBack",
-                                N21: "testN21CreatorAccessBack",
-                              };
+                            : packet
+                              ? {
+                                  M1: "testM01MayaWrittenReply",
+                                  M2: "testM02KilnClubVoiceNote",
+                                  M3: "testM03LargestTextNight",
+                                }
+                              : {
+                                  N1: "testN01ThreadBackAndGesture",
+                                  N2: "testN02ConsentIsReplaced",
+                                  N5: "testN05AccountBack",
+                                  N6: "testN06NotificationTrailAndLabel",
+                                  N8: "testN08ColdLink",
+                                  N13: "testN13AccountChangeClearsTrail",
+                                  N14: "testN14UnknownLink",
+                                  N15: "testN15RepeatedLinkAndQuickBack",
+                                  N16: "testN16LinkWhilePrivacyIsOpen",
+                                  N17: "testN17TrailBoundary",
+                                  N19: "testN19NewFanBack",
+                                  N20: "testN20EditProfileBack",
+                                  N21: "testN21CreatorAccessBack",
+                                };
 if (!source || ids.some((id) => !flows[id]))
   throw new Error(
     "Pass a built .xctestrun and optional unfinished iOS flow IDs.",

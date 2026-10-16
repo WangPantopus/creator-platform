@@ -20,6 +20,8 @@ if (!device || device.state !== "Booted")
 const paths = new Set([
   "/threads/c1000000-0000-4000-8000-000000000001/f1000000-0000-4000-8000-000000000001",
   "/threads/c1000000-0000-4000-8000-000000000002/f1000000-0000-4000-8000-000000000001",
+  // WP 7.4 P8 T2: another AI-on thread (Tomás Reyes), to move between creators.
+  "/threads/c1000000-0000-4000-8000-000000000004/f1000000-0000-4000-8000-000000000001",
   "/creators/maya",
   "/support",
   "/support/privacy",
