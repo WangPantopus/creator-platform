@@ -47,6 +47,9 @@ most of what the pilot needs:
 
 ## 4. Decisions for the founder
 
+**Answered 2026-10-16: the founder chose the proposed default for all five** (P1, P2, R1, O1,
+O2). R1 still needs counsel's confirmation; P1 is built by lane 4.
+
 | #   | Question                                                             | Proposed default                                                                                                                                                                                                                                                                                                                                         |
 | --- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | P1  | When ops pauses a creator, what happens to their open paid requests? | Requests not yet accepted: release the hold, nothing charged. Accepted but not delivered: keep the deadline, and refund automatically if it passes (the existing rule). Lane 4 builds it. This is money semantics, so it is yours                                                                                                                        |
