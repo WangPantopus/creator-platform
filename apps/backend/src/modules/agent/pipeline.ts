@@ -32,16 +32,18 @@ import {
   LEGACY_REPLY_INSTRUCTIONS,
 } from "./pipeline-compatibility.js";
 
-export const PIPELINE_REVISION = "w2-context-guardrails-15";
+export const PIPELINE_REVISION = "w2-context-guardrails-16";
 type PipelineRevision =
   | typeof PIPELINE_REVISION
   | "w2-context-guardrails-12"
   | "w2-context-guardrails-13"
-  | "w2-context-guardrails-14";
+  | "w2-context-guardrails-14"
+  | "w2-context-guardrails-15";
+const revisionNumber = (revision: PipelineRevision) =>
+  Number(revision.slice(revision.lastIndexOf("-") + 1));
 /** Revisions 12 and 13 budget context in UTF-8 bytes, before the model tokenizer. */
 const byteBudgeted = (revision: PipelineRevision) =>
-  revision === "w2-context-guardrails-12" ||
-  revision === "w2-context-guardrails-13";
+  revisionNumber(revision) <= 13;
 /** Revision 15 reserves this many context tokens for the nearest passages
  * before memory, Notes and history can use the budget. */
 export const EVIDENCE_FLOOR = 1000;
@@ -375,10 +377,164 @@ function hardBlock(text: string, configuration: Configuration, name: string) {
     return "dependency";
   return null;
 }
+
+/** Revision 16: one comparable form for the guard's patterns. Accents, zero-
+ * width and soft hyphens, full-width and look-alike letters, curly quotes,
+ * dashes and space variants cannot hide a phrase. */
+// Combining marks (U+034F, variation selectors) are removed with \p{M} below.
+const INVISIBLE =
+  /[\u00ad\u061c\u115f\u1160\u200b-\u200f\u202a-\u202e\u2060-\u206f\u3164\ufeff\uffa0]/gu;
+const LOOKALIKE: Readonly<Record<string, string>> = {
+  а: "a",
+  в: "b",
+  е: "e",
+  к: "k",
+  м: "m",
+  н: "h",
+  о: "o",
+  р: "p",
+  с: "c",
+  т: "t",
+  у: "y",
+  х: "x",
+  і: "i",
+  ј: "j",
+  ѕ: "s",
+  ԁ: "d",
+  ɡ: "g",
+  α: "a",
+  ε: "e",
+  ι: "i",
+  κ: "k",
+  ν: "v",
+  ο: "o",
+  ρ: "p",
+  τ: "t",
+  υ: "u",
+};
+function quotesAndSpaces(text: string) {
+  return text
+    .replace(INVISIBLE, "")
+    .replace(/[\u2018\u2019\u201b\u2032`\u00b4]/gu, "'")
+    .replace(/[\u201c\u201d\u201f\u2033]/gu, '"')
+    .replace(/[\u2010-\u2015\u2212]/gu, "-")
+    .replace(/\s+/gu, " ")
+    .trim();
+}
+function guardText(text: string) {
+  return quotesAndSpaces(
+    text
+      .normalize("NFKD")
+      .replace(/\p{M}/gu, "")
+      .toLowerCase()
+      .replace(/[^\t\n\r -~]/gu, (c) => LOOKALIKE[c] ?? c),
+  );
+}
+const LEET: Readonly<Record<string, string>> = {
+  "0": "o",
+  "1": "i",
+  "3": "e",
+  "4": "a",
+  "5": "s",
+  "7": "t",
+  "8": "b",
+  "@": "a",
+  "|": "l",
+  "!": "i",
+};
+const unleet = (text: string) =>
+  text.replace(/[0134578@|!]/gu, (c) => LEET[c]!);
+const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+const OFFERINGS =
+  "packets?(?! of\\b)|requests?|pass(?:es)?|memberships?|tiers?|subscriptions?|sessions?|calls?|voice notes?";
+const AMOUNT =
+  /[$€£¥] ?\d|\d[\d,.]* ?(?:dollars?|bucks|usd|eur|euros?|gbp|cents?)\b|\b(?:usd|eur|gbp|cad|aud) ?\d/u;
+const PRICE_CONTEXT =
+  /\b(?:costs?|costing|prices?|priced|pricing|pay|pays|paid|paying|charges?|charged|fees?|sells?|selling|sold|spend|spent|worth|budget|buys?|bought|purchased?|per|each|monthly|weekly|yearly|annually|only|just)\b|\b(?:a|an|per) (?:month|week|year|bucket|bag|pint|quart|gallon|pound|kilo|kg|lb|box|piece|mug|bowl|session|class|hour|lesson|reply|request|packet|note)\b|\bfor [$€£¥]|[$€£¥] ?\d[\d,.]* (?:for|gets?)\b|\b(?:starts?|starting) (?:at|from)\b|\bfrom [$€£¥]/u;
+const DISTRESS =
+  /\b(?:lonely|alone|no ?one|nobody|isolated|sad|depressed|hopeless|worthless|anxious|scared|afraid|heartbroken|miss (?:you|her|him)|need you|can't cope|cannot cope|struggling|falling apart|crying)\b/u;
+
+/** Revision 16 guard: word boundaries and subject anchors, so ordinary advice
+ * ("spread your glaze", "buy test tiles") passes while the creator's attention
+ * ("Maya read your message"), promises, impersonation, selling, prices
+ * (INV-21: also from the creator's own materials) and dependency stay blocked
+ * in every mode. Categories stay the closed set the guardrail audit stores. */
+function guardBlock(text: string, configuration: Configuration, name: string) {
+  const plain = guardText(text);
+  // Letters spelled apart ("m.a.y.a", "r e a d") are read joined as well.
+  const joined = unleet(plain).replace(/\b[a-z](?:[ ._-][a-z]\b){2,}/gu, (m) =>
+    m.replace(/[ ._-]/gu, ""),
+  );
+  const forms = [plain, unleet(plain), joined];
+  const test = (pattern: RegExp) => forms.some((form) => pattern.test(form));
+  if (
+    configuration.neverReveal.some((secret) => {
+      const value = guardText(secret);
+      return plain.includes(value) || forms[1]!.includes(unleet(value));
+    })
+  )
+    return "never_reveal";
+  const person = guardText(name);
+  const names = [...new Set([person, person.split(" ")[0]!].filter(Boolean))]
+    .map(escape)
+    .join("|");
+  const creator = `(?:${names}|she|he|they|the creator|your creator)`;
+  if (
+    test(
+      new RegExp(
+        `\\b(?:i am|i'm|im) (?:(?:the real|really|actually|the actual|the) )?(?:${names})\\b(?!'s\\b)|\\b(?:this is|it's|it is) (?:${names})\\b(?!'s\\b)|(?:^|[.!?] )(?:${names}) here\\b|\\b(?:${names}) speaking\\b|\\bas (?:${names}), i\\b`,
+        "u",
+      ),
+    )
+  )
+    return "impersonation";
+  if (
+    test(
+      new RegExp(
+        `\\b(?:upgrad|unlock|subscrib)\\w*|\\bexclusive access\\b|\\bbecome a (?:member|subscriber|supporter|patron|paid member)\\b|\\b(?:buy|buys|buying|purchase|purchasing|pay for|paying for|order|get|getting|grab|pick up|snag|treat yourself to) (?:(?:a|an|the|one|another|more|your|her|his|their|(?:${names})'s) )?(?:\\w+ )?(?:${OFFERINGS})\\b|\\b(?:buy|purchase|pay for|get) (?:(?:${names})'s|her|his|their) (?:time|attention|reply|replies)\\b`,
+        "u",
+      ),
+    ) ||
+    test(
+      new RegExp(
+        `\\b(?:${names}|she|he|they|i|we)(?:'ll| will| (?:is|are|am|was) going to|'s going to|'re going to|'m going to| (?:is|are|am) gonna| promises? to) (?:\\w+ ){0,2}?(?:call(?! (?:it|this|that|them)\\b)|reply|respond|meet (?:you|with you|up)|message|text|email|dm|write back|get back|reach out|see you|talk to you|be in touch|follow up with you)\\b|\\bexpect (?:a |an |her |his |their )?(?:reply|response|answer|call|message|note) from (?:${names}|her|him|them)\\b`,
+        "u",
+      ),
+    ) ||
+    test(
+      new RegExp(
+        `\\b${creator} (?:(?:has|had|have|already|just|really|definitely|totally|truly) )*(?:read|reads|saw|sees|seen|remember|remembers|remembered|felt|feels|feel|noticed|notices|loved|loves|liked|likes|decided|misses|missed|cares|cared|thinks of|thought of|thinks about|thought about|appreciates|appreciated)\\b(?: \\S+){0,4}? (?:you|your|you're|yours|ur|u)\\b|\\b${creator} (?:is|was|'s|has been|feels|felt) (?:(?:so|really|very|truly|incredibly) )*(?:proud|happy|glad|excited|thrilled|touched|grateful|moved|impressed) (?:of|for|about|with|by) (?:you|your|ur|u)\\b|\\b${creator} (?:wants|wanted|would love|'d love) (?:you|to (?:hear from|see|meet|talk to) (?:you|your))\\b`,
+        "u",
+      ),
+    ) ||
+    (AMOUNT.test(plain) && test(PRICE_CONTEXT))
+  )
+    return "promise_or_sales";
+  if (
+    test(
+      /\bonly (?:need|have) me\b|\b(?:don't|do not|dont) (?:need|want|talk to) (?:anyone|anybody|others|other people)\b(?!')|\blove you\b|\bkeep (?:chatting|talking) (?:to|with) me\b|\b(?:i'm|i am) all you need\b|\b(?:i'll|i will) always be (?:here|there) for you\b|\byou're all i need\b|\bi(?:'ll| will) miss you\b|\b(?:nobody|no one) (?:understands|gets|knows|cares about) you like i do\b/u,
+    )
+  )
+    return "dependency";
+  return null;
+}
 export function fallback(mode: Configuration["mode"], name: string) {
   return mode === "companion"
     ? "I’m an AI. I can’t help with that here."
     : `I’m ${name}’s AI. I can’t answer that from the approved sources. You can ask ${name} directly.`;
+}
+/** Revision 16 (INV-19, INV-21): only expert mode, and never a fan in
+ * distress, is told to ask the creator directly. A distressed fan gets the
+ * safety refusal; blend mode drops the step-in sentence. */
+function revisedFallback(
+  mode: Configuration["mode"],
+  name: string,
+  distressed: boolean,
+) {
+  if (mode === "companion" || distressed) return fallback("companion", name);
+  if (mode === "blend")
+    return `I’m ${name}’s AI. I can’t answer that from the approved sources.`;
+  return fallback(mode, name);
 }
 export const crisisText =
   "I’m an AI. If you’re in immediate danger, contact local emergency services now. In the U.S. or Canada, call or text 988. You can also reach out to someone you trust nearby.";
@@ -496,7 +652,7 @@ export class AgentPipeline {
         (byteBudgeted(this.revision)
           ? this.model?.preTokenizerFingerprint
           : this.model?.fingerprint) ?? "unconfigured",
-      ...(this.revision === PIPELINE_REVISION
+      ...(revisionNumber(this.revision) >= 15
         ? {
             retrieval: "scoped-exact-cosine-top4-previous-fan-turn",
             budget: 2500,
@@ -507,7 +663,7 @@ export class AgentPipeline {
   }
   /** The text this engine embeds to retrieve evidence for the fan's message. */
   retrievalQuery(message: string, history: readonly string[]): string {
-    return this.revision === PIPELINE_REVISION
+    return revisionNumber(this.revision) >= 15
       ? previousTurnQuery(message, history)
       : message;
   }
@@ -522,6 +678,7 @@ export class AgentPipeline {
           ? (["w2-context-guardrails-12", "w2-context-guardrails-13"] as const)
           : []),
         "w2-context-guardrails-14",
+        "w2-context-guardrails-15",
       ];
       this.historical ??= revisions.map(
         (revision) =>
@@ -815,6 +972,7 @@ export class AgentPipeline {
           ? Buffer.byteLength(text, "utf8")
           : this.model!.countContextTokens(text, route);
       const refusal = !classified.value.allowed;
+      const revised = revisionNumber(this.revision) >= 16;
       providerCallPending = true;
       const retrieved = await ports.retrieve();
       usage.push(retrieved.usage);
@@ -827,7 +985,7 @@ export class AgentPipeline {
         () => retrieved.examples(),
         tokens,
         language?.tag,
-        this.revision === PIPELINE_REVISION ? EVIDENCE_FLOOR : 0,
+        revisionNumber(this.revision) >= 15 ? EVIDENCE_FLOOR : 0,
       );
       const contextHash = contentHash({
         compiledHash: compiled.hash,
@@ -871,7 +1029,7 @@ export class AgentPipeline {
         if (blocked) continue;
         const sentence = proposal.sentence;
         input.signal.throwIfAborted();
-        const hard = hardBlock(
+        const hard = (revised ? guardBlock : hardBlock)(
           [...sentences.map((s) => s.text), sentence.text].join(" "),
           input.configuration,
           input.creatorName,
@@ -924,11 +1082,20 @@ export class AgentPipeline {
           sentence.citations.length > 0 ||
           verdict.value.requiresEvidence ||
           input.configuration.mode !== "companion";
+        // Revision 16 compares the guard's echo without its quote, dash and
+        // space variants; any other difference still fails the sentence.
+        const echo = (text: string) =>
+          revised ? quotesAndSpaces(text.normalize("NFKC")) : text;
         const grounded =
           this.revision === "w2-context-guardrails-12" ||
           (grounding !== null &&
-            grounding.map((segment) => segment.text).join("") ===
-              sentence.text &&
+            (revised
+              ? echo(grounding.map((segment) => segment.text).join("")).replace(
+                  / /gu,
+                  "",
+                ) === echo(sentence.text).replace(/ /gu, "")
+              : grounding.map((segment) => segment.text).join("") ===
+                sentence.text) &&
             grounding.every((segment) =>
               segment.kind === "non_factual"
                 ? segment.relation === "non_factual" &&
@@ -941,7 +1108,7 @@ export class AgentPipeline {
                       citations.some(
                         (passage) =>
                           passage?.id === support.passageId &&
-                          passage.text.includes(support.quote),
+                          echo(passage.text).includes(echo(support.quote)),
                       ),
                     )),
             ) &&
@@ -999,7 +1166,15 @@ export class AgentPipeline {
           contextHash,
         });
         const approved = {
-          text: fallback(input.configuration.mode, input.creatorName),
+          text: revised
+            ? revisedFallback(
+                input.configuration.mode,
+                input.creatorName,
+                classified.value.sensitive ||
+                  category === "dependency" ||
+                  DISTRESS.test(guardText(input.message)),
+              )
+            : fallback(input.configuration.mode, input.creatorName),
           citations: [],
         };
         await input.beforeSentence?.();
