@@ -238,7 +238,7 @@ export class SessionService implements PantopusIdentityAdapter {
     if (!row)
       throw new DomainError(
         "session_expired",
-        "Your session ended. Continue with Pantopus again.",
+        "Your session ended. Sign in again.",
         401,
       );
     const issuer = row.mode === "qelvora" ? this.qelvora : this.upstream;
@@ -279,7 +279,7 @@ export class SessionService implements PantopusIdentityAdapter {
         );
       throw new DomainError(
         "authorization_ended",
-        "Your authorization could not be confirmed. Continue with Pantopus again.",
+        "Your sign-in could not be confirmed. Sign in again.",
         401,
       );
     }

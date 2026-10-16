@@ -21,7 +21,7 @@ export class PasskeyService {
     invariant(
       Date.now() - authenticatedAt.getTime() < 300000,
       "fresh_identity_required",
-      "Continue with Pantopus again before changing passkeys.",
+      "Sign in again before changing passkeys.",
     );
   }
   private async enrollmentAllowed(client: PoolClient, actor: Actor) {
