@@ -1,8 +1,8 @@
 # Lane 4: Money status
 
-Updated: 2026-10-15 (evening, Pacific time), by the lane 4 session
+Updated: 2026-10-16 (early morning, Pacific time), by the lane 4 session
 
-Working on: nothing in flight. Everything is in the open pull requests below. **The next session starts at [`lane-4-handoff.md`](lane-4-handoff.md)**: WP 4.12, the environment to reuse, and the traps.
+Working on: WP 4.12. The backend field for "Ask for more information" is #467; the fan and Offers copy waits on the founder (decisions 6 and 7 in [`lane-4-decisions.md`](lane-4-decisions.md)). Next: the public summary stops listing a paused creator's offers, through lane 1's existing public creator check. A new session starts at [`lane-4-handoff.md`](lane-4-handoff.md).
 
 Open pull requests:
 
@@ -15,6 +15,7 @@ Open pull requests:
 | #450 | `lane-4/inbox-outage-fresh`        | `e4-3-inbox-outage` makes its own inbox login (the integrator's ticket)                                                                                                                                                     | —                                                                                       |
 | #459 | `lane-4/share-card-owners` (draft) | Lane 5's ticket: share cards. Commerce answers growth's `shareSource` (the fan's session) and `shareStatus` (no session, through one narrow definer function); proven through growth's real routes                          | **migration registration** and five regenerated catalogue pins; review by lanes 1 and 3 |
 | #453 | `lane-4/request-notices`           | Lane 5's ticket: request notices recorded in growth's notice table, handed to growth and withdrawn; one commitment reminder to the creator; proven end to end                                                               | production composition waits on the two authorities below                               |
+| #467 | `lane-4/more-info-question`        | WP 4.12: `decide` takes a separate `question` for `more_info`, so the Studio's reply draft never reaches the fan as a question; `text` alone still works for older clients (proposed default)                               | founder: keep or refuse the `text` fallback; lane 6: WP 6.6 sends `question`            |
 | #463 | `lane-4/settle-departure`          | Lane 1's ticket (G1): `settleDeparture`. A paused creator's requests not yet accepted are released (nothing charged), accepted ones keep their deadline; the pause case resolves; proven through lane 1's real ops decision | integrator: compose it in `server.ts` (P1 confirmed)                                    |
 
 Merged on main: #408, #410, #416, #418, #421, #423, #424, #427, #428, #429. #410's migration was registered through #442.
@@ -40,6 +41,8 @@ Blocked on:
 - **The founder:**
   - the five decisions in `lane-4-decisions.md`: refunds and the monthly limit; refunds and weekly slots; one signature for accept and send; never placing a hold for a request that is already ending; whether expired requests count toward "usually decides in";
   - Stripe test keys (WP 4.7);
+  - WP 4.12 copy: decision 6 (what the fan reads when Maya lets her AI answer, and "Answer by" while a question waits) and decision 7 (the refund rule on the Offers page);
+  - #467: keep accepting `text` alone as the question for older clients until WP 6.6 ships (built), or refuse it now;
   - Q16, what happens to a fan's money records and open requests when the fan deletes their account (retention and refunds). Lane 1's deletion work waits on it, and so does the privacy registration that request notices need in production (#453);
   - when the commitment reminder fires: proposed as the smaller of 24 hours and a quarter of the delivery window (#453);
 - **Lane 1 (W8):** a worker denial for commerce notices, so that a background publisher can check who may be told (#453).
@@ -66,7 +69,9 @@ Scenarios, all on the lane 4 stack with the fake processor. Run `node tests/scen
   - E4.8, except the refund counting rule;
   - E4.9, except refunds and slots, and including the public summary;
   - E4.10: lost answers, outages, a busy account and card declines;
-  - E4.12, including the guard and who can ask.
+  - E4.12, including the guard and who can ask;
+  - E4.2 "Ask for more information" (#467): a question in its own field, blank and too long refused, one pending at a time, a repeat key and a race, wrong people, two rounds of answers, then the accept (`e4-2-more-info`).
+- **Scenario data builds up.** Each scenario leaves its offer on offer. After about 20 runs on one stack, `e4-9-public-summary` cannot find its own offer, because the summary lists the 20 cheapest. Pause the leftovers or reset the stack; a fix (scenarios retire their offers) is planned.
 - **Waiting on a decision:** E4.8 after a refund (decision 1); E4.9, whether a refund frees a slot (decision 2).
 - **Not run:** E4.13 (needs the keys); E4.14 (needs lanes 1 and 7).
 
@@ -82,6 +87,8 @@ Findings (each fixed or reported in the pull requests above):
 - The Stripe SDK retries once with the same idempotency key on a connection reset, even with `maxNetworkRetries: 0`.
 - Team replies are unavailable on the development stack (`503 scope_denial_unconfigured`).
 - A new database function is executable by PUBLIC by default. That changes the usage-expiry catalogue pin and stops the backend from starting, so lane 4's migrations revoke it.
+- The Studio sent its reply draft as the question for "Ask for more information" (#467).
+- On the development stack another creator gets 503 `scope_denial_unavailable`, not 403, on every one of Maya's Studio routes, reads included; nothing moves (#467, ticket to lane 1).
 
 Ports and containers:
 
@@ -104,7 +111,8 @@ Tickets to other lanes:
 - **Lane 1:**
   - a W8 worker denial for commerce notices (`creator, fan, recipient`), in the pattern of the publication and media worker denials (#453);
   - the production work index needs `departureScopes(creatorId)` for `settleDeparture` (#463);
-  - a W8 public creator denial, so that the public summary (C8) stops listing a paused creator's offers;
+  - the public summary (C8) must stop listing a paused creator's offers. Lane 1's check already exists on main: `trustPublicCreatorDenial()` (`modules/trust/scope-restriction.ts`, migration 0086) answers `denied` while a `pause_creator` or `revoke_license` restriction is active. Lane 4 will use it from the public summary. Please confirm it is the authority for a creator's public commerce, and tell lane 4 before changing its meaning or signature;
+  - another creator gets 503 `scope_denial_unavailable` instead of 403 on Maya's Studio routes on the development stack (W8 interactive denial behind the Studio's `content.role` check, `trust/scope-restriction.ts:91`); nothing moves, but the answer reads as an outage (#467);
   - review #459's signature checks against `matchesThreadAct` (and #439), and add a W8 negative authority for public share cards;
   - an operations case or console list for money escalations (`refund_escalated` events, `resolution_required` commitments) (#421);
   - optionally, a distinct `signed_act_expired` code (C3).
@@ -114,4 +122,6 @@ Tickets to other lanes:
   - request notices now arrive as your stand-in described (#453). An entry for `commitment_due` in `growth/owners.ts` would let a signed-in creator get commerce's live answer. Without it, the recorded state is used, which works;
   - share cards work through your routes once #459 is composed. Finding: `growth.share` is unique on `(grant_id, source_version)`, so after a fan hides their handle no new card can be made for the same reply (409); decide whether that is intended.
 - **Lane 6 (Studio offers):** the mode command takes an optional `eligibility: [] | ["request"]`; leaving it out keeps the current value (#429).
+- **Lane 6 (WP 6.6, "Ask for more information"):** send `{ action: "more_info", question, version, idempotencyKey }` to `POST /v1/studio/{creatorId}/packets/{packetId}/decide`, and stop spreading the reply draft `text` into every decision (`features/studio/requests/PacketDetail.tsx:87`). Refusals: `question_required`, `question_pending`, `stale_request`, `decision_expired`, `authorization_expiring`, `idempotency_conflict` (403), and `invalid_request` (400, over 8,000 characters). While a second question waits, `fan_answer` is still the earlier answer. Full API in #467.
 - **Lane 7:** the `modeMembersOnly` copy is there if the phone apps show offers (#429).
+- **Lane 7:** once the founder approves decision 6, show the "Let AI answer" outcome (`declinedForAi`) and the decline line on the request screens; today both apps read "Hold released · nothing charged" for every released request (`CommerceFeature.swift`, `CommerceFeature.kt`, `outcome`).
