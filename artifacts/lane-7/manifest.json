@@ -118,5 +118,15 @@
     "path": "artifacts/lane-7/7-4-p3-run.txt",
     "sha256": "586c6c1b70f46e3b4f73efa81f4e8d864c61af8017200d03a6c3baa356e97b07",
     "bytes": 2433
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p6-sentence-pair.jpg",
+    "sha256": "6eb6f102bfd592de00040392ba848942807314722f6984458126a26b1b5d74e0",
+    "bytes": 110907
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p6-run.txt",
+    "sha256": "6aa1b8b70a66787936630429443216e89fa6d6610ff77a93e66335b9c936b47e",
+    "bytes": 1884
   }
 ]

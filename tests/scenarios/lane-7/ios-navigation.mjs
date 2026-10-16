@@ -13,6 +13,8 @@ const presence = ids[0] === "--presence";
 if (presence) ids.shift();
 const seal = ids[0] === "--seal";
 if (seal) ids.shift();
+const consent = ids[0] === "--consent";
+if (consent) ids.shift();
 const drafts = ids[0] === "--drafts";
 if (drafts) ids.shift();
 const draftStack = ids.length === 1 && ids[0] === "--draft-stack";
@@ -29,7 +31,9 @@ const suite = presence
         ? "Lane7StackNavigationFlow"
         : seal
           ? "Lane7SealFlows"
-          : "Lane7NavigationFlows";
+          : consent
+            ? "Lane7ConsentFlows"
+            : "Lane7NavigationFlows";
 const optInVariable = presence
   ? "LANE7_PRESENCE"
   : draftStack
@@ -40,7 +44,9 @@ const optInVariable = presence
         ? "LANE7_REAL_STACK"
         : seal
           ? "LANE7_SEAL"
-          : "LANE7_NAVIGATION";
+          : consent
+            ? "LANE7_CONSENT"
+            : "LANE7_NAVIGATION";
 const flows = presence
   ? {
       R1: "testR01NotesAndReactionsInPlace",
@@ -74,21 +80,29 @@ const flows = presence
               S2: "testS02LargestText",
               S3: "testS03EmojiLowercaseName",
             }
-          : {
-              N1: "testN01ThreadBackAndGesture",
-              N2: "testN02ConsentIsReplaced",
-              N5: "testN05AccountBack",
-              N6: "testN06NotificationTrailAndLabel",
-              N8: "testN08ColdLink",
-              N13: "testN13AccountChangeClearsTrail",
-              N14: "testN14UnknownLink",
-              N15: "testN15RepeatedLinkAndQuickBack",
-              N16: "testN16LinkWhilePrivacyIsOpen",
-              N17: "testN17TrailBoundary",
-              N19: "testN19NewFanBack",
-              N20: "testN20EditProfileBack",
-              N21: "testN21CreatorAccessBack",
-            };
+          : consent
+            ? {
+                C1: "testC01PromiseWhenProvidersKeepNothing",
+                C2: "testC02ProviderThatKeepsMessages",
+                C3: "testC03UnverifiedPolicy",
+                C4: "testC04TwoProviders",
+                C5: "testC05LargestTextNight",
+              }
+            : {
+                N1: "testN01ThreadBackAndGesture",
+                N2: "testN02ConsentIsReplaced",
+                N5: "testN05AccountBack",
+                N6: "testN06NotificationTrailAndLabel",
+                N8: "testN08ColdLink",
+                N13: "testN13AccountChangeClearsTrail",
+                N14: "testN14UnknownLink",
+                N15: "testN15RepeatedLinkAndQuickBack",
+                N16: "testN16LinkWhilePrivacyIsOpen",
+                N17: "testN17TrailBoundary",
+                N19: "testN19NewFanBack",
+                N20: "testN20EditProfileBack",
+                N21: "testN21CreatorAccessBack",
+              };
 if (!source || ids.some((id) => !flows[id]))
   throw new Error(
     "Pass a built .xctestrun and optional unfinished iOS flow IDs.",
@@ -189,7 +203,7 @@ try {
         `Expected ${expected} operated flows; observed ${summary.passedTests} passed, ${summary.skippedTests} skipped, ${summary.failedTests} failed.`,
       );
     console.log(
-      `PASS iOS: ${expected} operated ${presence ? "presence" : drafts ? "draft" : seal ? "seal" : "navigation"} flows, none skipped.`,
+      `PASS iOS: ${expected} operated ${presence ? "presence" : drafts ? "draft" : seal ? "seal" : consent ? "consent" : "navigation"} flows, none skipped.`,
     );
   }
 } finally {

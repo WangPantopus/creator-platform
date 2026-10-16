@@ -49,3 +49,12 @@ and repository gates. Expected skips and checks not run are named explicitly.
 
 `7-4-p3-run.txt` records the operated seal flows on both apps against the fake API (S3.1 to S3.3), the
 gates, and what was not run. Nothing here is the real backend.
+
+## WP 7.4 P6 (the provider sentence before the first message)
+
+| File                       | What it shows                                                                                                                                      |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `7-4-p6-sentence-pair.jpg` | Lena Park's first-conversation screen, iOS left, Android right: the fixed sentence, verbatim, because the one provider keeps and trains on nothing |
+
+`7-4-p6-run.txt` records the operated consent flows on both apps against the fake API (P6.1 to P6.5),
+the gates, and what was not run. Nothing here is the real backend.

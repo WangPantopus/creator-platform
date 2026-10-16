@@ -102,6 +102,7 @@ export function register(router) {
     flags: {
       generationAvailable: world.generationAvailable,
       policyVerified: world.policy.verified,
+      policyVersion: world.policy.version,
       replyDelayMs: world.replyDelayMs,
       sentenceDelayMs: world.sentenceDelayMs,
     },
@@ -183,6 +184,17 @@ export function register(router) {
       world.generationAvailable = body.generationAvailable;
     if (typeof body?.policyVerified === "boolean")
       world.policy.verified = body.policyVerified;
+    // WP 7.4 P6: the providers the consent screen names. A new list is a new
+    // policy version, so earlier consents no longer match it.
+    if (Array.isArray(body?.providers) && body.providers.length) {
+      world.policy.providers = body.providers.slice(0, 8).map((p) => ({
+        name: String(p.name),
+        termsUrl: String(p.termsUrl ?? "https://example.invalid/terms"),
+        noTraining: p.noTraining === true,
+        noRetention: p.noRetention === true,
+      }));
+      world.policy.version = "harness-providers-custom";
+    }
     if (Number.isFinite(body?.replyDelayMs))
       world.replyDelayMs = body.replyDelayMs;
     if (Number.isFinite(body?.sentenceDelayMs))

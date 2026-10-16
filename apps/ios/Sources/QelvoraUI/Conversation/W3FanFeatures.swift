@@ -367,13 +367,17 @@ private struct W3FirstConversation: View {
                         disclosureSection("WHO RUNS IT") {
                             if let policy = caps?.providers {
                                 if !policy.verified { Notice(title: QelvoraCopy.text("conversationDevelopmentPolicyTitle"), children: QelvoraCopy.text("conversationDevelopmentPolicyNotice")) }
-                                Text("This AI is powered by " + policy.providers.map(\.name).joined(separator: ", ") + ".").qText("body")
+                                // The fixed consent sentence is a promise: only for a verified policy whose
+                                // every provider keeps and trains on nothing. Otherwise each provider's own line.
+                                let promise = policy.verified && policy.providers.allSatisfy { $0.noTraining && $0.noRetention }
+                                let providers = policy.providers.map(\.name).joined(separator: ", ")
+                                Text(promise ? QelvoraCopy.text("processorConsent", values: ["name": creator?.name ?? "the creator", "providers": providers]) : "This AI is powered by " + providers + ".").qText("body")
                                 ForEach(policy.providers, id: \.name) { provider in
                                     if let url = URL(string: provider.termsUrl) {
                                         Link(provider.name + " processing terms", destination: url)
                                             .qText("body").frame(minHeight: 44, alignment: .leading)
                                     }
-                                    Text((provider.noTraining ? "Doesn't train on your messages." : "Review message use in these terms.") + " " + (provider.noRetention ? "Doesn't keep your messages." : "Review message retention in these terms.")).qText("caption")
+                                    if !promise { Text((provider.noTraining ? "Doesn't train on your messages." : "Review message use in these terms.") + " " + (provider.noRetention ? "Doesn't keep your messages." : "Review message retention in these terms.")).qText("caption") }
                                 }
                             } else { Text("AI providers and their verified processing terms are not configured yet.").qText("body") }
                         }

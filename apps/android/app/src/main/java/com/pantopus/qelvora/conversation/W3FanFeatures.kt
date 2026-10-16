@@ -829,11 +829,15 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                     BasicText("WHO RUNS IT", style = qText("data-sm").copy(color = qColor("ink-muted")))
                     val policy = capabilities?.providers
                     if (policy?.verified == false) Notice(title=QelvoraCopy.text("conversationDevelopmentPolicyTitle"),children=QelvoraCopy.text("conversationDevelopmentPolicyNotice"))
+                    // The fixed consent sentence is a promise: only for a verified policy whose
+                    // every provider keeps and trains on nothing. Otherwise each provider's own line.
+                    val promise = policy != null && policy.verified && policy.providers.all { it.noTraining && it.noRetention }
+                    val providers = policy?.providers?.joinToString(", ") { it.name }.orEmpty()
                     if (policy == null) BasicText("AI providers and their verified processing terms are not configured yet.", style = qText("body").copy(color = qColor("ink")))
-                    else BasicText("This AI is powered by ${policy.providers.joinToString(", ") { it.name }}.", style = qText("body").copy(color = qColor("ink")))
+                    else BasicText(if (promise) QelvoraCopy.text("processorConsent", mapOf("name" to name, "providers" to providers)) else "This AI is powered by $providers.", style = qText("body").copy(color = qColor("ink")))
                     policy?.providers?.forEach { provider ->
                         Button(provider.name + " processing terms", variant = ButtonVariant.QUIET) { uriHandler.openUri(provider.termsUrl) }
-                        BasicText((if (provider.noTraining) "Doesn't train on your messages." else "Review message use in these terms.") + " " + (if (provider.noRetention) "Doesn't keep your messages." else "Review message retention in these terms."), style = qText("caption").copy(color = qColor("ink")))
+                        if (!promise) BasicText((if (provider.noTraining) "Doesn't train on your messages." else "Review message use in these terms.") + " " + (if (provider.noRetention) "Doesn't keep your messages." else "Review message retention in these terms."), style = qText("caption").copy(color = qColor("ink")))
                     }
                 }
                 Hairline()
