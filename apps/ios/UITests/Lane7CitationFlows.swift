@@ -38,7 +38,7 @@ final class Lane7CitationFlows: XCTestCase {
         editor.tap(); editor.typeText(draft)
         // Slow drags reveal older rows and let the keyboard go. Fast swipes right
         // after typing can freeze this thread on iOS (see the P4 findings).
-        // The thread is a lazy stack: an off-screen row exists once scrolled to.
+        // Every row exists (a plain stack); the chip must be on screen to tap.
         for _ in 0..<20 where !(chip.exists && chip.isHittable) { dragOlder() }
         XCTAssertTrue(chip.isHittable, "a citation on screen")
     }
