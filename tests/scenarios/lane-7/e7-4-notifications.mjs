@@ -31,7 +31,7 @@ async function open(appearance = "light") {
 const descs = () => A.screen().map((n) => n.desc);
 /** Scrolls down with short drags until a row is on screen. */
 async function reveal(label) {
-  for (let i = 0; i < 10 && !descs().some((d) => d.includes(label)); i += 1) {
+  for (let i = 0; i < 30 && !descs().some((d) => d.includes(label)); i += 1) {
     A.swipe(540, 1500, 540, 1000, 600);
     await L.sleep(500);
   }
