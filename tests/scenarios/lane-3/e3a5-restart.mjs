@@ -4,7 +4,7 @@
 // answer, restarts the stack, and checks the state behind the screen: one AI
 // message for the fan's message, its sentences contiguous with no duplicate, an
 // honest terminal state, and the same idempotency key returning the same message.
-//   node tests/scenarios/lane-3/e3a5-restart.mjs --at admitted|guard|sentence [--stack "--provider anthropic ..."]
+//   node tests/scenarios/lane-3/e3a5-restart.mjs --at admitted|guard|sentence [--after-lapse] [--stack "--provider anthropic ..."]
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -212,5 +212,37 @@ step(
   left[0].n === 0,
   `${left[0].n} row(s)`,
 );
+if (process.argv.includes("--after-lapse")) {
+  // A6: once the crashed attempt's 5 minute hold has passed (fake clock, lane
+  // 3's own database), the creator's next reply is admitted, not locked.
+  await sql(
+    "UPDATE creator.ai_cost_hold SET expires_at=clock_timestamp()-interval '1 second' WHERE state='held'",
+  );
+  const next = await call(API, "POST", `${fan.thread}/messages`, {
+    token: fan.token,
+    body: {
+      idempotencyKey: key("e3a5-next"),
+      text: "After the crash: why does my glaze crawl?",
+      clientSequence: Date.now() % 1e6,
+    },
+  });
+  let row;
+  for (let w = 0; w < 120; w++) {
+    [row] = await sql(
+      "SELECT g.state FROM creator.generation g WHERE g.id=$1",
+      [next.json?.generationId],
+    );
+    if (row && !["queued", "generating"].includes(row.state)) break;
+    await sleep(1000);
+  }
+  const [estimate] = await sql(
+    "SELECT count(*)::int AS n FROM creator.ai_usage WHERE purpose='interrupted_hold_estimate'",
+  );
+  step(
+    "after the crashed attempt's hold lapses, the next reply is delivered and its cost is estimated",
+    next.status === 200 && row?.state === "delivered" && estimate.n === 1,
+    `send ${next.status}, ${row?.state}, ${estimate.n} estimate(s)`,
+  );
+}
 await closeDb();
 finish();

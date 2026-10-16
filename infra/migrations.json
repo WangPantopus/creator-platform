@@ -728,6 +728,27 @@
       "owner": "W7",
       "sourceSha256": "c4aedad199f7c68537ba7eb27a7d99ef2fa44a6f44b892261316c6a59caec9ca",
       "wave": "20261015-notices"
+    },
+    {
+      "version": "0249_w1_qelvora_sign_in",
+      "path": "apps/backend/src/modules/identity/pending-qelvora-sign-in.sql",
+      "owner": "W1",
+      "sourceSha256": "c96e26ceeb6ef6085520a5aec6d63da33d90872490c86e0ecec926841b6ef765",
+      "wave": "20261015-sign-in-and-money"
+    },
+    {
+      "version": "0250_w4_capture_guard",
+      "path": "apps/backend/src/modules/commerce/schema-capture-guard.sql",
+      "owner": "W4",
+      "sourceSha256": "593d7f65bccf848bb6bcb126f0f5087ca918babd655153128d60b4585965db19",
+      "wave": "20261015-sign-in-and-money"
+    },
+    {
+      "version": "0251_w2_interrupted_cost_estimate",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_interrupted_cost_estimate.sql",
+      "owner": "W2",
+      "sourceSha256": "3bfbe8e7b7646729f5b2662115ec9198d1c4f0103bff63f9ca08fc765d590b69",
+      "wave": "20261015-sign-in-and-money"
     }
   ],
   "reserved": [
@@ -1288,6 +1309,36 @@
       "state": "registered",
       "registeredVersion": "0248_w7_notice_snapshot",
       "reason": "Lane 5 proposal (pull request #385), registered by the integrator on 2026-10-15 after review of the exact source against a fresh database: the purpose-role reach it adds is the one the file grants. Apply only through the 20261015-notices wave; registration is not runtime activation."
+    },
+    {
+      "id": "0249",
+      "version": "0249_w1_qelvora_sign_in",
+      "owner": "W1",
+      "path": "apps/backend/src/modules/identity/pending-qelvora-sign-in.sql",
+      "sourceSha256": "c96e26ceeb6ef6085520a5aec6d63da33d90872490c86e0ecec926841b6ef765",
+      "state": "registered",
+      "registeredVersion": "0249_w1_qelvora_sign_in",
+      "reason": "Lane 1 proposal (pull request #431), registered by the integrator on 2026-10-15 at the founder's request after review of the exact source against a fresh and an independently restored database: the purpose-role reach it adds is the one the file grants. Apply only through the 20261015-sign-in-and-money wave; registration is not runtime activation."
+    },
+    {
+      "id": "0250",
+      "version": "0250_w4_capture_guard",
+      "owner": "W4",
+      "path": "apps/backend/src/modules/commerce/schema-capture-guard.sql",
+      "sourceSha256": "593d7f65bccf848bb6bcb126f0f5087ca918babd655153128d60b4585965db19",
+      "state": "registered",
+      "registeredVersion": "0250_w4_capture_guard",
+      "reason": "Lane 4 proposal (pull request #410), registered by the integrator on 2026-10-15 at the founder's request after review of the exact source against a fresh and an independently restored database: the purpose-role reach it adds is the one the file grants. Apply only through the 20261015-sign-in-and-money wave; registration is not runtime activation."
+    },
+    {
+      "id": "0251",
+      "version": "0251_w2_interrupted_cost_estimate",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_interrupted_cost_estimate.sql",
+      "sourceSha256": "3bfbe8e7b7646729f5b2662115ec9198d1c4f0103bff63f9ca08fc765d590b69",
+      "state": "registered",
+      "registeredVersion": "0251_w2_interrupted_cost_estimate",
+      "reason": "Lane 3 proposal (pull request #433), registered by the integrator on 2026-10-15 at the founder's request after review of the exact source against a fresh and an independently restored database: the purpose-role reach it adds is the one the file grants. Apply only through the 20261015-sign-in-and-money wave; registration is not runtime activation."
     }
   ]
 }

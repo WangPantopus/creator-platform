@@ -64,6 +64,7 @@ const IMMUTABLE: readonly RegExp[] = [
   /^conversationCursorDefinitions\..+$/u,
   /^comparison\.privacy\.definitionSha256$/u,
   /^baselineWave\.sha256$/u,
+  /^generationDefinitions\..+\.definitionChecksum$/u,
 ];
 
 export const outputTables = (generationOutputSource: string) => {
