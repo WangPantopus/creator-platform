@@ -68,6 +68,8 @@
   <string name="draft_notice" formatted="false">{name} may answer with her AI\'s draft; you\'ll see that label.</string>
   <string name="capacity" formatted="false">{name} answers {mode} within {deadline} · {n} of {cap} left this week.</string>
   <string name="mode_members_only" formatted="false">For members whose tier includes requests</string>
+  <string name="offer_delivery_heading" formatted="false">Delivery</string>
+  <string name="offer_delivery_rule" formatted="false">Within {deadline} of accepting, or a full refund</string>
   <string name="audit_access" formatted="false">Opening this conversation is logged and visible to the fan.</string>
   <string name="long_session" formatted="false">You\'ve been talking with {name}\'s AI for a while. It\'s an AI, and it will be here when you\'re back.</string>
   <string name="note_audience" formatted="false">{name} · to {audience}</string>
@@ -101,6 +103,9 @@
   <string name="access_changes" formatted="false">Changes: {changes}</string>
   <string name="source_unavailable" formatted="false">No longer accessible to you</string>
   <string name="declined" formatted="false">{name} passed on this one · nothing charged</string>
+  <string name="declined_for_ai" formatted="false">{name} suggests asking {name}\'s AI · nothing charged</string>
+  <string name="ask_ai_instead" formatted="false">Ask {name}\'s AI</string>
+  <string name="more_info_answer_by" formatted="false">Answer by</string>
   <string name="expired" formatted="false">{name}\'s queue didn\'t get to this · nothing charged</string>
   <string name="payment_failed" formatted="false">Payment didn\'t go through · nothing was shared</string>
   <string name="deadline_missed" formatted="false">Refunded automatically · {name} may still reply</string>
