@@ -16,11 +16,10 @@ Android fix keeping the thread at its bottom) →
 Android) → this status update. The spec with every piece's rules and results:
 [lane-7-rendering-parity.md](lane-7-rendering-parity.md).
 
-- Waiting on founder decisions (proposals in the spec): P2 the unread word; P3 the composer states
-  (design reference or the web screen); P5 the picker words; P8 the 3-hour reminder rule; P9 the
-  `chargeRule` sentence says "she" for every creator; P11 removing the comparison placeholder; P7
-  whether the under-18 screen keeps Crisis help; the seal letter for a name that starts with an
-  emoji (built as its first letter, "F").
+- Founder decisions 2026-10-16: P2 "Unread"; P3 composer states follow the design reference; P11
+  remove the comparison placeholder; the under-18 screen keeps nothing else (no Crisis help); the
+  seal shows "F" for "🌿 fern studio". Proposed and waiting for confirmation: P5 picker words, P8
+  the reminder rule, P9 the charge wording (all in the spec).
 - Waiting on others: P10 the share-card contract and a domain; chip titles for P4 (lane 3).
 - **Found, not fixed: an intermittent iOS freeze** in a long thread at normal text size when the
   person types and then swipes fast while Notes are still being placed (2 of about 13 attempts

@@ -7,19 +7,30 @@ carries an iOS and an Android result.
 WP 7.4 has twelve pieces. Each piece is its own pull request, in the order below. A piece that
 waits on a contract or a founder decision says so, keeps today's behavior and moves on.
 
-| Piece | Rule set                                       | Source                                                                            | State                                                                                                           |
-| ----- | ---------------------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| P1    | Notes and reactions in the thread              | C4 (lane 5), `GET /v1/content/{creatorId}/presence`                               | #452 (and its Android bottom fix)                                                                               |
-| P2    | Notification rows: glyph, color, time, unread  | `GET /v1/growth/notifications` (C4 notices, lane 5)                               | Next                                                                                                            |
-| P3    | Step-in seal and the composer states           | Conversation page (`control`, `canSend`, `unavailableReason`)                     | Seal: #457. Composer states: a founder decision (below); trial, ended, capacity: no contract (ticket to lane 3) |
-| P4    | Citations                                      | Message `citations` (ids) and the creator's posts                                 | Built: `lane-7/citation-refusal` (an Android fix); chip titles need lane 3                                      |
-| P5    | Named pickers instead of raw ids               | `GET /v1/conversations/account` (`threads[].name`)                                | Needs picker copy approved (proposed below)                                                                     |
-| P6    | Explicit provider consent                      | Capabilities `providers`, `POST .../consent`                                      | #460                                                                                                            |
-| P7    | 18+ confirmation                               | C1 (lane 1) age screen and `adult_eligibility_required`                           | #462 (the refusal); the age step itself: WP 7.5 (C1)                                                            |
-| P8    | The 3-hour reminder                            | No server signal; client rule proposed                                            | Needs a founder decision on the rule                                                                            |
-| P9    | Packet terms block and ETA line                | `chargeRule`, `pendingHold`, `decisionEta`; lane 4's public summary `reliability` | Copy decision: `chargeRule` says "she" for every creator; ETA waits on lane 4; Q04 keeps payment on the web     |
-| P10   | Share sheet for the card                       | Lane 5 share card (needs lanes 1, 3, 4)                                           | Waits on the share-card contract                                                                                |
-| P11   | Remove "AI comparisons are not available yet." | Comparison stays installed and off (2026-10-08)                                   | Copy change: founder approval                                                                                   |
+| Piece | Rule set                                       | Source                                                                            | State                                                                                                               |
+| ----- | ---------------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| P1    | Notes and reactions in the thread              | C4 (lane 5), `GET /v1/content/{creatorId}/presence`                               | #452 (and its Android bottom fix)                                                                                   |
+| P2    | Notification rows: glyph, color, time, unread  | `GET /v1/growth/notifications` (C4 notices, lane 5)                               | Decided: "Unread"; to build                                                                                         |
+| P3    | Step-in seal and the composer states           | Conversation page (`control`, `canSend`, `unavailableReason`)                     | Seal: #457. Composer states: decided (the design); to build. Trial, ended, capacity: no contract (ticket to lane 3) |
+| P4    | Citations                                      | Message `citations` (ids) and the creator's posts                                 | Built: `lane-7/citation-refusal` (an Android fix); chip titles need lane 3                                          |
+| P5    | Named pickers instead of raw ids               | `GET /v1/conversations/account` (`threads[].name`)                                | Picker words proposed (below), waiting for confirmation                                                             |
+| P6    | Explicit provider consent                      | Capabilities `providers`, `POST .../consent`                                      | #460                                                                                                                |
+| P7    | 18+ confirmation                               | C1 (lane 1) age screen and `adult_eligibility_required`                           | #462 (the refusal); the age step itself: WP 7.5 (C1)                                                                |
+| P8    | The 3-hour reminder                            | No server signal; client rule proposed                                            | Rule proposed (below), waiting for confirmation                                                                     |
+| P9    | Packet terms block and ETA line                | `chargeRule`, `pendingHold`, `decisionEta`; lane 4's public summary `reliability` | Wording proposed (below), waiting for confirmation; ETA waits on lane 4; Q04 keeps payment on the web               |
+| P10   | Share sheet for the card                       | Lane 5 share card (needs lanes 1, 3, 4)                                           | Waits on the share-card contract                                                                                    |
+| P11   | Remove "AI comparisons are not available yet." | Comparison stays installed and off (2026-10-08)                                   | Decided: remove; to build                                                                                           |
+
+## Founder decisions (2026-10-16)
+
+| Piece              | Decision                                                                                                          |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| P2                 | The screen-reader word for an unread notification is "Unread" (new key `growthUnread`)                            |
+| P3 composer states | Follow the design reference, not the web conversation screen (rules under P3 below); ticket to lane 3 for the web |
+| P3 seal            | A name that starts with an emoji or a symbol shows its first letter ("F" for "🌿 fern studio"), as built          |
+| P7                 | The under-18 screen offers nothing else, Crisis help included, as built                                           |
+| P11                | Remove "AI comparisons are not available yet."                                                                    |
+| P5, P8, P9         | Proposals below, waiting for the founder's confirmation                                                           |
 
 ## P1: Notes and reactions in the thread (C4)
 
@@ -336,8 +347,8 @@ said here, so nothing is built around a missing contract.
 `preview`, `readAt`, `createdAt`, `available`). Each row shows the authorship glyph for
 `authorKind` (the same table as messages; `system` has none), the server's `sender` verbatim in
 that authorship's color, the preview, the time, and an unread mark (a dot and a stronger weight).
-The screen reader hears sender, then preview, then time, then the unread state. An unread word for
-screen readers is new copy: proposed key `growthUnread` = "Unread" (founder approval needed).
+The screen reader hears sender, then preview, then time, then "Unread" (new key `growthUnread`,
+approved 2026-10-16); a read row says nothing more.
 The fake's Note and reaction notices follow C4 (sender from `noteAudience`, destination
 `/creators/{handle}/chat`, the generic preview for a reaction).
 
@@ -347,15 +358,19 @@ creator-colored input with `replyToCreator`. Trial, ended and capacity have no s
 page carries only `canSend` and a free-text `unavailableReason`); the apps keep the server's
 sentence and do not guess. Ticket to lane 3: a structured composer state on the conversation page.
 
-Founder decision needed before the composer states are built: the design reference
-(`packages/ui-web`, `Composer`) and the web conversation screen (lane 3, `ConversationScreen.tsx`)
-disagree, and the apps today match the web screen. The reference: while the creator is in the
-thread, a creator-colored input "Reply to {name}" (`replyToCreator`) and no step-in button; while
-the AI is paused, the paused line with its glyph and the step-in button in place of the input. The
-web screen and the apps: "Message {name}…", a notice with the server's sentence, the input, and
-the step-in button in every state (the web titles the notice "AI paused" when the AI is paused; the
-apps say "AI unavailable"). Proposed: follow the reference, keep the server's sentence as the
-paused line's detail, and ticket lane 3 to do the same on the web.
+Decided 2026-10-16: follow the design reference (`packages/ui-web`, `Composer`), not the web
+conversation screen.
+
+- While the creator is in the thread (`human_active`): the input is creator-colored, labelled and
+  hinted "Reply to {name}" (`replyToCreator`); Send carries the seal; there is no step-in button,
+  because the creator is already here.
+- While the AI is paused (`ai_paused`): in place of the input, the paused line with the pause
+  glyph, "{name}'s AI is paused · requests still work" (`aiPaused`; the page carries no return
+  date, so not `aiPausedBack`), and the step-in button. No "AI unavailable" notice.
+- While the AI is on (`ai_active`): unchanged ("Message {name}'s AI", the step-in button).
+- Trial, ended, capacity: unchanged until lane 3 gives the page a structured state.
+
+Ticket to lane 3: the web conversation screen to follow the same reference.
 
 **P4 Citations.** Surveyed and fixed: see P4 above.
 
@@ -365,11 +380,17 @@ paused line's detail, and ticket lane 3 to do the same on the web.
 `creatorId` (for example Report from a thread) shows that creator's name, not the id. No contract
 change.
 
-Not built yet: a picker needs words that the copy system does not have, in safety flows. Proposed
-(founder approval needed): the field label "Creator" or "Conversation" (today "Creator ID" and
-"Conversation ID"); the prompt "Choose a conversation"; with none, "You have no conversations yet.";
-when the list cannot load, "Your conversations could not load." with a "Try again" button. A report,
-block or deletion never picks a creator by default: nothing is sent until the person chooses one.
+Proposed words, waiting for the founder's confirmation (none exist in the copy system):
+
+- Field label: "Creator" (report, abuse, block) or "Conversation" (deleting one conversation),
+  where today it says "Creator ID" and "Conversation ID".
+- Before a choice: "Choose a creator" or "Choose a conversation". Nothing is chosen by default and
+  nothing is sent until the person chooses.
+- Each choice: the creator's name as the server gives it.
+- With no conversations: "You have no conversations yet."
+- When the list cannot load: "Your conversations couldn't load." with a "Try again" button.
+- Opened from a thread or a message (Report): that creator's name, already chosen.
+
 The web support form asks for typed references too: ticket to lane 1 (`apps/web/app/support`).
 
 **P6 Provider consent.** Built: see P6 above.
@@ -377,24 +398,41 @@ The web support form asks for typed references too: ticket to lane 1 (`apps/web/
 **P7 18+ confirmation.** The refusal is built: see P7 above. The age step itself is the release
 sign-in (C1, WP 7.5).
 
-**P8 The 3-hour reminder.** No server signal exists. Proposed: after three hours of continuous use
-of an AI thread in the foreground (a gap of 15 minutes or more resets it), the thread shows the
-`longSession` line once as a system line, then again after every further three hours. Founder
-decision needed (compliance wording is fixed; the counting rule is not).
+**P8 The 3-hour reminder.** No server signal exists. Proposed rule, waiting for the founder's
+confirmation:
+
+- The count is time spent in AI conversations on this phone, in the foreground, across creators:
+  moving from one creator's AI to another keeps counting.
+- A break of 15 minutes or more (the app in the background, another part of the app, the screen
+  off) starts the count again.
+- At 3 hours, the AI conversation open at that moment shows the fixed line once, as a system line
+  in the thread: "You've been talking with {name}'s AI for a while. It's an AI, and it will be
+  here when you're back." (`longSession`), naming that conversation's creator. It blocks nothing.
+- It shows again after each further 3 hours of the same count.
+- Time while the creator is in the thread (not the AI) does not count.
+- The count lives on the phone only, so another device keeps its own; a count across devices
+  would need a server field (lane 3).
 
 **P9 Packet terms and ETA.** The in-app packet shows the terms block: "Charged only when {name}
 accepts. …" (`chargeRule`) and `pendingHold`, as the web packet does. The ETA line ("{name} usually
 decides in {range}") appears only when lane 4's public summary gives a non-empty `reliability`;
 until the decision record lands it is empty and the apps show nothing (never an invented range).
-Payment stays on the web (Q04). Copy decision needed first: the fixed `chargeRule`
-sentence says "If she declines …" for every creator, whatever their pronouns (Kiln Club and
-Glazeco are not "she"); the web avoids it by showing only "Charged only when {name} accepts." Proposed: "If
-{name} declines or {deadline} pass, nothing is charged."
+Payment stays on the web (Q04).
+
+A copy change comes first (proposed, waiting for the founder's confirmation). Two fixed phrases
+say "she" for every creator, whatever their pronouns: `chargeRule` ("Charged only when {name}
+accepts. If she declines or {deadline} pass, nothing is charged.") and `ifDeclines` ("If she
+declines or {deadline} pass", the packet's price row). `{deadline}` is a duration such as "48 h".
+Proposed: "Charged only when {name} accepts. If {name} declines or {deadline} pass, nothing is
+charged." and "If {name} declines or {deadline} pass" (for example: "Charged only when Kiln Club
+accepts. If Kiln Club declines or 48 h pass, nothing is charged."). Both phrases live in the shared
+copy package and the brief, not in lane 7's files: once confirmed, the copy owner changes them
+(ticket to the integrator), then the apps build the terms block.
 
 **P10 Share sheet for the card.** Waits on the share-card contract (lane 5, with lanes 1, 3 and 4)
 and on a public domain for the verification link (WP 7.6). Not built in WP 7.4.
 
 **P11 The comparison placeholder.** "AI comparisons are not available yet." is removed. When
 comparisons turn off while the choice is open, the choice closes and nothing is said; the button
-is already hidden while comparisons are off (2026-10-08 decision). A copy removal: founder
-approval needed before it ships.
+is already hidden while comparisons are off (2026-10-08 decision). Approved by the founder
+2026-10-16.
