@@ -143,5 +143,15 @@
     "path": "artifacts/lane-7/7-4-p7-run.txt",
     "sha256": "c4243282b4af41a5b426559025c2cd145c7d54d1c09587e3aef091a35e8f1af0",
     "bytes": 1876
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p4-refused-pair.jpg",
+    "sha256": "e3c634cc0db5e353b83e5b2bd8df24dcb0f02594669388e535062925d20179ba",
+    "bytes": 84101
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p4-run.txt",
+    "sha256": "77cd51e2bc0be46f349151bf0f2e533153f186802c9bab7cfe21a8edf9747d99",
+    "bytes": 2237
   }
 ]

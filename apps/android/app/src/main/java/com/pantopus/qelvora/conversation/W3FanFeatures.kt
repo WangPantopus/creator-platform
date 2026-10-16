@@ -32,6 +32,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
@@ -130,6 +131,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         catch (failure: Exception) { if (failure is CancellationException) throw failure }
     }
     var source by remember(root, accountId) { mutableStateOf<Pair<String,String>?>(null) }
+    var sourceFailure by remember(root, accountId) { mutableStateOf("") }
     val lifecycleOwner = LocalLifecycleOwner.current
     var foreground by remember { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
     var offlineContext by remember(baseURL, root, accountId, session.session?.sessionId) { mutableStateOf<Long?>(null) }
@@ -240,6 +242,13 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             offlineShowing = false; offlineContext?.let { ConversationOfflineStorage.purge(it) }; offlineContext = null; page = null; older = emptyList(); before = null; presence = emptyList(); presenceRead++; draft = ""; pending = null; gate = null; source = null; privacy = false; transportReady = false; scope.launch { runCatching { resumeStorage.remove(accountId, storageScope) } }
         }
         else scope.launch { showOffline() }
+    }
+    // A source or an original reply that cannot be read is said in a dialog, as on
+    // iOS. The thread stays: a refused passage (403 citation_unavailable) is not a
+    // refused thread, and the thread's own reads decide access.
+    fun sourceUnavailable(failure: Throwable) {
+        if (failure is CancellationException) throw failure
+        sourceFailure = "No longer accessible to you"
     }
     suspend fun refresh(propagateFailure: Boolean = false) {
         val run = viewRun
@@ -375,6 +384,13 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             }
         }
     }
+    if (sourceFailure.isNotEmpty()) Dialog(onDismissRequest = { sourceFailure = "" }) {
+        Column(Modifier.background(qColor("ground")).padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            BasicText("Source unavailable", style = qText("display-md").copy(color = qColor("ink")), modifier = Modifier.semantics { heading() })
+            BasicText(sourceFailure, style = qText("body").copy(color = qColor("ink")))
+            Button("Close", variant = ButtonVariant.QUIET) { sourceFailure = "" }
+        }
+    }
     source?.let { passage -> Dialog(onDismissRequest = { source = null }) {
         Column(Modifier.background(qColor("ground")).padding(16.dp)) {
             BasicText("Original source", style = qText("data-sm").copy(color = qColor("ink")))
@@ -481,7 +497,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 items(timeline, key = { it.key }) { row ->
                     if (row is ThreadRow.Presence) PresenceRow(row.item) { session.open("/verify/$it") }
                     else { val message = (row as ThreadRow.Message).message
-                    if (message.recording == null) ConversationMessageRow(message, current.creatorName, current.control, creatorId = current.creatorId, onLink = { session.open(it) }, connected = !offline && foreground, original = (older + current.messages).firstOrNull { it.id == message.correction?.originalMessageId && it.version == message.correction.originalVersion && it.authorKind == APIMessageAuthorKind.AI }, onOriginal = { message.correction?.let { correction -> scope.launch { try { val original = client.json.decodeFromJsonElement<ConversationMessage>(client.request("$root/messages/${correction.originalMessageId}")); if (original.id != correction.originalMessageId || original.version != correction.originalVersion || original.authorKind != APIMessageAuthorKind.AI) throw ConversationFailure(409, "The original reply changed."); source = "Original AI reply · version ${original.version}" to original.text } catch (failure: Throwable) { fail(failure) } } } }, onVerify = { message.signedActId?.let { session.open("/verify/$it") } }, onReport = { session.open("/support?creatorId=$creatorId" + if (message.authorKind == APIMessageAuthorKind.AI) "&messageId=${message.id}" else "") }, onForget = if (busy || offline) null else { { scope.launch { busy=true;try { client.request("$root/messages/${message.id}/dont-remember",buildJsonObject { put("expectedRevision",current.revision) });refresh() } catch(failure:Throwable) { fail(failure) } finally {busy=false} } } }, onCitation = { id -> scope.launch { try { val passage = client.request("$root/citations/$id").jsonObject; source = passage["title"]?.jsonPrimitive?.content.orEmpty() to passage["text"]?.jsonPrimitive?.content.orEmpty() } catch (failure: Throwable) { fail(failure) } } })
+                    if (message.recording == null) ConversationMessageRow(message, current.creatorName, current.control, creatorId = current.creatorId, onLink = { session.open(it) }, connected = !offline && foreground, original = (older + current.messages).firstOrNull { it.id == message.correction?.originalMessageId && it.version == message.correction.originalVersion && it.authorKind == APIMessageAuthorKind.AI }, onOriginal = { message.correction?.let { correction -> scope.launch { try { val original = client.json.decodeFromJsonElement<ConversationMessage>(client.request("$root/messages/${correction.originalMessageId}")); if (original.id != correction.originalMessageId || original.version != correction.originalVersion || original.authorKind != APIMessageAuthorKind.AI) sourceFailure = "The original reply changed." else source = "Original AI reply · version ${original.version}" to original.text } catch (failure: Throwable) { sourceUnavailable(failure) } } } }, onVerify = { message.signedActId?.let { session.open("/verify/$it") } }, onReport = { session.open("/support?creatorId=$creatorId" + if (message.authorKind == APIMessageAuthorKind.AI) "&messageId=${message.id}" else "") }, onForget = if (busy || offline) null else { { scope.launch { busy=true;try { client.request("$root/messages/${message.id}/dont-remember",buildJsonObject { put("expectedRevision",current.revision) });refresh() } catch(failure:Throwable) { fail(failure) } finally {busy=false} } } }, onCitation = { id -> scope.launch { try { val passage = client.request("$root/citations/$id").jsonObject; source = passage["title"]?.jsonPrimitive?.content.orEmpty() to passage["text"]?.jsonPrimitive?.content.orEmpty() } catch (failure: Throwable) { sourceUnavailable(failure) } } })
                     if (comparisonsAvailable && message.authorKind == APIMessageAuthorKind.FAN && !message.offTheRecord && !current.offTheRecord && message.deliveryState in listOf(APIMessageDeliveryState.ACCEPTED, APIMessageDeliveryState.DELIVERED)) {
                         Button("AI comparison options", variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground, modifier = Modifier.testTag("comparison-options-${message.id}")) { comparisonQuestion = message }
                     }

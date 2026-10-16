@@ -68,3 +68,12 @@ the gates, and what was not run. Nothing here is the real backend.
 
 `7-4-p7-run.txt` records the survey, the operated flows on both apps against the fake API (P7.1 to
 P7.3), the gates, and what was not run. Nothing here is the real backend.
+
+## WP 7.4 P4 (citations)
+
+| File                      | What it shows                                                                                                                                       |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `7-4-p4-refused-pair.jpg` | A refused passage, iOS left, Android right (after the fix): "Source unavailable · No longer accessible to you" over the intact thread and its draft |
+
+`7-4-p4-run.txt` records the survey, the Android defect before and after, the operated flows on both
+apps against the fake API (P4.1 to P4.3), the iOS freeze found on the way, and what was not run.
