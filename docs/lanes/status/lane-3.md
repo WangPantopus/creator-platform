@@ -3,7 +3,7 @@
 Updated: 2026-10-16, by the lane 3 session
 Working on: nothing unblocked is left. Last done: the merge wave (#433 to #495 land together, at the founder's request)
 Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442); through the merge wave: #433 (status), A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451 (SQL proposal), finding 8 #455, finding 9 #456 (status only), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482, A5 #489, B5 #490 (SQL proposal), B5 web #491, finding 18 #492 (SQL proposal), finding 5 #494, finding 6 #495
-Next: B8 (the `CreatorAI.tsx` split, now unblocked: #441 and #446 are in); B6 waits on the provider key and the embedding choice; the real-model halves (B4, B1, finding 13) when the gateway is up; finding 7
+Next: B8 (the `CreatorAI.tsx` split, now unblocked: #441 and #446 are in); B6 waits on the provider key and the embedding choice; the real-model halves (B4, B1, finding 13) when the gateway is up
 Blocked on: nothing. Later: the integrator registers the three SQL proposals (#451, #490, #492: inactive until then); the embedding choice (B6); the real model (gateway)
 
 ## Resume here (2026-10-16, after the merge wave)
@@ -65,7 +65,7 @@ scripted edge): generate, typecheck, lint, format and every test suite pass; hol
 $5 cap (largest spend 0.39% of its hold); A6c disconnect 8 of 8 through a refusal; E3A.1 2 fans x 5:
 10 of 10 delivered, acknowledgment p50 216 ms, no socket closes; E3A.9 finding 6 pass; E3A.4 takeover
 ends the answer 2.7 to 3.1 s after the change (finding 8), with the known uncertain cost at the stream
-timing (finding 7, open, same on main); A5 7 of 7; E3B.4 as on its branch (4 of 6 follow-ups, the two
+timing (finding 7: by design since A6b, see the finding); A5 7 of 7; E3B.4 as on its branch (4 of 6 follow-ups, the two
 recorded misses); E3B.1 all pass; E3B.3 all pass. Not run on the combined tree: E3B.5 and its web half
 (they need the B5 writer registered), E3A.5 and E3A.3 (unchanged paths), the real model.
 
@@ -527,9 +527,13 @@ SHARE` on the thread row, which waits for the generation transaction writing tha
    retried the refusal; the settlement did not, so a refused completion waited for lease recovery and
    ended a fully streamed answer interrupted about 64 s later. Fixed by #495
    (no migration; see "Finding 6" above).
-7. Any authority change while the model is streaming (takeover, pause, consent withdrawal, licence
-   lapse, block, AI pause, sign-out) leaves a provider-cost row with no cost (the aborted stream),
-   which then locks the creator's AI for every fan (finding 3). Same on main and A3. A6.
+7. (Resolved by A6b, 0251 through #442.) Any authority change while the model is streaming
+   (takeover, pause, consent withdrawal, licence lapse, block, AI pause, sign-out) leaves the aborted
+   reply call with no cost. It used to lock the creator's AI for every fan (finding 3); since 0251 an
+   unknown cost inside an answer counts as that answer's whole cost hold, so the creator keeps
+   answering. E3A.4 now flags only an unknown cost outside an answer (the one kind that still locks;
+   A6c gives the acknowledgment's checks an estimate) and runs all 12 cases on one stack: 12 of 12,
+   4 interrupted calls counted at their hold, none outside an answer (2026-10-16, on the merge wave).
 8. (Fixed on `lane-3/f8-reconcile-own-answer`, no migration.) An authority change right after the
    worker claims an answer, or while the reply streams, left it "generating" until its 60 s lease
    expired and recovery finished it (main: the answer ended 59 to 64 s after the change). W8 denies
@@ -667,7 +671,7 @@ passing, on top of the existing boundary cases (all must pass). A first version 
 | E3A.2 ★              | Pass on A3: identical visible text, authorship, citations and order for every answer main also delivered                                                                                                                                                                                                                                                                                                                                                                                                                     | `a1-measure.mjs --compare`                                                            |
 | E3A.1/E3A.2 A4       | Paired: first sentence p50 8.17 to 6.88 s, statements 2,646 to 2,011, transactions 23.5 to 19.6; visible output identical                                                                                                                                                                                                                                                                                                                                                                                                    | `a1-measure.mjs --compare`                                                            |
 | E3A.3                | A2: claims 429 ms after accept (main 963 ms); the wakeup session killed before a send: answered (claimed in 404 ms) and the session returns; the backend killed with work accepted but unclaimed: answered once after the restart; burst of 30: 25 answered once, same as main; two workers: 2 of 10, none twice (main 1 of 10; finding 15)                                                                                                                                                                                  | `e3a3-wake.mjs`                                                                       |
-| E3A.4 ★              | A3: no AI sentence after any change in 27 runs (7 kinds of change, up to 4 timings). Takeover within 500 ms fails at some timings (finding 10, also on main). Deletion not run (finding 11)                                                                                                                                                                                                                                                                                                                                  | `e3a4-authority.mjs`, one case per fresh stack                                        |
+| E3A.4 ★              | A3: no AI sentence after any change in 27 runs (7 kinds of change, up to 4 timings). On the merge wave: takeover, pause, consent and lapse at 0, 200 ms and mid-stream, 12 of 12 on one stack, each answer ended 2.0 to 7.7 s after the change (finding 8); an interrupted call counts at its hold (finding 7). Takeover within 500 ms fails at some timings on main (finding 10). Deletion not run (finding 11)                                                                                                             | `e3a4-authority.mjs`                                                                  |
 | E3A.5 ★              | A3: kill after admission passes; kill during the guard call leaves an uncertain cost (finding 7); kill after the first sentence never finishes (finding 9). Same on main                                                                                                                                                                                                                                                                                                                                                     | `e3a5-restart.mjs --at admitted\|guard\|sentence`                                     |
 | E3A.6 ★              | Distressed message gets the safe response first: pass. Hard-block half not run (needs the real model)                                                                                                                                                                                                                                                                                                                                                                                                                        | `e3a6-safety.mjs`                                                                     |
 | E3A.7 workspace lock | Main: 3 and 4 of 9 answers while Studio reads every 150 ms (9 workspace refusals); with the pending migration 9 of 9 in three runs, no refusals, no deadlocks, E3A.2 identical. Two workers: 2 of 10 on main, 1 or 2 with the migration (finding 15)                                                                                                                                                                                                                                                                         | `e3a7-workspace-lock.mjs`                                                             |
