@@ -58,7 +58,7 @@ struct W3Memory: Decodable, Identifiable, Sendable {
 }
 struct W3MemoryView: Decodable, Sendable { let revision: Int; let offTheRecord: Bool; let introShared: Bool; let items: [W3Memory] }
 struct W3Audit: Decodable, Identifiable, Sendable { let id: String; let readerAccountId: String; let role: String; let readAt: String }
-struct W3Failure: Error, Sendable { let message: String; let status: Int }
+struct W3Failure: Error, Sendable { let message: String; let status: Int; var code: String? = nil }
 private struct W3ErrorEnvelope: Decodable { struct Failure: Decodable { let message: String; let code: String? }; let error: Failure }
 struct W3Status: Decodable, Sendable { let accepted: Bool }
 struct W3StatusQuery: Encodable { let idempotencyKey: String }
@@ -172,7 +172,7 @@ actor W3ConversationClient {
         guard let response = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
         guard (200..<300).contains(response.statusCode) else {
             let error = try? JSONDecoder().decode(W3ErrorEnvelope.self, from: data).error
-            throw W3Failure(message: error?.message ?? "Reconnect to refresh. Your input is kept.", status: error?.code == "session_account_changed" ? 401 : response.statusCode)
+            throw W3Failure(message: error?.message ?? "Reconnect to refresh. Your input is kept.", status: error?.code == "session_account_changed" ? 401 : response.statusCode, code: error?.code)
         }
         return data
     }

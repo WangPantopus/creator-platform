@@ -34,6 +34,7 @@ const {
   ConversationUsageSchema,
   AuditEntrySchema,
   ProviderPolicySchema,
+  ComparisonConsentStateSchema,
 } = await api("conversation/contracts.ts");
 const { ThreadPresencePage } = await api("content.ts");
 const growth = await import(
@@ -308,6 +309,23 @@ check(
   AuditEntrySchema.array(),
   (await call("GET", `${richRoot}/audit`, { token: live })).json,
 );
+// AI comparisons: refused while off (the default), a consent state once on.
+check(
+  "comparison refused while off",
+  ErrorSchema,
+  (await call("GET", `${richRoot}/comparison-consent`, { token: live })).json,
+);
+await call("POST", "/__harness/flags", {
+  body: { comparisonsAvailable: true },
+});
+check(
+  "comparison consent",
+  ComparisonConsentStateSchema,
+  (await call("GET", `${richRoot}/comparison-consent`, { token: live })).json,
+);
+await call("POST", "/__harness/flags", {
+  body: { comparisonsAvailable: false },
+});
 const memory = (await call("GET", `${richRoot}/memory`, { token: live })).json;
 check(
   "memory",

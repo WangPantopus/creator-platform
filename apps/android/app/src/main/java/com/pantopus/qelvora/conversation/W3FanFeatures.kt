@@ -378,7 +378,8 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 BasicText("AI comparisons", style = qText("display-lg").copy(color = qColor("ink")))
                 LazyColumn(Modifier.weight(1f, fill = false), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     item { BasicText("Your question", style = qText("data-sm").copy(color = qColor("ink"))); BasicText(question.text, style = qText("body").copy(color = qColor("ink"))) }
-                    item { ConversationComparisonChoice(client, root, question.id) }
+                    // Comparisons turned off while the choice was open: it closes, nothing is said.
+                    item { ConversationComparisonChoice(client, root, question.id) { comparisonQuestion = null; comparisonsAvailable = false } }
                 }
                 Button("Close", variant = ButtonVariant.QUIET) { comparisonQuestion = null }
             }
@@ -658,6 +659,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     var audit by remember(client, root) { mutableStateOf<List<ConversationAudit>?>(null) }
     var usage by remember(client, root) { mutableStateOf<ConversationUsage?>(null) }
     var policy by remember(client, root) { mutableStateOf<ConversationCapabilities?>(null) }; var page by remember(client, root) { mutableStateOf<ConversationPage?>(null) }
+    var comparisonsOff by remember(client, root) { mutableStateOf(false) }
     val name = page?.creatorName ?: "this creator"
     val uriHandler = LocalUriHandler.current
     var error by remember(client, root) { mutableStateOf("") }; var busy by remember(client, root) { mutableStateOf(false) }
@@ -667,7 +669,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     val lifecycleOwner = LocalLifecycleOwner.current
     var foreground by remember(lifecycleOwner) { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
     val scope = rememberCoroutineScope()
-    fun conceal() { revision += 1; memory = null; audit = null; policy = null; page = null; usage = null; provenance = null; busy = false }
+    fun conceal() { revision += 1; memory = null; audit = null; policy = null; page = null; usage = null; provenance = null; busy = false; comparisonsOff = false }
     fun current(ticket: Int) = revision == ticket && foreground
     fun failed(failure: Throwable, fallback: String) {
         if (failure is CancellationException) throw failure
@@ -754,7 +756,8 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             if (policy?.providers == null) BasicText("AI provider consent is unavailable or has been withdrawn.", style = qText("body").copy(color = qColor("ink")))
             Button(if(page?.consentCurrent == true) "Withdraw AI provider consent" else "Agree to these AI providers", variant = ButtonVariant.SECONDARY, disabled = busy || (page?.consentCurrent != true && policy?.consentAvailable != true)) { scope.launch { consent() } }
         }
-        item { BasicText("AI comparisons", style = qText("display-md").copy(color = qColor("ink"))); ConversationComparisonChoice(client, root) }
+        // While comparisons are off (2026-10-08) the section is absent, with no placeholder.
+        if (policy?.comparisonsAvailable == true && !comparisonsOff) item { BasicText("AI comparisons", style = qText("display-md").copy(color = qColor("ink"))); ConversationComparisonChoice(client, root) { comparisonsOff = true } }
         item { BasicText("Time with this creator's AI",style=qText("display-md").copy(color = qColor("ink"))); if (usage == null) BasicText(if (error.isEmpty()) "Loading time history…" else "Time history unavailable.", style = qText("body").copy(color = qColor("ink"))); usage?.let { time -> BasicText(time.measurement + " Days are shown in UTC.",style=qText("caption").copy(color = qColor("ink")));BasicText("This week · ${time.days.sumOf { it.seconds }.toInt()/60} minutes",style=qText("body").copy(color = qColor("ink")));time.days.forEach { day -> BasicText("${day.day} · ${day.seconds.toInt()/60} minutes",style=qText("body").copy(color = qColor("ink"))) };if(!time.modeAvailable) BasicText("Companion mode time signals await the verified AI mode configuration.",style=qText("caption").copy(color = qColor("ink"))) } }
         item { BasicText("Who opened your conversations", style = qText("display-md").copy(color = qColor("ink"))); if (audit == null) BasicText(if (error.isEmpty()) "Loading opening history…" else "Opening history unavailable.", style = qText("body").copy(color = qColor("ink"))) else if (audit?.isEmpty() == true) BasicText("No logged openings.", style = qText("body").copy(color = qColor("ink"))) }
         items(audit.orEmpty(), key = { it.id }) { entry -> BasicText((if (entry.role == "creator") "$name's account" else if (entry.role == "ops") "Authorized safety account" else "Authorized team · ${entry.role}") + "\nAccount " + entry.readerAccountId + "\n" + entry.readAt, style = qText("body").copy(color = qColor("ink"))) }

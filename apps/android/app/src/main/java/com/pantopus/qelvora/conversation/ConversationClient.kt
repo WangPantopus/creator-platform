@@ -66,7 +66,7 @@ fun ConversationMessage.authorLabel(name: String): String = if (correction != nu
 @Serializable data class ConversationAudit(val id: String, val readerAccountId: String, val role: String, val readAt: String)
 @Serializable data class ConversationUsage(val timezone: String, val days: List<ConversationUsageDay>, val modeAvailable: Boolean, val measurement: String)
 @Serializable data class ConversationUsageDay(val day: String, val seconds: Double, val companionSeconds: Double)
-class ConversationFailure(val status: Int, override val message: String) : Exception(message)
+class ConversationFailure(val status: Int, override val message: String, val code: String? = null) : Exception(message)
 /** C4: a Note or a reaction drawn into this fan's thread at read time. It is
  * never a thread message: no sequence, no control epoch (INV-03 untouched).
  * The server builds `authorLabel`; the app shows it verbatim. */
@@ -147,7 +147,7 @@ class ConversationClient(private val baseURL: String, private val token: () -> S
             val value = runCatching { json.parseToJsonElement(text) }.getOrNull()
             if (status !in 200..299) {
                 val error = value?.jsonObject?.get("error")?.jsonObject
-                throw ConversationFailure(if (error?.get("code")?.jsonPrimitive?.content == "session_account_changed") 401 else status, error?.get("message")?.jsonPrimitive?.content ?: "This conversation is unavailable. Your input is kept.")
+                throw ConversationFailure(if (error?.get("code")?.jsonPrimitive?.content == "session_account_changed") 401 else status, error?.get("message")?.jsonPrimitive?.content ?: "This conversation is unavailable. Your input is kept.", error?.get("code")?.jsonPrimitive?.content)
             }
             value ?: throw ConversationFailure(503, "Reconnect to refresh this conversation.")
         } catch (failure: IOException) {

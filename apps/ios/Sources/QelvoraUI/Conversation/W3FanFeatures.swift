@@ -202,7 +202,8 @@ private struct W3ThreadScreen: View {
                     HStack { Text("AI comparisons").qText("display-lg"); Spacer(); Button("Close", variant: .quiet) { comparisonQuestion = nil } }
                     Text("Your question").qText("data-sm")
                     Text(question.text).qText("body").padding(12).background(qColor("surface-sunken", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusLg))
-                    W3ComparisonChoice(client: model.client, root: model.root, messageId: question.id)
+                    // Comparisons turned off while the choice was open: it closes, nothing is said.
+                    W3ComparisonChoice(client: model.client, root: model.root, messageId: question.id) { comparisonQuestion = nil; comparisonsAvailable = false }
                 }.padding(16) }.foregroundStyle(qColor("ink", scheme)).background(qColor("ground", scheme)).presentationDragIndicator(.visible)
             }
             .sheet(isPresented: $privacy) { W3PrivacyScreen(client: model.client, root: model.root, session: session, onBack: { privacy = false }) }
@@ -511,6 +512,7 @@ private struct W3PrivacyScreen: View {
     var onBack: (() -> Void)? = nil
     @State private var memory: W3MemoryView?; @State private var audit: [W3Audit]?; @State private var caps: W3Capabilities?; @State private var page: W3Page?
     @State private var usage: W3Usage?
+    @State private var comparisonsOff = false
     @State private var failure = ""; @State private var busy = false; @State private var editing: String?; @State private var text = ""
     @State private var provenance: W3Message?
     @State private var revision = 0
@@ -552,8 +554,11 @@ private struct W3PrivacyScreen: View {
                 ForEach(usage.days, id: \.day) { day in HStack { Text(day.day).qText("data-sm"); Spacer(); Text("\(Int(day.seconds / 60)) minutes").qText("body") } }
                 if !usage.modeAvailable { Text("Companion mode time signals await the verified AI mode configuration.").qText("caption") }
             }
-            Text("AI comparisons").qText("display-md")
-            W3ComparisonChoice(client: client, root: root)
+            // While comparisons are off (2026-10-08) the section is absent, with no placeholder.
+            if caps?.comparisonsAvailable == true && !comparisonsOff {
+                Text("AI comparisons").qText("display-md")
+                W3ComparisonChoice(client: client, root: root) { comparisonsOff = true }
+            }
             Text("AI providers").qText("display-md")
             if caps?.providers?.verified == false { Notice(title: QelvoraCopy.text("conversationDevelopmentPolicyTitle"), children: QelvoraCopy.text("conversationDevelopmentPolicyNotice")) }
             if caps?.providers == nil { Text("AI provider consent is unavailable or has been withdrawn.").qText("body") }
@@ -569,7 +574,7 @@ private struct W3PrivacyScreen: View {
             .sheet(item: $provenance) { message in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Where this came from").qText("title"); Text(message.authorLabel(name:name)).qText("label"); Text(message.text).qText("body").textSelection(.enabled); Text(message.createdAt).qText("data-sm") }.padding(16) } }
     }
     private func conceal() {
-        revision += 1; memory = nil; audit = nil; caps = nil; page = nil; usage = nil; provenance = nil; busy = false
+        revision += 1; memory = nil; audit = nil; caps = nil; page = nil; usage = nil; provenance = nil; busy = false; comparisonsOff = false
     }
     private func current(_ ticket: Int) -> Bool { revision == ticket && scenePhase == .active && !Task.isCancelled }
     private func refresh() async {

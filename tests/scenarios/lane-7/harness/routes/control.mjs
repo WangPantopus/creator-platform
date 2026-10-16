@@ -101,6 +101,7 @@ export function register(router) {
     clockOffsetSeconds: Math.round(world.clockOffsetMs / 1000),
     flags: {
       generationAvailable: world.generationAvailable,
+      comparisonsAvailable: world.comparisonsAvailable,
       policyVerified: world.policy.verified,
       policyVersion: world.policy.version,
       replyDelayMs: world.replyDelayMs,
@@ -182,6 +183,9 @@ export function register(router) {
   router.add("POST", "/__harness/flags", ({ world, body }) => {
     if (typeof body?.generationAvailable === "boolean")
       world.generationAvailable = body.generationAvailable;
+    // WP 7.4 P11: comparisons on, or off again while a choice is open.
+    if (typeof body?.comparisonsAvailable === "boolean")
+      world.comparisonsAvailable = body.comparisonsAvailable;
     if (typeof body?.policyVerified === "boolean")
       world.policy.verified = body.policyVerified;
     // WP 7.4 P6: the providers the consent screen names. A new list is a new

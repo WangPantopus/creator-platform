@@ -257,6 +257,7 @@ export function createWorld({ now = () => Date.now() } = {}) {
     replyDelayMs: 500,
     sentenceDelayMs: 450,
     generationAvailable: true,
+    comparisonsAvailable: false,
     policy: structuredClone(POLICY),
   };
   seed(world);
@@ -282,6 +283,8 @@ export function seed(world) {
   world.devices = [];
   world.faults = [];
   world.generationAvailable = true;
+  // Comparisons stay installed and off (2026-10-08); a scenario turns them on.
+  world.comparisonsAvailable = false;
   world.policy = structuredClone(POLICY);
   world.clockOffsetMs = 0;
   for (const c of CREATORS) {

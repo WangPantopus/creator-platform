@@ -19,6 +19,8 @@ const adults = ids[0] === "--adults";
 if (adults) ids.shift();
 const citations = ids[0] === "--citations";
 if (citations) ids.shift();
+const comparison = ids[0] === "--comparison";
+if (comparison) ids.shift();
 const drafts = ids[0] === "--drafts";
 if (drafts) ids.shift();
 const draftStack = ids.length === 1 && ids[0] === "--draft-stack";
@@ -41,7 +43,9 @@ const suite = presence
               ? "Lane7AdultFlows"
               : citations
                 ? "Lane7CitationFlows"
-                : "Lane7NavigationFlows";
+                : comparison
+                  ? "Lane7ComparisonFlows"
+                  : "Lane7NavigationFlows";
 const optInVariable = presence
   ? "LANE7_PRESENCE"
   : draftStack
@@ -58,7 +62,9 @@ const optInVariable = presence
               ? "LANE7_ADULTS"
               : citations
                 ? "LANE7_CITATIONS"
-                : "LANE7_NAVIGATION";
+                : comparison
+                  ? "LANE7_COMPARISON"
+                  : "LANE7_NAVIGATION";
 const flows = presence
   ? {
       R1: "testR01NotesAndReactionsInPlace",
@@ -112,21 +118,28 @@ const flows = presence
                     P2: "testP02RefusedPassage",
                     P3: "testP03MissingPassage",
                   }
-                : {
-                    N1: "testN01ThreadBackAndGesture",
-                    N2: "testN02ConsentIsReplaced",
-                    N5: "testN05AccountBack",
-                    N6: "testN06NotificationTrailAndLabel",
-                    N8: "testN08ColdLink",
-                    N13: "testN13AccountChangeClearsTrail",
-                    N14: "testN14UnknownLink",
-                    N15: "testN15RepeatedLinkAndQuickBack",
-                    N16: "testN16LinkWhilePrivacyIsOpen",
-                    N17: "testN17TrailBoundary",
-                    N19: "testN19NewFanBack",
-                    N20: "testN20EditProfileBack",
-                    N21: "testN21CreatorAccessBack",
-                  };
+                : comparison
+                  ? {
+                      K1: "testK01OffSaysNothing",
+                      K2: "testK02QuestionChoiceClosesWhenTurnedOff",
+                      K3: "testK03PrivacySectionLeavesOnRefusal",
+                      K4: "testK04PrivacyRefreshAfterBackground",
+                    }
+                  : {
+                      N1: "testN01ThreadBackAndGesture",
+                      N2: "testN02ConsentIsReplaced",
+                      N5: "testN05AccountBack",
+                      N6: "testN06NotificationTrailAndLabel",
+                      N8: "testN08ColdLink",
+                      N13: "testN13AccountChangeClearsTrail",
+                      N14: "testN14UnknownLink",
+                      N15: "testN15RepeatedLinkAndQuickBack",
+                      N16: "testN16LinkWhilePrivacyIsOpen",
+                      N17: "testN17TrailBoundary",
+                      N19: "testN19NewFanBack",
+                      N20: "testN20EditProfileBack",
+                      N21: "testN21CreatorAccessBack",
+                    };
 if (!source || ids.some((id) => !flows[id]))
   throw new Error(
     "Pass a built .xctestrun and optional unfinished iOS flow IDs.",
