@@ -137,6 +137,8 @@ export function Studio({
       stream.current = controller;
       const current = ++generation.current;
       const started = performance.now();
+      // A focus or "online" event while this stream opens does not restart it.
+      lastFrame.current = started;
       if (!renewal) {
         setLoading(true);
         setError("");
@@ -306,7 +308,8 @@ export function Studio({
     };
   }, [connect]);
   useEffect(() => {
-    // Focus and a restored page reconnect only when the lease has lapsed.
+    // Focus and "online" reconnect only when nothing arrived for 5 seconds
+    // (nor did a stream open); a page restored from the back cache always does.
     const onFocus = () => {
       if (performance.now() >= lastFrame.current + 5000) connect();
     };
