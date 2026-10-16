@@ -2,8 +2,8 @@
 
 Updated: 2026-10-16, by the lane 3 session
 Working on: B5 (memory proposals), PR #490. Last done: A5 (safety check after acknowledgment), #489
-Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482, A5 #489, B5 #490, B5 web #491, finding 18 #492
-Next: finding 5; B8 after #441 and #446 merge; B6 waits on the provider key and the embedding choice
+Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482, A5 #489, B5 #490, B5 web #491, finding 18 #492, finding 5 #494
+Next: finding 6 (the worker waits for the thread row, migration proposal); B8 after #441 and #446 merge; B6 waits on the provider key and the embedding choice
 Blocked on: nothing. Later: the embedding choice (B6), the real model for B1's model check and finding 13 (gateway)
 
 ## Resume here (2026-10-16, B4)
@@ -434,10 +434,14 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
 4. The reply path refuses messages over 2,000 characters with `403 message_invalid`
    (`modules/agent/runtime.ts:282`), while the API schema allows 10,000. A 4xx other than 403 and a
    matching schema limit would be clearer. B9.
-5. The realtime gateway closed the fan's socket with 1013 about every 8 to 10 s during replies
-   (2-second authority deadline); a client must reconnect from its cursor. A7. 2026-10-16: not
-   the replay's share lock on the thread row (replaying without it: closes 6 to 5, worker thread-lock
-   errors 10 to 12 over 20 answers); cause still open, the experiment is an unpushed local branch.
+5. The realtime gateway closed the fan's socket with 1013 about every 8 to 10 s during replies; a client
+   must reconnect from its cursor (and the web refetches the page twice per reconnect). Cause, found
+   2026-10-16: every frame batch revalidates authority in `withThread` (`db/database.ts`) under `FOR
+SHARE` on the thread row, which waits for the generation transaction writing that thread (1.1 to
+   2.5 s per slow batch, all of it in the replay), past the gateway's 2 s deadline. Fixed by #494:
+   the deadline is the 5 s scope window (two paired runs, 2 fans x 10 messages: closes 5 and 3 to 0,
+   delivered 18 and 19 to 20 of 20). The same share lock is what the worker's `NOWAIT` on the thread
+   row hits (finding 6).
 6. The worker's `FOR UPDATE NOWAIT` on the thread row collides with the API's thread reads
    ("could not obtain lock on row in relation thread", several per run). A6.
 7. Any authority change while the model is streaming (takeover, pause, consent withdrawal, licence
