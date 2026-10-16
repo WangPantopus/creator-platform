@@ -23,6 +23,17 @@ export function chunkText(text: string) {
     start: number;
     end: number;
   }[] = [];
+  // Never cut between the two halves of an emoji or other astral character:
+  // a lone half is stored as U+FFFD and the chunk no longer equals its span.
+  const whole = (at: number) =>
+    at > 0 &&
+    at < text.length &&
+    text.charCodeAt(at) >= 0xdc00 &&
+    text.charCodeAt(at) <= 0xdfff &&
+    text.charCodeAt(at - 1) >= 0xd800 &&
+    text.charCodeAt(at - 1) <= 0xdbff
+      ? at - 1
+      : at;
   for (let start = 0; start < text.length; ) {
     let end = Math.min(start + 1600, text.length);
     if (end < text.length) {
@@ -32,6 +43,7 @@ export function chunkText(text: string) {
         text.lastIndexOf(" ", end),
       );
       if (breakAt > start + 1200) end = breakAt + 1;
+      end = whole(end);
     }
     chunks.push({
       id: randomUUID(),
@@ -41,7 +53,7 @@ export function chunkText(text: string) {
       end,
     });
     if (end === text.length) break;
-    start = end - 200;
+    start = whole(end - 200);
   }
   if (chunks.length > 200)
     throw new DomainError(
