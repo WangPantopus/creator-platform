@@ -470,6 +470,14 @@ private struct W3FirstConversation: View {
             struct Page: Decodable { let creator: GrowthCreator }
             do { let page: Page = try await GrowthClient(baseURL: baseURL, token: { nil }).request("public/creators/" + handle); creator = page.creator }
             catch { failure = "This creator or the conversation service is unavailable." }
+            // Someone who already talks with this creator's AI goes straight to that
+            // conversation: a Note or reaction notice, and "Message {name}'s AI", link
+            // here. A link with a post's context keeps this screen, which carries it.
+            if let creator, !contextPending, session.session?.accountId == accountId,
+               let fanId = await existingThread(creator.id), session.destination == destination {
+                session.replace("/threads/" + creator.id + "/" + fanId)
+                return
+            }
             do { caps = try await W3ConversationClient(baseURL: baseURL).request("capabilities", publicRead: true) }
             catch { failure = "This creator or the conversation service is unavailable." }
         }.task(id: session.destination + "|" + (session.session?.sessionId ?? "") + "|" + String(scenePhase == .active)) {
@@ -512,6 +520,20 @@ private struct W3FirstConversation: View {
             Text(title).qText("data-sm").foregroundStyle(qColor("ink-muted", scheme))
             content()
         }.frame(maxWidth: .infinity, alignment: .leading).padding(16)
+    }
+    /// The fan's conversation with this creator, if any (every page of the account's threads).
+    private func existingThread(_ creatorId: String) async -> String? {
+        struct Thread: Decodable, Sendable { let creatorId: String; let fanId: String }
+        struct Account: Decodable, Sendable { let threads: [Thread]; let nextCursor: String? }
+        let client = W3ConversationClient(baseURL: baseURL, expectedAccountId: accountId)
+        var cursor: String?
+        for _ in 0..<20 {
+            guard let page: Account = try? await client.request("account" + (cursor.map { "?cursor=" + $0 } ?? "")) else { return nil }
+            if let match = page.threads.first(where: { $0.creatorId == creatorId }) { return match.fanId }
+            cursor = page.nextCursor
+            if cursor == nil { return nil }
+        }
+        return nil
     }
     private func begin() async {
         guard !busy, !contextPending, scenePhase == .active,
