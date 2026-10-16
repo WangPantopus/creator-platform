@@ -144,7 +144,11 @@ export function Studio({
         setError("");
       }
       let first = true,
+        answered = false,
         ended: LiveFrame | null = null;
+      // As the old role check gave up after 4 seconds, a first answer slower
+      // than the lease counts as unavailable, and Studio retries.
+      const slow = setTimeout(() => controller.abort(), 5000);
       // The Studio picker has no creator, so no screen read either.
       const query = new URLSearchParams(creatorId ? watched : "");
       if (creatorId) query.set("creator", creatorId);
@@ -186,6 +190,8 @@ export function Studio({
             ended = frame;
             return;
           }
+          answered = true;
+          clearTimeout(slow);
           lastFrame.current = performance.now();
           // A frame delayed past its own lease cannot restore Studio.
           if (performance.now() >= started + frame.t + 5000) return;
@@ -244,9 +250,18 @@ export function Studio({
         controller.signal,
       ).then(
         () => {
+          clearTimeout(slow);
           if (current !== generation.current) return;
           const end = ended as LiveFrame | null;
-          if (end?.end === "renew") connect(true);
+          if (!answered && !end)
+            refused(
+              new StudioFailure(
+                503,
+                "offline",
+                "Reconnect to continue. Your input is kept; nothing is replayed automatically.",
+              ),
+            );
+          else if (end?.end === "renew") connect(true);
           else if (end?.error)
             refused(
               new StudioFailure(
@@ -262,6 +277,7 @@ export function Studio({
           }
         },
         (failure: unknown) => {
+          clearTimeout(slow);
           if (current === generation.current) refused(failure);
         },
       );
