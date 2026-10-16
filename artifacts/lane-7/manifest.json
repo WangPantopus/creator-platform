@@ -153,5 +153,10 @@
     "path": "artifacts/lane-7/7-4-p4-run.txt",
     "sha256": "77cd51e2bc0be46f349151bf0f2e533153f186802c9bab7cfe21a8edf9747d99",
     "bytes": 2237
+  },
+  {
+    "path": "artifacts/lane-7/7-4-freeze-run.txt",
+    "sha256": "d5b1802a671de56964cac970498fcb9859b567711fbdd711ae3474f7afda63cd",
+    "bytes": 2828
   }
 ]
