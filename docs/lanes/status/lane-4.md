@@ -2,7 +2,7 @@
 
 Updated: 2026-10-16 (early morning, Pacific time), by the lane 4 session
 
-Working on: WP 4.12. The backend field for "Ask for more information" is #467; the fan and Offers copy waits on the founder (decisions 6 and 7 in [`lane-4-decisions.md`](lane-4-decisions.md)). The public summary stops listing a paused creator's offers in #469. Next: scenarios retire the offers they make. A new session starts at [`lane-4-handoff.md`](lane-4-handoff.md).
+Working on: WP 4.12. The backend field for "Ask for more information" is #467; the fan and Offers copy waits on the founder (decisions 6 and 7 in [`lane-4-decisions.md`](lane-4-decisions.md)). The public summary stops listing a paused creator's offers in #469, and scenarios retire the offers they make in #470. Everything else waits on a decision or another lane (below). A new session starts at [`lane-4-handoff.md`](lane-4-handoff.md).
 
 Open pull requests:
 
@@ -17,6 +17,7 @@ Open pull requests:
 | #453 | `lane-4/request-notices`           | Lane 5's ticket: request notices recorded in growth's notice table, handed to growth and withdrawn; one commitment reminder to the creator; proven end to end                                                                     | production composition waits on the two authorities below                               |
 | #467 | `lane-4/more-info-question`        | WP 4.12: `decide` takes a separate `question` for `more_info`, so the Studio's reply draft never reaches the fan as a question; `text` alone still works for older clients (proposed default)                                     | founder: keep or refuse the `text` fallback; lane 6: WP 6.6 sends `question`            |
 | #469 | `lane-4/summary-paused-creator`    | WP 4.9: the public summary asks lane 1's public creator check first; a paused, suspended or revoked creator reads like an unknown one (404), 503 when the check cannot answer; `run.mjs` runs Maya-pausing scenarios only by name | integrator: pass the restoration-gated check in production                              |
+| #470 | `lane-4/scenario-offers-retire`    | Scenarios: each scenario takes the offers it made off offer when it ends, so leftovers no longer pile up past the 20 the summary lists                                                                                            | —                                                                                       |
 | #463 | `lane-4/settle-departure`          | Lane 1's ticket (G1): `settleDeparture`. A paused creator's requests not yet accepted are released (nothing charged), accepted ones keep their deadline; the pause case resolves; proven through lane 1's real ops decision       | integrator: compose it in `server.ts` (P1 confirmed)                                    |
 
 Merged on main: #408, #410, #416, #418, #421, #423, #424, #427, #428, #429. #410's migration was registered through #442.
@@ -73,7 +74,7 @@ Scenarios, all on the lane 4 stack with the fake processor. Run `node tests/scen
   - E4.12, including the guard and who can ask;
   - E4.9 when ops pauses a creator (#469): the public summary hides her offers, reads like an unknown creator, answers 503 when lane 1's check cannot answer, and shows her offers again once the pause is lifted; a fan who blocked her reads her as unavailable (`e4-9-paused-creator`, run by its full name, then reset the stack);
   - E4.2 "Ask for more information" (#467): a question in its own field, blank and too long refused, one pending at a time, a repeat key and a race, wrong people, two rounds of answers, then the accept (`e4-2-more-info`).
-- **Scenario data builds up.** Each scenario leaves its offer on offer. After about 20 runs on one stack, `e4-9-public-summary` cannot find its own offer, because the summary lists the 20 cheapest. Pause the leftovers or reset the stack; a fix (scenarios retire their offers) is planned.
+- **Scenario data no longer builds up** once #470 lands: each scenario retires the offers it made. Before that, after about 20 runs on one stack `e4-9-public-summary` cannot find its own offer (the summary lists the 20 cheapest); pause the leftovers or reset the stack.
 - **Waiting on a decision:** E4.8 after a refund (decision 1); E4.9, whether a refund frees a slot (decision 2).
 - **Not run:** E4.13 (needs the keys); E4.14 (needs lanes 1 and 7).
 
