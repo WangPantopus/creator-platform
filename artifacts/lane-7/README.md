@@ -83,3 +83,19 @@ apps against the fake API (P4.1 to P4.3), the iOS freeze found on the way, and w
 `7-4-freeze-run.txt` records the freeze's signature in samples (with the first fix, and on
 `lane-7/status-7-4`), the presence, draft, seal, citation and E7.1 flows on the final build, the
 gates, and what was not run. Fake API; nothing here is the real backend.
+
+## WP 7.4 P11, P3, P2, P5, P8, P9 and the chat link (2026-10-16, evening)
+
+Pairs show iOS left, Android right; each `*-run.txt` records that piece's flows on both apps
+against the fake API, the gates, and what was not run. Nothing here is the real backend.
+
+| File                       | What it shows                                                                                 |
+| -------------------------- | --------------------------------------------------------------------------------------------- |
+| `7-4-p3-paused-pair.jpg`   | P3: Glazeco's AI paused: the paused line in place of the input, the step-in button, no notice |
+| `7-4-p2-rows-pair.jpg`     | P2: Devon's notifications: authorship tiles, senders in their colors, times, unread dots      |
+| `7-4-p5-chosen-pair.jpg`   | P5: Block with "Kiln Club" chosen by name, no typed id                                        |
+| `7-4-p8-reminder-pair.jpg` | P8: the 3-hour line in Maya's thread (durations shortened), centered on both apps             |
+| `7-4-p9-terms-pair.jpg`    | P9: Maya's written reply: "If Maya declines or 48 h pass"                                     |
+
+Run logs: `7-4-p11-run.txt`, `7-4-p3-composer-run.txt`, `7-4-chat-link-run.txt`, `7-4-p2-run.txt`,
+`7-4-p5-run.txt`, `7-4-p8-run.txt`, `7-4-p9-run.txt`.

@@ -7,19 +7,19 @@ carries an iOS and an Android result.
 WP 7.4 has twelve pieces. Each piece is its own pull request, in the order below. A piece that
 waits on a contract or a founder decision says so, keeps today's behavior and moves on.
 
-| Piece | Rule set                                       | Source                                                                            | State                                                                                                               |
-| ----- | ---------------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| P1    | Notes and reactions in the thread              | C4 (lane 5), `GET /v1/content/{creatorId}/presence`                               | #452 (and its Android bottom fix)                                                                                   |
-| P2    | Notification rows: glyph, color, time, unread  | `GET /v1/growth/notifications` (C4 notices, lane 5)                               | Decided: "Unread"; to build                                                                                         |
-| P3    | Step-in seal and the composer states           | Conversation page (`control`, `canSend`, `unavailableReason`)                     | Seal: #457. Composer states: decided (the design); to build. Trial, ended, capacity: no contract (ticket to lane 3) |
-| P4    | Citations                                      | Message `citations` (ids) and the creator's posts                                 | Built: `lane-7/citation-refusal` (an Android fix); chip titles need lane 3                                          |
-| P5    | Named pickers instead of raw ids               | `GET /v1/conversations/account` (`threads[].name`)                                | Decided (words approved); to build                                                                                  |
-| P6    | Explicit provider consent                      | Capabilities `providers`, `POST .../consent`                                      | #460                                                                                                                |
-| P7    | 18+ confirmation                               | C1 (lane 1) age screen and `adult_eligibility_required`                           | #462 (the refusal); the age step itself: WP 7.5 (C1)                                                                |
-| P8    | The 3-hour reminder                            | No server signal; client rule proposed                                            | Decided (rule approved); to build                                                                                   |
-| P9    | Packet terms block and ETA line                | `chargeRule`, `pendingHold`, `decisionEta`; lane 4's public summary `reliability` | Decided (wording approved); to build; ETA waits on lane 4; Q04 keeps payment on the web                             |
-| P10   | Share sheet for the card                       | Lane 5 share card (needs lanes 1, 3, 4)                                           | Waits on the share-card contract                                                                                    |
-| P11   | Remove "AI comparisons are not available yet." | Comparison stays installed and off (2026-10-08)                                   | Decided: remove; to build                                                                                           |
+| Piece | Rule set                                       | Source                                                                            | State                                                                                     |
+| ----- | ---------------------------------------------- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| P1    | Notes and reactions in the thread              | C4 (lane 5), `GET /v1/content/{creatorId}/presence`                               | #452 (and its Android bottom fix)                                                         |
+| P2    | Notification rows: glyph, color, time, unread  | `GET /v1/growth/notifications` (C4 notices, lane 5)                               | #499 (and #498: a notice opens the conversation)                                          |
+| P3    | Step-in seal and the composer states           | Conversation page (`control`, `canSend`, `unavailableReason`)                     | Seal: #457. Composer states: #497. Trial, ended, capacity: no contract (ticket to lane 3) |
+| P4    | Citations                                      | Message `citations` (ids) and the creator's posts                                 | Built: `lane-7/citation-refusal` (an Android fix); chip titles need lane 3                |
+| P5    | Named pickers instead of raw ids               | `GET /v1/conversations/account` (`threads[].name`)                                | #500                                                                                      |
+| P6    | Explicit provider consent                      | Capabilities `providers`, `POST .../consent`                                      | #460                                                                                      |
+| P7    | 18+ confirmation                               | C1 (lane 1) age screen and `adult_eligibility_required`                           | #462 (the refusal); the age step itself: WP 7.5 (C1)                                      |
+| P8    | The 3-hour reminder                            | No server signal; client rule proposed                                            | #501                                                                                      |
+| P9    | Packet terms block and ETA line                | `chargeRule`, `pendingHold`, `decisionEta`; lane 4's public summary `reliability` | #502 (terms and wording); ETA waits on lane 4; Q04 keeps payment on the web               |
+| P10   | Share sheet for the card                       | Lane 5 share card (needs lanes 1, 3, 4)                                           | Waits on the share-card contract                                                          |
+| P11   | Remove "AI comparisons are not available yet." | Comparison stays installed and off (2026-10-08)                                   | #496                                                                                      |
 
 ## Founder decisions (2026-10-16)
 
@@ -393,6 +393,106 @@ load, and D7 passed when run again. Evidence: `artifacts/lane-7/7-4-freeze-run.t
   scroll that ended decides whether the thread follows.
 - **XCUITest is slower on long threads** now that every row is in the accessibility tree (about
   5 s a query on a 60-message thread). The app itself is not slower to scroll.
+
+## P11, P3, P2, P5, P8, P9: as built (2026-10-16)
+
+All runs: the fake API, synthetic identities and data, the real apps on their simulator and
+emulator, on the top of the stack (`lane-7/packet-terms`), which contains each piece unchanged.
+Gates there: contract 64/64; generate check, typecheck, prettier, eslint; Android unit, snapshot,
+lint, device and release; iOS test build, existing UI tests, release, `swift test` 18/18; the 28
+new iOS flows skip without their opt-in, as on CI. Snapshots re-recorded and reviewed:
+`NotificationRow` (P2), `TermsBlock` and `Sheet` (P9), on both apps.
+
+### P11: the comparison placeholder, removed (#496)
+
+Comparisons stay installed and off (2026-10-08). While they are off the apps say nothing about
+them: Me and privacy has no "AI comparisons" section (it had the heading and "AI comparisons are
+not available yet."), and a question has no comparison button (as before). A choice that is open
+when comparisons turn off closes and says nothing: on its next refresh (the app back in front),
+or when the server refuses its next action with `comparison_unavailable` (whose message is the
+removed sentence). Both apps' failures now carry the server's code. The fake API gains a
+comparisons switch (off by default) and the consent routes, refused with the real code while off.
+
+Results: #496 and `artifacts/lane-7/7-4-p11-run.txt`. K1 to K4 pass on both apps (off says
+nothing; turned off while open, the choice or the section leaves without a word).
+
+### P3: the composer states (#497)
+
+Built as decided (the design reference's `Composer`): creator here, "Reply to {name}", the input
+creator-colored, Send with the seal, no step-in button (the compact layout's step-in at the end of
+the thread is gone too); AI paused, the paused line with the pause glyph in place of the input and
+the step-in button, no "AI unavailable" notice (in the compact layout the header already carries
+the paused line, so only the step-in button remains, at the end of the thread); AI on, "Message
+{name}'s AI" (iOS dropped its trailing "…" and now draws the same 1-point border as Android).
+Trial, ended and capacity are unchanged until lane 3 gives the page a structured state; a closed
+conversation keeps the server's sentence. A draft typed before the AI pauses is kept and returns
+with the input. The seal, draft and E7.1 flows follow the new states (Kiln Club has no step-in
+button; Glazeco's composer shows the paused line, not the notice).
+
+Results: #497, `7-4-p3-composer-run.txt` and `7-4-p3-paused-pair.jpg`. Q1 to Q5 pass on both
+apps, and the seal, draft and E7.1 flows pass with the new states.
+
+### P2: notification rows (#499)
+
+Each row is the design's `NotificationRow`: the authorship tile for the server's `authorKind`
+(the same kinds as messages; a system notice has the inbox tile, as the design and the web
+inbox draw it), the server's `sender` verbatim in that authorship's color, the preview, the time
+(today's hour, else the day, as the web inbox) and, while unread, the surface background, a dot
+and a stronger preview. A screen reader hears sender, preview, time, then "Unread"
+(`growthUnread`), as sentences. The fake's Note and reaction notices follow C4 (the thread as
+destination; a reaction's preview is the generic one); its post notice became an announcement,
+which may open a post (navigation N6 and N18 use it).
+
+Results: #499, `7-4-p2-run.txt` and `7-4-p2-rows-pair.jpg`. U1 to U4 pass on both apps (U1
+checks each row's spoken label exactly); navigation N6 (and N18 on Android) still pass. A Note or
+reaction notice opens the conversation since #498: `/creators/{handle}/chat` opened "Before your
+first message" even for a fan who already had the conversation; now it opens that conversation
+(H1, H2 on both apps; `7-4-chat-link-run.txt`).
+
+### P5: named pickers (#500)
+
+Report (AI message, abuse), block, and exporting or deleting one creator's or one conversation's
+data pick from the person's conversations by the creator's name (`GET /v1/conversations/account`,
+every page, at most 20). "Creator" or "Conversation", "Choose a creator" or "Choose a
+conversation", nothing chosen until the person chooses, "You have no conversations yet.", "Your
+conversations couldn't load." with "Try again". Opened from a thread or a message, that creator is
+already chosen (iOS used to keep a linked creator only with a message; it now keeps it as Android
+does). An id the screen cannot name is never sent: a linked creator who is not among the person's
+conversations is cleared. The AI message id is still a typed field when the screen is not opened
+from a message (not in P5's scope). The fake serves reports, blocks and export (deletion stays
+for 7.5) and records what the apps send.
+
+Results: #500, `7-4-p5-run.txt` and `7-4-p5-chosen-pair.jpg`. V1 to V5 pass on both apps;
+the fake records exactly the ids the chosen names stand for.
+
+### P8: the 3-hour reminder (#501)
+
+Built to the approved rule. The count is kept on the phone (per account, its id hashed) so a
+relaunch within the break keeps it; the lines are memory only. It runs while an AI conversation is
+in front with its AI on (time while the creator is in the thread does not count; nor, taken as
+the default, while the AI is paused); a break of 15 minutes or more starts it again; one step adds at most twice the
+interval, so a suspended app is not counted. At each 3 hours the fixed line (`longSession`,
+naming that conversation's creator) joins the conversation open then, once, after its newest row;
+it blocks nothing. A debug launch can shorten both durations (`--harness-long-session` /
+`harness_long_session`); release builds contain none of it.
+
+Results: #501, `7-4-p8-run.txt` and `7-4-p8-reminder-pair.jpg`. T1 to T5 pass on both apps
+with the durations shortened to 20 s and 6 s. Android now centers a system line that wraps, as iOS
+and the design do (the reminder was the first to wrap).
+
+### P9: the packet terms (#502)
+
+`chargeRule` and `ifDeclines` now read "Charged only when {name} accepts. If {name} declines or
+{deadline} pass, nothing is charged." and "If {name} declines or {deadline} pass" (approved
+2026-10-16), regenerated for the web, iOS and Android. The in-app packet shows the terms block for
+the chosen mode, as the web packet does: its price ("Price unavailable" without one, the web's
+words; the mode list now says the same on both apps, where iOS said "Unset" and Android "Price not
+set") and its decision time as `{deadline}`. No ETA line: lane 4's summary has no `reliability`
+yet. The fake offers two modes (Maya's written reply, Kiln Club's voice note).
+
+Results: #502, `7-4-p9-run.txt` and `7-4-p9-terms-pair.jpg`. M1 to M3 pass on both apps.
+`draftNotice` ("{name} may answer with her AI's draft; you'll see that label.") also says "her";
+it was not part of the approved change and waits on the founder.
 
 ## P2 to P11: the rules, written before the code
 

@@ -158,5 +158,65 @@
     "path": "artifacts/lane-7/7-4-freeze-run.txt",
     "sha256": "d5b1802a671de56964cac970498fcb9859b567711fbdd711ae3474f7afda63cd",
     "bytes": 2828
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p11-run.txt",
+    "sha256": "3d95f73831f13d6480c67626b96ca6e0bd1a632eb4253cf81dd507edb95d39d3",
+    "bytes": 1000
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p3-composer-run.txt",
+    "sha256": "04a1377cd2644999764dcb8e0ef2f44137d451c6e15f83488f2870c1bce3ffea",
+    "bytes": 1286
+  },
+  {
+    "path": "artifacts/lane-7/7-4-chat-link-run.txt",
+    "sha256": "fba6461f899e8b9fecbe8db616fdbf67465358e6081eac59bf29b46c58f56b5c",
+    "bytes": 825
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p2-run.txt",
+    "sha256": "391b0bb6bb336b147b3975f5146e8b84507c0a543543451a0bafd32bdde03363",
+    "bytes": 1156
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p5-run.txt",
+    "sha256": "b0d6ff5fe35002e8b443e51e310e84ec962e47c7e70bbe515b1504c5ea115a07",
+    "bytes": 1530
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p8-run.txt",
+    "sha256": "5a0c1531182e045b9f9974451f65e2ac52b0e23d133f133c019461d20ce6890f",
+    "bytes": 1034
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p9-run.txt",
+    "sha256": "8fb7b5d0d917cf5047e62aa9c1923378fbd91bf2db4310d8a2af0c963c33596c",
+    "bytes": 1006
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p3-paused-pair.jpg",
+    "sha256": "2808530005f1ddbfd1fa2d04b0d3bc9a17e1b6eaa67f9cc25c758d08f5984e78",
+    "bytes": 92855
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p2-rows-pair.jpg",
+    "sha256": "47172771393fb5d171ac6b5c9b50f0c672d3a0060f28385754d69b532bc85f74",
+    "bytes": 99315
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p5-chosen-pair.jpg",
+    "sha256": "3c1ea09c76f13ad7219945cce31320e18f8b2ebe04092bec6fcdd5ba75b573f9",
+    "bytes": 73230
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p8-reminder-pair.jpg",
+    "sha256": "dd7f226b7e13bf628838af03e14636b63d660c2df7f3eca3e776dca008b68238",
+    "bytes": 89986
+  },
+  {
+    "path": "artifacts/lane-7/7-4-p9-terms-pair.jpg",
+    "sha256": "4f3069eb89b2c784e990abbd8e43594679cf1a97a0bb847db92efc1b6e630cce",
+    "bytes": 97297
   }
 ]

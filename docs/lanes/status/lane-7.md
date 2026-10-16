@@ -1,62 +1,86 @@
 # Lane 7: Phone apps (iOS and Android) status
 
-Updated: 2026-10-16, by the resumed lane 7 session (one session, both platforms).
+Updated: 2026-10-16 (evening), by the resumed lane 7 session (one session, both platforms).
 
-## Handoff (2026-10-16): resume here
+## Handoff (2026-10-16, evening): resume here
 
-**Pull requests, stacked; merge in this order.** Never rebase: a fix on a lower branch is merged
+**WP 7.4 is built, except P10** (it waits on the share-card contract). Every pull request is
+stacked on the one before; merge in this order. Never rebase: a fix on a lower branch is merged
 upward, branch by branch, and each is pushed.
 
-| PR                                                                | Branch                    | What                                                    |
-| ----------------------------------------------------------------- | ------------------------- | ------------------------------------------------------- |
-| [#401](https://github.com/WangPantopus/creator-platform/pull/401) | `lane-7/keyboard-drafts`  | WP 7.3 keyboard and drafts                              |
-| [#452](https://github.com/WangPantopus/creator-platform/pull/452) | `lane-7/notes-reactions`  | P1 Notes and reactions, Android keeps the bottom        |
-| [#457](https://github.com/WangPantopus/creator-platform/pull/457) | `lane-7/step-in-seal`     | P3 the creator's seal                                   |
-| [#460](https://github.com/WangPantopus/creator-platform/pull/460) | `lane-7/provider-consent` | P6 the provider sentence                                |
-| [#462](https://github.com/WangPantopus/creator-platform/pull/462) | `lane-7/adults-only`      | P7 the under-18 state                                   |
-| [#465](https://github.com/WangPantopus/creator-platform/pull/465) | `lane-7/citation-refusal` | P4 a refused source on Android                          |
-| [#466](https://github.com/WangPantopus/creator-platform/pull/466) | `lane-7/status-7-4`       | Status, decisions, these notes                          |
-| [#471](https://github.com/WangPantopus/creator-platform/pull/471) | `lane-7/thread-freeze`    | The iOS freeze fix, **draft**: newest branch, work here |
+| PR                                                                | Branch                          | What                                                      |
+| ----------------------------------------------------------------- | ------------------------------- | --------------------------------------------------------- |
+| [#401](https://github.com/WangPantopus/creator-platform/pull/401) | `lane-7/keyboard-drafts`        | WP 7.3 keyboard and drafts                                |
+| [#452](https://github.com/WangPantopus/creator-platform/pull/452) | `lane-7/notes-reactions`        | P1 Notes and reactions                                    |
+| [#457](https://github.com/WangPantopus/creator-platform/pull/457) | `lane-7/step-in-seal`           | P3 the creator's seal                                     |
+| [#460](https://github.com/WangPantopus/creator-platform/pull/460) | `lane-7/provider-consent`       | P6 the provider sentence                                  |
+| [#462](https://github.com/WangPantopus/creator-platform/pull/462) | `lane-7/adults-only`            | P7 the under-18 state                                     |
+| [#465](https://github.com/WangPantopus/creator-platform/pull/465) | `lane-7/citation-refusal`       | P4 a refused source on Android                            |
+| [#466](https://github.com/WangPantopus/creator-platform/pull/466) | `lane-7/status-7-4`             | Status and decisions                                      |
+| [#471](https://github.com/WangPantopus/creator-platform/pull/471) | `lane-7/thread-freeze`          | The iOS thread no longer freezes and keeps its newest row |
+| [#493](https://github.com/WangPantopus/creator-platform/pull/493) | `lane-7/android-follow`         | Android keeps following the thread when rows shift above  |
+| [#496](https://github.com/WangPantopus/creator-platform/pull/496) | `lane-7/comparison-placeholder` | P11 the comparison placeholder is gone                    |
+| [#497](https://github.com/WangPantopus/creator-platform/pull/497) | `lane-7/composer-states`        | P3 the composer states                                    |
+| [#498](https://github.com/WangPantopus/creator-platform/pull/498) | `lane-7/chat-link`              | A chat link opens the person's existing conversation      |
+| [#499](https://github.com/WangPantopus/creator-platform/pull/499) | `lane-7/notification-rows`      | P2 notification rows with authorship, time and Unread     |
+| [#500](https://github.com/WangPantopus/creator-platform/pull/500) | `lane-7/named-pickers`          | P5 named pickers instead of typed ids                     |
+| [#501](https://github.com/WangPantopus/creator-platform/pull/501) | `lane-7/long-session`           | P8 the 3-hour reminder                                    |
+| [#502](https://github.com/WangPantopus/creator-platform/pull/502) | `lane-7/packet-terms`           | P9 the packet's terms in the approved wording             |
+| this one                                                          | `lane-7/status-7-4b`            | Status, results, decisions, these notes                   |
 
-**CI at handoff.** #457, #460 and #462 got opt-in fixes for their new iOS flows (CI runs every UI
-test with nothing listening; a flow must skip before any call); the new runs were pending. #457's
-Android job was cut off at 50 minutes (the same code passed on #460). #401's iOS check was re-run
-(CI's simulator failed to launch the app; not code). Auto-fix reports failures; never poll CI.
+Results for every piece are in [the spec](lane-7-rendering-parity.md) and its pull request;
+evidence is under `artifacts/lane-7/` (`7-4-*`). Auto-fix watches the pull requests' CI; do not
+poll.
 
-**In flight: #471.** Verified: the build, and the freeze reproduction froze 0 of 10 rounds (2 of
-about 13 before). To do, in this order, then record the results in #471 and the spec and mark it
-ready (if a flow fails, run it on `lane-7/status-7-4` too, to tell a regression from an old
-problem):
-
-1. `node tests/scenarios/lane-7/ios-navigation.mjs <xctestrun> --presence` (R1 to R10).
-2. `… --drafts D1 D2 D3 D3T D4 D4R D5 D7 D7U D8`, then `… --seal` and `… --citations`.
-3. `node tests/scenarios/lane-7/e7-1-states.mjs ios` (L1 to L5, a streamed reply stays in view).
-4. The iOS gates: existing UI tests, release build, `swift test` (`p3-gates.sh` runs them).
-
-The freeze reproduction lives outside the repository in `~/Library/Caches/qelvora-lane7/diag/`:
-copy `Lane7FreezeDiag.swift` into `apps/ios/UITests/` only while running `run-freeze.sh presence`,
-and delete it before committing.
-
-**Then WP 7.4, decided 2026-10-16** (rules in [the spec](lane-7-rendering-parity.md)), each its own
-pull request stacked on the newest branch, both apps, operated flows, gates: P11 remove the
-comparison placeholder; P3 the composer states per the design; P2 notification rows with "Unread"
-(new key `growthUnread` in `config/copy.json`); P5 named pickers (approved words, new keys); P8 the
-3-hour reminder (approved rule); P9 the packet terms (change `chargeRule` and `ifDeclines` in
-`config/copy.json` to the approved wording, regenerate, ticket the integrator for the brief). Then
-stop and report. 7.10, 7.11, 7.8 and 7.12 wait for "Next for lane 7".
+**Next, only after the founder sends "Next for lane 7":** 7.10, 7.11, 7.8 and 7.12. Waiting on
+others: P10 (the share-card contract and a domain), chip titles for P4 (lane 3), the ETA line for
+P9 (lane 4's `reliability`).
 
 **Warm resources, left running for reuse.** Simulator `qelvora-lane7-ios`
-(925D2C3D-510E-4E1E-B5B0-52335B122ECF) booted; emulator `qelvora-lane7-android` (`emulator-5574`)
-running headless with the debug app for the fake installed (if not:
-`emulator -avd qelvora-lane7-android -port 5574 -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect`);
-the fake API on 56473 and the iOS link driver on 56475, started from this worktree (check
-`curl -s http://127.0.0.1:56473/__harness/health`; restart them after editing harness files). Build
-caches: iOS derived data `~/Library/Caches/qelvora-lane7/ios-dd` (built for the fake on #471's
-branch), Gradle `~/.gradle` (offline builds work), node_modules installed. Helper scripts in
-`~/Library/Caches/qelvora-lane7/diag/`: `env.sh` (toolchain PATH, `W`, `SP`; no secrets),
-`ios-p3-build.sh` (iOS test build for the fake), `locked.sh` (the heavy-build lock, with retry),
-`ci-skip-check.sh` (runs suites the way CI does), `p3-gates.sh` (both apps' gates),
-`p1fix-gates.sh` (Android gates), `manifest-update.mjs` (the artifact manifest).
+(925D2C3D-510E-4E1E-B5B0-52335B122ECF) booted; emulator `qelvora-lane7-android` (`emulator-5574`,
+restarted cold on 2026-10-16 after its display froze; if it is down:
+`emulator -avd qelvora-lane7-android -port 5574 -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect`,
+then `adb reverse tcp:56473 tcp:56473`) with the debug app for the fake installed; the fake API on
+56473 and the iOS link driver on 56475, both started from the worktree
+`.claude/worktrees/lane-7-phone-apps-resume-15e5a3` (restart them after editing harness files or
+the link driver). Helper scripts in `~/Library/Caches/qelvora-lane7/diag/`: `env.sh` (its `W`
+points at that worktree), `ios-p3-build.sh`, `android-debug.sh` (debug app for the fake, built and
+installed), `run-ios.sh <log> <suite args>` (an iOS suite with the freeze watchdog),
+`watchdog.sh`, `ci-skip-check.sh`, `p3-gates.sh`, `p1fix-gates.sh`, `locked.sh`,
+`manifest-update.mjs`.
+
+**A new session gets a new worktree** and the app does not let it write another worktree's files:
+work in the new one on the same branches (`git switch` a `lane-7/*` branch there, or point the
+session branch at it), repoint `W` in `env.sh` and `locked.sh`, run `pnpm install --frozen-lockfile
+--offline`, and restart the fake and the link driver from it. The first iOS build from a new path
+recompiles the packages (about 15 minutes).
+
+## WP 7.4 stop and report (2026-10-16, evening)
+
+- **#471 is ready.** Removing the bottom anchor was not enough: the presence flow R5 still froze,
+  on #471's first version and on `lane-7/status-7-4`, in SwiftUI's lazy stack layout. The thread is
+  now a plain stack at every text size, and only the reader moving the rows stops it following new
+  rows. The same runs found the iOS thread had been losing its bottom since P1 (E7.1 L1 to L5
+  failed on `lane-7/status-7-4`); fixed in #471. Android had the same fault after a reconnect
+  (#493).
+- **Built, each in its own pull request, both apps, flows and gates:** P11 (#496), P3 composer
+  states (#497), P2 (#499), P5 (#500), P8 (#501), P9 (#502), and #498 (a chat link opens the
+  existing conversation; found by P2's flows).
+- **Decisions taken as the proposed default** (founder may veto): the iOS thread is a plain stack;
+  E7.1 L1 and L5 follow C4 (a Note is read on open, return or reconnect, never pushed); a system
+  notice keeps the design's inbox tile; P3's compact paused layout keeps one step-in button, at the
+  thread's end (the header has the paused line); P5 clears a linked creator who is not among the
+  person's conversations, so an unnamed id is never sent; P8 does not count time while the AI is
+  paused, keeps the count per account (id hashed) so a relaunch within the break keeps it; P9 says
+  "Price unavailable" when a mode has no price (the web's words; iOS said "Unset", Android "Price
+  not set"); a chat link without post context opens the existing conversation.
+- **For the founder:** `draftNotice` ("{name} may answer with her AI's draft; you'll see that
+  label.") also says "her"; not changed (new copy needs approval).
+- **Process notes:** at the start this session pointed its own empty branch at #471 with `git reset
+--hard` (nothing lost; the working agreement says never, noted). One local merge committed
+  conflict markers; it was amended before anything was pushed. The emulator's display froze during
+  a gate run and the emulator was restarted cold.
+- Spend: no model gateway call, no download.
 
 ## WP 7.4 stop and report (2026-10-16)
 
@@ -123,11 +147,11 @@ Android) → this status update. The spec with every piece's rules and results:
   arbitration fix (`NativeBackSwipe`) passed N5, N1 and the full iOS run. It also
   preserves vertical scrolling at the edge; screenshots and API checks corroborate it.
 
-Working on: #471, the iOS freeze fix (draft): its regression flows are next (see "Handoff" above).
+Working on: nothing; WP 7.4 is built and in review (see "Handoff" above).
 
 Waiting on: review and merging of the stack; "Next for lane 7" for 7.10, 7.11, 7.8 and 7.12. Backend domain erasure is still blocked/retrying (lane 1 ticket).
 
-Next: finish #471; then WP 7.4 P11, P3 composer states, P2, P5, P8 and P9, as decided. WP 7.5/7.6/7.7/7.9 wait on C1, domain, credentials, accounts and icon art.
+Next: on "Next for lane 7", 7.10, 7.11, 7.8 and 7.12. WP 7.5/7.6/7.7/7.9 wait on C1, domain, credentials, accounts and icon art.
 
 ## Resume here
 
@@ -162,7 +186,7 @@ The original 7.1 flows and full 7.2 matrix use the fake API. A focused 7.2 flow 
 
 | ID                                                                                   | Result                                                                                                           | Command                                                                                          |
 | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Contract check, 62 checks (11 for C4 presence)                                       | pass                                                                                                             | `pnpm exec tsx tests/scenarios/lane-7/harness/check-contract.mjs`                                |
+| Contract check, 64 checks (11 for C4 presence, 2 for comparisons)                    | pass                                                                                                             | `pnpm exec tsx tests/scenarios/lane-7/harness/check-contract.mjs`                                |
 | H1 to H12 sign-in, session end, network drop                                         | pass on iOS and Android                                                                                          | `node tests/scenarios/lane-7/e7-1-signin.mjs [ios\|android]`                                     |
 | S1 to S8 states and switches, E1 server error, L1 to L5 live delivery                | pass on iOS and Android                                                                                          | `node tests/scenarios/lane-7/e7-1-states.mjs [ios\|android]`                                     |
 | F1 to F2 first conversation                                                          | pass on both (Android by script; iOS by hand through the simulator tool)                                         | `node tests/scenarios/lane-7/e7-1-first-conversation.mjs [ios\|android]`                         |
@@ -173,12 +197,30 @@ The original 7.1 flows and full 7.2 matrix use the fake API. A focused 7.2 flow 
 | P6.1 to P6.5 the provider sentence (P6)                                              | pass on both                                                                                                     | `e7-4-consent.mjs`; iOS `--consent`                                                              |
 | P7.1 to P7.3 the under-18 state (P7)                                                 | pass on both                                                                                                     | `e7-4-adults.mjs`; iOS `--adults`                                                                |
 | P4.1 to P4.3 citations (P4)                                                          | pass on both (Android P4.2 failed before its fix)                                                                | `e7-4-citations.mjs`; iOS `--citations`                                                          |
+| K1 to K4 no comparison placeholder (P11)                                             | pass on both                                                                                                     | `e7-4-comparison.mjs`; iOS `--comparison`                                                        |
+| Q1 to Q5 the composer states (P3)                                                    | pass on both                                                                                                     | `e7-4-composer.mjs`; iOS `--composer`                                                            |
+| H1, H2 a chat link opens the existing conversation                                   | pass on both                                                                                                     | `e7-4-chat-link.mjs`; iOS `--chat-link`                                                          |
+| U1 to U4 notification rows (P2)                                                      | pass on both                                                                                                     | `e7-4-notifications.mjs`; iOS `--notifications`                                                  |
+| V1 to V5 named pickers (P5)                                                          | pass on both                                                                                                     | `e7-4-pickers.mjs`; iOS `--pickers`                                                              |
+| T1 to T5 the 3-hour reminder, durations shortened (P8)                               | pass on both                                                                                                     | `e7-4-long-session.mjs`; iOS `--long-session`                                                    |
+| M1 to M3 the packet's terms (P9)                                                     | pass on both                                                                                                     | `e7-4-packet.mjs`; iOS `--packet`                                                                |
 | N1 to N21 navigation (WP 7.2)                                                        | Android: 21 of 21 pass. iOS: 13 XCUITest flows pass, plus prior manual results ([details](lane-7-navigation.md)) | `node tests/scenarios/lane-7/e7-2-navigation.mjs [N1 ...]`                                       |
 | Release builds contain none of the hook                                              | pass, both; repeated for 7.2                                                                                     | `artifacts/lane-7/7-2-gates.txt`                                                                 |
 
 Existing suites for 7.1 (Android unit and Paparazzi 19, Lint 0 errors, instrumentation 8 with 4 skipped by design; iOS `swift test` 18, UI tests 6 with 4 skipped by design): `./gradlew :app:testDebugUnitTest :app:verifyPaparazziDebug :app:lintDebug`; `swift test`; `xcodebuild test`. The 7.2 run of these is recorded in [lane-7-navigation.md](lane-7-navigation.md).
 
 ## Tickets and observations
+
+WP 7.4 tickets (2026-10-16, evening): **lane 3**, the web conversation screen's composer to follow
+the design reference (P3), a structured composer state on the conversation page (trial, ended,
+capacity), and a server field if the 3-hour count should span devices (P8); the server's
+`comparison_unavailable` message is the removed placeholder sentence (P11, lane 3's B9 covers the
+web). **Lane 5** (`apps/web/features/growth/actions.tsx`) and **lane 6** (`packages/ui-web`
+`NotificationRow`): the unread dot, stronger preview, sender color and "Unread" for screen readers
+(P2). **Lane 6** (`packages/ui-web` `TermsBlock`): uses "If she declines …" literally; use
+`chargeRule` and `ifDeclines` (P9). **Integrator**: the brief's copy of the old `chargeRule`. **Design
+system** (`design/design-system/project/components/TermsBlock`): the README and bundle still say
+"she". **Founder**: `draftNotice` says "her".
 
 WP 7.4 tickets (details in the spec): lane 3, a structured composer state on the conversation
 page, the fixed provider sentence on the web consent screen, and citation summaries on the thread
