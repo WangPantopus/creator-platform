@@ -9,7 +9,10 @@ of #443's version, so whichever of the two merges second takes this file as it i
 ## Resume here
 
 - **Prompt for the next session:** [lane-6-resume-prompt.md](lane-6-resume-prompt.md).
-- **Verified at handoff:** see the last lines of this section, updated when the session stopped.
+- **Verified at handoff (2026-10-16):** `lane-6/no-polling` is pushed with #488 open (CI was
+  running when the session stopped; Auto-fix watches it); `main` was still dea51a4ff, #443 open,
+  and the integrator's tab bar change not on `main`; the working tree is clean; the lane 6 stack
+  is down and nothing of this session runs.
 - **WP 6.9 in one paragraph:** each open Studio tab keeps one live stream
   (`/api/studio/live`); the server re-checks the roles and the open screen's read every 2
   seconds and sends fingerprints; screens read only on a change. The design, the safety
