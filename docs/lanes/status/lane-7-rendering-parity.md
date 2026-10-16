@@ -7,19 +7,19 @@ carries an iOS and an Android result.
 WP 7.4 has twelve pieces. Each piece is its own pull request, in the order below. A piece that
 waits on a contract or a founder decision says so, keeps today's behavior and moves on.
 
-| Piece | Rule set                                       | Source                                                                            | State                                                                                  |
-| ----- | ---------------------------------------------- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| P1    | Notes and reactions in the thread              | C4 (lane 5), `GET /v1/content/{creatorId}/presence`                               | This spec; first pull request                                                          |
-| P2    | Notification rows: glyph, color, time, unread  | `GET /v1/growth/notifications` (C4 notices, lane 5)                               | Next                                                                                   |
-| P3    | Step-in seal and the composer states           | Conversation page (`control`, `canSend`, `unavailableReason`)                     | Paused and human: buildable. Trial, ended, capacity: no contract (ticket to lane 3)    |
-| P4    | Citations                                      | Message `citations` (ids) and the creator's posts                                 | To survey                                                                              |
-| P5    | Named pickers instead of raw ids               | `GET /v1/conversations/account` (`threads[].name`)                                | Buildable, no contract change                                                          |
-| P6    | Explicit provider consent                      | Capabilities `providers`, `POST .../consent`                                      | To survey                                                                              |
-| P7    | 18+ confirmation                               | C1 (lane 1) age screen and `adult_eligibility_required`                           | Overlaps WP 7.5; to survey                                                             |
-| P8    | The 3-hour reminder                            | No server signal; client rule proposed                                            | Needs a founder decision on the rule                                                   |
-| P9    | Packet terms block and ETA line                | `chargeRule`, `pendingHold`, `decisionEta`; lane 4's public summary `reliability` | ETA waits on lane 4's decision record (empty until then); Q04 keeps payment on the web |
-| P10   | Share sheet for the card                       | Lane 5 share card (needs lanes 1, 3, 4)                                           | Waits on the share-card contract                                                       |
-| P11   | Remove "AI comparisons are not available yet." | Comparison stays installed and off (2026-10-08)                                   | Copy change: founder approval                                                          |
+| Piece | Rule set                                       | Source                                                                            | State                                                                                                           |
+| ----- | ---------------------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| P1    | Notes and reactions in the thread              | C4 (lane 5), `GET /v1/content/{creatorId}/presence`                               | #452 (and its Android bottom fix)                                                                               |
+| P2    | Notification rows: glyph, color, time, unread  | `GET /v1/growth/notifications` (C4 notices, lane 5)                               | Next                                                                                                            |
+| P3    | Step-in seal and the composer states           | Conversation page (`control`, `canSend`, `unavailableReason`)                     | Seal: #457. Composer states: a founder decision (below); trial, ended, capacity: no contract (ticket to lane 3) |
+| P4    | Citations                                      | Message `citations` (ids) and the creator's posts                                 | To survey                                                                                                       |
+| P5    | Named pickers instead of raw ids               | `GET /v1/conversations/account` (`threads[].name`)                                | Needs picker copy approved (proposed below)                                                                     |
+| P6    | Explicit provider consent                      | Capabilities `providers`, `POST .../consent`                                      | Built: `lane-7/provider-consent`                                                                                |
+| P7    | 18+ confirmation                               | C1 (lane 1) age screen and `adult_eligibility_required`                           | Overlaps WP 7.5; to survey                                                                                      |
+| P8    | The 3-hour reminder                            | No server signal; client rule proposed                                            | Needs a founder decision on the rule                                                                            |
+| P9    | Packet terms block and ETA line                | `chargeRule`, `pendingHold`, `decisionEta`; lane 4's public summary `reliability` | ETA waits on lane 4's decision record (empty until then); Q04 keeps payment on the web                          |
+| P10   | Share sheet for the card                       | Lane 5 share card (needs lanes 1, 3, 4)                                           | Waits on the share-card contract                                                                                |
+| P11   | Remove "AI comparisons are not available yet." | Comparison stays installed and off (2026-10-08)                                   | Copy change: founder approval                                                                                   |
 
 ## P1: Notes and reactions in the thread (C4)
 
@@ -189,6 +189,47 @@ Commands: `node tests/scenarios/lane-7/e7-4-seal.mjs [S1 S2 S3]` (Android) and
 - **Ticket to lane 6** (`packages/ui-web/src/components.ts`, `StepIn`): the web reference takes
   `name.charAt(0)`, which for "🌿 fern studio" draws half of an emoji. The apps show "F".
 
+## P6: the provider sentence before the first message
+
+### Rules
+
+1. When the provider policy is verified and every provider keeps no messages (`noRetention`) and
+   trains on none (`noTraining`), the first-conversation screen says the fixed sentence
+   `processorConsent` verbatim: "Before your first message, {name}'s AI is powered by {providers}.
+   They don't keep or train on your messages." `{providers}` is the providers' names joined with
+   ", ", as the web joins them.
+2. Otherwise the screen keeps today's lines: "This AI is powered by {providers}." and, under each
+   provider's terms link, that provider's own line. An unverified policy also keeps its development
+   notice. The sentence is a promise, so it is never said on settings nobody has reviewed.
+3. The terms links stay in both cases. The consent itself (its policy version, "Start with") is
+   unchanged.
+
+### Scenarios and results (fake API; synthetic identities and data; real apps)
+
+| ID   | Steps                                                         | Expected                                                                                                                                             | iOS        | Android               |
+| ---- | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | --------------------- |
+| P6.1 | Priya opens Lena Park's first conversation (the default fake) | The fixed sentence, verbatim, with "Lena Park" and the provider; its terms link; no per-provider line; "Start with" opens the thread once, consented | pass       | pass                  |
+| P6.2 | A provider that keeps messages                                | "This AI is powered by Synthetic provider." and its retention line; no promise                                                                       | pass       | pass                  |
+| P6.3 | The policy not verified                                       | The development notice and the provider's own line; no promise                                                                                       | pass       | pass                  |
+| P6.4 | Two providers that keep and train on nothing                  | Both named in the sentence; both terms links                                                                                                         | pass       | pass                  |
+| P6.5 | Largest text, Night                                           | The sentence on screen, in full                                                                                                                      | pass (AX5) | pass (font scale 2.0) |
+
+Commands: `node tests/scenarios/lane-7/e7-4-consent.mjs [C1 C2 C3 C4 C5]` (Android) and
+`node tests/scenarios/lane-7/ios-navigation.mjs <built.xctestrun> --consent [C1 C2 C3 C4 C5]` (iOS,
+with `ios-link-driver.mjs` running). The fake's `POST /__harness/flags` takes a `providers` list.
+
+### What the runs found
+
+- **The web consent screen** (lane 3, `apps/web/features/conversation/ConsentScreen.tsx`) does not
+  use the fixed sentence either. Ticket to lane 3: the same rule, so the surfaces say the same thing.
+- **iOS test details**: SwiftUI exposes the terms link as a button; at the largest text the
+  development banner becomes a scroll view of its own, so a scroll helper must drag the page's.
+- **Seen on the way, not part of P6**: at the largest text the iOS tab bar stacks its four items
+  and covers about a third of the screen, while Android keeps a two-by-two grid. A parity defect in
+  lane 7's own navigation (WP 7.2), to fix separately.
+- **Also seen, not part of P6**: the provider terms link is a plain body-weight link on iOS and a
+  bold, indented quiet button on Android. A small parity defect, to fix with the next consent work.
+
 ## P2 to P11: the rules, written before the code
 
 Each becomes its own pull request with its own scenario table. What a piece cannot do yet is
@@ -209,6 +250,16 @@ creator-colored input with `replyToCreator`. Trial, ended and capacity have no s
 page carries only `canSend` and a free-text `unavailableReason`); the apps keep the server's
 sentence and do not guess. Ticket to lane 3: a structured composer state on the conversation page.
 
+Founder decision needed before the composer states are built: the design reference
+(`packages/ui-web`, `Composer`) and the web conversation screen (lane 3, `ConversationScreen.tsx`)
+disagree, and the apps today match the web screen. The reference: while the creator is in the
+thread, a creator-colored input "Reply to {name}" (`replyToCreator`) and no step-in button; while
+the AI is paused, the paused line with its glyph and the step-in button in place of the input. The
+web screen and the apps: "Message {name}…", a notice with the server's sentence, the input, and
+the step-in button in every state (the web titles the notice "AI paused" when the AI is paused; the
+apps say "AI unavailable"). Proposed: follow the reference, keep the server's sentence as the
+paused line's detail, and ticket lane 3 to do the same on the web.
+
 **P4 Citations.** To survey: both apps draw `CitationChip` from message `citations` today; the
 spec will state the label, the unavailable state and what a tap opens, the same on both.
 
@@ -218,9 +269,14 @@ spec will state the label, the unavailable state and what a tap opens, the same 
 `creatorId` (for example Report from a thread) shows that creator's name, not the id. No contract
 change.
 
-**P6 Provider consent.** The first-conversation screen uses the fixed sentence `processorConsent`
-verbatim when every provider both keeps no messages and trains on none; otherwise it names each
-provider with its honest line, as today. The terms links stay. Same on both apps.
+Not built yet: a picker needs words that the copy system does not have, in safety flows. Proposed
+(founder approval needed): the field label "Creator" or "Conversation" (today "Creator ID" and
+"Conversation ID"); the prompt "Choose a conversation"; with none, "You have no conversations yet.";
+when the list cannot load, "Your conversations could not load." with a "Try again" button. A report,
+block or deletion never picks a creator by default: nothing is sent until the person chooses one.
+The web support form asks for typed references too: ticket to lane 1 (`apps/web/app/support`).
+
+**P6 Provider consent.** Built: see P6 above.
 
 **P7 18+ confirmation.** A sign-in refused with `adult_eligibility_required` shows
 `adultOnlyTitle` and `adultOnlyBody`, offers no retry into the same account, and keeps
