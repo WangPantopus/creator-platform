@@ -340,7 +340,7 @@ private final class W3RecordingPlayback: ObservableObject {
       } catch {
         if !Task.isCancelled, attempt == revision {
           clear()
-          failure = "Audio access could not be confirmed. Try again."
+          failure = QelvoraCopy.text("nativeAudioAccessCouldNotBeConfirmed")
         }
       }
     }
@@ -350,12 +350,12 @@ private final class W3RecordingPlayback: ObservableObject {
     guard active else { return }
     if let api = client, await !(api.isCurrent()), client === api {
       clear()
-      failure = "Your session changed. Load this recording again."
+      failure = QelvoraCopy.text("nativeYourSessionChangedLoadThisRecording")
       return
     }
     if player != nil, !fresh() {
       clear()
-      failure = "This recording is unavailable. Reopen the conversation to try again."
+      failure = QelvoraCopy.text("nativeThisRecordingIsUnavailableReopen")
       return
     }
     position = min(player?.currentTime ?? 0, Double(asset.durationMs ?? 0) / 1000)
@@ -375,7 +375,7 @@ private final class W3RecordingPlayback: ObservableObject {
          client === api
       {
         clear()
-        failure = "This recording is unavailable. Reopen the conversation to try again."
+        failure = QelvoraCopy.text("nativeThisRecordingIsUnavailableReopen")
       }
     }
   }
@@ -420,7 +420,7 @@ struct W3RecordingView: View {
         position: playback.position / max(1, Double(asset.durationMs ?? 0) / 1000),
         onPlayPause: { if active { playback.toggle() } }, onVerify: onVerify
       )
-      Text(playback.loading ? "Loading recording…" : elapsed(playback.position)).qText("data-sm")
+      Text(playback.loading ? QelvoraCopy.text("nativeLoadingRecording") : elapsed(playback.position)).qText("data-sm")
       if playback.loaded {
         ViewThatFits(in: .horizontal) {
           HStack { seekControls }
@@ -451,10 +451,10 @@ struct W3RecordingView: View {
   }
 
   @ViewBuilder private var seekControls: some View {
-    Button("Back 10 seconds", variant: .quiet, disabled: !active || playback.loading) {
+    Button(QelvoraCopy.text("nativeBack10Seconds"), variant: .quiet, disabled: !active || playback.loading) {
       playback.seek(by: -10)
     }
-    Button("Forward 10 seconds", variant: .quiet, disabled: !active || playback.loading) {
+    Button(QelvoraCopy.text("nativeForward10Seconds"), variant: .quiet, disabled: !active || playback.loading) {
       playback.seek(by: 10)
     }
   }

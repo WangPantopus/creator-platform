@@ -10,6 +10,7 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import android.os.Bundle
@@ -53,7 +54,7 @@ class FanSessionRequestCapture private constructor(
     /** Keep the original issuer/client, bounds and cancellable operation. */
     @androidx.annotation.MainThread
     suspend fun trustBytes(path: String, body: ByteArray? = null, binary: Boolean = false): CreatorAPIBinaryResponse {
-        check(isCurrent() && trustReady()) { "Refresh your account before continuing." }
+        check(isCurrent() && trustReady()) { QelvoraCopy.text("nativeRefreshYourAccountBeforeContinuing2") }
         try {
             val response = client.trustBytes(path, expectedAccountId, sessionId, body, binary)
             if (!isCurrent() || !trustReady()) throw kotlinx.coroutines.CancellationException("Your original account view changed.")
@@ -66,7 +67,7 @@ class FanSessionRequestCapture private constructor(
     /** Commerce retains this same genuine capture, issuer and bounded client. */
     @androidx.annotation.MainThread
     suspend fun commerceBytes(path: String, body: ByteArray? = null): CreatorAPIBinaryResponse {
-        check(isCurrent() && trustReady()) { "Refresh your account before continuing." }
+        check(isCurrent() && trustReady()) { QelvoraCopy.text("nativeRefreshYourAccountBeforeContinuing2") }
         try {
             val response = client.commerceBytes(path, expectedAccountId, sessionId, body)
             if (!isCurrent() || !trustReady()) throw kotlinx.coroutines.CancellationException("Your original account view changed.")
@@ -79,7 +80,7 @@ class FanSessionRequestCapture private constructor(
     /** Content retains this same genuine capture, issuer and bounded client. */
     @androidx.annotation.MainThread
     suspend fun contentBytes(path: String, body: ByteArray? = null, query: List<Pair<String, String?>> = emptyList()): CreatorAPIBinaryResponse {
-        check(isCurrent() && trustReady()) { "Refresh your account before continuing." }
+        check(isCurrent() && trustReady()) { QelvoraCopy.text("nativeRefreshYourAccountBeforeContinuing2") }
         try {
             val response = client.contentBytes(path, expectedAccountId, sessionId, body, query)
             if (!isCurrent() || !trustReady()) throw kotlinx.coroutines.CancellationException("Your original account view changed.")
@@ -137,6 +138,9 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     var choosingActor by mutableStateOf(false)
     var actors by mutableStateOf<List<APIIdentityCapabilitiesDevelopmentActorsItem>>(emptyList())
     var localPurgeFailed by mutableStateOf(false); private set
+    /** D-11: an account found under 18 (at sign-in, or flagged later) loses
+     * access. The session ends here too and only the adults-only state shows. */
+    var adultOnly by mutableStateOf(false); private set
     var purgingPrivateState by mutableStateOf(false); private set
     var arrival by mutableStateOf<ArrivalContext?>(null); private set
     private var generation = 0
@@ -154,7 +158,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         val credential = confirmedCredential ?: return
         if (!navigationInitialized || !navigationPersistencePending || purgingPrivateState || localPurgeFailed || !ApplicationDestination.isPermitted(destination)) return
         try { storage.saveDestination(destination, active.accountId, credential); navigationPersistencePending = false }
-        catch (_: Exception) { error = "Your place in the app could not be kept. You can still open it again." }
+        catch (_: Exception) { error = QelvoraCopy.text("nativeYourPlaceInTheAppCould") }
     }
     private fun restoreDestination(account: APISession, credential: String) {
         // Navigation during an offline read or credential rotation is retried
@@ -169,7 +173,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
             persistDestination()
         } catch (_: Exception) {
             navigationInitialized = true; navigationRestoreAllowed = false
-            error = "Your saved place is unavailable. Open it again from the app."
+            error = QelvoraCopy.text("nativeYourSavedPlaceIsUnavailableOpen")
         }
     }
     /** No default/global storage reconstruction. Away-and-back navigation also
@@ -233,11 +237,11 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
                 if (current != generation) return
                 if (currentToken() != token) {
                     confirmedCredential = null; session = null
-                    error = "Your session changed. Refresh your account before continuing."
+                    error = QelvoraCopy.text("nativeYourSessionChangedRefreshYour")
                     return
                 }
                 if (session?.accountId != null && session?.accountId != value.accountId) {
-                    if (purge()) error = "The account changed. Continue with Pantopus again."
+                    if (purge()) error = QelvoraCopy.text("nativeTheAccountChangedContinueWith")
                     return
                 }
                 if (BuildConfig.DEBUG && error.isNotEmpty()) android.util.Log.d("QelvoraIdentity", "session_reconfirmed")
@@ -247,14 +251,15 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
                 if (current != generation) return
                 confirmedCredential = null
                 if (runCatching { currentToken() }.getOrNull() != token) {
-                    session = null; error = "Your session changed. Refresh your account before continuing."; return
+                    session = null; error = QelvoraCopy.text("nativeYourSessionChangedRefreshYour"); return
                 }
+                if (adultRefusal(failure)) { if (purge()) adultOnly = true; return }
                 if (failure.status == 401) {
                     if (!busy) {
                         // A completed rotation performs its own guarded fresh read.
                         refreshingSession = false
                         refreshCredentials()
-                    } else if (purge()) error = "Your session ended. Continue with Pantopus again."
+                    } else if (purge()) error = QelvoraCopy.text("nativeYourSessionEndedContinueWith")
                 } else error = message(failure)
             } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
             catch (failure: Exception) {
@@ -269,7 +274,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
                     is kotlinx.serialization.SerializationException -> "session_decode_failed"
                     else -> "session_local_failed"
                 })
-                if (current == generation) { confirmedCredential = null; error = "Reconnect to refresh your account. Actions are unavailable while offline." }
+                if (current == generation) { confirmedCredential = null; error = QelvoraCopy.text("nativeReconnectToRefreshYourAccount") }
             }
         } finally { refreshingSession = false; checkingSession = false }
     }
@@ -278,7 +283,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         if (snapshot.substringBefore('?') == removedArrivalFor) return
         val handle = snapshot.removePrefix("/creators/").substringBefore('/').substringBefore('?')
         if (!snapshot.startsWith("/creators/")) return
-        try { val creator = GrowthClient(origin).request("public/creators/$handle").getJSONObject("creator"); if (snapshot == destination) { val name = creator.getString("name"); arrival = ArrivalContext("You came from $name's page", "$name · ${creator.getString("category")}", name) } }
+        try { val creator = GrowthClient(origin).request("public/creators/$handle").getJSONObject("creator"); if (snapshot == destination) { val name = creator.getString("name"); arrival = ArrivalContext(QelvoraCopy.text("nativeYouCameFromNamesPage", mapOf("name" to name)), "$name · ${creator.getString("category")}", name) } }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (_: Exception) { /* No invented public projection. */ }
     }
@@ -292,7 +297,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
             val available = capability.developmentActors.orEmpty()
             if (!capability.signInAvailable) error = QelvoraCopy.text("pantopusUnavailable")
             else if (BuildConfig.DEBUG && capability.mode == APIIdentityCapabilitiesMode.DEVELOPMENT && available.isNotEmpty()) { actors = available; choosingActor = true }
-            else error = "Pantopus account authorization is not connected for this native app. Your destination is kept."
+            else error = QelvoraCopy.text("nativePantopusAccountAuthorization")
         }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (_: Exception) { error = QelvoraCopy.text("pantopusUnavailable") }
@@ -308,6 +313,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
             destination = result.returnTo; choosingActor = false; refresh()
         }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+        catch (failure: CreatorAPIError) { if (adultRefusal(failure)) { if (purge()) adultOnly = true } else error = message(failure) }
         catch (failure: Exception) { error = message(failure) }
         finally { busy = false }
     }
@@ -385,7 +391,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         try { if (all) client.revokeSessions() else client.logout(); purge() }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (failure: CreatorAPIError) { if (failure.status == 401) purge() else error = message(failure) }
-        catch (_: Exception) { error = "Sign-out could not reach the server. Retry to revoke the session." }
+        catch (_: Exception) { error = QelvoraCopy.text("nativeSignOutCouldNotReachThe") }
         finally { busy = false }
     }
     suspend fun refreshCredentials() {
@@ -403,8 +409,8 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
             generation++; rotatingCredential = false; refresh()
         }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-        catch (failure: CreatorAPIError) { if (current == generation) { if (failure.status == 401) { if (purge()) error = message(failure) } else error = message(failure) } }
-        catch (_: Exception) { if (current == generation) error = "Session refresh could not complete. Reconnect and try again." }
+        catch (failure: CreatorAPIError) { if (current == generation) { if (adultRefusal(failure)) { if (purge()) adultOnly = true } else if (failure.status == 401) { if (purge()) error = message(failure) } else error = message(failure) } }
+        catch (_: Exception) { if (current == generation) error = QelvoraCopy.text("nativeSessionRefreshCouldNotComplete") }
         finally { busy = false; rotatingCredential = false }
     }
     /** Go forward. A link or a push (`arrival`) says which tab it belongs to; a route that only forwards replaces itself. */
@@ -412,12 +418,15 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     /** Go forward without leaving this screen on the trail, so Back never returns to it. */
     fun replace(target: String, arrival: Boolean = false) = go(target, Move.REPLACE, arrival)
     private fun go(target: String, mode: Move, arrival: Boolean) {
-        if (!ApplicationDestination.isPermitted(target)) { error = "This link is unavailable. Open the object from the app."; return }
+        if (!ApplicationDestination.isPermitted(target)) { error = QelvoraCopy.text("nativeThisLinkIsUnavailableOpenThe"); return }
         navigationRestoreAllowed = false; removedArrivalFor = null; move = mode
         destination = target
         if (arrival && !NavigationParents.isRoot(target)) tab = NavigationParents.tab(target)
     }
-    private fun message(failure: Exception): String = if (failure is CreatorAPIError) runCatching { Json.decodeFromString<APIError>(failure.body).error.message }.getOrDefault("This action could not complete. Reconnect and try again.") else "This action could not complete. Reconnect and try again."
+    /** The server's final under-18 answer (C1): 403 adult_eligibility_required. */
+    private fun adultRefusal(failure: CreatorAPIError): Boolean =
+        failure.status == 403 && runCatching { Json.decodeFromString<APIError>(failure.body).error.code }.getOrNull() == "adult_eligibility_required"
+    private fun message(failure: Exception): String = if (failure is CreatorAPIError) runCatching { Json.decodeFromString<APIError>(failure.body).error.message }.getOrDefault(QelvoraCopy.text("nativeThisActionCouldNotCompleteReconnect")) else QelvoraCopy.text("nativeThisActionCouldNotCompleteReconnect")
 }
 
 class FanFeatureRegistration(
@@ -504,13 +513,14 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
         if (foreground && !model.checkingSession && model.openNotification(id)) onNotificationConsumed()
     }
     Column(Modifier.fillMaxSize().background(qColor("ground")).windowInsetsPadding(WindowInsets.safeDrawing)) {
-        if (model.error.isNotEmpty()) Notice("error", "Account status", model.error)
+        if (model.error.isNotEmpty()) Notice("error", QelvoraCopy.text("nativeAccountStatus"), model.error)
         if (model.localPurgeFailed) Button(QelvoraCopy.text("identityPrivateClearRetry"), ButtonVariant.SECONDARY, block = true, disabled = model.busy || model.purgingPrivateState) { scope.launch { model.purge() } }
         when {
+            model.adultOnly -> AdultsOnly()
             model.choosingActor -> Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Notice(title = "Development identity", children = "Synthetic isolated accounts. Pantopus production sign-in is not connected.")
+                Notice(title = QelvoraCopy.text("identityDevelopmentTitle"), children = QelvoraCopy.text("nativeSyntheticIsolatedAccountsPantopus"))
                 model.actors.forEach { actor -> Button(actor.label, ButtonVariant.SECONDARY, block = true, disabled = model.busy) { scope.launch { model.selectActor(actor.id) } } }
-                Button("Cancel", ButtonVariant.QUIET) { model.choosingActor = false }
+                Button(QelvoraCopy.text("cancel"), ButtonVariant.QUIET) { model.choosingActor = false }
             }
             model.session == null && features.any { it.matches(model.destination) && it.allowsSignedOut(model.destination) } -> key(model.destination, destinationDelivery) { features.first { it.matches(model.destination) && it.allowsSignedOut(model.destination) }.screen(model) }
             model.session == null && model.hasSavedCredential -> Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -518,41 +528,41 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                 BasicText(QelvoraCopy.text("accountUnavailableBody"), style = qText("body").copy(color = qColor("ink-muted")))
                 Button(QelvoraCopy.text("retry"), ButtonVariant.SECONDARY, block = true, disabled = model.busy || model.checkingSession) { scope.launch { model.refresh() } }
                 if (features.any { it.matches("/trust/crisis") && it.allowsSignedOut("/trust/crisis") }) {
-                    Button("Crisis help", ButtonVariant.QUIET, block = true) { model.open("/trust/crisis") }
+                    Button(QelvoraCopy.text("nativeCrisisHelp"), ButtonVariant.QUIET, block = true) { model.open("/trust/crisis") }
                 }
             }
             model.session == null && model.checkingSession -> Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 BasicText(QelvoraCopy.text("growthLoading"), style = qText("body").copy(color = qColor("ink")))
                 if (features.any { it.matches("/trust/crisis") && it.allowsSignedOut("/trust/crisis") }) {
-                    Button("Crisis help", ButtonVariant.QUIET, block = true) { model.open("/trust/crisis") }
+                    Button(QelvoraCopy.text("nativeCrisisHelp"), ButtonVariant.QUIET, block = true) { model.open("/trust/crisis") }
                 }
             }
-            model.session == null -> Welcome(returnTo = model.destination, showContext = model.arrival != null, contextSource = model.arrival?.source, contextTitle = model.arrival?.title, bodyCopy = model.arrival?.let { "Every message says who wrote it: ${it.creatorName}'s AI, ${it.creatorName}, or their team. You'll always know which." } ?: "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext = model::removeArrival, onContinue = { scope.launch { model.beginSignIn() } }, busy = model.busy || model.purgingPrivateState)
+            model.session == null -> Welcome(returnTo = model.destination, showContext = model.arrival != null, contextSource = model.arrival?.source, contextTitle = model.arrival?.title, bodyCopy = model.arrival?.let { QelvoraCopy.text("nativeEveryMessageSaysWhoWroteItNames", mapOf("name" to it.creatorName)) } ?: QelvoraCopy.text("nativeEveryMessageSaysWhoWroteIt"), onRemoveContext = model::removeArrival, onContinue = { scope.launch { model.beginSignIn() } }, busy = model.busy || model.purgingPrivateState)
             model.session?.fan == null && features.any { it.matches(model.destination) && it.allowsSignedOut(model.destination) } -> key(model.session?.accountId, model.session?.sessionId, model.destination) { features.first { it.matches(model.destination) && it.allowsSignedOut(model.destination) }.screen(model) }
             (model.session?.fan == null && ApplicationDestination.requiresFanProfile(model.destination)) || model.destination == "/onboarding/handle" -> key(model.session?.accountId, model.session?.sessionId) { HandleForm(model) }
             else -> {
                 val isConversation = model.destination.substringBefore('?').startsWith("/threads/")
                 if (model.session?.mode == APISessionMode.DEVELOPMENT) {
-                    if (isConversation) BasicText("Development identity · synthetic account · actual local API", style = qText("caption").copy(color = qColor("ink")), modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
-                    else Notice(title = "Development identity", children = "Synthetic account · actual local API.")
+                    if (isConversation) BasicText(QelvoraCopy.text("nativeDevelopmentIdentitySynthetic"), style = qText("caption").copy(color = qColor("ink")), maxLines = 1, modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp))
+                    else Notice(title = QelvoraCopy.text("identityDevelopmentTitle"), children = QelvoraCopy.text("nativeSyntheticAccountActualLocalAPI"))
                 }
                 Box(Modifier.weight(1f).fillMaxWidth()) {
                     val feature = features.firstOrNull { it.matches(model.destination) }
                     if (model.destination == "/identity/account" || (model.destination == "/you" && feature == null)) Column(Modifier.padding(16.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                        BasicText("Your account", style = qText("display-md").copy(color = qColor("ink")))
+                        BasicText(QelvoraCopy.text("nativeYourAccount"), Modifier.semantics { heading() }, style = qText("display-md").copy(color = qColor("ink")))
                         model.session?.fan?.handle?.let { handle -> BasicText("@$handle", style = qText("body").copy(color = qColor("ink"))) }
                         Button(QelvoraCopy.text(if (model.session?.fan == null) "identityChooseHandle" else "identityEditPublicProfile"), ButtonVariant.SECONDARY, block = true) { model.destination = "/onboarding/handle" }
                         Button(QelvoraCopy.text("w5NativeTeamWorkspace"), ButtonVariant.SECONDARY, block = true, disabled = model.busy || model.checkingSession || model.purgingPrivateState || model.localPurgeFailed || model.error.isNotEmpty()) { model.open("/studio/workspace") }
-                        Button("Sign out", ButtonVariant.SECONDARY, block = true) { scope.launch { model.logout() } }
-                        Button("Refresh session", ButtonVariant.SECONDARY, block = true, disabled = model.busy) { scope.launch { model.refreshCredentials() } }
-                        Button("Sign out on all devices", ButtonVariant.QUIET, block = true) { scope.launch { model.logout(true) } }
-                        Button("Help and reports", ButtonVariant.QUIET, block = true) { model.open("/support") }
-                        Button("Your data", ButtonVariant.QUIET, block = true) { model.open("/support/privacy") }
-                        Button("Notification settings", ButtonVariant.QUIET, block = true) { model.open("/notifications/settings") }
+                        Button(QelvoraCopy.text("nativeSignOut"), ButtonVariant.SECONDARY, block = true) { scope.launch { model.logout() } }
+                        Button(QelvoraCopy.text("nativeRefreshSession"), ButtonVariant.SECONDARY, block = true, disabled = model.busy) { scope.launch { model.refreshCredentials() } }
+                        Button(QelvoraCopy.text("nativeSignOutOnAllDevices"), ButtonVariant.QUIET, block = true) { scope.launch { model.logout(true) } }
+                        Button(QelvoraCopy.text("nativeHelpAndReports"), ButtonVariant.QUIET, block = true) { model.open("/support") }
+                        Button(QelvoraCopy.text("nativeYourData"), ButtonVariant.QUIET, block = true) { model.open("/support/privacy") }
+                        Button(QelvoraCopy.text("growthNotificationSettings"), ButtonVariant.QUIET, block = true) { model.open("/notifications/settings") }
                         if (model.session?.creator != null) Button(QelvoraCopy.text("growthYourWeekImpact"), ButtonVariant.QUIET, block = true) { model.open("/studio/impact") }
                         if (model.session?.creator != null && context is android.app.Activity) CredentialSettings(context, model)
                     } else if (feature != null) key(model.session?.accountId, model.session?.sessionId, model.destination, destinationDelivery) { feature.screen(model) }
-                    else Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) { BasicText("This destination is not connected yet", style = qText("title").copy(color = qColor("ink"))); BasicText("Your account and arrival context are kept.", style = qText("body").copy(color = qColor("ink-muted"))); Button("Your account", ButtonVariant.SECONDARY) { model.destination = "/you" } }
+                    else Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) { BasicText(QelvoraCopy.text("nativeThisDestinationIsNotConnected"), style = qText("title").copy(color = qColor("ink"))); BasicText(QelvoraCopy.text("nativeYourAccountAndArrivalContext"), style = qText("body").copy(color = qColor("ink-muted"))); Button(QelvoraCopy.text("nativeYourAccount"), ButtonVariant.SECONDARY) { model.destination = "/you" } }
                 }
                 val labels = listOf("navHome" to "/home", "navDiscover" to "/discover", "navRequests" to "/requests", "navYou" to "/you")
                 val selectedTab = labels.first { it.second == model.tab }.first
@@ -570,25 +580,25 @@ private fun HandleForm(model: FanSession) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).heightIn(min = available).padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 36.dp), verticalArrangement = Arrangement.SpaceBetween) {
             Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Box(Modifier.size(44.dp).clickable(role = Role.Button) { model.back() }.semantics { contentDescription = "Back" }, contentAlignment = Alignment.Center) { Glyph("back", 22.dp, qColor("ink")) }
-                    BasicText(if (model.session?.mode == APISessionMode.DEVELOPMENT) "DEVELOPMENT SIGN-IN" else "SIGNED IN WITH PANTOPUS", style = qText("data-sm").copy(color = qColor("ink-muted")))
+                    Box(Modifier.size(44.dp).clickable(role = Role.Button) { model.back() }.semantics { contentDescription = QelvoraCopy.text("back") }, contentAlignment = Alignment.Center) { Glyph("back", 22.dp, qColor("ink")) }
+                    BasicText(if (model.session?.mode == APISessionMode.DEVELOPMENT) QelvoraCopy.text("nativeDEVELOPMENTSIGNIN") else QelvoraCopy.text("nativeSIGNEDINWITHPANTOPUS"), style = qText("data-sm").copy(color = qColor("ink-muted")))
                 }
-                BasicText("How creators will know you", Modifier.semantics { heading() }, style = qText("display-lg").copy(color = qColor("ink")))
+                BasicText(QelvoraCopy.text("nativeHowCreatorsWillKnowYou"), Modifier.semantics { heading() }, style = qText("display-lg").copy(color = qColor("ink")))
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    BasicText("Handle", style = qText("caption", true).copy(color = qColor("ink-muted")))
-                    BasicTextField(handle, { handle = it.take(31) }, Modifier.fillMaxWidth().heightIn(min = 44.dp).background(qColor("surface"), RoundedCornerShape(12.dp)).border(1.dp, qColor("control-line"), RoundedCornerShape(12.dp)).padding(12.dp).semantics { contentDescription = "Public handle, a pseudonym is allowed" }, textStyle = qText("body").copy(color = qColor("ink")), singleLine = true, keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrectEnabled = false))
-                    BasicText("Creators and their teams see your handle, never your name or city unless you share them in a request.", style = qText("caption").copy(color = qColor("ink-muted")))
+                    BasicText(QelvoraCopy.text("nativeHandle"), style = qText("caption", true).copy(color = qColor("ink-muted")))
+                    BasicTextField(handle, { handle = it.take(31) }, Modifier.fillMaxWidth().heightIn(min = 44.dp).background(qColor("surface"), RoundedCornerShape(12.dp)).border(1.dp, qColor("control-line"), RoundedCornerShape(12.dp)).padding(12.dp).semantics { contentDescription = QelvoraCopy.text("nativePublicHandle") + ". " + QelvoraCopy.text("nativeAPseudonymIsAllowedThreeTo") }, textStyle = qText("body").copy(color = qColor("ink")), singleLine = true, keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrectEnabled = false))
+                    BasicText(QelvoraCopy.text("nativeCreatorsAndTheirTeamsSeeYour"), style = qText("caption").copy(color = qColor("ink-muted")))
                 }
                 if (model.session?.fan != null) {
                     Column(Modifier.background(qColor("surface"), RoundedCornerShape(16.dp)).border(1.dp, qColor("line"), RoundedCornerShape(16.dp)).padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        BasicText("A LINE ABOUT YOU · OPTIONAL", style = qText("data-sm").copy(color = qColor("ink-muted")))
-                        BasicTextField(intro, { intro = it.take(240) }, Modifier.fillMaxWidth().heightIn(min = 90.dp).semantics { contentDescription = "A line about you, optional" }, textStyle = qText("body").copy(color = qColor("ink")))
-                        BasicText("You choose, per creator, whether their AI may use this.", style = qText("caption").copy(color = qColor("ink-muted")))
+                        BasicText(QelvoraCopy.text("nativeALINEABOUTYOUOPTIONAL"), style = qText("data-sm").copy(color = qColor("ink-muted")))
+                        BasicTextField(intro, { intro = it.take(240) }, Modifier.fillMaxWidth().heightIn(min = 90.dp).semantics { contentDescription = QelvoraCopy.text("nativeALineAboutYouOptional") }, textStyle = qText("body").copy(color = qColor("ink")))
+                        BasicText(QelvoraCopy.text("nativeYouChoosePerCreatorWhetherTheir"), style = qText("caption").copy(color = qColor("ink-muted")))
                     }
                 }
                 Spacer(Modifier.height(24.dp))
             }
-            Button(if (model.busy) "Saving…" else "Continue", ButtonVariant.SECONDARY, "lg", block = true, disabled = model.busy) { scope.launch { model.saveHandle(handle, if (model.session?.fan == null) "" else intro) } }
+            Button(if (model.busy) QelvoraCopy.text("nativeSaving") else QelvoraCopy.text("nativeContinue"), ButtonVariant.SECONDARY, "lg", block = true, disabled = model.busy) { scope.launch { model.saveHandle(handle, if (model.session?.fan == null) "" else intro) } }
         }
     }
 }

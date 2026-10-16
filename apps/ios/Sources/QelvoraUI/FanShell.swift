@@ -97,6 +97,9 @@ public final class FanSession: ObservableObject {
     @Published public private(set) var arrival: ArrivalContext?
     @Published public private(set) var actors: [APIIdentityCapabilitiesDevelopmentActorsItem] = []
     @Published public private(set) var localPurgeFailed = false
+    /// D-11: an account found under 18 (at sign-in, or flagged later) loses
+    /// access. The session ends here too and only the adults-only state shows.
+    @Published public private(set) var adultOnly = false
     @Published public private(set) var purgingPrivateState = false
     public let api: CreatorAPIClient?
     private let storage: SecureSessionStorage
@@ -137,7 +140,7 @@ public final class FanSession: ObservableObject {
                 try await storage.saveDestination(target, accountId: active.accountId, credential: credential, revision: revision)
             } catch {
                 guard snapshot == generation, revision == navigationRevision else { return }
-                self.error = "Your place in the app could not be kept. You can still open it again."
+                self.error = QelvoraCopy.text("nativeYourPlaceInTheAppCould")
             }
         }
     }
@@ -158,7 +161,7 @@ public final class FanSession: ObservableObject {
         } catch {
             guard !Task.isCancelled, snapshot == generation else { return }
             navigationInitialized = true; navigationRestoreAllowed = false
-            self.error = "Your saved place is unavailable. Open it again from the app."
+            self.error = QelvoraCopy.text("nativeYourSavedPlaceIsUnavailableOpen")
         }
     }
     /// Never reconstruct default/global storage for an authenticated request.
@@ -225,7 +228,7 @@ public final class FanSession: ObservableObject {
         do {
             let page: Page = try await GrowthClient(baseURL: baseURL, token: { nil }).request("public/creators/" + handle)
             guard destination == snapshot else { return }
-            arrival = ArrivalContext(source: "You came from " + page.creator.name + "'s page", title: page.creator.name + " · " + page.creator.category, creatorName: page.creator.name)
+            arrival = ArrivalContext(source: QelvoraCopy.text("nativeYouCameFromNamesPage", values: ["name": page.creator.name]), title: page.creator.name + " · " + page.creator.category, creatorName: page.creator.name)
         } catch { /* Do not invent creator identity when the public projection is unavailable. */ }
     }
     public func removeArrival() { arrival = nil; removedArrivalFor = destination.components(separatedBy: "?")[0]; move = .replace; destination = removedArrivalFor! }
@@ -258,10 +261,10 @@ public final class FanSession: ObservableObject {
             guard current == generation, !Task.isCancelled else { return }
             guard observedCredential == token else {
                 confirmedCredential = nil; session = nil
-                error = "Your session changed. Refresh your account before continuing."
+                error = QelvoraCopy.text("nativeYourSessionChangedRefreshYour")
                 return
             }
-            if let previous = session, previous.accountId != value.accountId { if await purge() { error = "The account changed. Continue with Pantopus again." }; return }
+            if let previous = session, previous.accountId != value.accountId { if await purge() { error = QelvoraCopy.text("nativeTheAccountChangedContinueWith") }; return }
             confirmedCredential = token; session = value; error = ""
             await restoreDestination(account: value, credential: token, generation: current)
             guard current == generation, !Task.isCancelled else { return }
@@ -274,15 +277,16 @@ public final class FanSession: ObservableObject {
             guard current == generation, !Task.isCancelled else { return }
             confirmedCredential = nil
             guard observedCredential == token else {
-                session = nil; error = "Your session changed. Refresh your account before continuing."; return
+                session = nil; error = QelvoraCopy.text("nativeYourSessionChangedRefreshYour"); return
             }
+            if Self.adultRefusal(failure) { if await purge() { adultOnly = true }; return }
             if failure.status == 401 {
                 if !busy { refreshingSession = false; await refreshCredentials() }
-                else { if await purge() { error = "Your session ended. Continue with Pantopus again." } }
+                else { if await purge() { error = QelvoraCopy.text("nativeYourSessionEndedContinueWith") } }
             }
             else { error = Self.message(failure) }
         } catch is CancellationError { return }
-        catch { guard current == generation, !Task.isCancelled else { return }; confirmedCredential = nil; self.error = "Reconnect to refresh your account. Actions are unavailable while offline." }
+        catch { guard current == generation, !Task.isCancelled else { return }; confirmedCredential = nil; self.error = QelvoraCopy.text("nativeReconnectToRefreshYourAccount") }
     }
     public func beginSignIn() async {
         guard !busy else { return }; busy = true; defer { busy = false }
@@ -294,8 +298,8 @@ public final class FanSession: ObservableObject {
             #if DEBUG
             if capabilities.mode == .development, let available = capabilities.developmentActors, !available.isEmpty { actors = available; choosingDevelopmentActor = true; return }
             #endif
-            error = "Pantopus account authorization is not connected for this native app. Your destination is kept."
-        } catch { self.error = "Sign-in is unavailable. Reconnect and try again." }
+            error = QelvoraCopy.text("nativePantopusAccountAuthorization")
+        } catch { self.error = QelvoraCopy.text("nativeSignInIsUnavailableReconnect") }
     }
     public func selectActor(_ id: String) async {
         #if DEBUG
@@ -311,7 +315,8 @@ public final class FanSession: ObservableObject {
             guard installing == generation else { return }
             destination = result.returnTo; choosingDevelopmentActor = false
             await refresh()
-        } catch { self.error = Self.message(error) }
+        } catch let failure as CreatorAPIError where Self.adultRefusal(failure) { if await purge() { adultOnly = true } }
+        catch { self.error = Self.message(error) }
         #endif
     }
     public func saveHandle(_ handle: String, intro: String) async -> Bool {
@@ -368,7 +373,7 @@ public final class FanSession: ObservableObject {
         guard let api else { await purge(); return }
         do { if all { _ = try await api.revokeSessions() } else { _ = try await api.logout() }; await purge() }
         catch let error as CreatorAPIError { if error.status == 401 { await purge() } else { self.error = Self.message(error) } }
-        catch { self.error = "Sign-out could not reach the server. Retry to revoke the session." }
+        catch { self.error = QelvoraCopy.text("nativeSignOutCouldNotReachThe") }
     }
     public func refreshCredentials() async {
         guard let api, !busy, !Task.isCancelled else { return }; busy = true; rotatingCredential = true; generation += 1; let current = generation; defer { busy = false; rotatingCredential = false }
@@ -387,8 +392,8 @@ public final class FanSession: ObservableObject {
             guard current == generation else { return }
             generation += 1; rotatingCredential = false; await refresh()
         }
-        catch let failure as CreatorAPIError { guard current == generation, !Task.isCancelled else { return }; if failure.status == 401 { if await purge() { error = Self.message(failure) } } else { error = Self.message(failure) } }
-        catch { guard current == generation, !Task.isCancelled else { return }; self.error = "Session refresh could not complete. Reconnect and try again." }
+        catch let failure as CreatorAPIError { guard current == generation, !Task.isCancelled else { return }; if Self.adultRefusal(failure) { if await purge() { adultOnly = true } } else if failure.status == 401 { if await purge() { error = Self.message(failure) } } else { error = Self.message(failure) } }
+        catch { guard current == generation, !Task.isCancelled else { return }; self.error = QelvoraCopy.text("nativeSessionRefreshCouldNotComplete") }
     }
     @discardableResult public func purge() async -> Bool {
         guard !purgingPrivateState else { return false }
@@ -443,7 +448,7 @@ public final class FanSession: ObservableObject {
     /// Go forward without leaving this screen on the trail, so Back never returns to it.
     public func replace(_ target: String, arrival: Bool = false) { go(target, .replace, arrival) }
     private func go(_ target: String, _ mode: Move, _ arrival: Bool) {
-        guard ApplicationDestination.isPermitted(target) else { error = "This link is unavailable. Open the object from the app."; return }
+        guard ApplicationDestination.isPermitted(target) else { error = QelvoraCopy.text("nativeThisLinkIsUnavailableOpenThe"); return }
         navigationRestoreAllowed = false; removedArrivalFor = nil; move = mode
         destination = target
         if arrival, !NavigationParents.isRoot(target) { tab = NavigationParents.tab(of: target) }
@@ -465,7 +470,11 @@ public final class FanSession: ObservableObject {
         destination = target.path
         return true
     }
-    static func message(_ error: Error) -> String { if let failure = error as? CreatorAPIError, let result = try? JSONDecoder().decode(APIError.self, from: failure.body) { return result.error.message }; return "This action could not complete. Reconnect and try again." }
+    /// The server's final under-18 answer (C1): 403 adult_eligibility_required.
+    static func adultRefusal(_ failure: CreatorAPIError) -> Bool {
+        failure.status == 403 && (try? JSONDecoder().decode(APIError.self, from: failure.body))?.error.code == "adult_eligibility_required"
+    }
+    static func message(_ error: Error) -> String { if let failure = error as? CreatorAPIError, let result = try? JSONDecoder().decode(APIError.self, from: failure.body) { return result.error.message }; return QelvoraCopy.text("nativeThisActionCouldNotCompleteReconnect") }
 }
 
 /// Owners register real fan screens; absence is explicit, never a fixture success.
@@ -506,11 +515,13 @@ public struct FanAppShell: View {
                     shellNotices
                 }
             }
-            if model.choosingDevelopmentActor {
+            if model.adultOnly {
+                AdultsOnly()
+            } else if model.choosingDevelopmentActor {
                 ScrollView { VStack(spacing: 16) {
-                    Notice(title: "Development identity", children: "Synthetic isolated accounts. Pantopus production sign-in is not connected.")
+                    Notice(title: QelvoraCopy.text("identityDevelopmentTitle"), children: QelvoraCopy.text("nativeSyntheticIsolatedAccountsPantopus"))
                     ForEach(model.actors, id: \.id) { actor in Button(actor.label, variant: .secondary, block: true, disabled: model.busy) { Task { await model.selectActor(actor.id) } } }
-                    Button("Cancel", variant: .quiet) { model.choosingDevelopmentActor = false }
+                    Button(QelvoraCopy.text("cancel"), variant: .quiet) { model.choosingDevelopmentActor = false }
                 }.padding(16) }
             } else if model.session == nil, let feature = features.first(where: { $0.matches(model.destination) && $0.allowsSignedOut(model.destination) }) {
                 feature.screen(model).id(model.destination + destinationDelivery.uuidString)
@@ -520,18 +531,18 @@ public struct FanAppShell: View {
                     Text(QelvoraCopy.text("accountUnavailableBody")).qText("body").foregroundStyle(qColor("ink-muted", scheme))
                     Button(QelvoraCopy.text("retry"), variant: .secondary, block: true, disabled: model.busy || model.checkingSession) { Task { await model.refresh() } }
                     if features.contains(where: { $0.matches("/trust/crisis") && $0.allowsSignedOut("/trust/crisis") }) {
-                        Button("Crisis help", variant: .quiet, block: true) { model.open("/trust/crisis") }
+                        Button(QelvoraCopy.text("nativeCrisisHelp"), variant: .quiet, block: true) { model.open("/trust/crisis") }
                     }
                 }.padding(16).frame(maxWidth: .infinity, alignment: .leading) }
             } else if model.session == nil, model.checkingSession {
                 VStack(spacing: 16) {
                     ProgressView(QelvoraCopy.text("growthLoading"))
                     if features.contains(where: { $0.matches("/trust/crisis") && $0.allowsSignedOut("/trust/crisis") }) {
-                        Button("Crisis help", variant: .quiet, block: true) { model.open("/trust/crisis") }
+                        Button(QelvoraCopy.text("nativeCrisisHelp"), variant: .quiet, block: true) { model.open("/trust/crisis") }
                     }
                 }.padding(16)
             } else if model.session == nil {
-                Welcome(returnTo: model.destination, showContext: model.arrival != nil, contextSource: model.arrival?.source, contextTitle: model.arrival?.title, bodyCopy: model.arrival.map { "Every message says who wrote it: " + $0.creatorName + "'s AI, " + $0.creatorName + ", or their team. You'll always know which." } ?? "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext: model.removeArrival, onContinue: { Task { await model.beginSignIn() } }).id(model.arrival?.title)
+                Welcome(returnTo: model.destination, showContext: model.arrival != nil, contextSource: model.arrival?.source, contextTitle: model.arrival?.title, bodyCopy: model.arrival.map { QelvoraCopy.text("nativeEveryMessageSaysWhoWroteItNames", values: ["name": $0.creatorName]) } ?? QelvoraCopy.text("nativeEveryMessageSaysWhoWroteIt"), onRemoveContext: model.removeArrival, onContinue: { Task { await model.beginSignIn() } }).id(model.arrival?.title)
                     .disabled(model.busy || model.purgingPrivateState)
             } else if model.session?.fan == nil, let feature = features.first(where: { $0.matches(model.destination) && $0.allowsSignedOut(model.destination) }) {
                 feature.screen(model).id((model.session?.accountId ?? "") + (model.session?.sessionId ?? "") + model.destination)
@@ -542,16 +553,16 @@ public struct FanAppShell: View {
                     let feature = features.first(where: { $0.matches(model.destination) })
                     if model.destination == "/identity/account" || (model.destination == "/you" && feature == nil) {
                         ScrollView { VStack(alignment: .leading, spacing: 16) {
-                            Text("Your account").qText("display-md")
+                            Text(QelvoraCopy.text("nativeYourAccount")).qText("display-md").accessibilityAddTraits(.isHeader)
                             if let handle = model.session?.fan?.handle { Text("@" + handle).qText("body") }
                             Button(QelvoraCopy.text(model.session?.fan == nil ? "identityChooseHandle" : "identityEditPublicProfile"), variant: .secondary, block: true) { model.destination = "/onboarding/handle" }
                             Button(QelvoraCopy.text("w5NativeTeamWorkspace"), variant: .secondary, block: true, disabled: model.busy || model.checkingSession || model.purgingPrivateState || model.localPurgeFailed || !model.error.isEmpty) { model.open("/studio/workspace") }
-                            Button("Sign out", variant: .secondary, block: true) { Task { await model.logout() } }
-                            Button("Refresh session", variant: .secondary, block: true, disabled: model.busy) { Task { await model.refreshCredentials() } }
-                            Button("Sign out on all devices", variant: .quiet, block: true) { Task { await model.logout(all: true) } }
-                            Button("Help and reports", variant: .quiet, block: true) { model.open("/support") }
-                            Button("Your data", variant: .quiet, block: true) { model.open("/support/privacy") }
-                            Button("Notification settings", variant: .quiet, block: true) { model.open("/notifications/settings") }
+                            Button(QelvoraCopy.text("nativeSignOut"), variant: .secondary, block: true) { Task { await model.logout() } }
+                            Button(QelvoraCopy.text("nativeRefreshSession"), variant: .secondary, block: true, disabled: model.busy) { Task { await model.refreshCredentials() } }
+                            Button(QelvoraCopy.text("nativeSignOutOnAllDevices"), variant: .quiet, block: true) { Task { await model.logout(all: true) } }
+                            Button(QelvoraCopy.text("nativeHelpAndReports"), variant: .quiet, block: true) { model.open("/support") }
+                            Button(QelvoraCopy.text("nativeYourData"), variant: .quiet, block: true) { model.open("/support/privacy") }
+                            Button(QelvoraCopy.text("growthNotificationSettings"), variant: .quiet, block: true) { model.open("/notifications/settings") }
                             if model.session?.creator != nil { Button(QelvoraCopy.text("growthYourWeekImpact"), variant: .quiet, block: true) { model.open("/studio/impact") } }
                             #if os(iOS)
                             if model.session?.creator != nil { CredentialSettings(model: model) }
@@ -559,7 +570,7 @@ public struct FanAppShell: View {
                         }.padding(16) }
                     } else if model.destination == "/onboarding/handle" { NativeHandleForm(model: model).id((model.session?.accountId ?? "") + (model.session?.sessionId ?? "")) }
                     else if let feature { feature.screen(model).id((model.session?.accountId ?? "") + (model.session?.sessionId ?? "") + model.destination + destinationDelivery.uuidString) }
-                    else { EmptyState(title: "This destination is not connected yet", body: "Your account and arrival context are kept. Return to your account or try again when this feature is available.") { Button("Your account", variant: .secondary) { model.destination = "/you" } }.frame(maxHeight: .infinity) }
+                    else { EmptyState(title: QelvoraCopy.text("nativeThisDestinationIsNotConnected"), body: QelvoraCopy.text("nativeYourAccountAndArrivalContext")) { Button(QelvoraCopy.text("nativeYourAccount"), variant: .secondary) { model.destination = "/you" } }.frame(maxHeight: .infinity) }
                     if !isConversation { TabBar(active: model.tab) { model.destination = "/" + $0.rawValue.lowercased() }.layoutPriority(1) }
                 }
             }
@@ -601,9 +612,9 @@ public struct FanAppShell: View {
                 #else
                 let initialLink = false
                 #endif
-                guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false), components.user == nil, components.password == nil, components.fragment == nil else { model.error = "This link is unavailable."; return }
+                guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false), components.user == nil, components.password == nil, components.fragment == nil else { model.error = QelvoraCopy.text("nativeThisLinkIsUnavailable"); return }
                 let associationHost = Bundle.main.object(forInfoDictionaryKey: "CreatorLinkHost") as? String
-                guard (components.scheme == "qelvora" && components.host == "app" && components.port == nil) || (components.scheme == "https" && associationHost != nil && components.host == associationHost && (components.port == nil || components.port == 443)) else { model.error = "This link does not belong to this app."; return }
+                guard (components.scheme == "qelvora" && components.host == "app" && components.port == nil) || (components.scheme == "https" && associationHost != nil && components.host == associationHost && (components.port == nil || components.port == 443)) else { model.error = QelvoraCopy.text("nativeThisLinkDoesNotBelongTo"); return }
                 let target = components.percentEncodedPath + (components.percentEncodedQuery.map { "?" + $0 } ?? "")
                 // A scene's initial link has no previous screen. Warm links push.
                 if initialLink { model.replace(target, arrival: true) }
@@ -622,14 +633,14 @@ public struct FanAppShell: View {
     private var shellNotices: some View {
         VStack(spacing: 0) {
             if !model.error.isEmpty {
-                Notice(tone: .error, title: "Account status", children: model.error, accessibilityIdentifier: model.session == nil && model.error == QelvoraCopy.text("pantopusUnavailable") ? "pantopus-unavailable" : "account-status").padding(16)
+                Notice(tone: .error, title: QelvoraCopy.text("nativeAccountStatus"), children: model.error, accessibilityIdentifier: model.session == nil && model.error == QelvoraCopy.text("pantopusUnavailable") ? "pantopus-unavailable" : "account-status").padding(16)
             }
             if model.localPurgeFailed {
                 Button(QelvoraCopy.text("identityPrivateClearRetry"), variant: .secondary, block: true, disabled: model.busy || model.purgingPrivateState) { Task { await model.purge() } }.padding(.horizontal, 16)
             }
             if showsDevelopmentNotice {
-                if isConversation { Text("Development identity · synthetic account · actual local API").qText("caption").padding(.horizontal, 16).padding(.vertical, 8) }
-                else { Notice(title: "Development identity", children: "Synthetic account · actual local API.").padding(16) }
+                if isConversation { Text(QelvoraCopy.text("nativeDevelopmentIdentitySynthetic")).qText("caption").padding(.horizontal, 16).padding(.vertical, 8) }
+                else { Notice(title: QelvoraCopy.text("identityDevelopmentTitle"), children: QelvoraCopy.text("nativeSyntheticAccountActualLocalAPI")).padding(16) }
             }
         }
     }
@@ -652,25 +663,25 @@ struct NativeHandleForm: View {
                 VStack(alignment: .leading, spacing: 0) {
                     VStack(alignment: .leading, spacing: 24) {
                         HStack {
-                            SwiftUI.Button { model.back() } label: { QelvoraGlyph(name: "back", size: 22).frame(width: 44, height: 44) }.buttonStyle(.plain).accessibilityLabel("Back")
-                            Spacer(); Text(model.session?.mode == .development ? "DEVELOPMENT SIGN-IN" : "SIGNED IN WITH PANTOPUS").qText("data-sm")
+                            SwiftUI.Button { model.back() } label: { QelvoraGlyph(name: "back", size: 22).frame(width: 44, height: 44) }.buttonStyle(.plain).accessibilityLabel(QelvoraCopy.text("back"))
+                            Spacer(); Text(model.session?.mode == .development ? QelvoraCopy.text("nativeDEVELOPMENTSIGNIN") : QelvoraCopy.text("nativeSIGNEDINWITHPANTOPUS")).qText("data-sm")
                         }
-                        Text("How creators will know you").qText("display-lg").accessibilityAddTraits(.isHeader)
+                        Text(QelvoraCopy.text("nativeHowCreatorsWillKnowYou")).qText("display-lg").accessibilityAddTraits(.isHeader)
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Handle").qText("caption", weight: .semibold).foregroundStyle(qColor("ink-muted", scheme))
-                            handleField.qText("body").textFieldStyle(.plain).padding(.horizontal, 12).frame(minHeight: 44).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: 12)).overlay(RoundedRectangle(cornerRadius: 12).stroke(qColor("control-line", scheme), lineWidth: 1)).accessibilityLabel("Public handle").accessibilityHint("A pseudonym is allowed. Three to thirty letters, numbers or underscores.")
-                            Text("Creators and their teams see your handle, never your name or city unless you share them in a request.").qText("caption").foregroundStyle(qColor("ink-muted", scheme))
+                            Text(QelvoraCopy.text("nativeHandle")).qText("caption", weight: .semibold).foregroundStyle(qColor("ink-muted", scheme))
+                            handleField.qText("body").textFieldStyle(.plain).padding(.horizontal, 12).frame(minHeight: 44).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: 12)).overlay(RoundedRectangle(cornerRadius: 12).stroke(qColor("control-line", scheme), lineWidth: 1)).accessibilityLabel(QelvoraCopy.text("nativePublicHandle")).accessibilityHint(QelvoraCopy.text("nativeAPseudonymIsAllowedThreeTo"))
+                            Text(QelvoraCopy.text("nativeCreatorsAndTheirTeamsSeeYour")).qText("caption").foregroundStyle(qColor("ink-muted", scheme))
                         }
                         if model.session?.fan != nil {
                             VStack(alignment: .leading, spacing: 10) {
-                                Text("A LINE ABOUT YOU · OPTIONAL").qText("data-sm")
-                                TextEditor(text: $intro).qText("body").scrollContentBackground(.hidden).frame(minHeight: 90).accessibilityLabel("A line about you, optional").onChange(of: intro) { _, value in if value.count > 240 { intro = String(value.prefix(240)) } }
-                                Text("You choose, per creator, whether their AI may use this.").qText("caption").foregroundStyle(qColor("ink-muted", scheme))
+                                Text(QelvoraCopy.text("nativeALINEABOUTYOUOPTIONAL")).qText("data-sm")
+                                TextEditor(text: $intro).qText("body").scrollContentBackground(.hidden).frame(minHeight: 90).accessibilityLabel(QelvoraCopy.text("nativeALineAboutYouOptional")).onChange(of: intro) { _, value in if value.count > 240 { intro = String(value.prefix(240)) } }
+                                Text(QelvoraCopy.text("nativeYouChoosePerCreatorWhetherTheir")).qText("caption").foregroundStyle(qColor("ink-muted", scheme))
                             }.padding(16).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: 16)).overlay(RoundedRectangle(cornerRadius: 16).stroke(qColor("line", scheme), lineWidth: 1))
                         }
                     }
                     Spacer(minLength: 24)
-                    Button(model.busy ? "Saving…" : "Continue", variant: .secondary, size: .lg, block: true, disabled: model.busy) { Task { if await model.saveHandle(handle, intro: model.session?.fan == nil ? "" : intro) && model.destination == "/onboarding/handle" { model.destination = "/you" } } }
+                    Button(model.busy ? QelvoraCopy.text("nativeSaving") : QelvoraCopy.text("nativeContinue"), variant: .secondary, size: .lg, block: true, disabled: model.busy) { Task { if await model.saveHandle(handle, intro: model.session?.fan == nil ? "" : intro) && model.destination == "/onboarding/handle" { model.destination = "/you" } } }
                 }.frame(minHeight: max(0, frame.size.height - 52)).padding(.horizontal, 20).padding(.top, 16).padding(.bottom, 36)
             }
         }.onAppear { handle = model.session?.fan?.handle ?? ""; intro = model.session?.fan?.intro ?? "" }
