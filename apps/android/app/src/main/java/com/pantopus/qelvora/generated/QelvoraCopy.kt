@@ -327,6 +327,7 @@ object QelvoraCopy {
     "growthFindingCreators" to "Finding creators",
     "growthUsefulness" to "Usefulness",
     "growthNotifications" to "Notifications",
+    "growthUnread" to "Unread",
     "growthLeaving" to "Leaving",
     "growthRating" to "Rating",
     "growthSkipRating" to "Skip rating",

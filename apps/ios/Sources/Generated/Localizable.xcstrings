@@ -3576,6 +3576,17 @@
         }
       }
     },
+    "Unread": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unread"
+          }
+        }
+      }
+    },
     "Leaving": {
       "extractionState": "manual",
       "localizations": {

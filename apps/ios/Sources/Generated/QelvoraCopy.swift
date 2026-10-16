@@ -327,6 +327,7 @@ public enum QelvoraCopy {
     "growthFindingCreators": "Finding creators",
     "growthUsefulness": "Usefulness",
     "growthNotifications": "Notifications",
+    "growthUnread": "Unread",
     "growthLeaving": "Leaving",
     "growthRating": "Rating",
     "growthSkipRating": "Skip rating",
