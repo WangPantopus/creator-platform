@@ -1,8 +1,8 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-15, by the lane 3 session
-Working on: B9 (small fixes on the fan thread and account pages), branch `lane-3/b9-small-fixes`
-Done: merged A1 #411, A3 #426, A6a #434. Open: A6b #433, A6c #436, A6 hold sizing #438, B2 #441, A2 #444, B9
+Working on: keeping the open pull requests current with main; waiting on the founder for B9's step-in rule
+Done: merged A1 #411, A3 #426, A6a #434, A6b #433 (its code and migration 0251 through the registration #442). Open: A6c #436, A6 hold sizing #438, B2 #441, A2 #444, B9 #446
 Next: the migration proposals for findings 8, 9 and 15, then the next work package in the founder's order
 Blocked on: nothing. Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
 
