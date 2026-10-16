@@ -4,6 +4,7 @@ import {
   DraftConfig,
   AgentAudience,
   type Passage,
+  type Usage,
 } from "../../../../../packages/api/src/agent/contracts.js";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
@@ -17,6 +18,17 @@ import {
   type GenerationConversationContext,
 } from "../conversation/generation-context.js";
 import { PreparedGenerationConversationOutput } from "../conversation/generation-output.js";
+import {
+  PreparedGenerationConversationMemory,
+  type MemoryProposalItem,
+} from "../conversation/generation-memory.js";
+import {
+  MEMORY_EXTRACTION_INSTRUCTIONS,
+  MEMORY_SENSITIVITY_INSTRUCTIONS,
+  MemoryExtraction,
+  MemorySensitivity,
+  SENSITIVE_MEMORY_TEXT,
+} from "./memory-proposals.js";
 import { CommerceGenerationAudience } from "../commerce/generation-audience.js";
 import {
   PreparedGenerationAgentInputs,
@@ -30,6 +42,7 @@ import {
   PreparedGenerationProviderAccounting,
   type GenerationProviderAttempt,
   type GenerationProviderCall,
+  type GenerationAdmissionBookend,
 } from "./generation-provider-usage.js";
 import {
   PreparedGenerationRuntimeContext,
@@ -162,6 +175,7 @@ export class PreparedGenerationPipeline {
     private readonly accounting: PreparedGenerationProviderAccounting,
     private readonly retrieval: PreparedGenerationRuntimeContext,
     private readonly guardrail: PreparedGenerationGuardrail,
+    private readonly memory?: PreparedGenerationConversationMemory,
   ) {}
 
   static prepare(input: {
@@ -174,6 +188,8 @@ export class PreparedGenerationPipeline {
     accounting: PreparedGenerationProviderAccounting;
     retrieval: PreparedGenerationRuntimeContext;
     guardrail: PreparedGenerationGuardrail;
+    /** Inactive until its reviewed receipt is registered (B5). */
+    memory?: PreparedGenerationConversationMemory;
   }): PreparedGenerationPipeline {
     invariant(
       input.identity instanceof GenerationIdentityAuthority &&
@@ -185,6 +201,8 @@ export class PreparedGenerationPipeline {
         input.accounting instanceof PreparedGenerationProviderAccounting &&
         input.retrieval instanceof PreparedGenerationRuntimeContext &&
         input.guardrail instanceof PreparedGenerationGuardrail &&
+        (input.memory === undefined ||
+          input.memory instanceof PreparedGenerationConversationMemory) &&
         input.service.pipeline.model?.pricingConfigured,
       "generation_pipeline_unconfigured",
       "All original prepared current-input, accounting, context and audit producers are required.",
@@ -208,6 +226,7 @@ export class PreparedGenerationPipeline {
       input.accounting,
       input.retrieval,
       input.guardrail,
+      input.memory,
     );
   }
 
@@ -324,6 +343,82 @@ export class PreparedGenerationPipeline {
       "generation_sentence_changed",
       "Approved output changed during its held operation.",
     );
+  }
+
+  /** B5: one extraction and an independent sensitivity call per item (at most
+   * five), each billed to this attempt under its memory category, then W3's
+   * proposal writer on a fresh held transaction. The answer is already
+   * delivered: a provider or write failure leaves it as it is and writes no
+   * memory. */
+  private async remember(
+    task: GenerationTask,
+    run: Run,
+    sentences: readonly { text: string }[],
+    signal: AbortSignal,
+    bookend: GenerationAdmissionBookend,
+  ): Promise<void> {
+    const model = this.service.pipeline.model!;
+    const billed = <T extends { usage: Usage }>(call: () => Promise<T>) =>
+      this.accounting.withUsage(
+        task,
+        run.attempt,
+        "memory",
+        signal,
+        call,
+        bookend,
+      );
+    try {
+      const exchange = [
+        `fan: ${run.conversation.acceptedText}`,
+        `ai: ${sentences.map((s) => s.text).join(" ")}`,
+      ];
+      const extracted = await billed(() =>
+        model.structured(
+          MEMORY_EXTRACTION_INSTRUCTIONS,
+          [JSON.stringify(exchange)],
+          MemoryExtraction,
+          "small",
+          signal,
+        ),
+      );
+      const items: MemoryProposalItem[] = [];
+      for (const item of extracted.value.items) {
+        const key = item.semanticKey.normalize("NFKC").toLowerCase().trim();
+        if (!key || run.conversation.snapshot.excludedKeys.includes(key))
+          continue;
+        const sensitive = await billed(() =>
+          model.structured(
+            MEMORY_SENSITIVITY_INSTRUCTIONS,
+            [JSON.stringify({ text: item.text })],
+            MemorySensitivity,
+            "small",
+            signal,
+          ),
+        );
+        items.push({
+          kind: item.kind,
+          text: item.text,
+          semanticKey: key,
+          sensitiveCategory:
+            item.sensitiveCategory ??
+            sensitive.value.category ??
+            (SENSITIVE_MEMORY_TEXT.test(item.text) || sensitive.value.uncertain
+              ? "sensitive_unspecified"
+              : null),
+        });
+      }
+      if (!items.length) return;
+      await this.identity.withGeneration(
+        task,
+        async (client, scope) => {
+          await bookend(client, scope);
+          await this.memory!.proposeInTransaction(client, scope, items);
+        },
+        signal,
+      );
+    } catch (cause) {
+      if (signal.aborted) throw cause;
+    }
   }
 
   private issue(
@@ -677,6 +772,16 @@ export class PreparedGenerationPipeline {
         "generation_output_missing",
         "Every approved sentence requires its actual ordered durable writer.",
       );
+      // B5: memory proposals after the answer is delivered and before the
+      // terminal, for an ordinary answer only (no crisis, refusal or withheld
+      // sentence). Off the record writes nothing (Q13).
+      if (
+        this.memory &&
+        !result.blocked &&
+        result.category === null &&
+        !current.conversation.snapshot.offTheRecord
+      )
+        await this.remember(task, current, result.sentences, signal, bookend);
       // The shared engine also serves previews. This worker measures from its
       // original preflight through the durable append and current-cursor
       // readback, including classifier safety/fallback delivery. Terminal
