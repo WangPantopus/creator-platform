@@ -41,9 +41,15 @@ final class Lane7PresenceFlows: XCTestCase {
     }
 
     /// Any element whose label contains the text (an author label is one
-    /// accessibility element, not always a static text).
+    /// accessibility element, not always a static text). Every row of the
+    /// thread exists (a plain stack), so a label that repeats ("Maya · to all
+    /// members") means the one on screen, as a reader sees it, or else the
+    /// newest: the flows start at the bottom.
     private func element(_ contains: String) -> XCUIElement {
-        app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", contains)).firstMatch
+        let query = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", contains))
+        let matches = query.allElementsBoundByIndex
+        guard matches.count > 1 else { return query.firstMatch }
+        return matches.last(where: visible) ?? matches[matches.count - 1]
     }
 
     /// A slow drag of about a third of the screen: unlike swipeUp/swipeDown it
@@ -149,7 +155,10 @@ final class Lane7PresenceFlows: XCTestCase {
         above(note, "The Friday glaze clinic is back")  // the label before the body
         above("The Friday glaze clinic is back", reaction)  // the Note (30 min) before the reaction (20 min)
         above(reaction, "send me a photo of the tile")  // the reaction (20 min) before the reply (10 min)
-        let container = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH 'presence-note-'")).firstMatch
+        // This Note's own container (every row exists, so not simply the first).
+        let notes = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH 'presence-note-'"))
+        let own = notes.containing(NSPredicate(format: "label CONTAINS %@", "The Friday glaze clinic is back")).firstMatch
+        let container = own.exists ? own : notes.element(boundBy: max(0, notes.count - 1))
         let labels = container.descendants(matching: .any).allElementsBoundByIndex.map(\.label).filter { !$0.isEmpty }
         XCTAssertEqual(labels.first, note, "a screen reader hears the label first: \(labels.prefix(3))")
         capture("R1-note-and-reaction")
@@ -274,7 +283,7 @@ final class Lane7PresenceFlows: XCTestCase {
             find("🔥 שלום עולם", up: false)
             capture("R8-long-unicode-largest-\(mode)")
             // The long Note is the newest: its own label is the bottom-most one
-            // (every row exists in the largest-text layout, so firstMatch is the oldest).
+            // (every row exists in the thread, so firstMatch is the oldest).
             let labels = app.descendants(matching: .any).matching(NSPredicate(format: "label == %@", note))
             let own = labels.element(boundBy: max(0, labels.count - 1))
             for _ in 0..<40 where !visible(own) { drag(up: true) }
