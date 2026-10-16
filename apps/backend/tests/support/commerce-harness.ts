@@ -7,6 +7,7 @@ import {
 } from "node:crypto";
 import type { KeyObject } from "node:crypto";
 import { execFile } from "node:child_process";
+import { readFile } from "node:fs/promises";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 import pg from "pg";
@@ -20,6 +21,26 @@ import { commerceSignedSubjects } from "../../src/modules/commerce/registration.
 import { SignedActService } from "../../src/modules/identity/signed-acts.js";
 import type { Actor } from "../../src/modules/identity/adapter.js";
 import { FakePaymentProvider } from "./fake-payment-provider.js";
+
+const CAPTURE_GUARD =
+  "apps/backend/src/modules/commerce/schema-capture-guard.sql";
+
+/** The capture guard (lane 4, WP 4.1) is registered in a wave, which a fresh
+ * fixture never activates: migrate-trust bootstraps the canonical 61 only. Its
+ * one dependency is the canonical commerce schema, so once it is registered the
+ * fixture installs its exact registered bytes, as the full host would. */
+async function installRegisteredCaptureGuard(admin: pg.Pool) {
+  const root = new URL("../../../../", import.meta.url);
+  const registry = JSON.parse(
+    await readFile(new URL("infra/migrations.json", root), "utf8"),
+  ) as { migrations: { path: string; sourceSha256: string }[] };
+  const entry = registry.migrations.find((m) => m.path === CAPTURE_GUARD);
+  if (!entry) return;
+  const sql = await readFile(new URL(CAPTURE_GUARD, root), "utf8");
+  if (createHash("sha256").update(sql).digest("hex") !== entry.sourceSha256)
+    throw new Error("The registered capture guard source changed.");
+  await admin.query(sql);
+}
 
 /**
  * Money-path harness. It boots a disposable PostgreSQL fixture database the
@@ -127,6 +148,7 @@ export class MoneyFixture {
           timeout: 60000,
         },
       );
+      await installRegisteredCaptureGuard(admin);
       // Configure only a newly created fixture role; never rotate a retained
       // cluster's runtime credential when this suite is repeated.
       if (!existingRole.rowCount)

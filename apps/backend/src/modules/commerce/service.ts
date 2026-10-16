@@ -116,6 +116,15 @@ const REFUND_TRIES_BEFORE_ESCALATION = 6;
 /** 30 s, 1, 2, 4, 8 minutes and so on, at most an hour between refund tries. */
 const refundBackoffSeconds = (attempt: number) =>
   Math.min(3600, 30 * 2 ** Math.max(0, attempt - 1));
+/** The processor's minimum card charge in minor units (Stripe's published
+ * minimums for the currencies the pilot can use); others default to 50. */
+const MINIMUM_CHARGE: Readonly<Record<string, number>> = {
+  USD: 50,
+  EUR: 50,
+  GBP: 30,
+  CAD: 50,
+  AUD: 50,
+};
 export type CommerceTrialAdmission = Readonly<{
   allowance: GenerationAllowance;
   units: number;
@@ -944,6 +953,14 @@ export class CommerceService {
     input: unknown,
   ) {
     const body = ModeCommand.parse(input);
+    // The processor refuses a card payment below its minimum charge, so a lower
+    // price could be offered but never held.
+    const minimum = MINIMUM_CHARGE[body.currency] ?? 50;
+    invariant(
+      [body.amount, body.publicAmount].every((v) => v === null || v >= minimum),
+      "price_below_minimum",
+      `Choose a price of at least the minimum card payment (${(minimum / 100).toFixed(2)} ${body.currency}).`,
+    );
     invariant(
       body.state !== "offered" || this.fulfillmentAvailable(body.kind),
       "fulfillment_unavailable",
@@ -2487,6 +2504,7 @@ export class CommerceService {
                 currency: effect.request.currency,
                 paymentMethodId: effect.request.paymentMethodId!,
                 key: effect.provider_key,
+                since: effect.created_at,
               })
             : undefined;
         // Stripe can prune idempotency records after 24h. Never recreate an ambiguous hold.
@@ -2769,6 +2787,7 @@ export class CommerceService {
         currency: effect.request.currency,
         paymentMethodId: effect.request.paymentMethodId!,
         key: effect.provider_key,
+        since: effect.created_at,
       });
       if (held) await this.applyIntent(actor, effect, held);
       else await this.failRejectedAuthorization(actor, effect);

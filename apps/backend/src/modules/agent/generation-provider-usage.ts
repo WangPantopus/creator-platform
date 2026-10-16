@@ -28,9 +28,19 @@ import {
   assertGenerationConsumerCustody,
   type GenerationConsumerCustody,
 } from "./generation-consumer-catalogue.js";
+import { registeredMigration } from "../../db/reviewed-migration.js";
 
 export const GENERATION_PROVIDER_MIGRATION =
   "0181_w2_generation_attempt_admission";
+/** Replaces only the attempt admission function: an interrupted reply's
+ * unknown cost counts as its whole hold instead of locking the creator. Its
+ * receipt must cite this source once registered, and only then. */
+export const GENERATION_INTERRUPTED_COST_SOURCE = Object.freeze({
+  name: "w2_interrupted_cost_estimate",
+  owner: "W2",
+  path: "apps/backend/src/modules/agent/migrations/pending_w2_interrupted_cost_estimate.sql",
+  checksum: "3bfbe8e7b7646729f5b2662115ec9198d1c4f0103bff63f9ca08fc765d590b69",
+});
 export const GENERATION_PROVIDER_SIGNATURES = Object.freeze([
   "creator.generation_begin_agent_attempt(uuid,uuid,text,text,bigint,text)",
   "creator.generation_open_provider_usage(uuid,uuid,text,text,text,text)",
@@ -161,6 +171,13 @@ export class PreparedGenerationProviderAccounting {
         }),
       ),
     );
+    const replaced = await registeredMigration(
+      GENERATION_INTERRUPTED_COST_SOURCE,
+    );
+    const admission = GENERATION_PROVIDER_SIGNATURES[0];
+    const original = consumers.filter(
+      (c) => !replaced || c.signature !== admission,
+    );
     invariant(
       Hash.safeParse(input.catalogueChecksum).success &&
         consumers.length === GENERATION_PROVIDER_SIGNATURES.length &&
@@ -169,11 +186,20 @@ export class PreparedGenerationProviderAccounting {
             consumers.filter((consumer) => consumer.signature === signature)
               .length === 1,
         ) &&
-        new Set(consumers.map((c) => c.migration.checksum)).size === 1 &&
+        new Set(original.map((c) => c.migration.checksum)).size === 1 &&
+        original.every(
+          (c) => c.migration.version === GENERATION_PROVIDER_MIGRATION,
+        ) &&
+        (!replaced ||
+          consumers.some(
+            (c) =>
+              c.signature === admission &&
+              c.migration.version === replaced.version &&
+              c.migration.checksum === replaced.checksum,
+          )) &&
         consumers.every(
           (c) =>
             c.owner === owner &&
-            c.migration.version === GENERATION_PROVIDER_MIGRATION &&
             Hash.safeParse(c.migration.checksum).success &&
             Hash.safeParse(c.definitionChecksum).success,
         ),
