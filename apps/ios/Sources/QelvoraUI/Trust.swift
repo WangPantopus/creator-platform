@@ -27,8 +27,8 @@ private struct TrustHelp: Decodable { struct Resource: Decodable { let region: S
 private struct TrustAck: Decodable { let id: String?; let number: Int?; let saved: Bool? }
 private struct TrustFailure: Decodable { struct Detail: Decodable { let message: String; let correlationId: String? }; let error: Detail }
 /// The person's conversations, by creator name (`GET /v1/conversations/account`).
-private struct TrustConversation: Decodable, Identifiable { let id: String; let creatorId: String; let name: String }
-private struct TrustConversationPage: Decodable { let threads: [TrustConversation]; let nextCursor: String? }
+private struct TrustConversation: Decodable, Identifiable, Sendable { let id: String; let creatorId: String; let name: String }
+private struct TrustConversationPage: Decodable, Sendable { let threads: [TrustConversation]; let nextCursor: String? }
 
 private final class TrustPublicRedirectGuard: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
     func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping @Sendable (URLRequest?) -> Void) { completionHandler(nil) }
