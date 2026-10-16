@@ -145,7 +145,8 @@ export function Studio({
       }
       let first = true,
         ended: LiveFrame | null = null;
-      const query = new URLSearchParams(watched);
+      // The Studio picker has no creator, so no screen read either.
+      const query = new URLSearchParams(creatorId ? watched : "");
       if (creatorId) query.set("creator", creatorId);
       const retryAfter = (delay: number) => {
         retry.current = setTimeout(() => connect(), delay);
@@ -212,7 +213,7 @@ export function Studio({
               ? frame.badge!
               : undefined,
           );
-          const key = watched,
+          const key = creatorId ? watched : "",
             read = frame.view;
           if (!key || !read) return;
           if ("error" in read) {
