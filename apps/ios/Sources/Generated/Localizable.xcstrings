@@ -650,13 +650,13 @@
         }
       }
     },
-    "Charged only when {name} accepts. If she declines or {deadline} pass, nothing is charged.": {
+    "Charged only when {name} accepts. If {name} declines or {deadline} pass, nothing is charged.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Charged only when {name} accepts. If she declines or {deadline} pass, nothing is charged."
+            "value": "Charged only when {name} accepts. If {name} declines or {deadline} pass, nothing is charged."
           }
         }
       }
@@ -2806,13 +2806,13 @@
         }
       }
     },
-    "If she declines or {deadline} pass": {
+    "If {name} declines or {deadline} pass": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "If she declines or {deadline} pass"
+            "value": "If {name} declines or {deadline} pass"
           }
         }
       }
@@ -3572,6 +3572,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Notifications"
+          }
+        }
+      }
+    },
+    "Unread": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unread"
           }
         }
       }
@@ -11690,6 +11701,72 @@
           "stringUnit": {
             "state": "translated",
             "value": "No weekly digest is available yet."
+          }
+        }
+      }
+    },
+    "Creator": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Creator"
+          }
+        }
+      }
+    },
+    "Conversation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conversation"
+          }
+        }
+      }
+    },
+    "Choose a creator": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a creator"
+          }
+        }
+      }
+    },
+    "Choose a conversation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a conversation"
+          }
+        }
+      }
+    },
+    "You have no conversations yet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You have no conversations yet."
+          }
+        }
+      }
+    },
+    "Your conversations couldn't load.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your conversations couldn't load."
           }
         }
       }

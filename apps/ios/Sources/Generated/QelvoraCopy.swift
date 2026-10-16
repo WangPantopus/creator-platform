@@ -61,7 +61,7 @@ public enum QelvoraCopy {
     "officialDisclaimer": "Official means {name} authorized this AI. It does not mean she read your message.",
     "conversationAccess": "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.",
     "packetAccess": "{name} and her authorized team can separately review this AI conversation. Those accesses are logged.",
-    "chargeRule": "Charged only when {name} accepts. If she declines or {deadline} pass, nothing is charged.",
+    "chargeRule": "Charged only when {name} accepts. If {name} declines or {deadline} pass, nothing is charged.",
     "pendingHold": "Your bank may show a pending hold for a few days.",
     "decisionEta": "{name} usually decides in {range}",
     "draftNotice": "{name} may answer with her AI's draft; you'll see that label.",
@@ -257,7 +257,7 @@ public enum QelvoraCopy {
     "editedByYou": "Edited by you",
     "summary": "Summary",
     "ifAccepts": "If {name} accepts",
-    "ifDeclines": "If she declines or {deadline} pass",
+    "ifDeclines": "If {name} declines or {deadline} pass",
     "requestsAhead": " · {count} requests ahead of you",
     "requestStatus": "Request status",
     "writtenReply": "Written reply",
@@ -327,6 +327,7 @@ public enum QelvoraCopy {
     "growthFindingCreators": "Finding creators",
     "growthUsefulness": "Usefulness",
     "growthNotifications": "Notifications",
+    "growthUnread": "Unread",
     "growthLeaving": "Leaving",
     "growthRating": "Rating",
     "growthSkipRating": "Skip rating",
@@ -1081,7 +1082,13 @@ public enum QelvoraCopy {
     "growthImpactPeopleHelped": "You helped {people} people this week.",
     "growthImpactThankYou": "A THANK-YOU, SHARED WITH PERMISSION",
     "growthImpactWeekCounts": "Counts are for this week only. Fans are never named here without their consent.",
-    "growthImpactNotAvailable": "No weekly digest is available yet."
+    "growthImpactNotAvailable": "No weekly digest is available yet.",
+    "pickerCreator": "Creator",
+    "pickerConversation": "Conversation",
+    "pickerChooseCreator": "Choose a creator",
+    "pickerChooseConversation": "Choose a conversation",
+    "pickerNoConversations": "You have no conversations yet.",
+    "pickerConversationsFailed": "Your conversations couldn't load."
   ]
   private static let variables = try! NSRegularExpression(pattern: #"\{([^}]+)\}"#)
   public static func text(_ key: String, values: [String: String] = [:]) -> String {
