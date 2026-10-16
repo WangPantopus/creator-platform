@@ -11,7 +11,6 @@
 import { createRequire } from "node:module";
 import { writeFileSync } from "node:fs";
 import {
-  API,
   MODEL,
   ACTORS,
   MAYA_CREATOR_ID,
