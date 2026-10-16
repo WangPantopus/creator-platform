@@ -32,11 +32,33 @@ import {
   LEGACY_REPLY_INSTRUCTIONS,
 } from "./pipeline-compatibility.js";
 
-export const PIPELINE_REVISION = "w2-context-guardrails-14";
+export const PIPELINE_REVISION = "w2-context-guardrails-15";
 type PipelineRevision =
   | typeof PIPELINE_REVISION
   | "w2-context-guardrails-12"
-  | "w2-context-guardrails-13";
+  | "w2-context-guardrails-13"
+  | "w2-context-guardrails-14";
+/** Revisions 12 and 13 budget context in UTF-8 bytes, before the model tokenizer. */
+const byteBudgeted = (revision: PipelineRevision) =>
+  revision === "w2-context-guardrails-12" ||
+  revision === "w2-context-guardrails-13";
+/** Revision 15 reserves this many context tokens for the nearest passages
+ * before memory, Notes and history can use the budget. */
+export const EVIDENCE_FLOOR = 1000;
+/** Revision 15 retrieves with the fan's previous turn, cut to this many characters. */
+export const PREVIOUS_TURN_LIMIT = 2000;
+/** What revision 15 embeds to retrieve evidence: the fan's previous turn in
+ * this thread, then the message, so a follow-up ("what about the second one?")
+ * finds what it refers to. The history is W3's thread-local snapshot
+ * ("fan: …" lines); an off-the-record thread, or one with memory exclusions,
+ * supplies none, and then the message is embedded alone. */
+export function previousTurnQuery(message: string, history: readonly string[]) {
+  const at = history.lastIndexOf(`fan: ${message}`);
+  for (let i = at - 1; i >= 0; i--)
+    if (history[i]!.startsWith("fan: "))
+      return `${[...history[i]!.slice(5)].slice(0, PREVIOUS_TURN_LIMIT).join("")}\n\n${message}`;
+  return message;
+}
 export type AudienceSnapshot = {
   revision: string;
   tierIds: string[];
@@ -174,6 +196,7 @@ export async function assembleTextContext(
   retrievedExamples: () => Promise<readonly string[]>,
   tokens: (text: string) => number,
   languageTag?: string,
+  evidenceFloor = 0,
 ) {
   const currentStatus =
     input.status && Date.parse(input.status.expiresAt) > Date.now()
@@ -209,6 +232,25 @@ export async function assembleTextContext(
     }
     return result;
   };
+  const evidence: Passage[] = [];
+  const takeEvidence = (limit: number) => {
+    let spent = 0;
+    for (const passage of passages) {
+      if (evidence.includes(passage)) continue;
+      const cost = tokens(canonical(passage)) + 2;
+      if (
+        cost <= budget &&
+        (spent + cost <= limit || (limit > 0 && evidence.length === 0))
+      ) {
+        evidence.push(passage);
+        budget -= cost;
+        spent += cost;
+      }
+    }
+  };
+  // The evidence floor (revision 15) goes first: the nearest passages up to
+  // the floor, and at least the nearest one that fits.
+  takeEvidence(evidenceFloor);
   // Preserve priority while rendering the fixed eight-slot contract.
   const memory = take(
     input.snapshot.offTheRecord ? [] : input.snapshot.memory.slice(0, 30),
@@ -220,14 +262,8 @@ export async function assembleTextContext(
   );
   const publicAnswers = take((input.snapshot.publicAnswers ?? []).slice(0, 20));
   const tail = take(input.snapshot.messages.slice(-30).reverse()).reverse();
-  const evidence: Passage[] = [];
-  for (const passage of passages) {
-    const cost = tokens(canonical(passage)) + 2;
-    if (cost <= budget) {
-      evidence.push(passage);
-      budget -= cost;
-    }
-  }
+  takeEvidence(Infinity);
+  evidence.sort((a, b) => passages.indexOf(a) - passages.indexOf(b));
   const intro = input.snapshot.intro
     ? (take([input.snapshot.intro])[0] ?? null)
     : null;
@@ -457,36 +493,45 @@ export class AgentPipeline {
     return contentHash({
       pipeline: this.revision,
       model:
-        (this.revision === PIPELINE_REVISION
-          ? this.model?.fingerprint
-          : this.model?.preTokenizerFingerprint) ?? "unconfigured",
-      retrieval: "scoped-exact-cosine-top4",
-      budget: 2500,
+        (byteBudgeted(this.revision)
+          ? this.model?.preTokenizerFingerprint
+          : this.model?.fingerprint) ?? "unconfigured",
+      ...(this.revision === PIPELINE_REVISION
+        ? {
+            retrieval: "scoped-exact-cosine-top4-previous-fan-turn",
+            budget: 2500,
+            evidenceFloor: EVIDENCE_FLOOR,
+          }
+        : { retrieval: "scoped-exact-cosine-top4", budget: 2500 }),
     });
+  }
+  /** The text this engine embeds to retrieve evidence for the fan's message. */
+  retrievalQuery(message: string, history: readonly string[]): string {
+    return this.revision === PIPELINE_REVISION
+      ? previousTurnQuery(message, history)
+      : message;
   }
   /** Select executable behavior, never substitute a new fingerprint on an old
    * publication. Models without an exact historical transport fingerprint and
    * changed model/rate/policy configurations cannot serve those publications. */
   publishedEngine(fingerprint: string): AgentPipeline {
     if (this.model && fingerprint === this.fingerprint) return this;
-    if (
-      this.revision === PIPELINE_REVISION &&
-      this.model?.preTokenizerFingerprint
-    ) {
-      this.historical ??= [
-        new AgentPipeline(
-          this.repository,
-          this.model,
-          "w2-context-guardrails-12",
-          this.running,
-        ),
-        new AgentPipeline(
-          this.repository,
-          this.model,
-          "w2-context-guardrails-13",
-          this.running,
-        ),
+    if (this.revision === PIPELINE_REVISION && this.model) {
+      const revisions: PipelineRevision[] = [
+        ...(this.model.preTokenizerFingerprint
+          ? (["w2-context-guardrails-12", "w2-context-guardrails-13"] as const)
+          : []),
+        "w2-context-guardrails-14",
       ];
+      this.historical ??= revisions.map(
+        (revision) =>
+          new AgentPipeline(
+            this.repository,
+            this.model,
+            revision,
+            this.running,
+          ),
+      );
       const engine = this.historical.find(
         (candidate) => candidate.fingerprint === fingerprint,
       );
@@ -620,7 +665,11 @@ export class AgentPipeline {
             compiled.hash,
             category,
             input.signal,
-            () => model!.embed([input.message], input.signal),
+            () =>
+              model!.embed(
+                [this.retrievalQuery(input.message, input.snapshot.messages)],
+                input.signal,
+              ),
             input.execution,
           );
           const vector = embedded.vectors[0]!;
@@ -762,9 +811,9 @@ export class AgentPipeline {
       // The design budgets uncached text in model tokens. UTF-8 byte length
       // prematurely exhausted it as history grew, excluding authorized chunks.
       const tokens = (text: string) =>
-        this.revision === PIPELINE_REVISION
-          ? this.model!.countContextTokens(text, route)
-          : Buffer.byteLength(text, "utf8");
+        byteBudgeted(this.revision)
+          ? Buffer.byteLength(text, "utf8")
+          : this.model!.countContextTokens(text, route);
       const refusal = !classified.value.allowed;
       providerCallPending = true;
       const retrieved = await ports.retrieve();
@@ -778,6 +827,7 @@ export class AgentPipeline {
         () => retrieved.examples(),
         tokens,
         language?.tag,
+        this.revision === PIPELINE_REVISION ? EVIDENCE_FLOOR : 0,
       );
       const contextHash = contentHash({
         compiledHash: compiled.hash,
