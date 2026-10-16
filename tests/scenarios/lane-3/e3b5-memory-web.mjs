@@ -174,7 +174,7 @@ step(
     ? (await asked.innerText()).replace(/\s+/gu, " ")
     : "no prompt",
 );
-await asked.getByRole("button", { name: "Remember" }).click();
+await asked.getByRole("button", { name: "Remember", exact: true }).click();
 const chip = page.getByText(
   "Remembered: Fires glazes at cone 6 in an electric kiln.",
 );
@@ -203,7 +203,9 @@ step(
 await send("My studio is in my garage.");
 const garage = prompt("Works in a garage studio.");
 await garage.waitFor({ timeout: 90_000 }).catch(() => {});
-await garage.getByRole("button", { name: "Don’t remember" }).click();
+await garage
+  .getByRole("button", { name: "Don’t remember", exact: true })
+  .click();
 await sleep(1500);
 step(
   "Don't remember stores nothing and the question goes away",
@@ -216,7 +218,7 @@ step(
 await send("I was diagnosed with diabetes last year.");
 const health = prompt("Has diabetes.");
 await health.waitFor({ timeout: 90_000 }).catch(() => {});
-await health.getByRole("button", { name: "Remember" }).click();
+await health.getByRole("button", { name: "Remember", exact: true }).click();
 await sleep(1500);
 const [stored] = await memory("health condition");
 step(
