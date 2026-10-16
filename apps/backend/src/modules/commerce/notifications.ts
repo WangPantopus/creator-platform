@@ -10,6 +10,7 @@ import {
   type GrowthEvent,
   type NotificationState,
 } from "../growth/contracts.js";
+import type { OwnerNotice, OwnerWithdrawal } from "../growth/notices.js";
 
 const ownerTypes = [
   "packet_submitted",
@@ -22,7 +23,20 @@ const ownerTypes = [
   "commitment_resolution",
   "hold_released",
   "refunded",
+  "commitment_due",
 ] as const;
+/** The request events that become notices. */
+export const commerceNoticeEventTypes: readonly string[] = ownerTypes;
+/** Events after which an accepted request is no longer due. */
+const ended = ["commitment_delivered", "commitment_resolution", "refunded"];
+/** What commerce records for each notice in growth's own notice table
+ * (`GrowthNotices`), from the process that holds request authority. The growth
+ * worker reads only these records, never request rows: record before the relay
+ * enqueues the event, and withdraw when there is nothing left to tell. */
+export type CommerceNoticeRecords = Readonly<{
+  emit(notice: OwnerNotice): Promise<unknown>;
+  withdraw(withdrawal: OwnerWithdrawal): Promise<unknown>;
+}>;
 type Recipient = GrowthEvent["recipients"][number];
 /** Current W1 recipient identity/adult status and W8 creator/pair/account
  * denials must be held on this client through the operation. False is a known
@@ -54,7 +68,7 @@ type OwnerRow = {
 };
 const select = `SELECT e.id,e.aggregate_id,e.aggregate_version,e.type,e.payload,e.created_at,
  p.id AS packet_id,p.version AS packet_version,p.state AS packet_state,p.snapshot,p.proposed_mode,
- CASE WHEN e.type IN('commitment_created','commitment_delivered','commitment_resolution','refunded') THEN coalesce(obligation.state,p.state) ELSE p.state END AS current_state,
+ CASE WHEN e.type IN('commitment_created','commitment_delivered','commitment_resolution','refunded','commitment_due') THEN coalesce(obligation.state,p.state) ELSE p.state END AS current_state,
  CASE WHEN e.aggregate_id=p.id THEN p.version ELSE c.version END AS current_version,
  fp.account_id AS fan_account,cp.account_id AS creator_account,cp.display_name,cp.verification,cp.recovery_required
  FROM creator.commerce_event e
@@ -77,6 +91,7 @@ export class CommerceRequestNotifications {
     private readonly scope: ThreadScope,
     private readonly recipients: CommerceNotificationRecipientAuthority,
     private readonly registered: () => Promise<void>,
+    private readonly notices?: CommerceNoticeRecords,
   ) {}
   static async prepare(input: {
     database: Database;
@@ -84,6 +99,8 @@ export class CommerceRequestNotifications {
     assertRecipientAllowed: CommerceNotificationRecipientAuthority;
     /** Actual owner outbox export/deletion/retention registration. */
     assertPrivacyRegistered(): Promise<void>;
+    /** Growth's notice records; without them a notice waits unconfigured. */
+    notices?: CommerceNoticeRecords;
   }) {
     assertThreadScope(input.scope);
     invariant(
@@ -115,6 +132,7 @@ export class CommerceRequestNotifications {
       input.scope,
       input.assertRecipientAllowed.bind(input),
       registered,
+      input.notices,
     );
   }
   private parameters() {
@@ -127,6 +145,7 @@ export class CommerceRequestNotifications {
   }
   private kind(row: OwnerRow): GrowthEvent["type"] {
     if (row.type === "packet_submitted_creator") return "new_packet";
+    if (row.type === "commitment_due") return "commitment_due";
     // Older offers have no retained exact signature metadata. They remain a
     // System request update, without inventing a named creator act.
     if (
@@ -139,7 +158,8 @@ export class CommerceRequestNotifications {
     return "request_status";
   }
   private recipient(row: OwnerRow): Recipient {
-    return row.type === "packet_submitted_creator"
+    return row.type === "packet_submitted_creator" ||
+      row.type === "commitment_due"
       ? { accountId: row.creator_account, role: "creator" }
       : { accountId: row.fan_account, role: "fan" };
   }
@@ -156,6 +176,9 @@ export class CommerceRequestNotifications {
       available &&=
         row.packet_state === "submitted" &&
         row.current_version === row.aggregate_version;
+    // A reminder is something to tell only while the answer is still owed.
+    if (kind === "commitment_due")
+      available &&= ["due", "in_progress"].includes(row.current_state);
     if (kind === "creator_offer") {
       available &&=
         row.packet_state === "offer_pending" &&
@@ -197,9 +220,9 @@ export class CommerceRequestNotifications {
       creatorName: row.display_name,
       authorKind: kind === "creator_offer" ? "human_creator" : "system",
       safePreview: kind === "new_packet" ? copy.queueNew : copy.requestUpdate,
-      // C09's present destination contract cannot name the actual commerce
-      // or Studio detail routes. Keep the safe inbox target until coordinated.
-      destination: "/notifications",
+      // The requests screen, as lane 5's notice table expects for every
+      // commerce notice; never the request's own private detail route.
+      destination: "/commerce/requests",
       status: row.current_state,
     };
   }
@@ -208,24 +231,29 @@ export class CommerceRequestNotifications {
   ): Promise<readonly { id: string; event: GrowthEvent | null }[]> {
     const bound = z.int().min(1).max(100).parse(limit);
     await this.registered();
-    return this.database.withThread(this.scope, async (client) => {
-      const rows = (
-        await client.query<OwnerRow>(
-          `${select} AND e.published_at IS NULL ORDER BY e.created_at,e.id LIMIT $5`,
-          [...this.parameters(), bound],
-        )
-      ).rows;
-      const pending = [];
-      for (const row of rows) {
-        const state = await this.state(client, row);
-        pending.push({
-          id: row.id,
-          event:
-            state.available && state.authorized
+    const records: (() => Promise<unknown>)[] = [];
+    const pending = await this.database.withThread(
+      this.scope,
+      async (client) => {
+        const rows = (
+          await client.query<OwnerRow>(
+            `${select} AND e.published_at IS NULL ORDER BY e.created_at,e.id LIMIT $5`,
+            [...this.parameters(), bound],
+          )
+        ).rows;
+        const pending = [];
+        for (const row of rows) {
+          const state = await this.state(client, row);
+          const told = state.available && state.authorized;
+          const type = this.kind(row);
+          const recipient = this.recipient(row);
+          pending.push({
+            id: row.id,
+            event: told
               ? EventEnvelope.parse({
                   id: row.id,
                   schemaVersion: 1,
-                  type: this.kind(row),
+                  type,
                   creatorId: this.scope.creatorId,
                   aggregateId: row.aggregate_id,
                   aggregateVersion: row.aggregate_version,
@@ -234,14 +262,65 @@ export class CommerceRequestNotifications {
                   causationId: row.id,
                   correlationId: row.packet_id,
                   occurredAt: row.created_at.toISOString(),
-                  recipients: [this.recipient(row)],
+                  recipients: [recipient],
                 })
               : null,
-        });
-      }
-      await this.registered();
-      return pending;
-    });
+          });
+          const notices = this.notices;
+          if (!notices) continue;
+          records.push(() =>
+            told
+              ? notices.emit({
+                  type: type as OwnerNotice["type"],
+                  aggregateId: row.aggregate_id,
+                  accountId: recipient.accountId,
+                  creatorId: this.scope.creatorId,
+                  version: state.version,
+                  // Commerce speaks as the system, or as the creator's signed offer.
+                  authorKind:
+                    state.authorKind === "human_creator"
+                      ? "human_creator"
+                      : "system",
+                  creatorName: state.creatorName,
+                  safePreview: state.safePreview,
+                  destination: state.destination,
+                  ...(state.status ? { status: state.status } : {}),
+                })
+              : notices.withdraw({
+                  type: type as OwnerWithdrawal["type"],
+                  aggregateId: row.aggregate_id,
+                  accountId: recipient.accountId,
+                }),
+          );
+          if (ended.includes(row.type))
+            records.push(() =>
+              notices.withdraw({
+                type: "commitment_due",
+                aggregateId: row.packet_id,
+                accountId: row.creator_account,
+              }),
+            );
+          // A request the creator has already dealt with is no longer new.
+          if (
+            row.type !== "packet_submitted_creator" &&
+            row.packet_state !== "submitted"
+          )
+            records.push(() =>
+              notices.withdraw({
+                type: "new_packet",
+                aggregateId: row.packet_id,
+                accountId: row.creator_account,
+              }),
+            );
+        }
+        await this.registered();
+        return pending;
+      },
+    );
+    // Recorded after the request transaction and before the relay enqueues
+    // the events: a notice is never sent before its record exists.
+    for (const record of records) await record();
+    return pending;
   }
   async acknowledge(id: string): Promise<void> {
     z.uuid().parse(id);

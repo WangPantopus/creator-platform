@@ -9,7 +9,8 @@ import type { CommerceWorkIndex, CommerceWorkScope } from "./inbox.js";
 
 // What the system, not a person, must finish: an ended decision window, a hold
 // still being placed or re-authorized past its window, money in an unknown
-// state, an overdue commitment, or a money call whose retry time has come.
+// state, an overdue commitment, a commitment whose reminder is due, or a money
+// call whose retry time has come.
 // Read as the fan who owns the request, under that fan's row security.
 const DUE = `SELECT p.id FROM creator.commerce_packet p
  JOIN creator.fan_profile f ON f.id=p.fan_id AND f.account_id=$1
@@ -19,9 +20,19 @@ const DUE = `SELECT p.id FROM creator.commerce_packet p
   OR p.payment_state='unknown'
   OR EXISTS(SELECT 1 FROM creator.commerce_commitment c WHERE c.packet_id=p.id AND c.creator_id=p.creator_id
    AND c.fan_id=p.fan_id AND c.state IN ('due','in_progress') AND c.due_at<=now())
+  OR EXISTS(SELECT 1 FROM creator.commerce_commitment c WHERE c.packet_id=p.id AND c.creator_id=p.creator_id
+   AND c.fan_id=p.fan_id AND c.state IN ('due','in_progress') AND c.due_at>now() AND p.accepted_at IS NOT NULL
+   AND c.due_at-least(interval '24 hours',(c.due_at-p.accepted_at)/4)<=now()
+   AND NOT EXISTS(SELECT 1 FROM creator.commerce_event e WHERE e.aggregate_id=p.id AND e.type='commitment_due'))
   OR EXISTS(SELECT 1 FROM creator.commerce_effect e WHERE e.packet_id=p.id AND e.state IN ('pending','unknown','processing')
    AND e.next_at<=now() AND (e.lease_until IS NULL OR e.lease_until<now()))
  ORDER BY p.updated_at,p.id LIMIT $2`;
+// Conversations with request events not yet handed to growth, read as the fan
+// of each pair, so each pair is found once.
+const NOTICES = `SELECT DISTINCT e.creator_id,e.fan_id FROM creator.commerce_event e
+ JOIN creator.fan_profile f ON f.id=e.fan_id AND f.account_id=$1
+ WHERE e.published_at IS NULL AND e.type=ANY($2::text[])
+ ORDER BY e.creator_id,e.fan_id LIMIT $3`;
 // A provider notification names a payment (its hold) or a refund.
 const NOTIFIED = `SELECT p.id FROM creator.commerce_packet p
  JOIN creator.fan_profile f ON f.id=p.fan_id AND f.account_id=$1
@@ -64,14 +75,18 @@ export class DevelopmentCommerceWorkIndex implements CommerceWorkIndex {
     return new DevelopmentCommerceWorkIndex(pool, actors, report);
   }
 
-  private async read(actor: Actor, text: string, values: unknown[]) {
+  private async read<Row = { id: string }>(
+    actor: Actor,
+    text: string,
+    values: unknown[],
+  ) {
     const client = await this.pool.connect();
     try {
       await client.query("BEGIN READ ONLY");
       await client.query("SELECT set_config('app.account_id',$1,true)", [
         actor.accountId,
       ]);
-      const rows = (await client.query<{ id: string }>(text, values)).rows;
+      const rows = (await client.query(text, values)).rows as Row[];
       await client.query("COMMIT");
       return rows;
     } catch (error) {
@@ -93,6 +108,27 @@ export class DevelopmentCommerceWorkIndex implements CommerceWorkIndex {
         scopes.push({ actor, kind: "packet", packetId: row.id });
     }
     return scopes;
+  }
+
+  /** Conversations whose request events wait to be told, each with its fan's
+   * own actor, who opens the conversation's scope. */
+  async noticePairs(types: readonly string[], limit: number) {
+    const pairs: { actor: Actor; creatorId: string; fanId: string }[] = [];
+    for (const actor of this.actors) {
+      if (pairs.length >= limit) break;
+      for (const row of await this.read<{ creator_id: string; fan_id: string }>(
+        actor,
+        NOTICES,
+        [actor.accountId, types, limit - pairs.length],
+      ))
+        pairs.push({ actor, creatorId: row.creator_id, fanId: row.fan_id });
+    }
+    return pairs;
+  }
+
+  /** The adult-eligible development account with this id, if there is one. */
+  actorFor(accountId: string) {
+    return this.actors.find((actor) => actor.accountId === accountId) ?? null;
   }
 
   /** Payments, their charges and refunds; nothing else happens on this host. */
