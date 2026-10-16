@@ -27,7 +27,7 @@ object ConversationLongSession {
     private var shown = 0
     private var running = false
     /** Lines shown, by thread: the row each follows (null: the thread's end), and its words. */
-    private val lines = mutableMapOf<String, MutableList<Pair<String?, String>>>()
+    private val shownLines = mutableMapOf<String, MutableList<Pair<String?, String>>>()
 
     /** Debug launches may shorten both durations (milliseconds). */
     fun configure(custom: Pair<Long, Long>?) { custom?.let { (reminder, gap) -> threshold = reminder; pause = gap } }
@@ -54,8 +54,8 @@ object ConversationLongSession {
         if (!running) return
         advance(now); running = false; save(context)
     }
-    fun lines(thread: String): List<Pair<String?, String>> = lines[thread].orEmpty()
-    fun add(thread: String, after: String?, text: String) { lines.getOrPut(thread) { mutableListOf() } += after to text }
+    fun lines(thread: String): List<Pair<String?, String>> = shownLines[thread].orEmpty()
+    fun add(thread: String, after: String?, text: String) { shownLines.getOrPut(thread) { mutableListOf() } += after to text }
     /** A clean start for operated verification (debug launches only). */
     fun forget(context: Context) { context.getSharedPreferences(STORE, Context.MODE_PRIVATE).edit().clear().apply(); loaded = false; account = ""; millis = 0; lastAt = 0; shown = 0; running = false }
 

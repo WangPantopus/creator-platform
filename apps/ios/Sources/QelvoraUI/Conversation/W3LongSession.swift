@@ -23,7 +23,7 @@ import Foundation
     private var shown = 0
     private var running = false
     /// Lines shown, by thread: the row each follows, and its words.
-    private var lines: [String: [(after: String?, text: String)]] = [:]
+    private var shownLines: [String: [(after: String?, text: String)]] = [:]
 
     private init() {
         #if DEBUG
@@ -58,8 +58,8 @@ import Foundation
         guard running else { return }
         advance(now); running = false; save()
     }
-    func lines(for thread: String) -> [(after: String?, text: String)] { lines[thread] ?? [] }
-    func add(thread: String, after: String?, text: String) { lines[thread, default: []].append((after, text)) }
+    func lines(for thread: String) -> [(after: String?, text: String)] { shownLines[thread] ?? [] }
+    func add(thread: String, after: String?, text: String) { shownLines[thread, default: []].append((after, text)) }
 
     /// A suspended app is not counted: one step adds at most twice the interval.
     private func advance(_ now: Date) {
