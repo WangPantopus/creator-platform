@@ -21,10 +21,16 @@ final class Lane7AdultFlows: XCTestCase {
         return try JSONSerialization.jsonObject(with: data)
     }
 
-    private func launch(_ extra: [String], appearance: String = "light") async throws {
+    /// Every flow skips before it calls anything: CI runs this target with no
+    /// harness and no link driver.
+    private func optIn() throws {
         guard ProcessInfo.processInfo.environment["LANE7_ADULTS"] == "1" else {
             throw XCTSkip("Opt in with LANE7_ADULTS=1 against lane 7's disposable harness.")
         }
+    }
+
+    private func launch(_ extra: [String], appearance: String = "light") async throws {
+        try optIn()
         continueAfterFailure = false
         app.terminate()
         app.launchArguments = arguments(appearance) + extra
@@ -53,6 +59,7 @@ final class Lane7AdultFlows: XCTestCase {
 
     /// Devon signed in on Home, then flagged under 18 (an ops review).
     private func flagged(appearance: String = "light") async throws {
+        try optIn()
         try await control("/__harness/reset", body: [:])
         try await launch(["--harness-reset", "--harness-actor", "devon", "--return-to", "/"], appearance: appearance)
         XCTAssertTrue(app.staticTexts["Your people"].waitForExistence(timeout: 30))
@@ -79,6 +86,7 @@ final class Lane7AdultFlows: XCTestCase {
 
     /// P7.2: the under-18 persona at sign-in: refused, with the same state.
     func testA02RefusedAtSignIn() async throws {
+        try optIn()
         try await control("/__harness/reset", body: [:])
         try await launch(["--harness-reset", "--return-to", "/"])
         let start = app.buttons["Continue with Pantopus"]
@@ -93,6 +101,7 @@ final class Lane7AdultFlows: XCTestCase {
 
     /// P7.3: largest text, Night: the state in full.
     func testA03LargestTextNight() async throws {
+        try optIn()
         try await control("/content-size", body: ["size": "accessibility-extra-extra-extra-large"], port: 56475)
         try await flagged(appearance: "night")
         capture("A3-largest-night")
