@@ -67,55 +67,24 @@ percentile), rounded to hours or days.
 Alternative: count only accepts and declines. The range is then about Maya's decisions, but a
 creator who lets requests expire would look faster than fans experience her.
 
-## 6. What the fan reads when Maya lets her AI answer (WP 4.12, copy)
+## Decided
 
-**Today:** "Let AI answer" releases the hold exactly as a decline does (`reason='ai_answer'`,
-end state `declined`). Nothing else happens; no AI answer is written. On the web the fan reads
-the decline line, "Maya passed on this one · nothing charged" (`CommerceScreen.tsx:356`, key
-`declined`). The phone apps read "Hold released · nothing charged" for every released request.
+### 6. What the fan reads when Maya lets her AI answer (WP 4.12): approved 2026-10-16
 
-**Proposed default:** a new line on the fan's request status and request list, with a button
-under it:
+The founder approved the proposed default. When Maya chooses "Let AI answer" (`reason='ai_answer'`,
+end state `declined`), the fan's request status and request list read:
 
 - `declinedForAi`: "{name} suggests asking {name}'s AI · nothing charged"
-- `askAiInstead`: "Ask {name}'s AI" (opens the fan's conversation with her)
+- `askAiInstead`: "Ask {name}'s AI", a button that opens the fan's conversation with her.
 
-It says who decided, who can answer now (her AI, by its label), and that nothing was charged.
-It promises no reply, because none is written. It avoids the forbidden words ("Maya will reply",
-"Failed").
+While a question waits for the fan, the step that showed "Decision due" reads `moreInfoAnswerBy`:
+"Answer by". Its date is when the request lapses unless the fan answers.
 
-Alternative: "{name} passed this one to {name}'s AI · nothing charged". It reads as though her
-AI already has the request, which is true only once lane 3 makes the AI answer the request in
-the thread (the source's "declined-with-AI-answer", Product Design, Studio queue).
+### 7. The refund rule on the Offers page (WP 4.12): approved 2026-10-16
 
-**Also, while a question waits:** the fan's step reads "Decision due {date}"
-(`CommerceScreen.tsx:436`), but that date is when the request lapses unless the fan answers.
-Proposed: `moreInfoAnswerBy`: "Answer by" in that state.
-
-## 7. The refund rule on the Offers page (WP 4.12, copy)
-
-**Today:** the creator's Offers table has a column "Refund if late", and every row says "Full
-refund" (`CommerceScreen.tsx:2185` and `:2208`, hard-coded). The Deadline column says "72 h".
-On a phone the table folds into two columns, so "Full refund" loses its heading.
-
-**The rule the server applies:** if Maya accepts and does not deliver within the offer's
-delivery hours, the fan is refunded in full, once, with nobody tapping (WP 4.3: retried until the
-processor confirms, then escalated to ops). A decline, an expiry or a withdrawal releases the
-hold instead, so nothing was charged.
-
-**Proposed default:** one column and one line per offer that says the whole rule, the same rule
-the fan reads when asking ("Within 72 hours or a full refund", `CommerceScreen.tsx:1275`):
-
-- `offerDeliveryHeading`: "Delivery"
-- `offerDeliveryRule`: "Within {deadline} of accepting, or a full refund" ({deadline} reads "72
-  hours" or "3 days", as in the public summary)
-
-The "Refund if late" column goes away.
-
-Alternative: keep both columns, with the heading "If not delivered in time" and every row "Full
-refund, automatically".
-
-## Decided
+The founder approved the proposed default. The creator's Offers table has one "Delivery" column
+(`offerDeliveryHeading`), and each row reads `offerDeliveryRule`: "Within {deadline} of accepting,
+or a full refund" ({deadline} reads "72 hours" or "3 days"). The "Refund if late" column goes away.
 
 ### P1. A paused creator's open paid requests (lane 1's G1, #463): confirmed 2026-10-15
 
