@@ -91,8 +91,8 @@ This is recorded as **"taken as the proposed default"** and can be vetoed.
 - Lane 1's identity check, 4 seconds on every signed-in page: lane 1's file. Ticketed.
 - `PhotoAttachment.tsx` checks a processing photo every 2 seconds until it is ready. It is not
   on WP 6.9's list, and it stops by itself.
-- Today (#443, not on `main` yet) does not poll; it reads on open and on return. After #443
-  merges, it can declare a live read like the other screens (a small follow-up).
+- Today (#443, merged) does not poll; it reads on open and on return. It can declare a live
+  read like the other screens (a small follow-up).
 - ADR-7's single WebSocket would carry Studio's updates in the long run. This stream is lane 6's
   step within its own files; moving it onto the gateway is lane 3's file (ticketed).
 

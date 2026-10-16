@@ -238,7 +238,8 @@ export const thanks = [
 ];
 export const audiences = {
   audienceCountsAvailable: true,
-  tiers: [{ id: ID.tier, name: "Studio circle" }],
+  members: "some",
+  tiers: [{ id: ID.tier, name: "Studio circle", reach: "some" }],
   groups: [],
 };
 export const team = {

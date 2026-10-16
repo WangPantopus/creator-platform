@@ -27,12 +27,9 @@ START (about five minutes; nothing needs rebuilding):
    is merged, otherwise
    `git show origin/lane-6/no-polling:docs/lanes/status/lane-6.md`), then
    `docs/lanes/status/lane-6-wp-6-9.md`.
-3. Check the two open lane 6 pull requests: #443 (WP 6.2, Today) and #488 (WP 6.9,
-   `lane-6/no-polling`). If #443 merged and WP 6.9 did not: merge `origin/main` into
-   `lane-6/no-polling`. `Studio.tsx` conflicts: keep both sides, and change `routeView`'s
-   default screen from `"notes"` to `"today"`. In `lane-6.md` and this file, keep the WP 6.9
-   side, which already contains #443's text. A local branch `scratch/6.9-with-443` (never
-   pushed) holds a resolved merge that passed the E6.2 scripts; reuse its `Studio.tsx`.
+3. #443 (WP 6.2, Today) is merged. Check #488 (WP 6.9, `lane-6/no-polling`):
+   `gh pr view 488 --json state,mergedAt`. If it is still open and `main` moved: merge `origin/main` into
+   `lane-6/no-polling` (it already contains #443).
 4. Start the stack in the background:
    `node infra/local/stack.mjs up --lane 6 --provider anthropic --growth` (about a minute).
 5. E6.1 captures are in `$HOME/.cache/qelvora-lane6/e6-1/` (README there). To compare a capture

@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { brand } from "@qelvora/brand";
 import { EmptyState, Notice, StudioTabBar } from "@qelvora/ui-web";
 import { validReturnTarget } from "@qelvora/api";
@@ -24,6 +24,7 @@ import { Library } from "./library/Library";
 import { Requests } from "./requests/Requests";
 import { PacketDetail } from "./requests/PacketDetail";
 import { Threads } from "./threads/Threads";
+import { Today } from "./today/Today";
 import { navigationTree, studioSidebar } from "./shell/navigation";
 import { liveQuery, StudioLive, type LiveViewState } from "./shell/live";
 /** One frame of Studio's live stream (backend `modules/studio/live.ts`). */
@@ -46,7 +47,7 @@ type Invitation = {
 };
 /** The read the route's screen declares, so the first stream already carries it. */
 const routeView = (screen: string[]) => {
-  const [current = "notes", fan] = screen;
+  const [current = "today", fan] = screen;
   return current === "notes"
     ? liveQuery({ view: "notes", filter: "all" })
     : current === "threads"
@@ -75,7 +76,7 @@ export function Studio({
     [session.accountId, session.sessionId, signal, end, isSessionEnded],
   );
   const requestedPath = creatorId
-    ? `/studio/${creatorId}/${screen.join("/") || "notes"}`
+    ? `/studio/${creatorId}/${screen.join("/") || "today"}`
     : "/studio/workspace";
   const [returnTo, setReturnTo] = useState(
     validReturnTarget(requestedPath) ? requestedPath : "/studio/workspace",
@@ -112,7 +113,8 @@ export function Studio({
     digests = useRef(new Map<string, string>()),
     reconnectButton = useRef<HTMLButtonElement>(null),
     previousFocus = useRef<HTMLElement | null>(null),
-    router = useRouter();
+    router = useRouter(),
+    from = useSearchParams().get("from");
   const watch = useCallback((query: string) => setWatched(query), []),
     live = useMemo(() => ({ state: view, watch }), [view, watch]);
   const conceal = useCallback(() => {
@@ -356,8 +358,11 @@ export function Studio({
   }, [conceal, connect]);
   const root = `/studio/${creatorId}`,
     continuation = `${sessionExpired ? "/api/auth/restore" : "/auth/continue"}?returnTo=${encodeURIComponent(returnTo)}`,
-    current = screen[0] ?? "notes";
+    current = screen[0] ?? "today",
+    // A composer opened from Today returns there; otherwise to Notes.
+    composeBack = `${root}/${from === "today" ? "today" : "notes"}`;
   const paths: Record<string, string> = {
+    Today: `${root}/today`,
     Notes: `${root}/notes`,
     Requests: `${root}/requests`,
     Threads: `${root}/threads`,
@@ -370,15 +375,17 @@ export function Studio({
     Team: `${root}/team`,
   };
   const active =
-    current === "compose"
-      ? "Notes"
-      : current === "packets"
-        ? "Requests"
-        : current === "publish"
-          ? "Publish"
-          : current === "team"
-            ? "Team"
-            : current.charAt(0).toUpperCase() + current.slice(1);
+    current === "today"
+      ? "Today"
+      : current === "compose"
+        ? "Notes"
+        : current === "packets"
+          ? "Requests"
+          : current === "publish"
+            ? "Publish"
+            : current === "team"
+              ? "Team"
+              : current.charAt(0).toUpperCase() + current.slice(1);
   const href = (label: string) =>
     paths[Object.keys(paths).find((k) => label.startsWith(k)) ?? "Notes"]!;
   if (!creatorId)
@@ -394,7 +401,7 @@ export function Studio({
           <p role="status">Loading your current roles…</p>
         ) : error ? null : creators.length ? (
           creators.map((c) => (
-            <Link key={c.id} className="w5-card" href={`/studio/${c.id}/notes`}>
+            <Link key={c.id} className="w5-card" href={`/studio/${c.id}/today`}>
               {c.display_name}
               <span className="qv-help">
                 {c.owned ? "Creator" : `Team · ${c.roles.join(", ")}`}
@@ -507,7 +514,7 @@ export function Studio({
         </aside>
         <main className="w5-main">
           <div className="w5-account">
-            <Link href="/studio/workspace">{brand.studioName}</Link>
+            <Link href={`${root}/today`}>{brand.studioName}</Link>
             <span>
               {creator.owned
                 ? creator.display_name
@@ -531,8 +538,11 @@ export function Studio({
               key={`${creator.viewerAccountId}:${creator.id}:${screen[1] ?? "new"}`}
               creator={creator}
               id={screen[1]}
-              onDone={() => router.push(`${root}/notes`)}
+              back={composeBack}
+              onDone={() => router.push(composeBack)}
             />
+          ) : current === "today" ? (
+            <Today creator={creator} />
           ) : current === "notes" ? (
             <Notes creator={creator} />
           ) : current === "requests" ? (
@@ -555,15 +565,15 @@ export function Studio({
           {navigationTree(
             StudioTabBar({
               requests,
-              active: [
-                "Notes",
-                "Requests",
-                "Threads",
-                "My AI",
-                "More",
-              ].includes(active)
-                ? (active as "Notes")
-                : "More",
+              // Today is not a tab (yet): the bar marks only an exact label
+              // match, so passing "Today" leaves every tab unselected.
+              active:
+                active === "Today" ||
+                ["Notes", "Requests", "Threads", "My AI", "More"].includes(
+                  active,
+                )
+                  ? (active as "Notes")
+                  : "More",
             }),
             href,
           )}

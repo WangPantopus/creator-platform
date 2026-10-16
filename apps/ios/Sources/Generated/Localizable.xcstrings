@@ -1706,6 +1706,193 @@
         }
       }
     },
+    "Today": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today"
+          }
+        }
+      }
+    },
+    "New Note": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New Note"
+          }
+        }
+      }
+    },
+    "Your latest Note": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your latest Note"
+          }
+        }
+      }
+    },
+    "Your first Note": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your first Note"
+          }
+        }
+      }
+    },
+    "Write one Note for your audience. Each fan's reply stays private.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Write one Note for your audience. Each fan's reply stays private."
+          }
+        }
+      }
+    },
+    "Replies": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Replies"
+          }
+        }
+      }
+    },
+    "1 unread reply": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 unread reply"
+          }
+        }
+      }
+    },
+    "{count} unread replies": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{count} unread replies"
+          }
+        }
+      }
+    },
+    "No unread replies": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No unread replies"
+          }
+        }
+      }
+    },
+    "Read and react in Notes.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read and react in Notes."
+          }
+        }
+      }
+    },
+    "You're up to date": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You're up to date"
+          }
+        }
+      }
+    },
+    "Your AI is paused": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your AI is paused"
+          }
+        }
+      }
+    },
+    "Your AI is not published yet": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your AI is not published yet"
+          }
+        }
+      }
+    },
+    "Loading…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading…"
+          }
+        }
+      }
+    },
+    "This part of Today is unavailable right now.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This part of Today is unavailable right now."
+          }
+        }
+      }
+    },
+    "Choose your Studio": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose your Studio"
+          }
+        }
+      }
+    },
+    "No one is in this audience right now. No one will be told about this Note; members who join later can read it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No one is in this audience right now. No one will be told about this Note; members who join later can read it."
+          }
+        }
+      }
+    },
     "This week": {
       "extractionState": "manual",
       "localizations": {
@@ -6135,17 +6322,6 @@
           "stringUnit": {
             "state": "translated",
             "value": ").getString("
-          }
-        }
-      }
-    },
-    "Loading…": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Loading…"
           }
         }
       }

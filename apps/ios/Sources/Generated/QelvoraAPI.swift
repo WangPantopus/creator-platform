@@ -4882,24 +4882,46 @@ public enum APIStudioSessionInvitationsItemRolesItem: String, Codable, Sendable 
   case `scheduler` = "scheduler"
 }
 
+public enum APIStudioAudienceReach: String, Codable, Sendable {
+  case `some` = "some"
+  case `none` = "none"
+  case `unknown` = "unknown"
+}
+
 public struct APIStudioAudiences: Codable, Sendable {
   public let `audienceCountsAvailable`: Bool
+  public let `members`: APIStudioAudiencesMembers
   public let `tiers`: [APIStudioAudiencesTiersItem]
   public let `groups`: [APIStudioAudiencesGroupsItem]
-  public init(audienceCountsAvailable: Bool, tiers: [APIStudioAudiencesTiersItem], groups: [APIStudioAudiencesGroupsItem]) {
+  public init(audienceCountsAvailable: Bool, members: APIStudioAudiencesMembers, tiers: [APIStudioAudiencesTiersItem], groups: [APIStudioAudiencesGroupsItem]) {
     self.audienceCountsAvailable = audienceCountsAvailable
+    self.members = members
     self.tiers = tiers
     self.groups = groups
   }
 }
 
+public enum APIStudioAudiencesMembers: String, Codable, Sendable {
+  case `some` = "some"
+  case `none` = "none"
+  case `unknown` = "unknown"
+}
+
 public struct APIStudioAudiencesTiersItem: Codable, Sendable {
   public let `id`: String
   public let `name`: String
-  public init(id: String, name: String) {
+  public let `reach`: APIStudioAudiencesTiersItemReach
+  public init(id: String, name: String, reach: APIStudioAudiencesTiersItemReach) {
     self.id = id
     self.name = name
+    self.reach = reach
   }
+}
+
+public enum APIStudioAudiencesTiersItemReach: String, Codable, Sendable {
+  case `some` = "some"
+  case `none` = "none"
+  case `unknown` = "unknown"
 }
 
 public struct APIStudioAudiencesGroupsItem: Codable, Sendable {
@@ -10902,24 +10924,46 @@ public struct APIStudioContentVersionCommand: Codable, Sendable {
   }
 }
 
+public enum APIStudioStudioAudienceReach: String, Codable, Sendable {
+  case `some` = "some"
+  case `none` = "none"
+  case `unknown` = "unknown"
+}
+
 public struct APIStudioStudioAudiences: Codable, Sendable {
   public let `audienceCountsAvailable`: Bool
+  public let `members`: APIStudioStudioAudiencesMembers
   public let `tiers`: [APIStudioStudioAudiencesTiersItem]
   public let `groups`: [APIStudioStudioAudiencesGroupsItem]
-  public init(audienceCountsAvailable: Bool, tiers: [APIStudioStudioAudiencesTiersItem], groups: [APIStudioStudioAudiencesGroupsItem]) {
+  public init(audienceCountsAvailable: Bool, members: APIStudioStudioAudiencesMembers, tiers: [APIStudioStudioAudiencesTiersItem], groups: [APIStudioStudioAudiencesGroupsItem]) {
     self.audienceCountsAvailable = audienceCountsAvailable
+    self.members = members
     self.tiers = tiers
     self.groups = groups
   }
 }
 
+public enum APIStudioStudioAudiencesMembers: String, Codable, Sendable {
+  case `some` = "some"
+  case `none` = "none"
+  case `unknown` = "unknown"
+}
+
 public struct APIStudioStudioAudiencesTiersItem: Codable, Sendable {
   public let `id`: String
   public let `name`: String
-  public init(id: String, name: String) {
+  public let `reach`: APIStudioStudioAudiencesTiersItemReach
+  public init(id: String, name: String, reach: APIStudioStudioAudiencesTiersItemReach) {
     self.id = id
     self.name = name
+    self.reach = reach
   }
+}
+
+public enum APIStudioStudioAudiencesTiersItemReach: String, Codable, Sendable {
+  case `some` = "some"
+  case `none` = "none"
+  case `unknown` = "unknown"
 }
 
 public struct APIStudioStudioAudiencesGroupsItem: Codable, Sendable {
@@ -11840,10 +11884,10 @@ public enum ApplicationDestination {
   public static func isPermitted(_ value: String) -> Bool {
     if value.count > 2048 || value.contains("%") || value.contains("\\") || value.contains("#") || value.rangeOfCharacter(from: .whitespacesAndNewlines) != nil { return false }
     let parts = value.components(separatedBy: "?")
-    guard parts.count <= 2, parts[0].range(of: "^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|ops(?:/(?:audits|metrics|cases/[a-f0-9-]{36}))?|status|notifications(?:/(?:settings|[a-f0-9-]{36}))?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}|/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$", options: .regularExpression) != nil else { return false }
+    guard parts.count <= 2, parts[0].range(of: "^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|ops(?:/(?:audits|metrics|cases/[a-f0-9-]{36}))?|status|notifications(?:/(?:settings|[a-f0-9-]{36}))?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}|/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:today|notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$", options: .regularExpression) != nil else { return false }
     if parts.count == 1 { return true }
-    let scopes = ["context": "^/creators/", "creatorId": "^(?:/commerce/|/support$|/you$|/media/voice$)", "fanId": "^/you$", "packetId": "^/commerce/", "offer": "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId": "^/support$", "quote": "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet": "^/studio/[a-f0-9-]{36}/publish$", "objectId": "^/media/voice$", "kind": "^/support$"]
-    let literalValues = ["offer": "1", "kind": "verification"]
+    let scopes = ["context": "^/creators/", "creatorId": "^(?:/commerce/|/support$|/you$|/media/voice$)", "fanId": "^/you$", "packetId": "^/commerce/", "offer": "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId": "^/support$", "quote": "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet": "^/studio/[a-f0-9-]{36}/publish$", "from": "^/studio/[a-f0-9-]{36}/compose$", "objectId": "^/media/voice$", "kind": "^/support$"]
+    let literalValues = ["offer": "1", "kind": "verification", "from": "today"]
     let fields = parts[1].components(separatedBy: "&")
     guard fields.count <= 2 else { return false }
     var names = Set<String>()

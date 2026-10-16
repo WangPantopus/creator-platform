@@ -3,16 +3,16 @@
 Updated: 2026-10-16, by the session that did WP 6.9.
 
 Working on: nothing. WP 6.9 (Studio without 4-second polling) is done in
-[#488](https://github.com/WangPantopus/creator-platform/pull/488) on `lane-6/no-polling`; WP 6.2 is in #443 (open). This file is written on top
-of #443's version, so whichever of the two merges second takes this file as it is.
+[#488](https://github.com/WangPantopus/creator-platform/pull/488) on `lane-6/no-polling`. WP 6.2 (#443) was merged to `main` on
+2026-10-16 (bb49eeacf), at the founder's request to merge ready pull requests; #488 includes it.
 
 ## Resume here
 
 - **Prompt for the next session:** [lane-6-resume-prompt.md](lane-6-resume-prompt.md).
-- **Verified at handoff (2026-10-16):** `lane-6/no-polling` is pushed with #488 open (CI was
-  running when the session stopped; Auto-fix watches it); `main` was still dea51a4ff, #443 open,
-  and the integrator's tab bar change not on `main`; the working tree is clean; the lane 6 stack
-  is down and nothing of this session runs.
+- **Verified at handoff (2026-10-16):** #443 merged (bb49eeacf); `lane-6/no-polling` includes
+  it, and its code is identical to the local merge that passed E6.2 and E6.9; #488 is merged
+  when its checks pass (see the pull request); the integrator's tab bar change is not on `main`;
+  the lane 6 stack is down and nothing of this session runs.
 - **WP 6.9 in one paragraph:** each open Studio tab keeps one live stream
   (`/api/studio/live`); the server re-checks the roles and the open screen's read every 2
   seconds and sends fingerprints; screens read only on a change. The design, the safety
@@ -21,18 +21,20 @@ of #443's version, so whichever of the two merges second takes this file as it i
   `$HOME/.cache/qelvora-lane6/e6-1/` (README there); the "after" capture of WP 6.9 is saved there
   too (folder `pr-6-9-5f14221ae`). Compare across WP 6.9 with `e6-1-compare.mjs --across-6.9`;
   once WP 6.9 is on `main`, compare as usual against a capture that includes it. A local branch
-  `scratch/6.9-with-443` (never pushed) holds this branch merged with #443; it passed E6.2.
+  `scratch/6.9-with-443` (never pushed) held the same merge before #443 landed; it can be
+  deleted.
 - **Waiting on others:** the integrator's tab bar change (ticket below; not on `main` at
   dea51a4ff, so the one-line "Today is the current tab on Notes and the composer" change is
-  not made yet); approval of the `config/navigation.json` addition in #443; and the WP 6.9
+  not made yet); the integrator's review of the `config/navigation.json` addition (merged with
+  #443); and the WP 6.9
   tickets (lane 1's 4-second identity check; optionally the session resolver for the Studio
   stream).
 - **Deliberately not done:** WP 6.3 onwards; the composer's label preview fix
-  (`notes/Compose.tsx:536`); a live read for Today (after #443 merges; Today does not poll);
+  (`notes/Compose.tsx:536`); a live read for Today (Today does not poll; a small follow-up);
   the tickets lanes 2 and 5 sent to lane 6 (listed under Next).
 
-Waiting on: the integrator (tab bar ticket, `navigation.json` approval, merging #443 and the
-WP 6.9 pull request); lane 1 (the identity check ticket).
+Waiting on: the integrator (tab bar ticket, `navigation.json` review); lane 1 (the identity
+check ticket).
 
 Decided by the founder, 2026-10-15, in chat:
 
@@ -76,7 +78,7 @@ recommended answer, or default decision"); each can be vetoed:
 
 1. When the integrator's tab bar change is on `main`: mark Today as the current tab on Notes and
    in the composer (`Studio.tsx`, the `active` mapping) and rerun E6.1.
-2. After #443 merges: give Today a live read like the other screens (small; Today does not poll).
+2. Give Today a live read like the other screens (small; Today does not poll).
 3. WP 6.3: reactions, then WP 6.4 (queue) and WP 6.5 (accept and send over C3, now on `main`).
 4. Tickets received for lane 6 (not started): `apps/web/next.config.ts` or `.gitignore` so
    `next dev` stops rewriting the tracked `apps/web/next-env.d.ts` (lanes 2 and 5); the profile
@@ -131,7 +133,7 @@ Commands: `node tests/scenarios/lane-6/e6-9-idle.mjs`, `e6-9-live.mjs`, `e6-9-re
   are now drawn in one pass instead of after a second request (not proven). Saved for reuse in
   `$HOME/.cache/qelvora-lane6/e6-1/pr-6-9-5f14221ae`.
 - **E6.2 with #443** (a local merge of this branch and `lane-6/today-note`, never pushed, on a
-  fresh stack): `e6-2-note` 10/10, `e6-2-ceremony` 5/5, `e6-2-tabs` 3/3, `e6-2-audience` 6/6
+  fresh stack; after #443 merged, this branch's merge of `main` has identical code): `e6-2-note` 10/10, `e6-2-ceremony` 5/5, `e6-2-tabs` 3/3, `e6-2-audience` 6/6
   plus the known limit, `e6-2-today` 10/10; on the same code `e6-9-idle` 7/7 and `e6-9-live`
   6/6.
 - Checks: `pnpm --filter @qelvora/web typecheck`, `pnpm --filter @qelvora/backend typecheck`,
