@@ -32,6 +32,19 @@ export const sql = async (text, values) =>
     )
   ).rows;
 
+/** A slow database stand-in: holds an exclusive lock on `table` for `ms`;
+ * resolves when the lock is released. */
+export async function lockFor(table, ms) {
+  const client = await (pool ??= new pg.Pool({
+    connectionString: DB,
+    max: 2,
+  })).connect();
+  await client.query("BEGIN");
+  await client.query(`LOCK TABLE ${table} IN ACCESS EXCLUSIVE MODE`);
+  await new Promise((resolve) => setTimeout(resolve, ms));
+  await client.query("ROLLBACK");
+  client.release();
+}
 const results = [];
 /** One named step: prints PASS or FAIL with what was observed, and keeps going. */
 export async function step(id, what, check) {
@@ -165,7 +178,24 @@ export async function stackFan() {
       `fan message ${r.status} ${JSON.stringify(r.json)}`,
     );
   };
-  return { ...row, say };
+  // Pausing the backend during an AI reply stops lane 3's generation worker and
+  // the host with it (a ticket), so a pause waits until no reply is in flight.
+  const quiet = async () => {
+    for (let waited = 0; waited < 120; waited++) {
+      const r = await api("GET", `/v1/conversations/${MAYA}/${row.id}`, token);
+      if (
+        !(r.json?.messages ?? []).some(
+          (m) =>
+            m.authorKind === "ai" &&
+            ["queued", "generating"].includes(m.deliveryState),
+        )
+      )
+        return;
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+    throw new Error("an AI reply was still in flight after 120 s");
+  };
+  return { ...row, say, quiet };
 }
 /** Studio is hidden ("Reconnect to Studio") or not drawn at all. */
 export const hidden = (page) =>

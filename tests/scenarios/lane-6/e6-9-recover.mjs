@@ -4,7 +4,9 @@
 // E6.9-6 the browser's background signal (headless Chrome always reports a page as
 // visible, so the script sets document.hidden and sends visibilitychange). E6.9-7
 // stops Chrome and all its processes for 20 s as a sleeping laptop would, and E6.9-8
-// stops the stack's backend process for about 10 s (SIGSTOP, then SIGCONT).
+// stops the stack's backend process for about 10 s (SIGSTOP, then SIGCONT) once no AI
+// reply is in flight. E6.9-13 holds a database lock (a slow database stand-in). E6.9-12
+// stops the backend and starts it again with `stack.mjs up` (about a minute).
 //   node tests/scenarios/lane-6/e6-9-recover.mjs
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
@@ -120,6 +122,7 @@ await step(
   "E6.9-8",
   "a stalled server hides Studio, keeps the draft, recovers",
   async () => {
+    await fan.quiet();
     const draft = A.locator("textarea").first();
     await draft.fill(`Unsent words ${L.run}`);
     const pids = JSON.parse(
@@ -154,6 +157,34 @@ await step(
   },
 );
 await step(
+  "E6.9-13",
+  "opening Studio while its roles check hangs: told within 6 s, then shown",
+  async () => {
+    // A stand-in for a slow database: the roles check waits on a held lock
+    // for 12 s while the page itself (served without that table) loads.
+    const second = await owner.context.newPage();
+    const held = L.lockFor("creator.team_membership", 12_000);
+    await new Promise((r) => setTimeout(r, 300));
+    const from = Date.now();
+    await second.goto(`${WEB}/studio/${MAYA}/notes`);
+    await second
+      .getByText("Reconnect to continue.", { exact: false })
+      .first()
+      .waitFor({ timeout: 15_000 });
+    const told = Date.now() - from;
+    await held;
+    const shown = await until(
+      second,
+      () => second.getByText(/^REPLIES ·/u).isVisible(),
+      20_000,
+      "Notes after the lock",
+    );
+    await second.close();
+    expect(told <= 8_000, `told after ${told} ms`);
+    return `told after ${told} ms (page load included); Notes ${shown} ms after the lock ended`;
+  },
+);
+await step(
   "E6.9-9",
   "an idle minute: renewals keep Studio shown and read nothing",
   async () => {
@@ -174,6 +205,53 @@ await step(
       JSON.stringify(seen),
     );
     return `65 s: ${JSON.stringify(seen)}, never hidden`;
+  },
+);
+await step(
+  "E6.9-12",
+  "a backend restart: Studio hides, then returns by itself",
+  async () => {
+    await A.goto(`${WEB}/studio/${MAYA}/notes`);
+    await A.getByText(/^REPLIES ·/u).waitFor({ timeout: 30_000 });
+    await A.evaluate(() => (window.e69 = "same page"));
+    const file = `${process.env.TMPDIR}/qelvora-stack/lane6/pids.json`;
+    execFileSync("kill", [
+      String(JSON.parse(readFileSync(file, "utf8")).backend.pid),
+    ]);
+    const hid = await until(
+      A,
+      () => A.getByText("Reconnect to Studio").isVisible(),
+      10_000,
+      "Reconnect to Studio",
+    );
+    const restarted = Date.now();
+    execFileSync(
+      process.execPath,
+      [
+        "infra/local/stack.mjs",
+        "up",
+        "--lane",
+        "6",
+        "--provider",
+        "anthropic",
+        "--growth",
+      ],
+      {
+        cwd: new URL("../../../", import.meta.url),
+        env: { ...process.env, CI: "1" },
+        stdio: "ignore",
+      },
+    );
+    const up = Date.now() - restarted;
+    const back = await until(
+      A,
+      async () =>
+        !(await hidden(A)) && (await A.locator(".w5-note-list").isVisible()),
+      20_000,
+      "Notes after the restart",
+    );
+    expect((await A.evaluate(() => window.e69)) === "same page", "reloaded");
+    return `hidden ${hid} ms after the backend stopped; stack back in ${Math.round(up / 1000)} s; Notes shown ${back} ms later, same page`;
   },
 );
 await L.finish(browser);

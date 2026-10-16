@@ -1,7 +1,8 @@
 // E6.9 part 2: with no polling, updates still arrive and role changes apply at once.
 // Maya's owner (development actor three) and a team member (actor two) in Chrome at
 // 390 px; a fan (actor one) through the real API. Fakes: the development identity,
-// the model fake, and team rows standing in for lane 1's invitation.
+// the model fake, and team rows standing in for lane 1's invitation. E6.9-11 ends all
+// of Maya's sessions, so it runs last.
 //   node tests/scenarios/lane-6/e6-9-live.mjs
 import * as L from "./e6-9-lib.mjs";
 const { step, expect, until, hidden, MAYA, WEB } = L;
@@ -123,6 +124,22 @@ await step(
     expect(odd.status() === 404, `unknown parameter ${odd.status()}`);
     expect(bad.status() === 400, `invalid view ${bad.status()}`);
     return `signed out 401, unknown parameter 404, a thread without a fan 400`;
+  },
+);
+await step(
+  "E6.9-11",
+  "signing out everywhere from another device leaves an open Studio",
+  async () => {
+    await A.goto(`${WEB}/studio/${MAYA}/notes`);
+    await A.getByText(/^REPLIES ·/u).waitFor({ timeout: 30_000 });
+    const elsewhere = await L.apiSession(3);
+    const from = Date.now();
+    const r = await L.api("POST", "/v1/identity/revoke-sessions", elsewhere);
+    expect(r.status === 200, `revoke ${r.status}`);
+    await A.waitForURL((u) => u.pathname.startsWith("/auth"), {
+      timeout: 10_000,
+    });
+    return `left Studio for sign-in after ${Date.now() - from} ms (lane 1's session check)`;
   },
 );
 await L.team(2, null);
