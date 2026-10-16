@@ -59,8 +59,16 @@ async function sent() {
   }
   return [];
 }
+/** Taps a text field (the node its label describes, not the label above it). */
+async function tapField(label) {
+  await reveal(label);
+  const node = A.screen().find((n) => n.desc === label);
+  if (!node) throw new Error(`No field: ${label}`);
+  A.tapAt(node.x, node.y);
+  await L.sleep(800);
+}
 async function reason(value) {
-  await tapLabel("What happened?");
+  await tapField("What happened?");
   A.type(value);
   A.key("BACK"); // the keyboard
   await L.sleep(600);
@@ -129,7 +137,7 @@ if (run("V3")) {
   );
   await tapLabel("Choose a conversation");
   await tapLabel("Glazeco");
-  await tapLabel("Local confirmation");
+  await tapField("Local confirmation");
   A.type("LOCAL DEVELOPMENT");
   A.key("BACK");
   await L.sleep(600);
