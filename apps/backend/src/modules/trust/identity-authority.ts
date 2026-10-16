@@ -28,7 +28,7 @@ export function trustIdentityAuthority(
     )
       throw new DomainError(
         "fresh_verification_required",
-        "Continue with Pantopus again before requesting data changes.",
+        "Sign in again before asking for changes to your data.",
         401,
       );
     return identityTransaction(pool, actor.accountId, async (client) => {
@@ -41,7 +41,7 @@ export function trustIdentityAuthority(
       if (!row)
         throw new DomainError(
           "fresh_verification_required",
-          "Continue with Pantopus again before requesting data changes.",
+          "Sign in again before asking for changes to your data.",
           401,
         );
       return {

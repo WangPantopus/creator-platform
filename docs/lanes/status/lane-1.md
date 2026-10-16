@@ -1,0 +1,147 @@
+# Lane 1: Identity and trust status
+
+Updated: 2026-10-16, by the lane 1 session (Claude Opus 5.5)
+
+Working on: nothing in flight. Every unblocked work package has a pull request; what remains
+waits on the people listed under "Blocked on". On 2026-10-16 the founder chose the proposed
+default for P1, P2, R1, O1 and O2 and asked lane 1 to take its own recommended default for any
+further decision; those defaults are marked "default" below.
+
+Merged: #406 (WP 1.1, the option D decision pack), #407 (WP 1.4, contract C1 and its stub), #409
+(WP 1.7, identity and media finish a fan's deletion), #431 (WP 1.2, the sign-in backend; its
+migration registered as `0249_w1_qelvora_sign_in` in #442) and #432 (WP 1.3, web sign-in).
+
+Open:
+
+- WP 1.5, signing fixes: the shared signing panel recovers when a publication is refused; decisions
+  on recovery and Android 8 and 9 in `lane-1-signing.md`: #437 (`lane-1/signing-fix`, on main).
+- WP 1.5, a lost passkey retires and past signatures stay valid; a compromised one revokes (founder,
+  2026-10-15); the second-passkey prompt: #439 (`lane-1/passkey-retirement`, stacked on #437).
+  Pending migration `pending-passkey-retirement.sql`; register with the pull request.
+- WP 1.6 (first part), the ops console proven end to end; reviewers cannot review their own cases;
+  stuck effects show why; findings and decisions in `lane-1-ops.md`: #440 (`lane-1/ops-console`, on
+  main).
+- WP 1.7 (second part), deletion and export for Apple and Google accounts: tokens revoked at the
+  provider, identities deleted, the account closed; D2's working default (founder, 2026-10-15);
+  section 8 of `lane-1-deletion.md`: #454 (`lane-1/signin-deletion`, on main).
+- E1.5 for a creator who signs in with Apple: sign-in, verification, a passkey, a signed and
+  published Note and its public page, with edges: #458 (`lane-1/e1-5-apple-creator`, on main,
+  a scenario only).
+- Copy: the founder's approved sign-in wording for Apple and Google accounts in lane 1's files
+  ("Sign in again" instead of "Continue with Pantopus"): #461 (`lane-1/sign-in-wording`, on main).
+  It and #439 both touch the recovery notice in `setup.tsx`; lane 1 resolves whichever merges
+  second. All of lane 1's sign-in and shared-account wording is approved and in it (founder,
+  2026-10-15); `e1-sign-in-wording.mjs` 12 of 12.
+- WP 1.6 (O2), a runbook command adds and removes ops reviewers, each change logged with the
+  operator and reason; runbook `lane-1-ops-runbook.md`; pending migration
+  `pending-ops-member-admin.sql`: #472 (`lane-1/ops-members`, on main).
+- WP 1.6 (O1), supervisors see every reviewer's case access records in their queues: #475
+  (`lane-1/supervisor-audits`, on main); pending migration `pending-supervisor-audits.sql`.
+- WP 1.6 (P2), a supervisor lifts a pause from its case: the unfinished pause action is cancelled,
+  conversations reopen, `agent.resume` waits for lane 3: #478 (`lane-1/lift-pause`, on main);
+  pending migration `pending-lift-pause.sql`.
+- WP 1.6 (R1), the Note-reply queue waits on activating `0156_w8_reply_review` (held and
+  unapplied, so no reply is ever reviewed today); the clean-reply screen's design, off by default
+  until the term list is reviewed (default): #479 (`lane-1/reply-screen`, docs only).
+- E1.9, authorship cannot be forged: #480 (`lane-1/e1-9-authorship`, a scenario only).
+- WP 1.9, nothing that identifies a person under 18 is kept (default), and the policy page for
+  younger people linked from the under-18 state: #481 (`lane-1/under-18`, stacked on #454).
+- E1.10, crisis resources by region (default list, counsel to confirm) and the data-safety source
+  document `lane-1-data-safety.md`: #483 (`lane-1/compliance`, on main).
+
+Next, as each blocker clears: build R1 and prove E1.7 once 0156 is active; after #439's migration
+is registered, its signing reads use the plain column and the identity export adds `retired_at`;
+creator deletion after D1.
+
+Blocked on:
+
+- Counsel: the 18+ method, the under-18 policy wording and retention (#481), the crisis
+  resources and the data-safety document (#483), and R1's term list (#479).
+- The integrator: activating `0156_w8_reply_review` (blocks E1.7 and R1); registering the pending
+  migrations of #439, #472, #475 and #478.
+- Lane 4: P1, settling a paused creator's open paid requests, so a pause action can finish.
+- Lane 3: an `agent.resume` action handler, so a lifted pause brings the AI back (#478).
+- The founder's deletion decisions D1, D3 and D4 ([deletion findings, section 4](lane-1-deletion.md)):
+  creator signature retention, how long the redacted fan record is kept, and Q16. D2 (sign-in
+  after deletion) runs on its proposed default until the founder says otherwise.
+- Real Apple and Google tokens need the founder's Apple and Google client ids and the domain
+  (Q09); until then the scenarios use `tests/scenarios/lane-1/fake-provider.mjs`.
+- A Qelvora account cannot open a conversation on a development host (lane 3's provider policy),
+  so "lands in the thread" is not shown yet (ticket to lane 3).
+
+Scenarios:
+
+- C1 stub, 2026-10-15: 32 of 32 pass, rate limit 2 of 2 pass. Re-run: stack up, then
+  `C1_RATE_LIMIT=1000 node tests/scenarios/lane-1/c1-stub.mjs &` and
+  `node tests/scenarios/lane-1/c1-check.mjs` (see #407 for the rate case).
+- E1.8, 2026-10-15: `e1-8-delete.mjs` 14 pass, 3 fail (lanes 3, 4, 5), 2 not run (identity waits);
+  `e1-8-edges.mjs` 16 of 16. Re-run on a fresh stack, see #409.
+- E1.1 to E1.4, 2026-10-15, on the final code of #431: E1.1 40 of 40, E1.2 28 of 28, E1.3 13 pass
+  and 2 not run (in-flight revocation; web CSRF, which is WP 1.3), E1.4 7 of 7. Needs the fake
+  provider, the stack with `QELVORA_SIGN_IN` and the migration with locally regenerated pins; see #431.
+- Web (#432), 2026-10-15, in system Chrome: `e1-web-sign-in.mjs` 18 of 18 (E1.1 to E1.4 in the
+  browser), `e1-5-passkey-web.mjs` 8 of 8 (E1.5 registration, fresh sign-in, a second device).
+- WP 1.5 (#437), 2026-10-15: the stuck Note reproduced and recovered with lane 6's patch; the
+  signing panel's refused-publication case fixed and its lost-answer case unchanged (scripts
+  `e1-5-pending-publication.mjs`, `e1-5-refused-publish.mjs`).
+- Key loss (#439), 2026-10-15: `e1-5-key-loss.mjs` 15 of 15 (lost retires, past Notes valid, a
+  retired key refused, fresh proof, compromised revokes), twice.
+- E1.6 (#440), 2026-10-15: `e1-6-ops.mjs` 24 pass, pause completion fails (lane 4), unpause not
+  run; `e1-6-console.mjs` 8 of 8.
+- E1.8 for Apple and Google accounts (#454), 2026-10-15: `e1-8-sign-in-delete.mjs` 26 of 26, its
+  restart steps 5 of 5; identity's erasure runs behind a labelled stand-in for the domains of
+  lanes 2 to 5. Unchanged: E1.1 to E1.4, `e1-8-delete.mjs`, `e1-8-edges.mjs` 16 of 16.
+- E1.5 with an Apple creator (#458), 2026-10-15: `e1-5-apple-creator.mjs` 15 pass, 1 not run (a
+  follower reading a followers Note: following needs the creator's page published by the AI
+  publication worker, which development stacks do not run, and growth).
+- WP 1.6 (2026-10-16): `e1-6-ops-members.mjs` 12 of 12 (#472); `e1-6-supervisor-audits.mjs` 7 of 7
+  plus the pre-registration check (#475); `e1-6-lift-pause.mjs` 9 of 9, and 1 of 1 with
+  `--before-registration` (#478).
+- E1.9 (#480): 8 pass, 1 not run (team replies are not composed on development stacks).
+- Under 18 (#481): `e1-2-under-18-data.mjs` 8 of 8; E1.1 and E1.2 unchanged.
+- E1.10 (#483): `e1-10-compliance.mjs` 6 of 6 on a `--growth` stack.
+- E1.7: not run (blocked on 0156). E1.11: not run (comparison is frozen; lowest priority).
+
+Tickets to other lanes:
+
+- Integrator: activate `0156_w8_reply_review` in a wave (#479); register the pending migrations of
+  #472, #475 and #478; pass the crisis resources in the production composition and in
+  `operations/local-server.ts` (#483).
+- Lane 3: an `agent.resume` action handler (#478); compose the team-reply denial authority on
+  development stacks, which answer `503 scope_denial_unconfigured` (#480).
+- Lane 4: P1's settlement of open paid requests on a pause (#478).
+- Sign-in wording for Apple and Google accounts (founder, 2026-10-15; exact strings in #461): lane 4
+  (`modules/commerce`, `features/commerce`), lane 6 (`features/studio`), lane 3
+  (`features/creator-ai`, the threads page, the studio AI proxy), lane 5 (`features/content` and
+  the `w5`/`growth` session copy keys), lane 7 (iOS and Android session messages), and the
+  integrator (`app.ts`, `integration.ts`, `packages/api/src/content-client.ts`).
+- Lane 3, `modules/conversation/privacy.ts`: run without a recordings adapter when none exist;
+  blocks conversation, agent and trust for export and delete (#409).
+- Lane 4, `modules/commerce/operations.ts`: deletion per Q16 (#409).
+- Lane 5, `modules/content/privacy.ts`: a fan's Note replies and thanks; `modules/growth/lifecycle.ts`:
+  conversation-scope and creator-scope deletion (#409).
+- Integrator: compose a Qelvora host (`IDENTITY_ADAPTER=qelvora` in `config.ts`, `QelvoraSignIn` as the identity
+  in `server.ts`); a trusted-proxy setting so the start limit sees the client's address (#431).
+- Lane 3, the development provider policy: Qelvora accounts get `providers_unconfigured`; staging
+  and the exit demo need a verified policy or an allowance for fake-provider accounts (#431).
+- Lane 4: settle a paused creator's open paid requests (`settleDeparture`); a pause never resolves
+  without it (#440).
+- Lane 3: "resume" for a paused agent; and a creator's trust action times out while their AI holds
+  the profile row in a generation transaction (#440).
+- Integrator: register `pending-passkey-retirement.sql` with #439 (signing tolerates the missing
+  column, so CI passes before it).
+- Integrator, `operations/local-server.ts`: pass `identitySignIn` to `createPrivacyConsumers`, or
+  Apple and Google accounts with a stored token block there (#454).
+- Lane 6, `features/studio/notes/Compose.tsx`: clear the pending publication when a retry is refused
+  with `signed_act_required` (verified patch in `lane-1-signing.md`, #437).
+- Integrator, `config/navigation.json`: exempt `studio/setup` from the fan-handle step (#432).
+- Lane 2: the edge must set `X-Forwarded-For` itself for the sign-in start limit (#432).
+- Integrator, `packages/api/src/schemas.ts`: with WP 1.2, `IdentityCapabilitiesSchema.mode` gains
+  `"qelvora"` and a `providers` list, and `IdentityContinueSchema` gains `provider` (#407).
+- Lane 7, `FanShell.kt:525` and `W3FanFeatures.kt:802`: "Signed in with Pantopus" is shown for
+  every non-development mode; wrong under option D (#407).
+
+Environment: the one-command stack runs as `node infra/local/stack.mjs up --lane 1 --provider
+anthropic --env W2_SMALL_MODEL=claude-sonnet-5-5 --growth --no-web` (ports 56410 to 56419,
+container `qelvora-lane1-postgres`). The fake Apple and Google provider uses port 56414, the C1
+stub 56415.

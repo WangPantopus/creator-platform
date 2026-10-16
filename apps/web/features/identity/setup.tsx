@@ -184,7 +184,7 @@ export function CreatorSetup({ initial }: { initial: Session }) {
     }
   };
   const steps = [
-    "Continue with Pantopus",
+    "Sign in",
     "Prove it’s you",
     "A passkey for signing",
     "Your license to your AI",
@@ -284,10 +284,9 @@ export function CreatorSetup({ initial }: { initial: Session }) {
                 "This synthetic account does not verify a real person's identity. Local proof challenges are for development only."
               ) : (
                 <>
-                  Your Pantopus account proves you're a person. This proves
-                  you're the {creator.displayName} your fans already follow.
-                  Post the code in a story or a caption; you can delete it once
-                  we've seen it.
+                  This proves you're the {creator.displayName} your fans already
+                  follow. Post the code in a story or a caption; you can delete
+                  it once we've seen it.
                 </>
               )}
             </p>
@@ -601,7 +600,7 @@ export function CreatorSetup({ initial }: { initial: Session }) {
                           setCreator(updated.creator);
                           await loadKeys().catch(() => {});
                           setNotice(
-                            "Recovery started. Reconnect your Pantopus account, then submit fresh external creator proof.",
+                            "Recovery started. Sign in again, then submit fresh creator proof.",
                           );
                         })
                       }

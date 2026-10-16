@@ -2,7 +2,8 @@
 // and how much of this week is left, and it always equals the capacity row the
 // server enforces: a hold takes a slot, a decline returns it, a full week says
 // when it opens; a paused offer disappears; nothing about a fan or a request is
-// ever in it; an unknown creator is not found. The sentence is the fixed copy.
+// ever in it; an unknown creator is not found. The sentence is the fixed copy,
+// and its delivery window reads "1 hour", "2 hours", "48 hours" or "3 days".
 // Fakes: card processor, development identity, software passkey.
 //   node tests/scenarios/lane-4/e4-9-public-summary.mjs
 import {
@@ -16,6 +17,7 @@ import {
   finish,
   http,
   offer,
+  pauseOffer,
   setLimit,
   sql,
   step,
@@ -166,6 +168,44 @@ await step(
       `leaks ${leaks}, pause ${paused.status} ${paused.code}, gone ${gone}, unknown ${unknown.status}`,
     );
     return "no fan or request data; the paused offer is gone; unknown creator 404";
+  },
+);
+await step(
+  "E4.9-12",
+  "the sentence says '1 hour' for a 1-hour offer; 2 hours, 48 hours and 3 days read as before",
+  async () => {
+    const said = [];
+    for (const hours of [1, 2, 48, 72]) {
+      // The cheapest offer leads the sentence: the minimum price, and a title
+      // that sorts before any other scenario's.
+      const made = (
+        await offer(maya, {
+          title: `A reply within ${hours} h (public summary)`,
+          amount: 50,
+          deliveryHours: hours,
+          weeklyLimit: 1,
+        })
+      ).body;
+      try {
+        const summary = (await read()).body;
+        expect(
+          summary.offers[0]?.modeId === made.id,
+          `another offer leads the sentence: ${summary.offers[0]?.title}`,
+        );
+        said.push(summary.capacity);
+      } finally {
+        await pauseOffer(maya, made.id);
+      }
+    }
+    const want = ["1 hour", "2 hours", "48 hours", "3 days"].map(
+      (d) =>
+        `Maya answers written replies within ${d} · 1 of 1 left this week.`,
+    );
+    expect(
+      JSON.stringify(said) === JSON.stringify(want),
+      said.map((s) => `"${s}"`).join(" / "),
+    );
+    return said.map((s) => `"${s}"`).join(" / ");
   },
 );
 for (const { id } of await sql(

@@ -4,6 +4,7 @@ import { registeredMigration } from "../../db/reviewed-migration.js";
 import { registeredComparisonProfile } from "../../db/comparison-profile.js";
 import { contentHash } from "../../core/canonical.js";
 import comparisonReview from "../../../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
+import noticesReview from "../../../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
 import {
   comparisonArtifactCatalogue,
   comparisonArtifactPrivacySource,
@@ -98,6 +99,19 @@ export async function assertDomainPrivacyTaskCatalogForComparisonReview(
     client,
     domain,
     async () => comparisonReview.comparison.artifactsCatalogueChecksum,
+  );
+}
+
+/** Fixed116 operator metadata before the sign-in and money wave: the notices
+ * review's own artifact pin. No task authority and no caller-provided pin. */
+export async function assertDomainPrivacyTaskCatalogForNoticesReview(
+  client: PoolClient,
+  domain: "trust" | "growth",
+) {
+  return assertDomainPrivacyTask(
+    client,
+    domain,
+    async () => noticesReview.comparison.artifactsCatalogueChecksum,
   );
 }
 

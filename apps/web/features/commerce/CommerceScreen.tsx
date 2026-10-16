@@ -80,6 +80,8 @@ type Packet = {
   decision_at: string | null;
   hold_expires_at: string | null;
   question?: string;
+  /** Why a declined request ended: "decline", or "ai_answer" for "Let AI answer". */
+  reason?: string | null;
   disclosure: { summary?: string };
   commitment_id?: string;
   commitment_state?: string;
@@ -155,6 +157,8 @@ type Overview = {
     month: string;
     refunded: number;
     captured: number;
+    /** What of this month's payments was refunded: room given back. */
+    returned: number;
     held: number;
     total: number;
     currency: string;
@@ -235,6 +239,10 @@ const modesNames: Record<string, string> = {
   group_answer: "Group answer",
   guaranteed_review: "Guaranteed review",
 };
+/** An offer's delivery window in hours: "1 hour", "72 hours". */
+function hoursPhrase(hours: number) {
+  return hours === 1 ? "1 hour" : `${hours} hours`;
+}
 function money(amount: number | string | bigint, currency: string) {
   const digits =
     new Intl.NumberFormat(undefined, {
@@ -286,6 +294,13 @@ function date(value: string | null | undefined) {
 }
 function requestId(id: string) {
   return `REQ-${id.slice(0, 8).toUpperCase()}`;
+}
+/** A delivery window in words: hours up to 48, whole days beyond. */
+function deadlinePhrase(hours: number) {
+  if (hours === 1) return "1 hour";
+  return hours <= 48 || hours % 24 !== 0
+    ? `${hours} hours`
+    : `${hours / 24} days`;
 }
 async function commerceFetch(path: string, init: RequestInit = {}) {
   try {
@@ -353,7 +368,10 @@ function Empty({
   );
 }
 function status(p: Packet, name: string) {
-  if (p.state === "declined") return formatCopy("declined", { name });
+  if (p.state === "declined")
+    return formatCopy(p.reason === "ai_answer" ? "declinedForAi" : "declined", {
+      name,
+    });
   if (p.state === "expired") return formatCopy("expired", { name });
   if (p.state === "withdrawn")
     return "Request withdrawn · the hold was released";
@@ -433,7 +451,13 @@ function requestSteps(p: Packet): RequestStatusProps["steps"] {
     ["submitted", "more_info", "offer_pending", "accepting"].includes(p.state)
   ) {
     steps.push({
-      label: p.state === "accepting" ? "Confirming charge" : "Decision due",
+      // While a question waits, this is when the request lapses unless the fan answers.
+      label:
+        p.state === "accepting"
+          ? "Confirming charge"
+          : p.state === "more_info"
+            ? copy.moreInfoAnswerBy
+            : "Decision due",
       time: date(p.decision_at),
       state: "current",
     });
@@ -611,6 +635,10 @@ function CommerceAccountScreen({
     [whole, setWhole] = useState(false),
     [filter, setFilter] = useState("Open");
   const pending = useRef(new Map<string, string>());
+  /** The request being sent and the card it was first sent with. */
+  const submission = useRef<{ draft: string; paymentMethodId: string } | null>(
+    null,
+  );
   const [membershipTier, setMembershipTier] = useState<string | null>(null);
   const [editingModeId, setEditingModeId] = useState<string | null>(null);
   const [editingTierId, setEditingTierId] = useState<string | null>(null);
@@ -1120,7 +1148,12 @@ function CommerceAccountScreen({
                       .toUpperCase()}
                   </span>
                   <div className="commerce-spend-total">
-                    {money(data.exposure?.captured ?? 0, currency)}
+                    {/* What counts toward the limit: a refund gives its room back. */}
+                    {money(
+                      (data.exposure?.captured ?? 0) -
+                        (data.exposure?.returned ?? 0),
+                      currency,
+                    )}
                   </div>
                   <p>
                     {limit?.explicit_none
@@ -1268,7 +1301,8 @@ function CommerceAccountScreen({
                             : "Price unavailable"}
                         </span>
                         <p>
-                          Within {m.delivery_hours} hours or a full refund ·{" "}
+                          Within {hoursPhrase(m.delivery_hours)} or a full
+                          refund ·{" "}
                           {Math.max(0, m.weekly_limit - m.used - m.reserved)} of{" "}
                           {m.weekly_limit} left this week
                         </p>
@@ -1397,8 +1431,8 @@ function CommerceAccountScreen({
                               copy.modeMembersOnly
                             ) : (
                               <>
-                                Within {m.delivery_hours} hours or a full refund
-                                ·{" "}
+                                Within {hoursPhrase(m.delivery_hours)} or a full
+                                refund ·{" "}
                                 {Math.max(
                                   0,
                                   m.weekly_limit - m.used - m.reserved,
@@ -1518,7 +1552,7 @@ function CommerceAccountScreen({
                               throw new Error(
                                 "This request is unavailable. Return to review its current access, limit and capacity.",
                               );
-                            const result = await command("packets", {
+                            const draft = {
                               creatorId: activeCreator,
                               fanId: data.fan!.id,
                               modeId: chosen.id,
@@ -1538,9 +1572,26 @@ function CommerceAccountScreen({
                                 accessNoticeVersion:
                                   disclosure.accessNoticeVersion,
                               },
-                              paymentMethodId,
+                            };
+                            // A lost answer can leave this exact request already
+                            // sent, with the card it first used. A retry of the same
+                            // request reuses that card, so it is the same command
+                            // with the same key: the server returns the first result
+                            // and no second hold is ever placed. A new card is used
+                            // only for a changed request.
+                            const signature = JSON.stringify(draft);
+                            if (submission.current?.draft !== signature)
+                              submission.current = {
+                                draft: signature,
+                                paymentMethodId,
+                              };
+                            const result = await command("packets", {
+                              ...draft,
+                              paymentMethodId:
+                                submission.current.paymentMethodId,
                             });
                             if (result?.packet?.id) {
+                              submission.current = null;
                               setCheckout(false);
                               window.location.assign(
                                 `/commerce/status?packetId=${result.packet.id}`,
@@ -1729,6 +1780,20 @@ function CommerceAccountScreen({
                         )?.display_name ?? "The creator",
                       )}
                     />
+                    {detail.packet.state === "declined" &&
+                      detail.packet.reason === "ai_answer" && (
+                        <Link
+                          className="qv qv-btn qv-btn--secondary qv-btn--lg"
+                          href={`/threads/${detail.packet.creator_id}/${detail.packet.fan_id}`}
+                        >
+                          {formatCopy("askAiInstead", {
+                            name:
+                              data.creators.find(
+                                (c) => c.id === detail.packet.creator_id,
+                              )?.display_name ?? "The creator",
+                          })}
+                        </Link>
+                      )}
                     {detail.callTransport && (
                       <section
                         className="commerce-card"
@@ -2160,8 +2225,7 @@ function CommerceAccountScreen({
                           {[
                             "Mode",
                             "Price",
-                            "Deadline",
-                            "Refund if late",
+                            copy.offerDeliveryHeading,
                             "Per week",
                             "State",
                           ].map((v) => (
@@ -2183,8 +2247,11 @@ function CommerceAccountScreen({
                                   ? money(m.amount, m.currency)
                                   : "Not set"}
                               </span>
-                              <span>{m.delivery_hours} h</span>
-                              <span>Full refund</span>
+                              <span>
+                                {formatCopy("offerDeliveryRule", {
+                                  deadline: deadlinePhrase(m.delivery_hours),
+                                })}
+                              </span>
                               <span>
                                 {m.used + m.reserved} of {m.weekly_limit}
                               </span>

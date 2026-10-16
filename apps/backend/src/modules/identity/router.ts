@@ -30,11 +30,7 @@ export interface IdentityRuntime {
 export function bearer(req: Request) {
   const token = req.headers.authorization?.match(/^Bearer ([^\s]+)$/u)?.[1];
   if (!token)
-    throw new DomainError(
-      "session_required",
-      "Continue with Pantopus to use this app.",
-      401,
-    );
+    throw new DomainError("session_required", "Sign in to use this app.", 401);
   return token;
 }
 /** Sign-in starts per client per minute; completions are single use, so this

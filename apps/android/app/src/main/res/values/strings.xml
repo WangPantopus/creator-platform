@@ -68,6 +68,8 @@
   <string name="draft_notice" formatted="false">{name} may answer with her AI\'s draft; you\'ll see that label.</string>
   <string name="capacity" formatted="false">{name} answers {mode} within {deadline} · {n} of {cap} left this week.</string>
   <string name="mode_members_only" formatted="false">For members whose tier includes requests</string>
+  <string name="offer_delivery_heading" formatted="false">Delivery</string>
+  <string name="offer_delivery_rule" formatted="false">Within {deadline} of accepting, or a full refund</string>
   <string name="audit_access" formatted="false">Opening this conversation is logged and visible to the fan.</string>
   <string name="long_session" formatted="false">You\'ve been talking with {name}\'s AI for a while. It\'s an AI, and it will be here when you\'re back.</string>
   <string name="note_audience" formatted="false">{name} · to {audience}</string>
@@ -101,6 +103,9 @@
   <string name="access_changes" formatted="false">Changes: {changes}</string>
   <string name="source_unavailable" formatted="false">No longer accessible to you</string>
   <string name="declined" formatted="false">{name} passed on this one · nothing charged</string>
+  <string name="declined_for_ai" formatted="false">{name} suggests asking {name}\'s AI · nothing charged</string>
+  <string name="ask_ai_instead" formatted="false">Ask {name}\'s AI</string>
+  <string name="more_info_answer_by" formatted="false">Answer by</string>
   <string name="expired" formatted="false">{name}\'s queue didn\'t get to this · nothing charged</string>
   <string name="payment_failed" formatted="false">Payment didn\'t go through · nothing was shared</string>
   <string name="deadline_missed" formatted="false">Refunded automatically · {name} may still reply</string>
@@ -131,6 +136,11 @@
   <string name="page_unavailable_body" formatted="false">Nothing you saved was changed. Try again in a moment.</string>
   <string name="adult_only_title" formatted="false">This app is for adults</string>
   <string name="adult_only_body" formatted="false">This app is available to adults aged 18 and over.</string>
+  <string name="underage_link" formatted="false">What we keep, and what we don\'t</string>
+  <string name="underage_policy_title" formatted="false">If you\'re under 18</string>
+  <string name="underage_policy_opening" formatted="false">This app is only for adults aged 18 and over, so we didn\'t open an account for you.</string>
+  <string name="underage_policy_not_kept" formatted="false">We never store a date of birth, and we erased the email address your Apple or Google sign-in shared with us.</string>
+  <string name="underage_policy_kept" formatted="false">We keep two things: that the age check said under 18, and a scrambled code made from your sign-in, so the same sign-in can\'t pass the age check later. Neither can be turned back into your name or email.</string>
   <string name="sign_in_with_apple" formatted="false">Continue with Apple</string>
   <string name="sign_in_with_google" formatted="false">Continue with Google</string>
   <string name="sign_in_age_title" formatted="false">Your date of birth</string>
@@ -164,6 +174,25 @@
   <string name="confirm" formatted="false">Confirm</string>
   <string name="waiting" formatted="false">{count} waiting</string>
   <string name="studio_live" formatted="false">Your AI is live · {version}</string>
+  <string name="studio_today_title" formatted="false">Today</string>
+  <string name="studio_new_note" formatted="false">New Note</string>
+  <string name="studio_today_latest_note" formatted="false">Your latest Note</string>
+  <string name="studio_first_note_title" formatted="false">Your first Note</string>
+  <string name="studio_first_note_body" formatted="false">Write one Note for your audience. Each fan\'s reply stays private.</string>
+  <string name="studio_today_replies" formatted="false">Replies</string>
+  <string name="studio_today_unread_reply" formatted="false">1 unread reply</string>
+  <string name="studio_today_unread_replies" formatted="false">{count} unread replies</string>
+  <string name="studio_today_no_unread_replies" formatted="false">No unread replies</string>
+  <string name="studio_today_replies_help" formatted="false">Read and react in Notes.</string>
+  <string name="studio_today_requests" formatted="false">Requests</string>
+  <string name="studio_today_requests_none" formatted="false">You\'re up to date</string>
+  <string name="studio_today_my_a_i" formatted="false">My AI</string>
+  <string name="studio_today_ai_paused" formatted="false">Your AI is paused</string>
+  <string name="studio_today_ai_not_published" formatted="false">Your AI is not published yet</string>
+  <string name="studio_today_loading" formatted="false">Loading…</string>
+  <string name="studio_today_unavailable" formatted="false">This part of Today is unavailable right now.</string>
+  <string name="studio_choose_studio" formatted="false">Choose your Studio</string>
+  <string name="studio_audience_empty" formatted="false">No one is in this audience right now. No one will be told about this Note; members who join later can read it.</string>
   <string name="this_week" formatted="false">This week</string>
   <string name="queue_accepted" formatted="false">Accepted</string>
   <string name="queue_rule" formatted="false">Matched your rule</string>

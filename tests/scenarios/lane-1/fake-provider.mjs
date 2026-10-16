@@ -65,8 +65,25 @@ const escape = (value) =>
       ],
   );
 const revoked = [];
-const stats = { authorize: 0, token: 0, keys: 0, refused: 0 };
+// Every refresh token handed out, so a scenario can check which were revoked.
+// Revoking one ends that person's grant for that client: all its tokens.
+const refreshTokens = new Map();
+const endGrant = (held) => {
+  for (const other of refreshTokens.values())
+    if (
+      other.provider === held.provider &&
+      other.clientId === held.clientId &&
+      other.sub === held.sub
+    )
+      other.revoked = true;
+};
+const stats = { authorize: 0, token: 0, keys: 0, refused: 0, revoking: 0 };
+// ok | down (503 everywhere) | slow (15 s everywhere) | slow-revoke (5 s on
+// revocation only) | refuse-revoke (revocation answers 400 invalid_client)
 let mode = "ok";
+// Real Google returns a refresh token only for offline access, which the
+// backend never asks for; this knob makes the fake return one anyway.
+let googleRefresh = false;
 
 function idToken(provider, aud, sub, nonce, extra = {}, options = {}) {
   const now = Math.floor(Date.now() / 1000);
@@ -213,7 +230,16 @@ function token(provider, res, form) {
   } else if (!appleSecretValid(form.client_secret, form.client_id))
     return refuse(res, "invalid_client");
   const refresh =
-    provider === "apple" ? `r.${randomBytes(16).toString("hex")}` : undefined;
+    provider === "apple" || googleRefresh
+      ? `r.${randomBytes(16).toString("hex")}`
+      : undefined;
+  if (refresh)
+    refreshTokens.set(refresh, {
+      provider,
+      clientId: entry.clientId,
+      sub: entry.sub,
+      revoked: false,
+    });
   send(res, 200, {
     access_token: randomBytes(16).toString("hex"),
     token_type: "Bearer",
@@ -234,15 +260,43 @@ const routes = {
   "GET /google/o/oauth2/v2/auth": (res, q) => authorize("google", res, q),
   "POST /apple/auth/token": (res, _q, form) => token("apple", res, form),
   "POST /google/token": (res, _q, form) => token("google", res, form),
+  // RFC 7009, as Apple does: an unknown or already revoked token is a 200;
+  // a token issued to another client is refused.
   "POST /apple/auth/revoke": (res, _q, form) => {
     if (!appleSecretValid(form.client_secret, form.client_id))
       return refuse(res, "invalid_client");
+    const held = refreshTokens.get(form.token);
+    if (held && held.clientId !== form.client_id)
+      return refuse(res, "unauthorized_client");
+    if (held) endGrant(held);
     revoked.push(form.token);
     send(res, 200, {});
   },
-  "GET /__stats": (res) => send(res, 200, { ...stats, mode, revoked }),
-  "POST /__control": (res, _q, body) =>
-    send(res, 200, { mode: (mode = body.mode ?? "ok") }),
+  // Google answers 400 invalid_token for an unknown or already revoked token.
+  "POST /google/revoke": (res, _q, form) => {
+    const held = refreshTokens.get(form.token);
+    if (!held || held.revoked || held.provider !== "google")
+      return refuse(res, "invalid_token");
+    endGrant(held);
+    revoked.push(form.token);
+    send(res, 200, {});
+  },
+  "GET /__stats": (res) =>
+    send(res, 200, {
+      ...stats,
+      mode,
+      googleRefresh,
+      revoked,
+      refreshTokens: [...refreshTokens].map(([token, held]) => ({
+        token,
+        ...held,
+      })),
+    }),
+  "POST /__control": (res, _q, body) => {
+    if (typeof body.googleRefresh === "boolean")
+      googleRefresh = body.googleRefresh;
+    send(res, 200, { mode: (mode = body.mode ?? "ok"), googleRefresh });
+  },
   // A native sheet's ID token, minted for a test person and any claims.
   "POST /__mint": (res, _q, body) =>
     send(res, 200, {
@@ -292,6 +346,14 @@ http
     }
     if (mode === "slow" && !url.pathname.startsWith("/__"))
       await new Promise((resolve) => setTimeout(resolve, 15_000));
+    if (/\/revoke$/u.test(url.pathname)) {
+      if (mode === "down") return send(res, 503, { error: "unavailable" });
+      if (mode === "refuse-revoke") return refuse(res, "invalid_client");
+      if (mode === "slow-revoke") {
+        stats.revoking += 1;
+        await new Promise((resolve) => setTimeout(resolve, 5_000));
+      }
+    }
     const route = routes[`${req.method} ${url.pathname}`];
     if (!route) return send(res, 404, { error: "not_found" });
     route(res, Object.fromEntries(url.searchParams), body);

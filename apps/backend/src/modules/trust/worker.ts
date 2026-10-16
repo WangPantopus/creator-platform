@@ -376,6 +376,8 @@ export class TrustWorker {
         "generation_settlement_clock_unavailable",
         "identity_retention_unconfigured",
         "identity_scope_adapter_required",
+        "identity_sign_in_unconfigured",
+        "identity_provider_revocation_refused",
         "growth_scope_adapter_required",
         "content_retention_unconfigured",
         "content_privacy_purpose_unconfigured",
@@ -394,6 +396,7 @@ export class TrustWorker {
             ...unavailable,
             "comparison_artifact_purge_pending",
             "identity_erasure_waiting",
+            "identity_provider_unavailable",
             "hook_timeout",
             "privacy_family_cancel_unavailable",
             "privacy_family_rollback_unavailable",
@@ -423,6 +426,8 @@ export class TrustWorker {
       const artifactPending = code === "comparison_artifact_purge_pending";
       // Identity erases last: it waits for every other domain, never dead-letters.
       const identityWaiting = code === "identity_erasure_waiting";
+      // A deletion outlives an Apple or Google outage: back off, never dead-letter.
+      const providerDown = code === "identity_provider_unavailable";
       const blocked =
         unavailable.includes(code) && !retryableAuthorityFailure(error);
       const saved = await trustTransaction(this.pool, (client) =>
@@ -435,7 +440,10 @@ export class TrustWorker {
             accounting?.state ??
               (blocked
                 ? "blocked"
-                : task.attempts >= 8 && !artifactPending && !identityWaiting
+                : task.attempts >= 8 &&
+                    !artifactPending &&
+                    !identityWaiting &&
+                    !providerDown
                   ? "dead_letter"
                   : "retry"),
             code,
@@ -500,7 +508,7 @@ export class TrustWorker {
             reporter_account_id: string;
             subject_account_id: string | null;
           }>(
-            "UPDATE creator_trust.safety_case c SET state='resolved',closed_at=now(),updated_at=now(),version=version+1 WHERE c.id=$1 AND c.state='action_pending' AND NOT EXISTS(SELECT 1 FROM creator_trust.effect e WHERE e.case_id=c.id AND e.state<>'complete') RETURNING version,resolution_reason,reporter_account_id,subject_account_id",
+            "UPDATE creator_trust.safety_case c SET state='resolved',closed_at=now(),updated_at=now(),version=version+1 WHERE c.id=$1 AND c.state='action_pending' AND NOT EXISTS(SELECT 1 FROM creator_trust.effect e WHERE e.case_id=c.id AND e.state NOT IN('complete','cancelled')) RETURNING version,resolution_reason,reporter_account_id,subject_account_id",
             [effect.case_id],
           );
           const current = cases.rows[0];
@@ -522,19 +530,22 @@ export class TrustWorker {
         }
       });
     } catch (error) {
+      // A domain refusal keeps its own code (an identifier, never personal
+      // data) so ops can see why an effect is stuck; anything else stays generic.
       const code =
-        error instanceof Error &&
-        [
-          "hook_timeout",
-          "receipt_invalid",
-          "trust_connection_budget_unavailable",
-          "trust_transaction_unavailable",
-          "trust_client_settlement_unavailable",
-        ].includes(error instanceof DomainError ? error.code : error.message)
-          ? error instanceof DomainError
-            ? error.code
-            : error.message
-          : "effect_hook_error";
+        error instanceof DomainError &&
+        /^[a-z][a-z0-9_]{2,63}$/u.test(error.code)
+          ? error.code
+          : error instanceof Error &&
+              [
+                "hook_timeout",
+                "receipt_invalid",
+                "trust_connection_budget_unavailable",
+                "trust_transaction_unavailable",
+                "trust_client_settlement_unavailable",
+              ].includes(error.message)
+            ? error.message
+            : "effect_hook_error";
       await trustTransaction(this.pool, (client) =>
         client.query(
           "UPDATE creator_trust.effect SET state=$3,error_code=$5,lease_until=NULL,available_at=now()+make_interval(secs=>$4) WHERE id=$1 AND lease_token=$2 AND state='running'",

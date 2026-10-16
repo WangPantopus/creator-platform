@@ -61,12 +61,12 @@ deletion completes in growth and a conversation deletion fails with `growth_scop
 
 ## 4. Decisions for the founder (each with a proposed default)
 
-| #   | Question                                                                                                                                                                     | Proposed default                                                                                                                                                                                                                                                                     |
-| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| D1  | When a creator deletes their account, what happens to their signed Notes, replies and reactions, and to the public verification pages that prove them (INV-22, share cards)? | Revoke every passkey; keep each public verification record's act type, content hash and time with the status "withdrawn"; drop the content and the creator's name; redact the creator profile like a fan's. Fans' threads with that creator follow lanes 3 and 4. Counsel to confirm |
-| D2  | Can a deleted account sign in again?                                                                                                                                         | Today it never can (the tombstone refuses it), and it can follow its deletion's progress only with sessions it already holds, for up to 7 days. With option D (decision pack, #406) a later sign-in creates a new, empty account, as E1.8 expects. Confirm that                      |
-| D3  | How long is the redacted fan record kept?                                                                                                                                    | Until the last retained record that references it expires (12 months for packets, longer for ledger entries where the law requires), then purged by a later job. Counsel to confirm                                                                                                  |
-| D4  | Q16: commerce retention and refunds on deletion                                                                                                                              | Already open; it blocks commerce deletion (lane 4)                                                                                                                                                                                                                                   |
+| #   | Question                                                                                                                                                                     | Proposed default                                                                                                                                                                                                                                                                                                                                    |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | When a creator deletes their account, what happens to their signed Notes, replies and reactions, and to the public verification pages that prove them (INV-22, share cards)? | Revoke every passkey; keep each public verification record's act type, content hash and time with the status "withdrawn"; drop the content and the creator's name; redact the creator profile like a fan's. Fans' threads with that creator follow lanes 3 and 4. Counsel to confirm                                                                |
+| D2  | Can a deleted account sign in again?                                                                                                                                         | Today it never can (the tombstone refuses it), and it can follow its deletion's progress only with sessions it already holds, for up to 7 days. With option D (decision pack, #406) a later sign-in creates a new, empty account, as E1.8 expects. **Founder's working default since 2026-10-15; built for Apple and Google accounts in section 8** |
+| D3  | How long is the redacted fan record kept?                                                                                                                                    | Until the last retained record that references it expires (12 months for packets, longer for ledger entries where the law requires), then purged by a later job. Counsel to confirm                                                                                                                                                                 |
+| D4  | Q16: commerce retention and refunds on deletion                                                                                                                              | Already open; it blocks commerce deletion (lane 4)                                                                                                                                                                                                                                                                                                  |
 
 The `retained` reasons each domain reports (for example identity's "A fan record without its
 handle or intro stays only as the anchor for payment and request records that must be kept") can
@@ -87,11 +87,13 @@ ones and have not been through copy review.
 
 - A deleted account that tries to sign in gets `403 scope_revoked`, but `POST /v1/identity/complete`
   writes a session row (then revokes it) before the trust check refuses. With the development
-  identity the stored upstream token is only `development:<id>`; WP 1.2 (option D) moves the check
-  before the session is written.
-- Identity's redaction and session revocation ran and were checked once (run 1 below). After I
-  moved identity to run last, that path cannot run again until conversation, agent, commerce,
-  content and trust finish. In the final code it is **not run**.
+  identity the stored upstream token is only `development:<id>`. **Option D did not move the
+  check** (corrected 2026-10-15): an Apple or Google sign-in during a deletion also commits its
+  grant, session and a new provider refresh token, then is refused. Erasure handles the token
+  (section 8); moving the check before anything is written is still open.
+- Identity's redaction and session revocation cannot run in a real job until conversation, agent,
+  commerce, content and trust finish. Section 8's scenario runs them behind a labelled stand-in
+  for those domains.
 
 ## 7. Runs
 
@@ -110,3 +112,82 @@ identity. Run them in this order: E1.8 uses fan 6, and the edges use fans 2 and 
 - Run 1 (before identity ran last): identity completed with `revokedSessions: 3, redactedProfiles:
 1`, the handle became `deleted-f1f8a290a56a87a2`, the intro was empty, and all 3 sessions were
   revoked with their upstream tokens dropped.
+
+## 8. Accounts that sign in with Apple or Google (WP 1.7, part two)
+
+Added 2026-10-15. Sign-in (option D, #431 and #432) made Qelvora-owned accounts with Apple and
+Google identities. The founder asked for their deletion and export, with D2's proposed default as
+the working rule: a deleted account never signs in again.
+
+**Export** (identity's part, beside the existing ten sources):
+
+| Source             | What the person gets                                                                                 | Never included                       |
+| ------------------ | ---------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| `signInAccount`    | The random account id, its state, when it was made and deleted                                       |                                      |
+| `signInIdentities` | Provider, the email address the provider last reported (decrypted), whether an authorization is held | The subject hash, the refresh tokens |
+| `signInGrants`     | When each sign-in was authenticated, made, expires and was revoked                                   | The token hash                       |
+| `ageChecks`        | Source, result, copy version and time of each age check                                              | A date of birth (none is stored)     |
+
+**Deletion.** Identity still erases last. Then:
+
+1. Every stored refresh token is revoked at the provider before anything is deleted, because a
+   deleted token could never be revoked (Apple requires revocation when an account is deleted).
+   Apple gets its client secret for the client the token was issued to. A token is now kept per
+   client (web, iPhone), with that client. Revoking is idempotent, so a failed attempt only
+   repeats it.
+2. In the same held transaction as the fan redaction: the identities are locked; if a sign-in
+   stored a new token since step 1, this attempt waits and the next one revokes it. Every grant
+   ends, the identities are deleted (with their email, tokens and any open age step), and the
+   account is closed (`state = 'deleted'`).
+3. Retained and reported: `closed_sign_in_account` (the random id, deletion time, sign-in times
+   and age results) and, only when one exists, `under_18_lock` (a keyed hash of the provider
+   identity, so a new account still cannot pass). The reasons are backend wording, not reviewed
+   copy.
+
+D2 as built: the deleted account never gets a session again, and the same Apple or Google ID
+later starts a new, empty account that passes the age step again.
+
+| When                                        | Task                                                                                 | Deleted?                  |
+| ------------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------- |
+| The provider is down, 429 or 5xx            | `identity_provider_unavailable`: retries, backing off to an hour, never dead-letters | Nothing until it succeeds |
+| The provider refuses (a wrong client setup) | `identity_provider_revocation_refused`: blocked until fixed and retried              | Nothing                   |
+| The host lacks that provider's sign-in      | `identity_sign_in_unconfigured`: blocked                                             | Nothing                   |
+| A sign-in lands during erasure              | `identity_erasure_waiting` for that attempt; the next one revokes the new token      | After the next attempt    |
+
+**Provider behaviour assumed** (from their documentation and RFC 7009; not checked against real
+Apple or Google accounts):
+
+- Apple answers 200 for a token that is already invalid; Google answers 400 `invalid_token`,
+  which counts as done. Any other refusal blocks.
+- Revoking a refresh token ends the person's grant for that client.
+- Whether revoking the iPhone app's token also ends the web client's grant at Apple is unknown, so
+  each client's token is kept and revoked.
+- Google returns a refresh token only for offline access, which sign-in never asks for, so a
+  Google account normally holds none. If one is ever returned, it is kept and revoked.
+
+A development database that stored an Apple token before this change holds it in the old format
+and cannot be erased: reset it (no other host has sign-in on).
+
+**Runs** (lane 1's stack with sign-in on, `QELVORA_SIGN_IN=apple,google` and the fake provider
+`tests/scenarios/lane-1/fake-provider.mjs`; fakes: Apple, Google, the development privacy proof):
+
+- `node tests/scenarios/lane-1/e1-8-sign-in-delete.mjs`: 26 of 26 (cases A, B, C, D and R in its
+  header). Identity's own erasure ran behind the stand-in described there; before it, identity was
+  seen waiting with nothing revoked. Earlier runs: one stopped on my idempotency key, one had 3
+  wrong expectations in the script (which email wins, when to look, what a refused sign-in
+  stores); no product code changed for them.
+- Restart and an unconfigured host: `--prepare`, then a restart with `QELVORA_SIGN_IN=google`,
+  `--unconfigured` (3 of 3: the export completes with the email, erasure blocks with
+  `identity_sign_in_unconfigured`, nothing revoked), then a restart with Apple again and
+  `--recover` (1 of 1: still blocked after the restart; the person's retry finishes it).
+- Unchanged: E1.1 40 of 40, E1.2 28 of 28, E1.3 13 with 2 not run (as before), E1.4 7 of 7;
+  `e1-8-delete.mjs` 14 pass, 3 fail, 2 not run (as before, lanes 3, 4 and 5).
+  `e1-8-edges.mjs` 16 of 16 on a `--growth` stack (15 of 16 without growth: its growth check needs
+  growth composed).
+- CI's backend suite (`pnpm run test` in `apps/backend`): 157 of 157.
+
+**Tickets.** Integrator: any host that composes privacy consumers outside
+`modules/trust/development.ts` (today `operations/local-server.ts`) must pass `identitySignIn`,
+or Apple and Google accounts with a stored token block with `identity_sign_in_unconfigured`.
+Before launch, someone with the real Apple and Google client setup should revoke one real token
+of each (a download or account is needed, so it is the founder's call).

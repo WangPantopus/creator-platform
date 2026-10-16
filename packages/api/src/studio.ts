@@ -67,9 +67,21 @@ export const StudioSession = z.strictObject({
   ),
   serverTime: z.iso.datetime({ offset: true }),
 });
+/** Whether anyone is in an audience right now, so the creator's own composer can
+ * warn before she signs a Note nobody can read (WP 6.2). "some" or "none" from
+ * current memberships; "unknown" for a team view, followers, groups, or when it
+ * cannot be read. Never a count and never a recipient. */
+export const StudioAudienceReach = z.enum(["some", "none", "unknown"]);
 export const StudioAudiences = z.strictObject({
   audienceCountsAvailable: z.boolean(),
-  tiers: z.array(z.strictObject({ id: z.uuid(), name: z.string() })),
+  members: StudioAudienceReach,
+  tiers: z.array(
+    z.strictObject({
+      id: z.uuid(),
+      name: z.string(),
+      reach: StudioAudienceReach,
+    }),
+  ),
   groups: z.array(z.strictObject({ id: z.uuid(), name: z.string() })),
 });
 export const StudioInvitation = z.object({
@@ -133,6 +145,7 @@ export const studioSchemas = {
   StudioDraftVersion,
   StudioReplyDraft,
   StudioSession,
+  StudioAudienceReach,
   StudioAudiences,
   StudioInvitation,
   StudioCommerceProjection,

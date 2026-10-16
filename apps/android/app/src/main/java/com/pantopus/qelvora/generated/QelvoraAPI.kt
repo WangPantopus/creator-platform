@@ -313,6 +313,7 @@ data class APICommerceDecidePacket(
   val `idempotencyKey`: String,
   val `signedActId`: String? = null,
   val `text`: String? = null,
+  val `question`: String? = null,
   val `proposedModeId`: String? = null
 )
 
@@ -2585,17 +2586,40 @@ enum class APIStudioSessionInvitationsItemRolesItem {
 }
 
 @Serializable
+enum class APIStudioAudienceReach {
+  @SerialName("some") SOME,
+  @SerialName("none") NONE,
+  @SerialName("unknown") UNKNOWN
+}
+
+@Serializable
 data class APIStudioAudiences(
   val `audienceCountsAvailable`: Boolean,
+  val `members`: APIStudioAudiencesMembers,
   val `tiers`: List<APIStudioAudiencesTiersItem>,
   val `groups`: List<APIStudioAudiencesGroupsItem>
 )
 
 @Serializable
+enum class APIStudioAudiencesMembers {
+  @SerialName("some") SOME,
+  @SerialName("none") NONE,
+  @SerialName("unknown") UNKNOWN
+}
+
+@Serializable
 data class APIStudioAudiencesTiersItem(
   val `id`: String,
-  val `name`: String
+  val `name`: String,
+  val `reach`: APIStudioAudiencesTiersItemReach
 )
+
+@Serializable
+enum class APIStudioAudiencesTiersItemReach {
+  @SerialName("some") SOME,
+  @SerialName("none") NONE,
+  @SerialName("unknown") UNKNOWN
+}
 
 @Serializable
 data class APIStudioAudiencesGroupsItem(
@@ -5843,17 +5867,40 @@ data class APIStudioContentVersionCommand(
 )
 
 @Serializable
+enum class APIStudioStudioAudienceReach {
+  @SerialName("some") SOME,
+  @SerialName("none") NONE,
+  @SerialName("unknown") UNKNOWN
+}
+
+@Serializable
 data class APIStudioStudioAudiences(
   val `audienceCountsAvailable`: Boolean,
+  val `members`: APIStudioStudioAudiencesMembers,
   val `tiers`: List<APIStudioStudioAudiencesTiersItem>,
   val `groups`: List<APIStudioStudioAudiencesGroupsItem>
 )
 
 @Serializable
+enum class APIStudioStudioAudiencesMembers {
+  @SerialName("some") SOME,
+  @SerialName("none") NONE,
+  @SerialName("unknown") UNKNOWN
+}
+
+@Serializable
 data class APIStudioStudioAudiencesTiersItem(
   val `id`: String,
-  val `name`: String
+  val `name`: String,
+  val `reach`: APIStudioStudioAudiencesTiersItemReach
 )
+
+@Serializable
+enum class APIStudioStudioAudiencesTiersItemReach {
+  @SerialName("some") SOME,
+  @SerialName("none") NONE,
+  @SerialName("unknown") UNKNOWN
+}
 
 @Serializable
 data class APIStudioStudioAudiencesGroupsItem(
@@ -6342,10 +6389,10 @@ object ApplicationDestination {
   fun isPermitted(value: String): Boolean {
     if (value.length > 2048 || value.contains('%') || value.contains('\\') || value.contains('#') || value.any { it.isWhitespace() }) return false
     val parts = value.split('?')
-    if (parts.size > 2 || !Regex("^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|ops(?:/(?:audits|metrics|cases/[a-f0-9-]{36}))?|status|notifications(?:/(?:settings|[a-f0-9-]{36}))?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}|/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$").matches(parts[0])) return false
+    if (parts.size > 2 || !Regex("^/(?:home|discover|requests(?:/[a-f0-9-]{36})?|you(?:/spending)?|identity/account|ops(?:/(?:audits|metrics|cases/[a-f0-9-]{36}))?|status|notifications(?:/(?:settings|[a-f0-9-]{36}))?|invite/[a-f0-9-]{36}|share/[a-f0-9-]{36}|onboarding/handle|studio(?:/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}|/(?:workspace|setup|notes|requests|threads|ai(?:/(?:overview|sources|style|rules|test|versions|license|interview|onboard))?|more|impact|insights|measurement|launch|activation)|/[a-f0-9-]{36}/(?:today|notes|replies|compose(?:/[a-f0-9-]{36})?|post(?:/[a-f0-9-]{36})?|publish|team|thanks|requests|packets/[a-f0-9-]{36}|threads(?:/[a-f0-9-]{36})?|ai|more))?|commerce/(?:requests|spending|access|packet|checkout|status|pass|membership|offers|earnings|pool)|media/voice|calls/[a-f0-9-]{36}(?:/[a-f0-9-]{36}/[a-f0-9-]{36})?|support(?:/(?:privacy|reports|access|feedback|cases/[a-f0-9-]{36}))?|trust(?:/(?:privacy|reports|crisis|cases/[a-f0-9-]{36}))?|content/[a-f0-9-]{36}/[a-f0-9-]{36}|creators/[a-z0-9_]{3,30}(?:/(?:chat|posts|requests|access)|/posts/[a-f0-9-]{36})?|threads/[a-f0-9-]{36}/[a-f0-9-]{36}|verify/[a-f0-9-]{36})$").matches(parts[0])) return false
     if (parts.size == 1) return true
-    val scopes = mapOf("context" to "^/creators/", "creatorId" to "^(?:/commerce/|/support$|/you$|/media/voice$)", "fanId" to "^/you$", "packetId" to "^/commerce/", "offer" to "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId" to "^/support$", "quote" to "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet" to "^/studio/[a-f0-9-]{36}/publish$", "objectId" to "^/media/voice$", "kind" to "^/support$")
-    val literalValues = mapOf("offer" to "1", "kind" to "verification")
+    val scopes = mapOf("context" to "^/creators/", "creatorId" to "^(?:/commerce/|/support$|/you$|/media/voice$)", "fanId" to "^/you$", "packetId" to "^/commerce/", "offer" to "^/calls/[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}$", "messageId" to "^/support$", "quote" to "^/studio/[a-f0-9-]{36}/(?:compose|post|publish)$", "packet" to "^/studio/[a-f0-9-]{36}/publish$", "from" to "^/studio/[a-f0-9-]{36}/compose$", "objectId" to "^/media/voice$", "kind" to "^/support$")
+    val literalValues = mapOf("offer" to "1", "kind" to "verification", "from" to "today")
     val fields = parts[1].split('&')
     if (fields.size > 2) return false
     val names = mutableSetOf<String>()

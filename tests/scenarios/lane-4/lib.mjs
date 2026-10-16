@@ -224,8 +224,10 @@ export async function signAct(
 
 // ----------------------------------------------------------------- money
 
-export const offer = (creator, overrides = {}) =>
-  http(
+/** Every offer a scenario makes, so that finish() can retire it. */
+const made = [];
+export async function offer(creator, overrides = {}) {
+  const answer = await http(
     "POST",
     `/v1/commerce/creators/${creator.creatorId}/modes`,
     creator.token,
@@ -246,6 +248,48 @@ export const offer = (creator, overrides = {}) =>
       ...overrides,
     },
   );
+  if (answer.status === 200 && answer.body?.id)
+    made.push({ creator, id: answer.body.id });
+  return answer;
+}
+/** Takes this scenario's offers off offer through the real mode command, as
+ * their creator would, so they do not pile up on the stack (the public summary
+ * lists 20). Best effort, after the sweep: a creator ops has paused cannot. */
+async function retireOffers() {
+  let retired = 0;
+  const kept = [];
+  for (const { creator, id } of made) {
+    const [m] = await sql("SELECT * FROM creator.commerce_mode WHERE id=$1", [
+      id,
+    ]);
+    if (m?.state !== "offered") continue;
+    const answer = await http(
+      "POST",
+      `/v1/commerce/creators/${m.creator_id}/modes/${id}`,
+      creator.token,
+      {
+        title: m.title,
+        kind: m.kind,
+        amount: m.amount === null ? null : Number(m.amount),
+        publicAmount: m.public_amount === null ? null : Number(m.public_amount),
+        currency: m.currency,
+        decisionHours: m.decision_hours,
+        deliveryHours: m.delivery_hours,
+        durationSeconds: m.duration_seconds,
+        weeklyLimit: m.weekly_limit,
+        shareable: m.shareable,
+        state: "paused",
+        version: m.version,
+        idempotencyKey: key("retire"),
+      },
+    ).catch((error) => ({ status: 0, code: error.message }));
+    if (answer.status === 200) retired++;
+    else kept.push(`${id.slice(0, 8)} ${answer.status} ${answer.code}`);
+  }
+  console.log(
+    `retired ${retired} offer(s) this scenario made${kept.length ? `; still on offer: ${kept.join(", ")}` : ""}`,
+  );
+}
 export const setLimit = (fan, amount) =>
   http("POST", "/v1/commerce/spend-limit", fan.token, {
     currency: "USD",
@@ -328,6 +372,32 @@ export async function withdraw(fan, packetId) {
     idempotencyKey: key("withdraw"),
   });
 }
+/** Takes an offer off offer through the real mode command, as its creator would. */
+export async function pauseOffer(creator, modeId) {
+  const [m] = await sql("SELECT * FROM creator.commerce_mode WHERE id=$1", [
+    modeId,
+  ]);
+  return http(
+    "POST",
+    `/v1/commerce/creators/${m.creator_id}/modes/${modeId}`,
+    creator.token,
+    {
+      title: m.title,
+      kind: m.kind,
+      amount: m.amount === null ? null : Number(m.amount),
+      publicAmount: m.public_amount === null ? null : Number(m.public_amount),
+      currency: m.currency,
+      decisionHours: m.decision_hours,
+      deliveryHours: m.delivery_hours,
+      durationSeconds: m.duration_seconds,
+      weeklyLimit: m.weekly_limit,
+      shareable: m.shareable,
+      state: "paused",
+      version: m.version,
+      idempotencyKey: key("pause"),
+    },
+  );
+}
 
 // -------------------------------------------------------------- reporting
 
@@ -358,6 +428,7 @@ export async function finish() {
       return `${report.checks} checks clean`;
     },
   );
+  await retireOffers();
   await pool?.end();
   const failed = results.filter((r) => !r.pass).length;
   console.log(`\n${results.length - failed}/${results.length} steps passed`);

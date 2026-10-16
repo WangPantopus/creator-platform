@@ -65,6 +65,9 @@ export interface CommerceWorkIndex {
   /** Whether a notification of this type can concern work this host does.
    * Others are acknowledged and ignored; without it, every type is tried. */
   handles?(type: string): boolean;
+  /** Each fan with a live request to this creator, as that fan's own issued
+   * actor: who settles a creator's departure (`createCommerceDeparture`). */
+  departureScopes?(creatorId: string): Promise<readonly { actor: Actor }[]>;
 }
 /** A notification no scope can be found for is tried this many times, about a
  * minute apart, then blocked for an operator. The due scan still finishes the

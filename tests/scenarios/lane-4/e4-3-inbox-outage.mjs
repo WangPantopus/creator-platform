@@ -69,7 +69,10 @@ const failures = (from) =>
     .filter((line) => line.includes("commerce_recovery_pass_failed"));
 
 // The scheduler starts with a working login, then the login stops working.
+// The login is made here too, so a fresh scenario directory needs no other
+// scenario to have run first.
 await stopScheduler();
+await ensureInboxLogin();
 await startScheduler(500);
 await sleep(1500);
 const from = statSync(log).size;

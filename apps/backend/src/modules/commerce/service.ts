@@ -116,6 +116,20 @@ const REFUND_TRIES_BEFORE_ESCALATION = 6;
 /** 30 s, 1, 2, 4, 8 minutes and so on, at most an hour between refund tries. */
 const refundBackoffSeconds = (attempt: number) =>
   Math.min(3600, 30 * 2 ** Math.max(0, attempt - 1));
+/** A request that is ending gets no new hold (the founder's decision 4). It is
+ * closed as never held only once no earlier try to hold can still reach the
+ * processor: a call gives up after 10 seconds and a lease lasts 30, so five
+ * minutes after its release began is far beyond the last one. */
+const NOTHING_HELD_AFTER_SECONDS = 300;
+/** The processor's minimum card charge in minor units (Stripe's published
+ * minimums for the currencies the pilot can use); others default to 50. */
+const MINIMUM_CHARGE: Readonly<Record<string, number>> = {
+  USD: 50,
+  EUR: 50,
+  GBP: 30,
+  CAD: 50,
+  AUD: 50,
+};
 export type CommerceTrialAdmission = Readonly<{
   allowance: GenerationAllowance;
   units: number;
@@ -726,15 +740,29 @@ export class CommerceService {
     );
   }
   private async exposure(client: PoolClient, fanId: string, currency: string) {
+    // A payment counts in the month it was captured, less what of it has been
+    // refunded successfully (the founder's decision 1): a refund gives back
+    // that month's room and never room in a later month, and a refund still
+    // in flight counts until it succeeds, since only a succeeded refund is in
+    // the ledger. Only a paid request's refunds are matched to their payment
+    // so far; a membership's or the pass's still count in full.
     const totals = (
-      await client.query<{ captured: string; refunded: string; month: string }>(
-        `SELECT coalesce(sum(amount) FILTER(WHERE kind='capture'),0)::text AS captured,
-         coalesce(sum(amount) FILTER(WHERE kind='refund'),0)::text AS refunded,
+      await client.query<{
+        captured: string;
+        refunded: string;
+        returned: string;
+        month: string;
+      }>(
+        `SELECT coalesce(sum(l.amount) FILTER(WHERE l.kind='capture'),0)::text AS captured,
+         coalesce(sum(l.amount) FILTER(WHERE l.kind='refund'),0)::text AS refunded,
+         coalesce(sum(least(l.amount,(SELECT coalesce(sum(r.amount),0) FROM creator.commerce_ledger r
+           WHERE r.kind='refund' AND r.packet_id=l.packet_id AND r.fan_id=l.fan_id AND r.currency=l.currency)))
+           FILTER(WHERE l.kind='capture' AND l.packet_id IS NOT NULL),0)::text AS returned,
          to_char(now() AT TIME ZONE 'UTC','YYYY-MM') AS month
-         FROM creator.commerce_ledger WHERE fan_id=$1 AND currency=$2
-         AND kind IN('capture','refund')
-         AND created_at>=date_trunc('month',now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC'
-         AND created_at<(date_trunc('month',now() AT TIME ZONE 'UTC')+interval '1 month') AT TIME ZONE 'UTC'`,
+         FROM creator.commerce_ledger l WHERE l.fan_id=$1 AND l.currency=$2
+         AND l.kind IN('capture','refund')
+         AND l.created_at>=date_trunc('month',now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC'
+         AND l.created_at<(date_trunc('month',now() AT TIME ZONE 'UTC')+interval '1 month') AT TIME ZONE 'UTC'`,
         [fanId, currency],
       )
     ).rows[0]!;
@@ -771,9 +799,10 @@ export class CommerceService {
         : "0";
     const heldTotal =
       BigInt(held.amount) + BigInt(billing.amount) + BigInt(passPending);
-    const total = BigInt(totals.captured) + heldTotal;
+    const total = BigInt(totals.captured) - BigInt(totals.returned) + heldTotal;
     invariant(
       total <= BigInt(Number.MAX_SAFE_INTEGER) &&
+        BigInt(totals.captured) <= BigInt(Number.MAX_SAFE_INTEGER) &&
         BigInt(totals.refunded) <= BigInt(Number.MAX_SAFE_INTEGER),
       "balance_reconciliation_required",
       "This balance needs reconciliation before new spending.",
@@ -782,6 +811,8 @@ export class CommerceService {
       month: totals.month,
       refunded: Number(totals.refunded),
       captured: Number(totals.captured),
+      /** What of this month's payments was refunded: room given back. */
+      returned: Number(totals.returned),
       held: Number(heldTotal),
       total: Number(total),
       currency,
@@ -824,9 +855,10 @@ export class CommerceService {
       BigInt(limit.amount ?? 0) > 0n
     ) {
       const spend = await this.exposure(client, fanId, currency);
+      // What counts toward the limit: a refund gives its room back (decision 1).
       for (const threshold of [50, 100])
         if (
-          BigInt(spend.captured) * 100n >=
+          BigInt(spend.captured - spend.returned) * 100n >=
           BigInt(limit.amount!) * BigInt(threshold)
         )
           await client.query(
@@ -944,6 +976,14 @@ export class CommerceService {
     input: unknown,
   ) {
     const body = ModeCommand.parse(input);
+    // The processor refuses a card payment below its minimum charge, so a lower
+    // price could be offered but never held.
+    const minimum = MINIMUM_CHARGE[body.currency] ?? 50;
+    invariant(
+      [body.amount, body.publicAmount].every((v) => v === null || v >= minimum),
+      "price_below_minimum",
+      `Choose a price of at least the minimum card payment (${(minimum / 100).toFixed(2)} ${body.currency}).`,
+    );
     invariant(
       body.state !== "offered" || this.fulfillmentAvailable(body.kind),
       "fulfillment_unavailable",
@@ -1588,14 +1628,18 @@ export class CommerceService {
               "question_pending",
               "Wait for the fan's answer before asking another question.",
             );
+            // The question has its own field, so a reply draft sent beside it
+            // never reaches the fan. Only a client that sends no question at
+            // all still has its text read as the question.
+            const question = body.question ?? body.text;
             invariant(
-              body.text,
+              question,
               "question_required",
               "Write the question for the fan.",
             );
             await client.query(
               `UPDATE creator.commerce_packet SET state='more_info',question=$2,remaining_sla_seconds=greatest(0,extract(epoch FROM decision_at-now())::integer),decision_at=hold_expires_at-interval '6 hours',version=version+1,updated_at=now() WHERE id=$1`,
-              [id, body.text],
+              [id, question],
             );
             await this.event(
               client,
@@ -2325,7 +2369,13 @@ export class CommerceService {
             "share_changed",
             { commitmentId: c.id },
           );
-          return { commitmentId: c.id };
+          // The grant is what a share card is made from (growth's createShare);
+          // its version is the one the next sharing choice must name.
+          return {
+            commitmentId: c.id,
+            grantId: grant.id,
+            version: grant.version,
+          };
         },
       ),
     );
@@ -2479,16 +2529,31 @@ export class CommerceService {
           );
           return;
         }
+        // A request that is being released, or has ended, never gets a new hold
+        // (decision 4). The processor is only asked whether it holds one for
+        // this try: a hold it has is applied below and released like any
+        // other; when it has none, nothing was held.
+        const ending =
+          !packet.intent_ref &&
+          ["releasing", "expired", "declined", "withdrawn", "draft"].includes(
+            packet.state,
+          ) &&
+          this.provider.recoverAuthorization !== undefined;
         const recovered =
-          !packet.intent_ref && effect.attempt > 1
+          !packet.intent_ref && (effect.attempt > 1 || ending)
             ? await this.provider.recoverAuthorization?.({
                 packetId: effect.packet_id,
                 amount: effect.request.amount,
                 currency: effect.request.currency,
                 paymentMethodId: effect.request.paymentMethodId!,
                 key: effect.provider_key,
+                since: effect.created_at,
               })
             : undefined;
+        if (ending && !recovered) {
+          await this.settleUnheldAuthorization(actor, effect);
+          return;
+        }
         // Stripe can prune idempotency records after 24h. Never recreate an ambiguous hold.
         invariant(
           packet.intent_ref !== null ||
@@ -2614,6 +2679,21 @@ export class CommerceService {
                 )
               ).rows[0]!;
               const full = BigInt(refunded.amount) >= BigInt(p.snapshot.amount);
+              // An accepted request refunded in full because it was not
+              // delivered gives back the slot it used in its week (the
+              // founder's decision 2). Once: when it becomes refunded.
+              if (
+                full &&
+                p.state === "accepted" &&
+                p.payment_state !== "refunded" &&
+                !(
+                  await client.query(
+                    "SELECT 1 FROM creator.commerce_commitment WHERE packet_id=$1 AND delivered_at IS NOT NULL",
+                    [p.id],
+                  )
+                ).rowCount
+              )
+                await this.freeUsedSlot(client, p);
               await client.query(
                 "UPDATE creator.commerce_packet SET payment_state=$2,version=version+1 WHERE id=$1",
                 [p.id, full ? "refunded" : "captured"],
@@ -2769,6 +2849,7 @@ export class CommerceService {
         currency: effect.request.currency,
         paymentMethodId: effect.request.paymentMethodId!,
         key: effect.provider_key,
+        since: effect.created_at,
       });
       if (held) await this.applyIntent(actor, effect, held);
       else await this.failRejectedAuthorization(actor, effect);
@@ -2807,6 +2888,69 @@ export class CommerceService {
       }
       await client.query(
         "UPDATE creator.commerce_effect SET state='failed',error_code='authorization_rejected',lease_until=NULL,updated_at=now() WHERE id=$1",
+        [effect.id],
+      );
+    });
+  }
+  /** The request is ending and the processor holds nothing for this try, so
+   * none is placed (decision 4). Once no earlier try can still reach the
+   * processor (this is the first try, or its release began, or else the try
+   * was first recorded, NOTHING_HELD_AFTER_SECONDS ago), nothing was ever
+   * held: the slot returns, the request closes in its terminal state with
+   * nothing in the ledger, and its release, which has nothing to cancel, is
+   * finished. Until then it stays unknown and the processor is asked again. */
+  private async settleUnheldAuthorization(actor: Actor, effect: EffectRow) {
+    await this.account(actor, async (client) => {
+      const p = await this.lockPacket(client, effect.packet_id);
+      await this.fenceEffect(client, effect);
+      const quiet =
+        effect.attempt === 1 ||
+        (
+          await client.query(
+            `SELECT 1 FROM creator.commerce_effect a
+             LEFT JOIN creator.commerce_effect r ON r.packet_id=a.packet_id AND r.provider_key=$2
+             WHERE a.id=$1 AND coalesce(r.created_at,a.created_at)<=now()-($3*interval '1 second')`,
+            [
+              effect.id,
+              `${p.id}:release:${p.authorization_attempt}`,
+              NOTHING_HELD_AFTER_SECONDS,
+            ],
+          )
+        ).rowCount === 1;
+      if (!quiet) {
+        await client.query(
+          "UPDATE creator.commerce_effect SET state='unknown',error_code='hold_unconfirmed',lease_until=NULL,next_at=now()+interval '30 seconds',updated_at=now() WHERE id=$1",
+          [effect.id],
+        );
+        return;
+      }
+      if (
+        effect.provider_key ===
+          `${p.id}:authorize:${p.authorization_attempt}` &&
+        !p.intent_ref &&
+        p.state === "releasing"
+      ) {
+        await client.query(
+          "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true)",
+          [p.creator_id, p.fan_id],
+        );
+        await this.releaseCapacity(client, p);
+        await client.query(
+          "UPDATE creator.commerce_packet SET state=$2,payment_state='released',version=version+1,updated_at=now() WHERE id=$1",
+          [p.id, p.terminal_target],
+        );
+        await client.query(
+          "UPDATE creator.commerce_effect SET state='done',error_code='nothing_held',lease_until=NULL,updated_at=now() WHERE packet_id=$1 AND operation='release' AND state<>'done'",
+          [p.id],
+        );
+        await this.event(
+          client,
+          { ...p, version: p.version + 1 },
+          "hold_released",
+        );
+      }
+      await client.query(
+        "UPDATE creator.commerce_effect SET state='done',error_code='nothing_held',lease_until=NULL,updated_at=now() WHERE id=$1",
         [effect.id],
       );
     });
@@ -3114,6 +3258,23 @@ export class CommerceService {
       "Capacity needs reconciliation.",
     );
   }
+  /** An accepted request refunded in full because it was not delivered no
+   * longer uses its slot in its week's window (the founder's decision 2). */
+  private async freeUsedSlot(client: PoolClient, p: PacketRow) {
+    await client.query(
+      "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true)",
+      [p.creator_id, p.fan_id],
+    );
+    const r = await client.query(
+      "UPDATE creator.commerce_capacity SET used=used-1,version=version+1 WHERE mode_id=$1 AND window_start=$2 AND used>0 RETURNING mode_id",
+      [p.mode_id, p.capacity_window],
+    );
+    invariant(
+      r.rowCount === 1,
+      "capacity_inconsistent",
+      "Capacity needs reconciliation.",
+    );
+  }
   async reconcile(actor: Actor, id: string) {
     let { packet } = await this.packet(actor, id);
     invariant(
@@ -3197,6 +3358,73 @@ export class CommerceService {
     );
     const intent = await this.provider.fetchIntent(packet.intent_ref);
     return { clientSecret: intent.clientSecret };
+  }
+  /** Ops paused this creator or revoked her license (a trust decision, run by
+   * lane 1's effect worker as `settleDeparture`). Run as one fan, under that
+   * fan's own row security: each of the fan's requests with this creator that
+   * she has not accepted ends with its hold released and nothing charged, the
+   * way a request nobody decides in time ends. Accepted requests keep their
+   * deadline, and refund if it passes. Money already moving is left to finish;
+   * it is counted as waiting so that the trust worker asks again. */
+  async releaseForDeparture(actor: Actor, creatorId: string, caseId: string) {
+    const ids = z
+      .strictObject({ creatorId: z.uuid(), caseId: z.uuid() })
+      .parse({ creatorId, caseId });
+    const queued = await this.account(actor, async (client) => {
+      const open = (
+        await client.query<PacketRow>(
+          `SELECT p.* FROM creator.commerce_packet p
+           JOIN creator.fan_profile f ON f.id=p.fan_id AND f.account_id=$2
+           WHERE p.creator_id=$1 AND p.state IN ('submitted','more_info','offer_pending')
+           ORDER BY p.created_at,p.id FOR UPDATE OF p SKIP LOCKED`,
+          [ids.creatorId, actor.accountId],
+        )
+      ).rows;
+      const effects: string[] = [];
+      for (const p of open) {
+        effects.push(await this.queueRelease(client, p, "expired"));
+        await this.event(
+          client,
+          { ...p, version: p.version + 1 },
+          "packet_departure",
+          { caseId: ids.caseId },
+        );
+      }
+      // Releases already under way (this one or an earlier attempt) whose
+      // retry time has come are run again below; the rest wait their turn.
+      const due = (
+        await client.query<{ id: string }>(
+          `SELECT e.id FROM creator.commerce_effect e
+           JOIN creator.commerce_packet p ON p.id=e.packet_id
+           JOIN creator.fan_profile f ON f.id=p.fan_id AND f.account_id=$2
+           WHERE p.creator_id=$1 AND p.state='releasing' AND e.operation='release'
+            AND e.state IN ('pending','unknown') AND e.next_at<=now()
+            AND (e.lease_until IS NULL OR e.lease_until<now())`,
+          [ids.creatorId, actor.accountId],
+        )
+      ).rows.map((row) => row.id);
+      return {
+        released: open.length,
+        effects: [...new Set([...effects, ...due])],
+      };
+    });
+    for (const id of queued.effects) await this.runEffect(actor, id);
+    const counts = await this.account(
+      actor,
+      async (client) =>
+        (
+          await client.query<{ waiting: number; accepted: number }>(
+            `SELECT count(*) FILTER (WHERE p.state IN ('submitting','submitted','more_info','offer_pending','accepting','releasing'))::int AS waiting,
+            count(*) FILTER (WHERE p.state='accepted' AND c.state IN ('due','in_progress'))::int AS accepted
+           FROM creator.commerce_packet p
+           JOIN creator.fan_profile f ON f.id=p.fan_id AND f.account_id=$2
+           LEFT JOIN creator.commerce_commitment c ON c.packet_id=p.id
+           WHERE p.creator_id=$1`,
+            [ids.creatorId, actor.accountId],
+          )
+        ).rows[0]!,
+    );
+    return { released: queued.released, ...counts };
   }
   async reconcileDeadlines(actor: Actor) {
     const effects = await this.account(actor, async (client) => {

@@ -30,6 +30,7 @@ import { registeredGenerationOutputProfile } from "../src/db/generation-output-p
 import comparisonReview from "../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
 import { registeredComparisonProfile } from "../src/db/comparison-profile.js";
 import noticesReview from "../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
+import signInAndMoneyReview from "../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
 import partialRecoveryReview from "../../../infra/migrations/reviews/20261007-partial-generation-recovery.json" with { type: "json" };
 import recoveryReview from "../../../infra/migrations/reviews/20261007-generation-recovery.json" with { type: "json" };
 import { registeredGenerationRecoveryProfile } from "../src/db/generation-recovery-profile.js";
@@ -74,15 +75,19 @@ async function activate() {
       "20261007-partial-generation-recovery",
       "20261008-comparison",
       "20261015-notices",
+      "20261015-sign-in-and-money",
     ].includes(process.env.W8_MIGRATION_WAVE ?? ""),
-    "Select a reviewed W8_MIGRATION_WAVE (20261002, 20261002-privacy, 20261007-generation, 20261007-content 20261007-generation-output 20261007-public-ai 20261007-generation-recovery 20261007-partial-generation-recovery 20261008-comparison or 20261015-notices).",
+    "Select a reviewed W8_MIGRATION_WAVE (20261002, 20261002-privacy, 20261007-generation, 20261007-content 20261007-generation-output 20261007-public-ai 20261007-generation-recovery 20261007-partial-generation-recovery 20261008-comparison 20261015-notices or 20261015-sign-in-and-money).",
   );
   const connection = process.env.DATABASE_MIGRATION_URL;
   check(
     connection,
     "Provide a separate DATABASE_MIGRATION_URL; never a runtime credential.",
   );
-  const notices = process.env.W8_MIGRATION_WAVE === "20261015-notices";
+  const signInAndMoney =
+    process.env.W8_MIGRATION_WAVE === "20261015-sign-in-and-money";
+  const notices =
+    signInAndMoney || process.env.W8_MIGRATION_WAVE === "20261015-notices";
   const comparison =
     notices || process.env.W8_MIGRATION_WAVE === "20261008-comparison";
   const partialRecovery =
@@ -115,6 +120,7 @@ async function activate() {
     "20261007-partial-generation-recovery",
     "20261008-comparison",
     "20261015-notices",
+    "20261015-sign-in-and-money",
   ];
   const packets = await Promise.all(
     ids.map(
@@ -138,7 +144,9 @@ async function activate() {
     partialTerminalRecovery,
     comparisonPacket,
     noticesPacket,
+    signInAndMoneyPacket,
   ] = packets as [
+    Packet,
     Packet,
     Packet,
     Packet,
@@ -156,8 +164,8 @@ async function activate() {
         entry.schemaVersion === 1 &&
         entry.id === ids[index] &&
         entry.baseline.length ===
-          [40, 57, 61, 100, 101, 102, 104, 105, 106, 114][index] &&
-        entry.wave.length === [17, 4, 39, 1, 1, 2, 1, 1, 8, 2][index],
+          [40, 57, 61, 100, 101, 102, 104, 105, 106, 114, 116][index] &&
+        entry.wave.length === [17, 4, 39, 1, 1, 2, 1, 1, 8, 2, 3][index],
     ) &&
       canonical(prior.baseline) ===
         canonical([...initial.baseline, ...initial.wave]) &&
@@ -307,8 +315,25 @@ async function activate() {
         await readFile(
           new URL(noticesReview.baselineWave.path, repositoryRoot),
         ),
-      ) === noticesReview.baselineWave.sha256,
-    "The exact reviewed 40/57/61/100/101/102/104/105/106/114/116-source migration chain is required.",
+      ) === noticesReview.baselineWave.sha256 &&
+      canonical(signInAndMoneyPacket.baseline) ===
+        canonical([...noticesPacket.baseline, ...noticesPacket.wave]) &&
+      canonical(signInAndMoneyPacket.wave) ===
+        canonical(
+          signInAndMoneyReview.sources.map(({ version, path, checksum }) => ({
+            version,
+            path,
+            checksum,
+          })),
+        ) &&
+      canonical(signInAndMoneyPacket.outOfOrderException) ===
+        canonical(noticesPacket.outOfOrderException) &&
+      sha256(
+        await readFile(
+          new URL(signInAndMoneyReview.baselineWave.path, repositoryRoot),
+        ),
+      ) === signInAndMoneyReview.baselineWave.sha256,
+    "The exact reviewed 40/57/61/100/101/102/104/105/106/114/116/119-source migration chain is required.",
   );
   check(
     await generationPrivacySourcesRegistered(),
@@ -332,7 +357,7 @@ async function activate() {
   );
   check(
     await registeredComparisonProfile(),
-    "All eight exact comparison and both notices source registrations are required.",
+    "All eight exact comparison, both notices and all three sign-in and money source registrations are required.",
   );
   const packet = packets.find(
     (entry) => entry.id === process.env.W8_MIGRATION_WAVE,
@@ -341,7 +366,10 @@ async function activate() {
     await readFile(new URL("infra/migrations.json", repositoryRoot), "utf8"),
   ) as { migrations: { version: string; path: string }[] };
   const sources = [...packet.baseline, ...packet.wave];
-  const registeredSources = [...noticesPacket.baseline, ...noticesPacket.wave];
+  const registeredSources = [
+    ...signInAndMoneyPacket.baseline,
+    ...signInAndMoneyPacket.wave,
+  ];
   check(
     new Set(registeredSources.map((s) => s.version.slice(0, 4))).size ===
       registeredSources.length,
@@ -556,24 +584,45 @@ async function activate() {
       !installedNotices || installedComparison === comparisonPacket.wave.length,
       "Notices cannot precede comparison.",
     );
+    const installedSignInAndMoney = before.filter((row) =>
+      signInAndMoneyPacket.wave.some(
+        (source) => source.version === row.version,
+      ),
+    ).length;
+    check(
+      installedSignInAndMoney === 0 ||
+        installedSignInAndMoney === signInAndMoneyPacket.wave.length,
+      "Partial sign-in and money wave is not an accepted baseline.",
+    );
+    check(
+      !signInAndMoney || installedNotices === noticesPacket.wave.length,
+      "Sign-in and money activation requires the complete reviewed116 predecessor.",
+    );
+    check(
+      !installedSignInAndMoney ||
+        installedNotices === noticesPacket.wave.length,
+      "Sign-in and money cannot precede notices.",
+    );
     if (generationInstalled)
       await assertGenerationWaveRoleSafety(
         client,
-        installedNotices
-          ? "notices"
-          : installedComparison
-            ? "comparison"
-            : installedPartialRecovery
-              ? "partial-generation-recovery"
-              : installedRecovery
-                ? "generation-recovery"
-                : installedPublic
-                  ? "public-ai"
-                  : outputInstalled
-                    ? "generation-output"
-                    : contentInstalled
-                      ? "content-privacy"
-                      : undefined,
+        installedSignInAndMoney
+          ? "sign-in-and-money"
+          : installedNotices
+            ? "notices"
+            : installedComparison
+              ? "comparison"
+              : installedPartialRecovery
+                ? "partial-generation-recovery"
+                : installedRecovery
+                  ? "generation-recovery"
+                  : installedPublic
+                    ? "public-ai"
+                    : outputInstalled
+                      ? "generation-output"
+                      : contentInstalled
+                        ? "content-privacy"
+                        : undefined,
       );
     else
       await assertWaveRoleSafety(client, {
@@ -605,6 +654,9 @@ async function activate() {
         ),
         comparisonBeforeNotices: Boolean(
           installedComparison && !installedNotices,
+        ),
+        noticesBeforeSignInAndMoney: Boolean(
+          installedNotices && !installedSignInAndMoney,
         ),
       });
     const tables = await waveDataTables(client);
@@ -697,21 +749,23 @@ async function activate() {
     const roleSafety = generation
       ? await assertGenerationWaveRoleSafety(
           client,
-          notices
-            ? "notices"
-            : comparison
-              ? "comparison"
-              : partialRecovery
-                ? "partial-generation-recovery"
-                : recovery
-                  ? "generation-recovery"
-                  : publicAI
-                    ? "public-ai"
-                    : output
-                      ? "generation-output"
-                      : content
-                        ? "content-privacy"
-                        : undefined,
+          signInAndMoney
+            ? "sign-in-and-money"
+            : notices
+              ? "notices"
+              : comparison
+                ? "comparison"
+                : partialRecovery
+                  ? "partial-generation-recovery"
+                  : recovery
+                    ? "generation-recovery"
+                    : publicAI
+                      ? "public-ai"
+                      : output
+                        ? "generation-output"
+                        : content
+                          ? "content-privacy"
+                          : undefined,
         )
       : await assertWaveRoleSafety(client, {
           trust: true,
@@ -729,6 +783,7 @@ async function activate() {
           outputBeforePublic: output && !publicAI,
           publicBeforeComparison: publicAI && !comparison,
           comparisonBeforeNotices: comparison && !notices,
+          noticesBeforeSignInAndMoney: notices && !signInAndMoney,
         })
       : undefined;
     check(
