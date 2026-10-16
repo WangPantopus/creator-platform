@@ -292,7 +292,7 @@ fun GrowthFanFeature(baseUrl: String?, token: () -> String? = { null }, destinat
                         }
                         if(route.contains("/posts/")) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                             IconButton("back", if(onBack == null || backTarget == "/creators/$handle") QelvoraCopy.text("growthBackToSPage", mapOf("name" to name)) else QelvoraCopy.text("back"), ink) {if(onBack != null) onBack() else navigate("/creators/$handle")}
-                            Avatar(name.take(1))
+                            Avatar(creatorInitial(name))
                             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {BasicText(name, style = qText("body-strong").copy(color = ink));BasicText(QelvoraCopy.text("growthPostPublic"), style = qText("data-sm").copy(color = qColor("ink-muted")))}
                         }
                         if(route.contains("/posts/") || section == "Posts") posts.forEach { post -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {

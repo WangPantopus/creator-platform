@@ -35,6 +35,7 @@ const {
   AuditEntrySchema,
   ProviderPolicySchema,
 } = await api("conversation/contracts.ts");
+const { ThreadPresencePage } = await api("content.ts");
 const growth = await import(
   new URL("apps/backend/src/modules/growth/contracts.ts", root).href
 );
@@ -359,6 +360,86 @@ check(
     agentVersion: z.unknown().optional(),
   }),
   after.messages.at(-1),
+);
+// C4: Notes and reactions come from the presence read, never the thread page.
+check(
+  "thread page has no Note or reaction",
+  z.literal(0),
+  after.messages.filter((m) =>
+    ["human_broadcast", "human_reaction"].includes(m.authorKind),
+  ).length,
+);
+const presenceRoot = `/v1/content/${rich.creatorId}/presence`;
+const pages = [];
+for (let before = null, n = 0; n < 10; n += 1) {
+  const page = (
+    await call(
+      "GET",
+      `${presenceRoot}?limit=50${before ? `&before=${encodeURIComponent(before)}` : ""}`,
+      { token: live },
+    )
+  ).json;
+  check(`presence page ${n + 1}`, ThreadPresencePage, page);
+  pages.push(page);
+  before = page?.nextBefore;
+  if (!before) break;
+}
+check(
+  "presence: three pages, the second empty with a cursor",
+  z.tuple([z.literal(2), z.literal(0), z.literal(2)]),
+  pages.map((page) => page.items.length),
+);
+check(
+  "presence: a Note, a reaction and labels from copy",
+  z.tuple([
+    z.literal("Maya · to all members"),
+    z.literal("Maya reacted to your reply"),
+  ]),
+  pages[0].items.map((item) => item.authorLabel),
+);
+const refused = async (name, path, token, status, code) => {
+  const answer = await call("GET", path, { token });
+  check(
+    `${name} (${status})`,
+    ErrorSchema.extend({
+      error: ErrorSchema.shape.error.extend({ code: z.literal(code) }),
+    }),
+    answer.status === status ? answer.json : null,
+  );
+};
+await refused(
+  "presence signed out",
+  presenceRoot,
+  null,
+  401,
+  "session_required",
+);
+await refused(
+  "presence with a malformed cursor",
+  `${presenceRoot}?before=nope`,
+  live,
+  400,
+  "presence_cursor_invalid",
+);
+await refused(
+  "presence with limit 51",
+  `${presenceRoot}?limit=51`,
+  live,
+  400,
+  "invalid_request",
+);
+await refused(
+  "presence for an unknown creator",
+  "/v1/content/c1000000-0000-4000-8000-00000000ffff/presence",
+  live,
+  403,
+  "audience_unavailable",
+);
+check(
+  "presence: another fan sees none of Devon's Notes or reactions",
+  z.literal(0),
+  (await call("GET", `${presenceRoot}?limit=50`, { token: fresh.json.token }))
+    .json?.items.length,
 );
 check(
   "another account cannot read the thread (403)",
