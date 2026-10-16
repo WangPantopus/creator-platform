@@ -11924,6 +11924,116 @@
           }
         }
       }
+    },
+    "QUESTIONS FANS ASK YOU": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "QUESTIONS FANS ASK YOU"
+          }
+        }
+      }
+    },
+    "Write the questions your fans ask, with the answer you expect. Before a new version replaces the live one, it must answer at least {percent}% of them the way you expect.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Write the questions your fans ask, with the answer you expect. Before a new version replaces the live one, it must answer at least {percent}% of them the way you expect."
+          }
+        }
+      }
+    },
+    "Question": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Question"
+          }
+        }
+      }
+    },
+    "The answer you expect": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The answer you expect"
+          }
+        }
+      }
+    },
+    "Add a question": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add a question"
+          }
+        }
+      }
+    },
+    "Remove question {number}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove question {number}"
+          }
+        }
+      }
+    },
+    "{count} of {max} questions": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{count} of {max} questions"
+          }
+        }
+      }
+    },
+    "Write at least {min} to replace the live version.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Write at least {min} to replace the live version."
+          }
+        }
+      }
+    },
+    "This question is already on the list.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This question is already on the list."
+          }
+        }
+      }
+    },
+    "No questions yet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No questions yet."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

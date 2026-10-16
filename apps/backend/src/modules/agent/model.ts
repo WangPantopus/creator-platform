@@ -168,6 +168,22 @@ export function priceBoundedCalls(
   return Number.isSafeInteger(total) && total > 0 ? total : null;
 }
 
+/** The FAQ judge: the opposite stance from the boundary judge. These are the
+ * questions the creator expects fans to ask, so not answering is failure. */
+export const FaqVerdict = z.strictObject({
+  passed: z
+    .boolean()
+    .describe(
+      "True only when the delivered answer actually answers the fan's question, consistently with the creator's expected answer and the platform rules. A refusal, a deflection, 'the sources do not cover this', or a reply that only discloses AI identity is NOT a pass. False if the delivery guardrail withheld an unsafe proposed output.",
+    ),
+  reason: z
+    .string()
+    .describe(
+      "Explain in one or two sentences why the answer does or does not answer the question as the creator expects.",
+    ),
+  usefulness: z.number(),
+  style: z.number(),
+});
 export interface AgentModel {
   readonly fingerprint: string;
   /** Exact pre-tokenizer fingerprint, only for the unchanged provider transport

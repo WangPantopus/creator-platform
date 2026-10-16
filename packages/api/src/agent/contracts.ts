@@ -19,6 +19,18 @@ export const Example = z.strictObject({
   fixed: z.boolean(),
   approved: z.boolean(),
 });
+/** A question the creator expects fans to ask, with the answer they expect. */
+export const FaqItem = z.strictObject({
+  question: z.string().trim().min(1).max(500),
+  answer: z.string().trim().min(1).max(2000),
+});
+export type FaqItem = z.infer<typeof FaqItem>;
+export const FAQ_MAX_QUESTIONS = 50;
+/** Founder decision 2026-10-15: replacing a live version needs at
+ * least this many creator-written questions, at least this share answered as
+ * the creator expects. Boundary and regression cases must all pass. */
+export const FAQ_MIN_QUESTIONS = 5;
+export const FAQ_PASS_RATE = 0.8;
 export const DraftConfig = z.strictObject({
   mode: Mode.default("expert"),
   tone: z.enum(["Plainer", "As written", "Warmer"]).default("As written"),
@@ -31,6 +43,18 @@ export const DraftConfig = z.strictObject({
   sessionNudgeMinutes: z.number().int().min(15).max(90).default(90),
   usefulnessCriteria: z.string().max(2000).default(""),
   styleCriteria: z.string().max(2000).default(""),
+  // Optional with no default: configurations stored before the FAQ existed
+  // must keep parsing to exactly themselves (the worker checks this).
+  faq: z
+    .array(FaqItem)
+    .max(FAQ_MAX_QUESTIONS)
+    .refine(
+      (items) =>
+        new Set(items.map((item) => item.question.toLocaleLowerCase())).size ===
+        items.length,
+      "Each FAQ question must be different.",
+    )
+    .optional(),
 });
 export type Configuration = z.infer<typeof DraftConfig>;
 export const Revision = z.number().int().nonnegative();
@@ -136,6 +160,8 @@ export type Passage = {
 };
 export type EvaluationCase = {
   name: string;
+  /** Boundary and regression cases must all pass; FAQ cases meet the FAQ bar. */
+  kind?: "boundary" | "regression" | "faq";
   state: "pass" | "fail";
   prompt: string;
   answer: string;

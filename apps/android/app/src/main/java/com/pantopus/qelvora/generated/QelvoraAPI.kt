@@ -52,7 +52,8 @@ data class APIAgentDraftConfig(
   val `dailyCostCapMicros`: Long,
   val `sessionNudgeMinutes`: Long,
   val `usefulnessCriteria`: String,
-  val `styleCriteria`: String
+  val `styleCriteria`: String,
+  val `faq`: List<APIAgentDraftConfigFaqItem>? = null
 )
 
 @Serializable
@@ -78,6 +79,12 @@ data class APIAgentDraftConfigExamplesItem(
 )
 
 @Serializable
+data class APIAgentDraftConfigFaqItem(
+  val `question`: String,
+  val `answer`: String
+)
+
+@Serializable
 data class APIAgentDraftWrite(
   val `expectedRevision`: Long,
   val `configuration`: APIAgentDraftWriteConfiguration
@@ -95,7 +102,8 @@ data class APIAgentDraftWriteConfiguration(
   val `dailyCostCapMicros`: Long,
   val `sessionNudgeMinutes`: Long,
   val `usefulnessCriteria`: String,
-  val `styleCriteria`: String
+  val `styleCriteria`: String,
+  val `faq`: List<APIAgentDraftWriteConfigurationFaqItem>? = null
 )
 
 @Serializable
@@ -121,6 +129,12 @@ data class APIAgentDraftWriteConfigurationExamplesItem(
 )
 
 @Serializable
+data class APIAgentDraftWriteConfigurationFaqItem(
+  val `question`: String,
+  val `answer`: String
+)
+
+@Serializable
 data class APIAgentEvaluationRequest(
   val `expectedRevision`: Long
 )
@@ -131,6 +145,12 @@ data class APIAgentExample(
   val `text`: String,
   val `fixed`: Boolean,
   val `approved`: Boolean
+)
+
+@Serializable
+data class APIAgentFaqItem(
+  val `question`: String,
+  val `answer`: String
 )
 
 @Serializable
