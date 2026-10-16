@@ -33,7 +33,7 @@ import {
 } from "./lib.mjs";
 
 const EDGE_PORT = Number(flag("--edge-port", "56438"));
-const { step, finish } = reporter();
+const { step, advise, finish } = reporter();
 
 // What the scripted extractor finds in each case message.
 const FACTS = {
@@ -66,6 +66,14 @@ const FACTS = {
       kind: "fact",
       text: "Works in a garage studio.",
       semanticKey: "studio location",
+      sensitiveCategory: null,
+    },
+  ],
+  "I sell my mugs at a weekend market.": [
+    {
+      kind: "fact",
+      text: "Sells mugs at a weekend market.",
+      semanticKey: "selling",
       sensitiveCategory: null,
     },
   ],
@@ -299,23 +307,36 @@ step(
   `${replies.length - back} reply calls seen`,
 );
 
-// 3. No: nothing stored; the exclusion removes only what it names.
-await say("My studio is in my garage, it gets cold in winter.");
-rows = await memories();
-const garage = rows.find((r) => r.semantic_key === "studio location");
-const no = await decide(garage?.id, "delete");
-await say("Again: my studio is in my garage.");
+// 3. An edit takes effect at once: the old text leaves the next answer, and
+// the edited text (free text that may be sensitive) is memory once accepted.
 await say("I mostly throw mugs and small bowls.");
 rows = await memories();
+const forms = rows.find((r) => r.semantic_key === "usual forms");
+await decide(forms?.id, "accept");
+const edited = await decide(forms?.id, "edit", "Mostly throws mugs.");
+const afterEdit = replies.length;
+await say("Thanks!");
+const editContext = replies
+  .slice(afterEdit)
+  .map((r) => r.input)
+  .join("");
 step(
-  "no stores nothing, and the same thing is not proposed again",
-  no.status === 200 && !rows.some((r) => r.semantic_key === "studio location"),
-  JSON.stringify(rows.map((r) => [r.semantic_key, r.state])),
+  "after an edit the old memory leaves the next answer at once",
+  edited.status === 200 &&
+    editContext.includes("Fires glazes at cone 6") &&
+    !editContext.includes("Mostly throws mugs and small bowls."),
+  `${edited.status}`,
 );
+const reaccepted = await decide(forms?.id, "accept");
+const afterAccept = replies.length;
+await say("Thanks again!");
 step(
-  "the exclusion removes only what it names",
-  rows.some((r) => r.semantic_key === "usual forms" && r.state === "proposed"),
-  JSON.stringify(rows.map((r) => r.semantic_key)),
+  "the edited memory is in the next answer once the fan accepts it",
+  reaccepted.status === 200 &&
+    replies
+      .slice(afterAccept)
+      .some((r) => r.input.includes("Mostly throws mugs.")),
+  `${reaccepted.status}`,
 );
 
 // 4. A sensitive fact needs its own consent (INV-23).
@@ -338,23 +359,31 @@ step(
   `${consent.status}; ${JSON.stringify(healthAfter ?? null)}`,
 );
 
-// 5. Edit takes effect at once.
-const forms = rows.find((r) => r.semantic_key === "usual forms");
-await decide(forms?.id, "accept");
-const edited = await decide(forms?.id, "edit", "Mostly throws mugs.");
-const afterEdit = replies.length;
-await say("Thanks!");
+// 5. No: nothing stored, the same key is not proposed again, other keys are.
+await say("My studio is in my garage, it gets cold in winter.");
+rows = await memories();
+const garage = rows.find((r) => r.semantic_key === "studio location");
+const no = await decide(garage?.id, "delete");
+await say("Again: my studio is in my garage.");
+const afterNo = replies.length;
+await say("I sell my mugs at a weekend market.");
+rows = await memories();
 step(
-  "an edit takes effect in the next answer at once",
-  edited.status === 200 &&
-    replies
-      .slice(afterEdit)
-      .some(
-        (r) =>
-          r.input.includes("Mostly throws mugs.") &&
-          !r.input.includes("small bowls"),
-      ),
-  `${edited.status}`,
+  "no stores nothing, and the same thing is not proposed again",
+  no.status === 200 && !rows.some((r) => r.semantic_key === "studio location"),
+  JSON.stringify(rows.map((r) => [r.semantic_key, r.state])),
+);
+step(
+  "the exclusion stops only the key it names from being proposed",
+  rows.some((r) => r.semantic_key === "selling" && r.state === "proposed"),
+  JSON.stringify(rows.map((r) => r.semantic_key)),
+);
+advise(
+  "after a no, the AI still uses the fan's other memories (W3 omits all memory and history once any exclusion exists)",
+  replies
+    .slice(afterNo)
+    .some((r) => r.input.includes("Fires glazes at cone 6")),
+  `${replies.length - afterNo} reply calls seen`,
 );
 
 // 6. Duplicates write one row.
