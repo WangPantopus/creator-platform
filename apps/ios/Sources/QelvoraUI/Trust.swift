@@ -302,10 +302,21 @@ public struct TrustFanFeature: View {
         guard !Task.isCancelled, privateReady, workEpoch == epoch else { return }
         error = failure?.localizedDescription ?? ""
     }
-    private func perform(_ path: String, _ input: [String: Any]) async -> TrustAck? {
+    /// A command with local consequences (`accepted`) finishes once sent, even if
+    /// a routine session check cancels this screen's work meanwhile: the server
+    /// may already have accepted it. Only showing the answer depends on the
+    /// checks after it.
+    private func perform(_ path: String, _ input: [String: Any], accepted: (@MainActor () async -> Void)? = nil) async -> TrustAck? {
         guard !privateDisabled else { return nil }
         let epoch = beginWork(); defer { finishWork(epoch) }
-        do { let client = try await capturedClient(); let ack: TrustAck = try await client.request(path, body: JSONSerialization.data(withJSONObject: input)); try Task.checkCancellation(); guard privateReady, workEpoch == epoch else { return nil }; error = ""; commandKey = UUID().uuidString; return ack }
+        do {
+            let client = try await capturedClient(), body = try JSONSerialization.data(withJSONObject: input)
+            let ack: TrustAck
+            if let accepted {
+                // Unstructured: a cancelled screen task cannot cancel it.
+                ack = try await Task { let value: TrustAck = try await client.request(path, body: body); await accepted(); return value }.value
+            } else { ack = try await client.request(path, body: body) }
+            try Task.checkCancellation(); guard privateReady, workEpoch == epoch else { return nil }; error = ""; commandKey = UUID().uuidString; return ack }
         catch { if !Task.isCancelled && privateReady && workEpoch == epoch { self.error = error.localizedDescription }; return nil }
     }
     private func report() async {
@@ -319,11 +330,15 @@ public struct TrustFanFeature: View {
         var input: [String: Any] = ["kind": kind, "scope": deletionScope, "proof": capability?.verificationMethod == "current_session" ? "CURRENT_SESSION" : proof, "idempotencyKey": commandKey]
         if deletionScope != "account" { input["creatorId"] = creator }
         if deletionScope == "thread" { input["threadId"] = thread }
-        if let ack = await perform("privacy/jobs", input) {
-            if kind == "delete" {
-                do { try await W3DraftStorage.shared.purge(origin: origin, account: account, creator: deletionScope == "account" ? nil : creator, thread: deletionScope == "thread" ? thread : nil) }
-                catch { await model.purge(); return }
-            }
+        // An accepted deletion removes the original account's matching drafts
+        // even if the account view changes before the answer is shown.
+        let purge = PurgeOutcome()
+        let ack = await perform("privacy/jobs", input, accepted: kind != "delete" ? nil : {
+            do { try await W3DraftStorage.shared.purge(origin: origin, account: account, creator: deletionScope == "account" ? nil : creator, thread: deletionScope == "thread" ? thread : nil) }
+            catch { purge.failed = true }
+        })
+        if purge.failed { await model.purge(); return }
+        if let ack {
             result = "Request saved; inspect each domain's progress."; await load()
             if let id = ack.id { await jobDetail(id) }
         }
@@ -350,3 +365,4 @@ public struct TrustFanFeature: View {
     }
     private func retry(_ id: String) async { if await perform("privacy/jobs/" + id + "/retry", [:]) != nil { result = "Incomplete domains queued again."; await jobDetail(id) } }
 }
+@MainActor private final class PurgeOutcome { var failed = false }

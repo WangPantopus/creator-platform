@@ -25,7 +25,7 @@ final class Lane7StackDraftFlow: XCTestCase {
         let token = identity.1["token"] as! String, path = "/v1/conversations/" + fixture["creator"]! + "/" + fixture["fan"]!
         func storage(_ count: Int) async throws {
             var result: [String: Any] = [:]
-            for _ in 0..<40 {
+            for _ in 0..<80 {
                 let response = try await request("/storage", body: ["markers": [marker, "real deletion draft"]], base: "http://127.0.0.1:56475")
                 XCTAssertEqual(response.0, 200); result = response.1
                 if result["count"] as? Int == count { break }
@@ -76,7 +76,8 @@ final class Lane7StackDraftFlow: XCTestCase {
             let shot = XCTAttachment(screenshot: XCUIScreen.main.screenshot()); shot.name = name; shot.lifetime = .keepAlways; add(shot)
         }
         XCUIDevice.shared.orientation = .portrait
-        let arguments = ["--api-url", api, "--appearance", "light", "-AppleLanguages", "(en)"]
+        // D6R: the app may reach the API through delay-proxy.mjs; checks stay direct.
+        let arguments = ["--api-url", fixture["appApi"] ?? api, "--appearance", "light", "-AppleLanguages", "(en)"]
         app.launchArguments = arguments + ["--harness-reset", "--harness-actor", fixture["actor"]!, "--return-to", fixture["route"]!]
         app.launch(); app.launchArguments = arguments
         XCTAssertTrue(field.waitForExistence(timeout: 30)); field.tap(); field.typeText(marker)
@@ -99,15 +100,40 @@ final class Lane7StackDraftFlow: XCTestCase {
         if open.waitForExistence(timeout: 3) { open.tap() }
         XCTAssertTrue(app.staticTexts["Your data"].waitForExistence(timeout: 30))
         let scope = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Data scope'")).firstMatch
-        try reveal(scope); scope.tap(); app.buttons["Conversation"].tap()
+        // Controls are disabled during each session check and the page can
+        // re-lay out after one: re-reveal, use an open menu, retry until it takes.
+        let conversation = app.buttons["Conversation"]
+        for _ in 0..<6 where !app.textFields["Creator ID"].exists {
+            if conversation.exists && conversation.isHittable { conversation.tap() }
+            else {
+                try reveal(scope)
+                for _ in 0..<40 where !(scope.isEnabled && scope.isHittable) { try await Task.sleep(for: .milliseconds(50)) }
+                if scope.isHittable { scope.tap() }
+                if conversation.waitForExistence(timeout: 2) && conversation.isHittable { conversation.tap() }
+            }
+            _ = app.textFields["Creator ID"].waitForExistence(timeout: 2)
+        }
+        XCTAssertTrue(app.textFields["Creator ID"].exists, "Choose the conversation scope")
         for (label, value) in [("Creator ID", fixture["creator"]!), ("Conversation ID", fixture["thread"]!), ("Local confirmation", "LOCAL DEVELOPMENT")] {
             let input = app.textFields[label]; try reveal(input); input.tap(); input.typeText(value)
             XCTAssertEqual(input.value as? String, value)
             if app.keyboards.buttons["Return"].exists { app.keyboards.buttons["Return"].tap() }
         }
-        try reveal(app.buttons["Request deletion"]); app.buttons["Request deletion"].tap()
-        try await Task.sleep(for: .seconds(6)) // Cross the readiness heartbeat.
         let dialogTitle = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Delete this data scope?'")).firstMatch
+        // Actions are disabled during each ~100 ms session check, by design, so
+        // a tap waits for an enabled control and is repeated if it had no effect.
+        func openConfirmation() async throws {
+            let button = app.buttons["Request deletion"]
+            for attempt in 1...3 {
+                for _ in 0..<40 where !button.isEnabled { try await Task.sleep(for: .milliseconds(50)) }
+                button.tap()
+                if dialogTitle.waitForExistence(timeout: 2) { return }
+                print("LANE7 deletion confirmation did not open on tap \(attempt)")
+            }
+            XCTFail("The deletion confirmation never opened")
+        }
+        try reveal(app.buttons["Request deletion"]); try await openConfirmation()
+        try await Task.sleep(for: .seconds(6)) // Cross the readiness heartbeat.
         XCTAssertTrue(dialogTitle.exists)
         capture("D6-confirmation-after-session-check")
         if app.buttons["Keep data"].exists { app.buttons["Keep data"].tap() }
@@ -116,20 +142,28 @@ final class Lane7StackDraftFlow: XCTestCase {
             // dimmed background is the native cancellation path.
             app.coordinate(withNormalizedOffset: CGVector(dx: 0.95, dy: 0.7)).tap()
         }
-        XCTAssertFalse(dialogTitle.exists)
+        XCTAssertTrue(dialogTitle.waitForNonExistence(timeout: 5))
         try await storage(1)
         let retained = try await request(path, token: token); XCTAssertEqual(retained.0, 200)
-        app.buttons["Request deletion"].tap()
+        try await openConfirmation()
         try await Task.sleep(for: .seconds(6))
         XCTAssertTrue(dialogTitle.exists)
         let confirmations = app.buttons.matching(identifier: "Request deletion")
         let confirm = confirmations.element(boundBy: confirmations.count - 1)
-        XCTAssertTrue(confirm.waitForExistence(timeout: 5)); confirm.tap()
+        XCTAssertTrue(confirm.waitForExistence(timeout: 5))
+        // Actions are disabled for the ~100 ms of each session check, by design:
+        // tap only when enabled, and tap again (same idempotency key) if no job
+        // appears while the confirmation is still open.
         var deleted = false
-        for _ in 0..<100 {
-            let jobs = try await request("/v1/trust/privacy/jobs", token: token); XCTAssertEqual(jobs.0, 200)
-            deleted = (jobs.1["items"] as! [[String: Any]]).contains { $0["kind"] as? String == "delete" && $0["scope"] as? String == "thread" }
-            if deleted { break }; try await Task.sleep(for: .milliseconds(250))
+        for attempt in 0..<3 where !deleted {
+            for _ in 0..<40 where !confirm.isEnabled { try await Task.sleep(for: .milliseconds(50)) }
+            if attempt == 0 || (dialogTitle.exists && confirm.exists) { confirm.tap() }
+            for _ in 0..<(attempt == 2 ? 100 : 12) {
+                let jobs = try await request("/v1/trust/privacy/jobs", token: token); XCTAssertEqual(jobs.0, 200)
+                deleted = (jobs.1["items"] as! [[String: Any]]).contains { $0["kind"] as? String == "delete" && $0["scope"] as? String == "thread" }
+                if deleted { break }; try await Task.sleep(for: .milliseconds(250))
+            }
+            if !deleted { print("LANE7 real API: no deletion job after confirm tap \(attempt + 1); confirmation open: \(dialogTitle.exists)") }
         }
         XCTAssertTrue(deleted); try await storage(0)
         let denied = try await request(path, token: token); XCTAssertTrue([403, 404, 410].contains(denied.0))

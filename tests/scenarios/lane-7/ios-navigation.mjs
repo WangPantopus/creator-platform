@@ -81,6 +81,7 @@ const optIn = (value) => {
       );
       const fields = [
         "api",
+        "appApi",
         "actor",
         "creator",
         "fan",

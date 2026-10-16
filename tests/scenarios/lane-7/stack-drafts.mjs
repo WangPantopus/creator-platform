@@ -8,6 +8,8 @@ import * as A from "./android-ui.mjs";
 import { sleep, screenshot } from "./lib.mjs";
 
 const api = "http://127.0.0.1:56471";
+// D6R: the app may reach the API through delay-proxy.mjs; checks stay direct.
+const appApi = process.env.LANE7_APP_API ?? api;
 const creator = "20000000-0000-4000-8000-000000000001";
 async function request(method, path, token, body) {
   const response = await fetch(api + path, {
@@ -79,6 +81,7 @@ async function prepare(platform) {
   assert.equal(page.body.control, "human_active");
   const fixture = {
     api,
+    appApi,
     actor: number === 1 ? "actor one" : "actor two",
     creator,
     fan: fan.id,
@@ -223,7 +226,12 @@ async function fillField(label, value) {
     }
   }
   assert.ok(focused, `${label} must focus the live keyboard`);
-  A.type(value);
+  // adb drops characters from one long burst under load (a 36-character id
+  // arrived as 32): send short chunks and let each one land.
+  for (const chunk of value.match(/.{1,6}/gsu)) {
+    A.type(chunk);
+    await sleep(250);
+  }
   await A.waitFor(value);
   A.key("BACK");
   const until = Date.now() + 10000;
@@ -239,6 +247,8 @@ async function fillField(label, value) {
 async function android() {
   const { fixture, token, path } = await prepare("android");
   A.adb("reverse", "tcp:56471", "tcp:56471");
+  const appPort = new URL(appApi).port;
+  A.adb("reverse", `tcp:${appPort}`, `tcp:${appPort}`);
   const launch = (reset = false) => {
     A.adb("shell", "am", "force-stop", "com.pantopus.qelvora");
     A.adb(
@@ -250,7 +260,7 @@ async function android() {
       "com.pantopus.qelvora/.MainActivity",
       "--es",
       "api_url",
-      api,
+      appApi,
       ...(reset
         ? [
             "--ez",
@@ -279,7 +289,9 @@ async function android() {
   );
   launch();
   await A.waitFor(fixture.marker, 30000);
-  await A.tap("Send");
+  // Send stays disabled until the relaunched thread is live again.
+  const send = await A.waitEnabled("Send");
+  A.tapAt(send.x, send.y);
   await verifyAccepted(fixture, token, path);
   for (let i = 0; i < 40 && draftCount() !== 0; i++) await sleep(250);
   assert.equal(draftCount(), 0);
@@ -290,7 +302,13 @@ async function android() {
   A.openLink("qelvora://app/support/privacy");
   await A.waitFor("Your data", 30000);
   await reveal("thread");
-  await A.tap("thread");
+  // Controls are disabled during each session check: retry until it takes.
+  for (let i = 0; i < 5 && !A.texts().includes("Data scope: thread"); i++) {
+    const chip = await A.waitEnabled("thread");
+    A.tapAt(chip.x, chip.y);
+    await sleep(700);
+  }
+  assert.ok(A.texts().includes("Data scope: thread"), "Choose thread scope");
   for (const [label, value] of [
     ["Creator ID", fixture.creator],
     ["Conversation ID", fixture.thread],
@@ -299,21 +317,30 @@ async function android() {
     await fillField(label, value);
   }
   await reveal("Request deletion");
-  await A.tap("Request deletion");
-  await A.waitFor("Delete this data scope?");
+  // Actions are disabled during each session check, by design: tap a control
+  // only when it is enabled.
+  const requestDeletion = async () => {
+    const button = await A.waitEnabled("Request deletion");
+    A.tapAt(button.x, button.y);
+    await A.waitFor("Delete this data scope?");
+  };
+  await requestDeletion();
   await sleep(6000); // Cross the ordinary session-readiness heartbeat.
   await A.waitFor("Delete this data scope?");
-  await A.tap("Keep data");
+  const keep = await A.waitEnabled("Keep data");
+  A.tapAt(keep.x, keep.y);
   assert.equal(draftCount(), 1);
   assert.equal((await request("GET", path, token)).status, 200);
-  await A.tap("Request deletion");
-  await A.waitFor("Delete this data scope?");
+  await requestDeletion();
   await sleep(6000);
   await A.waitFor("Delete this data scope?");
-  await A.tap("Request deletion");
+  // Actions are disabled for the moment of each session check, by design.
+  const confirm = await A.waitEnabled("Request deletion");
+  A.tapAt(confirm.x, confirm.y);
   await verifyDeleted(fixture, token, path);
   persistedDeletion(fixture, 1);
-  for (let i = 0; i < 40 && draftCount() !== 0; i++) await sleep(250);
+  // A held answer (D6R) reaches the app up to 9 s after the API accepted it.
+  for (let i = 0; i < 80 && draftCount() !== 0; i++) await sleep(250);
   assert.equal(
     draftCount(),
     0,
