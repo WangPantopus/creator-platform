@@ -102,7 +102,7 @@ fun Note(children: String, name: String = "Maya", audience: String = "Kiln Club 
             Column(Modifier.fillMaxWidth().padding(QelvoraTokens.space4), verticalArrangement = Arrangement.spacedBy(QelvoraTokens.messagePadding)) {
                 BasicText(children, style = qText("voice-lg").copy(color = qColor("on-maya")))
                 if (media != null) Row(Modifier.fillMaxWidth().height(QelvoraTokens.noteMediaHeight).dashedBorder(androidx.compose.ui.graphics.Color.White.copy(alpha = QelvoraTokens.noteMediaOpacity), QelvoraTokens.segmentRadius), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) { Glyph("image", QelvoraTokens.limitRadioSize, qColor("on-maya-muted")); Spacer(Modifier.width(QelvoraTokens.space2)); BasicText(media, style = qText("label").copy(color = qColor("on-maya-muted"))) }
-                SignedMarker(name, extra = audienceSize?.let { "$it members" }, onMaya = true, onClick = onVerify)
+                SignedMarker(name, extra = audienceSize?.let { QelvoraCopy.text("nativeCountMembers", mapOf("count" to it)) }, onMaya = true, onClick = onVerify)
             }
             if (reply) Column(Modifier.fillMaxWidth().background(ground).padding(QelvoraTokens.space4), verticalArrangement = Arrangement.spacedBy(QelvoraTokens.authorGap)) {
                 BasicText(QelvoraCopy.text("noteReplyLabel", mapOf("name" to name)), style = qText("caption", true).copy(color = qColor("ink-muted")))

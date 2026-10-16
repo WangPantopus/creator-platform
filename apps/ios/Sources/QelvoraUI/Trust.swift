@@ -248,7 +248,7 @@ public struct TrustFanFeature: View {
     }
     private func retainedRecord(_ item: TrustRetained) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Retained: \(item.category.replacingOccurrences(of: "_", with: " "))").qText("label")
+            Text(QelvoraCopy.text("nativeRetainedCategory", values: ["category": item.category.replacingOccurrences(of: "_", with: " ")])).qText("label")
             Text(item.reason).qText("body")
             if let until = item.until { Text(QelvoraCopy.text("nativeUntilDate", values: ["date": until])).qText("caption") }
         }

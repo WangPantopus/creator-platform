@@ -1185,7 +1185,6 @@ object QelvoraCopy {
     "nativeDEVELOPMENTSIGNIN" to "DEVELOPMENT SIGN-IN",
     "nativeDataScope" to "Data scope",
     "nativeDataScopeScope" to "Data scope: {scope}",
-    "nativeDayMinutesMinutes" to "{day} · {minutes} minutes",
     "nativeDecisionDeadline" to "Decision deadline",
     "nativeDelete" to "Delete",
     "nativeDeleteThisDataScope" to "Delete this data scope?",
@@ -1613,7 +1612,16 @@ object QelvoraCopy {
     "nativeYourTimeSummaryIsUnavailable" to "Your time summary is unavailable until conversation activity is connected.",
     "nativeYoureOffline" to "You're offline",
     "nativeYoureSeeingASavedConversation" to "You're seeing a saved conversation with a short reading lease. Reconnect to send.",
-    "nativeYouveReachedThresholdOfYourMonthly" to "You’ve reached {threshold}% of your monthly limit."
+    "nativeYouveReachedThresholdOfYourMonthly" to "You’ve reached {threshold}% of your monthly limit.",
+    "nativeCountMembers" to "{count} members",
+    "nativeLabelAtTime" to "{label} at {time}",
+    "nativeLabelEndsDate" to "{label} ends {date}",
+    "nativeMinutesMinutes" to "{minutes} minutes",
+    "nativeNameEndsDate" to "{name}: ends {date}",
+    "nativeNameReacted" to "{name} reacted",
+    "nativeNameRenewsDate" to "{name}: renews {date}",
+    "nativeRetainedCategory" to "Retained: {category}",
+    "nativeTimeUTC" to "{time} UTC"
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }

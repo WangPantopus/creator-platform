@@ -165,7 +165,7 @@ public struct Note: View {
                     if let media {
                         HStack(spacing: QelvoraTokens.space2) { QelvoraGlyph(name: "image", size: QelvoraTokens.limitRadioSize, color: qColor("on-maya-muted", scheme)); Text(media).qText("label").foregroundStyle(qColor("on-maya-muted", scheme)) }.frame(maxWidth: .infinity).frame(height: QelvoraTokens.noteMediaHeight).overlay(RoundedRectangle(cornerRadius: QelvoraTokens.segmentRadius).stroke(Color.white.opacity(QelvoraTokens.noteMediaOpacity), style: StrokeStyle(lineWidth: QelvoraTokens.hairline, dash: [QelvoraTokens.space1])))
                     }
-                    SignedMarker(name: name, extra: audienceSize.map { "\($0) members" }, onMaya: true, action: onVerify)
+                    SignedMarker(name: name, extra: audienceSize.map { QelvoraCopy.text("nativeCountMembers", values: ["count": $0]) }, onMaya: true, action: onVerify)
                 }.padding(QelvoraTokens.token("space-4")).frame(maxWidth: .infinity, alignment: .leading)
                 if reply {
                     VStack(alignment: .leading, spacing: QelvoraLayout.authorGap) {

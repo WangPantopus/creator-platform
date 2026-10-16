@@ -142,6 +142,9 @@ function literals(src, swift) {
 // Text a person reads: words with a space, a capitalized word, or the identity punctuation.
 function reads(t) {
   const plain = t.replace(/\{\d+\}/g, " ").trim();
+  // A word set apart by spaces (" at {time}") is spoken, even in lower case.
+  if (/(^|\s)[a-z]{2,}(\s|$)/.test(t.replace(/\{\d+\}/g, "")) && /\s/.test(t))
+    return true;
   if (
     !/[A-Za-z]/.test(plain) ||
     /^[a-z0-9_./:?=&#%@+*~-]+$/.test(plain) ||
@@ -237,7 +240,7 @@ function allow(file, line, t) {
     /\b(MMM|HH:mm|EEEE|uuuu|yyyy)\b/.test(t) ||
     /^\^|\[[0-9a-fA-F]/.test(t) ||
     /^bytes[ =]|'opsz'|^[a-z_]+ [a-z_]+=\{\d\}$/.test(t) ||
-    (!/\s/.test(plain) &&
+    (!/\s/.test(t.replace(/\{\d+\}/g, "")) &&
       /[/{}=:.]/.test(t) &&
       !/^[A-Z][a-z]+[.…]?$/.test(plain)) ||
     /StudioTeamWorkspace\.(swift|kt)$/.test(file) || // suffixes for teamCopy() keys

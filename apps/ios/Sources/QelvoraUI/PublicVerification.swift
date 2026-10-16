@@ -162,7 +162,7 @@ private struct PublicVerificationScreen: View {
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.timeZone = TimeZone(secondsFromGMT: 0)
         formatter.dateStyle = .medium; formatter.timeStyle = .short
-        return "\(formatter.string(from: date)) UTC"
+        return QelvoraCopy.text("nativeTimeUTC", values: ["time": formatter.string(from: date)])
     }
 
     private func actLabel(_ value: String) -> String {
