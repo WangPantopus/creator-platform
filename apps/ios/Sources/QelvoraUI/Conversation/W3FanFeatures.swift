@@ -46,6 +46,9 @@ private struct W3ConversationDestination: View {
     }
 }
 
+/// Whether the reader is at the thread's newest row; read only by event handlers.
+private final class W3Follow { var atEnd = true }
+
 private struct W3ThreadScreen: View {
     let baseURL: URL
     @StateObject private var model: W3ThreadModel
@@ -59,7 +62,9 @@ private struct W3ThreadScreen: View {
     @State private var sourceFailure = ""
     @State private var connectionRetry = 0
     /// The reader is at the newest row: the thread follows new rows only then.
-    @State private var following = true
+    /// A plain reference, not view state: the end marker updates it while the
+    /// reader scrolls, and as state every update re-rendered the whole thread.
+    @State private var follow = W3Follow()
     /// After "Earlier messages", the row that was first stays where it was.
     @State private var keepInPlace: String?
     @FocusState private var composerFocused: Bool
@@ -99,13 +104,13 @@ private struct W3ThreadScreen: View {
                 }
                 ScrollViewReader { proxy in
                     ScrollView {
-                        // At the largest text a lazy stack never settles under the bottom anchor:
-                        // its height estimates for very tall rows keep moving the anchored offset,
-                        // which re-estimates them, and the app spins. Exact sizes settle.
-                        Group {
-                            if compact { VStack(alignment: .leading, spacing: QelvoraTokens.space4) { threadRows(page) } }
-                            else { LazyVStack(alignment: .leading, spacing: QelvoraTokens.space4) { threadRows(page) } }
-                        }.padding(.horizontal, QelvoraTokens.space4).padding(.vertical, QelvoraTokens.space4)
+                        // A plain stack at every text size. A lazy stack's height estimates could
+                        // keep moving its rows while Notes were placed or removed during a
+                        // scroll, re-estimating them forever, and the app spun (WP 7.3 at the
+                        // largest text, R5 at normal size). Exact sizes settle; a thread holds
+                        // at most 250 earlier messages and one page.
+                        VStack(alignment: .leading, spacing: QelvoraTokens.space4) { threadRows(page) }
+                            .padding(.horizontal, QelvoraTokens.space4).padding(.vertical, QelvoraTokens.space4)
                     }.textSelection(.enabled)
                         .coordinateSpace(name: "thread-scroll")
                         // Open at the newest row and follow new rows while the reader is
@@ -113,9 +118,9 @@ private struct W3ThreadScreen: View {
                         // (`defaultScrollAnchor(.bottom)`) a lazy stack could re-measure its
                         // rows forever when the keyboard left while Notes arrived.
                         .onChange(of: model.page == nil, initial: true) { _, missing in
-                            if !missing { following = true; toEnd(proxy) }
+                            if !missing { follow.atEnd = true; toEnd(proxy) }
                         }
-                        .onChange(of: tail(page)) { if following { toEnd(proxy) } }
+                        .onChange(of: tail(page)) { if follow.atEnd { toEnd(proxy) } }
                         .onChange(of: compact) { toEnd(proxy) }
                         .onChange(of: model.older.count) {
                             if let id = keepInPlace { keepInPlace = nil; proxy.scrollTo(id, anchor: .top) }
@@ -129,7 +134,7 @@ private struct W3ThreadScreen: View {
                             if composerFocused { toEnd(proxy) }
                         }
                         #endif
-                        .onChange(of: model.pending?.key) { _, sent in if sent != nil { following = true; toEnd(proxy) } }
+                        .onChange(of: model.pending?.key) { _, sent in if sent != nil { follow.atEnd = true; toEnd(proxy) } }
                 }
                 VStack(spacing: QelvoraTokens.space3) {
                     if !page.canSend { Notice(title: "AI unavailable", children: page.unavailableReason ?? "Messaging is unavailable.") }
@@ -248,8 +253,7 @@ private struct W3ThreadScreen: View {
             .onGeometryChange(for: Bool.self) { geometry in
                 let visible = geometry.bounds(of: .named("thread-scroll"))?.height ?? 0
                 return geometry.frame(in: .named("thread-scroll")).minY <= visible + 40
-            } action: { atEnd in following = atEnd }
-            .onDisappear { following = false }
+            } action: { atEnd in follow.atEnd = atEnd }
     }
     /// The thread's newest end, below the last row.
     private func toEnd(_ proxy: ScrollViewProxy) { proxy.scrollTo("conversation-end", anchor: .bottom) }
