@@ -396,7 +396,9 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     val keyboardVisible = WindowInsets.ime.getBottom(density) > 0
     val compact = density.fontScale >= 1.5f || heightWithoutKeyboard < 480.dp
     val horizontalControls = maxHeight < 180.dp
-    LaunchedEffect(current?.threadId, current?.messages?.lastOrNull(), pending?.key, compact, maxHeight) {
+    // Presence arrives after the page: a reader still at the bottom stays there
+    // when its rows are placed, as iOS keeps its bottom anchor.
+    LaunchedEffect(current?.threadId, current?.messages?.lastOrNull(), pending?.key, compact, maxHeight, presence) {
         if (current != null && followingReply && !scroll.isScrollInProgress) {
             positioningReply = true
             try {

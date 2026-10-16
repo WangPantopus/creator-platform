@@ -55,7 +55,9 @@ them between the thread's messages.
 ### Merging
 
 6. Thread messages are placed by `createdAt`, presence items by `occurredAt`; at the same instant
-   the thread message comes first. Order among messages is unchanged (server order).
+   the thread message comes first. Order among messages is unchanged (server order). Placing
+   presence items never moves the reader: one at the bottom of the thread stays at the bottom, one
+   who scrolled away stays where they were.
 7. While older messages are still unloaded ("Earlier messages" is shown), a presence item older
    than the oldest loaded message stays hidden; loading earlier messages reveals it in place. When
    every message is loaded, every presence item is shown.
@@ -102,10 +104,11 @@ a Note's eligibility, and make the presence route fail.
 | R1.9  | The app's files after a read and a background                                                                           | No file contains Note text                                                                                                                                                          | pass (20 files in the data container, 0 hits)                                                        | pass (10 files, 0 hits)                         |
 | R1.10 | Sign out, sign in as Priya                                                                                              | No Note from Devon's session                                                                                                                                                        | not run                                                                                              | not run                                         |
 | R1.11 | Real stack: a Note published through the real content API                                                               | Appears in the real thread                                                                                                                                                          | not run: a Note is a signed act (passkey ceremony) with membership rows; lane 5's own host does that | not run                                         |
+| R1.12 | Largest text (the thread's own controls are its last rows): open Maya's thread; presence arrives after the page         | The thread stays at its bottom: its last row is on screen without scrolling                                                                                                         | pass                                                                                                 | pass (failed before the fix)                    |
 | D3T   | Largest text, a very tall row, thirty upward drags (guards the WP 7.3 freeze with presence rows present)                | The app answers and goes idle                                                                                                                                                       | pass                                                                                                 | pass (idle CPU 0%)                              |
 
-Commands: `node tests/scenarios/lane-7/e7-4-presence.mjs [R1 R4 R5 R7 R9 R8]` (Android) and
-`node tests/scenarios/lane-7/ios-navigation.mjs <built.xctestrun> --presence [R1 R4 R5 R7 R8 R9]` (iOS,
+Commands: `node tests/scenarios/lane-7/e7-4-presence.mjs [R1 R4 R5 R7 R8 R9 R10]` (Android) and
+`node tests/scenarios/lane-7/ios-navigation.mjs <built.xctestrun> --presence [R1 R4 R5 R7 R8 R9 R10]` (iOS,
 with `ios-link-driver.mjs` running). `pnpm exec tsx tests/scenarios/lane-7/harness/check-contract.mjs`
 checks the fake's presence answers against `ThreadPresencePage` (62 checks).
 
@@ -122,6 +125,12 @@ checks the fake's presence answers against `ThreadPresencePage` (62 checks).
   the last list" is only observable within one foreground session.
 - **The WP 7.3 largest-text freeze** (a very tall row plus scrolling up) first showed up in R8; it
   is fixed in #401 and guarded by D3T.
+- **Android lost the bottom of the thread when presence arrived** after the page. At the largest
+  text, where the thread's own controls are its last rows, the new rows pushed the bottom out of
+  view (the step-in button was off screen); iOS keeps its bottom anchor. Android now scrolls to the
+  bottom again when presence changes, only while the reader is still at the bottom. Found by the
+  P3 seal flows; R1.12 failed before the fix and passes after it. R1.1's order check now compares
+  neighboring rows one pair per screen: it had relied on where the list happened to stop.
 
 ## P2 to P11: the rules, written before the code
 
