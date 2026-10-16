@@ -1599,7 +1599,8 @@ export const copy = {
   "nativeYourTimeSummaryIsUnavailable": "Your time summary is unavailable until conversation activity is connected.",
   "nativeYoureOffline": "You're offline",
   "nativeYoureSeeingASavedConversation": "You're seeing a saved conversation with a short reading lease. Reconnect to send.",
-  "nativeYouveReachedThresholdOfYourMonthly": "You’ve reached {threshold}% of your monthly limit."
+  "nativeYouveReachedThresholdOfYourMonthly": "You’ve reached {threshold}% of your monthly limit.",
+  "nativeOpenStudio": "Open {studio}"
 } as const;
 export type CopyKey = keyof typeof copy;
 type Placeholders<T extends string> = T extends `${string}{${infer Key}}${infer Rest}` ? Key | Placeholders<Rest> : never;

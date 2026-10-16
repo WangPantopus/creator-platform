@@ -35,6 +35,8 @@ const packet = ids[0] === "--packet";
 if (packet) ids.shift();
 const a11y = ids[0] === "--a11y";
 if (a11y) ids.shift();
+const studio = ids[0] === "--studio";
+if (studio) ids.shift();
 const drafts = ids[0] === "--drafts";
 if (drafts) ids.shift();
 const draftStack = ids.length === 1 && ids[0] === "--draft-stack";
@@ -73,7 +75,9 @@ const suite = presence
                               ? "Lane7PacketFlows"
                               : a11y
                                 ? "Lane7AccessibilityFlows"
-                                : "Lane7NavigationFlows";
+                                : studio
+                                  ? "Lane7StudioLinkFlows"
+                                  : "Lane7NavigationFlows";
 const optInVariable = presence
   ? "LANE7_PRESENCE"
   : draftStack
@@ -106,7 +110,9 @@ const optInVariable = presence
                               ? "LANE7_PACKET"
                               : a11y
                                 ? "LANE7_A11Y"
-                                : "LANE7_NAVIGATION";
+                                : studio
+                                  ? "LANE7_STUDIO"
+                                  : "LANE7_NAVIGATION";
 const flows = presence
   ? {
       R1: "testR01NotesAndReactionsInPlace",
@@ -216,21 +222,26 @@ const flows = presence
                                     A4: "testA04NamedChoices",
                                     A5: "testA05LargestText",
                                   }
-                                : {
-                                    N1: "testN01ThreadBackAndGesture",
-                                    N2: "testN02ConsentIsReplaced",
-                                    N5: "testN05AccountBack",
-                                    N6: "testN06NotificationTrailAndLabel",
-                                    N8: "testN08ColdLink",
-                                    N13: "testN13AccountChangeClearsTrail",
-                                    N14: "testN14UnknownLink",
-                                    N15: "testN15RepeatedLinkAndQuickBack",
-                                    N16: "testN16LinkWhilePrivacyIsOpen",
-                                    N17: "testN17TrailBoundary",
-                                    N19: "testN19NewFanBack",
-                                    N20: "testN20EditProfileBack",
-                                    N21: "testN21CreatorAccessBack",
-                                  };
+                                : studio
+                                  ? {
+                                      Z1: "testZ01CreatorOpensTheWebStudio",
+                                      Z2: "testZ02FanSeesNoStudioLink",
+                                    }
+                                  : {
+                                      N1: "testN01ThreadBackAndGesture",
+                                      N2: "testN02ConsentIsReplaced",
+                                      N5: "testN05AccountBack",
+                                      N6: "testN06NotificationTrailAndLabel",
+                                      N8: "testN08ColdLink",
+                                      N13: "testN13AccountChangeClearsTrail",
+                                      N14: "testN14UnknownLink",
+                                      N15: "testN15RepeatedLinkAndQuickBack",
+                                      N16: "testN16LinkWhilePrivacyIsOpen",
+                                      N17: "testN17TrailBoundary",
+                                      N19: "testN19NewFanBack",
+                                      N20: "testN20EditProfileBack",
+                                      N21: "testN21CreatorAccessBack",
+                                    };
 if (!source || ids.some((id) => !flows[id]))
   throw new Error(
     "Pass a built .xctestrun and optional unfinished iOS flow IDs.",

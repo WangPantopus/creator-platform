@@ -76,6 +76,12 @@ const view = (session, account) => ({
 });
 
 export function register(router) {
+  // WP 7.12: stands in for the web Studio, so a browser's visit is in the log.
+  // The real page shows the Studio signed in, or its sign-in returning there.
+  router.add("GET", "/studio/:creatorId", ({ params }) => ({
+    page: "web Studio (lane 7 fake)",
+    creatorId: params.creatorId,
+  }));
   router.add("GET", "/v1/identity/capabilities", ({ world }) => ({
     signInAvailable: true,
     localAccountsAllowed: false,

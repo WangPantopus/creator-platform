@@ -493,6 +493,7 @@ public struct FanAppShell: View {
     @Environment(\.colorScheme) private var scheme
     @Environment(\.dynamicTypeSize) private var textSize
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.openURL) private var openURL
     // Before the scene first becomes active, an incoming link is its starting place.
     // Keep this true through backgrounding so later links retain the existing trail.
     @State private var hasEnteredForeground = false
@@ -563,6 +564,11 @@ public struct FanAppShell: View {
                             Button(QelvoraCopy.text("nativeHelpAndReports"), variant: .quiet, block: true) { model.open("/support") }
                             Button(QelvoraCopy.text("nativeYourData"), variant: .quiet, block: true) { model.open("/support/privacy") }
                             Button(QelvoraCopy.text("growthNotificationSettings"), variant: .quiet, block: true) { model.open("/notifications/settings") }
+                            // WP 7.12: a creator's Studio is on the web; the system browser opens it,
+                            // signed in there or at its sign-in, which returns to this Studio.
+                            if let creator = model.session?.creator, let studio = StudioLink.url(creatorId: creator.id) {
+                                Button(QelvoraCopy.text("nativeOpenStudio", values: ["studio": QelvoraCopy.studioName]), variant: .secondary, block: true) { openURL(studio) }
+                            }
                             if model.session?.creator != nil { Button(QelvoraCopy.text("growthYourWeekImpact"), variant: .quiet, block: true) { model.open("/studio/impact") } }
                             #if os(iOS)
                             if model.session?.creator != nil { CredentialSettings(model: model) }
@@ -694,5 +700,23 @@ struct NativeHandleForm: View {
         #else
         TextField("@handle", text: $handle)
         #endif
+    }
+}
+
+/// The web Studio of one creator: `CreatorWebURL` (an https origin; a debug build
+/// may use a local http one) and `/studio/{creatorId}`. No origin, no link.
+enum StudioLink {
+    static func url(creatorId: String, origin: String? = Bundle.main.object(forInfoDictionaryKey: "CreatorWebURL") as? String) -> URL? {
+        guard UUID(uuidString: creatorId) != nil, let origin, var components = URLComponents(string: origin),
+              let host = components.host, !host.isEmpty, components.user == nil, components.password == nil,
+              components.query == nil, components.fragment == nil,
+              components.percentEncodedPath.isEmpty || components.percentEncodedPath == "/" else { return nil }
+        #if DEBUG
+        guard components.scheme == "https" || (components.scheme == "http" && ["localhost", "127.0.0.1"].contains(host)) else { return nil }
+        #else
+        guard components.scheme == "https" else { return nil }
+        #endif
+        components.percentEncodedPath = "/studio/" + creatorId.lowercased()
+        return components.url
     }
 }

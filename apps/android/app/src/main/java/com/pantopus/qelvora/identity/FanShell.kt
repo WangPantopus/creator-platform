@@ -18,6 +18,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.Role
@@ -484,6 +485,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
     var appliedReturn by remember(baseURL) { mutableStateOf(returnTo) }
     var appliedDelivery by remember(baseURL) { mutableStateOf(destinationDelivery) }
     val scope = rememberCoroutineScope()
+    val uriHandler = LocalUriHandler.current
     val lifecycleOwner = LocalLifecycleOwner.current
     var foreground by remember(lifecycleOwner) { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
     DisposableEffect(lifecycleOwner) {
@@ -559,6 +561,9 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                         Button(QelvoraCopy.text("nativeHelpAndReports"), ButtonVariant.QUIET, block = true) { model.open("/support") }
                         Button(QelvoraCopy.text("nativeYourData"), ButtonVariant.QUIET, block = true) { model.open("/support/privacy") }
                         Button(QelvoraCopy.text("growthNotificationSettings"), ButtonVariant.QUIET, block = true) { model.open("/notifications/settings") }
+                        // WP 7.12: a creator's Studio is on the web; the system browser opens it,
+                        // signed in there or at its sign-in, which returns to this Studio.
+                        model.session?.creator?.let { creator -> StudioLink.url(creator.id)?.let { studio -> Button(QelvoraCopy.text("nativeOpenStudio", mapOf("studio" to QelvoraCopy.studioName)), ButtonVariant.SECONDARY, block = true) { runCatching { uriHandler.openUri(studio) } } } }
                         if (model.session?.creator != null) Button(QelvoraCopy.text("growthYourWeekImpact"), ButtonVariant.QUIET, block = true) { model.open("/studio/impact") }
                         if (model.session?.creator != null && context is android.app.Activity) CredentialSettings(context, model)
                     } else if (feature != null) key(model.session?.accountId, model.session?.sessionId, model.destination, destinationDelivery) { feature.screen(model) }
@@ -601,4 +606,17 @@ private fun HandleForm(model: FanSession) {
             Button(if (model.busy) QelvoraCopy.text("nativeSaving") else QelvoraCopy.text("nativeContinue"), ButtonVariant.SECONDARY, "lg", block = true, disabled = model.busy) { scope.launch { model.saveHandle(handle, if (model.session?.fan == null) "" else intro) } }
         }
     }
+}
+
+/** The web Studio of one creator: CREATOR_WEB_URL (an https origin; a debug build
+ *  may use a local http one) and /studio/{creatorId}. No origin, no link. */
+object StudioLink {
+    fun url(creatorId: String, origin: String = BuildConfig.CREATOR_WEB_URL): String? = runCatching {
+        val id = java.util.UUID.fromString(creatorId).toString()
+        val base = java.net.URI(origin)
+        val host = base.host
+        val local = BuildConfig.DEBUG && base.scheme == "http" && host in listOf("localhost", "127.0.0.1", "10.0.2.2")
+        if (host.isNullOrEmpty() || base.userInfo != null || base.rawQuery != null || base.rawFragment != null || base.rawPath !in listOf("", "/") || !(base.scheme == "https" || local) || !id.equals(creatorId, ignoreCase = true)) null
+        else java.net.URI(base.scheme, null, host, base.port, "/studio/$id", null, null).toString()
+    }.getOrNull()
 }

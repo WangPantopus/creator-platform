@@ -1601,7 +1601,8 @@ object QelvoraCopy {
     "nativeYourTimeSummaryIsUnavailable" to "Your time summary is unavailable until conversation activity is connected.",
     "nativeYoureOffline" to "You're offline",
     "nativeYoureSeeingASavedConversation" to "You're seeing a saved conversation with a short reading lease. Reconnect to send.",
-    "nativeYouveReachedThresholdOfYourMonthly" to "You’ve reached {threshold}% of your monthly limit."
+    "nativeYouveReachedThresholdOfYourMonthly" to "You’ve reached {threshold}% of your monthly limit.",
+    "nativeOpenStudio" to "Open {studio}"
   )
   private val variables = Regex("""\{([^}]+)\}""")
   fun text(key: String, values: Map<String, String> = emptyMap()): String = variables.replace(strings.getValue(key)) { match -> values[match.groupValues[1]] ?: match.value }

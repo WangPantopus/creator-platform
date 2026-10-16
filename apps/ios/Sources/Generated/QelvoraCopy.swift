@@ -1601,7 +1601,8 @@ public enum QelvoraCopy {
     "nativeYourTimeSummaryIsUnavailable": "Your time summary is unavailable until conversation activity is connected.",
     "nativeYoureOffline": "You're offline",
     "nativeYoureSeeingASavedConversation": "You're seeing a saved conversation with a short reading lease. Reconnect to send.",
-    "nativeYouveReachedThresholdOfYourMonthly": "You’ve reached {threshold}% of your monthly limit."
+    "nativeYouveReachedThresholdOfYourMonthly": "You’ve reached {threshold}% of your monthly limit.",
+    "nativeOpenStudio": "Open {studio}"
   ]
   private static let variables = try! NSRegularExpression(pattern: #"\{([^}]+)\}"#)
   public static func text(_ key: String, values: [String: String] = [:]) -> String {

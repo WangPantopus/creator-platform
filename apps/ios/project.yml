@@ -16,6 +16,7 @@ targets:
       properties:
         CreatorAPIURL: $(CREATOR_API_URL)
         CreatorLinkHost: $(CREATOR_LINK_HOST)
+        CreatorWebURL: $(CREATOR_WEB_URL)
         NSMicrophoneUsageDescription: Use your microphone for voice notes and calls you choose.
         NSCameraUsageDescription: Share your camera in a video call you choose to join.
         UIBackgroundModes: [audio]
@@ -28,6 +29,7 @@ targets:
       base:
         CREATOR_API_URL: ""
         CREATOR_LINK_HOST: ""
+        CREATOR_WEB_URL: ""
         PRODUCT_BUNDLE_IDENTIFIER: com.pantopus.qelvora
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Qelvora

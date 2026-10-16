@@ -17281,6 +17281,17 @@
           }
         }
       }
+    },
+    "Open {studio}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open {studio}"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

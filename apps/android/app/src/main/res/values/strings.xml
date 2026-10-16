@@ -1603,4 +1603,5 @@
   <string name="native_youre_offline" formatted="false">You\'re offline</string>
   <string name="native_youre_seeing_a_saved_conversation" formatted="false">You\'re seeing a saved conversation with a short reading lease. Reconnect to send.</string>
   <string name="native_youve_reached_threshold_of_your_monthly" formatted="false">You’ve reached {threshold}% of your monthly limit.</string>
+  <string name="native_open_studio" formatted="false">Open {studio}</string>
 </resources>
