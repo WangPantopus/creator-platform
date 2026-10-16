@@ -120,9 +120,34 @@ private struct GrowthNotification: Decodable, Identifiable {
   let id: String
   let type: String
   let sender: String
+  let authorKind: String
+  let creatorName: String
   let preview: String
   let destination: String
   let readAt: String?
+  let createdAt: String
+  /// The authorship tile: the same kinds as messages; a system notice has the inbox.
+  var kind: NotificationKind {
+    switch authorKind {
+    case "ai": .ai
+    case "approved_draft": .approved
+    case "human_broadcast": .note
+    case "human_reaction": .reaction
+    case "team": .team
+    case "human_creator", "human_call": .maya
+    default: .system
+    }
+  }
+  /// As the web inbox: today's time ("14:05"), otherwise the day ("Oct 14"), on this phone's clock.
+  var time: String? {
+    let precise = ISO8601DateFormatter()
+    precise.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+    guard let date = precise.date(from: createdAt) ?? ISO8601DateFormatter().date(from: createdAt) else { return nil }
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.dateFormat = Calendar.current.isDateInToday(date) ? "HH:mm" : "MMM d"
+    return formatter.string(from: date)
+  }
 }
 struct GrowthRequestFailure: Error {
   let status: Int
@@ -353,16 +378,14 @@ public struct GrowthFanFeature: View {
             if route == "/notifications" && notifications.isEmpty && !loading && error.isEmpty {
               EmptyState(title: QelvoraCopy.text("growthNoUpdatesYet"), body: QelvoraCopy.text("growthYourInAppRecordCannotBeTurnedOff"))
             }
-            ForEach(route == "/notifications" ? notifications : []) { item in
-              SwiftUI.Button {
-                openNotification(item)
-              } label: {
-                VStack(alignment: .leading, spacing: 6) {
-                  Text(item.sender).qText("label")
-                  Text(item.preview).qText("body")
-                }.frame(maxWidth: .infinity, alignment: .leading).padding(.vertical, 16)
-              }.buttonStyle(.plain).accessibilityLabel(item.sender + ". " + item.preview)
-            }
+            // Rows run edge to edge, divided by their own rules (the design's NotificationRow).
+            VStack(spacing: 0) {
+              ForEach(route == "/notifications" ? notifications : []) { item in
+                NotificationRow(kind: item.kind, name: item.creatorName, sender: item.sender, time: item.time, unread: item.readAt == nil, children: item.preview) {
+                  openNotification(item)
+                }
+              }
+            }.padding(.horizontal, -16)
           } else if route == "/home", let home {
             HStack {
               Text(QelvoraCopy.text("growthYourPeople")).qText("display-lg").accessibilityAddTraits(.isHeader).accessibilityFocused($homeHeadingFocused)

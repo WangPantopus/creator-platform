@@ -328,6 +328,7 @@
   <string name="growth_finding_creators" formatted="false">Finding creators</string>
   <string name="growth_usefulness" formatted="false">Usefulness</string>
   <string name="growth_notifications" formatted="false">Notifications</string>
+  <string name="growth_unread" formatted="false">Unread</string>
   <string name="growth_leaving" formatted="false">Leaving</string>
   <string name="growth_rating" formatted="false">Rating</string>
   <string name="growth_skip_rating" formatted="false">Skip rating</string>

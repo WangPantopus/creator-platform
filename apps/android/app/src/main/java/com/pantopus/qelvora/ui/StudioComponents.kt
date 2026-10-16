@@ -85,18 +85,28 @@ fun SourceRow(title: String, meta: String = "", scope: String = "public", state:
 }
 
 enum class NotificationKind { AI, MAYA, NOTE, APPROVED, REACTION, TEAM, SYSTEM }
+/** A notification: the authorship tile, the sender in that authorship's color,
+ * the preview, the time, and while unread a dot and a stronger preview; a
+ * screen reader hears sender, preview, time, then "Unread" (WP 7.4 P2).
+ * [sender] is the server's label, shown verbatim instead of one assembled here. */
 @Composable
-fun NotificationRow(text: String, kind: NotificationKind = NotificationKind.AI, name: String = "Maya", audience: String = "Kiln Club members", systemLabel: String = copy("requestUpdate"), time: String = "", unread: Boolean = false, onOpen: () -> Unit = {}) {
-    val sender = when (kind) { NotificationKind.AI -> copy("aiAuthor", "name" to name); NotificationKind.MAYA -> name; NotificationKind.NOTE -> copy("noteAudience", "name" to name, "audience" to audience); NotificationKind.APPROVED -> copy("approvedNotification", "name" to name); NotificationKind.REACTION -> copy("reaction", "name" to name); NotificationKind.TEAM -> copy("teamNotification", "name" to name); NotificationKind.SYSTEM -> systemLabel }
+fun NotificationRow(text: String, kind: NotificationKind = NotificationKind.AI, name: String = "Maya", audience: String = "Kiln Club members", systemLabel: String = copy("requestUpdate"), time: String = "", unread: Boolean = false, sender: String? = null, onOpen: () -> Unit = {}) {
+    val label = sender ?: when (kind) { NotificationKind.AI -> copy("aiAuthor", "name" to name); NotificationKind.MAYA -> name; NotificationKind.NOTE -> copy("noteAudience", "name" to name, "audience" to audience); NotificationKind.APPROVED -> copy("approvedNotification", "name" to name); NotificationKind.REACTION -> copy("reaction", "name" to name); NotificationKind.TEAM -> copy("teamNotification", "name" to name); NotificationKind.SYSTEM -> systemLabel }
     val category = when (kind) { NotificationKind.AI -> "ai"; NotificationKind.TEAM -> "team"; NotificationKind.SYSTEM -> "surface-sunken"; else -> "maya" }
     val ink = qColor(when (category) { "ai" -> "ai-ink"; "team" -> "team-ink"; "maya" -> "maya-accent"; else -> "ink-muted" })
-    Column(Modifier.fillMaxWidth().background(qColor(if (unread) "surface" else "ground")).clickable(role = Role.Button, onClick = onOpen)) {
+    // Sender, preview, time, then "Unread", as sentences (no doubled full stop).
+    val parts = listOf(label, text) + listOfNotNull(time.takeIf { it.isNotEmpty() }, if (unread) QelvoraCopy.text("growthUnread") else null)
+    val spoken = parts.mapIndexed { index, part -> if (index == parts.lastIndex || part.endsWith(".") || part.endsWith("?") || part.endsWith("!")) part else "$part." }.joinToString(" ")
+    Column(Modifier.fillMaxWidth().background(qColor(if (unread) "surface" else "ground")).clickable(role = Role.Button, onClick = onOpen).clearAndSetSemantics { contentDescription = spoken; role = Role.Button; onClick { onOpen(); true } }) {
         Row(Modifier.padding(horizontal = T.space4, vertical = T.messagePadding), horizontalArrangement = Arrangement.spacedBy(T.space3)) {
             Box(Modifier.size(T.avatarSize).background(qColor(if (category == "surface-sunken") category else "$category-surface"), RoundedCornerShape(T.notificationRadius)), contentAlignment = Alignment.Center) {
                 if (kind == NotificationKind.MAYA) BasicText(creatorInitial(name), style = wordmarkStyle().copy(color = ink)) else Glyph(when (kind) { NotificationKind.AI -> "ring"; NotificationKind.NOTE -> "broadcast"; NotificationKind.APPROVED -> "approved"; NotificationKind.REACTION -> "heart"; NotificationKind.TEAM -> "team"; else -> "inbox" }, T.space4, ink)
             }
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(T.space1 / 2)) { TextLine(sender, "label"); TextLine(text) }
-            TextLine(time, "data-sm", "ink-muted")
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(T.space1 / 2)) { TextLine(label, "label", when (category) { "ai" -> "ai-ink"; "team" -> "team-ink"; "maya" -> "maya-ink"; else -> "ink" }); TextLine(text, strong = unread) }
+            Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(T.space2)) {
+                TextLine(time, "data-sm", "ink-muted")
+                if (unread) Box(Modifier.size(T.space2).background(qColor("ink"), CircleShape))
+            }
         }
         Hairline()
     }

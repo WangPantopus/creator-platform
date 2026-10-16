@@ -578,9 +578,12 @@ function addNotifications(world, account) {
   const kiln = [...world.creators.values()].find(
     (c) => c.handle === "kilnclub",
   );
+  // Note and reaction notices follow C4 (content/notices.ts): they open the
+  // thread, and a reaction's preview is the generic one (WP 7.4 P2). The post
+  // notice is an announcement, which may open a post (navigation N6, N18).
   const rows = [
     [
-      "note",
+      "announcement",
       "human_broadcast",
       copy("noteAudience", { name: "Maya", audience: "followers" }),
       "The Friday glaze clinic is back. Bring one test tile.",
@@ -593,8 +596,8 @@ function addNotifications(world, account) {
       "reaction",
       "human_reaction",
       copy("reaction", { name: "Maya" }),
-      "Maya reacted to your reply.",
-      `/creators/maya`,
+      copy("growthHiddenUpdate"),
+      `/creators/maya/chat`,
       maya,
       50,
       false,
@@ -628,6 +631,16 @@ function addNotifications(world, account) {
       maya,
       1500,
       true,
+    ],
+    [
+      "note",
+      "human_broadcast",
+      copy("noteAudience", { name: "Maya", audience: "members" }),
+      "Studio note: the kiln is cooling until Thursday.",
+      `/creators/maya/chat`,
+      maya,
+      3000,
+      false,
     ],
   ];
   rows.forEach(

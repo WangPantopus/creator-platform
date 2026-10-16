@@ -29,6 +29,8 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.input.ImeAction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -77,6 +79,28 @@ private fun java.io.InputStream.readUpTo(limit: Int): ByteArray {
 }
 
 private fun JSONObject.objects(key: String): List<JSONObject> {val values = optJSONArray(key) ?: return emptyList(); return (0 until values.length()).mapNotNull { values.optJSONObject(it) }}
+
+/** The authorship tile for a notification: the same kinds as messages; a system notice has the inbox. */
+private fun notificationKind(authorKind: String) = when (authorKind) {
+    "ai" -> NotificationKind.AI
+    "approved_draft" -> NotificationKind.APPROVED
+    "human_broadcast" -> NotificationKind.NOTE
+    "human_reaction" -> NotificationKind.REACTION
+    "team" -> NotificationKind.TEAM
+    "human_creator", "human_call" -> NotificationKind.MAYA
+    else -> NotificationKind.SYSTEM
+}
+/** As the web inbox: today's time ("14:05"), otherwise the day ("Oct 14"), on this phone's clock. */
+private fun notificationTime(value: String): String = runCatching {
+    val at = java.time.OffsetDateTime.parse(value).atZoneSameInstant(java.time.ZoneId.systemDefault())
+    at.format(java.time.format.DateTimeFormatter.ofPattern(if (at.toLocalDate() == java.time.LocalDate.now()) "HH:mm" else "MMM d", java.util.Locale.US))
+}.getOrDefault("")
+/** Widens a child past its parent's padding on both sides, so a row can run edge to edge. */
+private fun Modifier.bleed(by: Dp) = layout { measurable, constraints ->
+    val extra = by.roundToPx()
+    val placeable = measurable.measure(constraints.copy(minWidth = constraints.maxWidth + 2 * extra, maxWidth = constraints.maxWidth + 2 * extra))
+    layout(constraints.maxWidth, placeable.height) { placeable.place(-extra, 0) }
+}
 
 @Composable
 private fun GrowthHomeHeader(onNotifications: () -> Unit) {
@@ -266,7 +290,10 @@ fun GrowthFanFeature(baseUrl: String?, token: () -> String? = { null }, destinat
                 }
                 route.startsWith("/notifications") -> {
                     BasicText(QelvoraCopy.text("growthNotifications"), style = qText("display-lg").copy(color = ink));Button(QelvoraCopy.text("growthSettings"), ButtonVariant.QUIET) {navigate("/notifications/settings")}
-                    if(route == "/notifications") notifications.forEach { item -> Column(Modifier.fillMaxWidth().clickable(role = Role.Button) { navigate("/notifications/${item.getString("id")}") }.padding(vertical = 16.dp).semantics {contentDescription = item.getString("sender") + ". " + item.getString("preview")}, verticalArrangement = Arrangement.spacedBy(6.dp)) {BasicText(item.getString("sender"), style = qText("label").copy(color = ink));BasicText(item.getString("preview"), style = qText("body").copy(color = ink))} }
+                    // Rows run edge to edge, divided by their own rules (the design's NotificationRow).
+                    if(route == "/notifications") Column(Modifier.bleed(16.dp)) { notifications.forEach { item ->
+                        NotificationRow(item.getString("preview"), notificationKind(item.getString("authorKind")), name = item.getString("creatorName"), sender = item.getString("sender"), time = notificationTime(item.getString("createdAt")), unread = item.isNull("readAt")) { navigate("/notifications/${item.getString("id")}") }
+                    } }
                     if (route == "/notifications" && notifications.isEmpty() && !loading && error.isEmpty()) EmptyState(QelvoraCopy.text("growthNoUpdatesYet"), QelvoraCopy.text("growthYourInAppRecordCannotBeTurnedOff"))
                 }
                 creator != null -> {
