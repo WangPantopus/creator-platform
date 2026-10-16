@@ -2,8 +2,8 @@
 
 Updated: 2026-10-16, by the lane 3 session
 Working on: B5 (memory proposals), PR #490. Last done: A5 (safety check after acknowledgment), #489
-Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482, A5 #489, B5 #490
-Next: the in-thread memory prompt (B5 web), finding 18 (context exclusions), finding 5; B8 after #441 and #446 merge; B6 waits on the provider key and the embedding choice
+Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482, A5 #489, B5 #490, B5 web #491, finding 18 F18_PR
+Next: finding 5; B8 after #441 and #446 merge; B6 waits on the provider key and the embedding choice
 Blocked on: nothing. Later: the embedding choice (B6), the real model for B1's model check and finding 13 (gateway)
 
 ## Resume here (2026-10-16, B4)
@@ -72,12 +72,22 @@ writer active every step passes:
 - no stores nothing and the same key is not proposed again, while a different key still is;
 - no key stored twice; a crisis answer and an off-the-record message run no extraction.
 
-Not in this PR: the in-thread "Want me to remember this? Only if you say yes." prompt (web, then
-lane 7): the memory view already lists proposals with accept and delete; a proactive first turn on
+Not in this PR: a proactive first turn on
 return (the AI uses the open loop when the fan writes); the guard treating memory as evidence (C6);
 200 items; account deletion and export (lane 1's sign-in, finding 11). Hold sizing (#438) must add
 one extraction and five sensitivity calls to `maximumGenerationCalls` (main's run ceiling already
 counts them).
+
+**In the thread (web, stacked PR #491).** Under the AI answer it came from, each proposal is asked with
+the fixed question "Want me to remember this? Only if you say yes." and Remember / Don't remember
+(existing copy keys `sensitiveMemory`, `remember`, `dontRemember`); a remembered item shows as
+"Remembered: …" with "Don't remember this" (`remembered`, `dontRememberThis`). The thread loads the fan's
+memory list with each page refresh (the worker writes proposals before the answer's final frame, so
+the reconciling refresh brings them) and decides through W3's existing memory endpoint. Default taken:
+every proposal gets the fixed question, not only sensitive ones, because W3 makes every item a proposal.
+`e3b5-memory-web.mjs` (installed Chrome, headless, writer applied locally): asked under the answer;
+Remember makes it memory and shows it; Don't remember this undoes it at once; Don't remember stores
+nothing; a sensitive item records its consent: 7 of 7. Lane 7 follows natively.
 
 Finding 18 (W3): once a thread has any exclusion ("don't remember this" or a deleted memory), the
 conversation context drops **all** memory and all history for that thread (W3's interim rule until a
@@ -85,6 +95,20 @@ semantic classifier purpose exists), so after one "no" the AI forgets everything
 removes only what it names" therefore holds for proposals but not for context; the fix replaces
 `creator.generation_conversation_context` (a migration) to drop only the excluded keys and the
 messages the fan marked.
+
+**Finding 18 fix (migration proposal, PR F18_PR, stacked on B5).** `pending_w3_generation_context_exclusions.sql`
+replaces `creator.generation_conversation_context` with the live definition changed in one place:
+history, memory and intro load whenever the thread is not off the record; excluded memory keys and
+the messages the fan marked "don't remember this" (W3 already sets them and their answer off the
+record) stay out. The restrictive fan-profile policy loses only its no-exclusions clause. Owner,
+signature, grants and every other check are unchanged. The context consumer accepts the reviewed
+replacement (`NNNN_w3_generation_context_exclusions`, source `5937065f…`) through the existing
+`generationDefinitions` route, which the worker custody now applies to the context receipt too.
+Default taken: a deleted memory's paraphrase elsewhere in recent history is no longer hidden by
+dropping everything (INV-15 still excludes the deleted item itself); W3 had chosen to drop all until a
+semantic classifier exists. E3B.5 with only B5 active: "after a no" warns and "don't remember this
+removes only that message" fails; with the fix both pass (local activation, pins and receipts not
+committed). Backend suite 157 of 157.
 
 ## A5: the model's safety check leaves the path before acknowledgment
 
@@ -587,4 +611,5 @@ Model gateway spend for lane 3 so far: 124 calls, 304,174 micros (/\_\_stats, 20
 | Lane 4     | `creator.generation_typed_original_allowance_receipt` (W4, the provenance check)                                        | Replace `OR u.provider_state IS DISTINCT FROM 'completed'` with `OR (u.provider_state IS DISTINCT FROM 'completed' AND NOT (u.provider_state='admitted' AND receipt.state='unknown' AND p.approval->>'kind'<>'crisis'))` (tested by hand: definition checksum 9e0c8329… → 6798d104…; pins `runtimeCatalogues.financial` and `purposeProfiles` change)                                                                               | Finding 9: a crash once a sentence is stored is never recovered                                              |
 | Integrator | `tests/scenarios/integrator/anthropic-adapter.mts` (case A6)                                                            | Expect a `ProviderResponseError` with a known zero usage for a non-2xx answer before any body (code, upstream status and the no-secret check are unchanged)                                                                                                                                                                                                                                                                         | A6a makes that error a known zero cost, as the brief decided; this case pinned the old behavior              |
 | Integrator | `infra/migrations.json`, `infra/migrations/reviews/*`, the worker custody                                               | Register `apps/backend/src/modules/conversation/migrations/pending_w3_generation_memory_proposals.sql` (version `NNNN_w3_generation_memory_proposals`, source SHA-256 `d84d6e02…`); regenerate the pins (on lane 3's stack only the new role's reach changed: 13 groups); add `custody.memory` `{consumer, catalogueChecksum}` and the same receipt to W1's `identity.consumers` (definition SHA-256 `583262e5…` on lane 3's stack) | B5: memory proposals stay off until registered                                                               |
+| Integrator | `infra/migrations.json`, the head review                                                                                | Register `pending_w3_generation_context_exclusions.sql` (`NNNN_w3_generation_context_exclusions`, source SHA-256 `5937065f…`) after B5's, add it to the wave's `sources` and a `generationDefinitions` entry for `creator.generation_conversation_context(uuid,uuid)` (owner `creator_generation_conversation_context`), regenerate the pins                                                                                        | Finding 18: an exclusion removes only what it names                                                          |
 | Lane 1     | `modules/trust/restoration.ts` (`assertGenerationWorkerRestoredInTransaction`)                                          | The same wrapper, if W8 agrees its restoration facts cannot change inside one transaction                                                                                                                                                                                                                                                                                                                                           | 41 runs per answer                                                                                           |
