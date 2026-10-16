@@ -2,8 +2,8 @@
 
 Updated: 2026-10-16, by the lane 1 session (Claude Opus 5.5)
 
-Working on: nothing in flight. Every unblocked work package has a pull request; what remains
-waits on the people listed under "Blocked on". On 2026-10-16 the founder chose the proposed
+Working on: nothing in flight. Every unblocked work package is merged except #439, which waits
+for its migration; what remains waits on the people listed under "Blocked on". On 2026-10-16 the founder chose the proposed
 default for P1, P2, R1, O1 and O2 and asked lane 1 to take its own recommended default for any
 further decision; those defaults are marked "default" below.
 
@@ -11,43 +11,35 @@ Merged: #406 (WP 1.1, the option D decision pack), #407 (WP 1.4, contract C1 and
 (WP 1.7, identity and media finish a fan's deletion), #431 (WP 1.2, the sign-in backend; its
 migration registered as `0249_w1_qelvora_sign_in` in #442) and #432 (WP 1.3, web sign-in).
 
+Merged on 2026-10-16 at the founder's request (lane 1 merged them; each was green and conflict-free,
+and the combined main passed typecheck, `generate:check`, CI's backend suite 157 of 157 and the
+lane 1 scenarios e1-2-under-18-data, e1-9-authorship, e1-sign-in-wording and
+e1-8-sign-in-delete):
+
+- #437 WP 1.5: the shared signing panel recovers when a publication is refused.
+- #440 WP 1.6: reviewers cannot review their own cases; stuck effects show why (`lane-1-ops.md`).
+- #454 WP 1.7: deletion and export for Apple and Google accounts (section 8 of `lane-1-deletion.md`).
+- #458 E1.5 with a creator who signs in with Apple (a scenario).
+- #461 the approved sign-in wording for Apple and Google accounts.
+- #472 WP 1.6 (O2): the ops reviewer command (`lane-1-ops-runbook.md`); pending migration
+  `pending-ops-member-admin.sql`, to register.
+- #475 WP 1.6 (O1): supervisors see every reviewer's access records; pending migration
+  `pending-supervisor-audits.sql`, to register (until then supervisors see their own, as before).
+- #478 WP 1.6 (P2): a supervisor lifts a pause; pending migration `pending-lift-pause.sql`, to
+  register (until then a lift answers `503 pause_lift_unavailable`).
+- #479 WP 1.6 (R1): the Note-reply queue waits on activating `0156_w8_reply_review`
+  (`lane-1-reply-queue.md`).
+- #480 E1.9: authorship cannot be forged (a scenario).
+- #481 WP 1.9: nothing that identifies a person under 18 is kept; the policy page for younger
+  people.
+- #483 E1.10: crisis resources by region; the data-safety source document.
+
 Open:
 
-- WP 1.5, signing fixes: the shared signing panel recovers when a publication is refused; decisions
-  on recovery and Android 8 and 9 in `lane-1-signing.md`: #437 (`lane-1/signing-fix`, on main).
 - WP 1.5, a lost passkey retires and past signatures stay valid; a compromised one revokes (founder,
-  2026-10-15); the second-passkey prompt: #439 (`lane-1/passkey-retirement`, stacked on #437).
-  Pending migration `pending-passkey-retirement.sql`; register with the pull request.
-- WP 1.6 (first part), the ops console proven end to end; reviewers cannot review their own cases;
-  stuck effects show why; findings and decisions in `lane-1-ops.md`: #440 (`lane-1/ops-console`, on
-  main).
-- WP 1.7 (second part), deletion and export for Apple and Google accounts: tokens revoked at the
-  provider, identities deleted, the account closed; D2's working default (founder, 2026-10-15);
-  section 8 of `lane-1-deletion.md`: #454 (`lane-1/signin-deletion`, on main).
-- E1.5 for a creator who signs in with Apple: sign-in, verification, a passkey, a signed and
-  published Note and its public page, with edges: #458 (`lane-1/e1-5-apple-creator`, on main,
-  a scenario only).
-- Copy: the founder's approved sign-in wording for Apple and Google accounts in lane 1's files
-  ("Sign in again" instead of "Continue with Pantopus"): #461 (`lane-1/sign-in-wording`, on main).
-  It and #439 both touch the recovery notice in `setup.tsx`; lane 1 resolves whichever merges
-  second. All of lane 1's sign-in and shared-account wording is approved and in it (founder,
-  2026-10-15); `e1-sign-in-wording.mjs` 12 of 12.
-- WP 1.6 (O2), a runbook command adds and removes ops reviewers, each change logged with the
-  operator and reason; runbook `lane-1-ops-runbook.md`; pending migration
-  `pending-ops-member-admin.sql`: #472 (`lane-1/ops-members`, on main).
-- WP 1.6 (O1), supervisors see every reviewer's case access records in their queues: #475
-  (`lane-1/supervisor-audits`, on main); pending migration `pending-supervisor-audits.sql`.
-- WP 1.6 (P2), a supervisor lifts a pause from its case: the unfinished pause action is cancelled,
-  conversations reopen, `agent.resume` waits for lane 3: #478 (`lane-1/lift-pause`, on main);
-  pending migration `pending-lift-pause.sql`.
-- WP 1.6 (R1), the Note-reply queue waits on activating `0156_w8_reply_review` (held and
-  unapplied, so no reply is ever reviewed today); the clean-reply screen's design, off by default
-  until the term list is reviewed (default): #479 (`lane-1/reply-screen`, docs only).
-- E1.9, authorship cannot be forged: #480 (`lane-1/e1-9-authorship`, a scenario only).
-- WP 1.9, nothing that identifies a person under 18 is kept (default), and the policy page for
-  younger people linked from the under-18 state: #481 (`lane-1/under-18`, stacked on #454).
-- E1.10, crisis resources by region (default list, counsel to confirm) and the data-safety source
-  document `lane-1-data-safety.md`: #483 (`lane-1/compliance`, on main).
+  2026-10-15); the second-passkey prompt: #439 (`lane-1/passkey-retirement`). Up to date with main
+  and green; `e1-5-key-loss.mjs` 15 of 15 after the merge. **Held until its migration
+  `pending-passkey-retirement.sql` is registered**: before that, "It's lost or broken" would fail.
 
 Next, as each blocker clears: build R1 and prove E1.7 once 0156 is active; after #439's migration
 is registered, its signing reads use the plain column and the identity export adds `retired_at`;
@@ -59,7 +51,8 @@ Blocked on:
   resources and the data-safety document (#483), and R1's term list (#479).
 - The integrator: activating `0156_w8_reply_review` (blocks E1.7 and R1); registering the pending
   migrations of #439, #472, #475 and #478.
-- Lane 4: P1, settling a paused creator's open paid requests, so a pause action can finish.
+- Lane 4: P1, settling a paused creator's open paid requests, so a pause action can finish (lane 4's
+  #463 is open for it).
 - Lane 3: an `agent.resume` action handler, so a lifted pause brings the AI back (#478).
 - The founder's deletion decisions D1, D3 and D4 ([deletion findings, section 4](lane-1-deletion.md)):
   creator signature retention, how long the redacted fan record is kept, and Q16. D2 (sign-in
