@@ -27,13 +27,13 @@ struct StoreMembershipPane: View {
             ForEach(coordinator.products, id: \.id) { product in
                 Button(product.displayName + " · " + product.displayPrice, variant: .secondary, block: true, disabled: coordinator.busy || !available) { operation?.cancel(); operation = Task { await coordinator.purchase(product, accountID: accountID) } }
             }
-            Button("Restore purchases", variant: .quiet, disabled: coordinator.busy || !available) { operation?.cancel(); operation = Task { await coordinator.restore() } }
+            Button(QelvoraCopy.text("nativeRestorePurchases"), variant: .quiet, disabled: coordinator.busy || !available) { operation?.cancel(); operation = Task { await coordinator.restore() } }
             StoreSubscriptionManagement(disabled: coordinator.busy)
-            if !coordinator.status.isEmpty { Notice(title: "Store status", children: coordinator.status) }
+            if !coordinator.status.isEmpty { Notice(title: QelvoraCopy.text("nativeStoreStatus"), children: coordinator.status) }
         }.task(id: productIDs) { coordinator.start(); await coordinator.load(productIDs: productIDs) }
             .onDisappear { operation?.cancel(); operation = nil; refreshOperation?.cancel(); refreshOperation = nil; coordinator.stop() }
             .onChange(of: coordinator.status) { _, value in
-                if value == "Purchase verified by the server. Refreshing access." { refreshOperation?.cancel(); refreshOperation = Task { await onVerified() } }
+                if value == QelvoraCopy.text("nativePurchaseVerifiedByTheServerRefreshing") { refreshOperation?.cancel(); refreshOperation = Task { await onVerified() } }
             }
     }
 }
@@ -45,7 +45,7 @@ struct StoreSubscriptionManagement: View {
     @State private var presented = false
     var body: some View {
         #if os(iOS)
-        Button("Manage in the App Store", variant: .quiet, disabled: disabled) { presented = true }
+        Button(QelvoraCopy.text("nativeManageInTheAppStore"), variant: .quiet, disabled: disabled) { presented = true }
             .manageSubscriptionsSheet(isPresented: $presented)
         #else
         EmptyView()
