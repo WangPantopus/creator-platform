@@ -9,9 +9,15 @@ the sweep both pass.
 node tests/scenarios/lane-4/stack.mjs up --no-web --ack-only   # the lane 4 stack plus the fake processor
 node tests/scenarios/lane-4/run.mjs                            # every scenario, one summary line each
 node tests/scenarios/lane-4/run.mjs e4-1 e4-12                 # only these
+node tests/scenarios/lane-4/run.mjs e4-9-paused-creator        # one that leaves Maya paused: by its full name, then reset
 node tests/scenarios/lane-4/sweep.mjs                          # the invariant sweep on its own
 node tests/scenarios/lane-4/stack.mjs down                     # remove the stack and the fake's record
 ```
+
+Scenarios that pause Maya through lane 1's ops decision (`e4-9-paused-creator`,
+and `e4-3-departure` once #463 lands) leave her paused, because nothing can
+unpause her yet. `run.mjs` runs them only when named in full; reset the stack
+after each (`node tests/scenarios/lane-4/stack.mjs reset --ack-only --growth`).
 
 Use the toolchain from the working agreement (section 3.7) first. Lane 4's ports
 are 56440 to 56449: PostgreSQL 56440, backend 56441, web 56442, model fake 56443,
