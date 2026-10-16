@@ -23,8 +23,10 @@ import kotlinx.serialization.json.*
 @Serializable data class ConversationComparisonResult(val included: Boolean)
 
 /** Live consent is never saved in app storage. Closing/backgrounding cancels
- * the actual HTTP call, including a question's provider operation. */
-@Composable fun ConversationComparisonChoice(client: ConversationClient, root: String, messageId: String? = null) {
+ * the actual HTTP call, including a question's provider operation. When
+ * comparisons are off, or turn off while it is open, it shows nothing and calls
+ * [onUnavailable] so the screen that opened it can close it (WP 7.4 P11). */
+@Composable fun ConversationComparisonChoice(client: ConversationClient, root: String, messageId: String? = null, onUnavailable: () -> Unit = {}) {
     var choice by remember(client, root) { mutableStateOf<ConversationComparisonConsent?>(null) }
     var available by remember(client, root) { mutableStateOf<Boolean?>(null) }
     var busy by remember(client, root) { mutableStateOf(false) }
@@ -37,6 +39,12 @@ import kotlinx.serialization.json.*
     var foreground by remember(lifecycle) { mutableStateOf(lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
     fun conceal() { revision++; operation?.cancel(); operation = null; choice = null; available = null; busy = false; failure = ""; status = "" }
     fun current(ticket: Int) = foreground && ticket == revision
+    // The server's answer when comparisons are off: the choice closes and nothing is said.
+    fun unavailable(error: Exception): Boolean {
+        if ((error as? ConversationFailure)?.code != "comparison_unavailable") return false
+        choice = null; failure = ""; status = ""; available = false
+        return true
+    }
     DisposableEffect(lifecycle, client, root) {
         val observer = LifecycleEventObserver { _, _ ->
             foreground = lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
@@ -55,7 +63,7 @@ import kotlinx.serialization.json.*
                 val fresh = client.json.decodeFromJsonElement<ConversationComparisonConsent>(client.request("$root/comparison-consent"))
                 if (current(ticket)) choice = fresh
             }
-        } catch (error: Exception) { if (error is CancellationException) throw error; if (current(ticket)) failure = error.message ?: "Reconnect to view your comparison choice." }
+        } catch (error: Exception) { if (error is CancellationException) throw error; if (current(ticket) && !unavailable(error)) failure = error.message ?: "Reconnect to view your comparison choice." }
     }
     fun act(action: String) {
         val original = choice ?: return
@@ -78,17 +86,17 @@ import kotlinx.serialization.json.*
                         status = if (action == "withdraw") "Your comparison choice is withdrawn. Saved comparison questions and text have been removed. Affected exports remain unavailable while their files are removed." else "Your comparison choice is saved. Choose a question in the conversation to include it."
                     }
                 }
-            } catch (error: Exception) { if (error is CancellationException) throw error; if (current(ticket)) failure = error.message ?: "The result could not be confirmed. Refresh your choice before continuing." }
+            } catch (error: Exception) { if (error is CancellationException) throw error; if (current(ticket) && !unavailable(error)) failure = error.message ?: "The result could not be confirmed. Refresh your choice before continuing." }
             finally { if (current(ticket)) busy = false }
         }
     }
     LaunchedEffect(client, root, foreground) { if (foreground) refresh() else conceal() }
+    LaunchedEffect(available) { if (available == false) onUnavailable() }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         if (failure.isNotEmpty()) {
             Notice(title = "Comparison status", children = failure)
             Button("Refresh comparison choice", variant = ButtonVariant.SECONDARY, disabled = busy) { operation = scope.launch { refresh() } }
         }
-        if (available == false) BasicText("AI comparisons are not available yet.", style = qText("body").copy(color = qColor("ink")))
         if (choice == null && available != false && failure.isEmpty()) BasicText("Loading your comparison choice…", style = qText("body").copy(color = qColor("ink")))
         choice?.let { current ->
             BasicText(if (current.allowed) "Allowed for this creator" else "Off · optional", style = qText("data-sm").copy(color = qColor("ink")))

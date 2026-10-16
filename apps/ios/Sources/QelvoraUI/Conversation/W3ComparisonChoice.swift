@@ -6,10 +6,13 @@ struct W3ComparisonConsent: Decodable, Sendable { let policy: W3ComparisonPolicy
 struct W3ComparisonResult: Decodable, Sendable { let included: Bool }
 
 /// A live, separate-purpose choice. No choice or notice is persisted by the app.
+/// When comparisons are off, or turn off while it is open, it shows nothing and
+/// calls `onUnavailable` so the screen that opened it can close it (WP 7.4 P11).
 struct W3ComparisonChoice: View {
     let client: W3ConversationClient
     let root: String
     var messageId: String? = nil
+    var onUnavailable: () -> Void = {}
     @Environment(\.scenePhase) private var scenePhase
     @State private var choice: W3ComparisonConsent?
     @State private var available: Bool?
@@ -24,7 +27,6 @@ struct W3ComparisonChoice: View {
                 Notice(tone: .error, title: "Comparison status", children: failure)
                 Button("Refresh comparison choice", variant: .secondary, disabled: busy) { operation = Task { await refresh() } }
             }
-            if available == false { Text("AI comparisons are not available yet.").qText("body") }
             if choice == nil && available != false && failure.isEmpty { Text("Loading your comparison choice…").qText("body") }
             if let choice {
                 Text(choice.allowed ? "Allowed for this creator" : "Off · optional").qText("data-sm")
@@ -43,12 +45,19 @@ struct W3ComparisonChoice: View {
         .task(id: "\(root)-\(scenePhase)") { if scenePhase == .active { await refresh() } else { conceal() } }
         .onChange(of: scenePhase) { _, phase in if phase != .active { conceal() } }
         .onDisappear { conceal() }
+        .onChange(of: available) { _, value in if value == false { onUnavailable() } }
     }
     private func conceal() {
         revision += 1; operation?.cancel(); operation = nil
         choice = nil; available = nil; failure = ""; status = ""; busy = false
     }
     private func current(_ ticket: Int) -> Bool { revision == ticket && scenePhase == .active && !Task.isCancelled }
+    /// The server's answer when comparisons are off: the choice closes and nothing is said.
+    private func unavailable(_ error: any Error) -> Bool {
+        guard (error as? W3Failure)?.code == "comparison_unavailable" else { return false }
+        choice = nil; failure = ""; status = ""; available = false
+        return true
+    }
     private func refresh() async {
         revision += 1
         let ticket = revision; choice = nil; available = nil; failure = ""; status = ""
@@ -60,7 +69,7 @@ struct W3ComparisonChoice: View {
                 let fresh: W3ComparisonConsent = try await client.request(root + "/comparison-consent")
                 if current(ticket) { choice = fresh }
             }
-        } catch { if current(ticket) { failure = (error as? W3Failure)?.message ?? "Reconnect to view your comparison choice." } }
+        } catch { if current(ticket) && !unavailable(error) { failure = (error as? W3Failure)?.message ?? "Reconnect to view your comparison choice." } }
     }
     private func run(_ action: String) {
         guard !busy, scenePhase == .active, let choice else { return }
@@ -81,7 +90,7 @@ struct W3ComparisonChoice: View {
                     self.choice = fresh
                     status = action == "withdraw" ? "Your comparison choice is withdrawn. Saved comparison questions and text have been removed. Affected exports remain unavailable while their files are removed." : "Your comparison choice is saved. Choose a question in the conversation to include it."
                 }
-            } catch { if current(ticket) { failure = (error as? W3Failure)?.message ?? "The result could not be confirmed. Refresh your choice before continuing." } }
+            } catch { if current(ticket) && !unavailable(error) { failure = (error as? W3Failure)?.message ?? "The result could not be confirmed. Refresh your choice before continuing." } }
         }
     }
 }

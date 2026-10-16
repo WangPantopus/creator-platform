@@ -6,6 +6,7 @@ import { Router, clientOf, createHandler } from "./http.mjs";
 import { createWorld } from "./world.mjs";
 import { accept } from "./ws.mjs";
 import * as commerce from "./routes/commerce.mjs";
+import * as content from "./routes/content.mjs";
 import * as control from "./routes/control.mjs";
 import * as conversation from "./routes/conversation.mjs";
 import * as growth from "./routes/growth.mjs";
@@ -19,7 +20,15 @@ const port = Number(flag("--port", "56473"));
 
 export const world = createWorld();
 const router = new Router();
-for (const routes of [identity, growth, conversation, commerce, trust, control])
+for (const routes of [
+  identity,
+  growth,
+  conversation,
+  content,
+  commerce,
+  trust,
+  control,
+])
   routes.register(router);
 
 const server = http.createServer(createHandler(world, router));
@@ -70,8 +79,11 @@ server.on("upgrade", (req, socket) => {
       thread.fanAccountId !== auth.account.id
     )
       return connection.close(1008, "Subscription refused");
-    if (subscriptions.size >= 64)
+    if (!subscriptions.has(thread.id) && subscriptions.size >= 64)
       return connection.close(1008, "Subscription limit");
+    // Resuming the same thread replaces its listener. Otherwise the Map drops
+    // the old cleanup callback while the thread retains a duplicate listener.
+    subscriptions.get(thread.id)?.();
     for (const frame of thread.frames)
       if (frame.cursor > message.cursor) connection.send(JSON.stringify(frame));
     const listener = (frame) => connection.send(JSON.stringify(frame));

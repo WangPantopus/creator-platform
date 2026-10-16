@@ -1,0 +1,81 @@
+WP 7.3 local regression gates, 2026-10-09.
+Main merged through 21b3d4836. Operated draft scenarios are recorded separately.
+
+Android (offline Gradle, LANE-7 heavy-build lock, ANDROID_SERIAL=emulator-5574):
+./gradlew --offline :app:testDebugUnitTest :app:verifyPaparazziDebug :app:lintDebug :app:connectedDebugAndroidTest :app:assembleRelease -PcreatorApiUrl=
+BUILD SUCCESSFUL in 2m 51s; 133 tasks: 41 executed, 92 up-to-date.
+Unit/snapshot XML: 8 snapshots, 9 delivery protocol, 2 contract = 19 pass.
+Lint: 0 errors, 1164 warnings. No warning-free claim.
+Instrumentation XML: 9 unique tests; 4 pass, 5 skipped, 0 errors/failures.
+Skips: four ConnectedJourneyTest cases need selected backend inputs; the opt-in
+Lane7DraftInputFlow needs explicit boundary/Unicode mode (both operated separately).
+The Gradle progress counter printed 14; the XML contains 9 unique tests.
+Unsigned release APK built; distribution signing/install not run (WP 7.9).
+Debug DEX markers harness_actor, harness_reset, No development actor matches: 1 each.
+Release DEX: all three 0, fake API origin absent.
+
+iOS Swift package: 18 pass, 0 failures (8 delivery protocol, 2 generated contract,
+5 identity, 3 snapshot suites). Command: swift test --skip-update --jobs 4.
+iOS existing UI: FoundationFlowTests 2 pass; ConnectedJourneyTests 4 skipped
+by design (explicit backend journey inputs absent); 0 failures. TEST SUCCEEDED.
+Ad-hoc signed Debug with empty API origin, owned iPhone simulator, serial tests.
+Result: draft-ios-existing-ui.xcresult. No test or snapshot expectation weakened.
+
+iOS Release simulator: BUILD SUCCEEDED, x86_64 and arm64, ad-hoc signed.
+Debug markers: harness-actor=1, harness-reset=1, No development actor matches=1,
+DebugHarness=36. Release: all four 0; fake API origin absent; CreatorAPIURL empty.
+Distribution archive/physical installation/release sign-in: not run (WP 7.9).
+Post-merge/final harness contract: 51/51 current schema checks pass.
+Root typecheck: 7/7 tasks pass, forced execution, no cache, concurrency 1.
+Root eslint: pass. Root prettier: all matched files pass.
+Generated-file check: pass, 12 shared resources and 119 OpenAPI operations.
+App PR check reader: GitHub connection required; CI not inspected, no fallback.
+
+Post-merge gates, 2026-10-15 (resumed lane 7 session).
+Main through 7ca3982fe (incl. #379 WP 7.2) merged at 234d81d69, no rebase.
+The merge changed no lane 7 source; it brought lane 1's sign-in schemas (Session
+mode gains "qelvora"; new sign-in types), ten copy keys, regenerated native API
+and copy files, and backend/stack changes. Only gates those can affect were rerun.
+Founder decision recorded: the compact persistent author header is accepted.
+
+Restart note: the Mac restarted since 2026-10-09; the lane's simulator, emulator
+and build caches were gone. Recreated qelvora-lane7-ios (iPhone 17 Pro, iOS 26.5,
+new id 925D2C3D-...) and qelvora-lane7-android (Pixel 7, Android 35 google_apis,
+GPU swiftshader) from installed runtimes. Downloads: Gradle 8.9 (wrapper pin,
+~130 MB, fetched before asking, reported to the founder); with the founder's yes,
+the 7 pinned iOS packages (~150 MB) and the missing pinned Android dependencies
+(Gradle cache +254 MB). The iOS runner now finds the simulator by name.
+
+Generated-file check: pass (12 shared resources, 119 OpenAPI operations).
+Harness contract check: 51/51 against the merged schemas.
+Root typecheck (forced, concurrency 1): 7/7 tasks pass.
+
+Android (LANE-7 lock, emulator-5574): ./gradlew :app:testDebugUnitTest
+:app:verifyPaparazziDebug :app:lintDebug :app:connectedDebugAndroidTest
+:app:assembleRelease -PcreatorApiUrl= -> BUILD SUCCESSFUL in 7m 45s, 133 tasks.
+Unit/snapshot XML 19 pass. Lint 0 errors (1181 warnings, 19 information; was
+1164 warnings before the merge). Instrumentation 9 unique: 4 pass, 5 skipped by
+design, 0 failures. Release DEX: harness_actor, harness_reset, "No development
+actor matches" and 127.0.0.1:56473 all 0; debug DEX has the three markers once each.
+
+iOS (LANE-7 lock, ad-hoc signed, empty API origin): Debug build-for-testing
+succeeded; existing UI suites FoundationFlowTests 2 pass, ConnectedJourneyTests 4
+skipped by design, 0 failures. Release simulator build succeeded (arm64, x86_64);
+release binary has 0 of harness-actor, harness-reset, "No development actor
+matches", DebugHarness and 127.0.0.1:56473; CreatorAPIURL empty. swift test:
+18 pass (8 delivery protocol, 2 generated contract, 5 identity, 3 snapshot).
+D6 on the real stack was rerun because the backend behind it changed; it found
+a WP 7.3 defect (see 7-3-real-stack-run.txt). After the fix (Trust.kt,
+Trust.swift) and the runner changes, rerun on the final code:
+Android: testDebugUnitTest verifyPaparazziDebug lintDebug connectedDebugAndroidTest
+assembleRelease -> BUILD SUCCESSFUL in 4m 33s. Unit/snapshot 19 pass. Lint 0
+errors (1181 warnings, unchanged). Instrumentation 9 unique: 4 pass, 5 skipped by
+design. Release DEX: all four markers 0.
+iOS: existing UI 6 = 2 pass, 4 skipped by design, 0 failures; Release build
+succeeded, all five markers 0, CreatorAPIURL empty; swift test 18 pass.
+Changed scenario scripts pass prettier and eslint.
+App PR check reader: requires the founder's GitHub connection; CI not inspected.
+After the iOS freeze fix (W3FanFeatures.swift, compact layout): iOS existing
+UI 6 = 2 pass, 4 skipped by design, 0 failures; Release build succeeded, all
+five markers 0, CreatorAPIURL empty; swift test 18 pass. Android unchanged by
+that fix; D3T passes there.
