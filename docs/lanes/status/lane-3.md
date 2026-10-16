@@ -63,9 +63,9 @@ stack's model fake. Host load 6 to 9.
 | The next answer after the reader stops         | delivered                                                     | delivered                                                       |
 | Maya takes over mid-answer under a 300 ms hold | interrupted after 65.4 s, 1 sentence                          | interrupted after 64.5 s, 1 sentence; handback, then delivered  |
 
-- A takeover still ends the worker's answer only through lease recovery (about 64 s, on main too):
-  the stages refuse the changed thread, which is not this finding. The fan sees the takeover at once
-  (E3A.4).
+- A takeover still ends the worker's answer only through lease recovery (about 64 s, on main too).
+  That is finding 8, fixed by #455 (not merged; this branch is main). The fan sees the takeover at
+  once (E3A.4).
 - Ordinary load with the fix (`a1-measure.mjs --messages 10 --fans 2`, no extra reader, host load
   12): 20 of 20 delivered; the database log shows 19 stage refusals and one claim refusal, all
   retried, and no settlement refusal in that run. The four 1013 socket closes are finding 5 (this
