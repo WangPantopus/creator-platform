@@ -137,10 +137,12 @@ describeMoney("commerce money path: deadlines, crashes, races", () => {
       expect(await world.events(id)).toEqual(
         expect.arrayContaining(["commitment_resolution", "refunded"]),
       );
-      // The promised slot was spent; refunding does not hand it out again.
-      expect(await world.capacity()).toMatchObject({ used: 1, reserved: 0 });
+      // Refunded because it was not delivered, it gives its slot back (the
+      // founder's decision 2, 2026-10-16).
+      expect(await world.capacity()).toMatchObject({ used: 0, reserved: 0 });
 
-      // Running the clock again, or reconciling, refunds nothing more.
+      // Running the clock again, or reconciling, refunds nothing more and
+      // frees nothing more.
       expect(
         await world.service.reconcileDeadlines(world.creator.actor),
       ).toEqual({
@@ -148,6 +150,7 @@ describeMoney("commerce money path: deadlines, crashes, races", () => {
       });
       await world.service.reconcile(world.fan.actor, id);
       expect(world.provider.realCalls("refund")).toHaveLength(1);
+      expect(await world.capacity()).toMatchObject({ used: 0, reserved: 0 });
       await world.assertConserved();
     });
 
