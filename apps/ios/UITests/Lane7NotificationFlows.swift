@@ -50,8 +50,9 @@ final class Lane7NotificationFlows: XCTestCase {
         let shot = XCTAttachment(screenshot: app.screenshot())
         shot.name = name; shot.lifetime = .keepAlways; add(shot)
     }
+    /// Slow drags until the row can be tapped (at the largest text a row is most of a screen).
     private func reveal(_ element: XCUIElement) {
-        for _ in 0..<10 where !element.isHittable {
+        for _ in 0..<30 where !element.isHittable {
             let origin = app.coordinate(withNormalizedOffset: .zero), frame = app.frame
             origin.withOffset(CGVector(dx: frame.midX, dy: frame.height * 0.7))
                 .press(forDuration: 0.05, thenDragTo: origin.withOffset(CGVector(dx: frame.midX, dy: frame.height * 0.4)), withVelocity: .slow, thenHoldForDuration: 0.2)
