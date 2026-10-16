@@ -57,6 +57,9 @@ export default function CasePage({
   const [busy, setBusy] = useState(false);
   const [retryReason, setRetryReason] = useState("");
   const retryKey = useRef<string | null>(null);
+  const [liftReason, setLiftReason] = useState("");
+  const liftKey = useRef<string | null>(null);
+  const liftDialog = useRef<HTMLDialogElement>(null);
   const key = useRef<string | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
   const resolutionSource = useRef<string | null>(null);
@@ -79,6 +82,7 @@ export default function CasePage({
   }, [id, data?.queue, data?.kind, replyUnavailable]);
   useLayoutEffect(() => {
     if (!data) dialog.current?.close();
+    if (!data?.pause_active) liftDialog.current?.close();
   }, [data]);
   useEffect(() => {
     if (!data) return;
@@ -91,6 +95,9 @@ export default function CasePage({
   }, [data?.access_expires_at, refresh]);
   const epoch = useTrustSession(() => {
     dialog.current?.close();
+    liftDialog.current?.close();
+    setLiftReason("");
+    liftKey.current = null;
     setPurpose("");
     setReason("");
     setAmount("");
@@ -160,6 +167,34 @@ export default function CasePage({
               "Reconnect and retry the same recovery action.",
               "offline",
             ),
+      );
+    } finally {
+      if (epoch.current === current) setBusy(false);
+    }
+  };
+  const lift = async () => {
+    if (!data || !sessionState.ready || busy) return;
+    const current = epoch.current;
+    setBusy(true);
+    setActionError(null);
+    liftKey.current ??= crypto.randomUUID();
+    try {
+      await request(`cases/${id}/lift-pause`, {
+        version: data.version,
+        reason: liftReason,
+        idempotencyKey: liftKey.current,
+      });
+      if (epoch.current !== current) return;
+      liftDialog.current?.close();
+      liftKey.current = null;
+      setLiftReason("");
+      await refresh();
+    } catch (error) {
+      if (epoch.current !== current) return;
+      setActionError(
+        error instanceof TrustError
+          ? error
+          : new TrustError("Reconnect and retry the same action.", "offline"),
       );
     } finally {
       if (epoch.current === current) setBusy(false);
@@ -528,6 +563,41 @@ export default function CasePage({
             )}
             <ErrorState error={sessionState.concealed ? null : actionError} />
           </form>
+          {data.pause_active && (
+            <form
+              onSubmit={(event) => {
+                event.preventDefault();
+                liftDialog.current?.showModal();
+              }}
+            >
+              <label className="qv-field__label" htmlFor="lift-reason">
+                Lift pause · supervisor
+              </label>
+              <p className="qv-help">
+                The creator's conversations reopen at once and their AI returns
+                to the version that was live. Both parties receive the reason in
+                their trust inbox.
+              </p>
+              <textarea
+                id="lift-reason"
+                rows={3}
+                required
+                minLength={12}
+                maxLength={2000}
+                value={liftReason}
+                onChange={(event) => {
+                  setLiftReason(event.target.value);
+                  liftKey.current = null;
+                }}
+              />
+              <button
+                className="qv-btn qv-btn--secondary"
+                disabled={busy || !sessionState.ready}
+              >
+                Lift pause
+              </button>
+            </form>
+          )}
           {data.state === "action_pending" && (
             <form
               onSubmit={(event) => {
@@ -586,6 +656,31 @@ export default function CasePage({
             onClick={() => dialog.current?.close()}
           >
             Keep reviewing
+          </button>
+        </div>
+        <ErrorState error={sessionState.concealed ? null : actionError} />
+      </dialog>
+      <dialog className="trust-dialog" ref={liftDialog}>
+        <h2>Lift this pause?</h2>
+        <p>{liftReason}</p>
+        <p>
+          Conversations reopen now. The AI comes back once its resume completes;
+          if its license or proof lapsed meanwhile, the creator must republish.
+        </p>
+        <div className="actions">
+          <button
+            className="qv-btn qv-btn--secondary"
+            disabled={busy || !data || !sessionState.ready}
+            onClick={() => void lift()}
+          >
+            {busy ? "Lifting…" : "Lift and notify"}
+          </button>
+          <button
+            className="qv-btn qv-btn--quiet"
+            disabled={busy || !sessionState.ready}
+            onClick={() => liftDialog.current?.close()}
+          >
+            Keep paused
           </button>
         </div>
         <ErrorState error={sessionState.concealed ? null : actionError} />

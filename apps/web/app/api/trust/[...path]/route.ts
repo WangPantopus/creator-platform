@@ -6,7 +6,7 @@ import { trustLocalSessionCookie } from "../../../../lib/trust-session";
 const readable =
   /^(capabilities|help|status|session|cases|cases\/[0-9a-f-]{36}|my-cases|inbox|access-history|privacy\/jobs|privacy\/jobs\/[0-9a-f-]{36}(\/download(\/(identity|conversation|agent|commerce|content|media|growth|trust))?)?|operations\/(metrics|audits))$/i;
 const writable =
-  /^(reports|blocks|feedback|cases\/[0-9a-f-]{36}\/(access|decisions|appeals|effects\/retry)|privacy\/jobs|privacy\/jobs\/[0-9a-f-]{36}\/retry|dev\/session|dev\/logout)$/i;
+  /^(reports|blocks|feedback|cases\/[0-9a-f-]{36}\/(access|decisions|appeals|effects\/retry|lift-pause)|privacy\/jobs|privacy\/jobs\/[0-9a-f-]{36}\/retry|dev\/session|dev\/logout)$/i;
 
 function downloadFailure(request: NextRequest, target: string, code: unknown) {
   // Keep API errors as JSON. A clicked download is a document navigation and

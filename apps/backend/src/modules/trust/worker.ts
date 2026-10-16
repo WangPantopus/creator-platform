@@ -508,7 +508,7 @@ export class TrustWorker {
             reporter_account_id: string;
             subject_account_id: string | null;
           }>(
-            "UPDATE creator_trust.safety_case c SET state='resolved',closed_at=now(),updated_at=now(),version=version+1 WHERE c.id=$1 AND c.state='action_pending' AND NOT EXISTS(SELECT 1 FROM creator_trust.effect e WHERE e.case_id=c.id AND e.state<>'complete') RETURNING version,resolution_reason,reporter_account_id,subject_account_id",
+            "UPDATE creator_trust.safety_case c SET state='resolved',closed_at=now(),updated_at=now(),version=version+1 WHERE c.id=$1 AND c.state='action_pending' AND NOT EXISTS(SELECT 1 FROM creator_trust.effect e WHERE e.case_id=c.id AND e.state NOT IN('complete','cancelled')) RETURNING version,resolution_reason,reporter_account_id,subject_account_id",
             [effect.case_id],
           );
           const current = cases.rows[0];
