@@ -6,15 +6,16 @@ Working on: nothing in flight. Everything is in the open pull requests below.
 
 Open pull requests:
 
-| PR   | Branch                             | What                                                                                                                                                                                               | Needs                                                                                   |
-| ---- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| #425 | `lane-4/inbox-login` (draft)       | WP 4.2: the non-owner login that claims processor notifications                                                                                                                                    | **migration registration** (a new login role)                                           |
-| #447 | `lane-4/status-refresh`            | This status file                                                                                                                                                                                   | —                                                                                       |
-| #448 | `lane-4/share-grant-id`            | Lane 5's ticket: the share call returns the grant id growth's `createShare` takes                                                                                                                  | —                                                                                       |
-| #449 | `lane-4/summary-members-only`      | WP 4.9: the public summary marks members-only offers; its headline describes an offer any fan can ask for                                                                                          | lane 5 to show `modeMembersOnly`                                                        |
-| #450 | `lane-4/inbox-outage-fresh`        | `e4-3-inbox-outage` makes its own inbox login (the integrator's ticket)                                                                                                                            | —                                                                                       |
-| #459 | `lane-4/share-card-owners` (draft) | Lane 5's ticket: share cards. Commerce answers growth's `shareSource` (the fan's session) and `shareStatus` (no session, through one narrow definer function); proven through growth's real routes | **migration registration** and five regenerated catalogue pins; review by lanes 1 and 3 |
-| #453 | `lane-4/request-notices`           | Lane 5's ticket: request notices recorded in growth's notice table, handed to growth and withdrawn; one commitment reminder to the creator; proven end to end                                      | production composition waits on the two authorities below                               |
+| PR   | Branch                             | What                                                                                                                                                                                                                        | Needs                                                                                   |
+| ---- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| #425 | `lane-4/inbox-login` (draft)       | WP 4.2: the non-owner login that claims processor notifications                                                                                                                                                             | **migration registration** (a new login role)                                           |
+| #447 | `lane-4/status-refresh`            | This status file                                                                                                                                                                                                            | —                                                                                       |
+| #448 | `lane-4/share-grant-id`            | Lane 5's ticket: the share call returns the grant id growth's `createShare` takes                                                                                                                                           | —                                                                                       |
+| #449 | `lane-4/summary-members-only`      | WP 4.9: the public summary marks members-only offers; its headline describes an offer any fan can ask for                                                                                                                   | lane 5 to show `modeMembersOnly`                                                        |
+| #450 | `lane-4/inbox-outage-fresh`        | `e4-3-inbox-outage` makes its own inbox login (the integrator's ticket)                                                                                                                                                     | —                                                                                       |
+| #459 | `lane-4/share-card-owners` (draft) | Lane 5's ticket: share cards. Commerce answers growth's `shareSource` (the fan's session) and `shareStatus` (no session, through one narrow definer function); proven through growth's real routes                          | **migration registration** and five regenerated catalogue pins; review by lanes 1 and 3 |
+| #453 | `lane-4/request-notices`           | Lane 5's ticket: request notices recorded in growth's notice table, handed to growth and withdrawn; one commitment reminder to the creator; proven end to end                                                               | production composition waits on the two authorities below                               |
+| #463 | `lane-4/settle-departure`          | Lane 1's ticket (G1): `settleDeparture`. A paused creator's requests not yet accepted are released (nothing charged), accepted ones keep their deadline; the pause case resolves; proven through lane 1's real ops decision | the founder's yes on decision P1                                                        |
 
 Merged on main: #408, #410, #416, #418, #421, #423, #424, #427, #428, #429. #410's migration was registered through #442.
 
@@ -40,7 +41,8 @@ Blocked on:
   - the five decisions in `lane-4-decisions.md`: refunds and the monthly limit; refunds and weekly slots; one signature for accept and send; never placing a hold for a request that is already ending; whether expired requests count toward "usually decides in";
   - Stripe test keys (WP 4.7);
   - Q16, what happens to a fan's money records and open requests when the fan deletes their account (retention and refunds). Lane 1's deletion work waits on it, and so does the privacy registration that request notices need in production (#453);
-  - when the commitment reminder fires: proposed as the smaller of 24 hours and a quarter of the delivery window (#453).
+  - when the commitment reminder fires: proposed as the smaller of 24 hours and a quarter of the delivery window (#453);
+  - decision P1 (#463): when ops pauses a creator, her requests not yet accepted are released at once and nothing is charged (the fan sees the existing "queue didn't get to this · nothing charged"), and accepted ones keep their deadline and refund if it passes.
 - **Lane 1 (W8):** a worker denial for commerce notices, so that a background publisher can check who may be told (#453).
 - **Lane 3:** the `afterHumanReply` hook (C3), for automatic delivery (WP 4.4).
 - **Lanes 1 and 7:** WP 4.8 (native handoff, E4.14).
@@ -49,7 +51,7 @@ Blocked on:
 
 Tickets received:
 
-- **Lane 1 (#440, G1):** an ops pause needs lane 4's `settleDeparture` port. Not started; I will scope it after lane 5's tickets.
+- **Lane 1 (#440, G1):** an ops pause needs lane 4's `settleDeparture` port. Done in #463, waiting on the founder's P1.
 - **Lane 1 (#409):** commerce's part of a fan's deletion, in `modules/commerce/operations.ts`. Waits on the founder's Q16.
 - **Lane 5:**
   - the owner calls for request-status and commitment-due notices: done in #453; production composition waits on W8 and Q16;
@@ -95,11 +97,14 @@ Tickets to other lanes:
   - give the #425 login's pool an `error` listener;
   - register #425;
   - register #459's migration, regenerate its five catalogue pins, and compose `createCommerceShareOwners` into growth's owners (the wiring is in `tests/scenarios/lane-4/share-host.mts`);
-  - once W8's worker denial and the privacy registration exist, hand commerce's request notices to growth: `commerce.requestNotifications(scope, recipientAuthority, privacyRegistered, growth.notices)` pulled by `growth.relay` (#453).
+  - once W8's worker denial and the privacy registration exist, hand commerce's request notices to growth: `commerce.requestNotifications(scope, recipientAuthority, privacyRegistered, growth.notices)` pulled by `growth.relay` (#453);
+  - compose `settleDeparture: createCommerceDeparture({ service, index })` into the development trust and the production agent domain (the wiring is in `tests/scenarios/lane-4/trust-host.mts`, #463).
 - **Lane 3:** review #459's reply check against `deliveredTextCommand`; sharing approved AI drafts or voice replies would need your signed-subject rules.
 - **Lane 3, `ConversationService.humanReply`:** an optional `afterHumanReply(client, scope, message)` hook inside its transaction, so a reply delivers its one open written commitment atomically (C3, #418).
 - **Lane 1:**
   - a W8 worker denial for commerce notices (`creator, fan, recipient`), in the pattern of the publication and media worker denials (#453);
+  - the production work index needs `departureScopes(creatorId)` for `settleDeparture` (#463);
+  - a W8 public creator denial, so that the public summary (C8) stops listing a paused creator's offers;
   - review #459's signature checks against `matchesThreadAct` (and #439), and add a W8 negative authority for public share cards;
   - an operations case or console list for money escalations (`refund_escalated` events, `resolution_required` commitments) (#421);
   - optionally, a distinct `signed_act_expired` code (C3).
