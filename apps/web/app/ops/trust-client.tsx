@@ -524,7 +524,7 @@ export function TrustSession({
         className="qv-link-btn"
         href={`/api/auth/continue?returnTo=${encodeURIComponent(returnTo)}`}
       >
-        Continue with Pantopus
+        Sign in
       </a>
     ) : null;
   if (capability.error)
@@ -554,9 +554,7 @@ export function TrustSession({
             className="qv-link-btn"
             href={`/api/auth/continue?returnTo=${encodeURIComponent(returnTo)}`}
           >
-            {session.data
-              ? "Switch development account"
-              : "Continue with Pantopus"}
+            {session.data ? "Switch development account" : "Sign in"}
           </a>
         )}
         {session.data && (

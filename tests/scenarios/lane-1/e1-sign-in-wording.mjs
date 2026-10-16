@@ -159,6 +159,25 @@ step(
     : "Maya is not verified",
 );
 
+// The setup page's first step, and the ops console's sign-in link when
+// signed out (founder, 2026-10-15, in #461).
+const main = (await page.locator("main").innerText()).replace(/\s+/gu, " ");
+step(
+  "the setup page's first step reads “Sign in”",
+  /1 Sign in 2 Prove it’s you/u.test(main),
+  main.match(/1 .{0,40}2 Prove/u)?.[0] ?? main.slice(0, 120),
+);
+const visitor = await (await browser.newContext({ locale: "en-US" })).newPage();
+await visitor.goto(`${WEB}/ops`);
+await visitor.waitForLoadState("networkidle");
+const opsLinks = await visitor.getByRole("link").allInnerTexts();
+step(
+  "the ops console, signed out, offers “Sign in”",
+  opsLinks.includes("Sign in") &&
+    !opsLinks.some((text) => text.includes("Pantopus")),
+  opsLinks.join(" · ").slice(0, 160),
+);
+
 // A fresh sign-in, then signing-key recovery: its notice (this starts Maya's
 // recovery, so run on a fresh stack).
 await page.goto(`${WEB}/auth/continue?returnTo=%2Fstudio%2Fsetup`);

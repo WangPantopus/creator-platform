@@ -171,7 +171,7 @@ export function CreatorSetup({ initial }: { initial: Session }) {
     }
   };
   const steps = [
-    "Continue with Pantopus",
+    "Sign in",
     "Prove it’s you",
     "A passkey for signing",
     "Your license to your AI",

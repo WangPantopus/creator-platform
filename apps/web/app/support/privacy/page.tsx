@@ -31,7 +31,7 @@ function DownloadNotice() {
         <>
           <p>Verify your account again to download your export.</p>
           <a href="/api/auth/continue?returnTo=%2Fsupport%2Fprivacy">
-            Continue with Pantopus
+            Sign in again
           </a>
           <p>Your completed request will still be here when you return.</p>
         </>
@@ -416,7 +416,7 @@ export default function PrivacyPage() {
         {capability.data && !capability.data.localDevelopment && (
           <p className="qv-help">
             {capability.data?.verificationMethod === "current_session"
-              ? "Your sign-in must be recent. Continue with Pantopus again if asked to verify your account."
+              ? "Your sign-in must be recent. Sign in again if asked to verify your account."
               : "Fresh identity verification must be connected before this action is available."}
           </p>
         )}
