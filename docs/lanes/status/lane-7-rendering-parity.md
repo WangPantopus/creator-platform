@@ -14,10 +14,10 @@ waits on a contract or a founder decision says so, keeps today's behavior and mo
 | P3    | Step-in seal and the composer states           | Conversation page (`control`, `canSend`, `unavailableReason`)                     | Seal: #457. Composer states: a founder decision (below); trial, ended, capacity: no contract (ticket to lane 3) |
 | P4    | Citations                                      | Message `citations` (ids) and the creator's posts                                 | To survey                                                                                                       |
 | P5    | Named pickers instead of raw ids               | `GET /v1/conversations/account` (`threads[].name`)                                | Needs picker copy approved (proposed below)                                                                     |
-| P6    | Explicit provider consent                      | Capabilities `providers`, `POST .../consent`                                      | Built: `lane-7/provider-consent`                                                                                |
-| P7    | 18+ confirmation                               | C1 (lane 1) age screen and `adult_eligibility_required`                           | Overlaps WP 7.5; to survey                                                                                      |
+| P6    | Explicit provider consent                      | Capabilities `providers`, `POST .../consent`                                      | #460                                                                                                            |
+| P7    | 18+ confirmation                               | C1 (lane 1) age screen and `adult_eligibility_required`                           | The refusal: built, `lane-7/adults-only`. The age step itself: WP 7.5 (C1)                                      |
 | P8    | The 3-hour reminder                            | No server signal; client rule proposed                                            | Needs a founder decision on the rule                                                                            |
-| P9    | Packet terms block and ETA line                | `chargeRule`, `pendingHold`, `decisionEta`; lane 4's public summary `reliability` | ETA waits on lane 4's decision record (empty until then); Q04 keeps payment on the web                          |
+| P9    | Packet terms block and ETA line                | `chargeRule`, `pendingHold`, `decisionEta`; lane 4's public summary `reliability` | Copy decision: `chargeRule` says "she" for every creator; ETA waits on lane 4; Q04 keeps payment on the web     |
 | P10   | Share sheet for the card                       | Lane 5 share card (needs lanes 1, 3, 4)                                           | Waits on the share-card contract                                                                                |
 | P11   | Remove "AI comparisons are not available yet." | Comparison stays installed and off (2026-10-08)                                   | Copy change: founder approval                                                                                   |
 
@@ -230,6 +230,47 @@ with `ios-link-driver.mjs` running). The fake's `POST /__harness/flags` takes a 
 - **Also seen, not part of P6**: the provider terms link is a plain body-weight link on iOS and a
   bold, indented quiet button on Android. A small parity defect, to fix with the next consent work.
 
+## P7: the 18+ refusal
+
+A survey first: with every request refused with `403 adult_eligibility_required` after sign-in
+(an account flagged under 18), both apps showed "We can't reach your account right now. Your
+session is kept on this device." with Retry and Crisis help, and checked the session again four
+times in twelve seconds. D-11 and C1 say otherwise: the answer is final, the session ends, and the
+person sees the designed under-18 state "with the policy and nothing else". The rules below follow
+them, and correct this spec's first draft, which kept "Choose another account".
+
+### Rules
+
+1. A `403 adult_eligibility_required` on the session check, the session refresh or the development
+   sign-in ends the session on the device the way sign-out does (the credential, drafts, Notes and
+   every other private state removed), and the app shows the designed under-18 state: the
+   wordmark, `adultOnlyTitle` and `adultOnlyBody`, and nothing else (no retry, sign-in, tabs or
+   help), as the web's `/auth/adults-only` does.
+2. Nothing retries with the old session. A relaunch finds no session and shows the welcome;
+   signing in again with the same identity gets the same answer (C1).
+3. Another screen's own request may meet the refusal first and show its own unavailable state for
+   a moment; the session check (at launch, on return and every few seconds while the app is open)
+   then ends the session. The release sign-in (WP 7.5) will meet the same answer and use the same
+   handling.
+
+### Scenarios and results (fake API; synthetic identities and data; real apps, storage and HTTP)
+
+| ID   | Steps                                                                           | Expected                                                                                                                          | iOS        | Android               |
+| ---- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------- | --------------------- |
+| P7.1 | Devon is signed in on Home; the fake flags the account under 18 (an ops review) | Only the under-18 state; at least one refusal, then no request with the old session for ten seconds; a relaunch shows the welcome | pass       | pass                  |
+| P7.2 | The under-18 persona signs in (development sign-in)                             | The same state; no session kept                                                                                                   | pass       | pass                  |
+| P7.3 | Largest text, Night                                                             | The state in full                                                                                                                 | pass (AX5) | pass (font scale 2.0) |
+
+Commands: `node tests/scenarios/lane-7/e7-4-adults.mjs [A1 A2 A3]` (Android) and
+`node tests/scenarios/lane-7/ios-navigation.mjs <built.xctestrun> --adults [A1 A2 A3]` (iOS). The
+fake's `POST /__harness/accounts/:key {adult}` flags an account; its next authenticated request
+ends its session with the refusal, as `resolveSession` does.
+
+### For the founder
+
+- The designed state offers nothing else, so it no longer shows "Crisis help" (the web's page has
+  none either). Say if crisis help should stay on this screen.
+
 ## P2 to P11: the rules, written before the code
 
 Each becomes its own pull request with its own scenario table. What a piece cannot do yet is
@@ -278,9 +319,8 @@ The web support form asks for typed references too: ticket to lane 1 (`apps/web/
 
 **P6 Provider consent.** Built: see P6 above.
 
-**P7 18+ confirmation.** A sign-in refused with `adult_eligibility_required` shows
-`adultOnlyTitle` and `adultOnlyBody`, offers no retry into the same account, and keeps
-"Choose another account". The age screen itself is the release sign-in (C1, WP 7.5).
+**P7 18+ confirmation.** The refusal is built: see P7 above. The age step itself is the release
+sign-in (C1, WP 7.5).
 
 **P8 The 3-hour reminder.** No server signal exists. Proposed: after three hours of continuous use
 of an AI thread in the foreground (a gap of 15 minutes or more resets it), the thread shows the
@@ -291,7 +331,10 @@ decision needed (compliance wording is fixed; the counting rule is not).
 accepts. …" (`chargeRule`) and `pendingHold`, as the web packet does. The ETA line ("{name} usually
 decides in {range}") appears only when lane 4's public summary gives a non-empty `reliability`;
 until the decision record lands it is empty and the apps show nothing (never an invented range).
-Payment stays on the web (Q04).
+Payment stays on the web (Q04). Copy decision needed first: the fixed `chargeRule`
+sentence says "If she declines …" for every creator, whatever their pronouns (Kiln Club and
+Glazeco are not "she"); the web avoids it by showing only "Charged only when {name} accepts." Proposed: "If
+{name} declines or {deadline} pass, nothing is charged."
 
 **P10 Share sheet for the card.** Waits on the share-card contract (lane 5, with lanes 1, 3 and 4)
 and on a public domain for the verification link (WP 7.6). Not built in WP 7.4.
