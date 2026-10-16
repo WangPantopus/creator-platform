@@ -2,7 +2,9 @@
 // the processor is down, the request is left in an honest "unknown" state with
 // its slot held, and the scheduler, with nobody tapping, reconciles it to the
 // processor's truth: one hold, never two; one capture, never two; and a request
-// stuck while its hold was being placed is ended without leaking its slot.
+// stuck while its hold was being placed is ended without leaking its slot, and
+// without any hold (decision 4: it closes five minutes after its release began,
+// moved here; e4-10-ending-no-hold covers the wait).
 // The Stripe SDK retries once, with the same idempotency key, when a
 // connection is reset, so a lost answer is a reset twice in a row here.
 // Fakes: card processor (faults before and after acting), development
@@ -140,7 +142,7 @@ await step(
 );
 await step(
   "E4.9-1",
-  "a request stuck while its hold is placed (processor never answers) ends without leaking its slot",
+  "a request stuck while its hold is placed (processor never answers) ends without leaking its slot, and without any hold",
   async () => {
     // Every attempt is lost before the processor acts, so no hold ever exists.
     await stripe({
@@ -153,20 +155,26 @@ await step(
       "UPDATE creator.commerce_packet SET auth_pending_until=now()-interval '1 second' WHERE id=$1",
       [id],
     );
+    await until(
+      "the release of the stuck request",
+      async () => (await packetRow(id)).state === "releasing",
+    );
     await stripe({ clearFaults: true });
-    await until("the release of the stuck request", async () =>
+    await sql(
+      "UPDATE creator.commerce_effect SET created_at=CASE WHEN operation='release' THEN now()-interval '330 seconds' ELSE created_at END,next_at=now() WHERE packet_id=$1 AND state<>'done'",
+      [id],
+    );
+    await until("the end of the stuck request", async () =>
       ["expired", "draft"].includes((await packetRow(id)).state),
     );
     const after = await reserved();
     const p = await packetRow(id);
-    const open = (await intentsFor(id)).filter(
-      (i) => i.status === "requires_capture",
-    ).length;
+    const intents = (await intentsFor(id)).length;
     expect(
-      after.reserved === before.reserved && open === 0,
-      `slots ${JSON.stringify(before)} -> ${JSON.stringify(held)} -> ${JSON.stringify(after)}, ${open} open holds`,
+      after.reserved === before.reserved && intents === 0,
+      `slots ${JSON.stringify(before)} -> ${JSON.stringify(held)} -> ${JSON.stringify(after)}, ${intents} intent(s) at the processor`,
     );
-    return `${p.state}/${p.payment_state}; reserved ${before.reserved} -> ${held.reserved} -> ${after.reserved}; no open hold`;
+    return `${p.state}/${p.payment_state}; reserved ${before.reserved} -> ${held.reserved} -> ${after.reserved}; no hold was ever placed`;
   },
 );
 await stripe({ clearFaults: true });

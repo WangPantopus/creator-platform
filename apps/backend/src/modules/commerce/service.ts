@@ -116,6 +116,11 @@ const REFUND_TRIES_BEFORE_ESCALATION = 6;
 /** 30 s, 1, 2, 4, 8 minutes and so on, at most an hour between refund tries. */
 const refundBackoffSeconds = (attempt: number) =>
   Math.min(3600, 30 * 2 ** Math.max(0, attempt - 1));
+/** A request that is ending gets no new hold (the founder's decision 4). It is
+ * closed as never held only once no earlier try to hold can still reach the
+ * processor: a call gives up after 10 seconds and a lease lasts 30, so five
+ * minutes after its release began is far beyond the last one. */
+const NOTHING_HELD_AFTER_SECONDS = 300;
 /** The processor's minimum card charge in minor units (Stripe's published
  * minimums for the currencies the pilot can use); others default to 50. */
 const MINIMUM_CHARGE: Readonly<Record<string, number>> = {
@@ -2506,8 +2511,18 @@ export class CommerceService {
           );
           return;
         }
+        // A request that is being released, or has ended, never gets a new hold
+        // (decision 4). The processor is only asked whether it holds one for
+        // this try: a hold it has is applied below and released like any
+        // other; when it has none, nothing was held.
+        const ending =
+          !packet.intent_ref &&
+          ["releasing", "expired", "declined", "withdrawn", "draft"].includes(
+            packet.state,
+          ) &&
+          this.provider.recoverAuthorization !== undefined;
         const recovered =
-          !packet.intent_ref && effect.attempt > 1
+          !packet.intent_ref && (effect.attempt > 1 || ending)
             ? await this.provider.recoverAuthorization?.({
                 packetId: effect.packet_id,
                 amount: effect.request.amount,
@@ -2517,6 +2532,10 @@ export class CommerceService {
                 since: effect.created_at,
               })
             : undefined;
+        if (ending && !recovered) {
+          await this.settleUnheldAuthorization(actor, effect);
+          return;
+        }
         // Stripe can prune idempotency records after 24h. Never recreate an ambiguous hold.
         invariant(
           packet.intent_ref !== null ||
@@ -2836,6 +2855,69 @@ export class CommerceService {
       }
       await client.query(
         "UPDATE creator.commerce_effect SET state='failed',error_code='authorization_rejected',lease_until=NULL,updated_at=now() WHERE id=$1",
+        [effect.id],
+      );
+    });
+  }
+  /** The request is ending and the processor holds nothing for this try, so
+   * none is placed (decision 4). Once no earlier try can still reach the
+   * processor (this is the first try, or its release began, or else the try
+   * was first recorded, NOTHING_HELD_AFTER_SECONDS ago), nothing was ever
+   * held: the slot returns, the request closes in its terminal state with
+   * nothing in the ledger, and its release, which has nothing to cancel, is
+   * finished. Until then it stays unknown and the processor is asked again. */
+  private async settleUnheldAuthorization(actor: Actor, effect: EffectRow) {
+    await this.account(actor, async (client) => {
+      const p = await this.lockPacket(client, effect.packet_id);
+      await this.fenceEffect(client, effect);
+      const quiet =
+        effect.attempt === 1 ||
+        (
+          await client.query(
+            `SELECT 1 FROM creator.commerce_effect a
+             LEFT JOIN creator.commerce_effect r ON r.packet_id=a.packet_id AND r.provider_key=$2
+             WHERE a.id=$1 AND coalesce(r.created_at,a.created_at)<=now()-($3*interval '1 second')`,
+            [
+              effect.id,
+              `${p.id}:release:${p.authorization_attempt}`,
+              NOTHING_HELD_AFTER_SECONDS,
+            ],
+          )
+        ).rowCount === 1;
+      if (!quiet) {
+        await client.query(
+          "UPDATE creator.commerce_effect SET state='unknown',error_code='hold_unconfirmed',lease_until=NULL,next_at=now()+interval '30 seconds',updated_at=now() WHERE id=$1",
+          [effect.id],
+        );
+        return;
+      }
+      if (
+        effect.provider_key ===
+          `${p.id}:authorize:${p.authorization_attempt}` &&
+        !p.intent_ref &&
+        p.state === "releasing"
+      ) {
+        await client.query(
+          "SELECT set_config('app.creator_id',$1,true),set_config('app.fan_id',$2,true)",
+          [p.creator_id, p.fan_id],
+        );
+        await this.releaseCapacity(client, p);
+        await client.query(
+          "UPDATE creator.commerce_packet SET state=$2,payment_state='released',version=version+1,updated_at=now() WHERE id=$1",
+          [p.id, p.terminal_target],
+        );
+        await client.query(
+          "UPDATE creator.commerce_effect SET state='done',error_code='nothing_held',lease_until=NULL,updated_at=now() WHERE packet_id=$1 AND operation='release' AND state<>'done'",
+          [p.id],
+        );
+        await this.event(
+          client,
+          { ...p, version: p.version + 1 },
+          "hold_released",
+        );
+      }
+      await client.query(
+        "UPDATE creator.commerce_effect SET state='done',error_code='nothing_held',lease_until=NULL,updated_at=now() WHERE id=$1",
         [effect.id],
       );
     });
