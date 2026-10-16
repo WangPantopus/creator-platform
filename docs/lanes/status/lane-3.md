@@ -1,14 +1,14 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-16, by the lane 3 session
-Working on: B5 (memory proposals), PR #490. Last done: A5 (safety check after acknowledgment), #489
-Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482, A5 #489, B5 #490, B5 web #491, finding 18 #492, finding 5 #494
-Next: finding 6 (the worker waits for the thread row, migration proposal); B8 after #441 and #446 merge; B6 waits on the provider key and the embedding choice
+Working on: nothing unblocked is left. Last done: finding 6 (the settlement retries a locked thread row), #495
+Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482, A5 #489, B5 #490, B5 web #491, finding 18 #492, finding 5 #494, finding 6 #495
+Next: B8 after #441 and #446 merge; B6 waits on the provider key and the embedding choice; the real-model halves (B4, B1, finding 13) when the gateway is up
 Blocked on: nothing. Later: the embedding choice (B6), the real model for B1's model check and finding 13 (gateway)
 
-## Resume here (2026-10-16, B4)
+## Resume here (2026-10-16, finding 6)
 
-- Worktree `.claude/worktrees/lane-3-resume-0d9ef8`, branch `lane-3/b4-retrieval` (pushed). The older
+- Worktree `.claude/worktrees/lane-3-resume-0d9ef8`, branch `lane-3/f6-terminal-lock-retry` (pushed). The older
   worktree `lane-3-ai-engine-696dd4` is back on `lane-3/a4-fewer-transactions`, clean; a session hook
   refuses writes to another session's worktree, so each session works in its own. Every open lane 3
   branch carries this status text with its own section; merge main into a branch when GitHub reports a
@@ -34,6 +34,46 @@ http://127.0.0.1:56499`; publish Maya on the fake first, then restart with the g
 - E3B.4 needs the backend's OpenAI-host calls routed through its recording edge: rebuild with
   `sh tests/scenarios/lane-3/fresh-stack.sh --env QELVORA_FAKE_MODEL_URL=http://127.0.0.1:56438`
   (port 56438 is lane 3's; the scenario opens the edge itself and forwards to the fake on 56433).
+
+## Finding 6: the settlement retries a locked thread row
+
+The worker locks the thread row with `FOR UPDATE NOWAIT` when it opens each stage
+(`generation_task_proof`) and when it settles the answer (`generation_terminal_matches`, called by
+`begin_generation_terminal`). The API's thread reads (`withThread`, and the gateway's frame batch
+after every commit) hold `FOR SHARE` on the same row, so either open can be refused. Opening a stage
+already retried the refusal (`withGeneration`, four retries 150 ms apart inside the lease); the
+settlement did not. A refused completion left the answer for lease recovery, which ended a fully
+streamed answer `interrupted` about 64 s later. The fix gives `withTerminal`
+(`modules/identity/generation-terminal.ts`) the same bounded retry: only a `55P03` raised before the
+settlement callback runs, after its transaction has rolled back, with a fresh custody token, and for
+a completion only while its lease has 150 ms left. The settlement callback is never replayed. No SQL
+change.
+
+E3A.9 (`f6-terminal-lock.mjs`): a real PostgreSQL session acts as a busy reader. It queues behind
+every worker transaction, as the gateway's frame read does, and holds the thread row's share lock;
+the answer is read on the fan's WebSocket and in the database. Fakes: development identity and the
+stack's model fake. Host load 6 to 9.
+
+| Case                                           | Main (dea51a4ff)                                              | Fix                                                             |
+| ---------------------------------------------- | ------------------------------------------------------------- | --------------------------------------------------------------- |
+| No contention                                  | delivered, 15.4 s                                             | delivered, 15.3 s                                               |
+| 300 ms hold, 3 answers in a row                | 3 of 3 interrupted after 63.6 to 64.7 s, both sentences shown | 3 of 3 delivered once, 18.1 to 20.9 s                           |
+| Settlement refusals (database log)             | 4 in the whole run, none retried                              | 6 in the 300 ms case, each retried; 79 stage refusals retried   |
+| 1,500 ms hold (beyond the retry window)        | failed by lease recovery after 64.0 s, no sentence            | the same: retries stay bounded, failed after 64.1 s, ended once |
+| The next answer after the reader stops         | delivered                                                     | delivered                                                       |
+| Maya takes over mid-answer under a 300 ms hold | interrupted after 65.4 s, 1 sentence                          | interrupted after 64.5 s, 1 sentence; handback, then delivered  |
+
+- A takeover still ends the worker's answer only through lease recovery (about 64 s, on main too).
+  That is finding 8, fixed by #455 (not merged; this branch is main). The fan sees the takeover at
+  once (E3A.4).
+- Ordinary load with the fix (`a1-measure.mjs --messages 10 --fans 2`, no extra reader, host load
+  12): 20 of 20 delivered; the database log shows 19 stage refusals and one claim refusal, all
+  retried, and no settlement refusal in that run. The four 1013 socket closes are finding 5 (this
+  branch is main's 2 s gateway deadline; #494 fixes it).
+- Backend suite 157 of 157; typecheck, lint and format pass.
+- Not run: a backend restart while a settlement is being retried (the retry spans at most about
+  0.7 s; a restart then leaves it to lease recovery, as before), and the real model (not needed: the
+  lock is below the model).
 
 ## B5: memory proposals after the answer (migration proposal)
 
@@ -385,6 +425,12 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
 
 ## Decisions
 
+- 2026-10-16, lane 3 (default taken, finding 6): the settlement retries a refused thread lock in
+  TypeScript, with the same bound as the stage opening (four retries 150 ms apart, inside the lease),
+  instead of a migration that drops `NOWAIT` from W1's SQL. No SQL, review receipt or pin changes; the
+  lock order and every check are unchanged. Dropping `NOWAIT` (a bounded wait in SQL) stays possible
+  later if the retry bound proves too short under real load.
+
 - 2026-10-16, founder (proposed default, B7): the consent screen keeps naming each configured provider with
   its real terms ("Review message retention" while a provider keeps messages); the fixed sentence "They
   don't keep or train on your messages." is used only once every provider has zero-retention terms.
@@ -443,7 +489,10 @@ SHARE` on the thread row, which waits for the generation transaction writing tha
    delivered 18 and 19 to 20 of 20). The same share lock is what the worker's `NOWAIT` on the thread
    row hits (finding 6).
 6. The worker's `FOR UPDATE NOWAIT` on the thread row collides with the API's thread reads
-   ("could not obtain lock on row in relation thread", several per run). A6.
+   ("could not obtain lock on row in relation thread", several per run). Opening a stage already
+   retried the refusal; the settlement did not, so a refused completion waited for lease recovery and
+   ended a fully streamed answer interrupted about 64 s later. Fixed by #495
+   (no migration; see "Finding 6" above).
 7. Any authority change while the model is streaming (takeover, pause, consent withdrawal, licence
    lapse, block, AI pause, sign-out) leaves a provider-cost row with no cost (the aborted stream),
    which then locks the creator's AI for every fan (finding 3). Same on main and A3. A6.
@@ -589,6 +638,7 @@ passing, on top of the existing boundary cases (all must pass). A first version 
 | E3A.6 ★              | Distressed message gets the safe response first: pass. Hard-block half not run (needs the real model)                                                                                                                                                                                                                                                                                                                                                                                                                        | `e3a6-safety.mjs`                                                                     |
 | E3A.7 workspace lock | Main: 3 and 4 of 9 answers while Studio reads every 150 ms (9 workspace refusals); with the pending migration 9 of 9 in three runs, no refusals, no deadlocks, E3A.2 identical. Two workers: 2 of 10 on main, 1 or 2 with the migration (finding 15)                                                                                                                                                                                                                                                                         | `e3a7-workspace-lock.mjs`                                                             |
 | E3A.8 frames (A7)    | Web thread paints a sentence 19 / 102 ms after its frame (main 342 / 1,794 ms); final text equals the server after a network drop; page fetches unchanged (finding 5)                                                                                                                                                                                                                                                                                                                                                        | `a7-paint-frames.mjs` on a stack with the web app                                     |
+| E3A.9 thread lock    | Finding 6: a 300 ms reader on every worker transaction: main 3 of 3 interrupted after about 64 s, the fix 3 of 3 delivered in 18 to 21 s; beyond the retry window both end the answer once by lease recovery                                                                                                                                                                                                                                                                                                                 | `f6-terminal-lock.mjs`                                                                |
 | A3 drift             | Pass on main and A3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | `a3-drift.mjs`                                                                        |
 | A6 hold bound        | Before: a $5 cap admits no Claude reply. After: hold $2.62 (Sonnet as small model) or $0.20 (Haiku); 10 of 10 replies delivered, spend at most 2.3% of the hold; one real reply cost $0.018 against a $2.62 hold                                                                                                                                                                                                                                                                                                             | `a6-hold-bound.mjs`                                                                   |
 | A6c dropped request  | Before: a fan dropping the request during the safety check, or a timed-out check, locks the creator (4 of 7 fail). After: 7 of 7                                                                                                                                                                                                                                                                                                                                                                                             | `a6-ack-disconnect.mjs`                                                               |
