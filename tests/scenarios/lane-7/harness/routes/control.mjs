@@ -202,6 +202,17 @@ export function register(router) {
     return { ok: true };
   });
 
+  // WP 7.4 P7: flag an account under 18 after sign-in (an ops review), or
+  // clear the flag. Its next authenticated request ends its session.
+  router.add("POST", "/__harness/accounts/:key", ({ world, params, body }) => {
+    const account = [...world.accounts.values()].find(
+      (a) => a.key === params.key,
+    );
+    if (!account) throw new Failure(404, "not_found", "No such account.");
+    if (typeof body?.adult === "boolean") account.adult = body.adult;
+    return { key: account.key, adult: account.adult };
+  });
+
   // Ends sessions without the app asking: expire (refreshable) or revoke.
   router.add("POST", "/__harness/sessions", ({ world, body }) => {
     for (const s of world.sessions.values()) {

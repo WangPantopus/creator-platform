@@ -58,3 +58,13 @@ gates, and what was not run. Nothing here is the real backend.
 
 `7-4-p6-run.txt` records the operated consent flows on both apps against the fake API (P6.1 to P6.5),
 the gates, and what was not run. Nothing here is the real backend.
+
+## WP 7.4 P7 (the 18+ refusal)
+
+| File                | What it shows                                                                                                                          |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `7-4-p7-before.jpg` | Before, iOS left, Android right: an account flagged under 18 is told "Your session is kept on this device" and offered Retry           |
+| `7-4-p7-after.jpg`  | After: the designed under-18 state (D-11), the wordmark and the two fixed sentences and nothing else; the session is gone on both apps |
+
+`7-4-p7-run.txt` records the survey, the operated flows on both apps against the fake API (P7.1 to
+P7.3), the gates, and what was not run. Nothing here is the real backend.
