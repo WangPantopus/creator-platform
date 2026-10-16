@@ -11,7 +11,7 @@
 // Fakes: development identity, the stack's model fake.
 //   node tests/scenarios/lane-3/f6-terminal-lock.mjs [--cases baseline,short,long,takeover]
 //     [--short 300] [--long 1500] [--repeat 3] [--delay 300]
-import { execFileSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import {
   API,
   MODEL,
@@ -103,28 +103,33 @@ function busyReader(holdMs) {
 /** Database log lines since `since` where a worker statement was refused the
  * thread row, by the statement that was refused. */
 function refusals(since) {
-  const log = execFileSync(
+  // PostgreSQL logs to the container's stderr.
+  const { stdout, stderr } = spawnSync(
     "docker",
     ["logs", "--since", since, "qelvora-lane3-postgres"],
-    { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], maxBuffer: 1 << 26 },
+    { encoding: "utf8", maxBuffer: 1 << 26 },
   );
+  const log = stdout + stderr;
   const lines = log.split("\n");
   const counts = { terminal: 0, stage: 0 };
   lines.forEach((line, at) => {
     if (!line.includes('could not obtain lock on row in relation "thread"'))
       return;
-    const after = lines.slice(at + 1, at + 4).join(" ");
-    if (after.includes("begin_generation_terminal")) counts.terminal++;
+    // The context runs to the refused statement's own STATEMENT line.
+    const end = lines.findIndex((l, i) => i > at && l.includes("STATEMENT:"));
+    const context = lines.slice(at + 1, end < 0 ? at + 8 : end + 1).join(" ");
+    if (context.includes("generation_terminal")) counts.terminal++;
     else counts.stage++;
   });
   return counts;
 }
 
+let sequence = 0;
 async function ask(text) {
   const started = performance.now();
   const sent = await call(API, "POST", `${fan.thread}/messages`, {
     token: fan.token,
-    body: { idempotencyKey: key("f6"), text },
+    body: { idempotencyKey: key("f6"), text, clientSequence: ++sequence },
   });
   if (sent.status !== 200)
     return { error: `send ${sent.status} ${sent.json?.error?.code ?? ""}` };
@@ -196,7 +201,8 @@ if (cases.includes("short")) {
 
 if (cases.includes("long")) {
   // Beyond the retry window: the retries are bounded, nothing waits on the lock,
-  // and the unfinished answer is ended by lease recovery as before.
+  // and the unfinished answer is ended by lease recovery as before (failed when
+  // no sentence was written, interrupted after one).
   const since = new Date().toISOString();
   const reader = busyReader(longMs);
   const r = await ask("Long hold: what cone should I fire stoneware to?");
@@ -204,7 +210,10 @@ if (cases.includes("long")) {
   const refused = refusals(since);
   step(
     `a ${longMs} ms reader on every worker transaction: the answer ends once, by lease recovery`,
-    r.end === "interrupted" && r.state === "interrupted" && r.ms < 90_000,
+    r.end === "interrupted" &&
+      ["failed", "interrupted"].includes(r.state) &&
+      r.answers === 1 &&
+      r.ms < 90_000,
     `${describe(r)}; ${refused.terminal} settlement and ${refused.stage} stage refusals, ${holds} reader holds`,
   );
   const after = await ask("After the long hold: what is a good first glaze?");
