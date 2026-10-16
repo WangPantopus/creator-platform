@@ -1,7 +1,7 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-15, by the lane 3 session
-Working on: the migration proposals: finding 15 open as a PR; findings 8 and 9 next
+Working on: the migration proposals: finding 15 open (#451), finding 8 fixed without a migration, finding 9 next
 Done: merged A1 #411, A3 #426, A6a #434, A6b #433 (its code and migration 0251 through the registration #442). Open: A6c #436, A6 hold sizing #438, B2 #441, A2 #444, B9 #446
 Next: the migration proposals for findings 8, 9 and 15, then the next work package in the founder's order
 Blocked on: nothing. Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
@@ -82,12 +82,12 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
 7. Any authority change while the model is streaming (takeover, pause, consent withdrawal, licence
    lapse, block, AI pause, sign-out) leaves a provider-cost row with no cost (the aborted stream),
    which then locks the creator's AI for every fan (finding 3). Same on main and A3. A6.
-8. An authority change right after the worker claims an answer leaves it "generating" until its
-   60 s lease expires and recovery finishes it. Same on main and A3. Cause: by design the terminal
-   step lets the original worker complete only while the thread's full authority holds (a takeover
-   makes the trust check answer "denied"); after a change only reconciliation may finish, and only
-   once the original lease has passed. A worker-only fix cannot help (tried, not opened). Needs a W1
-   SQL change: the worker releases its own lease when authority ends, so reconciliation runs at once.
+8. (Fixed on `lane-3/f8-reconcile-own-answer`, no migration.) An authority change right after the
+   worker claims an answer, or while the reply streams, left it "generating" until its 60 s lease
+   expired and recovery finished it (main: the answer ended 59 to 64 s after the change). W8 denies
+   the worker's completion once the answer's authority no longer holds, but already answers
+   `reconciliation_allowed` for its own failed cursor; the worker now reconciles at once with the
+   last cursor it committed (W1 accepts only the exact durable one): 2.0 to 3.7 s.
 9. After a crash once a sentence is stored, recovery fails every pass
    (`generation_terminal_recovery_incomplete`; the database says "Complete actual typed
    output/classifier provenance is unavailable" in `creator.generation_settle_typed_original_allowance`)

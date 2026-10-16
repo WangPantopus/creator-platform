@@ -142,6 +142,9 @@ function retrievalInput(context: GenerationRuntimeContext) {
   return contentHash({ ...context, audience: audienceInput(context.audience) });
 }
 
+/** For the worker: the last sentence cursor whose W1 COMMIT resolved. */
+export type GenerationProgress = { committed: number };
+
 /** Actual shared engine adapter, distinct from interactive Actor/ThreadScope.
  * It never writes W3 output/epoch or W4 money. W3's original prepared writer
  * calls assertApprovedInTransaction around its append; W1 alone commits.
@@ -403,6 +406,8 @@ export class PreparedGenerationPipeline {
     /** The original prepared W3 writer finishes its W1-held append, both
      * private approval bookends and sole W1 COMMIT before delivery resolves. */
     output: PreparedGenerationConversationOutput,
+    /** Observation only: W1 still accepts a terminal at the exact durable cursor. */
+    progress?: GenerationProgress,
   ): Promise<PipelineResult> {
     const started = performance.now();
     let firstApprovedMs: number | null = null;
@@ -502,6 +507,7 @@ export class PreparedGenerationPipeline {
           current.replyCall,
         );
         await output.deliver(task, approved, signal);
+        if (progress) progress.committed = approved.sequence;
         await this.identity.withGeneration(
           task,
           async (client, scope) => {
@@ -656,6 +662,7 @@ export class PreparedGenerationPipeline {
           current.classifierCall,
         );
         await output.deliver(task, approved, signal);
+        if (progress) progress.committed = approved.sequence;
         await this.identity.withGeneration(
           task,
           async (client, scope) => {

@@ -36,6 +36,16 @@ export type GenerationWorkerPass = Readonly<{
 
 const code = (cause: unknown) =>
   cause instanceof DomainError ? cause.code : "generation_worker_unavailable";
+/** The answer's own authority ended after its claim (a takeover, pause,
+ * withdrawn consent, sign-out): not a database or provider failure. */
+const authorityEnded = (cause: unknown) =>
+  cause instanceof DomainError &&
+  [
+    "generation_metadata_unavailable",
+    "generation_task_changed",
+    "generation_scope_changed",
+    "generation_denied",
+  ].includes(cause.code);
 
 /** Between passes without a wakeup. Accepted work wakes the worker at once
  * while its wakeup session listens; this interval then covers only lease
@@ -192,11 +202,13 @@ export class GenerationWorker {
             continue;
           }
           let failed = false;
+          const progress = { committed: task.lastSequence };
           try {
             await this.owners.pipeline.generate(
               task,
               signal,
               this.owners.output,
+              progress,
             );
           } catch (cause) {
             // generate() awaits provider-usage cleanup before rejecting. Never
@@ -207,22 +219,61 @@ export class GenerationWorker {
           }
           // Read the cursor through a fresh original purpose, including after
           // partial output or a lost ACK. Denial/expiry leaves it for recovery.
-          const lastSequence = await this.owners.identity.withGeneration(
-            task,
-            async (_client, scope) => scope.lastSequence,
-            signal,
-          );
-          await this.owners.terminal.withTerminal(
-            { mode: "completion", task, lastSequence, failed },
-            async (client, scope) => {
-              await this.owners.finalization.finalizeInTransaction(
-                client,
-                scope,
+          let lastSequence = progress.committed;
+          let reconcile = false;
+          try {
+            lastSequence = await this.owners.identity.withGeneration(
+              task,
+              async (_client, scope) => scope.lastSequence,
+              signal,
+            );
+          } catch (cause) {
+            if (signal.aborted || !failed || !authorityEnded(cause))
+              throw cause;
+            reconcile = true;
+          }
+          const settle = async (
+            client: Parameters<
+              Parameters<GenerationTerminalAuthority["withTerminal"]>[1]
+            >[0],
+            scope: Parameters<
+              Parameters<GenerationTerminalAuthority["withTerminal"]>[1]
+            >[1],
+          ) => {
+            await this.owners.finalization.finalizeInTransaction(client, scope);
+            await this.owners.settlement.settleInTransaction(client, scope);
+          };
+          if (!reconcile)
+            try {
+              await this.owners.terminal.withTerminal(
+                { mode: "completion", task, lastSequence, failed },
+                settle,
+                signal,
               );
-              await this.owners.settlement.settleInTransaction(client, scope);
-            },
-            signal,
-          );
+            } catch (cause) {
+              if (
+                signal.aborted ||
+                !failed ||
+                !(cause instanceof DomainError) ||
+                cause.code !== "generation_terminal_denied"
+              )
+                throw cause;
+              reconcile = true;
+            }
+          // A failed answer whose authority ended cannot be completed by its
+          // worker (W8 denies completion), but its own failed cursor may be
+          // reconciled now instead of after the 60 s lease. W1 accepts only
+          // the exact durable cursor; anything else stays for recovery.
+          if (reconcile)
+            await this.owners.terminal.withTerminal(
+              {
+                mode: "reconciliation",
+                generationId: task.generationId,
+                lastSequence,
+              },
+              settle,
+              signal,
+            );
           // Only W1's successful final COMMIT can increment either counter.
           if (failed) result.failed++;
           else result.completed++;

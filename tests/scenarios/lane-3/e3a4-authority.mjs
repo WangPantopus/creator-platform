@@ -221,6 +221,7 @@ for (const name of cases) {
           )
         : null;
     let state;
+    let endedMs = null;
     // Up to 100 s: a deferred answer is finished by recovery only after its 60 s lease.
     for (let w = 0; w < 200; w++) {
       [state] = await sql(
@@ -231,8 +232,10 @@ for (const name of cases) {
         state &&
         !["queued", "generating"].includes(state.state) &&
         state.delivery !== "generating"
-      )
+      ) {
+        endedMs = performance.now() - started;
         break;
+      }
       await sleep(500);
     }
     const late = await sql(
@@ -254,7 +257,7 @@ for (const name of cases) {
     step(
       `${name} at ${timing}`,
       ok,
-      `send ${sent.status}, change ${changed.status} in ${Math.round(changeMs)} ms, ${shown[0].n} sentence(s) before, ${late[0].n} after the change, answer ${state?.state}/${state?.delivery}` +
+      `send ${sent.status}, change ${changed.status} in ${Math.round(changeMs)} ms, ${shown[0].n} sentence(s) before, ${late[0].n} after the change, answer ${state?.state}/${state?.delivery}${endedMs === null ? "" : ` ${(endedMs / 1000).toFixed(1)} s after the change`}` +
         (control
           ? `, control frame after ${Math.round(control.at - started)} ms`
           : "") +
