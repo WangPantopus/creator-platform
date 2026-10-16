@@ -3,31 +3,195 @@
 // node tests/scenarios/lane-7/ios-navigation.mjs <built.xctestrun> [N2 N5 ... | --stack]
 // LANE7_OUT is an off-repository directory for the xcresult evidence.
 import { execFileSync, spawnSync } from "node:child_process";
+import { randomUUID } from "node:crypto";
 import { readFileSync, writeFileSync, unlinkSync, mkdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 
 const [source, ...ids] = process.argv.slice(2);
+const presence = ids[0] === "--presence";
+if (presence) ids.shift();
+const seal = ids[0] === "--seal";
+if (seal) ids.shift();
+const consent = ids[0] === "--consent";
+if (consent) ids.shift();
+const adults = ids[0] === "--adults";
+if (adults) ids.shift();
+const citations = ids[0] === "--citations";
+if (citations) ids.shift();
+const comparison = ids[0] === "--comparison";
+if (comparison) ids.shift();
+const composer = ids[0] === "--composer";
+if (composer) ids.shift();
+const chatLink = ids[0] === "--chat-link";
+if (chatLink) ids.shift();
+const notifications = ids[0] === "--notifications";
+if (notifications) ids.shift();
+const pickers = ids[0] === "--pickers";
+if (pickers) ids.shift();
+const drafts = ids[0] === "--drafts";
+if (drafts) ids.shift();
+const draftStack = ids.length === 1 && ids[0] === "--draft-stack";
+if (draftStack) ids.length = 0;
 const stack = ids.length === 1 && ids[0] === "--stack";
 if (stack) ids.length = 0;
-const suite = stack ? "Lane7StackNavigationFlow" : "Lane7NavigationFlows";
-const flows = stack
-  ? { STACK: "testNavigationOnRealStack" }
-  : {
-      N1: "testN01ThreadBackAndGesture",
-      N2: "testN02ConsentIsReplaced",
-      N5: "testN05AccountBack",
-      N6: "testN06NotificationTrailAndLabel",
-      N8: "testN08ColdLink",
-      N13: "testN13AccountChangeClearsTrail",
-      N14: "testN14UnknownLink",
-      N15: "testN15RepeatedLinkAndQuickBack",
-      N16: "testN16LinkWhilePrivacyIsOpen",
-      N17: "testN17TrailBoundary",
-      N19: "testN19NewFanBack",
-      N20: "testN20EditProfileBack",
-      N21: "testN21CreatorAccessBack",
-    };
+const suite = presence
+  ? "Lane7PresenceFlows"
+  : draftStack
+    ? "Lane7StackDraftFlow"
+    : drafts
+      ? "Lane7DraftFlows"
+      : stack
+        ? "Lane7StackNavigationFlow"
+        : seal
+          ? "Lane7SealFlows"
+          : consent
+            ? "Lane7ConsentFlows"
+            : adults
+              ? "Lane7AdultFlows"
+              : citations
+                ? "Lane7CitationFlows"
+                : comparison
+                  ? "Lane7ComparisonFlows"
+                  : composer
+                    ? "Lane7ComposerFlows"
+                    : chatLink
+                      ? "Lane7ChatLinkFlows"
+                      : notifications
+                        ? "Lane7NotificationFlows"
+                        : pickers
+                          ? "Lane7PickerFlows"
+                          : "Lane7NavigationFlows";
+const optInVariable = presence
+  ? "LANE7_PRESENCE"
+  : draftStack
+    ? "LANE7_STACK_DRAFTS"
+    : drafts
+      ? "LANE7_DRAFTS"
+      : stack
+        ? "LANE7_REAL_STACK"
+        : seal
+          ? "LANE7_SEAL"
+          : consent
+            ? "LANE7_CONSENT"
+            : adults
+              ? "LANE7_ADULTS"
+              : citations
+                ? "LANE7_CITATIONS"
+                : comparison
+                  ? "LANE7_COMPARISON"
+                  : composer
+                    ? "LANE7_COMPOSER"
+                    : chatLink
+                      ? "LANE7_CHAT_LINK"
+                      : notifications
+                        ? "LANE7_NOTIFICATIONS"
+                        : pickers
+                          ? "LANE7_PICKERS"
+                          : "LANE7_NAVIGATION";
+const flows = presence
+  ? {
+      R1: "testR01NotesAndReactionsInPlace",
+      R4: "testR04NewNoteAfterForegroundAndReconnect",
+      R5: "testR05EligibilityAndFailures",
+      R7: "testR07EarlierMessagesRevealOlderNotes",
+      R8: "testR08LongUnicodeNoteLargestText",
+      R9: "testR09NothingOnDisk",
+      R10: "testR10LargestTextOpensAtBottom",
+    }
+  : draftStack
+    ? { D6: "testD06RealSendAndDeletion" }
+    : drafts
+      ? {
+          D1: "testD01Lifecycle",
+          D2: "testD02IndependentThreads",
+          D3: "testD03LargestText",
+          D3T: "testD03TallRowScroll",
+          D4: "testD04SendRecovery",
+          D4R: "testD04RejectedRetry",
+          D5: "testD05AuthorizationAndReplacement",
+          D7: "testD07BoundaryAndCiphertext",
+          D7U: "testD07Unicode",
+          D8: "testD08NewTextDuringSend",
+        }
+      : stack
+        ? { STACK: "testNavigationOnRealStack" }
+        : seal
+          ? {
+              S1: "testS01SealPerCreator",
+              S2: "testS02LargestText",
+              S3: "testS03EmojiLowercaseName",
+            }
+          : consent
+            ? {
+                C1: "testC01PromiseWhenProvidersKeepNothing",
+                C2: "testC02ProviderThatKeepsMessages",
+                C3: "testC03UnverifiedPolicy",
+                C4: "testC04TwoProviders",
+                C5: "testC05LargestTextNight",
+              }
+            : adults
+              ? {
+                  A1: "testA01FlaggedAfterSignIn",
+                  A2: "testA02RefusedAtSignIn",
+                  A3: "testA03LargestTextNight",
+                }
+              : citations
+                ? {
+                    P1: "testP01PassageOpens",
+                    P2: "testP02RefusedPassage",
+                    P3: "testP03MissingPassage",
+                  }
+                : comparison
+                  ? {
+                      K1: "testK01OffSaysNothing",
+                      K2: "testK02QuestionChoiceClosesWhenTurnedOff",
+                      K3: "testK03PrivacySectionLeavesOnRefusal",
+                      K4: "testK04PrivacyRefreshAfterBackground",
+                    }
+                  : composer
+                    ? {
+                        Q1: "testQ01AiOn",
+                        Q2: "testQ02CreatorHere",
+                        Q3: "testQ03AiPaused",
+                        Q4: "testQ04LiveChangesKeepTheDraft",
+                        Q5: "testQ05LargestTextNight",
+                      }
+                    : chatLink
+                      ? {
+                          H1: "testH01ExistingConversationOpens",
+                          H2: "testH02NoConversationKeepsFirstScreen",
+                        }
+                      : notifications
+                        ? {
+                            U1: "testU01RowsSaySenderPreviewTimeUnread",
+                            U2: "testU02NoteOpensThreadAndIsRead",
+                            U3: "testU03ReactionOpensThread",
+                            U4: "testU04LargestTextNight",
+                          }
+                        : pickers
+                          ? {
+                              V1: "testV01BlockByName",
+                              V2: "testV02OpenedFromThreadShowsName",
+                              V3: "testV03ExportOneConversation",
+                              V4: "testV04NoConversations",
+                              V5: "testV05ListFailsThenRetries",
+                            }
+                          : {
+                              N1: "testN01ThreadBackAndGesture",
+                              N2: "testN02ConsentIsReplaced",
+                              N5: "testN05AccountBack",
+                              N6: "testN06NotificationTrailAndLabel",
+                              N8: "testN08ColdLink",
+                              N13: "testN13AccountChangeClearsTrail",
+                              N14: "testN14UnknownLink",
+                              N15: "testN15RepeatedLinkAndQuickBack",
+                              N16: "testN16LinkWhilePrivacyIsOpen",
+                              N17: "testN17TrailBoundary",
+                              N19: "testN19NewFanBack",
+                              N20: "testN20EditProfileBack",
+                              N21: "testN21CreatorAccessBack",
+                            };
 if (!source || ids.some((id) => !flows[id]))
   throw new Error(
     "Pass a built .xctestrun and optional unfinished iOS flow IDs.",
@@ -42,9 +206,28 @@ const optIn = (value) => {
   if (!value || typeof value !== "object") return;
   if (value.BlueprintName === "QelvoraUITests") {
     value.EnvironmentVariables ??= {};
-    value.EnvironmentVariables[
-      stack ? "LANE7_REAL_STACK" : "LANE7_NAVIGATION"
-    ] = "1";
+    value.EnvironmentVariables[optInVariable] = "1";
+    if (draftStack) {
+      const fixture = JSON.parse(
+        readFileSync(process.env.LANE7_STACK_FIXTURE, "utf8"),
+      );
+      const fields = [
+        "api",
+        "appApi",
+        "actor",
+        "creator",
+        "fan",
+        "thread",
+        "route",
+        "marker",
+      ];
+      if (Object.keys(fixture).some((key) => !fields.includes(key)))
+        throw new Error("Unexpected fixture field");
+      // A partial run may already have accepted its synthetic Send. Reusing
+      // object IDs is safe; each operated run needs a distinct message marker.
+      fixture.marker += " " + randomUUID().slice(0, 8);
+      value.EnvironmentVariables.LANE7_STACK_FIXTURE = JSON.stringify(fixture);
+    }
     targets += 1;
   }
   for (const child of Object.values(value)) optIn(child);
@@ -64,11 +247,7 @@ try {
   writeFileSync(scratch, JSON.stringify(config));
   execFileSync("plutil", ["-convert", "xml1", scratch]);
   // Refuse an empty or malformed conversion before starting the expensive job.
-  if (
-    !readFileSync(scratch, "utf8").includes(
-      stack ? "LANE7_REAL_STACK" : "LANE7_NAVIGATION",
-    )
-  )
+  if (!readFileSync(scratch, "utf8").includes(optInVariable))
     throw new Error("The runner opt-in was not written.");
   const result = spawnSync(
     process.execPath,
@@ -82,7 +261,7 @@ try {
       "-xctestrun",
       scratch,
       "-destination",
-      "platform=iOS Simulator,id=62DDB9C8-4B10-48CB-94ED-1746980B54EA",
+      `platform=iOS Simulator,name=${process.env.LANE7_IOS ?? "qelvora-lane7-ios"}`,
       "-parallel-testing-enabled",
       "NO",
       "-resultBundlePath",
@@ -113,7 +292,7 @@ try {
         `Expected ${expected} operated flows; observed ${summary.passedTests} passed, ${summary.skippedTests} skipped, ${summary.failedTests} failed.`,
       );
     console.log(
-      `PASS iOS: ${expected} operated navigation flows, none skipped.`,
+      `PASS iOS: ${expected} operated ${presence ? "presence" : drafts ? "draft" : seal ? "seal" : consent ? "consent" : adults ? "adults-only" : citations ? "citation" : "navigation"} flows, none skipped.`,
     );
   }
 } finally {

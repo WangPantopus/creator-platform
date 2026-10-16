@@ -10,6 +10,7 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import android.os.Bundle
@@ -137,6 +138,9 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     var choosingActor by mutableStateOf(false)
     var actors by mutableStateOf<List<APIIdentityCapabilitiesDevelopmentActorsItem>>(emptyList())
     var localPurgeFailed by mutableStateOf(false); private set
+    /** D-11: an account found under 18 (at sign-in, or flagged later) loses
+     * access. The session ends here too and only the adults-only state shows. */
+    var adultOnly by mutableStateOf(false); private set
     var purgingPrivateState by mutableStateOf(false); private set
     var arrival by mutableStateOf<ArrivalContext?>(null); private set
     private var generation = 0
@@ -249,6 +253,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
                 if (runCatching { currentToken() }.getOrNull() != token) {
                     session = null; error = "Your session changed. Refresh your account before continuing."; return
                 }
+                if (adultRefusal(failure)) { if (purge()) adultOnly = true; return }
                 if (failure.status == 401) {
                     if (!busy) {
                         // A completed rotation performs its own guarded fresh read.
@@ -308,6 +313,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
             destination = result.returnTo; choosingActor = false; refresh()
         }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+        catch (failure: CreatorAPIError) { if (adultRefusal(failure)) { if (purge()) adultOnly = true } else error = message(failure) }
         catch (failure: Exception) { error = message(failure) }
         finally { busy = false }
     }
@@ -403,7 +409,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
             generation++; rotatingCredential = false; refresh()
         }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-        catch (failure: CreatorAPIError) { if (current == generation) { if (failure.status == 401) { if (purge()) error = message(failure) } else error = message(failure) } }
+        catch (failure: CreatorAPIError) { if (current == generation) { if (adultRefusal(failure)) { if (purge()) adultOnly = true } else if (failure.status == 401) { if (purge()) error = message(failure) } else error = message(failure) } }
         catch (_: Exception) { if (current == generation) error = "Session refresh could not complete. Reconnect and try again." }
         finally { busy = false; rotatingCredential = false }
     }
@@ -417,6 +423,9 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         destination = target
         if (arrival && !NavigationParents.isRoot(target)) tab = NavigationParents.tab(target)
     }
+    /** The server's final under-18 answer (C1): 403 adult_eligibility_required. */
+    private fun adultRefusal(failure: CreatorAPIError): Boolean =
+        failure.status == 403 && runCatching { Json.decodeFromString<APIError>(failure.body).error.code }.getOrNull() == "adult_eligibility_required"
     private fun message(failure: Exception): String = if (failure is CreatorAPIError) runCatching { Json.decodeFromString<APIError>(failure.body).error.message }.getOrDefault("This action could not complete. Reconnect and try again.") else "This action could not complete. Reconnect and try again."
 }
 
@@ -507,6 +516,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
         if (model.error.isNotEmpty()) Notice("error", "Account status", model.error)
         if (model.localPurgeFailed) Button(QelvoraCopy.text("identityPrivateClearRetry"), ButtonVariant.SECONDARY, block = true, disabled = model.busy || model.purgingPrivateState) { scope.launch { model.purge() } }
         when {
+            model.adultOnly -> AdultsOnly()
             model.choosingActor -> Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Notice(title = "Development identity", children = "Synthetic isolated accounts. Pantopus production sign-in is not connected.")
                 model.actors.forEach { actor -> Button(actor.label, ButtonVariant.SECONDARY, block = true, disabled = model.busy) { scope.launch { model.selectActor(actor.id) } } }
@@ -533,7 +543,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
             else -> {
                 val isConversation = model.destination.substringBefore('?').startsWith("/threads/")
                 if (model.session?.mode == APISessionMode.DEVELOPMENT) {
-                    if (isConversation) BasicText("Development identity · synthetic account · actual local API", style = qText("caption").copy(color = qColor("ink")), modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+                    if (isConversation) BasicText("Development identity · synthetic account · actual local API", style = qText("caption").copy(color = qColor("ink")), maxLines = 1, modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp))
                     else Notice(title = "Development identity", children = "Synthetic account · actual local API.")
                 }
                 Box(Modifier.weight(1f).fillMaxWidth()) {

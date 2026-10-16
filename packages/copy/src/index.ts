@@ -325,6 +325,7 @@ export const copy = {
   "growthFindingCreators": "Finding creators",
   "growthUsefulness": "Usefulness",
   "growthNotifications": "Notifications",
+  "growthUnread": "Unread",
   "growthLeaving": "Leaving",
   "growthRating": "Rating",
   "growthSkipRating": "Skip rating",
@@ -1079,7 +1080,13 @@ export const copy = {
   "growthImpactPeopleHelped": "You helped {people} people this week.",
   "growthImpactThankYou": "A THANK-YOU, SHARED WITH PERMISSION",
   "growthImpactWeekCounts": "Counts are for this week only. Fans are never named here without their consent.",
-  "growthImpactNotAvailable": "No weekly digest is available yet."
+  "growthImpactNotAvailable": "No weekly digest is available yet.",
+  "pickerCreator": "Creator",
+  "pickerConversation": "Conversation",
+  "pickerChooseCreator": "Choose a creator",
+  "pickerChooseConversation": "Choose a conversation",
+  "pickerNoConversations": "You have no conversations yet.",
+  "pickerConversationsFailed": "Your conversations couldn't load."
 } as const;
 export type CopyKey = keyof typeof copy;
 type Placeholders<T extends string> = T extends `${string}{${infer Key}}${infer Rest}` ? Key | Placeholders<Rest> : never;
