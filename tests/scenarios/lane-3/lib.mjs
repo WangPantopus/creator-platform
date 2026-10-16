@@ -55,6 +55,12 @@ export const stats = async (text, values) =>
   (await pool("postgres").query(text, values)).rows;
 export const closeDb = () =>
   Promise.all([...pools.values()].map((p) => p.end()));
+/** A dedicated product-database session, for holding a lock as another reader would. */
+export async function connect() {
+  const client = new pg.Client({ connectionString: ADMIN });
+  await client.connect();
+  return client;
+}
 
 /** Fan account with a profile and an open conversation with Maya. */
 export async function openFan(accountId, handle) {
