@@ -4,7 +4,8 @@
 // question waits for the fan's answer; a repeat with one key asks once, and two
 // questions at the same instant ask once. Wrong people are refused with nothing
 // moved. The fan answers, the request goes back to Maya with the time it had
-// left, and she accepts: the money moves exactly as without a question. An older
+// left; she asks once more, the fan answers again, and she accepts: the money
+// moves exactly as without a question. An older
 // client that sends only `text` still asks (the documented fallback). Until a
 // decision the hold is untouched and nothing is captured.
 // Fakes: card processor, development identity, software passkey.
@@ -361,7 +362,7 @@ await step(
 );
 await step(
   "E4.2-MI-8",
-  "the fan answers: the request returns to Maya with the time it had left; she accepts and the money moves once",
+  "the fan answers: the request returns to Maya with the time it had left",
   async () => {
     const before = await packetRow(asked);
     const answered = await answer(fan, asked, "Stoneware, cone 6.");
@@ -375,6 +376,45 @@ await step(
         Math.abs(leftSeconds - before.remaining_sla_seconds) < 120,
       `${answered.status} ${answered.code} ${row.state} answer ${JSON.stringify(row.fan_answer)}; ${Math.round(leftSeconds)} s left of ${before.remaining_sla_seconds}`,
     );
+    return `submitted, answer stored, question kept; ${Math.round(leftSeconds)} s of ${before.remaining_sla_seconds} s back on the clock; ${await holdUntouched(asked)}`;
+  },
+);
+await step(
+  "E4.2-MI-9",
+  "Maya asks again after the answer; the fan answers again and the new answer replaces the first",
+  async () => {
+    const again = await studioDecide(asked, {
+      action: "more_info",
+      question: "Thanks. How thick is the glaze, roughly?",
+      text: DRAFT,
+    });
+    const waiting = await packetRow(asked);
+    // While the second question waits, the first answer is still on the request.
+    expect(
+      again.status === 200 &&
+        waiting.state === "more_info" &&
+        waiting.question === "Thanks. How thick is the glaze, roughly?" &&
+        waiting.fan_answer === "Stoneware, cone 6." &&
+        (await questionEvents(asked)) === 2,
+      `${again.status} ${again.code} ${waiting.state} ${JSON.stringify(waiting.question)} answer ${JSON.stringify(waiting.fan_answer)}`,
+    );
+    const answered = await answer(fan, asked, "About two coats, dipped.");
+    const row = await packetRow(asked);
+    const leftSeconds = (row.decision_at.getTime() - Date.now()) / 1000;
+    expect(
+      answered.status === 200 &&
+        row.state === "submitted" &&
+        row.fan_answer === "About two coats, dipped." &&
+        Math.abs(leftSeconds - waiting.remaining_sla_seconds) < 120,
+      `${answered.status} ${answered.code} ${row.state} ${JSON.stringify(row.fan_answer)}; ${Math.round(leftSeconds)} s left of ${waiting.remaining_sla_seconds}`,
+    );
+    return `second question asked (2 events; the first answer stays until the next one); answered again, ${Math.round(leftSeconds)} s back on the clock; ${await holdUntouched(asked)}`;
+  },
+);
+await step(
+  "E4.2-MI-10",
+  "after two rounds of questions Maya accepts: the money moves once",
+  async () => {
     const done = await accept(maya, asked);
     const after = await packetRow(asked);
     const rows = (await ledger(asked))
@@ -393,11 +433,11 @@ await step(
         captures === 1,
       `${done.status} ${done.code} ${after.state}/${after.payment_state}; ${rows}; ${intent.status}; ${captures} captures`,
     );
-    return `answered (${Math.round(leftSeconds)} s of ${before.remaining_sla_seconds} s back on the clock); accepted: ${rows}, 1 capture`;
+    return `accepted: ${rows}, 1 capture at the processor`;
   },
 );
 await step(
-  "E4.2-MI-9",
+  "E4.2-MI-11",
   "an older client that sends only text still asks (the documented fallback)",
   async () => {
     const id = await request();
@@ -416,7 +456,7 @@ await step(
   },
 );
 await step(
-  "E4.2-MI-10",
+  "E4.2-MI-12",
   "a question sent with another decision is not asked: Maya declines, the hold is released",
   async () => {
     const id = await request();
@@ -437,7 +477,7 @@ await step(
   },
 );
 await step(
-  "E4.2-MI-11",
+  "E4.2-MI-13",
   "the fan withdraws instead of answering: released, nothing charged",
   async () => {
     let withdrawn = 0;
