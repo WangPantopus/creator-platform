@@ -1,24 +1,23 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-16, by the lane 3 session
-Working on: nothing unblocked is left. Last done: finding 6 (the settlement retries a locked thread row), #495
-Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482, A5 #489, B5 #490, B5 web #491, finding 18 #492, finding 5 #494, finding 6 #495
-Next: B8 after #441 and #446 merge; B6 waits on the provider key and the embedding choice; the real-model halves (B4, B1, finding 13) when the gateway is up
-Blocked on: nothing. Later: the embedding choice (B6), the real model for B1's model check and finding 13 (gateway)
+Working on: nothing unblocked is left. Last done: the merge wave (#433 to #495 land together, at the founder's request)
+Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442); through the merge wave: #433 (status), A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451 (SQL proposal), finding 8 #455, finding 9 #456 (status only), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482, A5 #489, B5 #490 (SQL proposal), B5 web #491, finding 18 #492 (SQL proposal), finding 5 #494, finding 6 #495
+Next: B8 (the `CreatorAI.tsx` split, now unblocked: #441 and #446 are in); B6 waits on the provider key and the embedding choice; the real-model halves (B4, B1, finding 13) when the gateway is up; finding 7
+Blocked on: nothing. Later: the integrator registers the three SQL proposals (#451, #490, #492: inactive until then); the embedding choice (B6); the real model (gateway)
 
-## Resume here (2026-10-16, finding 6)
+## Resume here (2026-10-16, after the merge wave)
 
-- Worktree `.claude/worktrees/lane-3-resume-0d9ef8`, branch `lane-3/f6-terminal-lock-retry` (pushed). The older
-  worktree `lane-3-ai-engine-696dd4` is back on `lane-3/a4-fewer-transactions`, clean; a session hook
-  refuses writes to another session's worktree, so each session works in its own. Every open lane 3
-  branch carries this status text with its own section; merge main into a branch when GitHub reports a
-  conflict and take the newest status text.
+- Everything lane 3 had open is on main through the merge wave (branch `lane-3/merge-wave-2026-10-16`).
+  Start new work from the latest origin/main in your own worktree (a session hook refuses writes to
+  another session's worktree); `.claude/worktrees/lane-3-resume-0d9ef8` was the last one.
 - Tools: node and pnpm from the Codex runtime (`NB=$HOME/.cache/codex-runtimes/codex-primary-runtime/dependencies;
 export PATH=$NB/node/bin:$NB/bin/fallback:$PATH npm_config_manage_package_manager_versions=false`).
 - Stack: lane 3's container `qelvora-lane3-postgres` is stopped with its data (pg_stat_statements on).
   `node infra/local/stack.mjs up --lane 3 --no-ai --no-smoke` restarts it (add `--no-web` for backend
   only); `sh tests/scenarios/lane-3/fresh-stack.sh` rebuilds from nothing in about a minute (needed
-  before E3A.5 kills and after any crash, finding 17). Test DB:
+  before E3A.5 kills, after any crash, finding 17, and before E3B.1, E3B.3 and E3B.4, which publish
+  Maya themselves). Test DB:
   `eval "$(node infra/local/stack.mjs env --lane 3 | grep '^CREATOR_TEST_DATABASE_URL=' | sed 's/^/export /')"`,
   then `(cd apps/backend && pnpm exec vitest run)`; T-11 times out above host load about 20, rerun.
 - Real model: only through the founder's capped gateway (`--provider anthropic --model-gateway
@@ -28,12 +27,47 @@ http://127.0.0.1:56499`; publish Maya on the fake first, then restart with the g
   patch the `definitionChecksum` values in `infra/migrations/reviews/*.json`, `catalogues write --base F`,
   restart, test, then `git checkout -- infra/migrations/reviews` (never commit pins; the integrator
   regenerates them).
-- Waiting on others: the integrator registers #451 and reviews #455 and #464 (custody-adjacent); lane 4
+- Waiting on others: the integrator registers #451, #490 and #492 (integrator tickets below); lane 4
   takes finding 9's condition; lane 7 hides step-in natively (B9); lane 2 makes the model fake's reply
   configurable.
 - E3B.4 needs the backend's OpenAI-host calls routed through its recording edge: rebuild with
   `sh tests/scenarios/lane-3/fresh-stack.sh --env QELVORA_FAKE_MODEL_URL=http://127.0.0.1:56438`
   (port 56438 is lane 3's; the scenario opens the edge itself and forwards to the fake on 56433).
+
+## Merge wave (2026-10-16)
+
+At the founder's request every open lane 3 pull request lands at once through one merge-wave pull
+request (as the integrator landed #433 and #410 through #442): main plus each lane 3 head in
+dependency order, which closes each one as merged. Conflicts and their resolutions:
+
+- `agent/model.ts` (#438 with #441): both added independent code (the cost-hold pricing, the FAQ
+  verdict); both kept.
+- `agent/generation-pipeline.ts` (#455 with #464): A4 folds the readback into `deliver()`; finding 8
+  records the committed cursor after it. Kept A4's single transaction and record the cursor right after
+  its check passes, so finding 8 reconciles with the cursor actually committed.
+- `conversation/feature.ts` (#436 with #489): A5's structure (the model's check only before a refusal)
+  with A6c's protection inside it: a dropped request does not cancel a check already sent; it runs to
+  its 15 s deadline and a fan who left has nothing accepted.
+- `ConversationScreen.tsx` (#482 with #491): both imports kept. The memory prompt still appears on the
+  page's 15 s poll after the answer (as before A7: the proposal follows the last frame).
+- This status file: the newest text (#495's).
+
+Integration changes in the wave (not in any one pull request): the cost hold now also bounds B4's
+embedding query (the previous fan turn, at most 2,000 code points, before the message) and B5's
+memory calls (one extraction quoting the exchange, up to five sensitivity calls); with the Claude
+adapter and Sonnet as the small model the hold is $3.18 for a short question and $3.25 for a
+2,000-character one (it was $2.62), still admitted under a $5 cap. A6c's disconnect scenario now
+takes over fan 1's conversation first, because since A5 only a refused message gets the model's check
+before acknowledgment.
+
+Verified on the combined tree, end to end (fakes: development identity, the model fake or lane 3's
+scripted edge): generate, typecheck, lint, format and every test suite pass; hold bound 5 of 5 under a
+$5 cap (largest spend 0.39% of its hold); A6c disconnect 8 of 8 through a refusal; E3A.1 2 fans x 5:
+10 of 10 delivered, acknowledgment p50 216 ms, no socket closes; E3A.9 finding 6 pass; E3A.4 takeover
+ends the answer 2.7 to 3.1 s after the change (finding 8), with the known uncertain cost at the stream
+timing (finding 7, open, same on main); A5 7 of 7; E3B.4 as on its branch (4 of 6 follow-ups, the two
+recorded misses); E3B.1 all pass; E3B.3 all pass. Not run on the combined tree: E3B.5 and its web half
+(they need the B5 writer registered), E3A.5 and E3A.3 (unchanged paths), the real model.
 
 ## Finding 6: the settlement retries a locked thread row
 
