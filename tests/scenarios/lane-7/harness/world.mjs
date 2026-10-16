@@ -184,6 +184,21 @@ const CREATORS = [
       "Lena answers written replies within 3 days · 6 of 6 left this week.",
     membership: null,
   },
+  {
+    // WP 7.4 P3: a display name that starts with an emoji and a lowercase
+    // letter, so the seal must show "F" (the first letter, uppercased).
+    n: 8,
+    handle: "fernstudio",
+    name: "🌿 fern studio",
+    category: "Crafts",
+    mode: "companion",
+    state: "published",
+    topics: ["dyeing"],
+    bio: "Plant dyes for wool and linen.",
+    capacity:
+      "fern studio answers written replies within 3 days · 4 of 4 left this week.",
+    membership: null,
+  },
 ];
 
 /** One conversation per state. `rich` has every message kind the contract allows. */
@@ -233,6 +248,7 @@ export function createWorld({ now = () => Date.now() } = {}) {
     creators: new Map(),
     threads: new Map(),
     notifications: [],
+    presence: new Map(),
     follows: new Map(),
     devices: [],
     preferences: new Map(),
@@ -259,6 +275,7 @@ export function seed(world) {
     "threads",
     "follows",
     "preferences",
+    "presence",
   ])
     world[key].clear();
   world.notifications = [];
@@ -351,6 +368,7 @@ export function seed(world) {
     if (p.threads) for (const t of THREADS) addThread(world, account, t);
   }
   addNotifications(world, world.accounts.get(ids.account(1)));
+  addPresence(world, world.accounts.get(ids.account(1)));
 }
 
 let signedCounter = 100;
@@ -497,20 +515,6 @@ function addThread(world, account, spec) {
     addMessage(
       world,
       thread,
-      "human_broadcast",
-      "The Friday glaze clinic is back. Bring one test tile. Followers get the first places.",
-      { minutesAgo: 30 },
-    );
-    addMessage(
-      world,
-      thread,
-      "human_reaction",
-      copy("reaction", { name: first }),
-      { minutesAgo: 20 },
-    );
-    addMessage(
-      world,
-      thread,
       "human_creator",
       "Devon, send me a photo of the tile after the next firing and I'll look at it properly.",
       { minutesAgo: 10 },
@@ -644,4 +648,88 @@ function addNotifications(world, account) {
       });
     },
   );
+}
+
+/** The API's presence instants: UTC to the microsecond (C4 cursors need them). */
+export const isoMicro = (ms, micro = 0) =>
+  new Date(ms).toISOString().replace("Z", `${String(micro).padStart(3, "0")}Z`);
+
+let presenceCounter = 1;
+/** C4: a Note is stored once and drawn into each eligible fan's thread at read
+ * time, so it is never a thread message. `visibleTo` stands in for the real
+ * audience, tier, mute and denial checks. */
+export function publishNote(world, creator, spec) {
+  const n = presenceCounter++;
+  const note = {
+    kind: "note",
+    id: ids.note(n),
+    version: 1,
+    audience: spec.audience ?? { kind: "members", label: "all members" },
+    text: spec.text,
+    signedActId: ids.signed(5000 + n),
+    at: isoMicro(world.now() - (spec.minutesAgo ?? 0) * 60_000, n % 1000),
+    published: true,
+    visibleTo: new Set(spec.visibleTo ?? []),
+  };
+  presenceOf(world, creator).notes.push(note);
+  return note;
+}
+
+/** The creator's signed reaction to one fan's own reply to a Note. */
+export function react(world, creator, note, account, spec = {}) {
+  const n = presenceCounter++;
+  const reaction = {
+    kind: "reaction",
+    id: uid("e2000000", n),
+    noteId: note.id,
+    reaction: spec.reaction ?? "heart",
+    signedActId: ids.signed(5000 + n),
+    at: isoMicro(world.now() - (spec.minutesAgo ?? 0) * 60_000, n % 1000),
+    fanAccountId: account.id,
+    replyAvailable: true,
+  };
+  presenceOf(world, creator).reactions.push(reaction);
+  return reaction;
+}
+
+function presenceOf(world, creator) {
+  if (!world.presence.has(creator.id))
+    world.presence.set(creator.id, { notes: [], reactions: [] });
+  return world.presence.get(creator.id);
+}
+
+/** Devon's Notes from Maya: one he may see and one he may not beside his
+ * thread's messages, a reaction to his reply, and older Notes that make the
+ * app follow three pages at limit 50, the second of them empty. */
+function addPresence(world, devon) {
+  presenceCounter = 1;
+  const maya = [...world.creators.values()].find((c) => c.handle === "maya");
+  const gold = { kind: "tiers", label: "Gold members" };
+  publishNote(world, maya, {
+    text: "Studio hours change next month. Mornings move to Saturday.",
+    minutesAgo: 11 * 1440,
+    visibleTo: [devon.id],
+  });
+  publishNote(world, maya, {
+    text: "Thank you for the glaze questions this month.",
+    minutesAgo: 10 * 1440,
+    visibleTo: [devon.id],
+  });
+  for (let day = 100; day >= 1; day -= 1)
+    publishNote(world, maya, {
+      text: `Gold members: kiln log ${day}.`,
+      audience: gold,
+      minutesAgo: (9 + day / 101) * 1440,
+    });
+  const clinic = publishNote(world, maya, {
+    text: "The Friday glaze clinic is back. Bring one test tile and your firing notes.",
+    minutesAgo: 30,
+    visibleTo: [devon.id],
+  });
+  publishNote(world, maya, {
+    text: "Gold members: the spring kiln opening is booked.",
+    audience: gold,
+    minutesAgo: 25,
+  });
+  react(world, maya, clinic, devon, { minutesAgo: 20 });
 }

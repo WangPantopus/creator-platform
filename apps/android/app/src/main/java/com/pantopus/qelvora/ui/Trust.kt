@@ -183,9 +183,11 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
     var authorship by remember { mutableStateOf<Boolean?>(null) }
     var feedbackConsent by remember { mutableStateOf(false) }
     var feedbackComment by remember { mutableStateOf("") }
-    fun suspendPrivateResults() {
+    fun suspendPrivateResults(keepConfirmation: Boolean = false) {
         workEpoch++; busy = false
-        pendingExport = null; confirmDelete = false; result = ""; error = ""
+        // The generic confirmation carries no authority. Keep it through a
+        // same-session readiness check; its action stays disabled and captured.
+        pendingExport = null; if (!keepConfirmation) confirmDelete = false; result = ""; error = ""
     }
     fun clearPrivateResults() {
         suspendPrivateResults()
@@ -296,10 +298,14 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
             error = failure?.let { it.message ?: "Reconnect and try again." } ?: ""
         } finally { finishWork(epoch) }
     }
-    suspend fun perform(path: String, input: JsonObject): JsonObject? {
+    // A command with local consequences (`accepted`) finishes once sent, even if
+    // a routine session check cancels this screen's work meanwhile: the server
+    // may already have accepted it. Only showing the answer depends on the
+    // checks after it.
+    suspend fun perform(path: String, input: JsonObject, accepted: (suspend () -> Unit)? = null): JsonObject? {
         if (client == null || busy || !trustReady(model)) return null
         val epoch = beginWork()
-        return try { val value = capturedClient().request(path, input); currentCoroutineContext().ensureActive(); if (!trustReady(model) || workEpoch != epoch) throw CancellationException("Your original account view changed."); error = ""; key = UUID.randomUUID().toString(); value }
+        return try { val sender = capturedClient(); val value = if (accepted == null) sender.request(path, input) else withContext(kotlinx.coroutines.NonCancellable) { sender.request(path, input).also { accepted() } }; currentCoroutineContext().ensureActive(); if (!trustReady(model) || workEpoch != epoch) throw CancellationException("Your original account view changed."); error = ""; key = UUID.randomUUID().toString(); value }
         catch (cancelled: CancellationException) { throw cancelled }
         catch (failure: Exception) { if (trustReady(model) && workEpoch == epoch) error = failure.message ?: "Reconnect and try again."; null }
         finally { finishWork(epoch) }
@@ -321,12 +327,27 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
         finally { finishWork(epoch) }
     }
     suspend fun privacyCommand(action: String) {
-        val input = buildJsonObject { put("kind", action); put("scope", scope); put("proof", if (verificationMethod == "current_session") "CURRENT_SESSION" else proof); put("idempotencyKey", key); if (scope != "account") put("creatorId", creatorId.lowercase()); if (scope == "thread") put("threadId", threadId.lowercase()) }
-        perform("privacy/jobs", input)?.let { result = "Request saved; inspect each domain's progress."; load(); jobDetail(it.text("id")) }
+        val origin = baseURL ?: return
+        val account = model.session?.accountId ?: return
+        val deletionScope = scope; val creator = creatorId.lowercase(); val thread = threadId.lowercase()
+        val input = buildJsonObject { put("kind", action); put("scope", deletionScope); put("proof", if (verificationMethod == "current_session") "CURRENT_SESSION" else proof); put("idempotencyKey", key); if (deletionScope != "account") put("creatorId", creator); if (deletionScope == "thread") put("threadId", thread) }
+        // An accepted deletion removes the original account's matching drafts
+        // even if the account view changes before the answer is shown.
+        var purgeFailed = false
+        val saved = perform("privacy/jobs", input, accepted = if (action != "delete") null else ({
+            try {
+                com.pantopus.qelvora.conversation.ConversationDraftStorage(context).purge(origin, account,
+                    creator = if (deletionScope == "account") null else creator,
+                    thread = if (deletionScope == "thread") thread else null)
+            } catch (_: Exception) { purgeFailed = true }
+        }))
+        if (purgeFailed) { model.purge(); return }
+        saved?.let { result = "Request saved; inspect each domain's progress."; load(); jobDetail(it.text("id")) }
     }
+
     LaunchedEffect(route, privateReady, model.error) {
         operation?.cancel()
-        if (loadedRoute != route || model.error.isNotEmpty()) clearPrivateResults() else if (!privateReady) suspendPrivateResults()
+        if (loadedRoute != route || model.error.isNotEmpty()) clearPrivateResults() else if (!privateReady) suspendPrivateResults(keepConfirmation = privateVisible && model.checkingSession)
         loadedRoute = route; load()
     }
     LaunchedEffect(draftOwner, privateReady) {
@@ -450,7 +471,7 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
         }
         Button("Refresh", ButtonVariant.SECONDARY, block = true, disabled = busy || model.checkingSession || model.busy) { refreshOperation?.cancel(); refreshOperation = coroutine.launch { model.refresh() } }
     }
-    if (confirmDelete && privateReady) Dialog(onDismissRequest = { confirmDelete = false }) {
+    if (confirmDelete && privateVisible) Dialog(onDismissRequest = { confirmDelete = false }) {
         Column(Modifier.background(qColor("surface")).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             TrustText("Delete this data scope?", "title")
             TrustText("Access closes immediately. Purging waits for every domain. Store subscriptions must be canceled separately.")

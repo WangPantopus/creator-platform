@@ -1,0 +1,32 @@
+WP 7.4 P6, the provider sentence before the first message. 2026-10-15.
+Fake API (synthetic identities and data); the apps are real.
+Branch lane-7/provider-consent, stacked on #457.
+
+Rule: when the provider policy is verified and every provider keeps and
+trains on nothing, the first-conversation screen says the fixed sentence
+processorConsent verbatim; otherwise it keeps "This AI is powered by ..."
+and each provider's own line. The terms links stay.
+
+Android (e7-4-consent.mjs; qelvora-lane7-android), 7 steps, all pass:
+P6.1 the sentence verbatim with "Lena Park" and the provider, the terms link,
+no per-provider line; Start with opens the thread once (one begin request),
+consented. P6.2 a provider that keeps messages: its own retention line, no
+promise. P6.3 an unverified policy: the development notice and the own
+lines, no promise. P6.4 two clean providers, both named, both links. P6.5
+font scale 2.0, Night: the sentence on screen in full.
+iOS (Lane7ConsentFlows via ios-navigation.mjs --consent; qelvora-lane7-ios):
+the same C1 to C5 at AX5 for C5: 5 flows passed, none skipped.
+
+Failures on the way: the iOS test looked for the terms link as a link
+(SwiftUI exposes it as a button); an exact-text subscript asserted inside
+XCTest on the longest sentence (now a predicate); the largest-text capture
+first missed the sentence, because the development banner is a scroll
+view of its own at that size and the helper dragged it.
+
+Gates: harness contract 62/62; generated files; typecheck; prettier; eslint.
+Android: unit and snapshot tests 19/19 (no image changed), lint 0 errors, 9
+device tests (4 pass, 5 skipped by design), release build. iOS: test build,
+existing UI tests (2 pass, 4 skipped by design), release build, package
+tests 18/18.
+Not run: the real stack (the screen reads the capabilities' providers,
+which the real API serves the same way); physical devices.

@@ -8,9 +8,14 @@ public enum W3FanFeatures {
     /// W1 calls this at sign-out/account revocation alongside credential purge.
     public static func clearPrivateState() async throws {
         await W3Realtime.shared.purge()
+        // Purge every feature even if one storage operation fails. W1 keeps
+        // sign-in fenced until the entire local purge succeeds.
+        var failure: Error?
+        do { try await W3DraftStorage.shared.purge() } catch { failure = error }
         do { try await W3ResumeStorage.shared.purge() }
-        catch { await W3OfflineStorage.shared.purge(); throw error }
+        catch { failure = failure ?? error }
         await W3OfflineStorage.shared.purge()
+        if let failure { throw failure }
     }
     public static func registration(baseURL: URL?) -> FanFeatureRegistration {
         FanFeatureRegistration(matches: { destination in
@@ -41,6 +46,12 @@ private struct W3ConversationDestination: View {
     }
 }
 
+/// Whether the reader is at the thread's newest row; read only by event handlers.
+private final class W3Follow { var atEnd = true; var top: CGFloat? }
+/// Where the thread's rows sit in its visible part: their top edge, and how far
+/// their end lies below the visible part's bottom.
+private struct W3ThreadPlace: Equatable { let top: CGFloat; let gap: CGFloat }
+
 private struct W3ThreadScreen: View {
     let baseURL: URL
     @StateObject private var model: W3ThreadModel
@@ -53,72 +64,119 @@ private struct W3ThreadScreen: View {
     @State private var originalReply: W3Message?
     @State private var sourceFailure = ""
     @State private var connectionRetry = 0
+    /// The reader is at the newest row: the thread follows new rows only then.
+    /// A plain reference, not view state: the end marker updates it while the
+    /// reader scrolls, and as state every update re-rendered the whole thread.
+    @State private var follow = W3Follow()
+    /// After "Earlier messages", the row that was first stays where it was.
+    @State private var keepInPlace: String?
     @FocusState private var composerFocused: Bool
+    @ScaledMetric(relativeTo: .body) private var composerLineHeight: CGFloat = 24
+    @Environment(\.dynamicTypeSize) private var textSize
+    #if os(iOS)
+    @Environment(\.verticalSizeClass) private var verticalSize
+    #endif
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var scheme
     init(baseURL: URL, creatorId: String, fanId: String, session: FanSession) {
         self.baseURL = baseURL; _model = StateObject(wrappedValue: W3ThreadModel(baseURL: baseURL, creatorId: creatorId, fanId: fanId, accountId: session.session?.accountId ?? "signed-out", sessionId: session.session?.sessionId ?? "")); self.session = session
     }
+    private var compact: Bool {
+        #if os(iOS)
+        textSize.isAccessibilitySize || verticalSize == .compact
+        #else
+        textSize.isAccessibilitySize
+        #endif
+    }
     var body: some View {
         VStack(spacing: 0) {
             if let page = model.page {
-                ThreadHeader(name: page.creatorName, subtitle: "Official AI", live: !model.offline && page.control == .human_active, onBack: { session.back() }, onAbout: { privacy = true })
-                IdentityStrip(state: page.control == .human_active ? .human : page.control == .ai_active ? .ai : .paused, name: page.creatorName)
+                if compact {
+                    HStack {
+                        ThreadIconButton(glyph: "back", label: QelvoraCopy.text("back"), color: qColor("ink", scheme)) { session.back() }
+                        Group {
+                            if page.control != .ai_active && page.control != .human_active {
+                                HStack { QelvoraGlyph(name: "pause", color: qColor("ink-muted", scheme)); Text(QelvoraCopy.text("aiPaused", values: ["name": page.creatorName])).qText("caption") }
+                            } else { AuthorLabel(kind: page.control == .human_active ? .humanCreator : .ai, name: page.creatorName) }
+                        }.frame(maxWidth: .infinity, alignment: .leading)
+                        ThreadIconButton(glyph: "info", label: QelvoraCopy.text("aboutConversation"), color: qColor("ink-muted", scheme)) { privacy = true }
+                    }
+                } else {
+                    ThreadHeader(name: page.creatorName, subtitle: "Official AI", live: !model.offline && page.control == .human_active, onBack: { session.back() }, onAbout: { privacy = true })
+                    IdentityStrip(state: page.control == .human_active ? .human : page.control == .ai_active ? .ai : .paused, name: page.creatorName)
+                }
                 ScrollViewReader { proxy in
                     ScrollView {
-                        LazyVStack(alignment: .leading, spacing: QelvoraTokens.space4) {
-                            if let offerId = model.introOfferId, session.session?.fan != nil, page.feedbackPolicy != nil {
-                                IntroOffer(offerId: offerId, session: session,
-                                    enabled: scenePhase == .active && !privacy && source == nil && originalReply == nil && comparisonQuestion == nil && !model.offline && !model.busy,
-                                    acknowledge: model.acknowledgeIntroOffer).id(offerId)
+                        // A plain stack at every text size. A lazy stack's height estimates could
+                        // keep moving its rows while Notes were placed or removed during a
+                        // scroll, re-estimating them forever, and the app spun (WP 7.3 at the
+                        // largest text, R5 at normal size). Exact sizes settle; a thread holds
+                        // at most 250 earlier messages and one page.
+                        VStack(alignment: .leading, spacing: QelvoraTokens.space4) { threadRows(page) }
+                            .padding(.horizontal, QelvoraTokens.space4).padding(.vertical, QelvoraTokens.space4)
+                            // The reader is at the newest row while the rows' end is in view.
+                            // Only the reader moving the rows (their top edge moves) leaves it:
+                            // rows arriving or growing below do not, so the thread follows them.
+                            .onGeometryChange(for: W3ThreadPlace.self) { geometry in
+                                let frame = geometry.frame(in: .named("thread-scroll"))
+                                return W3ThreadPlace(top: frame.minY, gap: frame.maxY - (geometry.bounds(of: .named("thread-scroll"))?.height ?? 0))
+                            } action: { place in
+                                defer { follow.top = place.top }
+                                if place.gap <= 40 { follow.atEnd = true }
+                                else if let top = follow.top, abs(place.top - top) > 0.5 { follow.atEnd = false }
                             }
-                            Text("Conversations with a creator’s AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.").qText("caption").padding(12).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusMd))
-                            if model.offline { Notice(tone: .offline, title: "You're offline", children: "You're seeing a saved conversation with a short reading lease. Reconnect to send.") }
-                            if page.offTheRecord { SystemLine(children: "Off the record · the AI keeps no memory from this conversation.") }
-                            if model.before != nil { Button("Earlier messages", variant: .quiet, disabled: model.busy || model.offline) { Task { await model.earlier() } } }
-                            ForEach(model.older.filter { old in !page.messages.contains { $0.id == old.id } } + page.messages) { message in
-                                row(message, page: page).id(message.id)
-                            }
-                            if let pending = model.pending {
-                                Message(kind: .fan, children: pending.text, name: page.creatorName, delivery: pending.rejected ? .failed : pending.uncertain ? nil : .pending)
-                                if pending.uncertain {
-                                    Text("Acceptance has not been confirmed. Retry checks the same message without a duplicate.").qText("caption")
-                                    Button("Retry", variant: .quiet, disabled: model.busy || model.offline) { Task { await model.send(retry: true) } }
-                                }
-                                if pending.rejected { Button("Keep editing", variant: .quiet) { model.draft = pending.text; model.pending = nil } }
-                            }
-                            if !model.failure.isEmpty { Notice(tone: .error, title: "Conversation status", children: model.failure) }
-                            Color.clear.frame(height: 1).id("conversation-end")
-                        }.padding(.horizontal, QelvoraTokens.space4).padding(.vertical, QelvoraTokens.space4)
                     }.textSelection(.enabled)
-                        // Open at the current reply and keep bottom-anchored
-                        // content growth visible. SwiftUI preserves a reader's
-                        // deliberate scroll away from that default position.
-                        .defaultScrollAnchor(.bottom)
+                        .coordinateSpace(name: "thread-scroll")
+                        // Open at the newest row and follow new rows while the reader is
+                        // there, explicitly, as Android does. Under a bottom anchor
+                        // (`defaultScrollAnchor(.bottom)`) a lazy stack could re-measure its
+                        // rows forever when the keyboard left while Notes arrived.
+                        .onChange(of: model.page == nil, initial: true) { _, missing in
+                            if !missing { follow.atEnd = true; toEnd(proxy) }
+                        }
+                        .onChange(of: tail(page)) { if follow.atEnd { toEnd(proxy) } }
+                        .onChange(of: compact) { toEnd(proxy) }
+                        .onChange(of: model.older.count) {
+                            if let id = keepInPlace { keepInPlace = nil; proxy.scrollTo(id, anchor: .top) }
+                        }
                         .scrollDismissesKeyboard(.interactively)
                         #if os(iOS)
                         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardDidShowNotification)) { _ in
                             // The default anchor does not follow the viewport
                             // contraction when the software keyboard appears.
                             // Align after that OS transition, only when editing.
-                            if composerFocused { proxy.scrollTo("conversation-end", anchor: .bottom) }
+                            if composerFocused { toEnd(proxy) }
                         }
                         #endif
-                        .onChange(of: model.pending?.key) { _, sent in if sent != nil { proxy.scrollTo("conversation-end", anchor: .bottom) } }
+                        .onChange(of: model.pending?.key) { _, sent in if sent != nil { follow.atEnd = true; toEnd(proxy) } }
                 }
                 VStack(spacing: QelvoraTokens.space3) {
                     if !page.canSend { Notice(title: "AI unavailable", children: page.unavailableReason ?? "Messaging is unavailable.") }
-                    Button("Ask \(page.creatorName) to step in", variant: .maya, block: true) { session.open("/commerce/packet?creatorId=" + model.creatorId) }
+                    if !composerFocused && !compact { Button(QelvoraCopy.text("stepIn", values: ["name": page.creatorName]), variant: .maya, block: true, initial: creatorInitial(page.creatorName)) { session.open("/commerce/packet?creatorId=" + model.creatorId) } }
                     HStack(alignment: .bottom, spacing: QelvoraTokens.space2) {
-                        TextField(page.control == .human_active ? "Message \(page.creatorName)…" : "Message \(page.creatorName)'s AI…", text: $model.draft, axis: .vertical)
-                            .lineLimit(1...5).qText("body").padding(12).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusMd))
+                        TextEditor(text: Binding(get: { model.draft }, set: { model.draft = String($0.prefix(2000)) }))
+                            .qText("body").scrollContentBackground(.hidden)
+                            // A bounded scrolling editor avoids intrinsic-height
+                            // feedback when a restored draft gains keyboard focus.
+                            .frame(height: compact ? max(44, composerLineHeight) : min(120, composerLineHeight * 2))
+                            .overlay(alignment: .topLeading) {
+                                if model.draft.isEmpty {
+                                    Text(page.control == .human_active ? "Message \(page.creatorName)…" : "Message \(page.creatorName)'s AI…")
+                                        .qText("body").foregroundStyle(qColor("ink-muted", scheme))
+                                        .lineLimit(1).padding(.leading, 5).padding(.top, 8)
+                                        .allowsHitTesting(false).accessibilityHidden(true)
+                                }
+                            }
+                            .padding(compact ? 4 : 12).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusMd))
                             .accessibilityLabel(page.control == .human_active ? "Message \(page.creatorName)" : "Message \(page.creatorName)'s AI")
                             .focused($composerFocused)
-                            .onChange(of: model.draft) { _, value in if value.count > 2000 { model.draft = String(value.prefix(2000)) } }
-                        Button("Send", variant: page.control == .human_active ? .maya : .ai, disabled: scenePhase != .active || privacy || source != nil || originalReply != nil || comparisonQuestion != nil || !page.canSend || model.offline || model.busy || model.pending != nil || !page.generationSequences.isEmpty || model.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) { Task { await model.send() } }
+                        // Send takes its one-line width first, as on Android; at the largest
+                        // text the creator's seal otherwise split the word across two lines.
+                        Button("Send", variant: page.control == .human_active ? .maya : .ai, initial: creatorInitial(page.creatorName), disabled: scenePhase != .active || privacy || source != nil || originalReply != nil || comparisonQuestion != nil || !page.canSend || model.offline || model.busy || model.pending != nil || !page.generationSequences.isEmpty || model.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) { Task { await model.send() } }
+                            .layoutPriority(1)
                     }
-                    if !composerFocused { HStack { Button("Me and privacy", variant: .quiet) { privacy = true }; Button("Get support", variant: .quiet) { session.open("/support") } } }
-                }.padding(QelvoraTokens.space4).background(qColor("ground", scheme))
+                    if !composerFocused && !compact { HStack { Button("Me and privacy", variant: .quiet) { privacy = true }; Button("Get support", variant: .quiet) { session.open("/support") } } }
+                }.padding(.horizontal, QelvoraTokens.space4).padding(.vertical, compact && composerFocused ? 4 : QelvoraTokens.space4).background(qColor("ground", scheme))
             } else {
                 Notice(title: "Conversation unavailable", children: model.failure.isEmpty ? "Loading your messages…" : model.failure).padding(16)
                 Button("Refresh", variant: .secondary) { connectionRetry += 1 }
@@ -171,6 +229,47 @@ private struct W3ThreadScreen: View {
             .sheet(item: $originalReply) { original in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original AI reply · version \(original.version)").qText("data-sm"); Text(original.text).qText("body").textSelection(.enabled) }.padding(16) } }
             .alert("Source unavailable", isPresented: Binding(get: { !sourceFailure.isEmpty }, set: { if !$0 { sourceFailure = "" } })) { SwiftUI.Button("Close") { sourceFailure = "" } } message: { Text(sourceFailure) }
     }
+    /// The thread's rows, in one plain stack at every text size.
+    @ViewBuilder private func threadRows(_ page: W3Page) -> some View {
+        if compact { IdentityStrip(state: page.control == .human_active ? .human : page.control == .ai_active ? .ai : .paused, name: page.creatorName) }
+        if let offerId = model.introOfferId, session.session?.fan != nil, page.feedbackPolicy != nil {
+            IntroOffer(offerId: offerId, session: session,
+                enabled: scenePhase == .active && !privacy && source == nil && originalReply == nil && comparisonQuestion == nil && !model.offline && !model.busy,
+                acknowledge: model.acknowledgeIntroOffer).id(offerId)
+        }
+        Text("Conversations with a creator’s AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.").qText("caption").padding(12).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusMd))
+        if model.offline { Notice(tone: .offline, title: "You're offline", children: "You're seeing a saved conversation with a short reading lease. Reconnect to send.") }
+        if page.offTheRecord { SystemLine(children: "Off the record · the AI keeps no memory from this conversation.") }
+        if model.before != nil { Button("Earlier messages", variant: .quiet, disabled: model.busy || model.offline) { keepInPlace = model.timeline(page).first?.id; Task { await model.earlier() } } }
+        ForEach(model.timeline(page)) { entry in
+            switch entry {
+            case .message(let message): row(message, page: page).id(message.id)
+            case .presence(let item): presenceRow(item).id(entry.id)
+            }
+        }
+        if let pending = model.pending {
+            Message(kind: .fan, children: pending.text, name: page.creatorName, delivery: pending.rejected ? .failed : pending.uncertain ? nil : .pending, onRetry: { Task { await model.send(retry: true) } })
+            if pending.uncertain {
+                Text("Acceptance has not been confirmed. Retry checks the same message without a duplicate.").qText("caption")
+                Button("Retry", variant: .quiet, disabled: model.busy || model.offline) { Task { await model.send(retry: true) } }
+            }
+            if pending.rejected { Button("Keep editing", variant: .quiet, disabled: model.busy) { model.draft = pending.text; model.pending = nil } }
+        }
+        if !model.failure.isEmpty { Notice(tone: .error, title: "Conversation status", children: model.failure) }
+        if compact && !composerFocused {
+            Button(QelvoraCopy.text("stepIn", values: ["name": page.creatorName]), variant: .maya, block: true, initial: creatorInitial(page.creatorName)) { session.open("/commerce/packet?creatorId=" + model.creatorId) }
+            Button("Me and privacy", variant: .quiet) { privacy = true }
+            Button("Get support", variant: .quiet) { session.open("/support") }
+        }
+        Color.clear.frame(height: 1).id("conversation-end")
+    }
+    /// The thread's newest end, below the last row.
+    private func toEnd(_ proxy: ScrollViewProxy) { proxy.scrollTo("conversation-end", anchor: .bottom) }
+    /// What changes at the newest end of the thread: rows, a reply growing, a send, a notice.
+    private func tail(_ page: W3Page) -> String {
+        let last = page.messages.last
+        return "\(page.messages.count)|\(last?.id ?? "")|\(last?.text.count ?? 0)|\(model.presence.count)|\(model.pending?.key ?? "")|\(model.failure.isEmpty)|\(model.offline)"
+    }
     @ViewBuilder private func row(_ message: W3Message, page: W3Page) -> some View {
         if message.authorKind == .system {
             if let destination = message.publicAnswerDestination(creatorId: page.creatorId) {
@@ -215,12 +314,30 @@ private struct W3ThreadScreen: View {
             if message.authorKind == .fan { if message.offTheRecord { Text("Not used for memory").qText("caption") } else { Button("Don't remember this",variant:.quiet,disabled:model.busy || model.offline) { Task { await model.forget(message) } } } }
         } else {
             VStack(alignment: .leading, spacing: 8) {
-                Text(message.authorKind == .human_broadcast ? "Note from \(page.creatorName) · audience details unavailable" : message.authorKind == .human_reaction ? "\(page.creatorName) reacted" : "Call with \(page.creatorName)").qText("label")
+                HStack(spacing: QelvoraLayout.authorGap) {
+                    if message.authorKind == .human_broadcast { Mark(kind: .humanBroadcast) } else if message.authorKind == .human_reaction { Mark(kind: .humanReaction) }
+                    Text(message.authorKind == .human_broadcast ? "Note from \(page.creatorName) · audience details unavailable" : message.authorKind == .human_reaction ? "\(page.creatorName) reacted" : "Call with \(page.creatorName)").qText("label")
+                }
                 Text(message.text).qText("body")
                 if let act = message.signedActId { SignedMarker(name: page.creatorName) { session.open("/verify/" + act) } }
             }
         }
 
+    }
+    /// C4: a Note or reaction with the server's label, glyph and creator color.
+    /// A Note is never answered through the thread composer.
+    @ViewBuilder private func presenceRow(_ item: W3ThreadPresence) -> some View {
+        switch item {
+        case .note(let note):
+            Note(children: note.text, name: note.creatorName, reply: false, label: note.authorLabel) { session.open("/verify/" + note.signedActId) }
+                .accessibilityIdentifier("presence-note-" + note.id)
+        case .reaction(let reaction):
+            VStack(alignment: .leading, spacing: 8) {
+                ReactionChip(name: reaction.creatorName, label: reaction.authorLabel)
+                SignedMarker(name: reaction.creatorName) { session.open("/verify/" + reaction.signedActId) }
+            }.accessibilityElement(children: .contain).accessibilityIdentifier("presence-reaction-" + reaction.id)
+        case .unknown: EmptyView()
+        }
     }
     @ViewBuilder private func recordingRow(_ message: W3Message, page: W3Page) -> some View {
         if let recording = message.recording {
@@ -289,13 +406,17 @@ private struct W3FirstConversation: View {
                         disclosureSection("WHO RUNS IT") {
                             if let policy = caps?.providers {
                                 if !policy.verified { Notice(title: QelvoraCopy.text("conversationDevelopmentPolicyTitle"), children: QelvoraCopy.text("conversationDevelopmentPolicyNotice")) }
-                                Text("This AI is powered by " + policy.providers.map(\.name).joined(separator: ", ") + ".").qText("body")
+                                // The fixed consent sentence is a promise: only for a verified policy whose
+                                // every provider keeps and trains on nothing. Otherwise each provider's own line.
+                                let promise = policy.verified && policy.providers.allSatisfy { $0.noTraining && $0.noRetention }
+                                let providers = policy.providers.map(\.name).joined(separator: ", ")
+                                Text(promise ? QelvoraCopy.text("processorConsent", values: ["name": creator?.name ?? "the creator", "providers": providers]) : "This AI is powered by " + providers + ".").qText("body")
                                 ForEach(policy.providers, id: \.name) { provider in
                                     if let url = URL(string: provider.termsUrl) {
                                         Link(provider.name + " processing terms", destination: url)
                                             .qText("body").frame(minHeight: 44, alignment: .leading)
                                     }
-                                    Text((provider.noTraining ? "Doesn't train on your messages." : "Review message use in these terms.") + " " + (provider.noRetention ? "Doesn't keep your messages." : "Review message retention in these terms.")).qText("caption")
+                                    if !promise { Text((provider.noTraining ? "Doesn't train on your messages." : "Review message use in these terms.") + " " + (provider.noRetention ? "Doesn't keep your messages." : "Review message retention in these terms.")).qText("caption") }
                                 }
                             } else { Text("AI providers and their verified processing terms are not configured yet.").qText("body") }
                         }

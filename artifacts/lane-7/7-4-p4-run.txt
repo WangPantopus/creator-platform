@@ -1,0 +1,39 @@
+WP 7.4 P4, citations. 2026-10-15/16.
+Fake API (synthetic identities and data); the apps are real.
+Branch lane-7/citation-refusal, stacked on #462.
+
+Survey: both apps draw each citation as "Source · Read the original
+passage" and open the passage from GET .../citations/{id}. The real API
+refuses a passage that is no longer readable with 403 citation_unavailable
+("No longer accessible to you").
+
+Defect (Android), shown on the app before the fix: after that refusal the
+screen read "Conversation unavailable · No longer accessible to you" at 0.3
+and 1.2 s, and the thread came back at 2.5 s with nothing said about the
+source (a thread refusal path, followed by a reload). The "Original AI
+reply" link used the same handler. iOS shows "Source unavailable" and keeps
+the thread. Fix: Android says "Source unavailable · No longer accessible to
+you" in a dialog and keeps the thread, its draft and its connection.
+
+Android (e7-4-citations.mjs), after the fix, 4 steps, all pass: P4.1 the
+passage "Why celadon pinholes" opens and closes back to the thread; P4.2 a
+403 refusal is said, the thread and the typed draft stay; P4.3 a 404 the
+same. Before the fix P4.1 passed and P4.2 failed (no message; the thread was
+replaced for about two seconds).
+iOS (Lane7CitationFlows via ios-navigation.mjs --citations): P1 to P3, 3
+flows passed, none skipped (the iOS app was already right).
+
+Found on the way, not caused by P4: an intermittent iOS freeze when typing
+in Maya's thread at normal text size and swiping fast at once (2 of about 13
+attempts with Notes rows, 0 of 5 without); the main thread spun in SwiftUI's
+lazy stack under the bottom-anchored scroll position. Recorded in the spec
+with a proposed fix of its own; the iOS flows here scroll with slow drags.
+Also: an open dialog makes the Android thread fetch its offline lease about
+once a second (seen before this change too; for WP 7.8).
+
+Gates: harness contract 62/62; prettier; eslint. Android: unit and snapshot
+tests 19/19 (no image changed), lint 0 errors, 9 device tests (4 pass, 5
+skipped by design), release build. iOS: the
+app code is unchanged; its new test file builds.
+Not run: the original AI reply path (the fake has no corrections); the real
+stack; physical devices.
