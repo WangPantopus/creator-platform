@@ -80,6 +80,8 @@ type Packet = {
   decision_at: string | null;
   hold_expires_at: string | null;
   question?: string;
+  /** Why a declined request ended: "decline", or "ai_answer" for "Let AI answer". */
+  reason?: string | null;
   disclosure: { summary?: string };
   commitment_id?: string;
   commitment_state?: string;
@@ -291,6 +293,13 @@ function date(value: string | null | undefined) {
 function requestId(id: string) {
   return `REQ-${id.slice(0, 8).toUpperCase()}`;
 }
+/** A delivery window in words: hours up to 48, whole days beyond. */
+function deadlinePhrase(hours: number) {
+  if (hours === 1) return "1 hour";
+  return hours <= 48 || hours % 24 !== 0
+    ? `${hours} hours`
+    : `${hours / 24} days`;
+}
 async function commerceFetch(path: string, init: RequestInit = {}) {
   try {
     init.signal?.throwIfAborted();
@@ -357,7 +366,10 @@ function Empty({
   );
 }
 function status(p: Packet, name: string) {
-  if (p.state === "declined") return formatCopy("declined", { name });
+  if (p.state === "declined")
+    return formatCopy(p.reason === "ai_answer" ? "declinedForAi" : "declined", {
+      name,
+    });
   if (p.state === "expired") return formatCopy("expired", { name });
   if (p.state === "withdrawn")
     return "Request withdrawn · the hold was released";
@@ -437,7 +449,13 @@ function requestSteps(p: Packet): RequestStatusProps["steps"] {
     ["submitted", "more_info", "offer_pending", "accepting"].includes(p.state)
   ) {
     steps.push({
-      label: p.state === "accepting" ? "Confirming charge" : "Decision due",
+      // While a question waits, this is when the request lapses unless the fan answers.
+      label:
+        p.state === "accepting"
+          ? "Confirming charge"
+          : p.state === "more_info"
+            ? copy.moreInfoAnswerBy
+            : "Decision due",
       time: date(p.decision_at),
       state: "current",
     });
@@ -1755,6 +1773,20 @@ function CommerceAccountScreen({
                         )?.display_name ?? "The creator",
                       )}
                     />
+                    {detail.packet.state === "declined" &&
+                      detail.packet.reason === "ai_answer" && (
+                        <Link
+                          className="qv qv-btn qv-btn--secondary qv-btn--lg"
+                          href={`/threads/${detail.packet.creator_id}/${detail.packet.fan_id}`}
+                        >
+                          {formatCopy("askAiInstead", {
+                            name:
+                              data.creators.find(
+                                (c) => c.id === detail.packet.creator_id,
+                              )?.display_name ?? "The creator",
+                          })}
+                        </Link>
+                      )}
                     {detail.callTransport && (
                       <section
                         className="commerce-card"
@@ -2186,8 +2218,7 @@ function CommerceAccountScreen({
                           {[
                             "Mode",
                             "Price",
-                            "Deadline",
-                            "Refund if late",
+                            copy.offerDeliveryHeading,
                             "Per week",
                             "State",
                           ].map((v) => (
@@ -2209,8 +2240,11 @@ function CommerceAccountScreen({
                                   ? money(m.amount, m.currency)
                                   : "Not set"}
                               </span>
-                              <span>{m.delivery_hours} h</span>
-                              <span>Full refund</span>
+                              <span>
+                                {formatCopy("offerDeliveryRule", {
+                                  deadline: deadlinePhrase(m.delivery_hours),
+                                })}
+                              </span>
                               <span>
                                 {m.used + m.reserved} of {m.weekly_limit}
                               </span>

@@ -716,6 +716,28 @@
         }
       }
     },
+    "Delivery": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delivery"
+          }
+        }
+      }
+    },
+    "Within {deadline} of accepting, or a full refund": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Within {deadline} of accepting, or a full refund"
+          }
+        }
+      }
+    },
     "Opening this conversation is logged and visible to the fan.": {
       "extractionState": "manual",
       "localizations": {
@@ -1075,6 +1097,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "{name} passed on this one · nothing charged"
+          }
+        }
+      }
+    },
+    "{name} suggests asking {name}'s AI · nothing charged": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{name} suggests asking {name}'s AI · nothing charged"
+          }
+        }
+      }
+    },
+    "Ask {name}'s AI": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ask {name}'s AI"
+          }
+        }
+      }
+    },
+    "Answer by": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Answer by"
           }
         }
       }
