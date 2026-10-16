@@ -24,6 +24,10 @@ Open:
 - E1.5 for a creator who signs in with Apple: sign-in, verification, a passkey, a signed and
   published Note and its public page, with edges: #458 (`lane-1/e1-5-apple-creator`, on main,
   a scenario only).
+- Copy: the founder's approved sign-in wording for Apple and Google accounts in lane 1's files
+  ("Sign in again" instead of "Continue with Pantopus"): #461 (`lane-1/sign-in-wording`, on main).
+  It and #439 both touch the recovery notice in `setup.tsx`; lane 1 resolves whichever merges
+  second.
 
 Next: WP 1.6 second part after the founder's answers (automatic allowing of clean Note replies,
 lifting a pause). After #439's migration is registered, its signing reads use the plain column
@@ -33,8 +37,8 @@ Blocked on:
 
 - Counsel's confirmation of the 18+ method, and the policy page for younger people (WP 1.9) that
   the adults-only page should link to.
-- The founder's approval of sign-in wording for option D (#458): Apple and Google users still read
-  "Continue with Pantopus" when a session ends; proposed replacements are in #458.
+- The founder's approval of four more lane 1 strings that still say Pantopus (setup step label,
+  privacy page link and help line, ops sign-in link); proposed in #461.
 - The founder's ops decisions in `lane-1-ops.md` (#440): P1 (open paid requests on a pause), P2
   (lifting a pause), R1 (when a Note reply is clean), O1 (supervisor-wide audit wording), O2
   (adding ops reviewers).
@@ -75,6 +79,11 @@ Scenarios:
 
 Tickets to other lanes:
 
+- Sign-in wording for Apple and Google accounts (founder, 2026-10-15; exact strings in #461): lane 4
+  (`modules/commerce`, `features/commerce`), lane 6 (`features/studio`), lane 3
+  (`features/creator-ai`, the threads page, the studio AI proxy), lane 5 (`features/content` and
+  the `w5`/`growth` session copy keys), lane 7 (iOS and Android session messages), and the
+  integrator (`app.ts`, `integration.ts`, `packages/api/src/content-client.ts`).
 - Lane 3, `modules/conversation/privacy.ts`: run without a recordings adapter when none exist;
   blocks conversation, agent and trust for export and delete (#409).
 - Lane 4, `modules/commerce/operations.ts`: deletion per Q16 (#409).
