@@ -204,7 +204,7 @@ await new Promise((resolve, reject) => {
 });
 
 // ------------------------------------------------------------------ helpers
-const ROUTE = `--env=QELVORA_FAKE_MODEL_URL=http://127.0.0.1:${EDGE_PORT}`;
+const ROUTE = ["--env", `QELVORA_FAKE_MODEL_URL=http://127.0.0.1:${EDGE_PORT}`];
 /** The stack's own OpenAI rates (infra/local/stack.mjs) plus a second embedding model. */
 const RATES_WITH_LARGE = JSON.stringify({
   "gpt-4o-mini": {
@@ -243,7 +243,7 @@ function restart(extra = []) {
     "--no-web",
     "--no-ai",
     "--no-smoke",
-    ROUTE,
+    ...ROUTE,
     ...extra,
   ]);
   if (!/READY/u.test(out))
@@ -495,8 +495,10 @@ async function rebuild(extra, label) {
 }
 await rebuild(
   [
-    "--env=W2_EMBEDDING_MODEL=text-embedding-3-large",
-    `--env=W2_MODEL_RATES_JSON=${RATES_WITH_LARGE}`,
+    "--env",
+    "W2_EMBEDDING_MODEL=text-embedding-3-large",
+    "--env",
+    `W2_MODEL_RATES_JSON=${RATES_WITH_LARGE}`,
   ],
   "another embedding model",
 );
