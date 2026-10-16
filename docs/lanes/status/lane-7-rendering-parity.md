@@ -334,9 +334,65 @@ cite, while its post is published; otherwise `403 citation_unavailable`.
   about 13 attempts with Notes rows present, 0 of 5 without. The bottom anchor is older than lane
   7's current work (it is on `main`); Notes rows seem to make the loop likelier. Proposed fix, its
   own pull request: scroll to the newest row explicitly instead of anchoring, as Android does, then
-  rerun the WP 7.3 draft flows, the P1 flows and D3T. These flows scroll with slow drags meanwhile.
+  rerun the WP 7.3 draft flows, the P1 flows and D3T. Fixed in #471: see "The iOS thread freeze"
+  below.
 - **A small difference, by platform convention**: after the "Source unavailable" alert, iOS gives
   the message box its focus back (the keyboard returns); Android's dialog does not.
+
+## The iOS thread freeze (#471)
+
+Found while writing the P4 flows (see P4 above), fixed in its own pull request, #471.
+
+### What changed
+
+1. **No bottom anchor.** The thread opens at its newest row and follows new rows while the reader
+   is there, explicitly, as Android does. "Earlier messages" keeps the row that was first where it
+   was; switching between the compact and normal layouts returns to the newest row.
+2. **A plain stack at every text size.** Removing the anchor was not enough: the presence flow R5
+   froze the app on this branch, and on `lane-7/status-7-4` too, in SwiftUI's lazy stack layout
+   while Notes were placed or removed during a scroll (sampled both times: the main thread never
+   left `GraphHost.flushTransactions`). The largest text has used a plain stack since WP 7.3 for
+   the same reason and never froze; now every text size does. A thread holds at most 250 earlier
+   messages and one page, so every row is laid out exactly once.
+3. **Only the reader stops the following.** The thread follows new rows unless the reader moved
+   the rows (their top edge moved) and the newest row is out of view. Rows arriving or growing
+   below never stop it. Before, a Note, a takeover or a hand-back could land below the fold and
+   stay there (E7.1 L1 to L5 failed on `lane-7/status-7-4`, and L1, L3 to L5 with the first fix).
+   The flag is not view state, so scrolling does not re-render the thread.
+4. **The flows' finders.** Every row of the thread now exists for XCUITest, so a label that
+   repeats ("Maya · to all members") means the one on screen, or the newest; a row absent from the
+   tree is absent from the whole thread.
+
+### Results (fake API; synthetic identities and data; the real iOS app on its simulator)
+
+| ID                                        | What                                                                                                                                                            | Before (`lane-7/status-7-4`)                                  | #471                    |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ----------------------- |
+| R1, R4, R5, R7, R8, R9, R10               | P1 Notes and reactions, including R5 (refusals and timeouts while scrolling), R7 (earlier messages) and R10 (opens at the bottom at AX5)                        | R5 froze at its first scroll                                  | pass, 7 of 7, no freeze |
+| D1, D2, D3, D3T, D4, D4R, D5, D7, D7U, D8 | WP 7.3 drafts and keyboard: rotation, largest text, a very tall row with 30 drags, sends                                                                        | not run                                                       | pass, 10 of 10          |
+| S1 to S3                                  | The creator's seal                                                                                                                                              | not run                                                       | pass                    |
+| P1 to P3                                  | Citations                                                                                                                                                       | not run                                                       | pass                    |
+| E7.1 S1 to S8, E1                         | Every thread state, switches, a server error                                                                                                                    | pass                                                          | pass                    |
+| E7.1 L1 to L5                             | Live delivery into an open thread                                                                                                                               | L1 to L5 fail (the thread lost its bottom once Notes arrived) | pass, 5 of 5            |
+| Gates                                     | Contract 62/62; generate check, typecheck, prettier, eslint; iOS test build, existing UI tests (2 pass, 4 skipped by design), release build, `swift test` 18/18 | not rerun                                                     | pass                    |
+
+E7.1 L1 and L5 were brought in line with C4: a Note is presence, read when the thread opens,
+comes back to the front or reconnects (no frame carries it), so L1 checks it after one trip to
+the background and L5 counts it in the creator's presence. Before C4 it was a message.
+
+Commands: `node tests/scenarios/lane-7/ios-navigation.mjs <xctestrun> --presence` (and
+`--drafts D1 D2 D3 D3T D4 D4R D5 D7 D7U D8`, `--seal`, `--citations`);
+`node tests/scenarios/lane-7/e7-1-states.mjs ios`. A freeze watchdog (outside the repository)
+ended an app only after a minute over 90% CPU and a sample whose main thread never returned to its
+run loop; its first version (20 s of CPU alone) once ended D7's app while it was starting under
+load, and D7 passed when run again. Evidence: `artifacts/lane-7/7-4-freeze-run.txt`.
+
+### What the runs found
+
+- **Android lost the thread's bottom after a reconnect** (E7.1 L5: the Note arrived below the
+  fold). Not caused by #471; fixed in its own pull request (`lane-7/android-follow`): only a
+  scroll that ended decides whether the thread follows.
+- **XCUITest is slower on long threads** now that every row is in the accessibility tree (about
+  5 s a query on a 60-message thread). The app itself is not slower to scroll.
 
 ## P2 to P11: the rules, written before the code
 
