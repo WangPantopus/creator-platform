@@ -328,6 +328,32 @@ export async function withdraw(fan, packetId) {
     idempotencyKey: key("withdraw"),
   });
 }
+/** Takes an offer off offer through the real mode command, as its creator would. */
+export async function pauseOffer(creator, modeId) {
+  const [m] = await sql("SELECT * FROM creator.commerce_mode WHERE id=$1", [
+    modeId,
+  ]);
+  return http(
+    "POST",
+    `/v1/commerce/creators/${m.creator_id}/modes/${modeId}`,
+    creator.token,
+    {
+      title: m.title,
+      kind: m.kind,
+      amount: m.amount === null ? null : Number(m.amount),
+      publicAmount: m.public_amount === null ? null : Number(m.public_amount),
+      currency: m.currency,
+      decisionHours: m.decision_hours,
+      deliveryHours: m.delivery_hours,
+      durationSeconds: m.duration_seconds,
+      weeklyLimit: m.weekly_limit,
+      shareable: m.shareable,
+      state: "paused",
+      version: m.version,
+      idempotencyKey: key("pause"),
+    },
+  );
+}
 
 // -------------------------------------------------------------- reporting
 

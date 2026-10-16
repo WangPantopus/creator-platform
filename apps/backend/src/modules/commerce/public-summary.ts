@@ -42,9 +42,13 @@ const phrases: Record<string, string> = {
   group_answer: "group answers",
   guaranteed_review: "reviews",
 };
-/** 48 hours and under in hours; whole days beyond. */
+/** 48 hours and under in hours ("1 hour" alone); whole days beyond. */
 export const deadlinePhrase = (hours: number) =>
-  hours <= 48 || hours % 24 !== 0 ? `${hours} hours` : `${hours / 24} days`;
+  hours === 1
+    ? "1 hour"
+    : hours <= 48 || hours % 24 !== 0
+      ? `${hours} hours`
+      : `${hours / 24} days`;
 
 /** Read with no account: offers and capacity are world-readable rows. */
 export async function commercePublicSummary(

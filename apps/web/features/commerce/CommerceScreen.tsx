@@ -235,6 +235,10 @@ const modesNames: Record<string, string> = {
   group_answer: "Group answer",
   guaranteed_review: "Guaranteed review",
 };
+/** An offer's delivery window in hours: "1 hour", "72 hours". */
+function hoursPhrase(hours: number) {
+  return hours === 1 ? "1 hour" : `${hours} hours`;
+}
 function money(amount: number | string | bigint, currency: string) {
   const digits =
     new Intl.NumberFormat(undefined, {
@@ -1272,7 +1276,8 @@ function CommerceAccountScreen({
                             : "Price unavailable"}
                         </span>
                         <p>
-                          Within {m.delivery_hours} hours or a full refund ·{" "}
+                          Within {hoursPhrase(m.delivery_hours)} or a full
+                          refund ·{" "}
                           {Math.max(0, m.weekly_limit - m.used - m.reserved)} of{" "}
                           {m.weekly_limit} left this week
                         </p>
@@ -1401,8 +1406,8 @@ function CommerceAccountScreen({
                               copy.modeMembersOnly
                             ) : (
                               <>
-                                Within {m.delivery_hours} hours or a full refund
-                                ·{" "}
+                                Within {hoursPhrase(m.delivery_hours)} or a full
+                                refund ·{" "}
                                 {Math.max(
                                   0,
                                   m.weekly_limit - m.used - m.reserved,
