@@ -1,8 +1,8 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-16, by the lane 3 session
-Working on: A5 (safety check after acknowledgment), PR A5_PR. Last done: A7 (frames), #482
-Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482, A5 A5_PR
+Working on: A5 (safety check after acknowledgment), PR #489. Last done: A7 (frames), #482
+Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482, A5 #489
 Next: B8 (My AI publish flow), B7 (consent text), B5 (memory, migrations), finding 5; B6 waits on the provider key and the embedding choice
 Blocked on: nothing. Later: the embedding choice (B6), the real model for B1's model check and finding 13 (gateway)
 
