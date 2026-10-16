@@ -68,10 +68,9 @@ request, fix it on that branch, with evidence. Otherwise:
 
 ## Environment: the stack is running; reuse it
 
-The lane 4 stack is **running** from worktree
-`/Users/yingpengwang/creator-platform/.claude/worktrees/lane-4-money-117d77`, which is on
-`lane-4/status-refresh` (main's code). It was reset for #487's evidence and has run a few scenarios
-since.
+The lane 4 stack is **running** from the desktop app's worktree `lane-4-money-117d77` (under the
+repository's `.claude/worktrees`), which is on `lane-4/status-refresh` (main's code). It was reset
+for #487's evidence and has run a few scenarios since.
 
 - PostgreSQL `qelvora-lane4-postgres` on 56440, 119 migrations, without #487's stand-in migration
   (the scenario removes it);
