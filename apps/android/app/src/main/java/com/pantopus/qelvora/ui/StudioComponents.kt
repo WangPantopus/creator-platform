@@ -93,7 +93,7 @@ fun NotificationRow(text: String, kind: NotificationKind = NotificationKind.AI, 
     Column(Modifier.fillMaxWidth().background(qColor(if (unread) "surface" else "ground")).clickable(role = Role.Button, onClick = onOpen)) {
         Row(Modifier.padding(horizontal = T.space4, vertical = T.messagePadding), horizontalArrangement = Arrangement.spacedBy(T.space3)) {
             Box(Modifier.size(T.avatarSize).background(qColor(if (category == "surface-sunken") category else "$category-surface"), RoundedCornerShape(T.notificationRadius)), contentAlignment = Alignment.Center) {
-                if (kind == NotificationKind.MAYA) BasicText(name.take(1), style = wordmarkStyle().copy(color = ink)) else Glyph(when (kind) { NotificationKind.AI -> "ring"; NotificationKind.NOTE -> "broadcast"; NotificationKind.APPROVED -> "approved"; NotificationKind.REACTION -> "heart"; NotificationKind.TEAM -> "team"; else -> "inbox" }, T.space4, ink)
+                if (kind == NotificationKind.MAYA) BasicText(creatorInitial(name), style = wordmarkStyle().copy(color = ink)) else Glyph(when (kind) { NotificationKind.AI -> "ring"; NotificationKind.NOTE -> "broadcast"; NotificationKind.APPROVED -> "approved"; NotificationKind.REACTION -> "heart"; NotificationKind.TEAM -> "team"; else -> "inbox" }, T.space4, ink)
             }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(T.space1 / 2)) { TextLine(sender, "label"); TextLine(text) }
             TextLine(time, "data-sm", "ink-muted")
@@ -114,7 +114,7 @@ fun ShareCard(text: String, name: String = "Maya", handle: String = "@kilnfire",
 @Composable
 fun CallChip(name: String = "Maya", time: String? = null, end: String? = null, recording: Boolean = false) {
     Column(verticalArrangement = Arrangement.spacedBy(T.space2)) {
-        Row(Modifier.height(T.callPersonHeight).qShadow("glow-maya", T.radiusPill).background(qColor("maya-surface"), CircleShape).padding(start = T.space2, end = T.messagePadding), horizontalArrangement = Arrangement.spacedBy(T.space2), verticalAlignment = Alignment.CenterVertically) { Seal(name.take(1), T.space6, true, onMaya = true); TextLine(copy("callAuthor", "name" to name), "control-body", "maya-accent", true) }
+        Row(Modifier.height(T.callPersonHeight).qShadow("glow-maya", T.radiusPill).background(qColor("maya-surface"), CircleShape).padding(start = T.space2, end = T.messagePadding), horizontalArrangement = Arrangement.spacedBy(T.space2), verticalAlignment = Alignment.CenterVertically) { Seal(creatorInitial(name), T.space6, true, onMaya = true); TextLine(copy("callAuthor", "name" to name), "control-body", "maya-accent", true) }
         Row(horizontalArrangement = Arrangement.spacedBy(T.composerGap), verticalAlignment = Alignment.CenterVertically) {
             Row(Modifier.height(T.callRecordingHeight).background(qColor("surface"), CircleShape).border(T.hairline, qColor("control-line"), CircleShape).padding(horizontal = T.space3), horizontalArrangement = Arrangement.spacedBy(T.space2), verticalAlignment = Alignment.CenterVertically) {
                 val ink = qColor(if (recording) "ink" else "ink-muted")
