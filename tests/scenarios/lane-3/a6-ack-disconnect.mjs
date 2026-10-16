@@ -3,6 +3,9 @@
 // while the model fake (outer edge, slowed) is answering the safety check; then
 // fan 2 asks. Behind the screen: no usage row is left without a cost, fan 1's
 // dropped message was not accepted, and fan 2's reply is delivered.
+// Since A5 only a message that will be refused gets the model's check before
+// acknowledgment, so Maya first takes over fan 1's conversation (and hands it
+// back at the end).
 //   node tests/scenarios/lane-3/a6-ack-disconnect.mjs
 import {
   ACTORS,
@@ -16,6 +19,7 @@ import {
   key,
   openFan,
   reporter,
+  signIn,
   sleep,
   sql,
 } from "./lib.mjs";
@@ -28,6 +32,16 @@ step(
 );
 const fan1 = await openFan(ACTORS.fanOne, "lane3fan1");
 const fan2 = await openFan(ACTORS.fanTwo, "lane3fan2");
+const maya = (await signIn(API, ACTORS.maya, "/studio/ai")).token;
+const took = await call(API, "POST", `${fan1.thread}/takeover`, {
+  token: maya,
+  body: { idempotencyKey: key("takeover") },
+});
+step(
+  "Maya takes over fan 1's conversation, so fan 1's messages are refused after the model's check",
+  took.status === 200,
+  `takeover ${took.status}`,
+);
 const unknown = async () =>
   (
     await sql(
@@ -163,6 +177,15 @@ step(
   "then another fan's reply is delivered",
   after?.state === "delivered",
   `send ${again.status}, ${after?.state}`,
+);
+const back = await call(API, "POST", `${fan1.thread}/handback`, {
+  token: maya,
+  body: { idempotencyKey: key("handback") },
+});
+step(
+  "Maya hands fan 1's conversation back",
+  back.status === 200,
+  `handback ${back.status}`,
 );
 await closeDb();
 finish();
