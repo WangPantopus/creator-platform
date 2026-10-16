@@ -6,6 +6,7 @@ import { requestAuthority } from "../identity/request-authority.js";
 import { identityTransaction } from "../identity/transaction.js";
 import { createAgentDomain } from "../agent/integration.js";
 import { trustIdentityAuthority } from "./identity-authority.js";
+import { PILOT_CRISIS_RESOURCES } from "./crisis-resources.js";
 import {
   scopedTrustEvidence,
   verificationEffects,
@@ -413,7 +414,7 @@ export async function createDevelopmentTrust(
         return state.rows.length === 1 && state.rows[0]?.closed !== true;
       },
       restoreReadyInTransaction,
-      crisisResources: [],
+      crisisResources: [...PILOT_CRISIS_RESOURCES],
     };
   } catch (error) {
     const cleanup = await Promise.allSettled([
