@@ -25,6 +25,8 @@ import com.pantopus.qelvora.identity.FanFeatureRegistration
 import com.pantopus.qelvora.identity.FanSession
 import com.pantopus.qelvora.identity.FanSessionRequestCapture
 import com.pantopus.qelvora.generated.CreatorAPIError
+import com.pantopus.qelvora.generated.QelvoraCopy
+import com.pantopus.qelvora.conversation.ConversationClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -183,6 +185,9 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
     var authorship by remember { mutableStateOf<Boolean?>(null) }
     var feedbackConsent by remember { mutableStateOf(false) }
     var feedbackComment by remember { mutableStateOf("") }
+    // The pickers' choices: null until loaded; memory only, cleared with the account view.
+    var conversations by remember { mutableStateOf<List<JsonObject>?>(null) }
+    var conversationsFailed by remember { mutableStateOf(false) }
     fun suspendPrivateResults(keepConfirmation: Boolean = false) {
         workEpoch++; busy = false
         // The generic confirmation carries no authority. Keep it through a
@@ -193,6 +198,33 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
         suspendPrivateResults()
         cases = emptyList(); notices = emptyList(); jobs = emptyList(); history = emptyList(); selectedJob = null
         local = false; verificationConfigured = false; verificationMethod = ""
+        conversations = null; conversationsFailed = false
+    }
+    /** Every page of the person's conversations (at most 20 pages of 50). */
+    suspend fun loadConversations() {
+        val origin = baseURL ?: return
+        val account = model.session?.accountId ?: return
+        if (!trustReady(model)) return
+        conversationsFailed = false
+        val api = ConversationClient(origin, model::currentToken, account)
+        try {
+            val all = mutableListOf<JsonObject>()
+            var cursor: String? = null
+            for (page in 0 until 20) {
+                val answer = api.request("account" + (cursor?.let { "?cursor=$it" } ?: "")).jsonObject
+                all += answer["threads"]?.jsonArray.orEmpty().map { it.jsonObject }
+                cursor = answer["nextCursor"]?.takeUnless { it is JsonNull }?.jsonPrimitive?.content
+                if (cursor == null) break
+            }
+            currentCoroutineContext().ensureActive()
+            if (!trustReady(model) || model.session?.accountId != account) return
+            conversations = all
+            // An id this screen cannot name is never sent: a choice not among the
+            // person's conversations is cleared, and they choose again.
+            if (creatorId.isNotEmpty() && all.none { it.text("creatorId") == creatorId.lowercase() }) creatorId = ""
+            if (threadId.isNotEmpty() && all.none { it.text("id") == threadId.lowercase() }) threadId = ""
+        } catch (cancelled: CancellationException) { throw cancelled }
+        catch (failure: Exception) { if (trustReady(model) && model.session?.accountId == account) { conversations = null; conversationsFailed = true } }
     }
     fun beginWork(): Int { workEpoch++; busy = true; return workEpoch }
     fun finishWork(epoch: Int) { if (workEpoch == epoch) busy = false }
@@ -296,7 +328,36 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
             catch (current: Exception) { checkLoad(); cases = emptyList(); notices = emptyList(); jobs = emptyList(); history = emptyList(); selectedJob = null; pendingExport = null; failure = failure ?: current }
             checkLoad()
             error = failure?.let { it.message ?: "Reconnect and try again." } ?: ""
+            if (!route.startsWith("/trust") && !route.contains("access") && !route.contains("feedback")) loadConversations()
         } finally { finishWork(epoch) }
+    }
+    /** WP 7.4 P5: a creator or a conversation is picked by the creator's name,
+     * never typed as an id. Nothing is chosen until the person chooses; a
+     * screen opened from a thread arrives with that creator chosen. */
+    val conversationPicker: @Composable (Boolean) -> Unit = { thread ->
+        val label = QelvoraCopy.text(if (thread) "pickerConversation" else "pickerCreator")
+        var open by remember(thread) { mutableStateOf(false) }
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            TrustText(label, "label")
+            val loaded = conversations
+            when {
+                conversationsFailed -> { TrustText(QelvoraCopy.text("pickerConversationsFailed")); Button(QelvoraCopy.text("growthTryAgain"), ButtonVariant.SECONDARY, disabled = busy || !privateReady) { launchPrivate { loadConversations() } } }
+                loaded == null -> TrustText("Loading…")
+                loaded.isEmpty() -> TrustText(QelvoraCopy.text("pickerNoConversations"))
+                else -> {
+                    val choices = if (thread) loaded.map { it.text("id") to it } else loaded.distinctBy { it.text("creatorId") }.map { it.text("creatorId") to it }
+                    val chosen = choices.firstOrNull { it.first == (if (thread) threadId else creatorId).lowercase() }?.second?.text("name")
+                    val shown = chosen ?: QelvoraCopy.text(if (thread) "pickerChooseConversation" else "pickerChooseCreator")
+                    Button(shown, ButtonVariant.SECONDARY, block = true, modifier = Modifier.semantics { contentDescription = "$label, $shown" }) { open = !open }
+                    if (open) choices.forEach { (id, item) ->
+                        Button(item.text("name"), ButtonVariant.QUIET, block = true) {
+                            if (thread) { threadId = id; creatorId = item.text("creatorId") } else creatorId = id
+                            open = false
+                        }
+                    }
+                }
+            }
+        }
     }
     // A command with local consequences (`accepted`) finishes once sent, even if
     // a routine session check cancels this screen's work meanwhile: the server
@@ -407,8 +468,7 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
             Button("Manage Google Play subscriptions", ButtonVariant.SECONDARY, block = true) { context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://play.google.com/store/account/subscriptions"))) }
             Row { listOf("account", "creator", "thread").forEach { value -> Button(value, ButtonVariant.QUIET) { scope = value } } }
             TrustText("Data scope: $scope", "label")
-            if (scope != "account") TrustField("Creator ID", creatorId) { creatorId = it }
-            if (scope == "thread") TrustField("Conversation ID", threadId) { threadId = it }
+            if (scope != "account") conversationPicker(scope == "thread")
             if (local) { TrustText("Synthetic local account: type LOCAL DEVELOPMENT to confirm.", "caption"); TrustField("Local confirmation", proof) { proof = it } }
             else if (verificationMethod == "current_session") TrustText("Your sign-in must be recent. Continue with Pantopus again if asked to verify your account.", "caption")
             else if (verificationConfigured) TrustField("Account verification receipt", proof) { proof = it }
@@ -446,7 +506,7 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
         } else {
             listOf("support", "ai_report", "abuse", "block", "crisis").chunked(2).forEach { choices -> Row { choices.forEach { value -> Button(value.replace('_', ' '), ButtonVariant.QUIET) { kind = value } } } }
             TrustText("Report type: " + kind.replace('_', ' '), "label")
-            if (kind == "ai_report" || kind == "abuse" || kind == "block") TrustField("Creator ID", creatorId) { creatorId = it }
+            if (kind == "ai_report" || kind == "abuse" || kind == "block") conversationPicker(false)
             if (kind == "ai_report") TrustField("AI message ID", messageId) { messageId = it }
             if (kind == "support") TrustField("Request ID (optional)", requestId) { requestId = it }
             if (kind == "crisis") TrustCrisisHelp(context,help)

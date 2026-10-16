@@ -121,6 +121,8 @@ export function register(router) {
       fanVersion: a.fan?.version ?? null,
     })),
     devices: world.devices,
+    // WP 7.4 P5: reports, blocks and exports as the apps sent them.
+    trust: world.trustCommands,
     notifications: world.notifications.map((n) => ({
       id: n.id,
       type: n.type,

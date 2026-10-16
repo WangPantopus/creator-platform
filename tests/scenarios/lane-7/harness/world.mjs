@@ -258,6 +258,7 @@ export function createWorld({ now = () => Date.now() } = {}) {
     sentenceDelayMs: 450,
     generationAvailable: true,
     comparisonsAvailable: false,
+    trustCommands: [],
     policy: structuredClone(POLICY),
   };
   seed(world);
@@ -280,6 +281,7 @@ export function seed(world) {
   ])
     world[key].clear();
   world.notifications = [];
+  world.trustCommands = [];
   world.devices = [];
   world.faults = [];
   world.generationAvailable = true;

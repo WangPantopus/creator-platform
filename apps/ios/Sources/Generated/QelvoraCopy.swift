@@ -1082,7 +1082,13 @@ public enum QelvoraCopy {
     "growthImpactPeopleHelped": "You helped {people} people this week.",
     "growthImpactThankYou": "A THANK-YOU, SHARED WITH PERMISSION",
     "growthImpactWeekCounts": "Counts are for this week only. Fans are never named here without their consent.",
-    "growthImpactNotAvailable": "No weekly digest is available yet."
+    "growthImpactNotAvailable": "No weekly digest is available yet.",
+    "pickerCreator": "Creator",
+    "pickerConversation": "Conversation",
+    "pickerChooseCreator": "Choose a creator",
+    "pickerChooseConversation": "Choose a conversation",
+    "pickerNoConversations": "You have no conversations yet.",
+    "pickerConversationsFailed": "Your conversations couldn't load."
   ]
   private static let variables = try! NSRegularExpression(pattern: #"\{([^}]+)\}"#)
   public static func text(_ key: String, values: [String: String] = [:]) -> String {

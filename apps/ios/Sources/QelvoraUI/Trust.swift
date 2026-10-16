@@ -26,6 +26,9 @@ private struct TrustAccess: Decodable { let case_id: String; let action: String;
 private struct TrustHelp: Decodable { struct Resource: Decodable { let region: String; let name: String; let url: String; let phone: String? }; let emergencyMessage: String; let resources: [Resource] }
 private struct TrustAck: Decodable { let id: String?; let number: Int?; let saved: Bool? }
 private struct TrustFailure: Decodable { struct Detail: Decodable { let message: String; let correlationId: String? }; let error: Detail }
+/// The person's conversations, by creator name (`GET /v1/conversations/account`).
+private struct TrustConversation: Decodable, Identifiable { let id: String; let creatorId: String; let name: String }
+private struct TrustConversationPage: Decodable { let threads: [TrustConversation]; let nextCursor: String? }
 
 private final class TrustPublicRedirectGuard: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
     func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping @Sendable (URLRequest?) -> Void) { completionHandler(nil) }
@@ -107,13 +110,18 @@ public struct TrustFanFeature: View {
     @State private var authorship = "unanswered"
     @State private var feedbackComment = ""
     @State private var feedbackConsent = false
+    /// The pickers' choices: nil until loaded; memory only, cleared with the account view.
+    @State private var conversations: [TrustConversation]?
+    @State private var conversationsFailed = false
     @Environment(\.colorScheme) private var scheme
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     public init(baseURL: URL?, model: FanSession) {
         client = baseURL.map { TrustClient(baseURL: $0) }; self.model = model
         let query = URLComponents(string: model.destination)?.queryItems ?? []
         let creator = query.first { $0.name == "creatorId" }?.value ?? "", message = query.first { $0.name == "messageId" }?.value ?? ""
-        if UUID(uuidString: creator) != nil && UUID(uuidString: message) != nil { _creatorID = State(initialValue: creator); _messageID = State(initialValue: message); _kind = State(initialValue: "ai_report") }
+        // Opened from a thread or a message: that creator is already chosen (as on Android).
+        if UUID(uuidString: creator) != nil { _creatorID = State(initialValue: creator.lowercased()) }
+        if UUID(uuidString: creator) != nil && UUID(uuidString: message) != nil { _messageID = State(initialValue: message); _kind = State(initialValue: "ai_report") }
         let request = query.first { $0.name == "requestId" }?.value ?? ""
         if UUID(uuidString: request) != nil { _requestID = State(initialValue: request) }
     }
@@ -161,7 +169,7 @@ public struct TrustFanFeature: View {
     }
     private var support: some View { VStack(alignment: .leading, spacing: 16) {
         Picker("Report type", selection: $kind) { Text("Support request").tag("support"); Text("Report AI message").tag("ai_report"); Text("Abuse report").tag("abuse"); Text("Block creator").tag("block"); Text("Crisis help").tag("crisis") }.pickerStyle(.menu)
-        if kind == "ai_report" || kind == "abuse" || kind == "block" { field("Creator ID", $creatorID) }
+        if kind == "ai_report" || kind == "abuse" || kind == "block" { conversationPicker(thread: false) }
         if kind == "ai_report" { field("AI message ID", $messageID) }
         if kind == "support" { field("Request ID (optional)", $requestID) }
         if kind == "crisis" { crisisHelp }
@@ -201,7 +209,7 @@ public struct TrustFanFeature: View {
     } }
     @ViewBuilder private var privacyScope: some View {
         Picker("Data scope", selection: $scope) { Text("Account").tag("account"); Text("Creator").tag("creator"); Text("Conversation").tag("thread") }.pickerStyle(.menu).frame(minHeight: 44).contentShape(Rectangle())
-        if scope != "account" { field("Creator ID", $creatorID) }; if scope == "thread" { field("Conversation ID", $threadID) }
+        if scope != "account" { conversationPicker(thread: scope == "thread") }
     }
     @ViewBuilder private var privacyVerification: some View {
         if capability?.localDevelopment == true { Text("Synthetic local account: type LOCAL DEVELOPMENT to confirm.").qText("caption"); field("Local confirmation", $proof) }
@@ -254,7 +262,56 @@ public struct TrustFanFeature: View {
     private func clearPrivateResults() {
         suspendPrivateResults()
         cases = []; notices = []; jobs = []; history = []; selectedJob = nil
-        capability = nil
+        capability = nil; conversations = nil; conversationsFailed = false
+    }
+    /// WP 7.4 P5: a creator or a conversation is picked by the creator's name,
+    /// never typed as an id. Nothing is chosen until the person chooses; a
+    /// screen opened from a thread arrives with that creator chosen.
+    @ViewBuilder private func conversationPicker(thread: Bool) -> some View {
+        let title = QelvoraCopy.text(thread ? "pickerConversation" : "pickerCreator")
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title).qText("label")
+            if conversationsFailed {
+                Text(QelvoraCopy.text("pickerConversationsFailed")).qText("body")
+                Button(QelvoraCopy.text("growthTryAgain"), variant: .secondary, disabled: privateDisabled) { run { await loadConversations() } }
+            } else if let conversations {
+                if conversations.isEmpty { Text(QelvoraCopy.text("pickerNoConversations")).qText("body") }
+                else {
+                    Picker(title, selection: thread ? $threadID : $creatorID) {
+                        Text(QelvoraCopy.text(thread ? "pickerChooseConversation" : "pickerChooseCreator")).tag("")
+                        if thread { ForEach(conversations) { item in Text(item.name).tag(item.id) } }
+                        else { ForEach(uniqueCreators(conversations), id: \.creatorId) { item in Text(item.name).tag(item.creatorId) } }
+                    }.pickerStyle(.menu).frame(minHeight: 44).contentShape(Rectangle()).accessibilityIdentifier(thread ? "picker-conversation" : "picker-creator")
+                }
+            } else { ProgressView().accessibilityLabel("Loading") }
+        }
+        .onChange(of: threadID) { _, id in if let match = conversations?.first(where: { $0.id == id }) { creatorID = match.creatorId } }
+    }
+    private func uniqueCreators(_ items: [TrustConversation]) -> [TrustConversation] {
+        var seen = Set<String>(); return items.filter { seen.insert($0.creatorId).inserted }
+    }
+    /// Every page of the person's conversations (at most 20 pages of 50).
+    private func loadConversations() async {
+        guard let client, let account = model.session?.accountId, privateReady else { return }
+        conversationsFailed = false
+        let api = W3ConversationClient(baseURL: client.baseURL, expectedAccountId: account)
+        do {
+            var all: [TrustConversation] = [], cursor: String?
+            for _ in 0..<20 {
+                let page: TrustConversationPage = try await api.request("account" + (cursor.map { "?cursor=" + $0 } ?? ""))
+                all += page.threads; cursor = page.nextCursor
+                if cursor == nil { break }
+            }
+            guard !Task.isCancelled, privateReady, model.session?.accountId == account else { return }
+            conversations = all
+            // An id this screen cannot name is never sent: a choice not among the
+            // person's conversations is cleared, and they choose again.
+            if !creatorID.isEmpty && !all.contains(where: { $0.creatorId == creatorID.lowercased() }) { creatorID = "" }
+            if !threadID.isEmpty && !all.contains(where: { $0.id == threadID.lowercased() }) { threadID = "" }
+        } catch {
+            guard !Task.isCancelled, privateReady, model.session?.accountId == account else { return }
+            conversations = nil; conversationsFailed = true
+        }
     }
     // The generic confirmation holds no authority; the action remains disabled
     // and requires a fresh capture while a same-session check is in flight.
@@ -301,6 +358,7 @@ public struct TrustFanFeature: View {
         } catch { guard !Task.isCancelled, privateReady, workEpoch == epoch else { return }; cases = []; notices = []; jobs = []; history = []; selectedJob = nil; exportPayload = nil; failure = failure ?? error }
         guard !Task.isCancelled, privateReady, workEpoch == epoch else { return }
         error = failure?.localizedDescription ?? ""
+        if !route.hasPrefix("/trust") && !route.contains("access") && !route.contains("feedback") { await loadConversations() }
     }
     /// A command with local consequences (`accepted`) finishes once sent, even if
     /// a routine session check cancels this screen's work meanwhile: the server

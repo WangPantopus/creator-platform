@@ -1084,4 +1084,10 @@
   <string name="growth_impact_thank_you" formatted="false">A THANK-YOU, SHARED WITH PERMISSION</string>
   <string name="growth_impact_week_counts" formatted="false">Counts are for this week only. Fans are never named here without their consent.</string>
   <string name="growth_impact_not_available" formatted="false">No weekly digest is available yet.</string>
+  <string name="picker_creator" formatted="false">Creator</string>
+  <string name="picker_conversation" formatted="false">Conversation</string>
+  <string name="picker_choose_creator" formatted="false">Choose a creator</string>
+  <string name="picker_choose_conversation" formatted="false">Choose a conversation</string>
+  <string name="picker_no_conversations" formatted="false">You have no conversations yet.</string>
+  <string name="picker_conversations_failed" formatted="false">Your conversations couldn\'t load.</string>
 </resources>
