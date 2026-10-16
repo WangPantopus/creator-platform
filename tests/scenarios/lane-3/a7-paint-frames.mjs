@@ -96,6 +96,7 @@ for (let i = 0; i < answers + 1; i++) {
     fetches: fetches.length,
     paints: paints.length,
   };
+  const screenBefore = await page.locator("main").innerText();
   await page.locator("textarea").fill(question);
   await page.getByRole("button", { name: "Send message" }).click();
   let accepted = null;
@@ -116,13 +117,25 @@ for (let i = 0; i < answers + 1; i++) {
     await sleep(2500);
     await context.setOffline(false);
   }
+  // The gateway may close the socket mid-answer (finding 5); a client that
+  // reconnects resumes from its cursor and may never see the final frame, so
+  // the answer's end is read from the database.
   let end = null;
-  for (let waited = 0; waited < 120_000 && !end; waited += 100) {
-    end = frames.find(
-      (f) =>
-        f.generationId === g && ["delivered", "interrupted"].includes(f.kind),
-    );
-    if (!end) await sleep(100);
+  for (let waited = 0; waited < 180_000 && !end; waited += 200) {
+    const [row] = g
+      ? await sql("SELECT state FROM creator.generation WHERE id=$1", [g])
+      : [];
+    if (["delivered", "interrupted"].includes(row?.state))
+      end = {
+        kind: row.state,
+        at:
+          frames.find(
+            (f) =>
+              f.generationId === g &&
+              ["delivered", "interrupted"].includes(f.kind),
+          )?.at ?? now(),
+      };
+    else await sleep(200);
   }
   await sleep(2500); // let the reconciling fetch land
   const sentences = frames.filter(
@@ -150,7 +163,12 @@ for (let i = 0; i < answers + 1; i++) {
     )
   )[0]?.text;
   const screen = await page.locator("main").innerText();
-  const occurrences = server ? screen.split(server.trim()).length - 1 : 0;
+  // The fake gives every answer the same text: after answer i it shows i times.
+  // The fake gives every answer the same text: one more on screen than before.
+  const shownTimes = (text) =>
+    server ? text.split(server.trim()).length - 1 : 0;
+  const occurrences = shownTimes(screen);
+  const expected = shownTimes(screenBefore) + 1;
   results.push({
     drop,
     end: end?.kind ?? "none",
@@ -163,8 +181,8 @@ for (let i = 0; i < answers + 1; i++) {
     drop
       ? "network lost mid-answer: the screen ends with the server's text once"
       : `answer ${i + 1}`,
-    Boolean(end) && occurrences === 1,
-    `${end?.kind ?? "no end"}; ${sentences.length} sentence frames; paint after frame ${latencies.map((l) => (l == null ? "never" : `${l} ms`)).join(", ")}; ${during.length} page fetches; server text on screen ${occurrences}x`,
+    Boolean(end) && occurrences === expected,
+    `${end?.kind ?? "no end"}; ${sentences.length} sentence frames; paint after frame ${latencies.map((l) => (l == null ? "never" : `${l} ms`)).join(", ")}; ${during.length} page fetches; server text on screen ${occurrences}x (expected ${expected}x)`,
   );
 }
 
