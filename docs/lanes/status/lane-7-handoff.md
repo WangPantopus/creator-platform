@@ -3,6 +3,9 @@
 This is a continuation, not a new start. The founder requested a clean handoff.
 Read this alongside `lane-7.md`, `lane-7-keyboard-drafts.md` and the harness runbook.
 
+**2026-10-16: WP 7.4 stopped for the report.** The pull-request stack, the decisions needed and
+the iOS freeze found are at the top of `lane-7.md`.
+
 **Resumed 2026-10-15.** #379 merged; the compact header was accepted; main is merged into
 #401, which is ready for review after a post-merge D6 defect was fixed. Devices and caches were
 recreated after a restart. Current state and next steps live in `lane-7.md`; the sections below
