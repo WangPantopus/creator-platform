@@ -18,6 +18,9 @@ import {
 } from "./response-usage.js";
 import type { Usage } from "../../../../../packages/api/src/agent/contracts.js";
 
+/** Request framing beyond the plain text: system wrapper, structured-output
+ * schema and message envelope. Generous, so a bounded call stays bounded. */
+export const CALL_OVERHEAD_TOKENS = 4096;
 export const ReplySchema = z.strictObject({
   sentences: z
     .array(
@@ -122,6 +125,10 @@ export interface AgentModel {
   /** Plain-text assembly budget, not a provider billing receipt. */
   countContextTokens(text: string, route: "small" | "large"): number;
   maximumRunCostMicros(prefixBytes: number): number | null;
+  /** Upper bound for one call outside a generation hold: its input bytes as
+   * tokens plus a fixed request overhead, and its full output cap, at the
+   * highest configured rates. Used only to bound a call whose cost is unknown. */
+  maximumCallCostMicros?(inputBytes: number): number | null;
   reply(
     instructions: string,
     context: string[],
@@ -174,6 +181,22 @@ export class OpenAIResponsesModel implements AgentModel {
           );
         },
       )
+    );
+  }
+  maximumCallCostMicros(inputBytes: number) {
+    if (!this.pricingConfigured) return null;
+    const rates = Object.values(this.configuration.rates!);
+    const input = Math.max(
+      ...rates.flatMap((r) => [
+        r.inputMicrosPerMillion,
+        r.cachedInputMicrosPerMillion ?? 0,
+        r.cacheWriteMicrosPerMillion ?? 0,
+      ]),
+    );
+    const output = Math.max(...rates.map((r) => r.outputMicrosPerMillion));
+    // Every call caps its output at 2000 tokens; UTF-8 bytes bound tokens.
+    return Math.ceil(
+      ((inputBytes + CALL_OVERHEAD_TOKENS) * input + 2000 * output) / 1_000_000,
     );
   }
   maximumRunCostMicros(prefixBytes: number) {

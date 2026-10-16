@@ -2,7 +2,7 @@ import { z } from "zod";
 import { DomainError } from "../../core/errors.js";
 import { contentHash } from "../../core/canonical.js";
 import type { Usage } from "../../../../../packages/api/src/agent/contracts.js";
-import { ReplySchema, type AgentModel } from "./model.js";
+import { CALL_OVERHEAD_TOKENS, ReplySchema, type AgentModel } from "./model.js";
 import { completedSentences, type StreamProposal } from "./streaming.js";
 import {
   ModelRateSchema,
@@ -329,6 +329,24 @@ export class AnthropicMessagesModel implements AgentModel {
           rate.cacheWriteMicrosPerMillion !== undefined
         );
       })
+    );
+  }
+  maximumCallCostMicros(inputBytes: number) {
+    if (!this.pricingConfigured) return null;
+    const rates = Object.values(this.configuration.rates!);
+    const input = Math.max(
+      ...rates.flatMap((r) => [
+        r.inputMicrosPerMillion,
+        r.cachedInputMicrosPerMillion ?? 0,
+        r.cacheWriteMicrosPerMillion ?? 0,
+      ]),
+    );
+    const output = Math.max(...rates.map((r) => r.outputMicrosPerMillion));
+    // UTF-8 bytes bound tokens; every call caps output at MAX_OUTPUT_TOKENS.
+    return Math.ceil(
+      ((inputBytes + CALL_OVERHEAD_TOKENS) * input +
+        MAX_OUTPUT_TOKENS * output) /
+        1_000_000,
     );
   }
   maximumRunCostMicros(prefixBytes: number) {
