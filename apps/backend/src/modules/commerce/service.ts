@@ -3359,6 +3359,73 @@ export class CommerceService {
     const intent = await this.provider.fetchIntent(packet.intent_ref);
     return { clientSecret: intent.clientSecret };
   }
+  /** Ops paused this creator or revoked her license (a trust decision, run by
+   * lane 1's effect worker as `settleDeparture`). Run as one fan, under that
+   * fan's own row security: each of the fan's requests with this creator that
+   * she has not accepted ends with its hold released and nothing charged, the
+   * way a request nobody decides in time ends. Accepted requests keep their
+   * deadline, and refund if it passes. Money already moving is left to finish;
+   * it is counted as waiting so that the trust worker asks again. */
+  async releaseForDeparture(actor: Actor, creatorId: string, caseId: string) {
+    const ids = z
+      .strictObject({ creatorId: z.uuid(), caseId: z.uuid() })
+      .parse({ creatorId, caseId });
+    const queued = await this.account(actor, async (client) => {
+      const open = (
+        await client.query<PacketRow>(
+          `SELECT p.* FROM creator.commerce_packet p
+           JOIN creator.fan_profile f ON f.id=p.fan_id AND f.account_id=$2
+           WHERE p.creator_id=$1 AND p.state IN ('submitted','more_info','offer_pending')
+           ORDER BY p.created_at,p.id FOR UPDATE OF p SKIP LOCKED`,
+          [ids.creatorId, actor.accountId],
+        )
+      ).rows;
+      const effects: string[] = [];
+      for (const p of open) {
+        effects.push(await this.queueRelease(client, p, "expired"));
+        await this.event(
+          client,
+          { ...p, version: p.version + 1 },
+          "packet_departure",
+          { caseId: ids.caseId },
+        );
+      }
+      // Releases already under way (this one or an earlier attempt) whose
+      // retry time has come are run again below; the rest wait their turn.
+      const due = (
+        await client.query<{ id: string }>(
+          `SELECT e.id FROM creator.commerce_effect e
+           JOIN creator.commerce_packet p ON p.id=e.packet_id
+           JOIN creator.fan_profile f ON f.id=p.fan_id AND f.account_id=$2
+           WHERE p.creator_id=$1 AND p.state='releasing' AND e.operation='release'
+            AND e.state IN ('pending','unknown') AND e.next_at<=now()
+            AND (e.lease_until IS NULL OR e.lease_until<now())`,
+          [ids.creatorId, actor.accountId],
+        )
+      ).rows.map((row) => row.id);
+      return {
+        released: open.length,
+        effects: [...new Set([...effects, ...due])],
+      };
+    });
+    for (const id of queued.effects) await this.runEffect(actor, id);
+    const counts = await this.account(
+      actor,
+      async (client) =>
+        (
+          await client.query<{ waiting: number; accepted: number }>(
+            `SELECT count(*) FILTER (WHERE p.state IN ('submitting','submitted','more_info','offer_pending','accepting','releasing'))::int AS waiting,
+            count(*) FILTER (WHERE p.state='accepted' AND c.state IN ('due','in_progress'))::int AS accepted
+           FROM creator.commerce_packet p
+           JOIN creator.fan_profile f ON f.id=p.fan_id AND f.account_id=$2
+           LEFT JOIN creator.commerce_commitment c ON c.packet_id=p.id
+           WHERE p.creator_id=$1`,
+            [ids.creatorId, actor.accountId],
+          )
+        ).rows[0]!,
+    );
+    return { released: queued.released, ...counts };
+  }
   async reconcileDeadlines(actor: Actor) {
     const effects = await this.account(actor, async (client) => {
       const rows = (
