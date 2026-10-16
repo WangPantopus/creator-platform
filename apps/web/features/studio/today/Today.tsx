@@ -140,9 +140,15 @@ export function Today({ creator }: { creator: Creator }) {
         )}
       </header>
       <section className="w5-today-part" aria-labelledby="w5-today-note">
-        <h2 id="w5-today-note" className="qv-meta">
-          {copy.studioTodayLatestNote}
-        </h2>
+        <div className="w5-today-head">
+          <h2 id="w5-today-note" className="qv-meta">
+            {copy.studioTodayLatestNote}
+          </h2>
+          {/* Notes is reached from Today (founder, 2026-10-15). */}
+          <Link className="qv-link-btn" href={`/studio/${id}/notes`}>
+            {copy.navNotes}
+          </Link>
+        </div>
         {status(note)}
         {note.state === "ready" &&
           (note.value ? (

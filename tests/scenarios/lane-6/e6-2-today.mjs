@@ -1,6 +1,7 @@
 // E6.2 Today as a person sees it: each role sees only its parts, one failing read
 // leaves the rest, nothing polls on a timer, coming back reloads once, Light and
-// Night at 390 and 320 px, and a screen reader meets the headings and authorship.
+// Night at 390 and 320 px, a screen reader meets the headings and authorship, and
+// Notes is one tap from Today for every role that sees it.
 //   LANE6_OUT=<dir> node tests/scenarios/lane-6/e6-2-today.mjs
 import * as L from "./e6-2-lib.mjs";
 const { step, expect, MAYA, WEB } = L;
@@ -125,6 +126,15 @@ await step(
     return "Today › Your latest Note › Note from Maya to … › Replies › Requests › My AI";
   },
 );
+/** Notes is one tap from Today's Note part (founder, 2026-10-15). */
+async function reachesNotes(tab) {
+  await tab
+    .getByRole("region", { name: "Your latest Note" })
+    .getByRole("link", { name: "Notes", exact: true })
+    .click();
+  await tab.waitForURL((u) => u.pathname.endsWith("/notes"));
+  await tab.getByRole("heading", { name: "Notes", level: 1 }).waitFor();
+}
 await step(
   "E6.2-29",
   "a team drafter sees the Note part and New Note only",
@@ -140,12 +150,13 @@ await step(
     const write = await team.page
       .getByRole("link", { name: "New Note" })
       .isVisible();
+    await reachesNotes(team.page);
     await team.page.context().close();
     expect(
       seen.join() === "Your latest Note" && write,
       `${seen.join()} · New Note ${write}`,
     );
-    return "Your latest Note + New Note; no replies, requests or My AI";
+    return "Your latest Note + New Note, and Notes one tap away; no replies, requests or My AI";
   },
 );
 await step(
@@ -161,13 +172,24 @@ await step(
     const write = await team.page
       .getByRole("link", { name: "New Note" })
       .count();
+    await reachesNotes(team.page);
     await L.team(2, null);
     await team.page.context().close();
     expect(
       seen.join() === "Your latest Note,Replies" && write === 0,
       `${seen.join()} · New Note ${write}`,
     );
-    return "Your latest Note + Replies; no New Note (stand-in team rows, lane 1)";
+    return "Your latest Note + Replies, and Notes one tap away; no New Note (stand-in team rows, lane 1)";
+  },
+);
+await step(
+  "E6.2-31",
+  "the creator reaches Notes in one tap from Today",
+  async () => {
+    await page.goto(WEB + today);
+    await loaded(page);
+    await reachesNotes(page);
+    return "Your latest Note › Notes opens the Notes screen";
   },
 );
 await L.finish(browser);

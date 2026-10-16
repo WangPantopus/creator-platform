@@ -196,6 +196,7 @@ export function Studio({
     // A composer opened from Today returns there; otherwise to Notes.
     composeBack = `${root}/${from === "today" ? "today" : "notes"}`;
   const paths: Record<string, string> = {
+    Today: `${root}/today`,
     Notes: `${root}/notes`,
     Requests: `${root}/requests`,
     Threads: `${root}/threads`,

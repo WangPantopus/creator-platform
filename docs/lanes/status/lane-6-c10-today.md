@@ -24,7 +24,9 @@ message and never hides the others.
 
 "New Note" (creator and drafter) opens `/studio/{creatorId}/compose?from=today`; Cancel and a
 finished Note come back to Today. `from=today` is the only value allowed, on the composer only
-(`config/navigation.json`).
+(`config/navigation.json`). Notes is one tap from Today: a "Notes" link beside "Your latest
+Note", for every role that sees that part (founder, 2026-10-15: Today replaces Notes as the
+first Studio tab; the tab bar change is the integrator's, in `packages/ui-web`).
 
 ## What the composer reads: audience reach
 

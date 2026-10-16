@@ -5,11 +5,15 @@ Updated: 2026-10-15, by the lane 6 session resumed from the 2026-10-09 handoff.
 Working on: nothing. WP 6.2 (Today and the Note composer) is done in #443 on
 `lane-6/today-note`; the session stopped for the founder's review, as asked.
 
-Waiting on: the founder's decision on Today's place in the tab bar, and the integrator's
-approval of the small additive change to `config/navigation.json`.
+Waiting on: the integrator: the tab bar ticket below, and approval of the small additive change
+to `config/navigation.json`.
 
-Decided: the founder approved the new Today and composer copy in #443 as proposed (2026-10-15,
-in chat: "The new Today and composer copy in #443 is approved as proposed.").
+Decided by the founder, 2026-10-15, in chat:
+
+- "The new Today and composer copy in #443 is approved as proposed."
+- "Yes: Today replaces Notes as the first Studio tab; Notes stays reachable from Today. Ticket
+  the integrator for the tab bar change." Lane 6's side is in #443: Today links to Notes for
+  every role that sees it, and Studio maps a "Today" tab to Today and marks it on Today.
 
 ## Done
 
@@ -49,14 +53,17 @@ passkey authenticator, the model fake (unused by these checks), and stand-in row
 - `e6-2-audience.mjs` 6/6 plus one known limit: the warning shows only when nobody is in the
   audience, in the composer and on the review sheet; the Note still publishes and a member who
   joins later reads it; grace and cancelled-until-end count, ended does not; team sees `unknown`.
-- `e6-2-today.mjs` 9/9: each role sees only its parts; one failing read leaves the rest; no timer
+- `e6-2-today.mjs` 10/10: each role sees only its parts; one failing read leaves the rest; no timer
   polling (0 reads in 20 s idle, 1 each on return); Light and Night at 390 and 320 px; a screen
-  reader meets the headings and "Note from Maya to …" before the body.
-- E6.1 against a fresh `main` baseline (7ca3982fe, Chrome 155): 82 shots, 77 identical in pixels,
-  calls, console and Tab order, 1 within tolerance (`light/requests-empty/empty`, 11 pixels at
-  1/255, as in round 1), and 4 intended differences: `compose-new/typed` and `/saved` in Light
-  and Night, where the second paragraph, which starts in Arabic, now reads right to left. All 636
-  calls and 1,090 Tab stops are unchanged. The compare script prints FAIL for those 4 by design.
+  reader meets the headings and "Note from Maya to …" before the body; Notes is one tap from Today for the creator, a drafter and triage.
+- E6.1 against a fresh `main` baseline (7ca3982fe, Chrome 155), rerun on the final code after the
+  Notes link: 82 shots, 76 identical in pixels, calls, console and Tab order; 1 within tolerance
+  (`night/requests-empty/empty`, 12 pixels at 1/255, as in round 1); 4 intended differences
+  (`compose-new/typed` and `/saved` in Light and Night: the paragraph that starts in Arabic
+  now reads right to left); and `night/suspended/recovered` counted one role check and one
+  badge poll fewer (timing). A focused repeat of `workspace,suspended` on the same code was
+  identical (6 of 6), as round 1 found for this step. The compare script prints FAIL for the
+  intended differences by design.
 
 Not run: real Touch ID and real phones (Safari on iOS, Chrome on Android), `tests/visual`
 (needs Playwright's own Chromium), the backend integration suite (it does not cover Studio).
@@ -82,10 +89,22 @@ through the C4 read every thread uses.
 
 ## Tickets to other lanes
 
+- **Integrator, the tab bar (founder's decision, 2026-10-15):** Today replaces Notes as the first
+  Studio tab; Notes stays reachable from Today.
+  - `packages/ui-web/src/components.ts` `StudioTabBar` (line 2460): the first tab becomes
+    `["Today", G.home]` instead of `["Notes", G.broadcast]`. The broadcast glyph is the Note's
+    authorship mark, so a neutral glyph suits Today; the glyph is your and the founder's call.
+  - `Sidebar` (line 2500): Today first; whether Notes also stays in the desktop sidebar is your
+    and the founder's call (lane 6 handles either).
+  - `packages/ui-web/src/contracts.ts` `StudioTabBarProps.active` (line 520): add `"Today"`.
+  - Record the decision in the BRIEF (section 8 says "Notes (first tab on phone)") and the
+    `design/phase4c-studio-phone` boards with the founder.
+  - Lane 6 is ready in #443. After the change lands, lane 6 marks Today as the current tab on
+    Notes and the composer (one line in `Studio.tsx`) and reruns E6.1, which will differ on
+    every screen's tab bar by design.
 - **Integrator:** approve the additive `config/navigation.json` change (`today`, and
   `from=today` on the composer only); `packages/ui-web` Note and message bodies should keep line
-  breaks and take their direction per paragraph; with the founder, Today's place in
-  `StudioTabBar` and `Sidebar`.
+  breaks and take their direction per paragraph.
 - **Lane 1:** the signing sheet items in finding 2; an invalid return address after sign-in is
   shown as "Pantopus sign-in is not connected in this local build"; a creator must pick a fan
   handle before any Studio screen except Workspace and Team.

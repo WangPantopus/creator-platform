@@ -1,22 +1,22 @@
 [
   {
     "path": "artifacts/lane-6/6-2-compose-no-members.png",
-    "sha256": "499bda1b9a0c97f70e2b06245f487ac0fb71a9cd6ebfacdc05abcd6a03aa01eb",
-    "bytes": 47435
+    "sha256": "1cbeb04c5bec89abf88bc83ab4edc7ecd13b6885b5a3fa1ad546fc424289086d",
+    "bytes": 47306
   },
   {
     "path": "artifacts/lane-6/6-2-today-light.png",
-    "sha256": "39ac789c063409c84a5da1b62733fb15b6f8a8024c929c3772202cf66ffb0e6d",
-    "bytes": 43749
+    "sha256": "28742722e75dda212c67d36cffaefb0c4c782d90fc1c7bbff01b6d4697b1c2d9",
+    "bytes": 43009
   },
   {
     "path": "artifacts/lane-6/6-2-today-night.png",
-    "sha256": "c00d15c045e4383fb9a1c6fc591992c690e20e6a345d0bb55d0a815dfef4cfb3",
-    "bytes": 43417
+    "sha256": "2f651ac2a5a59d73ff67a315d22e4e9b17d848dda10be3a10e5562553715377b",
+    "bytes": 42517
   },
   {
     "path": "artifacts/lane-6/README.md",
-    "sha256": "72875db410c6d60353b666cbf3012ec66177e9c54215c1ba6081d15473d99e58",
-    "bytes": 896
+    "sha256": "f63dfab08d86be2a39d1c708b69d3ac21d192c8b906ec03b3b208db8a6b461d3",
+    "bytes": 958
   }
 ]
