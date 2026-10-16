@@ -77,6 +77,17 @@ export async function commercePublicSummary(
     // transaction refuses; everything read after it is read-only.
     await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
     await client.query("SET LOCAL statement_timeout = 5000");
+    const creator = (
+      await client.query<{ display_name: string }>(
+        "SELECT display_name FROM creator.creator_profile WHERE id=$1 AND verification='verified' AND NOT recovery_required",
+        [creatorId],
+      )
+    ).rows[0];
+    // Lane 1 cannot answer for a creator that does not exist: unknown first.
+    if (!creator) {
+      await client.query("COMMIT");
+      return null;
+    }
     await client.query("SELECT set_config('app.account_id',$1,true)", [
       visitor?.accountId ?? "",
     ]);
@@ -88,16 +99,6 @@ export async function commercePublicSummary(
       return null;
     }
     await client.query("SET TRANSACTION READ ONLY");
-    const creator = (
-      await client.query<{ display_name: string }>(
-        "SELECT display_name FROM creator.creator_profile WHERE id=$1 AND verification='verified' AND NOT recovery_required",
-        [creatorId],
-      )
-    ).rows[0];
-    if (!creator) {
-      await client.query("COMMIT");
-      return null;
-    }
     const rows = (
       await client.query<{
         id: string;
