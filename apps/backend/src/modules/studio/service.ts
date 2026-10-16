@@ -132,23 +132,59 @@ export class StudioService {
   }
   async audiences(actor: Actor, creatorId: string) {
     return this.content.transaction(actor, creatorId, async (client) => {
-      await this.content.role(client, actor, creatorId, [
+      const role = await this.content.role(client, actor, creatorId, [
         "drafter",
         "publisher",
       ]);
       if (!this.owners.commerce)
-        return { audienceCountsAvailable: false, tiers: [], groups: [] };
+        return {
+          audienceCountsAvailable: false,
+          members: "unknown" as const,
+          tiers: [],
+          groups: [],
+        };
+      // Whether anyone is in each audience now, only for the creator's own
+      // session (a team view is never shown her members). A current membership,
+      // by the rule Content uses to tell a Note's audience (content/notices.ts).
+      // A fan's read also needs that member's access grant, which only the pair's
+      // own scope can see; so "none" is exact and "some" can include a member
+      // whose grant lapsed (W4's narrow count, held migration 0155, is exact).
+      // An existence check, never a count or a recipient list.
+      const current = `EXISTS(SELECT 1 FROM creator.commerce_membership m JOIN creator.fan_profile f ON f.id=m.fan_id
+        WHERE m.creator_id=$1 AND m.state IN('active','grace','cancelled') AND m.period_start<=now()
+        AND CASE WHEN m.state='grace' THEN coalesce(m.grace_end,m.period_end) ELSE m.period_end END>now()`;
       const tiers = (
-        await client.query(
-          "SELECT id,name,catalog FROM creator.commerce_tier WHERE creator_id=$1 ORDER BY name,id LIMIT 100",
-          [creatorId],
+        await client.query<{
+          id: string;
+          name: string;
+          catalog: { contentGroups?: string[] };
+          reach: boolean | null;
+        }>(
+          `SELECT t.id,t.name,t.catalog,CASE WHEN $2 THEN ${current} AND m.tier_id=t.id) END AS reach
+           FROM creator.commerce_tier t WHERE t.creator_id=$1 ORDER BY t.name,t.id LIMIT 100`,
+          [creatorId, role.creator],
         )
       ).rows;
+      const members = role.creator
+        ? (
+            await client.query<{ reach: boolean }>(
+              `SELECT ${current}) AS reach`,
+              [creatorId],
+            )
+          ).rows[0]!.reach
+        : null;
+      const reach = (value: boolean | null): "some" | "none" | "unknown" =>
+        value === null ? "unknown" : value ? "some" : "none";
       return {
         audienceCountsAvailable: Boolean(
           this.content.dependencies.audienceCount,
         ),
-        tiers: tiers.map((t) => ({ id: t.id, name: t.name })),
+        members: reach(members),
+        tiers: tiers.map((t) => ({
+          id: t.id,
+          name: t.name,
+          reach: reach(t.reach),
+        })),
         groups: tiers.flatMap((t) =>
           (t.catalog.contentGroups ?? []).map((id: string) => ({
             id,

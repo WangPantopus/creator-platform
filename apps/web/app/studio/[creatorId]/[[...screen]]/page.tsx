@@ -12,7 +12,7 @@ export default async function Page({
 }) {
   const { creatorId, screen } = await params;
   if (!IdSchema.safeParse(creatorId).success) notFound();
-  const returnTo = `/studio/${creatorId}/${screen?.length ? screen.join("/") : "notes"}`;
+  const returnTo = `/studio/${creatorId}/${screen?.length ? screen.join("/") : "today"}`;
   if (!ReturnTargetSchema.safeParse(returnTo).success) notFound();
   const session = await currentSession(returnTo);
   if (!session) return <IdentityWelcome returnTo={returnTo} arrival={null} />;

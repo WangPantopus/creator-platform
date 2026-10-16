@@ -175,7 +175,7 @@ export async function assertCurrentSession(
   if (result.rowCount !== 1)
     throw new DomainError(
       "session_expired",
-      "Your session ended. Continue with Pantopus again.",
+      "Your session ended. Sign in again.",
       401,
     );
   // Participant-bounded RLS may use this ID only after the actual request

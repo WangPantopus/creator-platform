@@ -1,5 +1,6 @@
 import {
   createCipheriv,
+  createDecipheriv,
   createHash,
   createHmac,
   randomBytes,
@@ -12,6 +13,7 @@ import { verifyIdToken, type VerifiedIdToken } from "./id-token.js";
 import {
   exchangeCode,
   providerSettingsFromEnvironment,
+  revokeToken,
   type ProviderSettings,
   type SignInPlatform,
   type SignInProvider,
@@ -33,6 +35,7 @@ export type SignInStep =
   | { status: "signed_in"; token: string; returnTo: string }
   | { status: "age_required"; ageContinuationId: string; expiresAt: string };
 
+type RefreshToken = { token: string; clientId: string };
 type Continuation = {
   id: string;
   kind: "web" | "native" | "age";
@@ -147,6 +150,25 @@ export class QelvoraSignIn implements PantopusIdentityAdapter {
       adultEligible: row.attested && !row.minor,
     };
   }
+  /** Account deletion: ends the app's authorization at the provider with
+   * every stored refresh token (Apple requires this when an account is
+   * deleted). */
+  async revokeAtProvider(provider: SignInProvider, cipher: string) {
+    const settings = this.providers.get(provider);
+    if (!settings)
+      throw refused(
+        "identity_sign_in_unconfigured",
+        `${provider} sign-in is not configured on this host, so its token cannot be revoked.`,
+        503,
+      );
+    const tokens = this.refreshTokens(cipher);
+    for (const item of tokens) await revokeToken(settings, item);
+    return tokens.length;
+  }
+  /** The provider's email address, for the person's own export. */
+  revealEmail(cipher: string) {
+    return this.open(cipher);
+  }
   /** Sign out everywhere also ends every provider grant of the account. */
   async revokeGrants(accountId: string) {
     await this.pool.query(
@@ -226,7 +248,14 @@ export class QelvoraSignIn implements PantopusIdentityAdapter {
       keys: settings.keys,
     });
     if (!verified) throw failed();
-    return this.admit(continuation, verified, tokens.refresh_token, issue);
+    return this.admit(
+      continuation,
+      verified,
+      tokens.refresh_token
+        ? { token: tokens.refresh_token, clientId: settings.audiences.web! }
+        : undefined,
+      issue,
+    );
   }
 
   async startNative(input: {
@@ -286,12 +315,21 @@ export class QelvoraSignIn implements PantopusIdentityAdapter {
             }).catch(() => null)
           )?.refresh_token
         : undefined;
-    return this.admit(continuation, verified, refresh, issue);
+    return this.admit(
+      continuation,
+      verified,
+      refresh ? { token: refresh, clientId: audience } : undefined,
+      issue,
+    );
   }
 
   /** The age step. A date that does not exist is refused without using the
    * step. Under 18, from the date or a platform signal, locks this provider
-   * identity for good; an adult platform report is never proof. */
+   * identity for good; an adult platform report is never proof. Nothing that
+   * identifies a person under 18 is kept (founder's default, 2026-10-16): the
+   * email goes, a stored refresh token goes once revoked at the provider, and
+   * the account closes. The lock (a keyed hash) and the under-18 result
+   * (never a date) stay. */
   async confirmAge(
     input: {
       ageContinuationId: string;
@@ -319,6 +357,27 @@ export class QelvoraSignIn implements PantopusIdentityAdapter {
         );
       },
     );
+    // Revoke before the transaction, as account deletion does: a token
+    // deleted first could never be revoked. A failure keeps the token.
+    let revoked: string | null = null;
+    if (years < 18 || input.platformSignal?.under18) {
+      const held = (
+        await this.pool.query<{
+          provider: SignInProvider;
+          provider_refresh_cipher: string | null;
+        }>(
+          "SELECT provider,provider_refresh_cipher FROM creator.account_identity WHERE id=$1 AND account_id=$2",
+          [continuation.identity_id, continuation.account_id],
+        )
+      ).rows[0];
+      if (held?.provider_refresh_cipher)
+        revoked = await this.revokeAtProvider(
+          held.provider,
+          held.provider_refresh_cipher,
+        )
+          .then(() => held.provider_refresh_cipher)
+          .catch(() => null);
+    }
     const outcome = await this.transaction(async (client) => {
       const accountId = continuation.account_id!;
       await this.lock(client, `qelvora-account:${accountId}`);
@@ -341,6 +400,18 @@ export class QelvoraSignIn implements PantopusIdentityAdapter {
         await client.query(
           "INSERT INTO creator.age_lock(provider,subject_hmac) VALUES($1,$2) ON CONFLICT DO NOTHING",
           [identity.provider, identity.subject_hmac],
+        );
+        await client.query(
+          "UPDATE creator.account_identity SET email_cipher=NULL,provider_refresh_cipher=CASE WHEN provider_refresh_cipher IS NOT DISTINCT FROM $3 THEN NULL ELSE provider_refresh_cipher END WHERE id=$1 AND account_id=$2",
+          [continuation.identity_id, accountId, revoked],
+        );
+        await client.query(
+          "UPDATE creator.identity_grant SET revoked_at=now() WHERE account_id=$1 AND revoked_at IS NULL",
+          [accountId],
+        );
+        await client.query(
+          "UPDATE creator.account SET state='deleted',deleted_at=now() WHERE id=$1 AND state='active'",
+          [accountId],
         );
         return "underage" as const;
       }
@@ -367,7 +438,7 @@ export class QelvoraSignIn implements PantopusIdentityAdapter {
   private async admit(
     continuation: Continuation,
     verified: VerifiedIdToken,
-    refreshToken: string | undefined,
+    refreshToken: RefreshToken | undefined,
     issue: IssueSession,
   ): Promise<SignInStep> {
     const provider = continuation.provider;
@@ -383,7 +454,26 @@ export class QelvoraSignIn implements PantopusIdentityAdapter {
       );
       if (locked.rowCount) throw underage();
       const email = verified.email ? this.seal(verified.email) : null;
-      const refresh = refreshToken ? this.seal(refreshToken) : null;
+      // One refresh token per client (web and each app), with the client it
+      // was issued to, so deletion can revoke every one of them.
+      const held = refreshToken
+        ? (
+            await client.query<{ provider_refresh_cipher: string | null }>(
+              "SELECT provider_refresh_cipher FROM creator.account_identity WHERE provider=$1 AND subject_hmac=$2 FOR UPDATE",
+              [provider, subject],
+            )
+          ).rows[0]?.provider_refresh_cipher
+        : null;
+      const refresh = refreshToken
+        ? this.seal(
+            JSON.stringify([
+              ...(held ? this.refreshTokens(held) : []).filter(
+                (item) => item.clientId !== refreshToken.clientId,
+              ),
+              refreshToken,
+            ]),
+          )
+        : null;
       let identity = (
         await client.query<{ id: string; account_id: string; state: string }>(
           `UPDATE creator.account_identity i SET last_used_at=now(),email_cipher=coalesce($3,email_cipher),
@@ -404,7 +494,13 @@ export class QelvoraSignIn implements PantopusIdentityAdapter {
             state: string;
           }>(
             "INSERT INTO creator.account_identity(account_id,provider,subject_hmac,email_cipher,provider_refresh_cipher) VALUES($1,$2,$3,$4,$5) RETURNING id,account_id,'active' AS state",
-            [account.rows[0]!.id, provider, subject, email, refresh],
+            [
+              account.rows[0]!.id,
+              provider,
+              subject,
+              email,
+              refreshToken ? this.seal(JSON.stringify([refreshToken])) : null,
+            ],
           )
         ).rows[0]!;
       }
@@ -520,6 +616,22 @@ export class QelvoraSignIn implements PantopusIdentityAdapter {
     return createHmac("sha256", this.key)
       .update(`qelvora-pkce:${state}`)
       .digest("base64url");
+  }
+  private refreshTokens(cipher: string) {
+    return JSON.parse(this.open(cipher)) as RefreshToken[];
+  }
+  private open(value: string) {
+    const data = Buffer.from(value, "base64url");
+    const decipher = createDecipheriv(
+      "aes-256-gcm",
+      this.key,
+      data.subarray(0, 12),
+    );
+    decipher.setAuthTag(data.subarray(data.length - 16));
+    return Buffer.concat([
+      decipher.update(data.subarray(12, data.length - 16)),
+      decipher.final(),
+    ]).toString("utf8");
   }
   private seal(value: string) {
     const iv = randomBytes(12);

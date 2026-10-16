@@ -47,8 +47,7 @@ export default function TrustPage() {
         </p>
         <p>
           Cancel store subscriptions through the relevant store. Data deletion
-          is a separate request. Deleting creator product data does not silently
-          delete the shared Pantopus account.
+          is a separate request.
         </p>
       </section>
       <section className="trust-panel">

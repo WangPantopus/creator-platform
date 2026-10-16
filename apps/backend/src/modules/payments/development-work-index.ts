@@ -33,6 +33,14 @@ const NOTICES = `SELECT DISTINCT e.creator_id,e.fan_id FROM creator.commerce_eve
  JOIN creator.fan_profile f ON f.id=e.fan_id AND f.account_id=$1
  WHERE e.published_at IS NULL AND e.type=ANY($2::text[])
  ORDER BY e.creator_id,e.fan_id LIMIT $3`;
+// Whether this fan has a live request to the creator: one not yet ended,
+// whatever its money is doing, or accepted and still owed.
+const DEPARTING = `SELECT 1 AS id FROM creator.commerce_packet p
+ JOIN creator.fan_profile f ON f.id=p.fan_id AND f.account_id=$1
+ WHERE p.creator_id=$2 AND (p.state IN ('submitting','submitted','more_info','offer_pending','accepting','releasing')
+  OR (p.state='accepted' AND EXISTS(SELECT 1 FROM creator.commerce_commitment c
+   WHERE c.packet_id=p.id AND c.state IN ('due','in_progress'))))
+ LIMIT 1`;
 // A provider notification names a payment (its hold) or a refund.
 const NOTIFIED = `SELECT p.id FROM creator.commerce_packet p
  JOIN creator.fan_profile f ON f.id=p.fan_id AND f.account_id=$1
@@ -129,6 +137,17 @@ export class DevelopmentCommerceWorkIndex implements CommerceWorkIndex {
   /** The adult-eligible development account with this id, if there is one. */
   actorFor(accountId: string) {
     return this.actors.find((actor) => actor.accountId === accountId) ?? null;
+  }
+
+  /** The fans with a live request to this creator, each as its own actor. */
+  async departureScopes(creatorId: string) {
+    const fans: { actor: Actor }[] = [];
+    for (const actor of this.actors)
+      if (
+        (await this.read(actor, DEPARTING, [actor.accountId, creatorId])).length
+      )
+        fans.push({ actor });
+    return fans;
   }
 
   /** Payments, their charges and refunds; nothing else happens on this host. */

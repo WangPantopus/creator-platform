@@ -1,9 +1,10 @@
 // E4.9 capacity (INV-10): three fans send at once to an offer with two slots
 // left: exactly two are held, the third is refused before any hold; the number
 // a fan reads equals the capacity row and what is enforced; a decline and an
-// expiry each free a slot that another fan can then book. Whether a refund
-// frees a slot is the founder's decision 2 (lane-4-decisions.md): reported, not
-// asserted. Deadlines are moved by editing them in this stack's own database.
+// expiry each free a slot that another fan can then book, and so does a refund
+// for a missed deadline (the founder's decision 2, taken as the proposed
+// default on 2026-10-16; e4-9-refund-slot covers it in full). Deadlines are
+// moved by editing them in this stack's own database.
 // Fakes: card processor, development identity, software passkey.
 //   node tests/scenarios/lane-4/e4-9-capacity.mjs
 import {
@@ -154,7 +155,7 @@ await step(
 );
 await step(
   "E4.9-6",
-  "a refund and the slot (decision 2): reported, not asserted",
+  "a refund for a missed deadline frees its slot too (decision 2), with nobody tapping",
   async () => {
     expect((await accept(maya, held[1])).status === 200, "accept");
     const before = await row();
@@ -167,7 +168,13 @@ await step(
       async () => (await packetRow(held[1])).payment_state === "refunded",
     );
     const after = await row();
-    return `accepted: ${JSON.stringify(before)}; refunded: ${JSON.stringify(after)}; the slot is ${after.used < before.used ? "freed" : "kept (today's rule)"}`;
+    expect(
+      after.used === before.used - 1 &&
+        (await shown(fans[0])) ===
+          after.capacity_limit - after.used - after.reserved,
+      `accepted: ${JSON.stringify(before)}; refunded: ${JSON.stringify(after)}`,
+    );
+    return `accepted: ${JSON.stringify(before)}; refunded: ${JSON.stringify(after)}; the slot is freed, and fans read it`;
   },
 );
 for (const { id, fan_id } of await sql(

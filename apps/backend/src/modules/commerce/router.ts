@@ -4,12 +4,18 @@ import type { Actor } from "../identity/adapter.js";
 import { DomainError } from "../../core/errors.js";
 import type { CommerceService } from "./service.js";
 import { CreatorEarningsReader } from "./creator-earnings.js";
-import { commercePublicSummary } from "./public-summary.js";
+import {
+  commercePublicSummary,
+  type PublicCreatorCheck,
+} from "./public-summary.js";
 
 export function createCommerceRouter(input: {
   service?: CommerceService;
   actorFor: (request: Request) => Promise<Actor>;
   extended?: import("./extended.js").ExtendedCommerce;
+  /** Lane 1's public creator check as the host composes it (lane 1's plain
+   * check when absent). */
+  publicCreator?: PublicCreatorCheck;
 }) {
   const router = Router();
   const earnings = input.service
@@ -63,6 +69,7 @@ export function createCommerceRouter(input: {
     const summary = await commercePublicSummary(
       service().pool,
       id(req.params.creatorId),
+      input.publicCreator,
     );
     if (!summary)
       throw new DomainError(

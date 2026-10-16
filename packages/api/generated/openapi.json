@@ -14014,6 +14014,12 @@
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           },
           "text": {
+            "description": "Older clients' question for more_info, read only when question is absent. Never send a reply draft here.",
+            "type": "string",
+            "maxLength": 8000
+          },
+          "question": {
+            "description": "The question the fan is asked, used only with more_info and required there. When question is present, even blank, text is never read as the question.",
             "type": "string",
             "maxLength": 8000
           },
@@ -21375,12 +21381,29 @@
         ],
         "additionalProperties": false
       },
+      "StudioAudienceReach": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "string",
+        "enum": [
+          "some",
+          "none",
+          "unknown"
+        ]
+      },
       "StudioAudiences": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
           "audienceCountsAvailable": {
             "type": "boolean"
+          },
+          "members": {
+            "type": "string",
+            "enum": [
+              "some",
+              "none",
+              "unknown"
+            ]
           },
           "tiers": {
             "type": "array",
@@ -21394,11 +21417,20 @@
                 },
                 "name": {
                   "type": "string"
+                },
+                "reach": {
+                  "type": "string",
+                  "enum": [
+                    "some",
+                    "none",
+                    "unknown"
+                  ]
                 }
               },
               "required": [
                 "id",
-                "name"
+                "name",
+                "reach"
               ],
               "additionalProperties": false
             }
@@ -21427,6 +21459,7 @@
         },
         "required": [
           "audienceCountsAvailable",
+          "members",
           "tiers",
           "groups"
         ],
@@ -32239,12 +32272,29 @@
         ],
         "additionalProperties": false
       },
+      "StudioStudioAudienceReach": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "string",
+        "enum": [
+          "some",
+          "none",
+          "unknown"
+        ]
+      },
       "StudioStudioAudiences": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
           "audienceCountsAvailable": {
             "type": "boolean"
+          },
+          "members": {
+            "type": "string",
+            "enum": [
+              "some",
+              "none",
+              "unknown"
+            ]
           },
           "tiers": {
             "type": "array",
@@ -32258,11 +32308,20 @@
                 },
                 "name": {
                   "type": "string"
+                },
+                "reach": {
+                  "type": "string",
+                  "enum": [
+                    "some",
+                    "none",
+                    "unknown"
+                  ]
                 }
               },
               "required": [
                 "id",
-                "name"
+                "name",
+                "reach"
               ],
               "additionalProperties": false
             }
@@ -32291,6 +32350,7 @@
         },
         "required": [
           "audienceCountsAvailable",
+          "members",
           "tiers",
           "groups"
         ],

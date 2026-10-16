@@ -34,6 +34,19 @@ type CaseRow = CaseSummary & {
   resolution_reason: string | null;
   decision_account_id: string | null;
 };
+/** A reviewer never opens or decides a case they filed or a case about
+ * their own account (which covers a creator's own verification and any report
+ * about their creator profile): another reviewer must handle it. */
+function independentReviewer(actor: Actor, current: CaseRow) {
+  if (
+    current.reporter_account_id === actor.accountId ||
+    current.subject_account_id === actor.accountId
+  )
+    throw new DomainError(
+      "independent_reviewer_required",
+      "Another reviewer must handle a case about your own account.",
+    );
+}
 const summaryColumns =
   "id,number,kind,queue,creator_name,state,version,created_at,updated_at";
 function caseDto<T extends CaseSummary>(row: T): T {
@@ -256,6 +269,7 @@ export class TrustService {
           404,
         );
       await this.requireQueue(client, current.queue);
+      independentReviewer(actor, current);
       await client.query(
         "INSERT INTO creator_trust.case_access(case_id,account_id,purpose,granted_at,expires_at) VALUES($1,$2,$3,now(),now()+make_interval(mins=>$4)) ON CONFLICT(case_id,account_id) DO UPDATE SET purpose=$3,granted_at=now(),expires_at=now()+make_interval(mins=>$4)",
         [caseId, actor.accountId, purpose, minutes],
@@ -332,6 +346,10 @@ export class TrustService {
         "SELECT id,type,state,error_code FROM creator_trust.effect WHERE case_id=$1 ORDER BY created_at LIMIT 8",
         [caseId],
       );
+      const pause = await client.query(
+        "SELECT 1 FROM creator_trust.restriction WHERE case_id=$1 AND reason_code='pause_creator' AND revoked_at IS NULL",
+        [caseId],
+      );
       const {
         reporter_account_id,
         subject_account_id,
@@ -347,6 +365,7 @@ export class TrustService {
         timeline: timeline.rows,
         effects: effects.rows,
         access_expires_at: lease.expires_at,
+        pause_active: pause.rowCount !== 0,
         can_decide:
           current.state !== "resolved" &&
           current.state !== "action_pending" &&
@@ -373,6 +392,7 @@ export class TrustService {
           input,
           async () => {
             const current = await this.requireCase(client, caseId, true);
+            independentReviewer(actor, current);
             if (current.version !== input.version)
               throw new DomainError(
                 "stale_case",
@@ -705,6 +725,145 @@ export class TrustService {
             state: "action_pending",
             version: current.version,
             requeued: retried.rowCount,
+          };
+        },
+      ),
+    );
+  }
+  /** P2 (founder, 2026-10-16): a supervisor holding the case lifts its pause
+   * with a reason both parties receive. An unfinished pause action is
+   * cancelled first, so it can never fire after the lift; the restriction
+   * ends at once; the AI comes back through an agent.resume action (lane 3),
+   * and the case stays action_pending until it completes. */
+  async liftPause(
+    actor: Actor,
+    caseId: string,
+    input: { version: number; reason: string; idempotencyKey: string },
+    correlationId: string,
+  ) {
+    return this.store.actor(actor, (client) =>
+      command(
+        client,
+        actor,
+        `pause_lift:${caseId}`,
+        input.idempotencyKey,
+        input,
+        async () => {
+          const current = await this.requireCase(client, caseId, true);
+          const member = (
+            await client.query(
+              "SELECT supervisor FROM creator_trust.ops_member WHERE account_id=$1 AND expires_at>now() AND revoked_at IS NULL",
+              [actor.accountId],
+            )
+          ).rows[0];
+          if (!member?.supervisor)
+            throw new DomainError(
+              "supervisor_required",
+              "Lifting a pause needs an authorized supervisor.",
+            );
+          if (current.version !== input.version)
+            throw new DomainError(
+              "stale_case",
+              "This case changed. Refresh before lifting the pause.",
+              409,
+            );
+          const access = await client.query<{ allowed: boolean }>(
+            "SELECT creator_trust.has_case_access($1) AS allowed",
+            [caseId],
+          );
+          if (!access.rows[0]?.allowed)
+            throw new DomainError(
+              "case_access_required",
+              "Open this case with a reason before lifting its pause.",
+            );
+          if (current.outcome !== "pause_creator" || !current.creator_id)
+            throw new DomainError(
+              "pause_not_found",
+              "This case did not pause a creator.",
+              409,
+            );
+          const running = await client.query(
+            "SELECT 1 FROM creator_trust.effect WHERE case_id=$1 AND type='agent.pause' AND state='running'",
+            [caseId],
+          );
+          if (running.rowCount)
+            throw new DomainError(
+              "pause_in_progress",
+              "The pause is being applied. Try again in a minute.",
+              409,
+            );
+          // Until pending-lift-pause.sql is registered the database refuses
+          // both updates (no policy, no 'cancelled' state): say so plainly.
+          const lifting = async () => {
+            try {
+              const cancelled = await client.query(
+                "UPDATE creator_trust.effect SET state='cancelled',lease_until=NULL,lease_token=NULL WHERE case_id=$1 AND type='agent.pause' AND state IN('pending','blocked','retry','dead_letter')",
+                [caseId],
+              );
+              const lifted = await client.query(
+                "UPDATE creator_trust.restriction SET revoked_at=now() WHERE case_id=$1 AND reason_code='pause_creator' AND revoked_at IS NULL",
+                [caseId],
+              );
+              return { cancelled, lifted };
+            } catch (error) {
+              if (
+                ["42501", "23514"].includes(
+                  (error as { code?: string }).code ?? "",
+                )
+              )
+                throw new DomainError(
+                  "pause_lift_unavailable",
+                  "Lifting a pause is not available on this service yet.",
+                  503,
+                );
+              throw error;
+            }
+          };
+          const { cancelled, lifted } = await lifting();
+          if (!lifted.rowCount)
+            throw new DomainError(
+              "pause_already_lifted",
+              "This pause was already lifted.",
+              409,
+            );
+          const version = current.version + 1;
+          await client.query(
+            "INSERT INTO creator_trust.effect(case_id,actor_account_id,type,input,decision_version) VALUES($1,$2,'agent.resume',$3,$4)",
+            [
+              caseId,
+              actor.accountId,
+              JSON.stringify({
+                creatorId: current.creator_id,
+                reason: input.reason,
+              }),
+              version,
+            ],
+          );
+          await client.query(
+            "UPDATE creator_trust.safety_case SET state='action_pending',outcome='lift_pause',resolution_reason=$2,decision_account_id=$3,version=$4,updated_at=now(),closed_at=NULL WHERE id=$1",
+            [caseId, input.reason, actor.accountId, version],
+          );
+          await this.event(client, actor, caseId, "pause_lifted", input.reason);
+          await this.audit(
+            client,
+            actor,
+            caseId,
+            "pause_lift",
+            input.reason,
+            correlationId,
+          );
+          await this.notify(
+            client,
+            current,
+            version,
+            "pause_lifted",
+            input.reason,
+          );
+          return {
+            caseId,
+            state: "action_pending" as const,
+            version,
+            pauseActionCancelled: cancelled.rowCount !== 0,
           };
         },
       ),
@@ -1183,7 +1342,7 @@ export class TrustService {
     if (!proof.success || age < -30_000 || age >= 300_000)
       throw new DomainError(
         "fresh_verification_required",
-        "Continue with Pantopus again before downloading personal data.",
+        "Sign in again before downloading your data.",
         401,
       );
   }
@@ -1230,11 +1389,15 @@ export class TrustService {
       ).rows,
     }));
   }
+  /** A reviewer sees their own records; a supervisor sees every reviewer's
+   * records in the queues they supervise, with who made each one (O1,
+   * founder 2026-10-16). Row security decides which records a supervisor can
+   * read (`audit_supervisor_read`). */
   async opsAudits(actor: Actor) {
     return this.store.actor(actor, async (client) => {
       const member = (
-        await client.query(
-          "SELECT queues FROM creator_trust.ops_member WHERE account_id=$1 AND revoked_at IS NULL AND expires_at>now()",
+        await client.query<{ queues: string[]; supervisor: boolean }>(
+          "SELECT queues,supervisor FROM creator_trust.ops_member WHERE account_id=$1 AND revoked_at IS NULL AND expires_at>now()",
           [actor.accountId],
         )
       ).rows[0];
@@ -1244,9 +1407,10 @@ export class TrustService {
           "Access audits need an active operations role.",
         );
       return {
+        scope: member.supervisor ? ("supervisor" as const) : ("own" as const),
         items: (
           await client.query(
-            "SELECT a.id,a.case_id,a.action,a.created_at,a.correlation_id,c.queue FROM creator_trust.access_audit a JOIN creator_trust.safety_case c ON c.id=a.case_id WHERE a.actor_account_id=$1 AND c.queue=ANY($2) ORDER BY a.created_at DESC,a.id DESC LIMIT 100",
+            `SELECT a.id,a.case_id,a.action,a.created_at,a.correlation_id,c.queue,a.actor_account_id AS reviewer,a.actor_account_id=$1 AS mine FROM creator_trust.access_audit a JOIN creator_trust.safety_case c ON c.id=a.case_id WHERE ${member.supervisor ? "" : "a.actor_account_id=$1 AND "}c.queue=ANY($2) ORDER BY a.created_at DESC,a.id DESC LIMIT 100`,
             [actor.accountId, member.queues],
           )
         ).rows,

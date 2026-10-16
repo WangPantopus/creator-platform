@@ -1,6 +1,8 @@
 import type { Pool, PoolClient } from "pg";
 import { ContentHeldClient } from "../content/held-client-cleanup.js";
 import { DomainError, invariant } from "../../core/errors.js";
+import type { QelvoraSignIn } from "../identity/qelvora-sign-in.js";
+import type { SignInProvider } from "../identity/providers.js";
 import type { PrivacyHook } from "./contracts.js";
 import {
   privacyTaskAuthority,
@@ -8,15 +10,53 @@ import {
 } from "./privacy-authority.js";
 
 type Job = Parameters<PrivacyHook["run"]>[0];
+const signInUnconfigured = () =>
+  new DomainError(
+    "identity_sign_in_unconfigured",
+    "This account signed in with Apple or Google, which this host does not compose for privacy jobs.",
+    503,
+  );
 /** Export account records through existing W1 RLS; credentials and upstream
  * tokens never enter an artifact. Fan erasure redacts in place; creator
- * erasure awaits the reviewed signature-retention policy. */
+ * erasure awaits the reviewed signature-retention policy. A Qelvora account
+ * (sign-in with Apple or Google) also needs its sign-in, to reveal its email
+ * address for export and to revoke provider tokens on erasure. */
 export function identityPrivacyHook(
   runtime: Pool,
   coordinator: Pool,
   assertRestoredInTransaction?: (client: PoolClient) => Promise<void>,
+  signIn: () => QelvoraSignIn | undefined = () => undefined,
 ): PrivacyHook {
   const verify = privacyTaskAuthority(coordinator);
+  /** Apple requires a deleted account's authorization to end at Apple, and a
+   * refresh token deleted first could never be revoked. So every stored token
+   * is revoked before the transaction that deletes it. Revoking is
+   * idempotent: a failed transaction only repeats it, and an account kept
+   * after all just gets a fresh consent at its next sign-in. */
+  async function revokeProviderTokens(input: Job) {
+    const tokens = await runtime.query<{
+      provider: SignInProvider;
+      provider_refresh_cipher: string;
+    }>(
+      "SELECT provider,provider_refresh_cipher FROM creator.account_identity WHERE account_id=$1 AND provider_refresh_cipher IS NOT NULL",
+      [input.accountId],
+    );
+    if (tokens.rowCount === 0) return { ciphers: [], count: 0 };
+    const owner = signIn();
+    if (!owner) throw signInUnconfigured();
+    let count = 0;
+    for (const row of tokens.rows) {
+      input.signal!.throwIfAborted();
+      count += await owner.revokeAtProvider(
+        row.provider,
+        row.provider_refresh_cipher,
+      );
+    }
+    return {
+      ciphers: tokens.rows.map((row) => row.provider_refresh_cipher),
+      count,
+    };
+  }
   /** Retained payment and request records (D-08) reference the fan profile id,
    * so the row stays as an anchor without its handle or intro. Identity erases
    * last: other domains locate data through it, and the person keeps watching
@@ -51,6 +91,10 @@ export function identityPrivacyHook(
           503,
         );
     }
+    const revoked =
+      input.scope === "account"
+        ? await revokeProviderTokens(input)
+        : { ciphers: [], count: 0 };
     const client = await runtime.connect();
     const held = new ContentHeldClient(client, input.signal, runtime);
     let failure: unknown;
@@ -67,7 +111,48 @@ export function identityPrivacyHook(
       ]);
       if (await creatorAccount(client)) throw creatorRefused();
       const counts: Record<string, number> = {};
+      let signInAccount = false;
+      let ageLocked = false;
       if (input.scope === "account") {
+        // Holds off a sign-in until this commits. One that stored a new
+        // refresh token after the revocation above makes this attempt wait,
+        // and the next one revokes it.
+        const identities = await client.query<{
+          provider_refresh_cipher: string | null;
+        }>(
+          "SELECT provider_refresh_cipher FROM creator.account_identity WHERE account_id=$1 FOR UPDATE",
+          [input.accountId],
+        );
+        if (
+          identities.rows.some(
+            (row) =>
+              row.provider_refresh_cipher !== null &&
+              !revoked.ciphers.includes(row.provider_refresh_cipher),
+          )
+        )
+          throw new DomainError(
+            "identity_erasure_waiting",
+            "A sign-in stored a new provider token during erasure; the next attempt revokes it.",
+            503,
+          );
+        counts.revokedProviderTokens = revoked.count;
+        signInAccount =
+          (
+            await client.query("SELECT 1 FROM creator.account WHERE id=$1", [
+              input.accountId,
+            ])
+          ).rowCount !== 0;
+        ageLocked =
+          (
+            await client.query(
+              "SELECT 1 FROM creator.age_lock l JOIN creator.account_identity i ON i.provider=l.provider AND i.subject_hmac=l.subject_hmac WHERE i.account_id=$1 LIMIT 1",
+              [input.accountId],
+            )
+          ).rowCount !== 0;
+        // D2 (the founder's working default): the account stays closed, and a
+        // later sign-in with the same Apple or Google identity starts a new,
+        // empty account that passes the age step again. An under-18 lock is
+        // kept by provider identity, so it still refuses that account.
         const statements = [
           [
             "redactedProfiles",
@@ -84,6 +169,20 @@ export function identityPrivacyHook(
           [
             "revokedInvitations",
             "UPDATE creator.team_invitation SET revoked_at=now() WHERE account_id=$1 AND accepted_at IS NULL AND revoked_at IS NULL",
+          ],
+          [
+            "revokedSignInGrants",
+            "UPDATE creator.identity_grant SET revoked_at=now() WHERE account_id=$1 AND revoked_at IS NULL",
+          ],
+          [
+            // With each identity go its email address and refresh token, and
+            // any open age step (ON DELETE CASCADE).
+            "deletedSignInIdentities",
+            "DELETE FROM creator.account_identity WHERE account_id=$1",
+          ],
+          [
+            "closedSignInAccounts",
+            "UPDATE creator.account SET state='deleted',deleted_at=now() WHERE id=$1 AND state='active'",
           ],
         ] as const;
         for (const [name, sql] of statements) {
@@ -120,6 +219,26 @@ export function identityPrivacyHook(
                   reason:
                     "A fan record without its handle or intro stays only as the anchor for payment and request records that must be kept; final retention review is pending.",
                 },
+                ...(signInAccount
+                  ? [
+                      {
+                        category: "closed_sign_in_account",
+                        until: null,
+                        reason:
+                          "The account's random id, when it was deleted, when it signed in and its age check results (never a date of birth) stay, so the account stays closed and the 18+ check can be shown; final retention review is pending.",
+                      },
+                    ]
+                  : []),
+                ...(ageLocked
+                  ? [
+                      {
+                        category: "under_18_lock",
+                        until: null,
+                        reason:
+                          "A sign-in identity found to be under 18 stays locked, kept only as a keyed hash, so a new account cannot pass the age check; final retention review is pending.",
+                      },
+                    ]
+                  : []),
               ]
             : [],
       };
@@ -201,8 +320,26 @@ export function identityPrivacyHook(
               "sessions",
               "SELECT id,mode,created_at,expires_at,revoked_at FROM creator.identity_session WHERE account_id=$1",
             ],
+            [
+              "signInAccount",
+              "SELECT id,state,created_at,deleted_at FROM creator.account WHERE id=$1",
+            ],
+            [
+              // The email cipher is opened below; the refresh token never
+              // leaves, only whether one is held.
+              "signInIdentities",
+              "SELECT id,provider,email_cipher,provider_refresh_cipher IS NOT NULL AS provider_authorization_held,created_at,last_used_at FROM creator.account_identity WHERE account_id=$1",
+            ],
+            [
+              "signInGrants",
+              "SELECT id,authenticated_at,created_at,expires_at,revoked_at FROM creator.identity_grant WHERE account_id=$1",
+            ],
+            [
+              "ageChecks",
+              "SELECT source,result,copy_version,recorded_at FROM creator.age_signal WHERE account_id=$1",
+            ],
           ] as const;
-          // One fixed cursor gives all ten account projections the same MVCC
+          // One fixed cursor gives all fourteen account projections the same MVCC
           // snapshot. Separate held task/restore bookends remain current under
           // READ COMMITTED; a retained repeatable-read snapshot is not authority.
           const projection = sources
@@ -247,6 +384,17 @@ export function identityPrivacyHook(
             );
           }
           await client.query("CLOSE w8_identity_export");
+          const identities = data.signInIdentities as {
+            email_cipher: string | null;
+          }[];
+          if (identities.some((row) => row.email_cipher) && !signIn())
+            throw signInUnconfigured();
+          data.signInIdentities = identities.map(
+            ({ email_cipher, ...row }) => ({
+              ...row,
+              email: email_cipher ? signIn()!.revealEmail(email_cipher) : null,
+            }),
+          );
         }
         await restoredPrivacyTaskAuthorityInTransaction(
           client,

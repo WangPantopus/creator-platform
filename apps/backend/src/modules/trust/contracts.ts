@@ -74,6 +74,8 @@ export const AppealInput = z.strictObject({
   idempotencyKey: key,
 });
 export const EffectRetryInput = AppealInput;
+/** P2 (founder, 2026-10-16): a supervisor lifts a pause from its case. */
+export const LiftPauseInput = AppealInput;
 export const BlockInput = z.strictObject({
   creatorId: z.uuid(),
   reason,
@@ -184,6 +186,8 @@ export type CaseDetail = CaseSummary & {
   }[];
   access_expires_at: string;
   can_decide: boolean;
+  /** This case's pause still restricts the creator. */
+  pause_active: boolean;
   effects: {
     id: string;
     type: string;

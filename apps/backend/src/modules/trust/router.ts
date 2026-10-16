@@ -16,6 +16,7 @@ import {
   PrivacyInput,
   AppealInput,
   EffectRetryInput,
+  LiftPauseInput,
   BlockInput,
   FeedbackInput,
   Queue,
@@ -280,6 +281,16 @@ export function createTrustRouter(options: TrustRouterOptions) {
         await actor(req),
         id(req),
         EffectRetryInput.parse(req.body),
+        res.locals.correlationId as string,
+      ),
+    ),
+  );
+  router.post("/v1/trust/cases/:id/lift-pause", async (req, res) =>
+    res.json(
+      await options.service.liftPause(
+        await actor(req),
+        id(req),
+        LiftPauseInput.parse(req.body),
         res.locals.correlationId as string,
       ),
     ),
