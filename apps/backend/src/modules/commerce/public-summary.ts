@@ -1,8 +1,20 @@
-import type { Pool } from "pg";
+import type { Pool, PoolClient } from "pg";
 import { z } from "zod";
 import { formatCopy } from "@qelvora/copy";
 import { contentHash } from "../../core/canonical.js";
 import { invariant } from "../../core/errors.js";
+import { requestAuthority } from "../identity/request-authority.js";
+import { trustPublicCreatorDenial } from "../trust/scope-restriction.js";
+
+/** Lane 1's public creator check (W8): false while ops has paused or suspended
+ * the creator or revoked her license, or while the signed-in visitor is denied
+ * her; it throws when it cannot answer. A host may pass its restoration-gated
+ * form; lane 1's plain check is the default. */
+export type PublicCreatorCheck = (
+  client: PoolClient,
+  creatorId: string,
+) => Promise<boolean>;
+const lane1PublicCreatorCheck: PublicCreatorCheck = trustPublicCreatorDenial();
 
 /** What a creator offers by request, and how much of this week is left: the
  * world-readable summary of the capacity commerce enforces (contract C8). It
@@ -46,20 +58,36 @@ const phrases: Record<string, string> = {
 export const deadlinePhrase = (hours: number) =>
   hours <= 48 || hours % 24 !== 0 ? `${hours} hours` : `${hours / 24} days`;
 
-/** Read with no account: offers and capacity are world-readable rows. */
+/** Needs no account: offers and capacity are world-readable rows. A signed-in
+ * visitor is checked by lane 1 as that visitor. */
 export async function commercePublicSummary(
   pool: Pool,
   creatorId: string,
+  publicCreator: PublicCreatorCheck = lane1PublicCreatorCheck,
 ): Promise<CommercePublicSummary | null> {
   invariant(
     z.uuid().safeParse(creatorId).success,
     "invalid_request",
     "Check the information and try again.",
   );
+  const visitor = requestAuthority.getStore();
   const client = await pool.connect();
   try {
-    await client.query("BEGIN READ ONLY");
+    // Lane 1's check holds the visitor's session row, which a read-only
+    // transaction refuses; everything read after it is read-only.
+    await client.query("BEGIN ISOLATION LEVEL READ COMMITTED");
     await client.query("SET LOCAL statement_timeout = 5000");
+    await client.query("SELECT set_config('app.account_id',$1,true)", [
+      visitor?.accountId ?? "",
+    ]);
+    // A creator ops has paused, suspended or revoked offers nothing in public,
+    // and reads as unknown, so the ops action is not revealed. Checked before
+    // any offer is read and held to commit; no answer means no summary.
+    if (!(await publicCreator(client, creatorId))) {
+      await client.query("COMMIT");
+      return null;
+    }
+    await client.query("SET TRANSACTION READ ONLY");
     const creator = (
       await client.query<{ display_name: string }>(
         "SELECT display_name FROM creator.creator_profile WHERE id=$1 AND verification='verified' AND NOT recovery_required",

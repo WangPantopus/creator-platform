@@ -6,6 +6,7 @@ import { DomainError, invariant } from "../../core/errors.js";
 import { createCommerceRouter } from "./router.js";
 import type { CommerceService } from "./service.js";
 import type { ExtendedCommerce } from "./extended.js";
+import type { PublicCreatorCheck } from "./public-summary.js";
 import { callOfferCommand } from "./scheduling.js";
 import { tryLockCommitmentPacketForRead } from "./packet-locks.js";
 
@@ -13,6 +14,7 @@ import { tryLockCommitmentPacketForRead } from "./packet-locks.js";
 export function commerceFeature(
   service: CommerceService,
   extended?: ExtendedCommerce,
+  publicCreator?: PublicCreatorCheck,
 ): FeatureRegistration {
   return {
     name: "commerce",
@@ -22,6 +24,7 @@ export function commerceFeature(
         service,
         actorFor,
         ...(extended ? { extended } : {}),
+        ...(publicCreator ? { publicCreator } : {}),
       }),
   };
 }
