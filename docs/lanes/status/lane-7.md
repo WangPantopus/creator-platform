@@ -18,8 +18,8 @@ Android) → this status update. The spec with every piece's rules and results:
 
 - Founder decisions 2026-10-16: P2 "Unread"; P3 composer states follow the design reference; P11
   remove the comparison placeholder; the under-18 screen keeps nothing else (no Crisis help); the
-  seal shows "F" for "🌿 fern studio". Proposed and waiting for confirmation: P5 picker words, P8
-  the reminder rule, P9 the charge wording (all in the spec).
+  seal shows "F" for "🌿 fern studio". Approved the same day: P5 picker words, P8 the reminder
+  rule, P9 the charge wording (all in the spec).
 - Waiting on others: P10 the share-card contract and a domain; chip titles for P4 (lane 3).
 - **Found, not fixed: an intermittent iOS freeze** in a long thread at normal text size when the
   person types and then swipes fast while Notes are still being placed (2 of about 13 attempts

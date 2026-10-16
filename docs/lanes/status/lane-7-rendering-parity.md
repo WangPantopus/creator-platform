@@ -13,11 +13,11 @@ waits on a contract or a founder decision says so, keeps today's behavior and mo
 | P2    | Notification rows: glyph, color, time, unread  | `GET /v1/growth/notifications` (C4 notices, lane 5)                               | Decided: "Unread"; to build                                                                                         |
 | P3    | Step-in seal and the composer states           | Conversation page (`control`, `canSend`, `unavailableReason`)                     | Seal: #457. Composer states: decided (the design); to build. Trial, ended, capacity: no contract (ticket to lane 3) |
 | P4    | Citations                                      | Message `citations` (ids) and the creator's posts                                 | Built: `lane-7/citation-refusal` (an Android fix); chip titles need lane 3                                          |
-| P5    | Named pickers instead of raw ids               | `GET /v1/conversations/account` (`threads[].name`)                                | Picker words proposed (below), waiting for confirmation                                                             |
+| P5    | Named pickers instead of raw ids               | `GET /v1/conversations/account` (`threads[].name`)                                | Decided (words approved); to build                                                                                  |
 | P6    | Explicit provider consent                      | Capabilities `providers`, `POST .../consent`                                      | #460                                                                                                                |
 | P7    | 18+ confirmation                               | C1 (lane 1) age screen and `adult_eligibility_required`                           | #462 (the refusal); the age step itself: WP 7.5 (C1)                                                                |
-| P8    | The 3-hour reminder                            | No server signal; client rule proposed                                            | Rule proposed (below), waiting for confirmation                                                                     |
-| P9    | Packet terms block and ETA line                | `chargeRule`, `pendingHold`, `decisionEta`; lane 4's public summary `reliability` | Wording proposed (below), waiting for confirmation; ETA waits on lane 4; Q04 keeps payment on the web               |
+| P8    | The 3-hour reminder                            | No server signal; client rule proposed                                            | Decided (rule approved); to build                                                                                   |
+| P9    | Packet terms block and ETA line                | `chargeRule`, `pendingHold`, `decisionEta`; lane 4's public summary `reliability` | Decided (wording approved); to build; ETA waits on lane 4; Q04 keeps payment on the web                             |
 | P10   | Share sheet for the card                       | Lane 5 share card (needs lanes 1, 3, 4)                                           | Waits on the share-card contract                                                                                    |
 | P11   | Remove "AI comparisons are not available yet." | Comparison stays installed and off (2026-10-08)                                   | Decided: remove; to build                                                                                           |
 
@@ -30,7 +30,7 @@ waits on a contract or a founder decision says so, keeps today's behavior and mo
 | P3 seal            | A name that starts with an emoji or a symbol shows its first letter ("F" for "🌿 fern studio"), as built          |
 | P7                 | The under-18 screen offers nothing else, Crisis help included, as built                                           |
 | P11                | Remove "AI comparisons are not available yet."                                                                    |
-| P5, P8, P9         | Proposals below, waiting for the founder's confirmation                                                           |
+| P5, P8, P9         | Approved as proposed (below), 2026-10-16                                                                          |
 
 ## P1: Notes and reactions in the thread (C4)
 
@@ -380,7 +380,7 @@ Ticket to lane 3: the web conversation screen to follow the same reference.
 `creatorId` (for example Report from a thread) shows that creator's name, not the id. No contract
 change.
 
-Proposed words, waiting for the founder's confirmation (none exist in the copy system):
+Approved words (2026-10-16), new keys in `config/copy.json`:
 
 - Field label: "Creator" (report, abuse, block) or "Conversation" (deleting one conversation),
   where today it says "Creator ID" and "Conversation ID".
@@ -398,8 +398,7 @@ The web support form asks for typed references too: ticket to lane 1 (`apps/web/
 **P7 18+ confirmation.** The refusal is built: see P7 above. The age step itself is the release
 sign-in (C1, WP 7.5).
 
-**P8 The 3-hour reminder.** No server signal exists. Proposed rule, waiting for the founder's
-confirmation:
+**P8 The 3-hour reminder.** No server signal exists. Approved rule (2026-10-16):
 
 - The count is time spent in AI conversations on this phone, in the foreground, across creators:
   moving from one creator's AI to another keeps counting.
@@ -419,15 +418,15 @@ decides in {range}") appears only when lane 4's public summary gives a non-empty
 until the decision record lands it is empty and the apps show nothing (never an invented range).
 Payment stays on the web (Q04).
 
-A copy change comes first (proposed, waiting for the founder's confirmation). Two fixed phrases
+A copy change comes first (approved 2026-10-16). Two fixed phrases
 say "she" for every creator, whatever their pronouns: `chargeRule` ("Charged only when {name}
 accepts. If she declines or {deadline} pass, nothing is charged.") and `ifDeclines` ("If she
 declines or {deadline} pass", the packet's price row). `{deadline}` is a duration such as "48 h".
 Proposed: "Charged only when {name} accepts. If {name} declines or {deadline} pass, nothing is
 charged." and "If {name} declines or {deadline} pass" (for example: "Charged only when Kiln Club
-accepts. If Kiln Club declines or 48 h pass, nothing is charged."). Both phrases live in the shared
-copy package and the brief, not in lane 7's files: once confirmed, the copy owner changes them
-(ticket to the integrator), then the apps build the terms block.
+accepts. If Kiln Club declines or 48 h pass, nothing is charged."). Lanes may edit copy keys in
+`config/copy.json` (working agreement, rule 4), so lane 7 changes both there and regenerates; the
+brief's copy of the old sentence is the integrator's (ticket).
 
 **P10 Share sheet for the card.** Waits on the share-card contract (lane 5, with lanes 1, 3 and 4)
 and on a public domain for the verification link (WP 7.6). Not built in WP 7.4.
