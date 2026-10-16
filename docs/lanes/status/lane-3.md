@@ -2,7 +2,7 @@
 
 Updated: 2026-10-16, by the lane 3 session
 Working on: B5 (memory proposals), PR #490. Last done: A5 (safety check after acknowledgment), #489
-Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482, A5 #489, B5 #490, B5 web #491, finding 18 #492, finding 5 FIX5_PR
+Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482, A5 #489, B5 #490, B5 web #491, finding 18 #492, finding 5 #494
 Next: finding 6 (the worker waits for the thread row, migration proposal); B8 after #441 and #446 merge; B6 waits on the provider key and the embedding choice
 Blocked on: nothing. Later: the embedding choice (B6), the real model for B1's model check and finding 13 (gateway)
 
@@ -438,7 +438,7 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
    must reconnect from its cursor (and the web refetches the page twice per reconnect). Cause, found
    2026-10-16: every frame batch revalidates authority in `withThread` (`db/database.ts`) under `FOR
 SHARE` on the thread row, which waits for the generation transaction writing that thread (1.1 to
-   2.5 s per slow batch, all of it in the replay), past the gateway's 2 s deadline. Fixed by FIX5_PR:
+   2.5 s per slow batch, all of it in the replay), past the gateway's 2 s deadline. Fixed by #494:
    the deadline is the 5 s scope window (two paired runs, 2 fans x 10 messages: closes 5 and 3 to 0,
    delivered 18 and 19 to 20 of 20). The same share lock is what the worker's `NOWAIT` on the thread
    row hits (finding 6).
