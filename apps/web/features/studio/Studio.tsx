@@ -1,11 +1,16 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { brand } from "@qelvora/brand";
 import { EmptyState, Notice, StudioTabBar } from "@qelvora/ui-web";
 import { validReturnTarget } from "@qelvora/api";
-import { configureStudioRequests, StudioFailure, studioRequest } from "./api";
+import {
+  configureStudioRequests,
+  StudioFailure,
+  studioRequest,
+  studioStream,
+} from "./api";
 import "./studio.css";
 import { useIdentityRequest } from "../identity/session-boundary";
 import type { Creator } from "./shared/types";
@@ -20,7 +25,36 @@ import { Requests } from "./requests/Requests";
 import { PacketDetail } from "./requests/PacketDetail";
 import { Threads } from "./threads/Threads";
 import { navigationTree, studioSidebar } from "./shell/navigation";
-import { useRequestsCount } from "./shell/useRequestsCount";
+import { liveQuery, StudioLive, type LiveViewState } from "./shell/live";
+/** One frame of Studio's live stream (backend `modules/studio/live.ts`). */
+type LiveFrame = {
+  t: number;
+  session?: string;
+  state?: { creators: Creator[]; invitations: Invitation[] };
+  badge?: number | null;
+  view?: { digest: string } | { error: LiveFailure };
+  end?: "renew" | "error";
+  error?: LiveFailure;
+};
+type LiveFailure = { status: number; code: string; message: string };
+type Invitation = {
+  id: string;
+  creatorId: string;
+  creatorName: string;
+  roles: string[];
+  expiresAt: string;
+};
+/** The read the route's screen declares, so the first stream already carries it. */
+const routeView = (screen: string[]) => {
+  const [current = "notes", fan] = screen;
+  return current === "notes"
+    ? liveQuery({ view: "notes", filter: "all" })
+    : current === "threads"
+      ? liveQuery(fan ? { view: "thread", fan } : { view: "threads" })
+      : current === "team" || current === "thanks"
+        ? liveQuery({ view: current })
+        : "";
+};
 export function Studio({
   creatorId,
   screen = [],
@@ -65,88 +99,192 @@ export function Studio({
     [sessionExpired, setSessionExpired] = useState(false),
     [suspended, setSuspended] = useState(false),
     [freshUntil, setFreshUntil] = useState(0),
-    [loading, setLoading] = useState(true);
-  const requests = useRequestsCount(creator, suspended);
+    [loading, setLoading] = useState(true),
+    [badge, setBadge] = useState<number>(),
+    [watched, setWatched] = useState(() => routeView(screen)),
+    [view, setView] = useState<LiveViewState>();
+  const requests = suspended ? undefined : badge;
   const generation = useRef(0),
-    roleRequest = useRef<AbortController | null>(null),
+    stream = useRef<AbortController | null>(null),
+    retry = useRef<ReturnType<typeof setTimeout>>(undefined),
+    failures = useRef(0),
+    lastFrame = useRef(0),
+    digests = useRef(new Map<string, string>()),
     reconnectButton = useRef<HTMLButtonElement>(null),
     previousFocus = useRef<HTMLElement | null>(null),
     router = useRouter();
+  const watch = useCallback((query: string) => setWatched(query), []),
+    live = useMemo(() => ({ state: view, watch }), [view, watch]);
   const conceal = useCallback(() => {
     const focused = document.activeElement;
     if (focused instanceof HTMLElement && focused.closest(".w5-studio"))
       previousFocus.current = focused;
     setSuspended(true);
   }, []);
-  const refresh = useCallback(async () => {
-    if (document.hidden) {
-      conceal();
-      return;
-    }
-    if (roleRequest.current) return;
-    const controller = new AbortController();
-    roleRequest.current = controller;
-    const current = ++generation.current;
-    const started = performance.now();
-    setLoading(true);
-    setError("");
-    try {
-      const result = await studioRequest<{
-        creators: Creator[];
-        invitations: typeof invitations;
-      }>("studio", "session", undefined, undefined, {
-        signal: AbortSignal.any([controller.signal, AbortSignal.timeout(4000)]),
-      });
-      if (current !== generation.current) return;
-      if (document.hidden || performance.now() >= started + 5000)
-        throw new StudioFailure(
-          503,
-          "authority_expired",
-          "Reconnect to check your current account and roles. Your input is kept.",
-        );
-      setCreators(result.creators);
-      setSessionExpired(false);
-      setInvitations(result.invitations);
-      setCreator(result.creators.find((c) => c.id === creatorId) ?? null);
-      setFreshUntil(started + 5000);
-      setSuspended(false);
-    } catch (failure) {
-      if (current !== generation.current) return;
-      setCreators([]);
-      setInvitations([]);
-      setSessionExpired(
-        failure instanceof StudioFailure && failure.status === 401,
-      );
-      const unavailable =
-        failure instanceof StudioFailure && failure.status >= 500;
-      // A transport outage cannot prove role removal. Keep the mounted view's
-      // input in memory, but conceal it and disable interaction until the same
-      // account's current authority is confirmed. Explicit denial clears it.
-      if (unavailable) {
+  // One live stream per open tab replaces the 4-second role check: the server
+  // re-checks the current roles and the open screen's read every two seconds,
+  // and each answer extends the five-second authority lease from the moment
+  // that check started. `renewal` is the server's routine 30-second turnover.
+  const connect = useCallback(
+    (renewal = false) => {
+      clearTimeout(retry.current);
+      if (document.hidden) {
         conceal();
-      } else {
-        setCreator(null);
-        setFreshUntil(0);
-        previousFocus.current = null;
+        return;
       }
-      setSuspended(unavailable);
-      setError(
-        failure instanceof Error ? failure.message : "Studio is unavailable.",
+      stream.current?.abort();
+      const controller = new AbortController();
+      stream.current = controller;
+      const current = ++generation.current;
+      const started = performance.now();
+      if (!renewal) {
+        setLoading(true);
+        setError("");
+      }
+      let first = true,
+        ended: LiveFrame | null = null;
+      const query = new URLSearchParams(watched);
+      if (creatorId) query.set("creator", creatorId);
+      const retryAfter = (delay: number) => {
+        retry.current = setTimeout(() => connect(), delay);
+      };
+      const refused = (failure: unknown) => {
+        setCreators([]);
+        setInvitations([]);
+        setSessionExpired(
+          failure instanceof StudioFailure && failure.status === 401,
+        );
+        const unavailable =
+          failure instanceof StudioFailure && failure.status >= 500;
+        // A transport outage cannot prove role removal. Keep the mounted view's
+        // input in memory, but conceal it and disable interaction until the same
+        // account's current authority is confirmed. Explicit denial clears it.
+        if (unavailable) {
+          conceal();
+          if (!document.hidden)
+            retryAfter(Math.min(8000, 1000 * 2 ** failures.current++));
+        } else {
+          setCreator(null);
+          setFreshUntil(0);
+          previousFocus.current = null;
+        }
+        setSuspended(unavailable);
+        setError(
+          failure instanceof Error ? failure.message : "Studio is unavailable.",
+        );
+        setLoading(false);
+      };
+      void studioStream(
+        query.toString(),
+        (raw) => {
+          if (current !== generation.current) return;
+          const frame = raw as LiveFrame;
+          if (frame.end) {
+            ended = frame;
+            return;
+          }
+          lastFrame.current = performance.now();
+          // A frame delayed past its own lease cannot restore Studio.
+          if (performance.now() >= started + frame.t + 5000) return;
+          failures.current = 0;
+          if (frame.state) {
+            const next =
+              frame.state.creators.find((c) => c.id === creatorId) ?? null;
+            setCreators(frame.state.creators);
+            setInvitations(frame.state.invitations);
+            setCreator((previous) =>
+              previous &&
+              next &&
+              JSON.stringify(previous) === JSON.stringify(next)
+                ? previous
+                : next,
+            );
+          }
+          setSessionExpired(false);
+          setError("");
+          setFreshUntil(started + frame.t + 5000);
+          setSuspended(false);
+          setLoading(false);
+          setBadge(
+            Number.isSafeInteger(frame.badge) && frame.badge! >= 0
+              ? frame.badge!
+              : undefined,
+          );
+          const key = watched,
+            read = frame.view;
+          if (!key || !read) return;
+          if ("error" in read) {
+            digests.current.delete(key);
+            setView((previous) => ({
+              key,
+              revision: previous?.key === key ? previous.revision : 0,
+              error: new StudioFailure(
+                read.error.status,
+                read.error.code,
+                read.error.message,
+              ),
+            }));
+          } else {
+            // Read again on a change, and once after any reconnect that was
+            // not a routine renewal (a return to the tab, a lapse, a retry).
+            const changed =
+              digests.current.get(key) !== read.digest || (first && !renewal);
+            digests.current.set(key, read.digest);
+            if (changed)
+              setView((previous) => ({
+                key,
+                revision: (previous?.key === key ? previous.revision : 0) + 1,
+              }));
+          }
+          first = false;
+        },
+        controller.signal,
+      ).then(
+        () => {
+          if (current !== generation.current) return;
+          const end = ended as LiveFrame | null;
+          if (end?.end === "renew") connect(true);
+          else if (end?.error)
+            refused(
+              new StudioFailure(
+                end.error.status,
+                end.error.code,
+                end.error.message,
+              ),
+            );
+          // A dropped stream reconnects at once, then backs off.
+          else if (!document.hidden) {
+            const tries = failures.current++;
+            retryAfter(tries ? Math.min(8000, 1000 * 2 ** tries) : 0);
+          }
+        },
+        (failure: unknown) => {
+          if (current === generation.current) refused(failure);
+        },
       );
-    } finally {
-      if (roleRequest.current === controller) roleRequest.current = null;
-      if (current === generation.current) setLoading(false);
-    }
-  }, [conceal, creatorId]);
+    },
+    [conceal, creatorId, watched],
+  );
   useEffect(() => {
     if (!creator || !freshUntil) return;
-    // A slow role request cannot extend the last successful authority check.
+    // A slow check cannot extend the last successful authority check. When the
+    // lease lapses and the stream stays silent, open a new one.
+    let watchdog: ReturnType<typeof setTimeout> | undefined;
     const timer = setTimeout(
-      conceal,
+      () => {
+        conceal();
+        const silentSince = lastFrame.current;
+        watchdog = setTimeout(() => {
+          if (lastFrame.current === silentSince) connect();
+        }, 3000);
+      },
       Math.max(0, freshUntil - performance.now()),
     );
-    return () => clearTimeout(timer);
-  }, [conceal, creator, freshUntil]);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(watchdog);
+    };
+  }, [conceal, connect, creator, freshUntil]);
   useEffect(() => {
     if (suspended) {
       if (!document.hidden) reconnectButton.current?.focus();
@@ -159,35 +297,43 @@ export function Studio({
     }
   }, [suspended]);
   useEffect(() => {
-    void refresh();
+    connect();
     return () => {
       generation.current++;
-      roleRequest.current?.abort();
-      roleRequest.current = null;
+      stream.current?.abort();
+      stream.current = null;
+      clearTimeout(retry.current);
     };
-  }, [refresh]);
+  }, [connect]);
   useEffect(() => {
-    const onFocus = () => void refresh();
+    // Focus and a restored page reconnect only when the lease has lapsed.
+    const onFocus = () => {
+      if (performance.now() >= lastFrame.current + 5000) connect();
+    };
     const onVisibility = () => {
       if (document.hidden) {
         generation.current++;
-        roleRequest.current?.abort();
-        roleRequest.current = null;
+        stream.current?.abort();
+        stream.current = null;
+        clearTimeout(retry.current);
         setFreshUntil(0);
         conceal();
-      } else void refresh();
+      } else connect();
+    };
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) connect();
     };
     window.addEventListener("focus", onFocus);
-    window.addEventListener("pageshow", onFocus);
+    window.addEventListener("online", onFocus);
+    window.addEventListener("pageshow", onPageShow);
     document.addEventListener("visibilitychange", onVisibility);
-    const timer = setInterval(onFocus, 4000);
     return () => {
-      clearInterval(timer);
       window.removeEventListener("focus", onFocus);
-      window.removeEventListener("pageshow", onFocus);
+      window.removeEventListener("online", onFocus);
+      window.removeEventListener("pageshow", onPageShow);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [conceal, refresh]);
+  }, [conceal, connect]);
   const root = `/studio/${creatorId}`,
     continuation = `${sessionExpired ? "/api/auth/restore" : "/auth/continue"}?returnTo=${encodeURIComponent(returnTo)}`,
     current = screen[0] ?? "notes";
@@ -261,7 +407,7 @@ export function Studio({
                     `invitations/${invite.id}/accept`,
                     {},
                   );
-                  await refresh();
+                  connect();
                 } catch (failure) {
                   setError((failure as Error).message);
                   setLoading(false);
@@ -293,7 +439,7 @@ export function Studio({
       </main>
     );
   return (
-    <>
+    <StudioLive.Provider value={live}>
       {suspended && (
         <main className="qv w5-entry">
           <Notice tone="error" title="Reconnect to Studio">
@@ -305,7 +451,7 @@ export function Studio({
             type="button"
             className="qv-btn qv-btn--secondary"
             aria-busy={loading}
-            onClick={() => void refresh()}
+            onClick={() => connect()}
           >
             Check connection and roles
           </button>
@@ -350,7 +496,7 @@ export function Studio({
             <button
               type="button"
               className="qv-link-btn"
-              onClick={() => void refresh()}
+              onClick={() => connect()}
             >
               Refresh role
             </button>
@@ -403,6 +549,6 @@ export function Studio({
           )}
         </div>
       </div>
-    </>
+    </StudioLive.Provider>
   );
 }

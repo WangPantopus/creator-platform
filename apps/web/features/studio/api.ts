@@ -100,6 +100,74 @@ export function configureStudioRequests(
     if (identityScope === scope) identityScope = null;
   };
 }
+/** Reads Studio's live stream (shell/live.tsx) until the server ends it or the
+ * connection drops. A refused stream throws the status a direct read would. */
+export async function studioStream(
+  query: string,
+  onFrame: (frame: unknown) => void,
+  signal: AbortSignal,
+): Promise<void> {
+  const scope = identityScope;
+  if (!scope || scope.signal.aborted)
+    throw new StudioFailure(
+      401,
+      "session_ended",
+      "Continue with Pantopus before using Studio.",
+    );
+  const stop = AbortSignal.any([scope.signal, signal]);
+  const current = () => identityScope === scope && !stop.aborted;
+  let response: Response;
+  try {
+    response = await fetch(`/api/studio/live?${query}`, {
+      headers: {
+        "X-Expected-Session-Id": scope.sessionId,
+        "x-qelvora-expected-account": scope.accountId,
+      },
+      cache: "no-store",
+      signal: stop,
+    });
+  } catch {
+    throw new StudioFailure(
+      503,
+      "offline",
+      "Reconnect to continue. Your input is kept; nothing is replayed automatically.",
+    );
+  }
+  if (!current()) return;
+  if (!response.ok || !response.body) {
+    const value = await response.json().catch(() => null);
+    const failure = new StudioFailure(
+      response.ok ? 503 : response.status,
+      value?.error?.code ?? "unavailable",
+      value?.error?.message ?? "Studio is unavailable.",
+    );
+    if (
+      ["session_view_changed", "session_account_changed"].includes(failure.code)
+    )
+      scope.end();
+    throw failure;
+  }
+  const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+  let buffer = "";
+  try {
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done || !current()) return;
+      buffer += value;
+      for (let end = buffer.indexOf("\n\n"); end >= 0; ) {
+        const event = buffer.slice(0, end);
+        buffer = buffer.slice(end + 2);
+        if (event.startsWith("data: ")) onFrame(JSON.parse(event.slice(6)));
+        if (!current()) return;
+        end = buffer.indexOf("\n\n");
+      }
+    }
+  } catch {
+    // A dropped connection ends the stream; the caller reconnects.
+  } finally {
+    void reader.cancel().catch(() => undefined);
+  }
+}
 export async function studioRequest<T>(
   domain: "studio" | "content" | "commerce-approvals" | "conversations",
   path: string,

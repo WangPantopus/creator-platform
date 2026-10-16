@@ -10,6 +10,7 @@ import {
 } from "../../../../packages/api/src/conversation/correction";
 import { SignedActReview } from "../identity/signing";
 import { StudioFailure, studioRequest } from "./api";
+import { useLiveReload, useLiveState } from "./shell/live";
 
 export function CorrectionReply({
   creator,
@@ -48,7 +49,7 @@ export function CorrectionReply({
     mounted = useRef(false),
     active = useRef(false),
     currentAccess = useRef(false),
-    refreshing = useRef(false),
+    refreshing = useRef<Promise<void> | null>(null),
     working = useRef(false),
     generation = useRef(0),
     checkedAt = useRef(0),
@@ -116,28 +117,43 @@ export function CorrectionReply({
       );
     return actual;
   }, [request, originalMessageId, originalVersion, threadId]);
-  const refresh = useCallback(async () => {
-    if (refreshing.current || working.current || !active.current) return;
-    refreshing.current = true;
+  // A caller during a read waits for that read instead of starting another.
+  const refresh = useCallback((): Promise<void> => {
+    if (refreshing.current) return refreshing.current;
+    if (working.current || !active.current) return Promise.resolve();
     const epoch = generation.current,
       started = performance.now();
-    try {
-      const actual = await readSource();
-      if (!mounted.current || epoch !== generation.current) return;
-      if (currentSource.current?.version !== actual.version) setReview(false);
-      currentSource.current = actual;
-      setSource(actual);
-      checkedAt.current = started;
-      currentAccess.current =
-        active.current && performance.now() - started < 5000;
-      setCurrent(currentAccess.current);
-      setError("");
-    } catch (value) {
-      if (epoch === generation.current) failure(value);
-    } finally {
-      refreshing.current = false;
-    }
+    const read = (async () => {
+      try {
+        const actual = await readSource();
+        if (!mounted.current || epoch !== generation.current) return;
+        if (currentSource.current?.version !== actual.version) setReview(false);
+        currentSource.current = actual;
+        setSource(actual);
+        checkedAt.current = started;
+        currentAccess.current =
+          active.current && performance.now() - started < 5000;
+        setCurrent(currentAccess.current);
+        setError("");
+      } catch (value) {
+        if (epoch === generation.current) failure(value);
+      } finally {
+        refreshing.current = null;
+      }
+    })();
+    refreshing.current = read;
+    return read;
   }, [readSource, failure]);
+  // Nothing re-reads on a timer: the thread's live read (Studio's stream) says
+  // when the conversation changed or was refused, and sending re-checks first.
+  const live = useLiveState();
+  useLiveReload(live ?? { key: "", revision: 0 }, refresh);
+  useEffect(() => {
+    if (live?.error) suspend();
+  }, [live?.error, suspend]);
+  const recheck = async () => {
+    if (performance.now() - checkedAt.current >= 5000) await refresh();
+  };
   useEffect(() => {
     mounted.current = true;
     const visibility = () => {
@@ -175,25 +191,18 @@ export function CorrectionReply({
         attributeFilter: ["hidden", "inert", "aria-hidden", "open"],
       });
     visibility();
-    const polling = setInterval(() => void refresh(), 4000),
-      expiry = setInterval(() => {
-        if (performance.now() - checkedAt.current >= 5000) suspend();
-      }, 500);
     document.addEventListener("visibilitychange", visibility);
-    window.addEventListener("focus", refresh);
     return () => {
       mounted.current = false;
       active.current = false;
       currentAccess.current = false;
       generation.current++;
       observer.disconnect();
-      clearInterval(polling);
-      clearInterval(expiry);
       document.removeEventListener("visibilitychange", visibility);
-      window.removeEventListener("focus", refresh);
     };
   }, [refresh, suspend]);
   const submit = async (body: ConversationCorrectionInput) => {
+    if (!working.current) await recheck();
     if (
       working.current ||
       !currentAccess.current ||
@@ -370,6 +379,7 @@ export function CorrectionReply({
             onSigned={async (signedActId, exactCommand) => {
               const exact =
                 ConversationCorrectionCommandSchema.parse(exactCommand);
+              await recheck();
               if (
                 !currentAccess.current ||
                 !active.current ||

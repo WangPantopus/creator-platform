@@ -9,6 +9,7 @@ import { useIdentityRequest } from "../../identity/session-boundary";
 import { Feedback, useAction } from "../shared/action";
 import { time } from "../shared/format";
 import type { Creator } from "../shared/types";
+import { useLiveReload, useLiveView } from "../shell/live";
 const teamRoleChoices = [
   ["triage", "Triage", "Reads and routes the queue. Replies as team."],
   ["drafter", "Drafting", "Prepares drafts. Never approves as you."],
@@ -66,8 +67,10 @@ export function Team({
     roleReturn = useRef(false),
     teamRefresh = useRef<HTMLButtonElement | null>(null),
     generation = useRef(0),
-    checkedUntil = useRef(0),
     request = useRef<AbortController | null>(null);
+  // Studio's live stream re-checks this read on the server and says when it
+  // changed or was refused; nothing here runs on a timer.
+  const live = useLiveView({ view: "team" });
   const load = useCallback(async () => {
     if (!mounted.current || document.hidden || request.current) return;
     const controller = new AbortController(),
@@ -91,12 +94,10 @@ export function Team({
         );
       setMembers(result.members);
       setPendingInvites(result.invitations);
-      checkedUntil.current = started + 5000;
       setTeamCurrent(true);
       setReadError("");
     } catch (failure) {
       if (!mounted.current || current !== generation.current) return;
-      checkedUntil.current = 0;
       setTeamCurrent(false);
       setMembers([]);
       setPendingInvites([]);
@@ -108,44 +109,35 @@ export function Team({
       if (mounted.current && current === generation.current) setReading(false);
     }
   }, [creator.id, creator.viewerAccountId]);
+  const conceal = useCallback(() => {
+    generation.current++;
+    request.current?.abort();
+    request.current = null;
+    setReading(false);
+    setTeamCurrent(false);
+    setMembers([]);
+    setPendingInvites([]);
+  }, []);
   useEffect(() => {
     mounted.current = true;
-    const refresh = () => void load(),
-      conceal = () => {
-        generation.current++;
-        request.current?.abort();
-        request.current = null;
-        checkedUntil.current = 0;
-        setReading(false);
-        setTeamCurrent(false);
-        setMembers([]);
-        setPendingInvites([]);
-      },
-      visibility = () => {
-        if (document.hidden) conceal();
-        else refresh();
-      };
-    refresh();
-    const polling = setInterval(refresh, 4000),
-      expiry = setInterval(() => {
-        if (performance.now() >= checkedUntil.current) setTeamCurrent(false);
-      }, 250);
-    window.addEventListener("focus", refresh);
-    window.addEventListener("pageshow", refresh);
+    const visibility = () => {
+      if (document.hidden) conceal();
+    };
     document.addEventListener("visibilitychange", visibility);
     return () => {
       mounted.current = false;
       generation.current++;
       request.current?.abort();
       request.current = null;
-      checkedUntil.current = 0;
-      clearInterval(polling);
-      clearInterval(expiry);
-      window.removeEventListener("focus", refresh);
-      window.removeEventListener("pageshow", refresh);
       document.removeEventListener("visibilitychange", visibility);
     };
-  }, [load]);
+  }, [conceal]);
+  useLiveReload(live, load);
+  useEffect(() => {
+    if (!live.error) return;
+    conceal();
+    setReadError(live.error.message);
+  }, [live.error, conceal]);
   useEffect(() => {
     if (reading) return;
     const requested = retryFocusRequested.current;
@@ -206,7 +198,7 @@ export function Team({
       suspended ||
       session.accountId !== creator.viewerAccountId ||
       document.hidden ||
-      performance.now() >= checkedUntil.current
+      live.error
     )
       throw new StudioFailure(
         403,

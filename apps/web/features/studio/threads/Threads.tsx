@@ -21,6 +21,7 @@ import { Feedback, useAction } from "../shared/action";
 import { key, speakerLabel } from "../shared/format";
 import { Modal } from "../shared/Modal";
 import type { Creator } from "../shared/types";
+import { useLiveReload, useLiveView } from "../shell/live";
 import { CorrectionForm } from "./CorrectionForm";
 export function Threads({
   creator,
@@ -77,6 +78,7 @@ export function Threads({
     ),
     [correctionPending, setCorrectionPending] = useState(false),
     [threadCurrent, setThreadCurrent] = useState(false),
+    [directoryCursor, setDirectoryCursor] = useState<string | null>(null),
     [teamPending, setTeamPending] = useState<{
       idempotencyKey: string;
       draftVersion: number;
@@ -87,9 +89,16 @@ export function Threads({
     threadLoading = useRef(false),
     threadMounted = useRef(false),
     threadGeneration = useRef(0),
-    threadCheckedAt = useRef(0),
     directoryCursors = useRef<(string | null)[]>([null]),
     pendingTeam = useRef<typeof teamPending>(null);
+  // Studio's live stream re-checks this read on the server and says when it
+  // changed or was refused; nothing here runs on a timer.
+  const live = useLiveView(
+    fanId
+      ? { view: "thread", fan: fanId }
+      : { view: "threads", cursor: directoryCursor },
+  );
+  const current = threadCurrent && !live.error;
   const teamStorage = `w5.team-reply:${creator.viewerAccountId}:${creator.id}:${fanId}`;
   const rememberTeam = useCallback(
     (value: typeof teamPending) => {
@@ -104,6 +113,25 @@ export function Threads({
     },
     [teamStorage],
   );
+  // A refusal removes the private conversation from this view.
+  const forget = useCallback((error: unknown) => {
+    if (
+      error instanceof StudioFailure &&
+      ([401, 403, 404].includes(error.status) ||
+        error.code === "session_account_changed" ||
+        error.code === "session_changed")
+    ) {
+      setData(null);
+      setEntries(null);
+      setText("");
+      setReview(false);
+      setApproveDraft(false);
+      setCorrection(null);
+      setAttachedCorrection(null);
+      setCorrectionPending(false);
+      draftEdited.current = false;
+    }
+  }, []);
   const load = useCallback(async () => {
     if (threadLoading.current) return;
     threadLoading.current = true;
@@ -162,33 +190,17 @@ export function Threads({
           return;
         setEntries(value);
       }
-      threadCheckedAt.current = started;
       setThreadCurrent(!document.hidden && performance.now() - started < 5000);
     } catch (error) {
       if (threadMounted.current && generation === threadGeneration.current) {
         setThreadCurrent(false);
-        if (
-          error instanceof StudioFailure &&
-          ([401, 403, 404].includes(error.status) ||
-            error.code === "session_account_changed" ||
-            error.code === "session_changed")
-        ) {
-          setData(null);
-          setEntries(null);
-          setText("");
-          setReview(false);
-          setApproveDraft(false);
-          setCorrection(null);
-          setAttachedCorrection(null);
-          setCorrectionPending(false);
-          draftEdited.current = false;
-        }
+        forget(error);
       }
       throw error;
     } finally {
       threadLoading.current = false;
     }
-  }, [creator.id, creator.viewerAccountId, fanId, rememberTeam]);
+  }, [creator.id, creator.viewerAccountId, fanId, rememberTeam, forget]);
   useEffect(() => {
     threadMounted.current = true;
     try {
@@ -206,32 +218,28 @@ export function Threads({
     } catch {
       /* Corrupt metadata cannot select an actor or invent a receipt. */
     }
-    void action.run(load);
-    const refresh = () => {
-        if (!document.hidden) void action.run(load);
-      },
-      visibility = () => {
-        if (document.hidden) {
-          threadGeneration.current++;
-          setThreadCurrent(false);
-        } else refresh();
-      },
-      polling = setInterval(refresh, 4000),
-      expiry = setInterval(() => {
-        if (performance.now() - threadCheckedAt.current >= 5000)
-          setThreadCurrent(false);
-      }, 500);
-    window.addEventListener("focus", refresh);
+    const visibility = () => {
+      if (document.hidden) {
+        threadGeneration.current++;
+        setThreadCurrent(false);
+      }
+    };
     document.addEventListener("visibilitychange", visibility);
     return () => {
       threadMounted.current = false;
       threadGeneration.current++;
-      clearInterval(polling);
-      clearInterval(expiry);
-      window.removeEventListener("focus", refresh);
       document.removeEventListener("visibilitychange", visibility);
     };
-  }, [load, teamStorage, rememberTeam]);
+  }, [teamStorage, rememberTeam]);
+  useLiveReload(live, () => action.run(load));
+  useEffect(() => forget(live.error), [live.error, forget]);
+  const page = (cursors: (string | null)[]) => {
+    threadGeneration.current++;
+    setThreadCurrent(false);
+    setEntries(null);
+    directoryCursors.current = cursors;
+    setDirectoryCursor(cursors.at(-1) ?? null);
+  };
   const sendTeam = async () => {
     if (!fanId || !data || creator.owned) return;
     let command = pendingTeam.current;
@@ -323,14 +331,14 @@ export function Threads({
       </header>
       <div className="w5-gutter">
         <AuditBanner />
-        <Feedback action={action} />
-        {!threadCurrent && (
+        <Feedback action={action} error={live.error?.message} />
+        {!current && (
           <p role="status">
             Checking current conversation access. Your draft stays here during a
             connection interruption.
           </p>
         )}
-        <div hidden={!threadCurrent} inert={!threadCurrent}>
+        <div hidden={!current} inert={!current}>
           {!fanId ? (
             <>
               <p className="qv-help">
@@ -384,15 +392,7 @@ export function Threads({
                   <button
                     className="qv-btn qv-btn--secondary"
                     disabled={action.busy}
-                    onClick={() =>
-                      void action.run(async () => {
-                        threadGeneration.current++;
-                        setThreadCurrent(false);
-                        setEntries(null);
-                        directoryCursors.current.pop();
-                        await load();
-                      })
-                    }
+                    onClick={() => page(directoryCursors.current.slice(0, -1))}
                   >
                     Previous conversations
                   </button>
@@ -402,14 +402,7 @@ export function Threads({
                     className="qv-btn qv-btn--secondary"
                     disabled={action.busy}
                     onClick={() =>
-                      void action.run(async () => {
-                        if (!entries.nextCursor) return;
-                        threadGeneration.current++;
-                        setThreadCurrent(false);
-                        directoryCursors.current.push(entries.nextCursor);
-                        setEntries(null);
-                        await load();
-                      })
+                      page([...directoryCursors.current, entries.nextCursor])
                     }
                   >
                     Next conversations
@@ -703,7 +696,7 @@ export function Threads({
           )}
         </div>
       </div>
-      <div hidden={!threadCurrent} inert={!threadCurrent}>
+      <div hidden={!current} inert={!current}>
         {creator.owned &&
           fanId &&
           data &&
@@ -722,9 +715,7 @@ export function Threads({
                 threadId={data.timeline.threadId}
                 creatorName={creator.display_name}
                 expectedAccountId={creator.viewerAccountId}
-                current={
-                  threadCurrent && data.timeline.control === "human_active"
-                }
+                current={current && data.timeline.control === "human_active"}
                 onPendingChange={setVoicePending}
                 onDelivered={() => {
                   setVoiceReply(null);
