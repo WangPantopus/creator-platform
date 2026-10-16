@@ -117,14 +117,16 @@ final class Lane7NotificationFlows: XCTestCase {
         capture("U4-largest-night-top")
         // The last row ends the list; at this size the tab bar may cover its middle,
         // so the check is that it is on screen, not that its centre takes a tap.
+        // Drags stay inside the list's own scroll view: at this size the development
+        // banner (a scroll view of its own) and the tab bar take most of the screen.
         let note = row("Studio note: the kiln is cooling until Thursday.")
-        let window = app.windows.firstMatch.frame
+        let list = app.scrollViews.containing(NSPredicate(format: "label == %@", "Notifications")).firstMatch.frame
         let origin = app.coordinate(withNormalizedOffset: .zero)
-        for _ in 0..<30 where !(note.exists && window.intersects(note.frame)) {
-            origin.withOffset(CGVector(dx: window.midX, dy: window.height * 0.7))
-                .press(forDuration: 0.05, thenDragTo: origin.withOffset(CGVector(dx: window.midX, dy: window.height * 0.4)), withVelocity: .slow, thenHoldForDuration: 0.2)
+        for _ in 0..<40 where !(note.exists && list.intersects(note.frame)) {
+            origin.withOffset(CGVector(dx: list.midX, dy: list.midY + list.height * 0.3))
+                .press(forDuration: 0.05, thenDragTo: origin.withOffset(CGVector(dx: list.midX, dy: list.midY - list.height * 0.3)), withVelocity: .slow, thenHoldForDuration: 0.2)
         }
-        XCTAssertTrue(note.exists && window.intersects(note.frame), "the last row is on screen")
+        XCTAssertTrue(note.exists && list.intersects(note.frame), "the last row is on screen")
         capture("U4-largest-night-note")
         try await control("/content-size", body: ["size": "large"], port: 56475)
     }
