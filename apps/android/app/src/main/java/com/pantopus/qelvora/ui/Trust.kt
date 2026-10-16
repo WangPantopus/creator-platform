@@ -472,7 +472,7 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
             // The same names as iOS's picker; the chosen one is announced as selected.
             val scopes = mapOf("account" to QelvoraCopy.text("nativeAccount"), "creator" to QelvoraCopy.text("pickerCreator"), "thread" to QelvoraCopy.text("nativeConversation"))
             Row { scopes.forEach { (value, name) -> Button(name, ButtonVariant.QUIET, modifier = Modifier.semantics { selected = scope == value }) { scope = value } } }
-            TrustText(QelvoraCopy.text("nativeDataScopeScope", mapOf("scope" to scopes.getValue(scope))), "label")
+            TrustText(QelvoraCopy.text("nativeDataScopeScope", mapOf("scope" to (scopes[scope] ?: scope))), "label")
             if (scope != "account") conversationPicker(scope == "thread")
             if (local) { TrustText(QelvoraCopy.text("nativeSyntheticLocalAccountTypeLOCAL"), "caption"); TrustField(QelvoraCopy.text("nativeLocalConfirmation"), proof) { proof = it } }
             else if (verificationMethod == "current_session") TrustText(QelvoraCopy.text("nativeYourSignInMustBeRecent"), "caption")
@@ -489,7 +489,7 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
             selectedJob?.takeIf { privateVisible }?.let { job ->
                 TrustText(QelvoraCopy.text("nativeJobId", mapOf("id" to job.text("id"))), "caption")
                 job["tasks"]?.jsonArray?.forEach { item -> val task = item.jsonObject; TrustText(task.text("domain") + ": " + task.text("state").replace('_', ' ') + task.text("error_code").takeIf { it.isNotEmpty() }?.let { " · " + it.replace('_', ' ') }.orEmpty()) }
-                job["retained"]?.jsonArray?.forEach { item -> val retained = item.jsonObject; TrustText("Retained: ${retained.text("category").replace('_',' ')}","label"); TrustText(retained.text("reason")); retained.text("until").takeIf { it.isNotEmpty() }?.let { TrustText(QelvoraCopy.text("nativeUntilDate", mapOf("date" to it)),"caption") } }
+                job["retained"]?.jsonArray?.forEach { item -> val retained = item.jsonObject; TrustText(QelvoraCopy.text("nativeRetainedCategory", mapOf("category" to retained.text("category").replace('_',' '))),"label"); TrustText(retained.text("reason")); retained.text("until").takeIf { it.isNotEmpty() }?.let { TrustText(QelvoraCopy.text("nativeUntilDate", mapOf("date" to it)),"caption") } }
                 if (job.text("state") != "complete") Button(QelvoraCopy.text("nativeRetryIncompleteDomains"), ButtonVariant.SECONDARY, block = true, disabled = busy || !privateReady) { launchPrivate { if (perform("privacy/jobs/" + job.text("id") + "/retry", buildJsonObject {}) != null) { result = QelvoraCopy.text("nativeIncompleteDomainsQueuedAgain"); jobDetail(job.text("id")) } } }
                 if (job.text("state") == "complete" && job.text("kind") == "export") Button(QelvoraCopy.text("nativeSaveExport"), ButtonVariant.SECONDARY, block = true, disabled = busy || !privateReady) { launchPrivate {
                     if (baseURL != null && trustReady(model)) {
@@ -511,7 +511,7 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
         } else {
             val kinds = mapOf("support" to QelvoraCopy.text("nativeSupportRequest"), "ai_report" to QelvoraCopy.text("nativeReportAIMessage"), "abuse" to QelvoraCopy.text("nativeAbuseReport"), "block" to QelvoraCopy.text("nativeBlockCreator"), "crisis" to QelvoraCopy.text("nativeCrisisHelp"))
             kinds.entries.chunked(2).forEach { choices -> Row { choices.forEach { (value, name) -> Button(name, ButtonVariant.QUIET, modifier = Modifier.semantics { selected = kind == value }) { kind = value } } } }
-            TrustText(QelvoraCopy.text("nativeReportTypeKind", mapOf("kind" to kinds.getValue(kind))), "label")
+            TrustText(QelvoraCopy.text("nativeReportTypeKind", mapOf("kind" to (kinds[kind] ?: kind))), "label")
             if (kind == "ai_report" || kind == "abuse" || kind == "block") conversationPicker(false)
             if (kind == "ai_report") TrustField(QelvoraCopy.text("nativeAIMessageID"), messageId) { messageId = it }
             if (kind == "support") TrustField(QelvoraCopy.text("nativeRequestIDOptional"), requestId) { requestId = it }
