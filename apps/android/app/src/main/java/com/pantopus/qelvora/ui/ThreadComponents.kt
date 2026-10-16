@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -108,7 +109,9 @@ fun SystemLine(text: String = "", variant: SystemLineVariant = SystemLineVariant
                 TextLine(copy("takeover", "name" to name), "caption", "maya-accent", true)
                 time?.let { TextLine(it, "data-sm", "on-maya-muted") }
             }
-        } else TextLine(text, if (variant == SystemLineVariant.DATE) "data-sm" else "label", "ink-muted")
+        } else if (variant == SystemLineVariant.DATE) TextLine(text, "data-sm", "ink-muted")
+        // Centered between its rules, as the design and iOS draw it; it shows once a line wraps.
+        else BasicText(text, style = qText("label").copy(color = qColor("ink-muted"), textAlign = TextAlign.Center))
         Box(Modifier.weight(1f).height(T.hairline).background(line))
     }
 }
