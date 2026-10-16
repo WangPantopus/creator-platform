@@ -735,15 +735,29 @@ export class CommerceService {
     );
   }
   private async exposure(client: PoolClient, fanId: string, currency: string) {
+    // A payment counts in the month it was captured, less what of it has been
+    // refunded successfully (the founder's decision 1): a refund gives back
+    // that month's room and never room in a later month, and a refund still
+    // in flight counts until it succeeds, since only a succeeded refund is in
+    // the ledger. Only a paid request's refunds are matched to their payment
+    // so far; a membership's or the pass's still count in full.
     const totals = (
-      await client.query<{ captured: string; refunded: string; month: string }>(
-        `SELECT coalesce(sum(amount) FILTER(WHERE kind='capture'),0)::text AS captured,
-         coalesce(sum(amount) FILTER(WHERE kind='refund'),0)::text AS refunded,
+      await client.query<{
+        captured: string;
+        refunded: string;
+        returned: string;
+        month: string;
+      }>(
+        `SELECT coalesce(sum(l.amount) FILTER(WHERE l.kind='capture'),0)::text AS captured,
+         coalesce(sum(l.amount) FILTER(WHERE l.kind='refund'),0)::text AS refunded,
+         coalesce(sum(least(l.amount,(SELECT coalesce(sum(r.amount),0) FROM creator.commerce_ledger r
+           WHERE r.kind='refund' AND r.packet_id=l.packet_id AND r.fan_id=l.fan_id AND r.currency=l.currency)))
+           FILTER(WHERE l.kind='capture' AND l.packet_id IS NOT NULL),0)::text AS returned,
          to_char(now() AT TIME ZONE 'UTC','YYYY-MM') AS month
-         FROM creator.commerce_ledger WHERE fan_id=$1 AND currency=$2
-         AND kind IN('capture','refund')
-         AND created_at>=date_trunc('month',now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC'
-         AND created_at<(date_trunc('month',now() AT TIME ZONE 'UTC')+interval '1 month') AT TIME ZONE 'UTC'`,
+         FROM creator.commerce_ledger l WHERE l.fan_id=$1 AND l.currency=$2
+         AND l.kind IN('capture','refund')
+         AND l.created_at>=date_trunc('month',now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC'
+         AND l.created_at<(date_trunc('month',now() AT TIME ZONE 'UTC')+interval '1 month') AT TIME ZONE 'UTC'`,
         [fanId, currency],
       )
     ).rows[0]!;
@@ -780,9 +794,10 @@ export class CommerceService {
         : "0";
     const heldTotal =
       BigInt(held.amount) + BigInt(billing.amount) + BigInt(passPending);
-    const total = BigInt(totals.captured) + heldTotal;
+    const total = BigInt(totals.captured) - BigInt(totals.returned) + heldTotal;
     invariant(
       total <= BigInt(Number.MAX_SAFE_INTEGER) &&
+        BigInt(totals.captured) <= BigInt(Number.MAX_SAFE_INTEGER) &&
         BigInt(totals.refunded) <= BigInt(Number.MAX_SAFE_INTEGER),
       "balance_reconciliation_required",
       "This balance needs reconciliation before new spending.",
@@ -791,6 +806,8 @@ export class CommerceService {
       month: totals.month,
       refunded: Number(totals.refunded),
       captured: Number(totals.captured),
+      /** What of this month's payments was refunded: room given back. */
+      returned: Number(totals.returned),
       held: Number(heldTotal),
       total: Number(total),
       currency,
@@ -833,9 +850,10 @@ export class CommerceService {
       BigInt(limit.amount ?? 0) > 0n
     ) {
       const spend = await this.exposure(client, fanId, currency);
+      // What counts toward the limit: a refund gives its room back (decision 1).
       for (const threshold of [50, 100])
         if (
-          BigInt(spend.captured) * 100n >=
+          BigInt(spend.captured - spend.returned) * 100n >=
           BigInt(limit.amount!) * BigInt(threshold)
         )
           await client.query(
