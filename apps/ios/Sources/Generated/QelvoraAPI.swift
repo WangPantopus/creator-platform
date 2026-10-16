@@ -593,13 +593,15 @@ public struct APICommerceDecidePacket: Codable, Sendable {
   public let `idempotencyKey`: String
   public let `signedActId`: String?
   public let `text`: String?
+  public let `question`: String?
   public let `proposedModeId`: String?
-  public init(action: APICommerceDecidePacketAction, version: Int, idempotencyKey: String, signedActId: String? = nil, text: String? = nil, proposedModeId: String? = nil) {
+  public init(action: APICommerceDecidePacketAction, version: Int, idempotencyKey: String, signedActId: String? = nil, text: String? = nil, question: String? = nil, proposedModeId: String? = nil) {
     self.action = action
     self.version = version
     self.idempotencyKey = idempotencyKey
     self.signedActId = signedActId
     self.text = text
+    self.question = question
     self.proposedModeId = proposedModeId
   }
 }

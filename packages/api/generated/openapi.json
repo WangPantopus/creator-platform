@@ -14083,6 +14083,12 @@
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           },
           "text": {
+            "description": "Older clients' question for more_info, read only when question is absent. Never send a reply draft here.",
+            "type": "string",
+            "maxLength": 8000
+          },
+          "question": {
+            "description": "The question the fan is asked, used only with more_info and required there. When question is present, even blank, text is never read as the question.",
             "type": "string",
             "maxLength": 8000
           },
