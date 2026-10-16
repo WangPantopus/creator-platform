@@ -1,10 +1,10 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-16, by the lane 3 session
-Working on: B4 (retrieval), PR #468, draft until the founder decides its engine revision
+Working on: B1 (guard revision, engine revision 16). Last done: B4 (retrieval), #468
 Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468
-Next: after B4, the founder picks; remaining: A5 (safety sign-off), A7 (C5 frames), B1 (price rule), B3 citations, B5 memory, B7 consent text, B8 My AI publish flow
-Blocked on: the founder's decision on B4's engine revision (proposed default below). Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
+Next: B3 citations, then B5 memory (launch plan steps 2 and 3); remaining: A5 (safety sign-off), A7 (C5 frames), B6 (provider), B7 consent text, B8 My AI publish flow
+Blocked on: nothing. Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
 
 ## Resume here (2026-10-16, B4)
 
@@ -49,10 +49,8 @@ from W3's thread-local history (INV-11; an off-the-record thread or one with mem
 none, and the message is embedded alone), using the published version's own engine, and every
 retrieval read re-derives the query and refuses a changed one. No SQL change.
 
-**Founder decision needed (engine revision).** Proposed default: B4 is revision 15 as built; B1 (guard)
-and B6 (Anthropic adapter), planned as "revision 15", become revision 16 together. The alternative is
-holding B4 until B1 and B6 so all three ship as one revision. The floor (1,000 of 2,500 tokens: the two
-nearest full-size chunks) is part of the same revision.
+Founder decision 2026-10-16 (the proposed default): B4 is engine revision 15 as built, with the
+1,000-token floor; B1 and B6 follow as later revisions.
 
 E3B.4 on the fake model (100 ms), fresh stack each, paired at load 5.3 and 5.6. The fake embeds with
 a 64-dimension hash of words; a recording edge in front of it shows the embedded text and the
@@ -151,6 +149,12 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
 
 ## Decisions
 
+- 2026-10-16, founder: take the proposed default instead of stopping to ask; each such decision is
+  recorded here, marked "proposed default", and can be reversed.
+- 2026-10-16, founder (proposed default): B4 ships as engine revision 15 (previous fan turn in the
+  query, 1,000-token evidence floor); revision 14 stays a historical engine. B1 (guard) is revision
+  16; B6 (provider switch) gets its own later revision instead of sharing one with B1, since it waits
+  on the key and the embedding choice.
 - 2026-10-15, founder: finding 9 (a crash once a sentence is stored) is fixed by lane 4's one
   condition in `creator.generation_typed_original_allowance_receipt`; the crashed, partly delivered
   answer keeps the fan's reservation held like any unknown receipt (#456, ticket to lane 4).
