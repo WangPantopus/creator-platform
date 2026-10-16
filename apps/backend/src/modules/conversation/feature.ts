@@ -350,10 +350,12 @@ export class ConversationFeature {
     // creator's paid attention: never right after the crisis response or a
     // companion safety refusal (INV-19, INV-21). Both texts are written only
     // by the server; the expert fallback ("You can ask … directly") keeps it.
+    // An answer that has no sentence yet does not count, so the button cannot
+    // flash back while the next reply might still be the crisis response.
     const latestAi =
       (
         await client.query<{ text: string }>(
-          "SELECT text FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND author_kind='ai' ORDER BY sequence DESC LIMIT 1",
+          "SELECT text FROM creator.message WHERE thread_id=$1 AND creator_id=$2 AND fan_id=$3 AND author_kind='ai' AND text<>'' ORDER BY sequence DESC LIMIT 1",
           [scope.threadId, scope.creatorId, scope.fanId],
         )
       ).rows[0]?.text ?? "";
