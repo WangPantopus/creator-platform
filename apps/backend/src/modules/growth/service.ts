@@ -1325,6 +1325,28 @@ export class GrowthService {
       );
     return id;
   }
+  async launchKit(actor: Actor) {
+    const id = await this.requireCreator(actor);
+    await this.refreshCreator(id);
+    return this.db.actor(actor, id, async (client) => {
+      const creator = (
+        await client.query<{ document: PublicCreator }>(
+          "SELECT document FROM growth.creator_public WHERE id=$1",
+          [id],
+        )
+      ).rows[0]?.document;
+      const visible =
+        creator?.verified &&
+        ["published", "paused"].includes(creator.state) &&
+        /^[a-z0-9_]{3,30}$/u.test(creator.handle);
+      return {
+        publicPage: visible
+          ? { path: `/creators/${creator.handle}`, name: creator.name }
+          : null,
+        canInvite: Boolean(visible && creator.state === "published"),
+      };
+    });
+  }
   /** Privileged W3 ETL supplies categorical signals, never raw conversation text. */
   async signal(input: unknown) {
     const value = InsightSignal.parse(input);
