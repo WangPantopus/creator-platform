@@ -1,7 +1,7 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-15, by the lane 3 session
-Working on: keeping the open pull requests current with main; waiting on the founder for B9's step-in rule
+Working on: the migration proposals for findings 15, 8 and 9
 Done: merged A1 #411, A3 #426, A6a #434, A6b #433 (its code and migration 0251 through the registration #442). Open: A6c #436, A6 hold sizing #438, B2 #441, A2 #444, B9 #446
 Next: the migration proposals for findings 8, 9 and 15, then the next work package in the founder's order
 Blocked on: nothing. Later: the founder's A5 safety sign-off, the INV-21 price rule (B1), the embedding choice (B6/B1)
@@ -53,6 +53,9 @@ and worker database time per answer from 22.6 s to 6.6 to 7.4 s. The acknowledgm
 
 ## Decisions
 
+- 2026-10-15, founder: "Ask Maya to step in" is hidden after the crisis response and the companion
+  safety refusal, kept after the expert fallback, and back with the next ordinary answer; with no
+  allowance and step-in hidden, the unavailable line drops its step-in sentence. B9 (#446).
 - 2026-10-15, founder: a reply's cost hold is a strict upper bound computed from what this pipeline can
   send for the creator's configuration (calls actually made, each at its own model's rate); the cap is
   never exceeded. Implemented on `lane-3/a6-hold-sizing`.
@@ -167,8 +170,8 @@ still hold the creator's budget (main's hold envelope; #433 and #438 fix it).
   answer's admission locks with `NOWAIT` (finding 15). With the tab open and comparisons off: main
   14 reads and 14 row locks in 70 s; B9 one read at load, none after (a focus reads once more and
   polling stays off).
-- Waiting on the founder: the reading above (hide after the crisis response and the companion
-  refusal, keep after the expert fallback, back with the next ordinary answer) and the shortened
+- Founder decision 2026-10-15: keep this reading (hidden after the crisis response and the companion
+  refusal, kept after the expert fallback, back with the next ordinary answer) and the shortened
   no-allowance line.
 
 ## B2: the FAQ publish check

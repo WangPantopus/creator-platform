@@ -833,6 +833,17 @@ export function CreatorAI({
       setComparisons({ available: false, items: [] });
       setComparisonReadState(readable() ? "checking" : "unavailable");
     };
+    // Poll only while comparisons are on: each read holds the creator's AI
+    // workspace row, which an answer in progress also needs. Focus,
+    // visibility and reconnect still read once and resume polling if on.
+    let timer: ReturnType<typeof setInterval> | undefined;
+    const poll = (on: boolean) => {
+      if (on && !timer) timer = setInterval(() => void load(), 5000);
+      if (!on && timer) {
+        clearInterval(timer);
+        timer = undefined;
+      }
+    };
     const load = async () => {
       if (!readable()) {
         clear();
@@ -858,6 +869,7 @@ export function CreatorAI({
         if (pending === controller && readable() && !signal.aborted) {
           setComparisons(result);
           setComparisonReadState("current");
+          poll(result.available);
         }
       } catch {
         if (!cancelled && pending === controller) {
@@ -875,7 +887,7 @@ export function CreatorAI({
       void load();
     };
     refresh();
-    const timer = setInterval(() => void load(), 5000);
+    poll(true);
     window.addEventListener("online", refresh);
     window.addEventListener("offline", refresh);
     window.addEventListener("focus", refresh);
@@ -884,7 +896,7 @@ export function CreatorAI({
     return () => {
       cancelled = true;
       pending?.abort();
-      clearInterval(timer);
+      poll(false);
       window.removeEventListener("online", refresh);
       window.removeEventListener("offline", refresh);
       window.removeEventListener("focus", refresh);
