@@ -317,7 +317,7 @@ export default function PrivacyPage() {
       {capability.data?.verificationMethod === "current_session" && (
         <p>
           <a href="/api/auth/continue?returnTo=%2Fsupport%2Fprivacy">
-            Verify with Pantopus again
+            Sign in again
           </a>{" "}
           before requesting or downloading your data.
         </p>
@@ -455,10 +455,7 @@ export default function PrivacyPage() {
           retention needs reviewed configuration. Backup restoration must apply
           the tombstone before reopening access.
         </p>
-        <p>
-          This does not cancel store billing or silently close your shared
-          Pantopus account.
-        </p>
+        <p>This does not cancel store billing.</p>
         <div className="actions">
           <button
             className="qv-btn qv-btn--secondary"

@@ -178,6 +178,78 @@ step(
   opsLinks.join(" · ").slice(0, 160),
 );
 
+// Lines that assumed a shared Pantopus account (founder, 2026-10-15, #461).
+const readMain = async (target, path) => {
+  await target.goto(`${WEB}${path}`);
+  await target.waitForLoadState("networkidle");
+  return (await target.locator("main").innerText()).replace(/\s+/gu, " ");
+};
+const trustText = await readMain(visitor, "/trust");
+step(
+  "the trust page no longer mentions a shared Pantopus account",
+  trustText.includes("Data deletion is a separate request.") &&
+    !trustText.includes("Pantopus"),
+  trustText.match(/Cancel store subscriptions.{0,90}/u)?.[0] ?? "",
+);
+const termsText = await readMain(visitor, "/trust/terms");
+step(
+  "the terms page names “the account lifecycle boundary”",
+  termsText.includes("support contacts and the account lifecycle boundary") &&
+    !termsText.includes("Pantopus"),
+  termsText.match(/retention configuration.{0,80}/u)?.[0] ?? "",
+);
+await page.goto(`${WEB}/support/privacy`);
+await page.waitForLoadState("networkidle");
+const deletion = (
+  (await page.locator("dialog.trust-dialog").textContent()) ?? ""
+).replace(/\s+/gu, " ");
+step(
+  "the privacy page's deletion dialog: “This does not cancel store billing.”",
+  deletion.includes("This does not cancel store billing.") &&
+    !deletion.includes("Pantopus"),
+  deletion.match(/This does not cancel.{0,60}/u)?.[0] ?? deletion.slice(0, 120),
+);
+// The proof step on a host that is not development-only: an Apple creator.
+const applePage = await (
+  await browser.newContext({ locale: "en-US" })
+).newPage();
+await applePage.goto(`${WEB}/auth/continue?returnTo=%2Fstudio%2Fsetup`);
+await applePage
+  .getByRole("link", { name: "Continue with Apple" })
+  .first()
+  .click();
+await applePage.getByLabel("Test person").fill(person("wording-creator"));
+await applePage.getByRole("button", { name: "Sign in" }).click();
+await applePage.waitForLoadState("networkidle");
+await applePage.locator("#birth-date").fill(yearsAgo(33));
+await applePage.getByRole("button", { name: "Continue" }).click();
+await applePage.waitForLoadState("networkidle");
+if (new URL(applePage.url()).pathname === "/onboarding/handle") {
+  await applePage.locator("#handle").fill(`wfan${Date.now() % 1e8}`);
+  await applePage.locator("button.handle-continue").click();
+  await applePage
+    .waitForURL("**/studio/setup", { timeout: 20_000 })
+    .catch(() => {});
+}
+const appleToken = (await applePage.context().cookies(WEB)).find(
+  (c) => c.name === SESSION,
+)?.value;
+const creatorName = `Wording Kiln ${Date.now() % 1e5}`;
+const profile = await call("POST", "/v1/identity/creator-profile", {
+  token: appleToken,
+  body: { handle: `wk${Date.now() % 1e8}`, displayName: creatorName },
+});
+const proofText = await readMain(applePage, "/studio/setup");
+step(
+  "an Apple creator's proof step: “This proves you're the … your fans already follow.”",
+  profile.status === 200 &&
+    proofText.includes(
+      `This proves you're the ${creatorName} your fans already follow.`,
+    ) &&
+    !proofText.includes("Pantopus account"),
+  proofText.match(/This proves.{0,80}/u)?.[0] ?? describe(profile),
+);
+
 // A fresh sign-in, then signing-key recovery: its notice (this starts Maya's
 // recovery, so run on a fresh stack).
 await page.goto(`${WEB}/auth/continue?returnTo=%2Fstudio%2Fsetup`);

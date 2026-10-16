@@ -12,8 +12,8 @@ export default function TermsPage() {
       </p>
       <p>
         Public release requires reviewed terms, actual processor disclosures,
-        retention configuration, support contacts and the shared Pantopus
-        account lifecycle boundary.
+        retention configuration, support contacts and the account lifecycle
+        boundary.
       </p>
       <Link href="/support">Ask for help</Link>
     </main>
