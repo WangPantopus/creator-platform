@@ -1,6 +1,6 @@
 # Lane 6, WP 6.9: Studio without 4-second polling
 
-Written 2026-10-16 by the lane 6 session that did WP 6.9 (branch `lane-6/no-polling`).
+Written 2026-10-16 by the lane 6 session that did WP 6.9 (branch `lane-6/no-polling`, #488).
 
 ## What changed, in plain words
 

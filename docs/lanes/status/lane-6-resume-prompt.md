@@ -23,12 +23,12 @@ START (about five minutes; nothing needs rebuilding):
    `.claude/worktrees/`), then `git fetch origin`. Toolchain:
    `NB="$HOME/.cache/codex-runtimes/codex-primary-runtime/dependencies"; export PATH=$NB/node/bin:$NB/bin/fallback:$PATH npm_config_manage_package_manager_versions=false CI=1; pnpm install --frozen-lockfile --offline`
    (about 10 seconds).
-2. Read the "Resume here" section of `docs/lanes/status/lane-6.md` (from `origin/main` if the
-   WP 6.9 pull request is merged, otherwise
+2. Read the "Resume here" section of `docs/lanes/status/lane-6.md` (from `origin/main` if #488
+   is merged, otherwise
    `git show origin/lane-6/no-polling:docs/lanes/status/lane-6.md`), then
    `docs/lanes/status/lane-6-wp-6-9.md`.
-3. Check the two open lane 6 pull requests: #443 (WP 6.2, Today) and the WP 6.9 pull request
-   (`lane-6/no-polling`). If #443 merged and WP 6.9 did not: merge `origin/main` into
+3. Check the two open lane 6 pull requests: #443 (WP 6.2, Today) and #488 (WP 6.9,
+   `lane-6/no-polling`). If #443 merged and WP 6.9 did not: merge `origin/main` into
    `lane-6/no-polling`. `Studio.tsx` conflicts: keep both sides, and change `routeView`'s
    default screen from `"notes"` to `"today"`. In `lane-6.md` and this file, keep the WP 6.9
    side, which already contains #443's text. A local branch `scratch/6.9-with-443` (never

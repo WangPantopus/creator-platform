@@ -3,7 +3,7 @@
 Updated: 2026-10-16, by the session that did WP 6.9.
 
 Working on: nothing. WP 6.9 (Studio without 4-second polling) is done in
-[#PR69](PR69_URL) on `lane-6/no-polling`; WP 6.2 is in #443 (open). This file is written on top
+[#488](https://github.com/WangPantopus/creator-platform/pull/488) on `lane-6/no-polling`; WP 6.2 is in #443 (open). This file is written on top
 of #443's version, so whichever of the two merges second takes this file as it is.
 
 ## Resume here
@@ -62,7 +62,7 @@ recommended answer, or default decision"); each can be vetoed:
   composer warns when nobody is in the chosen audience, handles right-to-left text, and returns
   to Today after a Note is signed. Contract **C10** is written:
   [lane-6-c10-today.md](lane-6-c10-today.md).
-- **WP 6.9** ([#PR69](PR69_URL)): no Studio screen polls. One live stream per tab replaces the
+- **WP 6.9** ([#488](https://github.com/WangPantopus/creator-platform/pull/488)): no Studio screen polls. One live stream per tab replaces the
   role check, the screens' 4-second reads, the expiry timers and the badge poll. Idle requests a
   minute: Notes 74 to 18, an open thread 80 to 18, Threads, Team and Thanks 64 to 18, Requests
   48 to 18, the Studio picker 32 to 16; what is left is lane 1's identity check and the stream's
