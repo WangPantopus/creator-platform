@@ -6,12 +6,14 @@ import {
   assertOutputPrivacyTaskCatalogForReview,
   assertPublicPrivacyTaskCatalogForReview,
   assertComparisonPrivacyTaskCatalogForReview,
+  assertNoticesPrivacyTaskCatalogForReview,
   assertContentPrivacyTaskCatalogForReview,
   assertPrivacyTaskCatalog,
 } from "../src/modules/trust/privacy-catalog.js";
 import {
   assertDomainPrivacyTaskCatalog,
   assertDomainPrivacyTaskCatalogForComparisonReview,
+  assertDomainPrivacyTaskCatalogForNoticesReview,
 } from "../src/modules/trust/domain-privacy-catalog.js";
 import { repositoryRoot, sha256 } from "./migration-custody.js";
 import { WaveRoleSafetyError } from "./migration-wave-roles.js";
@@ -49,6 +51,7 @@ export async function assertPrivacyWaveRoleSafety(
     outputBeforePublic?: boolean;
     publicBeforeComparison?: boolean;
     comparisonBeforeNotices?: boolean;
+    noticesBeforeSignInAndMoney?: boolean;
   },
 ) {
   const fail = (purpose: string): never => {
@@ -137,13 +140,17 @@ export async function assertPrivacyWaveRoleSafety(
         await assertPublicPrivacyTaskCatalogForReview(client);
       else if (installed.comparisonBeforeNotices)
         await assertComparisonPrivacyTaskCatalogForReview(client);
+      else if (installed.noticesBeforeSignInAndMoney)
+        await assertNoticesPrivacyTaskCatalogForReview(client);
       else await assertPrivacyTaskCatalog(client);
       await client.query("RESET SESSION AUTHORIZATION");
     }
     if (installed.domain) {
       const domainCatalog = installed.comparisonBeforeNotices
         ? assertDomainPrivacyTaskCatalogForComparisonReview
-        : assertDomainPrivacyTaskCatalog;
+        : installed.noticesBeforeSignInAndMoney
+          ? assertDomainPrivacyTaskCatalogForNoticesReview
+          : assertDomainPrivacyTaskCatalog;
       await client.query("SET SESSION AUTHORIZATION creator_trust_worker");
       await domainCatalog(client, "trust");
       await client.query("RESET SESSION AUTHORIZATION");

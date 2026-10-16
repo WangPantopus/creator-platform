@@ -1,5 +1,6 @@
 import review from "../../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
 import noticesReview from "../../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
+import signInAndMoneyReview from "../../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
 import type { PoolClient } from "pg";
 import { invariant } from "../core/errors.js";
 import {
@@ -14,6 +15,7 @@ function freeze<T extends object>(value: T): Readonly<T> {
 }
 const profile = freeze(review);
 const notices = freeze(noticesReview);
+const signInAndMoney = freeze(signInAndMoneyReview);
 
 /** The notices wave follows comparison. Every pinned catalogue lists every
  * relation, so once its two sources are registered its regenerated pins
@@ -35,6 +37,27 @@ async function registeredNoticesProfile(signal?: AbortSignal) {
   return notices;
 }
 
+/** The sign-in and money wave follows notices, and its regenerated pins
+ * replace the notices pins the same way once its three sources are registered. */
+async function registeredSignInAndMoneyProfile(signal?: AbortSignal) {
+  signal?.throwIfAborted();
+  const active = await Promise.all(
+    signInAndMoney.sources.map(registeredMigration),
+  );
+  signal?.throwIfAborted();
+  if (active.every((source) => !source)) return undefined;
+  invariant(
+    active.every(
+      (source, index) =>
+        source?.version === signInAndMoney.sources[index]!.version &&
+        source.checksum === signInAndMoney.sources[index]!.checksum,
+    ),
+    "comparison_unconfigured",
+    "The complete reviewed sign-in and money source graph is required.",
+  );
+  return signInAndMoney;
+}
+
 /** Exact executable source selects independently reviewed metadata only.
  * Reservations and hand-installed ledger entries cannot activate this profile.
  * Original owners still check their actual source, purpose and transaction. */
@@ -53,11 +76,22 @@ export async function registeredComparisonProfile(signal?: AbortSignal) {
     "The complete reviewed comparison source graph is required.",
   );
   const head = await registeredNoticesProfile(signal);
+  const next = await registeredSignInAndMoneyProfile(signal);
+  invariant(
+    head || !next,
+    "comparison_unconfigured",
+    "The sign-in and money wave requires the complete reviewed notices source graph.",
+  );
   return head
     ? freeze({
         ...profile,
         ...head,
-        sources: [...profile.sources, ...head.sources],
+        ...next,
+        sources: [
+          ...profile.sources,
+          ...head.sources,
+          ...(next?.sources ?? []),
+        ],
       })
     : profile;
 }
