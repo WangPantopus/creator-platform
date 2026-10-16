@@ -33,6 +33,7 @@ import { useConversationRequest, ConversationError } from "./api";
 import { copy, formatCopy } from "@qelvora/copy";
 import { useIdentityRequest } from "../identity/session-boundary";
 import { ConversationOfflineStorage } from "./offline-storage";
+import { paintFrame } from "./frames";
 import { VoicePlayer } from "../media/VoicePlayer";
 import { IntroOffer } from "../identity/intro-offer";
 import { ReplyFeedbackResultSchema } from "../../../../packages/api/src/conversation/contracts";
@@ -402,7 +403,29 @@ export function ConversationScreen({
       if (!parsed.success || !gate.current) return;
       try {
         const visible: Frame[] = gate.current.receive(parsed.data);
-        if (visible.length) void orderedRefresh();
+        if (!visible.length) return;
+        // Paint approved AI sentences straight from their frames (C5); fetch
+        // the page only for what a frame does not carry.
+        let next = current.current;
+        let reconcile = false;
+        for (const frame of visible) {
+          const painted = next ? paintFrame(next, frame) : null;
+          if (!painted) {
+            reconcile = true;
+            break;
+          }
+          next = painted.page;
+          reconcile ||= painted.reconcile;
+        }
+        if (next && next !== current.current && !refreshing) {
+          current.current = next;
+          setPage(next);
+          sessionStorage.setItem(
+            cursorKey,
+            JSON.stringify({ cursor: next.cursor, epoch: next.epoch }),
+          );
+        } else if (next !== current.current) reconcile = true;
+        if (reconcile) void orderedRefresh();
       } catch {
         void orderedRefresh();
       }

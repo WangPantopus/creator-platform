@@ -1,9 +1,9 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-16, by the lane 3 session
-Working on: B3 (citations), PR #477. Last done: B1 (guard revision 16), #473 stacked on B4 #468
-Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477
-Next: B5 memory (launch plan step 3), then A7, B8, A5, B7; remaining: A5 (safety sign-off), A7 (C5 frames), B6 (provider), B7 consent text, B8 My AI publish flow
+Working on: A7 (frames, C5), PR #482. Last done: B3 (citations), #477
+Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482
+Next: finding 5 (socket closes during answers), then A5, B8, B7, B5 memory; remaining: A5 (safety sign-off), A7 (C5 frames), B6 (provider), B7 consent text, B8 My AI publish flow
 Blocked on: nothing. Later: the founder's A5 safety sign-off, the embedding choice (B6), the real model for B1's model check and finding 13 (gateway)
 
 ## Resume here (2026-10-16, B4)
@@ -34,6 +34,40 @@ http://127.0.0.1:56499`; publish Maya on the fake first, then restart with the g
 - E3B.4 needs the backend's OpenAI-host calls routed through its recording edge: rebuild with
   `sh tests/scenarios/lane-3/fresh-stack.sh --env QELVORA_FAKE_MODEL_URL=http://127.0.0.1:56438`
   (port 56438 is lane 3's; the scenario opens the edge itself and forwards to the fake on 56433).
+
+## A7: the web thread paints sentences from their frames (contract C5)
+
+A frame already carried each approved sentence (the server writes it only after the guard approves),
+but the web thread refetched the whole page on every frame and painted from that. Now an AI sentence
+frame is appended to its message the moment it arrives; the answer's end (`delivered` or
+`interrupted`) sets the message state and asks for one reconciling fetch for what frames do not
+carry (citations, version, feedback). Accepted and control frames and other authors still refetch,
+as before. `ThreadDeliveryGate` is unchanged: it drops duplicates and stale-epoch frames (INV-03) and
+holds anything after a gap.
+
+C5 as built: a sentence frame is `{threadId, cursor, epoch, kind: "sentence", messageId, authorKind,
+text, generationId, sequence}`, where `text` is the sentence to append to message `messageId` (one AI
+message per answer); `delivered` and `interrupted` close it; a client keeps one gate per thread,
+paints only what the gate returns, refetches on anything it cannot paint and on a gap or replay
+error, and subscribes again from its cursor after a reconnect. Frames do not carry citations (adding
+them changes the SQL that writes frames, a migration), so a citation chip appears with the answer's
+end.
+
+E3A.8 (`a7-paint-frames.mjs`): installed Chrome (headless) signs in as development actor one, sends
+five questions through the composer and drops the network in a sixth answer; every frame and every
+change of the thread's text is timestamped on one clock. Fake model at 700 ms per chunk, load 16 to 17.
+
+| Measure                                      | Main           | A7             |
+| -------------------------------------------- | -------------- | -------------- |
+| Sentence painted after its frame, p50 / p95  | 342 / 1,794 ms | 19 / 102 ms    |
+| Page fetches per answer                      | 6, 8, 8, 8, 7  | 6, 8, 7, 5, 10 |
+| Final text equals the server's, network drop | yes            | yes            |
+
+- Page fetches hardly change: sentences no longer fetch, but the gateway closes the socket about
+  every 8 to 10 s during an answer (finding 5) and each reconnect fetches the page twice. That is the
+  next fix (server side).
+- One A7 answer ended `interrupted` on the server (load 16); the screen still matched the server.
+- Lane 7 follows for the native threads (7.8). Typecheck, lint, format and generate checks pass.
 
 ## B3: citations survive a rebuild and open their exact span
 
@@ -434,6 +468,7 @@ passing, on top of the existing boundary cases (all must pass). A first version 
 | E3A.5 ★              | A3: kill after admission passes; kill during the guard call leaves an uncertain cost (finding 7); kill after the first sentence never finishes (finding 9). Same on main                                                                                                                                                                                                                                                                                                                                                     | `e3a5-restart.mjs --at admitted\|guard\|sentence`                                     |
 | E3A.6 ★              | Distressed message gets the safe response first: pass. Hard-block half not run (needs the real model)                                                                                                                                                                                                                                                                                                                                                                                                                        | `e3a6-safety.mjs`                                                                     |
 | E3A.7 workspace lock | Main: 3 and 4 of 9 answers while Studio reads every 150 ms (9 workspace refusals); with the pending migration 9 of 9 in three runs, no refusals, no deadlocks, E3A.2 identical. Two workers: 2 of 10 on main, 1 or 2 with the migration (finding 15)                                                                                                                                                                                                                                                                         | `e3a7-workspace-lock.mjs`                                                             |
+| E3A.8 frames (A7)    | Web thread paints a sentence 19 / 102 ms after its frame (main 342 / 1,794 ms); final text equals the server after a network drop; page fetches unchanged (finding 5)                                                                                                                                                                                                                                                                                                                                                        | `a7-paint-frames.mjs` on a stack with the web app                                     |
 | A3 drift             | Pass on main and A3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | `a3-drift.mjs`                                                                        |
 | A6 hold bound        | Before: a $5 cap admits no Claude reply. After: hold $2.62 (Sonnet as small model) or $0.20 (Haiku); 10 of 10 replies delivered, spend at most 2.3% of the hold; one real reply cost $0.018 against a $2.62 hold                                                                                                                                                                                                                                                                                                             | `a6-hold-bound.mjs`                                                                   |
 | A6c dropped request  | Before: a fan dropping the request during the safety check, or a timed-out check, locks the creator (4 of 7 fail). After: 7 of 7                                                                                                                                                                                                                                                                                                                                                                                             | `a6-ack-disconnect.mjs`                                                               |
