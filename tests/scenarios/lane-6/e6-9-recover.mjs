@@ -22,7 +22,7 @@ await step(
   "a background tab stops reading; its return reads once",
   async () => {
     await A.goto(`${WEB}/studio/${MAYA}/notes`);
-    await A.getByText("REPLIES").waitFor();
+    await A.getByText(/^REPLIES ·/u).waitFor();
     await until(A, async () => !(await hidden(A)), 30_000, "Notes shown");
     await A.waitForTimeout(2_000);
     const background = (state) =>

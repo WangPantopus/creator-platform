@@ -16,7 +16,7 @@ const subset = process.argv.includes("--subset"),
   across = process.argv.includes("--across-6.9");
 // The calls WP 6.9 replaced: the role check and badge (now in the stream) and the stream.
 const replaced =
-  /^GET \/api\/studio\/(?:live\?|session$|[0-9a-f-]{36}\/queue\?filter=all&limit=1$)/u;
+  /^GET \/api\/studio\/(?:live(?:\?|$)|session$|[0-9a-f-]{36}\/queue\?filter=all&limit=1$)/u;
 // Reads that only the 4-second timers repeated; the stream asks for them only on a change.
 const polled =
   /^GET \/api\/(?:content\/[0-9a-f-]{36}\/studio(?:\/replies|\/thanks)?|studio\/[0-9a-f-]{36}\/(?:threads|team)|commerce-approvals\/|conversations\/)/u;

@@ -330,6 +330,20 @@ const server = createServer(async (req, res) => {
     });
   if (delay.ms && delay.match.test(path))
     await new Promise((resolve) => setTimeout(resolve, delay.ms));
+  // As the backend's query check: a screen read needs a creator, a thread a fan.
+  const q = url.searchParams;
+  if (
+    req.method === "GET" &&
+    path === "studio/live" &&
+    ((q.get("view") && !q.get("creator")) ||
+      (q.get("view") === "thread") !== Boolean(q.get("fan")))
+  )
+    return send(400, {
+      error: {
+        code: "invalid_request",
+        message: "The request does not match the API contract.",
+      },
+    });
   if (req.method === "GET" && path === "studio/live")
     return liveStream(req, res, url.searchParams);
   for (const [[method, re], handler] of routes) {

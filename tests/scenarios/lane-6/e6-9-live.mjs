@@ -34,7 +34,7 @@ await step("E6.9-2", "a fan's message reaches an open thread", async () => {
   );
   return `shown after ${ms} ms, same page (no reload)`;
 });
-await step("E6.9-3", "Team shows a new member and a removal", async () => {
+await step("E6.9-3", "Team shows a member added, then removed", async () => {
   await A.goto(`${WEB}/studio/${MAYA}/team`);
   await A.locator(".w5-team-member").first().waitFor();
   await A.waitForTimeout(3_000);
@@ -42,7 +42,10 @@ await step("E6.9-3", "Team shows a new member and a removal", async () => {
   await L.team(1, ["drafter"]);
   const added = await until(
     A,
-    () => A.locator(".w5-team-member").getByText(name).isVisible(),
+    () =>
+      A.locator(".w5-team-member", { hasText: name })
+        .locator("p", { hasText: /^drafter$/u })
+        .isVisible(),
     8_000,
     "the new member",
   );
@@ -67,7 +70,7 @@ await step(
   "E6.9-4",
   "a removed team member's Studio hides within 5 s",
   async () => {
-    await B.getByText("REPLIES").waitFor({ timeout: 30_000 });
+    await B.getByText(/^REPLIES ·/u).waitFor({ timeout: 30_000 });
     await until(B, async () => !(await hidden(B)), 30_000, "member Studio");
     await B.waitForTimeout(2_000);
     await L.team(2, null);
