@@ -313,6 +313,7 @@ data class APICommerceDecidePacket(
   val `idempotencyKey`: String,
   val `signedActId`: String? = null,
   val `text`: String? = null,
+  val `question`: String? = null,
   val `proposedModeId`: String? = null
 )
 

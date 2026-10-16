@@ -279,7 +279,22 @@ export const DecidePacket = z.strictObject({
   version: z.number().int().positive(),
   idempotencyKey: IdempotencyKey,
   signedActId: z.uuid().optional(),
-  text: z.string().trim().max(8000).optional(),
+  text: z
+    .string()
+    .trim()
+    .max(8000)
+    .optional()
+    .describe(
+      "Older clients' question for more_info, read only when question is absent. Never send a reply draft here.",
+    ),
+  question: z
+    .string()
+    .trim()
+    .max(8000)
+    .optional()
+    .describe(
+      "The question the fan is asked, used only with more_info and required there. When question is present, even blank, text is never read as the question.",
+    ),
   proposedModeId: z.uuid().optional(),
 });
 export const VersionCommand = z.strictObject({

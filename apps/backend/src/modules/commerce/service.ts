@@ -1605,14 +1605,18 @@ export class CommerceService {
               "question_pending",
               "Wait for the fan's answer before asking another question.",
             );
+            // The question has its own field, so a reply draft sent beside it
+            // never reaches the fan. Only a client that sends no question at
+            // all still has its text read as the question.
+            const question = body.question ?? body.text;
             invariant(
-              body.text,
+              question,
               "question_required",
               "Write the question for the fan.",
             );
             await client.query(
               `UPDATE creator.commerce_packet SET state='more_info',question=$2,remaining_sla_seconds=greatest(0,extract(epoch FROM decision_at-now())::integer),decision_at=hold_expires_at-interval '6 hours',version=version+1,updated_at=now() WHERE id=$1`,
-              [id, body.text],
+              [id, question],
             );
             await this.event(
               client,
