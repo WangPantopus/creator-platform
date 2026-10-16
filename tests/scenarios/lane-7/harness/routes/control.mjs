@@ -3,6 +3,7 @@
 // the world (faults, clock, model switch, the creator showing up). The real
 // API has none of it.
 import { Failure } from "../http.mjs";
+import { randomUUID } from "node:crypto";
 import { addMessage, copy, seed } from "../world.mjs";
 import { sendToAi } from "./conversation.mjs";
 
@@ -261,5 +262,25 @@ export function register(router) {
       thread.consentVersion = ctx.world.policy.version;
     thread.revision += 1;
     return { ok: true };
+  });
+  // A deleted/recreated conversation keeps its route but has a new physical
+  // identity. Used with the app stopped; it must never inherit the old draft.
+  router.add("POST", "/__harness/threads/:handle/recreate", (ctx) => {
+    const thread = threadOf(ctx);
+    if (thread.listeners.size || thread.generation)
+      throw new Failure(
+        409,
+        "harness_thread_active",
+        "Stop the app and generation first.",
+      );
+    thread.id = randomUUID();
+    thread.messages = [];
+    thread.frames = [];
+    thread.idempotency.clear();
+    thread.memory = [];
+    thread.cursor = 0;
+    thread.epoch = 0;
+    thread.revision = 1;
+    return { id: thread.id };
   });
 }

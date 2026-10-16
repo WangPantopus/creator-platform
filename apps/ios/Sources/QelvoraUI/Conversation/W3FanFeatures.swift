@@ -8,9 +8,14 @@ public enum W3FanFeatures {
     /// W1 calls this at sign-out/account revocation alongside credential purge.
     public static func clearPrivateState() async throws {
         await W3Realtime.shared.purge()
+        // Purge every feature even if one storage operation fails. W1 keeps
+        // sign-in fenced until the entire local purge succeeds.
+        var failure: Error?
+        do { try await W3DraftStorage.shared.purge() } catch { failure = error }
         do { try await W3ResumeStorage.shared.purge() }
-        catch { await W3OfflineStorage.shared.purge(); throw error }
+        catch { failure = failure ?? error }
         await W3OfflineStorage.shared.purge()
+        if let failure { throw failure }
     }
     public static func registration(baseURL: URL?) -> FanFeatureRegistration {
         FanFeatureRegistration(matches: { destination in
@@ -54,41 +59,48 @@ private struct W3ThreadScreen: View {
     @State private var sourceFailure = ""
     @State private var connectionRetry = 0
     @FocusState private var composerFocused: Bool
+    @ScaledMetric(relativeTo: .body) private var composerLineHeight: CGFloat = 24
+    @Environment(\.dynamicTypeSize) private var textSize
+    #if os(iOS)
+    @Environment(\.verticalSizeClass) private var verticalSize
+    #endif
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var scheme
     init(baseURL: URL, creatorId: String, fanId: String, session: FanSession) {
         self.baseURL = baseURL; _model = StateObject(wrappedValue: W3ThreadModel(baseURL: baseURL, creatorId: creatorId, fanId: fanId, accountId: session.session?.accountId ?? "signed-out", sessionId: session.session?.sessionId ?? "")); self.session = session
     }
+    private var compact: Bool {
+        #if os(iOS)
+        textSize.isAccessibilitySize || verticalSize == .compact
+        #else
+        textSize.isAccessibilitySize
+        #endif
+    }
     var body: some View {
         VStack(spacing: 0) {
             if let page = model.page {
-                ThreadHeader(name: page.creatorName, subtitle: "Official AI", live: !model.offline && page.control == .human_active, onBack: { session.back() }, onAbout: { privacy = true })
-                IdentityStrip(state: page.control == .human_active ? .human : page.control == .ai_active ? .ai : .paused, name: page.creatorName)
+                if compact {
+                    HStack {
+                        ThreadIconButton(glyph: "back", label: QelvoraCopy.text("back"), color: qColor("ink", scheme)) { session.back() }
+                        Group {
+                            if page.control != .ai_active && page.control != .human_active {
+                                HStack { QelvoraGlyph(name: "pause", color: qColor("ink-muted", scheme)); Text(QelvoraCopy.text("aiPaused", values: ["name": page.creatorName])).qText("caption") }
+                            } else { AuthorLabel(kind: page.control == .human_active ? .humanCreator : .ai, name: page.creatorName) }
+                        }.frame(maxWidth: .infinity, alignment: .leading)
+                        ThreadIconButton(glyph: "info", label: QelvoraCopy.text("aboutConversation"), color: qColor("ink-muted", scheme)) { privacy = true }
+                    }
+                } else {
+                    ThreadHeader(name: page.creatorName, subtitle: "Official AI", live: !model.offline && page.control == .human_active, onBack: { session.back() }, onAbout: { privacy = true })
+                    IdentityStrip(state: page.control == .human_active ? .human : page.control == .ai_active ? .ai : .paused, name: page.creatorName)
+                }
                 ScrollViewReader { proxy in
                     ScrollView {
-                        LazyVStack(alignment: .leading, spacing: QelvoraTokens.space4) {
-                            if let offerId = model.introOfferId, session.session?.fan != nil, page.feedbackPolicy != nil {
-                                IntroOffer(offerId: offerId, session: session,
-                                    enabled: scenePhase == .active && !privacy && source == nil && originalReply == nil && comparisonQuestion == nil && !model.offline && !model.busy,
-                                    acknowledge: model.acknowledgeIntroOffer).id(offerId)
-                            }
-                            Text("Conversations with a creator’s AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.").qText("caption").padding(12).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusMd))
-                            if model.offline { Notice(tone: .offline, title: "You're offline", children: "You're seeing a saved conversation with a short reading lease. Reconnect to send.") }
-                            if page.offTheRecord { SystemLine(children: "Off the record · the AI keeps no memory from this conversation.") }
-                            if model.before != nil { Button("Earlier messages", variant: .quiet, disabled: model.busy || model.offline) { Task { await model.earlier() } } }
-                            ForEach(model.older.filter { old in !page.messages.contains { $0.id == old.id } } + page.messages) { message in
-                                row(message, page: page).id(message.id)
-                            }
-                            if let pending = model.pending {
-                                Message(kind: .fan, children: pending.text, name: page.creatorName, delivery: pending.rejected ? .failed : pending.uncertain ? nil : .pending)
-                                if pending.uncertain {
-                                    Text("Acceptance has not been confirmed. Retry checks the same message without a duplicate.").qText("caption")
-                                    Button("Retry", variant: .quiet, disabled: model.busy || model.offline) { Task { await model.send(retry: true) } }
-                                }
-                                if pending.rejected { Button("Keep editing", variant: .quiet) { model.draft = pending.text; model.pending = nil } }
-                            }
-                            if !model.failure.isEmpty { Notice(tone: .error, title: "Conversation status", children: model.failure) }
-                            Color.clear.frame(height: 1).id("conversation-end")
+                        // At the largest text a lazy stack never settles under the bottom anchor:
+                        // its height estimates for very tall rows keep moving the anchored offset,
+                        // which re-estimates them, and the app spins. Exact sizes settle.
+                        Group {
+                            if compact { VStack(alignment: .leading, spacing: QelvoraTokens.space4) { threadRows(page) } }
+                            else { LazyVStack(alignment: .leading, spacing: QelvoraTokens.space4) { threadRows(page) } }
                         }.padding(.horizontal, QelvoraTokens.space4).padding(.vertical, QelvoraTokens.space4)
                     }.textSelection(.enabled)
                         // Open at the current reply and keep bottom-anchored
@@ -108,17 +120,28 @@ private struct W3ThreadScreen: View {
                 }
                 VStack(spacing: QelvoraTokens.space3) {
                     if !page.canSend { Notice(title: "AI unavailable", children: page.unavailableReason ?? "Messaging is unavailable.") }
-                    Button("Ask \(page.creatorName) to step in", variant: .maya, block: true) { session.open("/commerce/packet?creatorId=" + model.creatorId) }
+                    if !composerFocused && !compact { Button("Ask \(page.creatorName) to step in", variant: .maya, block: true) { session.open("/commerce/packet?creatorId=" + model.creatorId) } }
                     HStack(alignment: .bottom, spacing: QelvoraTokens.space2) {
-                        TextField(page.control == .human_active ? "Message \(page.creatorName)…" : "Message \(page.creatorName)'s AI…", text: $model.draft, axis: .vertical)
-                            .lineLimit(1...5).qText("body").padding(12).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusMd))
+                        TextEditor(text: Binding(get: { model.draft }, set: { model.draft = String($0.prefix(2000)) }))
+                            .qText("body").scrollContentBackground(.hidden)
+                            // A bounded scrolling editor avoids intrinsic-height
+                            // feedback when a restored draft gains keyboard focus.
+                            .frame(height: compact ? max(44, composerLineHeight) : min(120, composerLineHeight * 2))
+                            .overlay(alignment: .topLeading) {
+                                if model.draft.isEmpty {
+                                    Text(page.control == .human_active ? "Message \(page.creatorName)…" : "Message \(page.creatorName)'s AI…")
+                                        .qText("body").foregroundStyle(qColor("ink-muted", scheme))
+                                        .lineLimit(1).padding(.leading, 5).padding(.top, 8)
+                                        .allowsHitTesting(false).accessibilityHidden(true)
+                                }
+                            }
+                            .padding(compact ? 4 : 12).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusMd))
                             .accessibilityLabel(page.control == .human_active ? "Message \(page.creatorName)" : "Message \(page.creatorName)'s AI")
                             .focused($composerFocused)
-                            .onChange(of: model.draft) { _, value in if value.count > 2000 { model.draft = String(value.prefix(2000)) } }
                         Button("Send", variant: page.control == .human_active ? .maya : .ai, disabled: scenePhase != .active || privacy || source != nil || originalReply != nil || comparisonQuestion != nil || !page.canSend || model.offline || model.busy || model.pending != nil || !page.generationSequences.isEmpty || model.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) { Task { await model.send() } }
                     }
-                    if !composerFocused { HStack { Button("Me and privacy", variant: .quiet) { privacy = true }; Button("Get support", variant: .quiet) { session.open("/support") } } }
-                }.padding(QelvoraTokens.space4).background(qColor("ground", scheme))
+                    if !composerFocused && !compact { HStack { Button("Me and privacy", variant: .quiet) { privacy = true }; Button("Get support", variant: .quiet) { session.open("/support") } } }
+                }.padding(.horizontal, QelvoraTokens.space4).padding(.vertical, compact && composerFocused ? 4 : QelvoraTokens.space4).background(qColor("ground", scheme))
             } else {
                 Notice(title: "Conversation unavailable", children: model.failure.isEmpty ? "Loading your messages…" : model.failure).padding(16)
                 Button("Refresh", variant: .secondary) { connectionRetry += 1 }
@@ -170,6 +193,37 @@ private struct W3ThreadScreen: View {
             .sheet(item: $source) { passage in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original source").qText("data-sm"); Text(passage.title).qText("display-md"); Text(passage.text).qText("body").textSelection(.enabled) }.padding(16) } }
             .sheet(item: $originalReply) { original in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original AI reply · version \(original.version)").qText("data-sm"); Text(original.text).qText("body").textSelection(.enabled) }.padding(16) } }
             .alert("Source unavailable", isPresented: Binding(get: { !sourceFailure.isEmpty }, set: { if !$0 { sourceFailure = "" } })) { SwiftUI.Button("Close") { sourceFailure = "" } } message: { Text(sourceFailure) }
+    }
+    /// The thread's rows, the same in the lazy and the plain stack.
+    @ViewBuilder private func threadRows(_ page: W3Page) -> some View {
+        if compact { IdentityStrip(state: page.control == .human_active ? .human : page.control == .ai_active ? .ai : .paused, name: page.creatorName) }
+        if let offerId = model.introOfferId, session.session?.fan != nil, page.feedbackPolicy != nil {
+            IntroOffer(offerId: offerId, session: session,
+                enabled: scenePhase == .active && !privacy && source == nil && originalReply == nil && comparisonQuestion == nil && !model.offline && !model.busy,
+                acknowledge: model.acknowledgeIntroOffer).id(offerId)
+        }
+        Text("Conversations with a creator’s AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.").qText("caption").padding(12).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusMd))
+        if model.offline { Notice(tone: .offline, title: "You're offline", children: "You're seeing a saved conversation with a short reading lease. Reconnect to send.") }
+        if page.offTheRecord { SystemLine(children: "Off the record · the AI keeps no memory from this conversation.") }
+        if model.before != nil { Button("Earlier messages", variant: .quiet, disabled: model.busy || model.offline) { Task { await model.earlier() } } }
+        ForEach(model.older.filter { old in !page.messages.contains { $0.id == old.id } } + page.messages) { message in
+            row(message, page: page).id(message.id)
+        }
+        if let pending = model.pending {
+            Message(kind: .fan, children: pending.text, name: page.creatorName, delivery: pending.rejected ? .failed : pending.uncertain ? nil : .pending, onRetry: { Task { await model.send(retry: true) } })
+            if pending.uncertain {
+                Text("Acceptance has not been confirmed. Retry checks the same message without a duplicate.").qText("caption")
+                Button("Retry", variant: .quiet, disabled: model.busy || model.offline) { Task { await model.send(retry: true) } }
+            }
+            if pending.rejected { Button("Keep editing", variant: .quiet, disabled: model.busy) { model.draft = pending.text; model.pending = nil } }
+        }
+        if !model.failure.isEmpty { Notice(tone: .error, title: "Conversation status", children: model.failure) }
+        if compact && !composerFocused {
+            Button("Ask \(page.creatorName) to step in", variant: .maya, block: true) { session.open("/commerce/packet?creatorId=" + model.creatorId) }
+            Button("Me and privacy", variant: .quiet) { privacy = true }
+            Button("Get support", variant: .quiet) { session.open("/support") }
+        }
+        Color.clear.frame(height: 1).id("conversation-end")
     }
     @ViewBuilder private func row(_ message: W3Message, page: W3Page) -> some View {
         if message.authorKind == .system {
