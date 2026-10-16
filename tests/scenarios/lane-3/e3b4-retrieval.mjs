@@ -730,7 +730,7 @@ const summary = {
   followUpHits: `${hits}/${dialogues.length}`,
   firstSentence: { p50: percentile(firsts, 50), p95: percentile(firsts, 95) },
   delivered: `${results.filter((r) => r.end === "delivered").length}/${results.length}`,
-  results: results.map(({ vector, ...r }) => r),
+  results: results.map((r) => ({ ...r, vector: undefined })),
 };
 process.stdout.write(
   `\nfollow-ups ${summary.followUpHits} | first sentence p50 ${Math.round(summary.firstSentence.p50 ?? 0)} ms p95 ${Math.round(summary.firstSentence.p95 ?? 0)} ms | ${summary.delivered} delivered | load ${summary.load.toFixed(1)}\n`,
