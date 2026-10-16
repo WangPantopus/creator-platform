@@ -40,6 +40,7 @@ import com.pantopus.qelvora.generated.*
 import com.pantopus.qelvora.identity.FanFeatureRegistration
 import com.pantopus.qelvora.identity.FanSession
 import com.pantopus.qelvora.identity.NativeIntroOffer
+import com.pantopus.qelvora.identity.HarnessLaunch
 import com.pantopus.qelvora.ui.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -405,6 +406,27 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     val timeline = remember(current?.messages, older, presence, before != null) {
         current?.let { shown -> threadTimeline(older.filter { old -> shown.messages.none { it.id == old.id } } + shown.messages, presence, before != null) } ?: emptyList()
     }
+    // WP 7.4 P8: the phone's count runs while this AI conversation is in front
+    // with its AI on; at each 3 hours the fixed line joins this thread once.
+    var reminderRevision by remember(root, accountId) { mutableStateOf(0) }
+    val counting = foreground && !privacy && comparisonQuestion == null && source == null && current?.control == APIThreadControl.AI_ACTIVE
+    val latestTimeline by rememberUpdatedState(timeline)
+    LaunchedEffect(counting, root, accountId) {
+        if (!counting || session.session?.accountId == null) return@LaunchedEffect
+        ConversationLongSession.configure(HarnessLaunch.longSession(context))
+        ConversationLongSession.begin(context, accountId)
+        try {
+            while (isActive) {
+                delay(ConversationLongSession.interval)
+                val shown = page ?: continue
+                if (ConversationLongSession.tick(context)) {
+                    ConversationLongSession.add(root, latestTimeline.lastOrNull()?.key, copy("longSession", "name" to shown.creatorName))
+                    reminderRevision++
+                }
+            }
+        } finally { ConversationLongSession.end(context) }
+    }
+    val rows = remember(timeline, reminderRevision) { withReminders(timeline, ConversationLongSession.lines(root)) }
     BoxWithConstraints(Modifier.widthIn(max = 680.dp).fillMaxSize()) {
     val density = LocalDensity.current
     // The composer stays outside the list in every orientation. Only the
@@ -415,7 +437,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     val horizontalControls = maxHeight < 180.dp
     // Presence arrives after the page: a reader still at the bottom stays there
     // when its rows are placed, as iOS keeps its bottom anchor.
-    LaunchedEffect(current?.threadId, current?.messages?.lastOrNull(), pending?.key, compact, maxHeight, presence) {
+    LaunchedEffect(current?.threadId, current?.messages?.lastOrNull(), pending?.key, compact, maxHeight, presence, reminderRevision) {
         if (current != null && followingReply && !scroll.isScrollInProgress) {
             positioningReply = true
             try {
@@ -505,8 +527,9 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                     try { val previous = client.page("$root?before=$before"); older = (previous.messages + older).distinctBy { it.id }.take(250); before = previous.before }
                     catch (failure: Throwable) { fail(failure) } finally { busy = false }
                 } } }
-                items(timeline, key = { it.key }) { row ->
-                    if (row is ThreadRow.Presence) PresenceRow(row.item) { session.open("/verify/$it") }
+                items(rows, key = { it.key }) { row ->
+                    if (row is ThreadRow.Reminder) SystemLine(row.text)
+                    else if (row is ThreadRow.Presence) PresenceRow(row.item) { session.open("/verify/$it") }
                     else { val message = (row as ThreadRow.Message).message
                     if (message.recording == null) ConversationMessageRow(message, current.creatorName, current.control, creatorId = current.creatorId, onLink = { session.open(it) }, connected = !offline && foreground, original = (older + current.messages).firstOrNull { it.id == message.correction?.originalMessageId && it.version == message.correction.originalVersion && it.authorKind == APIMessageAuthorKind.AI }, onOriginal = { message.correction?.let { correction -> scope.launch { try { val original = client.json.decodeFromJsonElement<ConversationMessage>(client.request("$root/messages/${correction.originalMessageId}")); if (original.id != correction.originalMessageId || original.version != correction.originalVersion || original.authorKind != APIMessageAuthorKind.AI) sourceFailure = "The original reply changed." else source = "Original AI reply · version ${original.version}" to original.text } catch (failure: Throwable) { sourceUnavailable(failure) } } } }, onVerify = { message.signedActId?.let { session.open("/verify/$it") } }, onReport = { session.open("/support?creatorId=$creatorId" + if (message.authorKind == APIMessageAuthorKind.AI) "&messageId=${message.id}" else "") }, onForget = if (busy || offline) null else { { scope.launch { busy=true;try { client.request("$root/messages/${message.id}/dont-remember",buildJsonObject { put("expectedRevision",current.revision) });refresh() } catch(failure:Throwable) { fail(failure) } finally {busy=false} } } }, onCitation = { id -> scope.launch { try { val passage = client.request("$root/citations/$id").jsonObject; source = passage["title"]?.jsonPrimitive?.content.orEmpty() to passage["text"]?.jsonPrimitive?.content.orEmpty() } catch (failure: Throwable) { sourceUnavailable(failure) } } })
                     if (comparisonsAvailable && message.authorKind == APIMessageAuthorKind.FAN && !message.offTheRecord && !current.offTheRecord && message.deliveryState in listOf(APIMessageDeliveryState.ACCEPTED, APIMessageDeliveryState.DELIVERED)) {

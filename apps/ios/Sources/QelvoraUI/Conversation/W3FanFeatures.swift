@@ -67,6 +67,8 @@ private struct W3ThreadScreen: View {
     @State private var follow = W3Follow()
     /// After "Earlier messages", the row that was first stays where it was.
     @State private var keepInPlace: String?
+    /// A reminder line was added (WP 7.4 P8): the thread draws it.
+    @State private var reminderRevision = 0
     @FocusState private var composerFocused: Bool
     @ScaledMetric(relativeTo: .body) private var composerLineHeight: CGFloat = 24
     @Environment(\.dynamicTypeSize) private var textSize
@@ -182,6 +184,7 @@ private struct W3ThreadScreen: View {
                 Spacer()
             }
         }.frame(maxWidth: 390).foregroundStyle(qColor("ink", scheme)).background(qColor("ground", scheme))
+            .task(id: counting) { await countTime() }
             .task(id: "\(scenePhase)-\(privacy)-\(source != nil)-\(originalReply != nil || comparisonQuestion != nil)-\(connectionRetry)") {
                 let active = scenePhase == .active && !privacy && source == nil && originalReply == nil && comparisonQuestion == nil
                 model.setActive(active)
@@ -245,12 +248,17 @@ private struct W3ThreadScreen: View {
         if model.offline { Notice(tone: .offline, title: "You're offline", children: "You're seeing a saved conversation with a short reading lease. Reconnect to send.") }
         if page.offTheRecord { SystemLine(children: "Off the record · the AI keeps no memory from this conversation.") }
         if model.before != nil { Button("Earlier messages", variant: .quiet, disabled: model.busy || model.offline) { keepInPlace = model.timeline(page).first?.id; Task { await model.earlier() } } }
-        ForEach(model.timeline(page)) { entry in
+        let rows = model.timeline(page), reminders = W3LongSession.shared.lines(for: model.root)
+        ForEach(rows) { entry in
             switch entry {
             case .message(let message): row(message, page: page).id(message.id)
             case .presence(let item): presenceRow(item).id(entry.id)
             }
+            // The 3-hour reminder, after the row that was newest when it appeared.
+            ForEach(reminders.indices.filter { reminders[$0].after == entry.id }, id: \.self) { index in SystemLine(children: reminders[index].text) }
         }
+        let present = Set(rows.map(\.id))
+        ForEach(reminders.indices.filter { reminders[$0].after.map { !present.contains($0) } ?? true }, id: \.self) { index in SystemLine(children: reminders[index].text) }
         if let pending = model.pending {
             Message(kind: .fan, children: pending.text, name: page.creatorName, delivery: pending.rejected ? .failed : pending.uncertain ? nil : .pending, onRetry: { Task { await model.send(retry: true) } })
             if pending.uncertain {
@@ -278,7 +286,27 @@ private struct W3ThreadScreen: View {
     /// What changes at the newest end of the thread: rows, a reply growing, a send, a notice.
     private func tail(_ page: W3Page) -> String {
         let last = page.messages.last
-        return "\(page.messages.count)|\(last?.id ?? "")|\(last?.text.count ?? 0)|\(model.presence.count)|\(model.pending?.key ?? "")|\(model.failure.isEmpty)|\(model.offline)"
+        return "\(page.messages.count)|\(last?.id ?? "")|\(last?.text.count ?? 0)|\(model.presence.count)|\(model.pending?.key ?? "")|\(model.failure.isEmpty)|\(model.offline)|\(reminderRevision)"
+    }
+    /// WP 7.4 P8: the AI conversation is in front with its AI on, so its time counts.
+    private var counting: Bool {
+        scenePhase == .active && !privacy && source == nil && originalReply == nil && comparisonQuestion == nil && model.page?.control == .ai_active
+    }
+    /// Runs the phone's count while this thread counts; at each 3 hours the fixed
+    /// line joins this thread once.
+    private func countTime() async {
+        guard counting, let account = session.session?.accountId else { return }
+        let clock = W3LongSession.shared
+        clock.begin(account: account)
+        while !Task.isCancelled {
+            try? await Task.sleep(for: .seconds(clock.interval))
+            guard !Task.isCancelled, counting else { break }
+            if clock.tick(), let page = model.page {
+                clock.add(thread: model.root, after: model.timeline(page).last?.id, text: QelvoraCopy.text("longSession", values: ["name": page.creatorName]))
+                reminderRevision += 1
+            }
+        }
+        clock.end()
     }
     @ViewBuilder private func row(_ message: W3Message, page: W3Page) -> some View {
         if message.authorKind == .system {

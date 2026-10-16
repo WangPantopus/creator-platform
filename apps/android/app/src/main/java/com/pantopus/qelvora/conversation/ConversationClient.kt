@@ -80,6 +80,21 @@ sealed interface ThreadRow {
     val key: String
     data class Message(val message: ConversationMessage) : ThreadRow { override val key get() = message.id }
     data class Presence(val item: ThreadPresence) : ThreadRow { override val key get() = "presence-" + item.id }
+    /** WP 7.4 P8: the 3-hour reminder, a line this phone added. */
+    data class Reminder(val index: Int, val text: String) : ThreadRow { override val key get() = "reminder-$index" }
+}
+/** Each reminder line after the row that was newest when it appeared; one
+ * whose row is no longer loaded ends the thread. */
+fun withReminders(rows: List<ThreadRow>, lines: List<Pair<String?, String>>): List<ThreadRow> {
+    if (lines.isEmpty()) return rows
+    val present = rows.map { it.key }.toSet()
+    val out = mutableListOf<ThreadRow>()
+    for (row in rows) {
+        out += row
+        lines.forEachIndexed { index, (after, text) -> if (after == row.key) out += ThreadRow.Reminder(index, text) }
+    }
+    lines.forEachIndexed { index, (after, text) -> if (after == null || after !in present) out += ThreadRow.Reminder(index, text) }
+    return out
 }
 private val PRESENCE_CURSOR = Regex("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z~[0-9a-f-]{36}")
 /** Exact instants (nanoseconds, offset applied) for ordering presence against messages. */

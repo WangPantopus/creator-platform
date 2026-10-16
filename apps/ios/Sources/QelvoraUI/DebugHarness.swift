@@ -8,6 +8,9 @@ import Foundation
 ///                            starts from a clean app
 ///   --harness-actor <text>   sign in as the development actor whose label
 ///                            contains <text>, when nobody is signed in
+///   --harness-long-session <reminder>,<break>
+///                            the 3-hour reminder's two durations, in seconds
+///                            (WP 7.4 P8), so a scenario need not wait hours
 /// Nothing here grants authority: it taps the same sign-in the person would,
 /// against the development identity the server advertises.
 @MainActor
@@ -16,10 +19,18 @@ enum DebugHarness {
     private static var didSignIn = false
     private static var arguments: [String] { ProcessInfo.processInfo.arguments }
 
+    static var longSession: (threshold: TimeInterval, pause: TimeInterval)? {
+        guard let index = arguments.firstIndex(of: "--harness-long-session"), arguments.indices.contains(index + 1) else { return nil }
+        let parts = arguments[index + 1].split(separator: ",").compactMap { TimeInterval(String($0)) }
+        guard parts.count == 2, parts.allSatisfy({ $0 > 0 }) else { return nil }
+        return (parts[0], parts[1])
+    }
+
     /// Before the shell's first session check, so a stale credential is never sent.
     static func resetIfRequested(_ model: FanSession) async {
         guard !didReset, arguments.contains("--harness-reset") else { return }
         didReset = true
+        UserDefaults.standard.removeObject(forKey: "qelvora.longSession.v1")
         await model.purge()
     }
 
