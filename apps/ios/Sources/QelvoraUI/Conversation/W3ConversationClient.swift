@@ -94,13 +94,39 @@ struct W3PresencePage: Decodable, Sendable { let items: [W3ThreadPresence]; let 
 struct W3Instant: Comparable, Sendable {
     let seconds: Int64; let micros: Int
     static func < (a: W3Instant, b: W3Instant) -> Bool { a.seconds == b.seconds ? a.micros < b.micros : a.seconds < b.seconds }
+    /// "YYYY-MM-DDTHH:MM:SS[.fraction](Z|+HH:MM|-HH:MM)", parsed by hand: it
+    /// runs for every row on every render, so no regex and no formatter.
     init?(_ value: String) {
-        let pattern = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d{1,9}))?(Z|[+-]\d{2}:\d{2})$/
-        guard let match = value.wholeMatch(of: pattern) else { return nil }
-        let formatter = ISO8601DateFormatter(); formatter.formatOptions = [.withInternetDateTime]
-        guard let date = formatter.date(from: String(match.1) + String(match.3)) else { return nil }
-        let fraction = String((match.2.map(String.init) ?? "").prefix(6))
-        seconds = Int64(date.timeIntervalSince1970.rounded()); micros = Int(fraction.padding(toLength: 6, withPad: "0", startingAt: 0)) ?? 0
+        let b = Array(value.utf8)
+        func number(_ from: Int, _ count: Int) -> Int? {
+            guard from + count <= b.count else { return nil }
+            var n = 0
+            for i in from..<from + count { guard (48...57).contains(b[i]) else { return nil }; n = n * 10 + Int(b[i] - 48) }
+            return n
+        }
+        guard b.count >= 20, b[4] == 45, b[7] == 45, b[10] == 84, b[13] == 58, b[16] == 58,
+              let year = number(0, 4), let month = number(5, 2), let day = number(8, 2),
+              let hour = number(11, 2), let minute = number(14, 2), let second = number(17, 2),
+              (1...12).contains(month), (1...31).contains(day), hour < 24, minute < 60, second < 61 else { return nil }
+        var i = 19, fraction = 0, digits = 0
+        if i < b.count, b[i] == 46 {
+            i += 1
+            while i < b.count, (48...57).contains(b[i]) { if digits < 6 { fraction = fraction * 10 + Int(b[i] - 48); digits += 1 }; i += 1 }
+            guard digits > 0 else { return nil }
+        }
+        while digits < 6 { fraction *= 10; digits += 1 }
+        var offset = 0
+        if i == b.count - 1, b[i] == 90 {}
+        else if i == b.count - 6, b[i] == 43 || b[i] == 45, b[i + 3] == 58, let h = number(i + 1, 2), let m = number(i + 4, 2) {
+            offset = (h * 3600 + m * 60) * (b[i] == 43 ? 1 : -1)
+        } else { return nil }
+        // Days from 1970-01-01 (proleptic Gregorian).
+        let y = month <= 2 ? year - 1 : year
+        let era = (y >= 0 ? y : y - 399) / 400, yoe = y - era * 400
+        let doy = (153 * (month + (month > 2 ? -3 : 9)) + 2) / 5 + day - 1
+        let days = era * 146097 + yoe * 365 + yoe / 4 - yoe / 100 + doy - 719468
+        seconds = Int64(days) * 86400 + Int64(hour * 3600 + minute * 60 + second - offset)
+        micros = fraction
     }
 }
 enum W3ThreadRow: Identifiable {
@@ -290,14 +316,17 @@ final class W3ThreadModel: ObservableObject {
     /// Messages in server order with presence placed by time (rule 6). While
     /// earlier messages are unloaded, older presence waits for them (rule 7).
     func timeline(_ page: W3Page) -> [W3ThreadRow] {
-        let messages = older.filter { old in !page.messages.contains { $0.id == old.id } } + page.messages
+        let current = Set(page.messages.map(\.id))
+        let messages = older.filter { !current.contains($0.id) } + page.messages
+        guard !presence.isEmpty else { return messages.map { .message($0) } }
         let floor = before == nil ? nil : messages.first.flatMap { W3Instant($0.createdAt) }
         var waiting = presence.compactMap { item in item.occurredAt.flatMap(W3Instant.init).map { (item, $0) } }
-            .filter { floor == nil || !($0.1 < floor!) }
+            .filter { floor == nil || !($0.1 < floor!) }[...]
         var rows: [W3ThreadRow] = []
+        rows.reserveCapacity(messages.count + waiting.count)
         for message in messages {
             if let at = W3Instant(message.createdAt) {
-                while let first = waiting.first, first.1 < at { rows.append(.presence(first.0)); waiting.removeFirst() }
+                while let first = waiting.first, first.1 < at { rows.append(.presence(first.0)); waiting = waiting.dropFirst() }
             }
             rows.append(.message(message))
         }
@@ -366,7 +395,6 @@ final class W3ThreadModel: ObservableObject {
                                 switch event {
                                 case .connected:
                                     transportReady = true; delay = 1
-                                    presenceStale = true
                                     await refresh()
                                 case .frame(let frame):
                                     if try !(gate?.receive(frame).isEmpty ?? true) { await refresh() }
@@ -379,7 +407,7 @@ final class W3ThreadModel: ObservableObject {
                     if activeLease == lease.id { activeLease = nil }
                 } catch { if !Task.isCancelled { failed(error) } }
             }
-            transportReady = false; offline = true
+            transportReady = false; offline = true; presenceStale = true
             if authorizationDenied || Task.isCancelled || !active { return }
             await showOffline()
             do { try await Task.sleep(for: .seconds(delay + Double.random(in: 0...0.5))) }

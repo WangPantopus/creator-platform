@@ -30,7 +30,7 @@ const server = http.createServer(async (request, response) => {
   try {
     if (
       request.method !== "POST" ||
-      !["/link", "/storage", "/content-size"].includes(request.url)
+      !["/link", "/storage", "/content-size", "/scan"].includes(request.url)
     )
       throw new Error("Only lane 7 scenario controls are supported.");
     let body = "";
@@ -88,6 +88,38 @@ const server = http.createServer(async (request, response) => {
         ),
         excludedFromBackup,
       };
+    } else if (request.url === "/scan") {
+      // WP 7.4 R1.9: count the app's data files that contain a marker, to prove
+      // presence is never written. Returns counts only, never contents.
+      const container = execFileSync(
+        "xcrun",
+        [
+          "simctl",
+          "get_app_container",
+          device.udid,
+          "com.pantopus.qelvora",
+          "data",
+        ],
+        { encoding: "utf8" },
+      ).trim();
+      const markers = (input.markers ?? []).map((marker) =>
+        Buffer.from(marker),
+      );
+      let files = 0;
+      let hits = 0;
+      const walk = (directory) => {
+        for (const entry of readdirSync(directory, { withFileTypes: true })) {
+          const path = join(directory, entry.name);
+          if (entry.isDirectory()) walk(path);
+          else if (entry.isFile()) {
+            files += 1;
+            const data = readFileSync(path);
+            if (markers.some((marker) => data.includes(marker))) hits += 1;
+          }
+        }
+      };
+      walk(container);
+      result = { files, hits };
     } else if (request.url === "/content-size") {
       if (
         !["large", "accessibility-extra-extra-extra-large"].includes(input.size)

@@ -9,57 +9,71 @@ import { dirname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 
 const [source, ...ids] = process.argv.slice(2);
+const presence = ids[0] === "--presence";
+if (presence) ids.shift();
 const drafts = ids[0] === "--drafts";
 if (drafts) ids.shift();
 const draftStack = ids.length === 1 && ids[0] === "--draft-stack";
 if (draftStack) ids.length = 0;
 const stack = ids.length === 1 && ids[0] === "--stack";
 if (stack) ids.length = 0;
-const suite = draftStack
-  ? "Lane7StackDraftFlow"
-  : drafts
-    ? "Lane7DraftFlows"
-    : stack
-      ? "Lane7StackNavigationFlow"
-      : "Lane7NavigationFlows";
-const optInVariable = draftStack
-  ? "LANE7_STACK_DRAFTS"
-  : drafts
-    ? "LANE7_DRAFTS"
-    : stack
-      ? "LANE7_REAL_STACK"
-      : "LANE7_NAVIGATION";
-const flows = draftStack
-  ? { D6: "testD06RealSendAndDeletion" }
-  : drafts
-    ? {
-        D1: "testD01Lifecycle",
-        D2: "testD02IndependentThreads",
-        D3: "testD03LargestText",
-        D4: "testD04SendRecovery",
-        D4R: "testD04RejectedRetry",
-        D5: "testD05AuthorizationAndReplacement",
-        D7: "testD07BoundaryAndCiphertext",
-        D7U: "testD07Unicode",
-        D8: "testD08NewTextDuringSend",
-      }
-    : stack
-      ? { STACK: "testNavigationOnRealStack" }
-      : {
-          N1: "testN01ThreadBackAndGesture",
-          N2: "testN02ConsentIsReplaced",
-          N5: "testN05AccountBack",
-          N6: "testN06NotificationTrailAndLabel",
-          N8: "testN08ColdLink",
-          N13: "testN13AccountChangeClearsTrail",
-          N14: "testN14UnknownLink",
-          N15: "testN15RepeatedLinkAndQuickBack",
-          N16: "testN16LinkWhilePrivacyIsOpen",
-          N17: "testN17TrailBoundary",
-          N19: "testN19NewFanBack",
-          N20: "testN20EditProfileBack",
-          N21: "testN21CreatorAccessBack",
-        };
+const suite = presence
+  ? "Lane7PresenceFlows"
+  : draftStack
+    ? "Lane7StackDraftFlow"
+    : drafts
+      ? "Lane7DraftFlows"
+      : stack
+        ? "Lane7StackNavigationFlow"
+        : "Lane7NavigationFlows";
+const optInVariable = presence
+  ? "LANE7_PRESENCE"
+  : draftStack
+    ? "LANE7_STACK_DRAFTS"
+    : drafts
+      ? "LANE7_DRAFTS"
+      : stack
+        ? "LANE7_REAL_STACK"
+        : "LANE7_NAVIGATION";
+const flows = presence
+  ? {
+      R1: "testR01NotesAndReactionsInPlace",
+      R4: "testR04NewNoteAfterForegroundAndReconnect",
+      R5: "testR05EligibilityAndFailures",
+      R8: "testR08LongUnicodeNoteLargestText",
+      R9: "testR09NothingOnDisk",
+    }
+  : draftStack
+    ? { D6: "testD06RealSendAndDeletion" }
+    : drafts
+      ? {
+          D1: "testD01Lifecycle",
+          D2: "testD02IndependentThreads",
+          D3: "testD03LargestText",
+          D4: "testD04SendRecovery",
+          D4R: "testD04RejectedRetry",
+          D5: "testD05AuthorizationAndReplacement",
+          D7: "testD07BoundaryAndCiphertext",
+          D7U: "testD07Unicode",
+          D8: "testD08NewTextDuringSend",
+        }
+      : stack
+        ? { STACK: "testNavigationOnRealStack" }
+        : {
+            N1: "testN01ThreadBackAndGesture",
+            N2: "testN02ConsentIsReplaced",
+            N5: "testN05AccountBack",
+            N6: "testN06NotificationTrailAndLabel",
+            N8: "testN08ColdLink",
+            N13: "testN13AccountChangeClearsTrail",
+            N14: "testN14UnknownLink",
+            N15: "testN15RepeatedLinkAndQuickBack",
+            N16: "testN16LinkWhilePrivacyIsOpen",
+            N17: "testN17TrailBoundary",
+            N19: "testN19NewFanBack",
+            N20: "testN20EditProfileBack",
+            N21: "testN21CreatorAccessBack",
+          };
 if (!source || ids.some((id) => !flows[id]))
   throw new Error(
     "Pass a built .xctestrun and optional unfinished iOS flow IDs.",
@@ -160,7 +174,7 @@ try {
         `Expected ${expected} operated flows; observed ${summary.passedTests} passed, ${summary.skippedTests} skipped, ${summary.failedTests} failed.`,
       );
     console.log(
-      `PASS iOS: ${expected} operated ${drafts ? "draft" : "navigation"} flows, none skipped.`,
+      `PASS iOS: ${expected} operated ${presence ? "presence" : drafts ? "draft" : "navigation"} flows, none skipped.`,
     );
   }
 } finally {

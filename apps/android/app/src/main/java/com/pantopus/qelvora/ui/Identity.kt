@@ -58,13 +58,15 @@ fun Mark(kind: AuthorKind = AuthorKind.AI, size: Dp? = null, initial: String = "
 }
 
 @Composable
-fun AuthorLabel(kind: AuthorKind = AuthorKind.AI, name: String = "Maya", audience: String = "Kiln Club members", member: String = "Priya", time: String? = null, onMaya: Boolean = false) {
-    Row(Modifier.clearAndSetSemantics { contentDescription = kind.label(name, audience, member) + (time?.let { " at $it" } ?: "") }, horizontalArrangement = Arrangement.spacedBy(QelvoraTokens.authorGap), verticalAlignment = Alignment.CenterVertically) {
+fun AuthorLabel(kind: AuthorKind = AuthorKind.AI, name: String = "Maya", audience: String = "Kiln Club members", member: String = "Priya", time: String? = null, onMaya: Boolean = false, label: String? = null) {
+    // `label`: a label the server built (C4 `authorLabel`), shown verbatim instead of one assembled here.
+    val words = label ?: kind.label(name, audience, member)
+    Row(Modifier.clearAndSetSemantics { contentDescription = words + (time?.let { " at $it" } ?: "") }, horizontalArrangement = Arrangement.spacedBy(QelvoraTokens.authorGap), verticalAlignment = Alignment.CenterVertically) {
         Mark(kind, initial = name.take(1), onMaya = onMaya)
         val ai = qColor("ai-ink"); val creator = qColor(kind.colorToken(onMaya))
         val label = buildAnnotatedString {
             if (kind == AuthorKind.APPROVED_DRAFT) { withStyle(SpanStyle(color = ai)) { append(copy("preparedByAI")) }; withStyle(SpanStyle(color = creator)) { append(" · " + copy("approvedBy", "name" to name)) } }
-            else withStyle(SpanStyle(color = creator)) { append(kind.label(name, audience, member)) }
+            else withStyle(SpanStyle(color = creator)) { append(words) }
         }
         BasicText(label, style = qText("caption", strong = true))
         if (time != null) BasicText("· $time", style = qText("data-sm").copy(color = qColor(if (onMaya) "on-maya-muted" else "ink-muted")))

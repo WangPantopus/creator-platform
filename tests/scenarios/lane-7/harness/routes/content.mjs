@@ -107,16 +107,23 @@ export function register(router) {
       .sort(newestFirst);
     const window = candidates.slice(0, limit);
     const edge = window.at(-1);
+    const nextBefore =
+      candidates.length > limit && edge ? `${edge.at}~${edge.id}` : null;
     const items = window
       .filter(
         (item) => item.kind === "reaction" || item.visibleTo.has(account.id),
       )
       .map((item) => presenceItem(creator, item))
       .reverse();
+    // Behind the screen: which cursor came in and which went out (synthetic).
+    Object.assign(ctx.entry, {
+      before: query.before ?? null,
+      nextBefore,
+      items: items.length,
+    });
     return {
       items,
-      nextBefore:
-        candidates.length > limit && edge ? `${edge.at}~${edge.id}` : null,
+      nextBefore,
       serverTime: new Date(world.now()).toISOString(),
     };
   });
