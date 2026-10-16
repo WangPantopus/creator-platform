@@ -7,7 +7,8 @@
 // simulated by holding that key in this database), the summary answers 503 and
 // lists nothing. Lifting the pause brings her offer back at once; there is no
 // unpause yet, so the scenario revokes its own restriction row in this stack's
-// own database. Lane 1's pause effect also pauses Maya's AI, and nothing can
+// own database. A fan who blocked Maya reads her as unavailable, while others
+// read her offer. Lane 1's pause effect also pauses Maya's AI, and nothing can
 // undo that yet: reset the stack after this scenario.
 // Fakes: card processor, development identity, software passkey.
 //   node tests/scenarios/lane-4/e4-9-paused-creator.mjs
@@ -36,6 +37,8 @@ const devon = await asCreator(ACCOUNT.devon, CREATOR.devon);
 // A report about Maya needs the reporter's own conversation with her.
 const reporter = await asFan(ACCOUNT.fanOne);
 const visitor = await signIn(ACCOUNT.fanTwo);
+// Blocks Maya later; a block, too, goes through her own conversation.
+const blocker = await asFan(ACCOUNT.fanThree);
 const supervisor = await signIn(ACCOUNT.team);
 const UNKNOWN = "20000000-0000-4000-8000-0000000000ff";
 // Cheaper than every other scenario's offer, so it is always among the 20 listed.
@@ -204,7 +207,36 @@ await step(
         signed.offer?.amount === 4100,
       `signed out ${out.status} ${out.code}; signed in ${signed.status} ${signed.code}`,
     );
-    // Each creator retires this scenario's offer.
+    return "200 with her offer again for both";
+  },
+);
+await step(
+  "E4.9-P6",
+  "a fan who blocked Maya reads her as unavailable; everyone else still reads her offer",
+  async () => {
+    const blocked = await http("POST", "/v1/trust/blocks", blocker.token, {
+      creatorId: CREATOR.maya,
+      reason: "I don't want to see this creator.",
+      idempotencyKey: key("block"),
+    });
+    const theirs = await summary(CREATOR.maya, blocker);
+    const others = await summary(CREATOR.maya, visitor);
+    const out = await summary(CREATOR.maya);
+    expect(
+      blocked.status === 200 &&
+        theirs.status === 404 &&
+        theirs.code === "creator_unavailable" &&
+        others.offer?.amount === 4100 &&
+        out.offer?.amount === 4100,
+      `block ${blocked.status} ${blocked.code}; blocker ${theirs.status} ${theirs.code}; another fan ${others.status}; signed out ${out.status}`,
+    );
+    return "the blocker reads 404 creator_unavailable; another fan and a signed-out visitor read her offer";
+  },
+);
+await step(
+  "E4.9-P7",
+  "each creator retires this scenario's offer",
+  async () => {
     const retired = [];
     for (const [creatorId, entry] of Object.entries(offers)) {
       const answer = await http(
@@ -231,7 +263,7 @@ await step(
       retired.every((s) => s === 200),
       `retired ${retired.join(", ")}`,
     );
-    return "200 with her offer again for both; both offers then retired";
+    return "both offers paused";
   },
 );
 await finish();
