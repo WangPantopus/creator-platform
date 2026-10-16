@@ -1,9 +1,9 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-16, by the lane 3 session
-Working on: nothing unblocked is left. Last done: the merge wave (#433 to #495 land together, at the founder's request)
+Working on: nothing unblocked is left. Last done: B8 (`CreatorAI.tsx` split, stacked on #512, finding 7, which is stacked on the merge wave #511)
 Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442); through the merge wave: #433 (status), A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451 (SQL proposal), finding 8 #455, finding 9 #456 (status only), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482, A5 #489, B5 #490 (SQL proposal), B5 web #491, finding 18 #492 (SQL proposal), finding 5 #494, finding 6 #495
-Next: B8 (the `CreatorAI.tsx` split, now unblocked: #441 and #446 are in); B6 waits on the provider key and the embedding choice; the real-model halves (B4, B1, finding 13) when the gateway is up
+Next: B6 waits on the provider key and the embedding choice; the real-model halves (B4, B1, finding 13) when the gateway is up
 Blocked on: nothing. Later: the integrator registers the three SQL proposals (#451, #490, #492: inactive until then); the embedding choice (B6); the real model (gateway)
 
 ## Resume here (2026-10-16, after the merge wave)
@@ -33,6 +33,31 @@ http://127.0.0.1:56499`; publish Maya on the fake first, then restart with the g
 - E3B.4 needs the backend's OpenAI-host calls routed through its recording edge: rebuild with
   `sh tests/scenarios/lane-3/fresh-stack.sh --env QELVORA_FAKE_MODEL_URL=http://127.0.0.1:56438`
   (port 56438 is lane 3's; the scenario opens the edge itself and forwards to the fake on 56433).
+
+## B8: My AI split into a hook, the layout and one file per screen
+
+B2 (#441) built the FAQ editor and the publish check in My AI, so B8's remaining part was splitting
+`apps/web/features/creator-ai/CreatorAI.tsx` (3,007 lines), which waited for #441 and #446 (decided
+2026-10-16). Nothing it renders or does changes:
+
+- `useCreatorAI.tsx`: every piece of state, effect and action, moved verbatim (state stays in the one
+  component, so text typed in a section survives switching sections as before); it returns the view the
+  screens read.
+- `CreatorAI.tsx` (286 lines): the sidebar, header, notices, the confirmation dialog and the section
+  switch.
+- One file per screen, each block moved verbatim: `OverviewScreen`, `SourcesScreen` (sources and
+  onboarding), `StyleScreen` (style and rules), `TestScreen` (test and versions), `LicenseScreen`,
+  `InterviewScreen`. Each destructures exactly the names it uses; the state and configuration they
+  render are passed already non-null, as the old block guarded them.
+- `shared.tsx`: the module-level helpers (draft storage, Button, Field, Panel, Lines, Glyph, types).
+
+The split was generated with the TypeScript compiler API (each block's free names resolved to their
+declarations), not by hand. Proof on lane 3's stack with the web app (real browser, API and
+PostgreSQL; fakes: development identity, model fake): as Maya, every My AI section (overview, sources,
+onboard, style, rules, test, versions, license, interview) and the same six sections after typing into
+their first field render byte-identical DOM on the monolith and on the split (15 of 15), with the same
+console messages; through the split, Save draft keeps a new rule across a reload and "Test it as a fan"
+completes its preview. Typecheck and lint pass.
 
 ## Merge wave (2026-10-16)
 
