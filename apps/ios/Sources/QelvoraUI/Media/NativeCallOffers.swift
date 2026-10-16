@@ -175,7 +175,7 @@ private func callOfferNotice(_ error: Error, fallback: String) -> String {
             Text(QelvoraCopy.text("w6CALLREQUEST")).qText("label"); Text(QelvoraCopy.text("w6ChooseATime")).qText("display-md")
             if let offer, offer.state == "offered", !stale, scenePhase == .active {
                 ForEach(offer.slots, id: \.id) { slot in
-                    Button(display(slot.startsAt, zone: offer.fanTimeZone) + (chosen == slot.id ? " · Selected" : ""), variant: .secondary, block: true, disabled: busy || !selectable || !canSelect || (NativeCallOffer.date(slot.startsAt) ?? .distantPast) <= now) { chosen = slot.id }
+                    Button(chosen == slot.id ? QelvoraCopy.text("nativeTimeSelected", values: ["time": display(slot.startsAt, zone: offer.fanTimeZone)]) : display(slot.startsAt, zone: offer.fanTimeZone), variant: .secondary, block: true, disabled: busy || !selectable || !canSelect || (NativeCallOffer.date(slot.startsAt) ?? .distantPast) <= now) { chosen = slot.id }
                 }
                 Text(QelvoraCopy.text("w6YourTime", values: ["value1": String(describing: offer.fanTimeZone)])).qText("caption")
                 Text(QelvoraCopy.text("w6CreatorSTimeZone", values: ["value1": String(describing: offer.creatorTimeZone)])).qText("caption")

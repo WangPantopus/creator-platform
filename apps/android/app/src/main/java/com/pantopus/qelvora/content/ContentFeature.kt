@@ -122,7 +122,7 @@ object ContentFanFeature {
 
 @Composable
 private fun ContentChoice(label: String, checked: Boolean, disabled: Boolean, change: (Boolean) -> Unit) {
-    Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).toggleable(value=checked,enabled=!disabled,role=Role.Checkbox,onValueChange=change).semantics { contentDescription = label + if (checked) ", selected" else ", not selected" }.padding(vertical = 8.dp)) { QText(if (checked) "☑ " else "☐ ", "body"); QText(label, "body") }
+    Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).toggleable(value=checked,enabled=!disabled,role=Role.Checkbox,onValueChange=change).semantics { contentDescription = if (checked) QelvoraCopy.text("nativeLabelSelected", mapOf("label" to label)) else QelvoraCopy.text("nativeLabelNotSelected", mapOf("label" to label)) }.padding(vertical = 8.dp)) { QText(if (checked) "☑ " else "☐ ", "body"); QText(label, "body") }
 }
 @Composable
 private fun ContentInput(label: String, value: String, max: Int, change: (String) -> Unit) {
@@ -167,7 +167,7 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
         val cycleStartedAt = SystemClock.elapsedRealtime()
         loadGeneration++;val generation=loadGeneration
         try {
-            val api=client?:error("The content service is not connected.")
+            val api=client?:error(QelvoraCopy.text("nativeTheContentServiceIsNotConnected"))
             val before=api.request("$creatorId/mute").jsonObject
             val statuses=mutableListOf<String>()
             val view=try{api.request("$creatorId/$contentId", expectedAccountId=before.text("accountId")).jsonObject}catch(cancelled:kotlinx.coroutines.CancellationException){throw cancelled}catch(failure:Exception){
@@ -182,7 +182,7 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
                 page=fresh;currentReplies=fresh["items"]!!.jsonArray.map{it.jsonObject};repliesAvailable=true
             }catch(cancelled:kotlinx.coroutines.CancellationException){throw cancelled}catch(failure:Exception){
                 if(failure is ContentFailure && failure.authorityDenied)throw failure
-                statuses.add("Private replies are unavailable. Refresh to try again.")
+                statuses.add(QelvoraCopy.text("nativePrivateRepliesAreUnavailable"))
             }
             var mine:JsonObject?=null;var thanksAvailable=false
             try {
@@ -190,7 +190,7 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
                 mine=if(saved is JsonNull)null else saved.jsonObject;thanksAvailable=true
             }catch(cancelled:kotlinx.coroutines.CancellationException){throw cancelled}catch(failure:Exception){
                 if(failure is ContentFailure && failure.authorityDenied)throw failure
-                statuses.add("Thanks is unavailable. Your input is kept; refresh before saving.")
+                statuses.add(QelvoraCopy.text("nativeThanksIsUnavailableYourInput"))
             }
             var policy: ContentReplyPolicy? = null
             try {
@@ -225,7 +225,7 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
         val fields=body.toMutableMap();fields.remove("idempotencyKey")
         val fingerprint=path+JsonObject(fields.toSortedMap()).toString()
         val command=if(body["idempotencyKey"]==null)body else JsonObject(fields+ ("idempotencyKey" to JsonPrimitive(retryKeys.getOrPut(fingerprint){UUID.randomUUID().toString()})))
-        try { client?.request("$creatorId/$path", command, expectedAccountId=viewerAccountId) ?: error("The content service is not connected."); retryKeys.remove(fingerprint); if (clearReply) replyText = ""; load(resetThanks) }
+        try { client?.request("$creatorId/$path", command, expectedAccountId=viewerAccountId) ?: error(QelvoraCopy.text("nativeTheContentServiceIsNotConnected")); retryKeys.remove(fingerprint); if (clearReply) replyText = ""; load(resetThanks) }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (failure: Exception) { if(failure is ContentFailure && failure.status in 400..499)retryKeys.remove(fingerprint); if(failure is ContentFailure && failure.authorityDenied)clearAuthority(); error = contentFailureCopy(failure, action = true) }
         finally { busy = false }
@@ -272,23 +272,23 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
         } else {
         val current = content
         if (current == null) {
-            QText("Content unavailable", "display-md");Button("Refresh",ButtonVariant.SECONDARY,disabled=busy){scope.launch{load()}}
+            QText(QelvoraCopy.text("nativeContentUnavailable"), "display-md");Button(QelvoraCopy.text("nativeRefresh"),ButtonVariant.SECONDARY,disabled=busy){scope.launch{load()}}
             replies.filter{it.text("contentId")==contentId}.forEach{reply->key(reply.text("id")){
                 QText(reply.text("text"),"body");val consent=reply["consent"]!!.jsonObject
-                if(consent.flag("shareText")||consent.flag("showHandle"))Button("Withdraw quote permission",ButtonVariant.QUIET,disabled=busy){scope.launch{mutate("replies/${reply.text("id")}/consent",buildJsonObject{put("version",consent.number("version"));put("shareText",false);put("showHandle",false);put("idempotencyKey",UUID.randomUUID().toString())})}}
-                Button("Withdraw private reply",ButtonVariant.QUIET,disabled=busy){scope.launch{mutate("replies/${reply.text("id")}/withdraw",buildJsonObject{put("version",reply.number("version"));put("idempotencyKey",UUID.randomUUID().toString())})}}
+                if(consent.flag("shareText")||consent.flag("showHandle"))Button(QelvoraCopy.text("nativeWithdrawQuotePermission"),ButtonVariant.QUIET,disabled=busy){scope.launch{mutate("replies/${reply.text("id")}/consent",buildJsonObject{put("version",consent.number("version"));put("shareText",false);put("showHandle",false);put("idempotencyKey",UUID.randomUUID().toString())})}}
+                Button(QelvoraCopy.text("nativeWithdrawPrivateReply"),ButtonVariant.QUIET,disabled=busy){scope.launch{mutate("replies/${reply.text("id")}/withdraw",buildJsonObject{put("version",reply.number("version"));put("idempotencyKey",UUID.randomUUID().toString())})}}
             }}
-            if (replyCursors.size > 1) Button("Newer replies", ButtonVariant.SECONDARY, disabled = busy || loading) { scope.launch { changeReplyPage(newer = true) } }
-            cursor?.let { next -> Button("Older replies", ButtonVariant.SECONDARY, disabled = busy || loading) { scope.launch { changeReplyPage(next) } } }
-            if(thanks!=null && thanks?.flag("withdrawn")==false)Button("Withdraw Thanks",ButtonVariant.QUIET,disabled=busy || !thanksAccess){scope.launch{mutate("thanks",buildJsonObject{put("targetKind","content");put("targetId",contentId);put("text","");put("shareWithCreatorDigest",false);put("showIdentity",false);put("withdrawn",true);put("expectedVersion",thanks?.number("version")?:0);put("idempotencyKey",UUID.randomUUID().toString())},resetThanks=true)}}
-            Button(if(muted==true) "Unmute Notes from this creator" else "Mute Notes from this creator",ButtonVariant.QUIET,disabled=busy || muted==null){scope.launch{val currentMuted=muted?:return@launch;mutate("mute",buildJsonObject{put("muted",!currentMuted)})}}
+            if (replyCursors.size > 1) Button(QelvoraCopy.text("nativeNewerReplies"), ButtonVariant.SECONDARY, disabled = busy || loading) { scope.launch { changeReplyPage(newer = true) } }
+            cursor?.let { next -> Button(QelvoraCopy.text("nativeOlderReplies"), ButtonVariant.SECONDARY, disabled = busy || loading) { scope.launch { changeReplyPage(next) } } }
+            if(thanks!=null && thanks?.flag("withdrawn")==false)Button(QelvoraCopy.text("nativeWithdrawThanks"),ButtonVariant.QUIET,disabled=busy || !thanksAccess){scope.launch{mutate("thanks",buildJsonObject{put("targetKind","content");put("targetId",contentId);put("text","");put("shareWithCreatorDigest",false);put("showIdentity",false);put("withdrawn",true);put("expectedVersion",thanks?.number("version")?:0);put("idempotencyKey",UUID.randomUUID().toString())},resetThanks=true)}}
+            Button(if(muted==true) QelvoraCopy.text("nativeUnmuteNotesFromThisCreator") else QelvoraCopy.text("nativeMuteNotesFromThisCreator"),ButtonVariant.QUIET,disabled=busy || muted==null){scope.launch{val currentMuted=muted?:return@launch;mutate("mute",buildJsonObject{put("muted",!currentMuted)})}}
         }
         else {
             val document = current["document"]!!.jsonObject; val creator = current.text("creatorName")
             if (document.text("kind") == "note") Note(current.text("displayText"), name = creator, audience = current.text("audienceLabel"), time = current.text("publishedAt"), reply = false, onVerify = { signature = current["signedActId"]?.jsonPrimitive?.contentOrNull })
-            else { QText(current.text("authorLabel"), "label"); QText(document.text("title"), "display-md", modifier = Modifier.semantics { heading() }); current["quotedText"]?.jsonPrimitive?.contentOrNull?.let { QText(it, "body");current["quotedHandle"]?.jsonPrimitive?.contentOrNull?.let{handle->QText("@$handle","caption")} }; QText(current.text("displayText"), "body"); if(current["signedActId"]?.jsonPrimitive?.contentOrNull != null) Button("Signed", ButtonVariant.QUIET) { signature = current["signedActId"]?.jsonPrimitive?.contentOrNull } }
-            current["audienceCount"]?.jsonPrimitive?.intOrNull?.let { QText("Audience size · $it","caption") }
-            if(current.text("displayText")!=document.text("text")) { QText(if(current["signedActId"]?.jsonPrimitive?.contentOrNull != null) "Signed original" else "Original text","label");QText(document.text("text"),"body") }
+            else { QText(current.text("authorLabel"), "label"); QText(document.text("title"), "display-md", modifier = Modifier.semantics { heading() }); current["quotedText"]?.jsonPrimitive?.contentOrNull?.let { QText(it, "body");current["quotedHandle"]?.jsonPrimitive?.contentOrNull?.let{handle->QText("@$handle","caption")} }; QText(current.text("displayText"), "body"); if(current["signedActId"]?.jsonPrimitive?.contentOrNull != null) Button(QelvoraCopy.text("nativeSigned"), ButtonVariant.QUIET) { signature = current["signedActId"]?.jsonPrimitive?.contentOrNull } }
+            current["audienceCount"]?.jsonPrimitive?.intOrNull?.let { QText(QelvoraCopy.text("nativeAudienceSizeCount", mapOf("count" to it.toString())),"caption") }
+            if(current.text("displayText")!=document.text("text")) { QText(if(current["signedActId"]?.jsonPrimitive?.contentOrNull != null) QelvoraCopy.text("nativeSignedOriginal") else QelvoraCopy.text("nativeOriginalText"),"label");QText(document.text("text"),"body") }
             val media = document["media"]?.jsonArray
             val publicationVersion = current["version"]?.jsonPrimitive?.intOrNull
             if (baseURL != null && viewerAccountId != null && media != null && publicationVersion != null && publicationVersion > 0) {
@@ -301,46 +301,46 @@ private fun ContentObjectScreen(context: Context, baseURL: String?, model: FanSe
                         key(viewerAccountId, current.text("id"), publicationVersion, actual.id, actual.version, actual.sha256) {
                             NativeContentAttachment(context, model, model.destination, baseURL, viewerAccountId!!, creatorId, current.text("id"), document.text("kind"), creator, actual)
                         }
-                    } else QText("Attachment information is unavailable. Refresh current access.", "caption")
+                    } else QText(QelvoraCopy.text("nativeAttachmentInformationIsUnavailable"), "caption")
                 }
-                } else QText("Attachment information is unavailable. Refresh current access.", "caption")
+                } else QText(QelvoraCopy.text("nativeAttachmentInformationIsUnavailable"), "caption")
             }
             if (document.text("kind") == "note") {
-                QText("Your private replies", "display-md", modifier = Modifier.semantics { heading() }); QText("Only you, the creator, and their permitted team can read your replies. A Note is a broadcast.", "caption")
+                QText(QelvoraCopy.text("nativeYourPrivateReplies"), "display-md", modifier = Modifier.semantics { heading() }); QText(QelvoraCopy.text("nativeOnlyYouTheCreatorAndTheir"), "caption")
                 replyPolicy?.let { policy -> if (policy.milestone != null && policy.confirmedDays != null) QText(QelvoraCopy.text("contentConfirmedTenure", mapOf("days" to policy.confirmedDays.toString())), "caption") }
                 if (replyPolicy == null) QText(QelvoraCopy.text("contentReplyPolicyUnavailable"), "caption")
-                ContentInput("Reply privately", replyText, replyLimit) { replyText = it }
+                ContentInput(QelvoraCopy.text("nativeReplyPrivately"), replyText, replyLimit) { replyText = it }
                 QText(QelvoraCopy.text("contentReplyLimit", mapOf("used" to replyText.length.toString(), "limit" to replyLimit.toString())), "caption")
                 if (replyText.length > replyLimit) QText(QelvoraCopy.text("contentReplyOverLimit"), "caption")
-                Button("Send private reply", ButtonVariant.SECONDARY, block = true, disabled = busy || !replyAccess || replyText.isBlank() || replyText.trim().length > replyLimit) { scope.launch { mutate("$contentId/replies", buildJsonObject { put("text", replyText); put("idempotencyKey", UUID.randomUUID().toString()) }, clearReply = true) } }
+                Button(QelvoraCopy.text("nativeSendPrivateReply"), ButtonVariant.SECONDARY, block = true, disabled = busy || !replyAccess || replyText.isBlank() || replyText.trim().length > replyLimit) { scope.launch { mutate("$contentId/replies", buildJsonObject { put("text", replyText); put("idempotencyKey", UUID.randomUUID().toString()) }, clearReply = true) } }
                 replies.filter { it.text("contentId") == contentId }.forEach { reply ->
                     key(reply.text("id")) { Column(Modifier.background(qColor("surface")).padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         QText(reply.text("text"), "body")
-                        if(reply.text("safetyState")!="allowed") QText(if(reply.text("safetyState")=="flagged") "This reply is withheld for safety review." else "Waiting for safety review. It has not reached the creator’s feed.","caption")
-                        if(reply.text("safetyState")=="pending" && reply.flag("safetyReviewAvailable")) Button("Retry safety review",ButtonVariant.QUIET,disabled=busy) { scope.launch { mutate("replies/${reply.text("id")}/review",buildJsonObject { put("version",reply.number("version"));put("idempotencyKey",UUID.randomUUID().toString()) }) } }
+                        if(reply.text("safetyState")!="allowed") QText(if(reply.text("safetyState")=="flagged") QelvoraCopy.text("nativeThisReplyIsWithheldForSafety") else QelvoraCopy.text("nativeWaitingForSafetyReviewItHas"),"caption")
+                        if(reply.text("safetyState")=="pending" && reply.flag("safetyReviewAvailable")) Button(QelvoraCopy.text("nativeRetrySafetyReview"),ButtonVariant.QUIET,disabled=busy) { scope.launch { mutate("replies/${reply.text("id")}/review",buildJsonObject { put("version",reply.number("version"));put("idempotencyKey",UUID.randomUUID().toString()) }) } }
                         val reaction = reply["reaction"]?.takeUnless { it is JsonNull }?.jsonObject
-                        if (reaction != null) { QText("$creator reacted · ${reaction.text("kind")}", "caption"); Button("Verify reaction", ButtonVariant.QUIET) { signature = reaction.text("signedActId") } }
-                        Button("Withdraw private reply",ButtonVariant.QUIET,disabled=busy){scope.launch{mutate("replies/${reply.text("id")}/withdraw",buildJsonObject{put("version",reply.number("version"));put("idempotencyKey",UUID.randomUUID().toString())})}}
+                        if (reaction != null) { QText(QelvoraCopy.text("nativeNameReactedKind", mapOf("name" to creator, "kind" to reaction.text("kind"))), "caption"); Button(QelvoraCopy.text("nativeVerifyReaction"), ButtonVariant.QUIET) { signature = reaction.text("signedActId") } }
+                        Button(QelvoraCopy.text("nativeWithdrawPrivateReply"),ButtonVariant.QUIET,disabled=busy){scope.launch{mutate("replies/${reply.text("id")}/withdraw",buildJsonObject{put("version",reply.number("version"));put("idempotencyKey",UUID.randomUUID().toString())})}}
                         val consent = reply["consent"]!!.jsonObject
                         fun choice(text: Boolean, handle: Boolean) { scope.launch { mutate("replies/${reply.text("id")}/consent", buildJsonObject { put("version", consent.number("version")); put("shareText", text); put("showHandle", handle); put("idempotencyKey", UUID.randomUUID().toString()) }) } }
-                        ContentChoice("Allow this reply to be quoted", consent.flag("shareText"), busy) { choice(it, it && consent.flag("showHandle")) }
-                        ContentChoice("Show my handle on the quote", consent.flag("showHandle"), busy || !consent.flag("shareText")) { choice(true, it) }
+                        ContentChoice(QelvoraCopy.text("nativeAllowThisReplyToBeQuoted"), consent.flag("shareText"), busy) { choice(it, it && consent.flag("showHandle")) }
+                        ContentChoice(QelvoraCopy.text("nativeShowMyHandleOnTheQuote"), consent.flag("showHandle"), busy || !consent.flag("shareText")) { choice(true, it) }
                     } }
                 }
-                if (replyCursors.size > 1) Button("Newer replies", ButtonVariant.SECONDARY, disabled = busy || loading) { scope.launch { changeReplyPage(newer = true) } }
-                cursor?.let { next -> Button("Older replies", ButtonVariant.SECONDARY, disabled = busy || loading) { scope.launch { changeReplyPage(next) } } }
-                Button(if(muted==true) "Unmute Notes from this creator" else "Mute Notes from this creator", ButtonVariant.QUIET, disabled = busy || muted==null) { scope.launch { val currentMuted=muted?:return@launch;mutate("mute", buildJsonObject { put("muted", !currentMuted) }) } }
+                if (replyCursors.size > 1) Button(QelvoraCopy.text("nativeNewerReplies"), ButtonVariant.SECONDARY, disabled = busy || loading) { scope.launch { changeReplyPage(newer = true) } }
+                cursor?.let { next -> Button(QelvoraCopy.text("nativeOlderReplies"), ButtonVariant.SECONDARY, disabled = busy || loading) { scope.launch { changeReplyPage(next) } } }
+                Button(if(muted==true) QelvoraCopy.text("nativeUnmuteNotesFromThisCreator") else QelvoraCopy.text("nativeMuteNotesFromThisCreator"), ButtonVariant.QUIET, disabled = busy || muted==null) { scope.launch { val currentMuted=muted?:return@launch;mutate("mute", buildJsonObject { put("muted", !currentMuted) }) } }
             }
-            QText("This helped", "display-md", modifier = Modifier.semantics { heading() }); ContentInput("Thanks · optional", thanksText, 2000) { thanksText = it }
-            ContentChoice("Share this text with the creator’s digest", share, busy || !thanksAccess) { share = it; if (!it) identity = false }; ContentChoice("Include my handle", identity, busy || !thanksAccess || !share) { identity = it }
+            QText(QelvoraCopy.text("thisHelped"), "display-md", modifier = Modifier.semantics { heading() }); ContentInput(QelvoraCopy.text("nativeThanksOptional"), thanksText, 2000) { thanksText = it }
+            ContentChoice(QelvoraCopy.text("nativeShareThisTextWithTheCreators"), share, busy || !thanksAccess) { share = it; if (!it) identity = false }; ContentChoice(QelvoraCopy.text("nativeIncludeMyHandle"), identity, busy || !thanksAccess || !share) { identity = it }
             fun sendThanks(withdraw: Boolean) { scope.launch { mutate("thanks", buildJsonObject { put("targetKind", "content"); put("targetId", contentId); put("text", if (withdraw) "" else thanksText); put("shareWithCreatorDigest", !withdraw && share); put("showIdentity", !withdraw && identity); put("withdrawn", withdraw); put("expectedVersion", thanks?.number("version") ?: 0); put("idempotencyKey", UUID.randomUUID().toString()) }, resetThanks = true) } }
-            Button(if (thanks != null && thanks?.flag("withdrawn") == false) "Update Thanks" else "This helped", ButtonVariant.SECONDARY, disabled = busy || !thanksAccess) { sendThanks(false) }
-            if (thanks != null && thanks?.flag("withdrawn") == false) Button("Withdraw Thanks", ButtonVariant.QUIET, disabled = busy || !thanksAccess) { sendThanks(true) }
+            Button(if (thanks != null && thanks?.flag("withdrawn") == false) QelvoraCopy.text("nativeUpdateThanks") else QelvoraCopy.text("thisHelped"), ButtonVariant.SECONDARY, disabled = busy || !thanksAccess) { sendThanks(false) }
+            if (thanks != null && thanks?.flag("withdrawn") == false) Button(QelvoraCopy.text("nativeWithdrawThanks"), ButtonVariant.QUIET, disabled = busy || !thanksAccess) { sendThanks(true) }
         }
         }
     }
     if (currentAccess && signature != null) Dialog(onDismissRequest = { signature = null; signatureStatus = "" }) {
-        LaunchedEffect(signature) { try { val proof = model.api!!.publicSignature(signature!!); signatureStatus = proof.creatorName + " · " + proof.status.toString() + "\n" + proof.explanation } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled } catch (_: Exception) { signatureStatus = "This signature is private or unavailable. Content access does not grant public verification access." } }
-        Column(Modifier.background(qColor("surface")).padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) { QText("Signature", "display-md"); QText(signatureStatus.ifEmpty { "Checking current signature…" }, "body"); Button("Done", ButtonVariant.SECONDARY) { signature = null; signatureStatus = "" } }
+        LaunchedEffect(signature) { try { val proof = model.api!!.publicSignature(signature!!); signatureStatus = proof.creatorName + " · " + proof.status.toString() + "\n" + proof.explanation } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled } catch (_: Exception) { signatureStatus = QelvoraCopy.text("nativeThisSignatureIsPrivateOrUnavailable") } }
+        Column(Modifier.background(qColor("surface")).padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) { QText(QelvoraCopy.text("nativeSignature"), "display-md"); QText(signatureStatus.ifEmpty { QelvoraCopy.text("nativeCheckingCurrentSignature") }, "body"); Button(QelvoraCopy.text("nativeDone"), ButtonVariant.SECONDARY) { signature = null; signatureStatus = "" } }
     }
 }

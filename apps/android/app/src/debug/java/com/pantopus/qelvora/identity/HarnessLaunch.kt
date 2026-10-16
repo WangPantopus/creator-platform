@@ -12,6 +12,9 @@ import android.content.Context
  *                         starts from a clean app
  *   harness_actor=<text>  sign in as the development actor whose label contains
  *                         <text>, when nobody is signed in
+ *   harness_long_session=<reminder>,<break>
+ *                         the 3-hour reminder's two durations, in seconds
+ *                         (WP 7.4 P8), so a scenario need not wait hours
  * Nothing here grants authority: it uses the same sign-in the person would,
  * against the development identity the server advertises.
  */
@@ -22,7 +25,16 @@ object HarnessLaunch {
         if (!intent.getBooleanExtra("harness_reset", false)) return
         // One launch, one run: rotation recreates the activity with the same intent.
         intent.removeExtra("harness_reset")
+        com.pantopus.qelvora.conversation.ConversationLongSession.forget(context)
         model.purge()
+    }
+
+    /** The reminder's durations in milliseconds, when a debug launch sets them. */
+    fun longSession(context: Context): Pair<Long, Long>? {
+        val value = (context as? Activity)?.intent?.getStringExtra("harness_long_session") ?: return null
+        val parts = value.split(",").mapNotNull { it.trim().toDoubleOrNull() }
+        if (parts.size != 2 || parts.any { it <= 0 }) return null
+        return (parts[0] * 1000).toLong() to (parts[1] * 1000).toLong()
     }
 
     /** After the first session check: nothing happens if someone is signed in. */

@@ -32,8 +32,8 @@ actor W3Realtime {
     private let session: URLSession
     private var connections: [Key: Connection] = [:]
     private var purgeRevision = 0
-    private var unavailable: W3Failure { W3Failure(message: "Reconnect to refresh this conversation.", status: 503) }
-    private var accountChanged: W3Failure { W3Failure(message: "Your account changed. Open this conversation again.", status: 401) }
+    private var unavailable: W3Failure { W3Failure(message: QelvoraCopy.text("nativeReconnectToRefreshThisConversation"), status: 503) }
+    private var accountChanged: W3Failure { W3Failure(message: QelvoraCopy.text("nativeYourAccountChangedOpenThisConversation"), status: 401) }
 
     init() {
         let configuration = URLSessionConfiguration.ephemeral

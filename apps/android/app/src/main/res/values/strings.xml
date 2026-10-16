@@ -62,7 +62,7 @@
   <string name="official_disclaimer" formatted="false">Official means {name} authorized this AI. It does not mean she read your message.</string>
   <string name="conversation_access" formatted="false">Conversations with a creator\'s AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.</string>
   <string name="packet_access" formatted="false">{name} and her authorized team can separately review this AI conversation. Those accesses are logged.</string>
-  <string name="charge_rule" formatted="false">Charged only when {name} accepts. If she declines or {deadline} pass, nothing is charged.</string>
+  <string name="charge_rule" formatted="false">Charged only when {name} accepts. If {name} declines or {deadline} pass, nothing is charged.</string>
   <string name="pending_hold" formatted="false">Your bank may show a pending hold for a few days.</string>
   <string name="decision_eta" formatted="false">{name} usually decides in {range}</string>
   <string name="draft_notice" formatted="false">{name} may answer with her AI\'s draft; you\'ll see that label.</string>
@@ -258,7 +258,7 @@
   <string name="edited_by_you" formatted="false">Edited by you</string>
   <string name="summary" formatted="false">Summary</string>
   <string name="if_accepts" formatted="false">If {name} accepts</string>
-  <string name="if_declines" formatted="false">If she declines or {deadline} pass</string>
+  <string name="if_declines" formatted="false">If {name} declines or {deadline} pass</string>
   <string name="requests_ahead" formatted="false"> · {count} requests ahead of you</string>
   <string name="request_status" formatted="false">Request status</string>
   <string name="written_reply" formatted="false">Written reply</string>
@@ -328,6 +328,7 @@
   <string name="growth_finding_creators" formatted="false">Finding creators</string>
   <string name="growth_usefulness" formatted="false">Usefulness</string>
   <string name="growth_notifications" formatted="false">Notifications</string>
+  <string name="growth_unread" formatted="false">Unread</string>
   <string name="growth_leaving" formatted="false">Leaving</string>
   <string name="growth_rating" formatted="false">Rating</string>
   <string name="growth_skip_rating" formatted="false">Skip rating</string>
@@ -1083,4 +1084,543 @@
   <string name="growth_impact_thank_you" formatted="false">A THANK-YOU, SHARED WITH PERMISSION</string>
   <string name="growth_impact_week_counts" formatted="false">Counts are for this week only. Fans are never named here without their consent.</string>
   <string name="growth_impact_not_available" formatted="false">No weekly digest is available yet.</string>
+  <string name="picker_creator" formatted="false">Creator</string>
+  <string name="picker_conversation" formatted="false">Conversation</string>
+  <string name="picker_choose_creator" formatted="false">Choose a creator</string>
+  <string name="picker_choose_conversation" formatted="false">Choose a conversation</string>
+  <string name="picker_no_conversations" formatted="false">You have no conversations yet.</string>
+  <string name="picker_conversations_failed" formatted="false">Your conversations couldn\'t load.</string>
+  <string name="native1_o_f1" formatted="false">1 OF 1</string>
+  <string name="native_a_general_version_of_this_question" formatted="false">A general version of this question is saved for AI comparisons. You can withdraw your choice in Me and privacy.</string>
+  <string name="native_a_i_comparison_options" formatted="false">AI comparison options</string>
+  <string name="native_a_i_comparisons" formatted="false">AI comparisons</string>
+  <string name="native_a_i_message_i_d" formatted="false">AI message ID</string>
+  <string name="native_a_i_provider_consent_is_unavailable" formatted="false">AI provider consent is unavailable or has been withdrawn.</string>
+  <string name="native_a_i_providers" formatted="false">AI providers</string>
+  <string name="native_a_i_providers_and_their_verified_processing" formatted="false">AI providers and their verified processing terms are not configured yet.</string>
+  <string name="native_a_i_time" formatted="false">AI time</string>
+  <string name="native_a_i_unavailable" formatted="false">AI unavailable</string>
+  <string name="native_a_l_i_n_e_a_b_o_u_t_y_o_u_o_p_t_i_o_n_a_l" formatted="false">A LINE ABOUT YOU · OPTIONAL</string>
+  <string name="native_a_line_about_you_optional" formatted="false">A line about you, optional</string>
+  <string name="native_a_pass_grants_a_i_reach_separate" formatted="false">A pass grants AI reach. Separate memberships grant tier depth and do not consume a slot.</string>
+  <string name="native_a_pseudonym_is_allowed_three_to" formatted="false">A pseudonym is allowed. Three to thirty letters, numbers or underscores.</string>
+  <string name="native_abuse_report" formatted="false">Abuse report</string>
+  <string name="native_acceptance_hasnt_been_confirmed" formatted="false">Acceptance hasn\'t been confirmed. Retry checks the same message without a duplicate.</string>
+  <string name="native_accepted_service" formatted="false">Accepted service</string>
+  <string name="native_access_closes_immediately_purging" formatted="false">Access closes immediately. Purging waits for every domain. Retained records are disclosed in job progress. Store subscriptions must be canceled separately.</string>
+  <string name="native_access_history" formatted="false">Access history</string>
+  <string name="native_access_refreshes_from_the_server" formatted="false">Access refreshes from the server.</string>
+  <string name="native_access_until" formatted="false">Access until</string>
+  <string name="native_account" formatted="false">Account</string>
+  <string name="native_account_id" formatted="false">Account {id}</string>
+  <string name="native_account_status" formatted="false">Account status</string>
+  <string name="native_account_unavailable" formatted="false">Account unavailable</string>
+  <string name="native_account_verification_receipt" formatted="false">Account verification receipt</string>
+  <string name="native_agree_to_these_a_i_providers" formatted="false">Agree to these AI providers</string>
+  <string name="native_agreed" formatted="false">Agreed</string>
+  <string name="native_agreed_to_share_feedback" formatted="false">Agreed to share feedback</string>
+  <string name="native_allow_questions_for_a_i_comparisons" formatted="false">Allow questions for AI comparisons</string>
+  <string name="native_allow_sharing_without_your_handle" formatted="false">Allow sharing without your handle</string>
+  <string name="native_allow_this_reply_to_be_quoted" formatted="false">Allow this reply to be quoted</string>
+  <string name="native_allowed_for_this_creator" formatted="false">Allowed for this creator</string>
+  <string name="native_amount_in_currency" formatted="false">Amount in {currency}</string>
+  <string name="native_anything_to_improve_optional" formatted="false">Anything to improve? (optional)</string>
+  <string name="native_appeal_c_a_s_e_number" formatted="false">Appeal CASE-{number}</string>
+  <string name="native_attachment_access_could_not_be_confirmed" formatted="false">Attachment access could not be confirmed. Check current access before retrying.</string>
+  <string name="native_attachment_information_is_unavailable" formatted="false">Attachment information is unavailable. Refresh current access.</string>
+  <string name="native_audience_size_count" formatted="false">Audience size · {count}</string>
+  <string name="native_audio_access_could_not_be_confirmed" formatted="false">Audio access could not be confirmed. Try again.</string>
+  <string name="native_authorized_safety_account" formatted="false">Authorized safety account</string>
+  <string name="native_authorized_team_member" formatted="false">Authorized team member</string>
+  <string name="native_authorized_team_role" formatted="false">Authorized team · {role}</string>
+  <string name="native_back10_seconds" formatted="false">Back 10 seconds</string>
+  <string name="native_back_to_first_page" formatted="false">Back to first page</string>
+  <string name="native_bank_authorization_expires" formatted="false">Bank authorization expires</string>
+  <string name="native_before_your_first_message" formatted="false">Before your first message</string>
+  <string name="native_benefits_cannot_be_confirmed" formatted="false">Benefits cannot be confirmed.</string>
+  <string name="native_billing_provider" formatted="false">Billing provider</string>
+  <string name="native_block_creator" formatted="false">Block creator</string>
+  <string name="native_c_a_s_e_number_is_saved_no_provider" formatted="false">CASE-{number} is saved. No provider action is implied.</string>
+  <string name="native_c_a_s_e_number_kind_state" formatted="false">CASE-{number} · {kind} · {state}</string>
+  <string name="native_call_with_name" formatted="false">Call with {name}</string>
+  <string name="native_case_access_history" formatted="false">Case access history</string>
+  <string name="native_change_anything_nothing_is_sent_until" formatted="false">Change anything; nothing is sent until you do.</string>
+  <string name="native_charged" formatted="false">Charged</string>
+  <string name="native_charged_this_u_t_c_calendar_month" formatted="false">Charged this UTC calendar month</string>
+  <string name="native_checking_current_attachment_access" formatted="false">Checking current attachment access…</string>
+  <string name="native_checking_current_signature" formatted="false">Checking current signature…</string>
+  <string name="native_choose_a_writable_export_destination" formatted="false">Choose a writable export destination.</string>
+  <string name="native_choose_an_amount" formatted="false">Choose an amount</string>
+  <string name="native_choose_an_answer" formatted="false">Choose an answer</string>
+  <string name="native_choose_an_available_membership_or" formatted="false">Choose an available membership or restore your current store purchases.</string>
+  <string name="native_choose_another_category_to_view_your" formatted="false">Choose another category to view your requests and retained receipts.</string>
+  <string name="native_choose_before_your_first_paid_action" formatted="false">Choose before your first paid action</string>
+  <string name="native_choose_your_limit" formatted="false">Choose your limit</string>
+  <string name="native_closed" formatted="false">Closed</string>
+  <string name="native_commerce_is_not_connected_yet_reconnect" formatted="false">Commerce is not connected yet. Reconnect to try again.</string>
+  <string name="native_companion_mode_time_signals_await" formatted="false">Companion mode time signals await the verified AI mode configuration.</string>
+  <string name="native_comparison_status" formatted="false">Comparison status</string>
+  <string name="native_complete_all_slotcapacity_choices" formatted="false">Complete all {slotCapacity} choices. An incomplete draft carries forward your current selection.</string>
+  <string name="native_confirming_payment" formatted="false">Confirming payment</string>
+  <string name="native_connection_status" formatted="false">Connection status</string>
+  <string name="native_consent_could_not_be_saved" formatted="false">Consent could not be saved.</string>
+  <string name="native_content_unavailable" formatted="false">Content unavailable</string>
+  <string name="native_continue" formatted="false">Continue</string>
+  <string name="native_conversation" formatted="false">Conversation</string>
+  <string name="native_conversation_status" formatted="false">Conversation status</string>
+  <string name="native_conversation_trial" formatted="false">Conversation trial</string>
+  <string name="native_conversation_unavailable" formatted="false">Conversation unavailable</string>
+  <string name="native_conversation_update" formatted="false">Conversation update</string>
+  <string name="native_could_not_complete" formatted="false">Could not complete</string>
+  <string name="native_creator_access" formatted="false">Creator access</string>
+  <string name="native_creator_proof_must_be_approved_and" formatted="false">Creator proof must be approved and Pantopus authorization must be fresh before enrollment.</string>
+  <string name="native_creators_and_their_teams_see_your" formatted="false">Creators and their teams see your handle, never your name or city unless you share them in a request.</string>
+  <string name="native_crisis_help" formatted="false">Crisis help</string>
+  <string name="native_crisis_help_protocol" formatted="false">Crisis help protocol</string>
+  <string name="native_current_access" formatted="false">Current access</string>
+  <string name="native_current_access_is_unavailable_refresh" formatted="false">Current access is unavailable. Refresh to try again.</string>
+  <string name="native_current_call_status_is_unavailable" formatted="false">Current call status is unavailable. Your recorded receipt remains available.</string>
+  <string name="native_current_limit" formatted="false">Current limit</string>
+  <string name="native_current_purchases_were_sent_to_the" formatted="false">Current purchases were sent to the server for verification.</string>
+  <string name="native_currently_unavailable" formatted="false">Currently unavailable</string>
+  <string name="native_d_e_v_e_l_o_p_m_e_n_t_s_i_g_n_i_n" formatted="false">DEVELOPMENT SIGN-IN</string>
+  <string name="native_data_scope" formatted="false">Data scope</string>
+  <string name="native_data_scope_scope" formatted="false">Data scope: {scope}</string>
+  <string name="native_decision_deadline" formatted="false">Decision deadline</string>
+  <string name="native_delete" formatted="false">Delete</string>
+  <string name="native_delete_this_data_scope" formatted="false">Delete this data scope?</string>
+  <string name="native_delivered" formatted="false">Delivered</string>
+  <string name="native_delivery_deadline" formatted="false">Delivery deadline</string>
+  <string name="native_delivery_recorded" formatted="false">Delivery recorded</string>
+  <string name="native_development_identity_synthetic" formatted="false">Development identity · synthetic account · actual local API</string>
+  <string name="native_doesnt_keep_your_messages" formatted="false">Doesn\'t keep your messages.</string>
+  <string name="native_doesnt_train_on_your_messages" formatted="false">Doesn\'t train on your messages.</string>
+  <string name="native_done" formatted="false">Done</string>
+  <string name="native_dont_remember" formatted="false">Don\'t remember</string>
+  <string name="native_dont_remember_this" formatted="false">Don\'t remember this</string>
+  <string name="native_earlier_messages" formatted="false">Earlier messages</string>
+  <string name="native_edit_handle_and_intro" formatted="false">Edit handle and intro</string>
+  <string name="native_enter_a_valid_amount" formatted="false">Enter a valid amount.</string>
+  <string name="native_every_message_says_who_wrote_it" formatted="false">Every message says who wrote it: the creator\'s AI, the creator, or their team. You\'ll always know which.</string>
+  <string name="native_every_message_says_who_wrote_it_names" formatted="false">Every message says who wrote it: {name}\'s AI, {name}, or their team. You\'ll always know which.</string>
+  <string name="native_export_and_deletion_are_separate" formatted="false">Export and deletion are separate from canceling store billing. A job finishes only after every data domain acknowledges it.</string>
+  <string name="native_export_or_delete_my_data" formatted="false">Export or delete my data</string>
+  <string name="native_external_creator_proof_and_fresh" formatted="false">External creator proof and fresh Pantopus authorization are required. Each named act needs its own exact-content signature.</string>
+  <string name="native_feedback" formatted="false">Feedback</string>
+  <string name="native_fill_available_slots" formatted="false">Fill available slots</string>
+  <string name="native_forward10_seconds" formatted="false">Forward 10 seconds</string>
+  <string name="native_free_replacement" formatted="false">Free replacement</string>
+  <string name="native_fresh_account_verification_must" formatted="false">Fresh account verification must be connected before requesting data changes.</string>
+  <string name="native_get_support" formatted="false">Get support</string>
+  <string name="native_gifted_access" formatted="false">Gifted access</string>
+  <string name="native_google_play_billing_is_unavailable" formatted="false">Google Play Billing is unavailable on this device.</string>
+  <string name="native_google_play_could_not_complete_the" formatted="false">Google Play could not complete the purchase. Restore to check its current status.</string>
+  <string name="native_google_play_disconnected_reconnect" formatted="false">Google Play disconnected. Reconnect to purchase or restore.</string>
+  <string name="native_google_play_found_no_current_purchases" formatted="false">Google Play found no current purchases for this store account.</string>
+  <string name="native_google_play_is_unavailable_restore" formatted="false">Google Play is unavailable. Restore when connected.</string>
+  <string name="native_google_play_subscriptions_are_unavailable" formatted="false">Google Play subscriptions are unavailable on this device.</string>
+  <string name="native_handle" formatted="false">Handle</string>
+  <string name="native_held_not_charged" formatted="false">Held, not charged</string>
+  <string name="native_help_and_reports" formatted="false">Help and reports</string>
+  <string name="native_help_and_safety" formatted="false">Help and safety</string>
+  <string name="native_hold_release_is_being_confirmed" formatted="false">Hold release is being confirmed.</string>
+  <string name="native_hold_released_nothing_charged" formatted="false">Hold released · nothing charged</string>
+  <string name="native_hours_h_remaining_left" formatted="false">{hours} h · {remaining} left</string>
+  <string name="native_how_creators_will_know_you" formatted="false">How creators will know you</string>
+  <string name="native_i_agree_to_share_these_answers" formatted="false">I agree to share these answers for product feedback.</string>
+  <string name="native_if_you_are_in_immediate_danger" formatted="false">If you are in immediate danger, contact local emergency services. An AI cannot provide emergency help.</string>
+  <string name="native_include_my_handle" formatted="false">Include my handle</string>
+  <string name="native_include_this_question" formatted="false">Include this question</string>
+  <string name="native_incomplete_domains_queued_again" formatted="false">Incomplete domains queued again.</string>
+  <string name="native_increases_take24_hours_decreases" formatted="false">Increases take 24 hours. Decreases are immediate and affect new requests. Existing obligations remain.</string>
+  <string name="native_job_id" formatted="false">Job {id}</string>
+  <string name="native_keep_data" formatted="false">Keep data</string>
+  <string name="native_keep_editing" formatted="false">Keep editing</string>
+  <string name="native_keep_this_conversation_off_the_record" formatted="false">Keep this conversation off the record</string>
+  <string name="native_kind_scope_state_requested_createdat" formatted="false">{kind}, {scope}, {state}, requested {createdAt}, job {id}</string>
+  <string name="native_label_not_selected" formatted="false">{label}, not selected</string>
+  <string name="native_label_selected" formatted="false">{label}, selected</string>
+  <string name="native_limit_unavailable" formatted="false">Limit unavailable</string>
+  <string name="native_load_photo" formatted="false">Load photo</string>
+  <string name="native_load_recording" formatted="false">Load recording</string>
+  <string name="native_loading" formatted="false">Loading…</string>
+  <string name="native_loading_commerce" formatted="false">Loading commerce…</string>
+  <string name="native_loading_opening_history" formatted="false">Loading opening history…</string>
+  <string name="native_loading_photo" formatted="false">Loading photo…</string>
+  <string name="native_loading_recording" formatted="false">Loading recording…</string>
+  <string name="native_loading_time_history" formatted="false">Loading time history…</string>
+  <string name="native_loading_your_account" formatted="false">Loading your account…</string>
+  <string name="native_loading_your_comparison_choice" formatted="false">Loading your comparison choice…</string>
+  <string name="native_loading_your_conversations" formatted="false">Loading your conversations…</string>
+  <string name="native_loading_your_memories" formatted="false">Loading your memories…</string>
+  <string name="native_loading_your_messages" formatted="false">Loading your messages…</string>
+  <string name="native_local_confirmation" formatted="false">Local confirmation</string>
+  <string name="native_m_e_m_b_e_r_s_h_i_p_s" formatted="false">MEMBERSHIPS</string>
+  <string name="native_manage_apple_subscriptions" formatted="false">Manage Apple subscriptions</string>
+  <string name="native_manage_google_play_subscriptions" formatted="false">Manage Google Play subscriptions</string>
+  <string name="native_manage_in_google_play" formatted="false">Manage in Google Play</string>
+  <string name="native_manage_in_the_app_store" formatted="false">Manage in the App Store</string>
+  <string name="native_manage_membership" formatted="false">Manage membership</string>
+  <string name="native_manage_your_memberships" formatted="false">Manage your memberships</string>
+  <string name="native_me_and_privacy" formatted="false">Me and privacy</string>
+  <string name="native_measurement_days_are_shown_in_u_t_c" formatted="false">{measurement} Days are shown in UTC.</string>
+  <string name="native_membership" formatted="false">Membership</string>
+  <string name="native_membership_products_are_not_configured" formatted="false">Membership products are not configured.</string>
+  <string name="native_memberships" formatted="false">Memberships</string>
+  <string name="native_memberships_are_the_current_way_to" formatted="false">Memberships are the current way to deepen access. The pass is not open yet.</string>
+  <string name="native_memories_unavailable" formatted="false">Memories unavailable.</string>
+  <string name="native_memories_who_opened_your_conversations" formatted="false">Memories, who opened your conversations, consents</string>
+  <string name="native_memory_and_access" formatted="false">Memory and access</string>
+  <string name="native_memory_and_conversation_access_by" formatted="false">Memory and conversation access by creator</string>
+  <string name="native_message_reference_reference" formatted="false">{message} Reference {reference}</string>
+  <string name="native_message_this_a_i" formatted="false">Message this AI.</string>
+  <string name="native_messaging_is_unavailable" formatted="false">Messaging is unavailable.</string>
+  <string name="native_month_u_t_c" formatted="false">{month} · UTC</string>
+  <string name="native_monthly_amount" formatted="false">Monthly amount</string>
+  <string name="native_monthly_amount_in_currency" formatted="false">Monthly amount in {currency}</string>
+  <string name="native_monthly_spending_limit" formatted="false">Monthly spending limit</string>
+  <string name="native_more_conversations" formatted="false">More conversations</string>
+  <string name="native_mute_notes_from_this_creator" formatted="false">Mute Notes from this creator</string>
+  <string name="native_name_price_month" formatted="false">{name} · {price} / month</string>
+  <string name="native_name_reacted_kind" formatted="false">{name} reacted · {kind}</string>
+  <string name="native_names_account" formatted="false">{name}\'s account</string>
+  <string name="native_names_recording" formatted="false">{name}’s recording</string>
+  <string name="native_newer_replies" formatted="false">Newer replies</string>
+  <string name="native_no" formatted="false">No</string>
+  <string name="native_no_approved_monthly_membership_products" formatted="false">No approved monthly membership products are available in Google Play.</string>
+  <string name="native_no_case_accesses_yet" formatted="false">No case accesses yet.</string>
+  <string name="native_no_conversations_yet" formatted="false">No conversations yet.</string>
+  <string name="native_no_human_modes_are_currently_available" formatted="false">No human modes are currently available.</string>
+  <string name="native_no_included_access_for_this_creator" formatted="false">No included access for this creator.</string>
+  <string name="native_no_logged_openings" formatted="false">No logged openings.</string>
+  <string name="native_no_memberships_yet" formatted="false">No memberships yet</string>
+  <string name="native_no_memories_the_a_i_asks_before" formatted="false">No memories. The AI asks before remembering.</string>
+  <string name="native_no_requests_here" formatted="false">No requests here</string>
+  <string name="native_not_agreed" formatted="false">Not agreed</string>
+  <string name="native_not_helpful" formatted="false">Not helpful</string>
+  <string name="native_not_now" formatted="false">Not now</string>
+  <string name="native_not_selected" formatted="false">Not selected</string>
+  <string name="native_not_used_for_memory" formatted="false">Not used for memory</string>
+  <string name="native_note_from_name_audience_details_unavailable" formatted="false">Note from {name} · audience details unavailable</string>
+  <string name="native_of_your_amount_limit" formatted="false">of your {amount} limit</string>
+  <string name="native_off_optional" formatted="false">Off · optional</string>
+  <string name="native_off_the_record" formatted="false">Off the record</string>
+  <string name="native_off_the_record_the_a_i_keeps" formatted="false">Off the record · the AI keeps no memory from this conversation.</string>
+  <string name="native_official_a_i" formatted="false">Official AI</string>
+  <string name="native_older_replies" formatted="false">Older replies</string>
+  <string name="native_only_what_you_agree_to_it" formatted="false">Only what you agree to. It asks first, and you can see and delete every memory in You.</string>
+  <string name="native_only_you_the_creator_and_their" formatted="false">Only you, the creator, and their permitted team can read your replies. A Note is a broadcast.</string>
+  <string name="native_open" formatted="false">Open</string>
+  <string name="native_open_conversation" formatted="false">Open conversation</string>
+  <string name="native_open_loop" formatted="false">Open loop</string>
+  <string name="native_open_play_store_then_payments_subscriptions" formatted="false">Open Play Store, then Payments &amp; subscriptions, then Subscriptions to manage your membership.</string>
+  <string name="native_open_signed_acceptance" formatted="false">Open signed acceptance</string>
+  <string name="native_open_signed_verification" formatted="false">Open signed verification</string>
+  <string name="native_open_this_attachment_in_the_ios" formatted="false">Open this attachment in the iOS app.</string>
+  <string name="native_open_this_conversation_from_your" formatted="false">Open this conversation from your account.</string>
+  <string name="native_opening_history_unavailable" formatted="false">Opening history unavailable.</string>
+  <string name="native_optional_product_feedback" formatted="false">Optional product feedback</string>
+  <string name="native_original_a_i_reply_version_version" formatted="false">Original AI reply · version {version}</string>
+  <string name="native_original_source" formatted="false">Original source</string>
+  <string name="native_original_text" formatted="false">Original text</string>
+  <string name="native_paid_written_and_voice_requests_are" formatted="false">Paid written and voice requests are unavailable in this native app. Your draft stays on this screen.</string>
+  <string name="native_paid_written_and_voice_requests_are_unavailable" formatted="false">Paid written and voice requests are unavailable in this native app.</string>
+  <string name="native_pantopus_account_authorization" formatted="false">Pantopus account authorization is not connected for this native app. Your destination is kept.</string>
+  <string name="native_pass_a_i_reach" formatted="false">Pass AI reach</string>
+  <string name="native_pass_is_unavailable" formatted="false">Pass is unavailable</string>
+  <string name="native_passkey_registered_nothing_was_published" formatted="false">Passkey registered. Nothing was published.</string>
+  <string name="native_passkey_status" formatted="false">Passkey status</string>
+  <string name="native_pause_recording" formatted="false">Pause recording</string>
+  <string name="native_payment_authentication_needed" formatted="false">Payment authentication needed</string>
+  <string name="native_payment_failed_nothing_charged" formatted="false">Payment failed · nothing charged</string>
+  <string name="native_payment_processing" formatted="false">Payment processing</string>
+  <string name="native_payment_unavailable" formatted="false">Payment unavailable</string>
+  <string name="native_personal_call_provider_confirmed" formatted="false">Personal call · provider-confirmed outcome</string>
+  <string name="native_play_recording" formatted="false">Play recording</string>
+  <string name="native_playback_could_not_continue_check" formatted="false">Playback could not continue. Check current access before retrying.</string>
+  <string name="native_playback_could_not_continue_try_again" formatted="false">Playback could not continue. Try again.</string>
+  <string name="native_post_context_unavailable" formatted="false">Post context unavailable</string>
+  <string name="native_prepare_export" formatted="false">Prepare export</string>
+  <string name="native_price_unavailable" formatted="false">Price unavailable</string>
+  <string name="native_privacy_status" formatted="false">Privacy status</string>
+  <string name="native_private_replies_are_unavailable" formatted="false">Private replies are unavailable. Refresh to try again.</string>
+  <string name="native_private_reply" formatted="false">Private reply</string>
+  <string name="native_provider_processing_terms" formatted="false">{provider} processing terms</string>
+  <string name="native_public_handle" formatted="false">Public handle</string>
+  <string name="native_public_handle_a_pseudonym_is_allowed" formatted="false">Public handle, a pseudonym is allowed</string>
+  <string name="native_purchase_and_restore_unavailable" formatted="false">Purchase and restore unavailable</string>
+  <string name="native_purchase_cancelled_nothing_changed" formatted="false">Purchase cancelled. Nothing changed.</string>
+  <string name="native_purchase_did_not_complete_check_the" formatted="false">Purchase did not complete. Check the App Store and try again.</string>
+  <string name="native_purchase_is_pending_with_google_play" formatted="false">Purchase is pending with Google Play. No access has been granted.</string>
+  <string name="native_purchase_is_pending_with_the_app" formatted="false">Purchase is pending with the App Store. No access has been granted.</string>
+  <string name="native_purchase_status_is_unavailable_restore" formatted="false">Purchase status is unavailable. Restore to check the current state.</string>
+  <string name="native_purchase_verified_by_the_server_refreshing" formatted="false">Purchase verified by the server. Refreshing access.</string>
+  <string name="native_push_and_email_per_creator_quiet" formatted="false">Push and email, per creator, quiet hours</string>
+  <string name="native_read_included_notes" formatted="false">Read included notes.</string>
+  <string name="native_read_the_original_passage" formatted="false">Read the original passage</string>
+  <string name="native_read_your_existing_conversations" formatted="false">Read your existing conversations.</string>
+  <string name="native_receipts" formatted="false">Receipts</string>
+  <string name="native_reconnect_and_retry_your_export" formatted="false">Reconnect and retry your export.</string>
+  <string name="native_reconnect_and_try_again" formatted="false">Reconnect and try again.</string>
+  <string name="native_reconnect_to_check_your_account_your" formatted="false">Reconnect to check your account. Your unsaved input is kept.</string>
+  <string name="native_reconnect_to_load_public_help" formatted="false">Reconnect to load public help.</string>
+  <string name="native_reconnect_to_open_this_conversation" formatted="false">Reconnect to open this conversation from your account.</string>
+  <string name="native_reconnect_to_open_you" formatted="false">Reconnect to open You.</string>
+  <string name="native_reconnect_to_refresh_this_conversation" formatted="false">Reconnect to refresh this conversation.</string>
+  <string name="native_reconnect_to_refresh_your_account" formatted="false">Reconnect to refresh your account. Actions are unavailable while offline.</string>
+  <string name="native_reconnect_to_refresh_your_input_is" formatted="false">Reconnect to refresh. Your input is kept; actions are unavailable while offline.</string>
+  <string name="native_reconnect_to_refresh_your_input_is_kept" formatted="false">Reconnect to refresh. Your input is kept on this screen.</string>
+  <string name="native_reconnect_to_refresh_your_input_is_kept2" formatted="false">Reconnect to refresh. Your input is kept.</string>
+  <string name="native_reconnect_to_refresh_your_privacy" formatted="false">Reconnect to refresh your privacy settings.</string>
+  <string name="native_reconnect_to_try_again_no_message" formatted="false">Reconnect to try again. No message was sent.</string>
+  <string name="native_reconnect_to_view_your_comparison" formatted="false">Reconnect to view your comparison choice.</string>
+  <string name="native_refresh" formatted="false">Refresh</string>
+  <string name="native_refresh_comparison_choice" formatted="false">Refresh comparison choice</string>
+  <string name="native_refresh_session" formatted="false">Refresh session</string>
+  <string name="native_refresh_the_request_from_your_account" formatted="false">Refresh the request from your account.</string>
+  <string name="native_refresh_your_account_before_continuing" formatted="false">Refresh your account before continuing. Your input is kept.</string>
+  <string name="native_refresh_your_account_before_continuing2" formatted="false">Refresh your account before continuing.</string>
+  <string name="native_refresh_your_account_before_continuing_unsaved" formatted="false">Refresh your account before continuing. Unsaved input stays in this account view.</string>
+  <string name="native_refund_confirmed" formatted="false">Refund confirmed</string>
+  <string name="native_refund_processing" formatted="false">Refund processing</string>
+  <string name="native_refunds_recorded" formatted="false">Refunds recorded</string>
+  <string name="native_regional_help_resources_are_not_configured" formatted="false">Regional help resources are not configured in this environment.</string>
+  <string name="native_register_a_signing_passkey" formatted="false">Register a signing passkey</string>
+  <string name="native_registered_passkey" formatted="false">Registered passkey</string>
+  <string name="native_registration_cancelled_nothing" formatted="false">Registration cancelled. Nothing was published.</string>
+  <string name="native_remaining_of_limit_left_hours_h" formatted="false">{remaining} of {limit} left · {hours} h delivery</string>
+  <string name="native_remembered" formatted="false">Remembered</string>
+  <string name="native_remind_me_at50_and100" formatted="false">Remind me at 50% and 100%</string>
+  <string name="native_reminders_at50_and100_off" formatted="false">Reminders at 50% and 100% · off</string>
+  <string name="native_reminders_at50_and100_on" formatted="false">Reminders at 50% and 100% · on</string>
+  <string name="native_remove_my_response" formatted="false">Remove my response</string>
+  <string name="native_reopen_this_page_with_your_current" formatted="false">Reopen this page with your current account.</string>
+  <string name="native_replace_unavailable_creator" formatted="false">Replace unavailable creator</string>
+  <string name="native_reply_privately" formatted="false">Reply privately</string>
+  <string name="native_report_a_i_message" formatted="false">Report AI message</string>
+  <string name="native_report_block_crisis_support" formatted="false">Report, block, crisis support</string>
+  <string name="native_report_type" formatted="false">Report type</string>
+  <string name="native_report_type_kind" formatted="false">Report type: {kind}</string>
+  <string name="native_reports_are_available_without_paid" formatted="false">Reports are available without paid access. Case evidence is limited to what you report.</string>
+  <string name="native_reports_do_not_require_paid_access" formatted="false">Reports do not require paid access. Urgent cases need a staffed safety responder. This service does not claim continuous emergency monitoring or a guaranteed response time.</string>
+  <string name="native_request_available_services" formatted="false">Request available services.</string>
+  <string name="native_request_deletion" formatted="false">Request deletion</string>
+  <string name="native_request_export" formatted="false">Request export</string>
+  <string name="native_request_i_d_optional" formatted="false">Request ID (optional)</string>
+  <string name="native_request_saved_inspect_each_domains" formatted="false">Request saved; inspect each domain\'s progress.</string>
+  <string name="native_request_unavailable" formatted="false">Request unavailable</string>
+  <string name="native_requested_time" formatted="false">Requested {time}</string>
+  <string name="native_requests_appear_after_you_send_them" formatted="false">Requests appear after you send them.</string>
+  <string name="native_resolved" formatted="false">Resolved</string>
+  <string name="native_resolved_open_loop" formatted="false">Resolved open loop</string>
+  <string name="native_restore_could_not_reach_google_play" formatted="false">Restore could not reach Google Play. No local receipt grants access.</string>
+  <string name="native_restore_could_not_reach_the_app" formatted="false">Restore could not reach the App Store. No local receipt grants access.</string>
+  <string name="native_restore_purchases" formatted="false">Restore purchases</string>
+  <string name="native_retry_incomplete_domains" formatted="false">Retry incomplete domains</string>
+  <string name="native_retry_safety_review" formatted="false">Retry safety review</string>
+  <string name="native_review_message_retention_in_these" formatted="false">Review message retention in these terms.</string>
+  <string name="native_review_message_use_in_these_terms" formatted="false">Review message use in these terms.</string>
+  <string name="native_revocation_could_not_complete_reconnect" formatted="false">Revocation could not complete. Reconnect and try again.</string>
+  <string name="native_revoke_sharing" formatted="false">Revoke sharing</string>
+  <string name="native_revoked_passkey" formatted="false">Revoked passkey</string>
+  <string name="native_s_i_g_n_e_d_i_n_w_i_t_h_p_a_n_t_o_p_u_s" formatted="false">SIGNED IN WITH PANTOPUS</string>
+  <string name="native_save_export" formatted="false">Save export</string>
+  <string name="native_save_limit" formatted="false">Save limit</string>
+  <string name="native_save_next_months_choices" formatted="false">Save next month’s choices</string>
+  <string name="native_save_proposal" formatted="false">Save proposal</string>
+  <string name="native_saved" formatted="false">Saved</string>
+  <string name="native_saved_memberships" formatted="false">Saved memberships</string>
+  <string name="native_saving" formatted="false">Saving…</string>
+  <string name="native_saving_your_comparison_choice_or" formatted="false">Saving your comparison choice or checking this question…</string>
+  <string name="native_selected" formatted="false">Selected</string>
+  <string name="native_send" formatted="false">Send</string>
+  <string name="native_send_answer" formatted="false">Send answer</string>
+  <string name="native_send_feedback" formatted="false">Send feedback</string>
+  <string name="native_send_private_reply" formatted="false">Send private reply</string>
+  <string name="native_send_report" formatted="false">Send report</string>
+  <string name="native_send_request" formatted="false">Send request</string>
+  <string name="native_sensitive_item_agreeing_applies" formatted="false">Sensitive item · agreeing applies only to this exact memory.</string>
+  <string name="native_server_verification_is_processing" formatted="false">Server verification is processing. Access refreshes when confirmed.</string>
+  <string name="native_server_verification_is_unavailable" formatted="false">Server verification is unavailable. This purchase remains recoverable; restore when connected.</string>
+  <string name="native_session_refresh_could_not_complete" formatted="false">Session refresh could not complete. Reconnect and try again.</string>
+  <string name="native_share_my_intro_with_this_creators" formatted="false">Share my intro with this creator\'s AI</string>
+  <string name="native_share_this_text_with_the_creators" formatted="false">Share this text with the creator’s digest</string>
+  <string name="native_share_your_export" formatted="false">Share your export</string>
+  <string name="native_show_my_handle_on_the_quote" formatted="false">Show my handle on the quote</string>
+  <string name="native_sign_in_is_unavailable_reconnect" formatted="false">Sign-in is unavailable. Reconnect and try again.</string>
+  <string name="native_sign_out" formatted="false">Sign out</string>
+  <string name="native_sign_out_could_not_reach_the" formatted="false">Sign-out could not reach the server. Retry to revoke the session.</string>
+  <string name="native_sign_out_on_all_devices" formatted="false">Sign out on all devices</string>
+  <string name="native_signature" formatted="false">Signature</string>
+  <string name="native_signed" formatted="false">Signed</string>
+  <string name="native_signed_in_with_pantopus" formatted="false">Signed in with Pantopus</string>
+  <string name="native_signed_original" formatted="false">Signed original</string>
+  <string name="native_signing_passkeys" formatted="false">Signing passkeys</string>
+  <string name="native_signing_requires_android9_or_newer" formatted="false">Signing requires Android 9 or newer and a configured passkey provider. No weaker signature is substituted.</string>
+  <string name="native_source_unavailable" formatted="false">Source unavailable</string>
+  <string name="native_spending_and_time" formatted="false">Spending and time</string>
+  <string name="native_start_with_names_a_i" formatted="false">Start with {name}\'s AI</string>
+  <string name="native_status" formatted="false">Status</string>
+  <string name="native_stop_sharing_my_intro" formatted="false">Stop sharing my intro</string>
+  <string name="native_store_products_must_be_configured" formatted="false">Store products must be configured and verified by the server before access is granted.</string>
+  <string name="native_store_settings_unavailable" formatted="false">Store settings unavailable</string>
+  <string name="native_store_status" formatted="false">Store status</string>
+  <string name="native_support" formatted="false">Support</string>
+  <string name="native_support_request" formatted="false">Support request</string>
+  <string name="native_synthetic_account_actual_local_a_p_i" formatted="false">Synthetic account · actual local API.</string>
+  <string name="native_synthetic_isolated_accounts_pantopus" formatted="false">Synthetic isolated accounts. Pantopus production sign-in is not connected.</string>
+  <string name="native_synthetic_local_account_development" formatted="false">Synthetic local account · development</string>
+  <string name="native_synthetic_local_account_type_l_o_c_a_l" formatted="false">Synthetic local account: type LOCAL DEVELOPMENT to confirm.</string>
+  <string name="native_system_call_status" formatted="false">System · call status</string>
+  <string name="native_system_delivery_notice" formatted="false">System delivery notice</string>
+  <string name="native_system_update_answered_publicly" formatted="false">System update: Answered publicly. Open answer</string>
+  <string name="native_t_h_i_s_m_o_n_t_h" formatted="false">THIS MONTH</string>
+  <string name="native_thanks_is_unavailable_your_input" formatted="false">Thanks is unavailable. Your input is kept; refresh before saving.</string>
+  <string name="native_thanks_optional" formatted="false">Thanks · optional</string>
+  <string name="native_the_a_i_keeps_no_memory_from" formatted="false">The AI keeps no memory from it. It is still labeled, visible to the creator and their team, and you can delete it.</string>
+  <string name="native_the_account_changed_continue_with" formatted="false">The account changed. Continue with Pantopus again.</string>
+  <string name="native_the_app_store_has_no_available" formatted="false">The App Store has no available monthly memberships for this catalog.</string>
+  <string name="native_the_app_store_is_unavailable_reconnect" formatted="false">The App Store is unavailable. Reconnect to try again.</string>
+  <string name="native_the_app_store_transaction_could_not" formatted="false">The App Store transaction could not be verified. No access was granted.</string>
+  <string name="native_the_attachment_could_not_be_loaded" formatted="false">The attachment could not be loaded. Check current access before retrying.</string>
+  <string name="native_the_call_room_closed_after_neither" formatted="false">The call room closed after neither participant joined during the arrival window. The service outcome remains unresolved. Recorded {time}. Check the current receipt for billing status.</string>
+  <string name="native_the_content_service_is_not_connected" formatted="false">The content service is not connected.</string>
+  <string name="native_the_creator" formatted="false">the creator</string>
+  <string name="native_the_creator_and_their_team_can" formatted="false">The creator and their team can see these memories, never edit them. Deleting one also removes summaries that could repeat it.</string>
+  <string name="native_the_creator_asked_for_more_information" formatted="false">The creator asked for more information.</string>
+  <string name="native_the_current_comparison_notice_is" formatted="false">The current comparison notice is unavailable. No new questions can be included.</string>
+  <string name="native_the_device_could_not_complete_passkey" formatted="false">The device could not complete passkey registration. Check the relying-party association or try again. Nothing was published.</string>
+  <string name="native_the_export_could_not_be_saved" formatted="false">The export could not be saved.</string>
+  <string name="native_the_export_was_interrupted_remove" formatted="false">The export was interrupted. Remove the incomplete file from the destination you chose.</string>
+  <string name="native_the_media_service_is_not_connected" formatted="false">The media service is not connected.</string>
+  <string name="native_the_original_reply_changed" formatted="false">The original reply changed.</string>
+  <string name="native_the_passkey_provider_could_not_complete" formatted="false">The passkey provider could not complete registration.</string>
+  <string name="native_the_photo_is_unreadable" formatted="false">The photo is unreadable.</string>
+  <string name="native_the_play_catalog_is_unavailable_reconnect" formatted="false">The Play catalog is unavailable. Reconnect to try again.</string>
+  <string name="native_the_play_purchase_sheet_is_unavailable" formatted="false">The Play purchase sheet is unavailable. Restore to check existing purchases.</string>
+  <string name="native_the_provider_must_confirm_payment" formatted="false">The provider must confirm payment. No completion is inferred from this screen.</string>
+  <string name="native_the_public_help_response_exceeds" formatted="false">The public help response exceeds the native limit.</string>
+  <string name="native_the_purchase_sheet_needs_the_active" formatted="false">The purchase sheet needs the active app screen.</string>
+  <string name="native_the_recording_could_not_be_decoded" formatted="false">The recording could not be decoded. Check current access before retrying.</string>
+  <string name="native_the_recording_could_not_be_played" formatted="false">The recording could not be played. Check current access before retrying.</string>
+  <string name="native_the_result_could_not_be_confirmed" formatted="false">The result could not be confirmed. Refresh your choice before continuing.</string>
+  <string name="native_the_trust_service_is_not_configured" formatted="false">The trust service is not configured.</string>
+  <string name="native_these_records_show_when_an_authorized" formatted="false">These records show when an authorized operations account opened your case evidence and its purpose. Opening a case does not mean someone read every word.</string>
+  <string name="native_this_a_i_is_powered_by_providers" formatted="false">This AI is powered by {providers}.</string>
+  <string name="native_this_action_could_not_complete_reconnect" formatted="false">This action could not complete. Reconnect and try again.</string>
+  <string name="native_this_action_is_unavailable_your_input" formatted="false">This action is unavailable. Your input is kept.</string>
+  <string name="native_this_amount_is_too_large" formatted="false">This amount is too large.</string>
+  <string name="native_this_attachment_link_expired_load" formatted="false">This attachment link expired. Load it again to check current access.</string>
+  <string name="native_this_change_could_not_be_saved" formatted="false">This change could not be saved.</string>
+  <string name="native_this_conversation_is_unavailable" formatted="false">This conversation is unavailable. Your input is kept.</string>
+  <string name="native_this_conversation_response_is_too" formatted="false">This conversation response is too large. Refresh to try again.</string>
+  <string name="native_this_creator" formatted="false">this creator</string>
+  <string name="native_this_creator_or_the_conversation" formatted="false">This creator or the conversation service is unavailable.</string>
+  <string name="native_this_destination_is_not_connected" formatted="false">This destination is not connected yet</string>
+  <string name="native_this_information_is_unavailable" formatted="false">This information is unavailable</string>
+  <string name="native_this_link_does_not_belong_to" formatted="false">This link does not belong to this app.</string>
+  <string name="native_this_link_is_unavailable" formatted="false">This link is unavailable.</string>
+  <string name="native_this_link_is_unavailable_open_the" formatted="false">This link is unavailable. Open the object from the app.</string>
+  <string name="native_this_posts_conversation_context" formatted="false">This post\'s conversation context is not connected yet. Remove the post context to continue to the current AI provider review.</string>
+  <string name="native_this_purchase_belongs_to_another" formatted="false">This purchase belongs to another app account. Switch to its original account before restoring.</string>
+  <string name="native_this_question_was_not_included_it" formatted="false">This question was not included. It did not pass the comparison privacy checks.</string>
+  <string name="native_this_recording_is_unavailable_for" formatted="false">This recording is unavailable for this conversation.</string>
+  <string name="native_this_recording_is_unavailable_reopen" formatted="false">This recording is unavailable. Reopen the conversation to try again.</string>
+  <string name="native_this_reply_is_withheld_for_safety" formatted="false">This reply is withheld for safety review.</string>
+  <string name="native_this_shows_when_an_authorized_account" formatted="false">This shows when an authorized account opened a conversation, not that a person read every message.</string>
+  <string name="native_this_signature_is_private_or_unavailable" formatted="false">This signature is private or unavailable. Current content access does not grant public verification access.</string>
+  <string name="native_this_source_message_is_unavailable" formatted="false">This source message is unavailable.</string>
+  <string name="native_this_week_minutes_minutes" formatted="false">This week · {minutes} minutes</string>
+  <string name="native_through_date" formatted="false">Through {date}</string>
+  <string name="native_time_history_unavailable" formatted="false">Time history unavailable.</string>
+  <string name="native_time_selected" formatted="false">{time} · Selected</string>
+  <string name="native_time_with_this_creators_a_i" formatted="false">Time with this creator\'s AI</string>
+  <string name="native_title_personally_fulfilled_by_name" formatted="false">{title} · personally fulfilled by {name}</string>
+  <string name="native_trust_inbox" formatted="false">Trust inbox</string>
+  <string name="native_try_again" formatted="false">Try again</string>
+  <string name="native_turn_off_off_the_record" formatted="false">Turn off off-the-record</string>
+  <string name="native_turn_on_off_the_record" formatted="false">Turn on off-the-record</string>
+  <string name="native_unmute_notes_from_this_creator" formatted="false">Unmute Notes from this creator</string>
+  <string name="native_until_date" formatted="false">Until {date}</string>
+  <string name="native_unused_memberships_cancelled_within" formatted="false">Unused memberships cancelled within seven days qualify for a full refund. Later refunds follow the remaining paid period; store refunds follow that store\'s process.</string>
+  <string name="native_update_thanks" formatted="false">Update Thanks</string>
+  <string name="native_used_of_allowance_shared_a_i_cost" formatted="false">{used} of {allowance} shared AI cost units used or reserved.</string>
+  <string name="native_verify_reaction" formatted="false">Verify reaction</string>
+  <string name="native_view_request" formatted="false">View request</string>
+  <string name="native_view_where_this_came_from" formatted="false">View where this came from</string>
+  <string name="native_w_h_a_t_i_t_r_e_m_e_m_b_e_r_s" formatted="false">WHAT IT REMEMBERS</string>
+  <string name="native_w_h_o_c_a_n_r_e_a_d_i_t" formatted="false">WHO CAN READ IT</string>
+  <string name="native_w_h_o_r_u_n_s_i_t" formatted="false">WHO RUNS IT</string>
+  <string name="native_waiting_for_device" formatted="false">Waiting for device…</string>
+  <string name="native_waiting_for_safety_review_it_has" formatted="false">Waiting for safety review. It has not reached the creator’s feed.</string>
+  <string name="native_was_it_clear_who_wrote_each" formatted="false">Was it clear who wrote each message?</string>
+  <string name="native_was_the_conversation_useful" formatted="false">Was the conversation useful?</string>
+  <string name="native_what_happened" formatted="false">What happened?</string>
+  <string name="native_what_names_a_i_remembers" formatted="false">What {name}\'s AI remembers</string>
+  <string name="native_what_you_want_remembered" formatted="false">What you want remembered</string>
+  <string name="native_where_this_came_from" formatted="false">Where this came from</string>
+  <string name="native_who_opened_your_conversations" formatted="false">Who opened your conversations</string>
+  <string name="native_withdraw_a_i_provider_consent" formatted="false">Withdraw AI provider consent</string>
+  <string name="native_withdraw_comparison_choice" formatted="false">Withdraw comparison choice</string>
+  <string name="native_withdraw_private_reply" formatted="false">Withdraw private reply</string>
+  <string name="native_withdraw_quote_permission" formatted="false">Withdraw quote permission</string>
+  <string name="native_withdraw_request" formatted="false">Withdraw request</string>
+  <string name="native_withdraw_thanks" formatted="false">Withdraw Thanks</string>
+  <string name="native_yes" formatted="false">Yes</string>
+  <string name="native_you" formatted="false">You</string>
+  <string name="native_you_came_from_names_page" formatted="false">You came from {name}\'s page</string>
+  <string name="native_you_choose_per_creator_whether_their" formatted="false">You choose, per creator, whether their AI may use this.</string>
+  <string name="native_you_havent_added_an_intro_yet" formatted="false">You haven’t added an intro yet.</string>
+  <string name="native_your_a_i_allowance_is_used_for" formatted="false">Your AI allowance is used for this period.</string>
+  <string name="native_your_account" formatted="false">Your account</string>
+  <string name="native_your_account_and_arrival_context" formatted="false">Your account and arrival context are kept. Return to your account or try again when this feature is available.</string>
+  <string name="native_your_account_changed_open_this_conversation" formatted="false">Your account changed. Open this conversation again.</string>
+  <string name="native_your_answer" formatted="false">Your answer</string>
+  <string name="native_your_answer_is_saved" formatted="false">Your answer is saved.</string>
+  <string name="native_your_answers_help_evaluate_usefulness" formatted="false">Your answers help evaluate usefulness and clear authorship. They do not affect access, ranking or payment. Feedback is retained for 90 days and included in account deletion.</string>
+  <string name="native_your_appeal_is_saved_for_a" formatted="false">Your appeal is saved for a different reviewer.</string>
+  <string name="native_your_block_is_saved_enforcement_in" formatted="false">Your block is saved. Enforcement in connected domains follows their current denial checks.</string>
+  <string name="native_your_cases" formatted="false">Your cases</string>
+  <string name="native_your_choice_ends_date" formatted="false">Your choice ends {date}.</string>
+  <string name="native_your_comparison_choice_is_saved_choose" formatted="false">Your comparison choice is saved. Choose a question in the conversation to include it.</string>
+  <string name="native_your_comparison_choice_is_withdrawn" formatted="false">Your comparison choice is withdrawn. Saved comparison questions and text have been removed. Affected exports remain unavailable while their files are removed.</string>
+  <string name="native_your_creator_data" formatted="false">Your creator data</string>
+  <string name="native_your_current_choices_are_saved" formatted="false">Your current choices are saved.</string>
+  <string name="native_your_data" formatted="false">Your data</string>
+  <string name="native_your_export_was_saved_to_the" formatted="false">Your export was saved to the destination you chose.</string>
+  <string name="native_your_feedback_is_saved" formatted="false">Your feedback is saved.</string>
+  <string name="native_your_increase_takes_effect_date" formatted="false">Your increase takes effect {date}.</string>
+  <string name="native_your_intro" formatted="false">Your intro</string>
+  <string name="native_your_intro_is_unavailable" formatted="false">Your intro is unavailable.</string>
+  <string name="native_your_limit_receipts_time_with_each" formatted="false">Your limit, receipts, time with each AI</string>
+  <string name="native_your_next_month_draft_is_saved" formatted="false">Your next-month draft is saved.</string>
+  <string name="native_your_pass" formatted="false">Your pass</string>
+  <string name="native_your_place_in_the_app_could" formatted="false">Your place in the app could not be kept. You can still open it again.</string>
+  <string name="native_your_private_replies" formatted="false">Your private replies</string>
+  <string name="native_your_purchases_and_deliveries" formatted="false">Your purchases and deliveries</string>
+  <string name="native_your_question" formatted="false">Your question</string>
+  <string name="native_your_replacement_is_saved" formatted="false">Your replacement is saved.</string>
+  <string name="native_your_request" formatted="false">Your request</string>
+  <string name="native_your_response_is_saved" formatted="false">Your response is saved.</string>
+  <string name="native_your_saved_place_is_unavailable_open" formatted="false">Your saved place is unavailable. Open it again from the app.</string>
+  <string name="native_your_session_changed_load_this_recording" formatted="false">Your session changed. Load this recording again.</string>
+  <string name="native_your_session_changed_refresh_your" formatted="false">Your session changed. Refresh your account before continuing.</string>
+  <string name="native_your_session_ended" formatted="false">Your session ended.</string>
+  <string name="native_your_session_ended_continue_with" formatted="false">Your session ended. Continue with Pantopus again.</string>
+  <string name="native_your_sharing_choice_is_saved" formatted="false">Your sharing choice is saved.</string>
+  <string name="native_your_sign_in_must_be_recent" formatted="false">Your sign-in must be recent. Continue with Pantopus again if asked to verify your account.</string>
+  <string name="native_your_spending_choice_is_saved" formatted="false">Your spending choice is saved.</string>
+  <string name="native_your_time_summary_is_unavailable" formatted="false">Your time summary is unavailable until conversation activity is connected.</string>
+  <string name="native_youre_offline" formatted="false">You\'re offline</string>
+  <string name="native_youre_seeing_a_saved_conversation" formatted="false">You\'re seeing a saved conversation with a short reading lease. Reconnect to send.</string>
+  <string name="native_youve_reached_threshold_of_your_monthly" formatted="false">You’ve reached {threshold}% of your monthly limit.</string>
+  <string name="native_count_members" formatted="false">{count} members</string>
+  <string name="native_label_at_time" formatted="false">{label} at {time}</string>
+  <string name="native_label_ends_date" formatted="false">{label} ends {date}</string>
+  <string name="native_minutes_minutes" formatted="false">{minutes} minutes</string>
+  <string name="native_name_ends_date" formatted="false">{name}: ends {date}</string>
+  <string name="native_name_reacted" formatted="false">{name} reacted</string>
+  <string name="native_name_renews_date" formatted="false">{name}: renews {date}</string>
+  <string name="native_retained_category" formatted="false">Retained: {category}</string>
+  <string name="native_time_u_t_c" formatted="false">{time} UTC</string>
 </resources>

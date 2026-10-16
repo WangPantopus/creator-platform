@@ -133,56 +133,56 @@ private struct ContentFanScreen: View {
                         Text(content.authorLabel).qText("label"); Text(content.document.title).qText("display-md").accessibilityAddTraits(.isHeader)
                         if let quote = content.quotedText { Text(quote).qText("body"); if let handle = content.quotedHandle { Text("@" + handle).qText("caption") } }
                         Text(content.displayText).qText("body")
-                        if content.signedActId != nil { Button("Signed", variant: .quiet) { signature = content.signedActId } }
+                        if content.signedActId != nil { Button(QelvoraCopy.text("nativeSigned"), variant: .quiet) { signature = content.signedActId } }
                     }
-                    if let count = content.audienceCount { Text("Audience size · \(count)").qText("caption") }
-                    if content.displayText != content.document.text { DisclosureGroup(content.signedActId == nil ? "Original text" : "Signed original") { Text(content.document.text).qText("body") } }
+                    if let count = content.audienceCount { Text(QelvoraCopy.text("nativeAudienceSizeCount", values: ["count": String(count)])).qText("caption") }
+                    if content.displayText != content.document.text { DisclosureGroup(content.signedActId == nil ? QelvoraCopy.text("nativeOriginalText") : QelvoraCopy.text("nativeSignedOriginal")) { Text(content.document.text).qText("body") } }
                     attachments(for: content)
                     if content.document.kind == "note" {
-                        Text("Your private replies").qText("display-md").accessibilityAddTraits(.isHeader)
-                        Text("Only you, the creator, and their permitted team can read your replies. A Note is a broadcast.").qText("caption")
+                        Text(QelvoraCopy.text("nativeYourPrivateReplies")).qText("display-md").accessibilityAddTraits(.isHeader)
+                        Text(QelvoraCopy.text("nativeOnlyYouTheCreatorAndTheir")).qText("caption")
                         if replyPolicy?.milestone != nil, let days = replyPolicy?.confirmedDays {
                             Text(QelvoraCopy.text("contentConfirmedTenure", values: ["days": String(days)])).qText("caption")
                         }
                         if replyPolicy == nil { Text(QelvoraCopy.text("contentReplyPolicyUnavailable")).qText("caption") }
-                        TextField("Reply privately", text: Binding(get: { replyText }, set: { value in
+                        TextField(QelvoraCopy.text("nativeReplyPrivately"), text: Binding(get: { replyText }, set: { value in
                             if value.utf16.count <= replyLimit || value.utf16.count < replyText.utf16.count { replyText = value }
-                        }), axis: .vertical).qText("body").lineLimit(3...8).accessibilityLabel("Private reply")
+                        }), axis: .vertical).qText("body").lineLimit(3...8).accessibilityLabel(QelvoraCopy.text("nativePrivateReply"))
                         Text(QelvoraCopy.text("contentReplyLimit", values: ["used": String(replyText.utf16.count), "limit": String(replyLimit)])).qText("caption")
                         if replyText.utf16.count > replyLimit { Text(QelvoraCopy.text("contentReplyOverLimit")).qText("caption") }
-                        Button("Send private reply", variant: .secondary, block: true, disabled: busy || !replyAccess || replyText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || replyText.trimmingCharacters(in: .whitespacesAndNewlines).utf16.count > replyLimit) { Task { await sendReply() } }
+                        Button(QelvoraCopy.text("nativeSendPrivateReply"), variant: .secondary, block: true, disabled: busy || !replyAccess || replyText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || replyText.trimmingCharacters(in: .whitespacesAndNewlines).utf16.count > replyLimit) { Task { await sendReply() } }
                         ForEach(replies.filter { $0.contentId == contentId }) { reply in
                             VStack(alignment: .leading, spacing: 12) {
                                 Text(reply.text).qText("body")
-                                if reply.safetyState != "allowed" { Text(reply.safetyState == "flagged" ? "This reply is withheld for safety review." : "Waiting for safety review. It has not reached the creator’s feed.").qText("caption") }
-                                if reply.safetyState == "pending",reply.safetyReviewAvailable == true { Button("Retry safety review",variant:.quiet,disabled:busy) { Task { if await mutate("replies/"+reply.id+"/review",["version":reply.version,"idempotencyKey":UUID().uuidString]) { await load(refreshThanks:false) } } } }
-                                if let reaction = reply.reaction { Text(content.creatorName + " reacted · " + reaction.kind).qText("caption"); Button("Verify reaction", variant: .quiet) { signature = reaction.signedActId } }
-                                Button("Withdraw private reply", variant: .quiet, disabled: busy) { Task { await withdraw(reply) } }
-                                Toggle("Allow this reply to be quoted", isOn: Binding(get: { reply.consent.shareText }, set: { value in Task { await consent(reply, text: value, handle: value && reply.consent.showHandle) } })).disabled(busy)
-                                Toggle("Show my handle on the quote", isOn: Binding(get: { reply.consent.showHandle }, set: { value in Task { await consent(reply, text: true, handle: value) } })).disabled(busy || !reply.consent.shareText)
+                                if reply.safetyState != "allowed" { Text(reply.safetyState == "flagged" ? QelvoraCopy.text("nativeThisReplyIsWithheldForSafety") : QelvoraCopy.text("nativeWaitingForSafetyReviewItHas")).qText("caption") }
+                                if reply.safetyState == "pending",reply.safetyReviewAvailable == true { Button(QelvoraCopy.text("nativeRetrySafetyReview"),variant:.quiet,disabled:busy) { Task { if await mutate("replies/"+reply.id+"/review",["version":reply.version,"idempotencyKey":UUID().uuidString]) { await load(refreshThanks:false) } } } }
+                                if let reaction = reply.reaction { Text(QelvoraCopy.text("nativeNameReactedKind", values: ["name": content.creatorName, "kind": reaction.kind])).qText("caption"); Button(QelvoraCopy.text("nativeVerifyReaction"), variant: .quiet) { signature = reaction.signedActId } }
+                                Button(QelvoraCopy.text("nativeWithdrawPrivateReply"), variant: .quiet, disabled: busy) { Task { await withdraw(reply) } }
+                                Toggle(QelvoraCopy.text("nativeAllowThisReplyToBeQuoted"), isOn: Binding(get: { reply.consent.shareText }, set: { value in Task { await consent(reply, text: value, handle: value && reply.consent.showHandle) } })).disabled(busy)
+                                Toggle(QelvoraCopy.text("nativeShowMyHandleOnTheQuote"), isOn: Binding(get: { reply.consent.showHandle }, set: { value in Task { await consent(reply, text: true, handle: value) } })).disabled(busy || !reply.consent.shareText)
                             }.padding(16).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: 16))
                         }
                         replyPageControls
-                        if let muted { Button(muted ? "Unmute Notes from this creator" : "Mute Notes from this creator", variant: .quiet, disabled: busy) { Task { if await mutate("mute", ["muted": !muted]) { await load(refreshThanks:false) } } } }
+                        if let muted { Button(muted ? QelvoraCopy.text("nativeUnmuteNotesFromThisCreator") : QelvoraCopy.text("nativeMuteNotesFromThisCreator"), variant: .quiet, disabled: busy) { Task { if await mutate("mute", ["muted": !muted]) { await load(refreshThanks:false) } } } }
                     }
-                    Text("This helped").qText("display-md").accessibilityAddTraits(.isHeader)
-                    TextField("Thanks · optional", text: $thanksText, axis: .vertical).qText("body").lineLimit(2...6)
-                    Toggle("Share this text with the creator’s digest", isOn: $shareDigest).disabled(busy || !thanksAccess).onChange(of: shareDigest) { _, value in if !value { showIdentity = false } }
-                    Toggle("Include my handle", isOn: $showIdentity).disabled(busy || !thanksAccess || !shareDigest)
-                    Button(thanks != nil && thanks?.withdrawn == false ? "Update Thanks" : "This helped", variant: .secondary, block: true, disabled: busy || !thanksAccess) { Task { await saveThanks(withdraw: false) } }
-                    if thanks != nil && thanks?.withdrawn == false { Button("Withdraw Thanks", variant: .quiet, disabled: busy || !thanksAccess) { Task { await saveThanks(withdraw: true) } } }
+                    Text(QelvoraCopy.text("thisHelped")).qText("display-md").accessibilityAddTraits(.isHeader)
+                    TextField(QelvoraCopy.text("nativeThanksOptional"), text: $thanksText, axis: .vertical).qText("body").lineLimit(2...6)
+                    Toggle(QelvoraCopy.text("nativeShareThisTextWithTheCreators"), isOn: $shareDigest).disabled(busy || !thanksAccess).onChange(of: shareDigest) { _, value in if !value { showIdentity = false } }
+                    Toggle(QelvoraCopy.text("nativeIncludeMyHandle"), isOn: $showIdentity).disabled(busy || !thanksAccess || !shareDigest)
+                    Button(thanks != nil && thanks?.withdrawn == false ? QelvoraCopy.text("nativeUpdateThanks") : QelvoraCopy.text("thisHelped"), variant: .secondary, block: true, disabled: busy || !thanksAccess) { Task { await saveThanks(withdraw: false) } }
+                    if thanks != nil && thanks?.withdrawn == false { Button(QelvoraCopy.text("nativeWithdrawThanks"), variant: .quiet, disabled: busy || !thanksAccess) { Task { await saveThanks(withdraw: true) } } }
                 } else {
-                    Text("Content unavailable").qText("display-md"); Button("Refresh", variant: .secondary, disabled: busy) { Task { await load() } }
+                    Text(QelvoraCopy.text("nativeContentUnavailable")).qText("display-md"); Button(QelvoraCopy.text("nativeRefresh"), variant: .secondary, disabled: busy) { Task { await load() } }
                     ForEach(replies.filter { $0.contentId == contentId }) { reply in
                         VStack(alignment: .leading,spacing:12) {
                             Text(reply.text).qText("body")
-                            if reply.consent.shareText || reply.consent.showHandle { Button("Withdraw quote permission", variant:.quiet,disabled:busy) { Task { await consent(reply,text:false,handle:false) } } }
-                            Button("Withdraw private reply",variant:.quiet,disabled:busy) { Task { await withdraw(reply) } }
+                            if reply.consent.shareText || reply.consent.showHandle { Button(QelvoraCopy.text("nativeWithdrawQuotePermission"), variant:.quiet,disabled:busy) { Task { await consent(reply,text:false,handle:false) } } }
+                            Button(QelvoraCopy.text("nativeWithdrawPrivateReply"),variant:.quiet,disabled:busy) { Task { await withdraw(reply) } }
                         }.padding(16).background(qColor("surface",scheme))
                     }
                     replyPageControls
-                    if thanks != nil && thanks?.withdrawn == false { Button("Withdraw Thanks",variant:.quiet,disabled:busy || !thanksAccess) { Task { await saveThanks(withdraw:true) } } }
-                    if let muted { Button(muted ? "Unmute Notes from this creator" : "Mute Notes from this creator",variant:.quiet,disabled:busy) { Task { if await mutate("mute",["muted": !muted]) { await load(refreshThanks:false) } } } }
+                    if thanks != nil && thanks?.withdrawn == false { Button(QelvoraCopy.text("nativeWithdrawThanks"),variant:.quiet,disabled:busy || !thanksAccess) { Task { await saveThanks(withdraw:true) } } }
+                    if let muted { Button(muted ? QelvoraCopy.text("nativeUnmuteNotesFromThisCreator") : QelvoraCopy.text("nativeMuteNotesFromThisCreator"),variant:.quiet,disabled:busy) { Task { if await mutate("mute",["muted": !muted]) { await load(refreshThanks:false) } } } }
                 }
                 }
             }.padding(16)
@@ -212,7 +212,7 @@ private struct ContentFanScreen: View {
         .onAppear { active = true }
         .onDisappear { active = false; loadGeneration += 1; clearAuthority() }
         .sheet(isPresented: Binding(get: { signature != nil }, set: { if !$0 { signature = nil; signatureStatus = "" } })) {
-            VStack(spacing: 16) { Text("Signature").qText("display-md"); Text(signatureStatus.isEmpty ? "Checking current signature…" : signatureStatus).qText("body"); Button("Done", variant: .secondary) { signature = nil; signatureStatus = "" } }.padding(24).task { await verify() }
+            VStack(spacing: 16) { Text(QelvoraCopy.text("nativeSignature")).qText("display-md"); Text(signatureStatus.isEmpty ? QelvoraCopy.text("nativeCheckingCurrentSignature") : signatureStatus).qText("body"); Button(QelvoraCopy.text("nativeDone"), variant: .secondary) { signature = nil; signatureStatus = "" } }.padding(24).task { await verify() }
         }
     }
     @ViewBuilder private func attachments(for content: ContentViewValue) -> some View {
@@ -223,7 +223,7 @@ private struct ContentFanScreen: View {
                         .id("\(viewerAccountId):\(content.id):\(content.version):\(attachment.id)")
                 }
             } else {
-                Text("Attachment information is unavailable. Refresh current access.").qText("caption")
+                Text(QelvoraCopy.text("nativeAttachmentInformationIsUnavailable")).qText("caption")
             }
         }
     }
@@ -258,12 +258,12 @@ private struct ContentFanScreen: View {
                 page=fresh;currentReplies=fresh.items;repliesAvailable=true
             } catch {
                 if (error as? ContentFailure)?.authorityDenied == true {throw error}
-                statuses.append("Private replies are unavailable. Refresh to try again.")
+                statuses.append(QelvoraCopy.text("nativePrivateRepliesAreUnavailable"))
             }
             var mine:ContentThanks?;var thanksAvailable=false
             do {mine=try await client.request(creatorId+"/thanks?targetKind=content&targetId="+contentId, expectedAccountId: before.accountId);thanksAvailable=true} catch {
                 if (error as? ContentFailure)?.authorityDenied == true {throw error}
-                statuses.append("Thanks is unavailable. Your input is kept; refresh before saving.")
+                statuses.append(QelvoraCopy.text("nativeThanksIsUnavailableYourInput"))
             }
             var policy: ContentReplyPolicy?
             do {
@@ -312,10 +312,10 @@ private struct ContentFanScreen: View {
     @ViewBuilder private var replyPageControls: some View {
         VStack(alignment: .leading, spacing: 8) {
             if replyCursors.count > 1 {
-                Button("Newer replies", variant: .secondary, disabled: busy || loading) { Task { await changeReplyPage(newer: true) } }
+                Button(QelvoraCopy.text("nativeNewerReplies"), variant: .secondary, disabled: busy || loading) { Task { await changeReplyPage(newer: true) } }
             }
             if let cursor = nextCursor {
-                Button("Older replies", variant: .secondary, disabled: busy || loading) { Task { await changeReplyPage(next: cursor) } }
+                Button(QelvoraCopy.text("nativeOlderReplies"), variant: .secondary, disabled: busy || loading) { Task { await changeReplyPage(next: cursor) } }
             }
         }
     }
@@ -335,6 +335,6 @@ private struct ContentFanScreen: View {
     @MainActor private func verify() async {
         guard currentAccess, let signature, let api = session.api else { return }
         do { let proof = try await api.publicSignature(signedActId: signature); guard self.signature == signature, currentAccess else { return }; signatureStatus = proof.creatorName + " · " + proof.status.rawValue.replacingOccurrences(of: "_", with: " ") + "\n" + proof.explanation }
-        catch { guard self.signature == signature, currentAccess else { return }; signatureStatus = "This signature is private or unavailable. Current content access does not grant public verification access." }
+        catch { guard self.signature == signature, currentAccess else { return }; signatureStatus = QelvoraCopy.text("nativeThisSignatureIsPrivateOrUnavailable") }
     }
 }

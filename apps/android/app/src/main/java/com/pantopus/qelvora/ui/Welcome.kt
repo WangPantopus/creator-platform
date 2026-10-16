@@ -14,6 +14,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import com.pantopus.qelvora.generated.QelvoraCopy
 import com.pantopus.qelvora.generated.QelvoraTokens
 import kotlinx.coroutines.launch
@@ -60,6 +62,17 @@ fun Welcome(returnTo: String = "/creators/maya", signIn: PantopusSignInProvider 
             BasicText(QelvoraCopy.text("pantopusAccount"), style = qText("caption").copy(color = qColor("ink-muted"), textAlign = TextAlign.Center))
             if (unavailable) BasicText(QelvoraCopy.text("pantopusUnavailable"), style = qText("caption").copy(color = qColor("alert")))
         }
+    }
+}
+
+/** The designed under-18 state (D-11): the policy and nothing else. No session
+ * exists and no part of the app opens from here, as on the web. */
+@Composable
+fun AdultsOnly() {
+    Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).padding(start = QelvoraTokens.space6, end = QelvoraTokens.space6, top = QelvoraTokens.welcomeTop), verticalArrangement = Arrangement.spacedBy(QelvoraTokens.welcomeGap)) {
+        BasicText(QelvoraCopy.brandName, style = wordmarkStyle().copy(color = qColor("ink")))
+        BasicText(QelvoraCopy.text("adultOnlyTitle"), style = qText("display-lg").copy(color = qColor("ink")), modifier = Modifier.semantics { heading() })
+        BasicText(QelvoraCopy.text("adultOnlyBody"), style = qText("body").copy(color = qColor("ink-muted")))
     }
 }
 
