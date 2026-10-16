@@ -233,7 +233,7 @@ private struct W3ThreadScreen: View {
     private func composerLabel(_ page: W3Page) -> String {
         QelvoraCopy.text(page.control == .human_active ? "replyToCreator" : "messageAI", values: ["name": page.creatorName])
     }
-    /// The thread's rows, the same in the lazy and the plain stack.
+    /// The thread's rows, in one plain stack at every text size.
     @ViewBuilder private func threadRows(_ page: W3Page) -> some View {
         if compact { IdentityStrip(state: page.control == .human_active ? .human : page.control == .ai_active ? .ai : .paused, name: page.creatorName) }
         if let offerId = model.introOfferId, session.session?.fan != nil, page.feedbackPolicy != nil {
