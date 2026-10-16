@@ -126,8 +126,7 @@ const accountD = accountOf(firstD);
 const ageD = await confirmAge(firstD, yearsAgo(30));
 step(
   "an adult keeps their account, email and token",
-  ageD.json?.status === "signed_in" &&
-    kept(accountD) === "active,f,1,1,1,0,0",
+  ageD.json?.status === "signed_in" && kept(accountD) === "active,f,1,1,1,0,0",
   kept(accountD),
 );
 
