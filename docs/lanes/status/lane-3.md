@@ -1,8 +1,8 @@
 # Lane 3: AI engine status
 
 Updated: 2026-10-16, by the lane 3 session
-Working on: A7 (frames, C5), PR A7_PR. Last done: B3 (citations), #477
-Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477, A7 A7_PR
+Working on: A7 (frames, C5), PR #482. Last done: B3 (citations), #477
+Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442). Open: A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451, finding 8 #455, finding 9 #456 (status only, decided), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482
 Next: finding 5 (socket closes during answers), then A5, B8, B7, B5 memory; remaining: A5 (safety sign-off), A7 (C5 frames), B6 (provider), B7 consent text, B8 My AI publish flow
 Blocked on: nothing. Later: the founder's A5 safety sign-off, the embedding choice (B6), the real model for B1's model check and finding 13 (gateway)
 
