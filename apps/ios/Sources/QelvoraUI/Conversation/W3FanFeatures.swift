@@ -47,7 +47,10 @@ private struct W3ConversationDestination: View {
 }
 
 /// Whether the reader is at the thread's newest row; read only by event handlers.
-private final class W3Follow { var atEnd = true }
+private final class W3Follow { var atEnd = true; var top: CGFloat? }
+/// Where the thread's rows sit in its visible part: their top edge, and how far
+/// their end lies below the visible part's bottom.
+private struct W3ThreadPlace: Equatable { let top: CGFloat; let gap: CGFloat }
 
 private struct W3ThreadScreen: View {
     let baseURL: URL
@@ -111,6 +114,17 @@ private struct W3ThreadScreen: View {
                         // at most 250 earlier messages and one page.
                         VStack(alignment: .leading, spacing: QelvoraTokens.space4) { threadRows(page) }
                             .padding(.horizontal, QelvoraTokens.space4).padding(.vertical, QelvoraTokens.space4)
+                            // The reader is at the newest row while the rows' end is in view.
+                            // Only the reader moving the rows (their top edge moves) leaves it:
+                            // rows arriving or growing below do not, so the thread follows them.
+                            .onGeometryChange(for: W3ThreadPlace.self) { geometry in
+                                let frame = geometry.frame(in: .named("thread-scroll"))
+                                return W3ThreadPlace(top: frame.minY, gap: frame.maxY - (geometry.bounds(of: .named("thread-scroll"))?.height ?? 0))
+                            } action: { place in
+                                defer { follow.top = place.top }
+                                if place.gap <= 40 { follow.atEnd = true }
+                                else if let top = follow.top, abs(place.top - top) > 0.5 { follow.atEnd = false }
+                            }
                     }.textSelection(.enabled)
                         .coordinateSpace(name: "thread-scroll")
                         // Open at the newest row and follow new rows while the reader is
@@ -248,12 +262,6 @@ private struct W3ThreadScreen: View {
             Button("Get support", variant: .quiet) { session.open("/support") }
         }
         Color.clear.frame(height: 1).id("conversation-end")
-            // At the newest row when this marker is within the visible part of the
-            // thread. Changes only when that answer changes, not on every frame.
-            .onGeometryChange(for: Bool.self) { geometry in
-                let visible = geometry.bounds(of: .named("thread-scroll"))?.height ?? 0
-                return geometry.frame(in: .named("thread-scroll")).minY <= visible + 40
-            } action: { atEnd in follow.atEnd = atEnd }
     }
     /// The thread's newest end, below the last row.
     private func toEnd(_ proxy: ScrollViewProxy) { proxy.scrollTo("conversation-end", anchor: .bottom) }
