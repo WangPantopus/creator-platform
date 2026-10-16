@@ -80,10 +80,14 @@ function controlFor(label, nodes) {
     )
     .sort((a, b) => a.w * a.h - b.w * b.h)[0];
 }
+// The composer: "Message {name}'s AI", or "Reply to {name}" while the creator is here.
 function inputControl() {
   const nodes = A.screen();
   return controlFor(
-    nodes.find((node) => node.desc.startsWith("Message ")),
+    nodes.find(
+      (node) =>
+        node.desc.startsWith("Message ") || node.desc.startsWith("Reply to "),
+    ),
     nodes,
   );
 }

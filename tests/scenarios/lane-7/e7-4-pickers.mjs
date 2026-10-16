@@ -21,13 +21,27 @@ async function open(path, actor = "devon", faults = []) {
   await A.waitFor("Crisis help", 30000);
   await L.sleep(1500);
 }
-/** Scrolls down with short drags until a label is on screen. */
+/** Waits for a label (the conversations load after the screen), then scrolls
+ * down and, if it is still not there, back up with short drags. */
 async function reveal(label) {
-  for (let i = 0; i < 10 && !has(label); i += 1) {
-    A.swipe(540, 1500, 540, 1000, 600);
+  const find = () =>
+    A.screen().find((n) => n.text === label || n.desc === label);
+  for (let i = 0; i < 6; i += 1) {
+    const node = find();
+    if (node) return node;
     await L.sleep(500);
   }
-  return A.screen().find((n) => n.text === label || n.desc === label);
+  for (const [from, to] of [
+    [1500, 1000],
+    [1000, 1500],
+  ])
+    for (let i = 0; i < 8; i += 1) {
+      const node = find();
+      if (node) return node;
+      A.swipe(540, from, 540, to, 600);
+      await L.sleep(500);
+    }
+  return find();
 }
 async function tapLabel(label) {
   const node = await reveal(label);
