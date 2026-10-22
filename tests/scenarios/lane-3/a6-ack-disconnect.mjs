@@ -25,6 +25,14 @@ import {
 } from "./lib.mjs";
 
 const { step, finish } = reporter();
+// A reused stack may contain an earlier evaluation with genuinely unknown
+// provider cost. Keep that receipt intact and inspect every new receipt here.
+const previousUnknownIds = (
+  await sql(
+    "SELECT id FROM creator.ai_usage WHERE creator_id=$1 AND cost_micros IS NULL",
+    [MAYA_CREATOR_ID],
+  )
+).map((row) => row.id);
 step(
   "Maya's AI is live",
   true,
@@ -45,8 +53,8 @@ step(
 const unknown = async () =>
   (
     await sql(
-      "SELECT count(*)::int AS n FROM creator.ai_usage WHERE creator_id=$1 AND cost_micros IS NULL",
-      [MAYA_CREATOR_ID],
+      "SELECT count(*)::int AS n FROM creator.ai_usage WHERE creator_id=$1 AND cost_micros IS NULL AND id <> ALL($2::uuid[])",
+      [MAYA_CREATOR_ID, previousUnknownIds],
     )
   )[0].n;
 const before =
@@ -108,7 +116,7 @@ step(
 step(
   "the safety check's cost is known or bounded, never left unknown",
   left === 0,
-  `${left} unknown row(s); last check row ${ackRows[0]?.provider}:${ackRows[0]?.cost ?? "unknown"}`,
+  `${left} new unknown row(s); ${previousUnknownIds.length} pre-existing unknown receipt(s) preserved; last check row ${ackRows[0]?.provider}:${ackRows[0]?.cost ?? "unknown"}`,
 );
 const sent = await call(API, "POST", `${fan2.thread}/messages`, {
   token: fan2.token,
