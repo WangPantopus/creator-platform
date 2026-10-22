@@ -19,7 +19,9 @@ the current recovery pass before the canonical database pool closes.
   `/v1/commerce/provider-notifications/stripe`, before JSON and session
   middleware. Collection-account checks and event deduplication are preserved.
 - Optional `COMMERCE_INBOX_DATABASE_URL` must name the separate restricted
-  `creator_commerce_inbox` login on the same loopback database. The host checks
+  `creator_commerce_inbox` login on the same loopback database. Database URLs
+  cannot contain query parameters or fragments that could override the host
+  or login in the PostgreSQL driver. The host checks
   role properties, ownership, memberships and the exact proposed column
   grants. Its pool discards idle connection failures without crashing the host
   or logging connection details. Without this role, incoming events stay
@@ -33,19 +35,19 @@ It called the stock API on port 56581, inspected PostgreSQL on 56580 and checked
 the fake processor's actual holds, captures and refunds on 56584. No recovery
 side process was started. Only deadlines in this disposable database moved.
 
-| Check                                                                                                  | Result                                                                                             |
-| ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
-| Submit, then wait before the decision deadline                                                         | One hold, request still submitted                                                                  |
-| Leave the request alone past its deadline                                                              | Expired/released; one provider release; ledger hold 5000, release 5000                             |
-| Read the fan's outcome and inspect capacity                                                            | Expired visible, slot returned, notice event retained unpublished                                  |
-| Sign and accept a second request                                                                       | Accepted/captured exactly once                                                                     |
-| Leave its undelivered commitment overdue                                                               | Fully refunded; ledger hold 5000, capture 5000, refund 5000; commitment `refunded/deadline_missed` |
-| Send a signed provider event twice to the stock API                                                    | Two 204 responses, one pending inbox row                                                           |
-| Bad signature, stale signature, wrong collection account                                               | 400, 400, 403 respectively; no inbox rows                                                          |
-| Existing money invariant sweep                                                                         | All nine checks passed; the scenario passed all eight steps                                        |
-| Actual backend startup with an invalid interval, core login as inbox, or disabled scheduler plus inbox | All three refused before listening and exited 1                                                    |
-| Inbox qualification SQL against the actual core runtime role                                           | Executed successfully and refused that role                                                        |
-| Backend typecheck; touched-source ESLint and Prettier                                                  | Passed                                                                                             |
+| Check                                                                                                                    | Result                                                                                             |
+| ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| Submit, then wait before the decision deadline                                                                           | One hold, request still submitted                                                                  |
+| Leave the request alone past its deadline                                                                                | Expired/released; one provider release; ledger hold 5000, release 5000                             |
+| Read the fan's outcome and inspect capacity                                                                              | Expired visible, slot returned, notice event retained unpublished                                  |
+| Sign and accept a second request                                                                                         | Accepted/captured exactly once                                                                     |
+| Leave its undelivered commitment overdue                                                                                 | Fully refunded; ledger hold 5000, capture 5000, refund 5000; commitment `refunded/deadline_missed` |
+| Send a signed provider event twice to the stock API                                                                      | Two 204 responses, one pending inbox row                                                           |
+| Bad signature, stale signature, wrong collection account                                                                 | 400, 400, 403 respectively; no inbox rows                                                          |
+| Existing money invariant sweep                                                                                           | All nine checks passed; the scenario passed all eight steps                                        |
+| Actual backend startup with an invalid interval, core login as inbox, disabled scheduler plus inbox, or query parameters | All four refused before listening and exited 1                                                     |
+| Inbox qualification SQL against the actual core runtime role                                                             | Executed successfully and refused that role                                                        |
+| Backend typecheck; touched-source ESLint and Prettier                                                                    | Passed                                                                                             |
 
 The scenario retired the offer it created. Applied SQL, migrations, catalogue
 pins and existing databases outside this disposable stack were unchanged.

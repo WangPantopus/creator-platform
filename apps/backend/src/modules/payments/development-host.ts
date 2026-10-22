@@ -22,7 +22,9 @@ function loopbackDatabase(value: string | undefined) {
     const url = new URL(value);
     return (
       ["postgres:", "postgresql:"].includes(url.protocol) &&
-      ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)
+      ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname) &&
+      !url.search &&
+      !url.hash
     );
   } catch {
     return false;
