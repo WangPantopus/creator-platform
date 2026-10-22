@@ -3,6 +3,10 @@ import { Client, type Pool, type PoolClient } from "pg";
 import { z } from "zod";
 import { canonical, contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
+import {
+  registeredWorkspaceLockReceipt,
+  workspaceLockTerminalReceipt,
+} from "../../db/workspace-lock-receipts.js";
 import { generationHostDatabase } from "../identity/generation-host-database.js";
 import { generationTransaction } from "../identity/generation-transaction.js";
 import {
@@ -19,6 +23,8 @@ import { verifyInHeldTransaction } from "../identity/generation-held-verificatio
 
 export const GENERATION_TERMINAL_JOURNAL_MIGRATION =
   "0188_w2_generation_terminal_journal";
+const originalMigrationChecksum =
+  "7ab8974d065b1b9e5befa2ded26c6978876957fab0eee80b9632825bbac98477";
 export const GENERATION_TERMINAL_JOURNAL_SIGNATURES = [
   "creator.generation_agent_journal_receipt(uuid,uuid)",
   "creator.generation_seal_agent_journal(uuid,uuid)",
@@ -114,21 +120,30 @@ export class PreparedGenerationTerminalJournal {
         }),
       ),
     );
+    const workspaceLocks = await Promise.all(
+      receipts.map(
+        async (receipt) =>
+          receipt.signature === workspaceLockTerminalReceipt &&
+          (await registeredWorkspaceLockReceipt(receipt)),
+      ),
+    );
+    input.signal?.throwIfAborted();
     invariant(
       receipts.length === GENERATION_TERMINAL_JOURNAL_SIGNATURES.length &&
         Hash.safeParse(input.privateHelperDefinitionChecksum).success &&
         Hash.safeParse(input.catalogueChecksum).success &&
         new Set(receipts.map((r) => r.signature)).size === receipts.length &&
         receipts.every(
-          (r) =>
+          (r, index) =>
             GENERATION_TERMINAL_JOURNAL_SIGNATURES.some(
               (s) => s === r.signature,
             ) &&
             r.owner === Owner &&
-            r.migration.version === GENERATION_TERMINAL_JOURNAL_MIGRATION &&
+            ((r.migration.version === GENERATION_TERMINAL_JOURNAL_MIGRATION &&
+              r.migration.checksum === originalMigrationChecksum) ||
+              workspaceLocks[index]) &&
             Hash.safeParse(r.migration.checksum).success &&
-            Hash.safeParse(r.definitionChecksum).success &&
-            r.migration.checksum === receipts[0]!.migration.checksum,
+            Hash.safeParse(r.definitionChecksum).success,
         ),
       "generation_terminal_journal_unconfigured",
       "Both exact reviewed terminal journal executables and catalogue are required.",
@@ -187,6 +202,8 @@ export class PreparedGenerationTerminalJournal {
           `SELECT (SELECT oid FROM pg_database WHERE datname=current_database()) AS "databaseOid",
            session_user='creator_generation_worker' AND current_user=session_user
            AND EXISTS(SELECT FROM creator.schema_migration WHERE version=$1 AND checksum=$2)
+           AND NOT EXISTS(SELECT FROM jsonb_to_recordset($5::jsonb) AS expected(version text,checksum text)
+             WHERE NOT EXISTS(SELECT FROM creator.schema_migration m WHERE m.version=expected.version AND m.checksum=expected.checksum))
            AND EXISTS(SELECT FROM pg_roles r WHERE r.rolname=$3 AND NOT r.rolcanlogin
             AND NOT r.rolinherit AND NOT r.rolsuper AND NOT r.rolbypassrls AND NOT r.rolcreatedb
             AND NOT r.rolcreaterole AND NOT r.rolreplication AND (r.rolconfig IS NULL OR cardinality(r.rolconfig)=0)
@@ -206,9 +223,10 @@ export class PreparedGenerationTerminalJournal {
            AS ready`,
           [
             GENERATION_TERMINAL_JOURNAL_MIGRATION,
-            receipts[0]!.migration.checksum,
+            originalMigrationChecksum,
             Owner,
             PrivateHelper,
+            JSON.stringify(receipts.map((receipt) => receipt.migration)),
           ],
         )
       ).rows[0];

@@ -209,6 +209,15 @@ export async function reviewedGenerationWorkerCustody(
     identity: {
       ...custody.identity,
       consumers: custody.identity.consumers?.map(replaced),
+      terminalConsumers: custody.identity.terminalConsumers?.map(replaced),
+    },
+    inputs: {
+      ...custody.inputs,
+      consumer: replaced(custody.inputs.consumer),
+    },
+    terminalJournal: {
+      ...custody.terminalJournal,
+      consumers: custody.terminalJournal.consumers.map(replaced),
     },
     accounting: {
       ...custody.accounting,
