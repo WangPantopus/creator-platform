@@ -10,8 +10,10 @@ export const generationQueuedChannel = "creator_generation_queued";
  * while it was disconnected is found by ordinary discovery. */
 export class GenerationWake {
   private client?: pg.Client;
-  private connecting = false;
+  private connecting?: Promise<void>;
+  private connectingClient?: pg.Client;
   private closed = false;
+  private closing?: Promise<void>;
   private retry?: ReturnType<typeof setTimeout>;
   private retryMs = 250;
 
@@ -29,13 +31,20 @@ export class GenerationWake {
     void this.connect();
   }
 
-  async close(): Promise<void> {
-    this.closed = true;
-    if (this.retry) clearTimeout(this.retry);
-    this.retry = undefined;
-    const client = this.client;
-    this.client = undefined;
-    await client?.end().catch(() => {});
+  close(): Promise<void> {
+    this.closing ??= (async () => {
+      this.closed = true;
+      if (this.retry) clearTimeout(this.retry);
+      this.retry = undefined;
+      const opening = this.connecting;
+      const client = this.client ?? this.connectingClient;
+      this.client = undefined;
+      // Opening sockets belong to this host too. End the socket first so a
+      // slow handshake cannot keep shutdown waiting until its own timeout.
+      await client?.end().catch(() => {});
+      await opening;
+    })();
+    return this.closing;
   }
 
   private scheduleReconnect(): void {
@@ -51,13 +60,23 @@ export class GenerationWake {
     this.retryMs = Math.min(2000, this.retryMs * 2);
   }
 
-  private async connect(): Promise<void> {
-    if (this.closed || this.client || this.connecting) return;
-    this.connecting = true;
+  private connect(): Promise<void> {
+    if (this.closed || this.client || this.connecting)
+      return this.connecting ?? Promise.resolve();
     const client = new pg.Client({
       connectionString: this.connectionString,
       connectionTimeoutMillis: 5000,
     });
+    this.connectingClient = client;
+    this.connecting = this.open(client).finally(() => {
+      this.connectingClient = undefined;
+      this.connecting = undefined;
+      if (!this.client) this.scheduleReconnect();
+    });
+    return this.connecting;
+  }
+
+  private async open(client: pg.Client): Promise<void> {
     const failed = () => {
       if (this.client === client) this.client = undefined;
       void client.end().catch(() => {});
@@ -73,7 +92,23 @@ export class GenerationWake {
         this.wake();
     });
     try {
-      await client.connect();
+      // pg intentionally leaves connect() pending when end() is called during
+      // its handshake. The actual socket's end is also a completed opening,
+      // so shutdown can await our attempt without leaking that pending wait.
+      await new Promise<void>((resolve, reject) => {
+        const ended = () => reject(new Error("Generation listener closed."));
+        client.once("end", ended);
+        void client.connect().then(
+          () => {
+            client.removeListener("end", ended);
+            resolve();
+          },
+          (cause: unknown) => {
+            client.removeListener("end", ended);
+            reject(cause);
+          },
+        );
+      });
       await client.query(`LISTEN ${generationQueuedChannel}`);
       if (this.closed) {
         await client.end().catch(() => {});
@@ -87,8 +122,6 @@ export class GenerationWake {
       // Never include a connection string or driver error in diagnostics.
       await client.end().catch(() => {});
       this.scheduleReconnect();
-    } finally {
-      this.connecting = false;
     }
   }
 }

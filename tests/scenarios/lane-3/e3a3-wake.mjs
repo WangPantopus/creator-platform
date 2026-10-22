@@ -3,13 +3,16 @@
 // real WebSocket; SQL reads the state behind the screen (when the worker claimed
 // each answer, how many answers each message got). Fakes: the development
 // identity and the stack's model fake, at the outer edge.
-//   node tests/scenarios/lane-3/e3a3-wake.mjs [--cases latency,idle,listener,restart,two,burst]
+//   node tests/scenarios/lane-3/e3a3-wake.mjs [--cases latency,idle,listener,shutdown,restart,two,burst]
 //     [--messages 8] [--burst 30] [--delay 300]
 // "restart" kills lane 3's own backend (by its recorded pid, only if it listens on
 // lane 3's API port) and restarts the stack; "two" starts a second backend on
 // port 56437 with the stack's own settings file and stops it afterwards.
 import { execFileSync, spawn } from "node:child_process";
+import { once } from "node:events";
 import { closeSync, openSync, readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import net from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
@@ -32,9 +35,10 @@ import {
 } from "./lib.mjs";
 
 const { step, finish } = reporter();
-const cases = flag("--cases", "latency,idle,listener,restart,two,burst").split(
-  ",",
-);
+const cases = flag(
+  "--cases",
+  "latency,idle,listener,shutdown,restart,two,burst",
+).split(",");
 const messages = Number(flag("--messages", "8"));
 const burst = Number(flag("--burst", "30"));
 const delayMs = Number(flag("--delay", "300"));
@@ -151,6 +155,48 @@ const listeners = async () =>
       "SELECT pid FROM pg_stat_activity WHERE usename='creator_generation_worker' AND query ILIKE 'LISTEN creator_generation_queued%'",
     )
   ).map((r) => r.pid);
+
+if (cases.includes("shutdown")) {
+  const require = createRequire(
+    new URL("../../../apps/backend/package.json", import.meta.url),
+  );
+  const { tsImport } = require("tsx/esm/api");
+  const { GenerationWake } = await tsImport(
+    "../../../apps/backend/src/workers/generation-wake.ts",
+    import.meta.url,
+  );
+  // A slow network edge accepts the PostgreSQL socket but holds its handshake.
+  // Closing the actual listener must drain that in-progress connection too.
+  const edge = net.createServer();
+  edge.listen(0, "127.0.0.1");
+  await once(edge, "listening");
+  const accepted = once(edge, "connection");
+  let woke = 0;
+  const wake = new GenerationWake(
+    `postgresql://scenario:scenario@127.0.0.1:${edge.address().port}/scenario`,
+    () => woke++,
+  );
+  let socket;
+  try {
+    wake.start();
+    [socket] = await accepted;
+    socket.resume();
+    const ended = once(socket, "close").then(() => true);
+    const started = performance.now();
+    await wake.close();
+    const drained = await Promise.race([ended, sleep(250).then(() => false)]);
+    await wake.close();
+    step(
+      "shutdown: closing during a PostgreSQL handshake drains the socket",
+      drained && woke === 0 && !wake.listening,
+      `socket closed ${drained}, wakeups ${woke}, elapsed ${Math.round(performance.now() - started)} ms`,
+    );
+  } finally {
+    socket?.destroy();
+    await wake.close();
+    await new Promise((resolve) => edge.close(resolve));
+  }
+}
 
 if (cases.includes("latency")) {
   const f = await fan(0);

@@ -609,11 +609,14 @@ export class PreparedGenerationProviderAccounting {
     call: () => Promise<T>,
     onAdmission?: (call: GenerationProviderCall) => void,
   ): Promise<T> {
-    let usage = this.unknownUsage();
+    // A committed admission is still a known zero until the provider call
+    // starts. Cancellation before that point must release its unused budget.
+    let usage: Usage = { ...this.unknownUsage(), costMicros: 0 };
     let sourceFailure: { cause: unknown } | undefined;
     try {
       onAdmission?.(this.issuedCall(admitted, task, attempt));
       signal.throwIfAborted();
+      usage = this.unknownUsage();
       const result = await call();
       usage = result.usage;
       return result;
@@ -664,11 +667,12 @@ export class PreparedGenerationProviderAccounting {
     call: () => AsyncIterable<StreamProposal>,
     onAdmission?: (call: GenerationProviderCall) => void,
   ): AsyncIterable<StreamProposal> {
-    let usage = this.unknownUsage();
+    let usage: Usage = { ...this.unknownUsage(), costMicros: 0 };
     let sourceFailure: { cause: unknown } | undefined;
     try {
       onAdmission?.(this.issuedCall(admitted, task, attempt));
       signal.throwIfAborted();
+      usage = this.unknownUsage();
       for await (const proposal of call()) {
         if ("usage" in proposal) usage = proposal.usage;
         yield proposal;

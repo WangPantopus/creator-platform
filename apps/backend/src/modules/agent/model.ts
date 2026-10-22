@@ -160,12 +160,15 @@ export function priceBoundedCalls(
     const outRate = Math.max(
       ...priced.map((rate) => rate!.outputMicrosPerMillion),
     );
-    micros +=
-      (call.inputTokens + CALL_OVERHEAD_TOKENS) * inRate +
-      (call.route === "embedding" ? 0 : outputTokenCap * outRate);
+    // Each provider receipt rounds its own cost up to a whole micro. Reserve
+    // those rounded costs too, rather than rounding only their sum.
+    micros += Math.ceil(
+      ((call.inputTokens + CALL_OVERHEAD_TOKENS) * inRate +
+        (call.route === "embedding" ? 0 : outputTokenCap * outRate)) /
+        1_000_000,
+    );
   }
-  const total = Math.ceil(micros / 1_000_000);
-  return Number.isSafeInteger(total) && total > 0 ? total : null;
+  return Number.isSafeInteger(micros) && micros > 0 ? micros : null;
 }
 
 /** The FAQ judge: the opposite stance from the boundary judge. These are the
