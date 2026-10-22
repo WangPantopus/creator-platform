@@ -515,9 +515,9 @@ export interface DigestItemProps {
 
 /* ---------- navigation ---------- */
 
-/** The studio's phone tabs: Notes, Requests, Threads, My AI and More. */
+/** The studio's phone tabs: Today, Requests, Threads, My AI and More. */
 export interface StudioTabBarProps {
-  active?: "Notes" | "Requests" | "Threads" | "My AI" | "More";
+  active?: "Today" | "Requests" | "Threads" | "My AI" | "More";
   /** Waiting packets and due commitments. */
   requests?: number;
 }

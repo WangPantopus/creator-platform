@@ -2459,7 +2459,7 @@ export function DigestItem(p: DigestItemProps) {
 /* ---------- navigation ---------- */
 export function StudioTabBar(p: StudioTabBarProps) {
   const tabs: [string, (s?: number) => React.ReactElement][] = [
-    ["Notes", G.broadcast],
+    ["Today", G.home],
     ["Requests", G.inbox],
     ["Threads", G.threads],
     ["My AI", G.ring],
@@ -2486,12 +2486,7 @@ export function StudioTabBar(p: StudioTabBarProps) {
           className: cx("qv-tab", active === t[0] && "is-active"),
           "aria-current": active === t[0] ? "page" : undefined,
         },
-        h(
-          "span",
-          { className: "qv-tab__icon" },
-          t[1](t[0] === "Notes" ? 17 : 22),
-          badge,
-        ),
+        h("span", { className: "qv-tab__icon" }, t[1](22), badge),
         t[0],
       );
     }),
@@ -2501,7 +2496,7 @@ export function Sidebar(p: SidebarProps) {
   const name = p.name || "Maya",
     active = p.active || "Requests";
   const main: [string, (s?: number) => React.ReactElement][] = [
-    ["Notes", G.broadcast],
+    ["Today", G.home],
     ["Requests", G.inbox],
     ["Threads", G.threads],
     ["My AI", G.ring],
@@ -2526,11 +2521,7 @@ export function Sidebar(p: SidebarProps) {
         className: cx("qv-side__item", active === t[0] && "is-active"),
         "aria-current": active === t[0] ? "page" : undefined,
       },
-      h(
-        "span",
-        { className: "qv-side__icon" },
-        t[1](t[0] === "Notes" ? 15 : 20),
-      ),
+      h("span", { className: "qv-side__icon" }, t[1](20)),
       h("span", { className: "qv-side__label" }, t[0]),
       count,
     );

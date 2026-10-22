@@ -208,18 +208,22 @@ export function Studio({
     Earnings: "/commerce/earnings",
     Team: `${root}/team`,
   };
-  const active =
-    current === "today"
-      ? "Today"
-      : current === "compose"
-        ? "Notes"
-        : current === "packets"
-          ? "Requests"
-          : current === "publish"
-            ? "Publish"
-            : current === "team"
-              ? "Team"
-              : current.charAt(0).toUpperCase() + current.slice(1);
+  const active = ["today", "notes", "compose"].includes(current)
+    ? "Today"
+    : current === "packets"
+      ? "Requests"
+      : current === "publish"
+        ? "Publish"
+        : current === "team"
+          ? "Team"
+          : current.charAt(0).toUpperCase() + current.slice(1);
+  const tabActive =
+    active === "Today" ||
+    active === "Requests" ||
+    active === "Threads" ||
+    active === "My AI"
+      ? active
+      : "More";
   const href = (label: string) =>
     paths[Object.keys(paths).find((k) => label.startsWith(k)) ?? "Notes"]!;
   if (!creatorId)
@@ -399,15 +403,7 @@ export function Studio({
           {navigationTree(
             StudioTabBar({
               requests,
-              // Today is not a tab (yet): the bar marks only an exact label
-              // match, so passing "Today" leaves every tab unselected.
-              active:
-                active === "Today" ||
-                ["Notes", "Requests", "Threads", "My AI", "More"].includes(
-                  active,
-                )
-                  ? (active as "Notes")
-                  : "More",
+              active: tabActive,
             }),
             href,
           )}

@@ -588,6 +588,10 @@ body {
   gap: 14px;
   padding: 16px;
 }
+.qv-note__body > .qv-voice {
+  white-space: pre-wrap;
+  unicode-bidi: plaintext;
+}
 .qv-note__media {
   height: 150px;
   border-radius: 10px;
