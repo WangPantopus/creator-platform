@@ -3,7 +3,11 @@ import { join } from "node:path";
 import pg from "pg";
 import { assertGenerationWaveRoleSafety } from "../../../scripts/migration-generation-roles.js";
 import { assertPrivacyWaveRoleSafety } from "../../../scripts/migration-privacy-roles.js";
-import { readLedger, sha256 } from "../../../scripts/migration-custody.js";
+import {
+  canonical,
+  readLedger,
+  sha256,
+} from "../../../scripts/migration-custody.js";
 import {
   waveDataDigest,
   waveDataTables,
@@ -35,10 +39,91 @@ export const FRESH_WAVES = [
   "20261008-comparison",
   "20261015-notices",
   "20261015-sign-in-and-money",
+  "20261022-workspace-lock",
 ] as const;
 
 type Source = { version: string; path: string; checksum: string };
-type Packet = { id: string; baseline: Source[]; wave: Source[] };
+type Packet = {
+  schemaVersion: number;
+  id: string;
+  baseline: Source[];
+  wave: Source[];
+};
+
+function registeredPackets(repoRoot: string): Packet[] {
+  const packets = FRESH_WAVES.map(
+    (id) =>
+      JSON.parse(
+        readFileSync(
+          join(repoRoot, `infra/migrations/waves/${id}.json`),
+          "utf8",
+        ),
+      ) as Packet,
+  );
+  const fail = (): never => {
+    throw new Error(
+      "The complete reviewed full-host wave chain and executable migration registry must match.",
+    );
+  };
+  const baseline = packets[0]!.baseline;
+  if (!Array.isArray(baseline) || baseline.length !== 61) fail();
+  const sources = [...baseline];
+  for (const [index, packet] of packets.entries()) {
+    if (
+      packet.schemaVersion !== 1 ||
+      packet.id !== FRESH_WAVES[index] ||
+      !Array.isArray(packet.wave) ||
+      packet.wave.length === 0 ||
+      canonical(packet.baseline) !== canonical(sources)
+    )
+      fail();
+    sources.push(...packet.wave);
+  }
+  const registry = JSON.parse(
+    readFileSync(join(repoRoot, "infra/migrations.json"), "utf8"),
+  ) as {
+    schemaVersion: number;
+    migrations: { version: string; path: string; sourceSha256?: string }[];
+  };
+  if (
+    registry.schemaVersion !== 1 ||
+    !Array.isArray(registry.migrations) ||
+    registry.migrations.length !== sources.length ||
+    new Set(sources.map((source) => source.version.slice(0, 4))).size !==
+      sources.length ||
+    new Set(sources.map((source) => source.path)).size !== sources.length ||
+    new Set(registry.migrations.map((source) => source.version)).size !==
+      sources.length ||
+    new Set(registry.migrations.map((source) => source.path)).size !==
+      sources.length
+  )
+    fail();
+  const canonicalVersions = new Set(baseline.map((source) => source.version));
+  for (const source of sources) {
+    const entry = registry.migrations.find(
+      (candidate) => candidate.version === source.version,
+    );
+    if (
+      !/^\d{4}_[a-z0-9_]+$/.test(source.version) ||
+      !/^(apps\/backend|infra\/migrations\/history)\/[a-zA-Z0-9_./-]+\.sql$/.test(
+        source.path,
+      ) ||
+      source.path.includes("..") ||
+      !/^[a-f0-9]{64}$/.test(source.checksum) ||
+      !entry ||
+      entry.path !== source.path ||
+      (entry.sourceSha256 === undefined
+        ? !canonicalVersions.has(source.version)
+        : entry.sourceSha256 !== source.checksum)
+    )
+      fail();
+    // Historical canonical entries predate registry source hashes. Their SQL
+    // still has to match the same fixed baseline checksum before any SQL runs.
+    if (sha256(readFileSync(join(repoRoot, source.path))) !== source.checksum)
+      throw new Error(`Pinned source changed: ${source.version}.`);
+  }
+  return packets;
+}
 
 export type FreshInstallInput = {
   /** Superuser (migration administrator) URL of the fresh database. */
@@ -48,15 +133,7 @@ export type FreshInstallInput = {
 };
 
 export async function installFullHost(input: FreshInstallInput) {
-  const packets = FRESH_WAVES.map(
-    (id) =>
-      JSON.parse(
-        readFileSync(
-          join(input.repoRoot, `infra/migrations/waves/${id}.json`),
-          "utf8",
-        ),
-      ) as Packet,
-  );
+  const packets = registeredPackets(input.repoRoot);
   const pool = new pg.Pool({ connectionString: input.databaseUrl, max: 1 });
   const client = await pool.connect();
   let locked = false;
@@ -157,7 +234,7 @@ export async function installFullHost(input: FreshInstallInput) {
     }
     // The same final assertions scripts/migrate-trust.ts runs on any database
     // that holds the wave graph, plus the original business-row check.
-    await assertGenerationWaveRoleSafety(client, "sign-in-and-money");
+    await assertGenerationWaveRoleSafety(client, "workspace-lock");
     await assertPrivacyWaveRoleSafety(client, {
       privacy: true,
       domain: true,
