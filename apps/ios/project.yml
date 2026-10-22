@@ -29,6 +29,7 @@ targets:
         CREATOR_API_URL: ""
         CREATOR_LINK_HOST: ""
         PRODUCT_BUNDLE_IDENTIFIER: com.pantopus.qelvora
+        CODE_SIGN_ENTITLEMENTS: App/QelvoraApp.entitlements
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Qelvora
         INFOPLIST_KEY_UILaunchScreen_Generation: YES

@@ -36,6 +36,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.isActive
 import kotlinx.serialization.json.Json
 
 data class ArrivalContext(val source: String, val title: String, val creatorName: String)
@@ -135,6 +136,13 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     var error by mutableStateOf("")
     var busy by mutableStateOf(false)
     var choosingActor by mutableStateOf(false)
+    internal var choosingIdentityProvider by mutableStateOf(false); private set
+    internal var signInProviders by mutableStateOf<List<NativeIdentityProvider>>(emptyList()); private set
+    internal var ageConfirmation by mutableStateOf<APIIdentitySignInResultAgeConfirmation?>(null); private set
+    internal var adultEligibilityDenied by mutableStateOf(false); private set
+    internal val showsSignIn: Boolean get() = choosingIdentityProvider || ageConfirmation != null || adultEligibilityDenied
+    private var identityAttempt = java.util.UUID.randomUUID()
+    private var signInAccount: String? = null
     var actors by mutableStateOf<List<APIIdentityCapabilitiesDevelopmentActorsItem>>(emptyList())
     var localPurgeFailed by mutableStateOf(false); private set
     var purgingPrivateState by mutableStateOf(false); private set
@@ -201,6 +209,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         purgingPrivateState = true; localPurgeFailed = true
         try {
             generation++; confirmedCredential = null; session = null; hasSavedCredential = false; checkingSession = false; actors = emptyList(); choosingActor = false; error = ""; history = emptyList()
+            cancelSignIn(); adultEligibilityDenied = false
             navigationInitialized = false; navigationRestoreAllowed = false; navigationPersistencePending = true
             GrowthPush.clearSession(context, pushCredential)
             var cleared = true
@@ -249,7 +258,10 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
                 if (runCatching { currentToken() }.getOrNull() != token) {
                     session = null; error = "Your session changed. Refresh your account before continuing."; return
                 }
-                if (failure.status == 401) {
+                val code = identityErrorCode(failure)
+                if (code == "adult_eligibility_required") { purge(); adultEligibilityDenied = true }
+                else if (code == "authorization_ended" || code == "scope_revoked" || code == "session_changed") { if (purge()) error = message(failure) }
+                else if (failure.status == 401) {
                     if (!busy) {
                         // A completed rotation performs its own guarded fresh read.
                         refreshingSession = false
@@ -284,20 +296,116 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     }
     fun removeArrival() { arrival = null; removedArrivalFor = destination.substringBefore('?'); move = Move.REPLACE; destination = removedArrivalFor!! }
     suspend fun beginSignIn() {
-        if (busy) return; busy = true
+        if (busy || purgingPrivateState) return
+        busy = true
+        var attempt = java.util.UUID.randomUUID()
         try {
             if (localPurgeFailed && !purge()) return
-            val client = api ?: error("unconfigured")
+            val client = api ?: throw NativeIdentityUnavailable()
+            attempt = java.util.UUID.randomUUID(); identityAttempt = attempt; signInAccount = session?.accountId
+            error = ""; adultEligibilityDenied = false; ageConfirmation = null
             val capability = client.identityCapabilities()
-            val available = capability.developmentActors.orEmpty()
-            if (!capability.signInAvailable) error = QelvoraCopy.text("pantopusUnavailable")
-            else if (BuildConfig.DEBUG && capability.mode == APIIdentityCapabilitiesMode.DEVELOPMENT && available.isNotEmpty()) { actors = available; choosingActor = true }
-            else error = "Pantopus account authorization is not connected for this native app. Your destination is kept."
+            if (attempt != identityAttempt) return
+            if (!capability.signInAvailable) { error = QelvoraCopy.text("signInUnavailable"); return }
+            if (BuildConfig.DEBUG && capability.mode == APIIdentityCapabilitiesMode.DEVELOPMENT) actors = capability.developmentActors.orEmpty()
+            signInProviders = NativeIdentityProvider.entries.filter { it.isConfigured && capability.providers.orEmpty().map { candidate -> candidate.name.lowercase() }.contains(it.value) }
+            if (signInProviders.isNotEmpty()) choosingIdentityProvider = true
+            else if (BuildConfig.DEBUG && actors.isNotEmpty()) choosingActor = true
+            else error = QelvoraCopy.text("signInUnavailable")
         }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-        catch (_: Exception) { error = QelvoraCopy.text("pantopusUnavailable") }
+        catch (_: Exception) { if (attempt == identityAttempt || api == null) error = QelvoraCopy.text("signInUnavailable") }
         finally { busy = false }
     }
+    internal fun cancelSignIn() {
+        identityAttempt = java.util.UUID.randomUUID(); choosingIdentityProvider = false; ageConfirmation = null; signInAccount = null; error = ""
+    }
+    internal fun expireSignInAge(id: String) {
+        if (busy || ageConfirmation?.ageContinuationId != id) return
+        ageConfirmation = null; choosingIdentityProvider = true; error = QelvoraCopy.text("signInFailed")
+    }
+    internal suspend fun signIn(provider: NativeIdentityProvider, credential: suspend (String) -> NativeIdentityCredential) {
+        val client = api ?: return
+        if (busy || !choosingIdentityProvider || !signInProviders.contains(provider)) return
+        busy = true; error = ""; val attempt = identityAttempt
+        try {
+            val nonce = client.startNativeSignIn(APINativeSignInStart(APINativeSignInStartProvider.GOOGLE, APINativeSignInStartPlatform.ANDROID, destination, signInAccount != null))
+            currentCoroutineContext().ensureActive()
+            if (attempt != identityAttempt) return
+            val proof = credential(nonce.nonce)
+            currentCoroutineContext().ensureActive()
+            if (attempt != identityAttempt) return
+            if (identityDeadline(nonce.expiresAt)?.isAfter(java.time.Instant.now()) != true) throw NativeIdentityUnavailable()
+            val result = client.completeNativeSignIn(APINativeSignInComplete(nonce.continuationId, APINativeSignInCompleteProvider.GOOGLE, proof.idToken, proof.authorizationCode))
+            if (attempt != identityAttempt || !currentCoroutineContext().isActive) { revokeUninstalledSignIn(result); return }
+            applySignIn(result)
+        }
+        catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+        catch (_: androidx.credentials.exceptions.GetCredentialCancellationException) { /* A cancelled sheet has no app effect. */ }
+        catch (failure: Exception) { if (attempt == identityAttempt) signInFailed(failure) }
+        finally { busy = false }
+    }
+    internal suspend fun confirmSignInAge(birthDate: String) {
+        val client = api ?: return
+        val age = ageConfirmation ?: return
+        if (busy) return
+        if (identityDeadline(age.expiresAt)?.isAfter(java.time.Instant.now()) != true) { expireSignInAge(age.ageContinuationId); return }
+        busy = true; error = ""; val attempt = identityAttempt
+        try {
+            val result = client.confirmIdentityAge(APIAgeConfirmationInput(age.ageContinuationId, birthDate))
+            if (attempt != identityAttempt || !currentCoroutineContext().isActive) { revokeUninstalledSignIn(result); return }
+            applySignIn(result)
+        }
+        catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+        catch (failure: Exception) { if (attempt == identityAttempt) signInFailed(failure) }
+        finally {
+            busy = false
+            ageConfirmation?.let { pending -> if (identityDeadline(pending.expiresAt)?.isAfter(java.time.Instant.now()) != true) expireSignInAge(pending.ageContinuationId) }
+        }
+    }
+    private suspend fun applySignIn(result: APIIdentitySignInResult) {
+        when (result.status) {
+            APIIdentitySignInResultStatus.AGE_REQUIRED -> {
+                val age = result.ageConfirmation ?: throw NativeIdentityUnavailable()
+                if (result.completion != null || identityDeadline(age.expiresAt)?.isAfter(java.time.Instant.now()) != true) throw NativeIdentityUnavailable()
+                choosingIdentityProvider = false; ageConfirmation = age
+            }
+            APIIdentitySignInResultStatus.SIGNED_IN -> {
+                val completion = result.completion ?: throw NativeIdentityUnavailable()
+                if (result.ageConfirmation != null || completion.token.isBlank() || !ApplicationDestination.isPermitted(completion.returnTo)) throw NativeIdentityUnavailable()
+                if (signInAccount != null && signInAccount != completion.session.accountId) {
+                    revokeUninstalledSignIn(result)
+                    throw NativeIdentityUnavailable()
+                }
+                if (!purge() || !currentCoroutineContext().isActive) { revokeUninstalledSignIn(result); return }
+                val installing = generation
+                try { storage.save(completion.token) }
+                catch (_: Exception) {
+                    revokeUninstalledSignIn(result)
+                    if (installing == generation && purge()) error = QelvoraCopy.text("identitySessionSaveFailed")
+                    return
+                }
+                if (installing != generation) { revokeUninstalledSignIn(result); return }
+                destination = completion.returnTo
+                refresh()
+            }
+        }
+    }
+    /** This cleanup is bound to the returned token, never the newer local session. */
+    private suspend fun revokeUninstalledSignIn(result: APIIdentitySignInResult) = withContext(NonCancellable) {
+        val origin = baseURL ?: return@withContext
+        val token = result.completion?.token?.takeIf { it.isNotBlank() } ?: return@withContext
+        runCatching { CreatorAPIClient(origin, maximumResponseBytes = 65_536, timeoutMs = 5_000) { token }.logout() }
+        Unit
+    }
+    private suspend fun signInFailed(failure: Exception) {
+        val code = identityErrorCode(failure)
+        if (code == "adult_eligibility_required") { purge(); adultEligibilityDenied = true; return }
+        if (code != "invalid_request") { ageConfirmation = null; choosingIdentityProvider = true }
+        if (code == "invalid_request") { error = message(failure); return }
+        error = QelvoraCopy.text(when (code) { "rate_limited" -> "signInRateLimited"; "identity_provider_unavailable", "sign_in_unconfigured" -> "signInUnavailable"; else -> "signInFailed" })
+    }
+    private fun identityErrorCode(failure: Exception): String? = (failure as? CreatorAPIError)?.let { runCatching { Json.decodeFromString<APIError>(it.body).error.code }.getOrNull() }
     suspend fun selectActor(id: String) {
         if (!BuildConfig.DEBUG || busy) return; val client = api ?: return; busy = true
         try {
@@ -403,7 +511,8 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
             generation++; rotatingCredential = false; refresh()
         }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-        catch (failure: CreatorAPIError) { if (current == generation) { if (failure.status == 401) { if (purge()) error = message(failure) } else error = message(failure) } }
+        catch (failure: CreatorAPIError) { if (current == generation) { if (identityErrorCode(failure) == "adult_eligibility_required") { purge(); adultEligibilityDenied = true }
+            else if (failure.status == 401 || identityErrorCode(failure) == "scope_revoked") { if (purge()) error = message(failure) } else error = message(failure) } }
         catch (_: Exception) { if (current == generation) error = "Session refresh could not complete. Reconnect and try again." }
         finally { busy = false; rotatingCredential = false }
     }
@@ -492,10 +601,11 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
     // the app to go, so at Home the system shows its own animation and leaves the app. A screen
     // with a sheet or step of its own registers its handler later, and that one wins.
     val signedOutScreen = model.session == null && features.any { it.matches(model.destination) && it.allowsSignedOut(model.destination) }
+    BackHandler(enabled = model.showsSignIn && !model.adultEligibilityDenied && !model.busy) { model.cancelSignIn() }
     BackHandler(enabled = model.choosingActor) { model.choosingActor = false }
-    BackHandler(enabled = !model.choosingActor && model.canGoBack && (model.session != null || signedOutScreen)) { model.back() }
+    BackHandler(enabled = !model.choosingActor && !model.showsSignIn && model.canGoBack && (model.session != null || signedOutScreen)) { model.back() }
     LaunchedEffect(model.destination) { model.loadArrival() }
-    LaunchedEffect(model, foreground) { if (foreground) { HarnessLaunch.resetIfRequested(context, model); model.refresh(); HarnessLaunch.signInIfRequested(context, model); while (true) { delay(4000); if (!model.choosingActor && !model.busy && (model.session != null || model.hasSavedCredential)) model.refresh() } } }
+    LaunchedEffect(model, foreground) { if (foreground) { HarnessLaunch.resetIfRequested(context, model); model.refresh(); HarnessLaunch.signInIfRequested(context, model); while (true) { delay(4000); if (!model.choosingActor && !model.showsSignIn && !model.busy && (model.session != null || model.hasSavedCredential)) model.refresh() } } }
     LaunchedEffect(model.session?.sessionId, model.checkingSession, foreground) {
         if (foreground && !model.checkingSession) GrowthPush.refresh(context)
     }
@@ -507,6 +617,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
         if (model.error.isNotEmpty()) Notice("error", "Account status", model.error)
         if (model.localPurgeFailed) Button(QelvoraCopy.text("identityPrivateClearRetry"), ButtonVariant.SECONDARY, block = true, disabled = model.busy || model.purgingPrivateState) { scope.launch { model.purge() } }
         when {
+            model.showsSignIn -> NativeSignInPane(model, scope)
             model.choosingActor -> Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Notice(title = "Development identity", children = "Synthetic isolated accounts. Pantopus production sign-in is not connected.")
                 model.actors.forEach { actor -> Button(actor.label, ButtonVariant.SECONDARY, block = true, disabled = model.busy) { scope.launch { model.selectActor(actor.id) } } }
@@ -527,7 +638,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                     Button("Crisis help", ButtonVariant.QUIET, block = true) { model.open("/trust/crisis") }
                 }
             }
-            model.session == null -> Welcome(returnTo = model.destination, showContext = model.arrival != null, contextSource = model.arrival?.source, contextTitle = model.arrival?.title, bodyCopy = model.arrival?.let { "Every message says who wrote it: ${it.creatorName}'s AI, ${it.creatorName}, or their team. You'll always know which." } ?: "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext = model::removeArrival, onContinue = { scope.launch { model.beginSignIn() } }, busy = model.busy || model.purgingPrivateState)
+            model.session == null -> Welcome(returnTo = model.destination, showContext = model.arrival != null, contextSource = model.arrival?.source, contextTitle = model.arrival?.title, continueLabel = QelvoraCopy.text("growthSignInToContinue"), accountNote = "", bodyCopy = model.arrival?.let { "Every message says who wrote it: ${it.creatorName}'s AI, ${it.creatorName}, or their team. You'll always know which." } ?: "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext = model::removeArrival, onContinue = { scope.launch { model.beginSignIn() } }, busy = model.busy || model.purgingPrivateState)
             model.session?.fan == null && features.any { it.matches(model.destination) && it.allowsSignedOut(model.destination) } -> key(model.session?.accountId, model.session?.sessionId, model.destination) { features.first { it.matches(model.destination) && it.allowsSignedOut(model.destination) }.screen(model) }
             (model.session?.fan == null && ApplicationDestination.requiresFanProfile(model.destination)) || model.destination == "/onboarding/handle" -> key(model.session?.accountId, model.session?.sessionId) { HandleForm(model) }
             else -> {
@@ -544,6 +655,7 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
                         Button(QelvoraCopy.text(if (model.session?.fan == null) "identityChooseHandle" else "identityEditPublicProfile"), ButtonVariant.SECONDARY, block = true) { model.destination = "/onboarding/handle" }
                         Button(QelvoraCopy.text("w5NativeTeamWorkspace"), ButtonVariant.SECONDARY, block = true, disabled = model.busy || model.checkingSession || model.purgingPrivateState || model.localPurgeFailed || model.error.isNotEmpty()) { model.open("/studio/workspace") }
                         Button("Sign out", ButtonVariant.SECONDARY, block = true) { scope.launch { model.logout() } }
+                        Button(QelvoraCopy.text("growthSignInToContinue"), ButtonVariant.SECONDARY, block = true, disabled = model.busy) { scope.launch { model.beginSignIn() } }
                         Button("Refresh session", ButtonVariant.SECONDARY, block = true, disabled = model.busy) { scope.launch { model.refreshCredentials() } }
                         Button("Sign out on all devices", ButtonVariant.QUIET, block = true) { scope.launch { model.logout(true) } }
                         Button("Help and reports", ButtonVariant.QUIET, block = true) { model.open("/support") }
@@ -571,7 +683,7 @@ private fun HandleForm(model: FanSession) {
             Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.size(44.dp).clickable(role = Role.Button) { model.back() }.semantics { contentDescription = "Back" }, contentAlignment = Alignment.Center) { Glyph("back", 22.dp, qColor("ink")) }
-                    BasicText(if (model.session?.mode == APISessionMode.DEVELOPMENT) "DEVELOPMENT SIGN-IN" else "SIGNED IN WITH PANTOPUS", style = qText("data-sm").copy(color = qColor("ink-muted")))
+                    BasicText(if (model.session?.mode == APISessionMode.DEVELOPMENT) "DEVELOPMENT SIGN-IN" else "SIGNED IN", style = qText("data-sm").copy(color = qColor("ink-muted")))
                 }
                 BasicText("How creators will know you", Modifier.semantics { heading() }, style = qText("display-lg").copy(color = qColor("ink")))
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

@@ -7,3 +7,32 @@ To operate the app signed in without the full stack, run the lane 7 fake API and
 Generated tokens, copy, SVG geometry and OpenAPI DTO/client files are owned by the shared generators. Do not edit them manually. Bundled fonts include OFL licenses. Network, identity and signing adapters must be configured before claiming those flows work.
 
 See [native verification limits](../../docs/implementation/native-foundation.md).
+
+## Provider sign-in
+
+The fan shell consumes C1's native nonce, completion and age endpoints. Sign in
+with Apple uses AuthenticationServices, hashes the server nonce with SHA-256, and
+sends Apple's identity token and authorization code to the backend. The app target
+has the Sign in with Apple entitlement; device distribution needs it enabled on
+the registered App ID and provisioning profile. The backend's Apple bundle
+audience must match the app. No provider secret belongs in the app.
+
+Only Apple currently has an iOS credential adapter. A backend advertising Google
+alone does not expose a nonworking button: iOS Google support remains a separate
+implementation task. No web callback transports an app session in a URL.
+
+Birth dates and provider tokens stay in memory only. The backend decides age and
+account eligibility; only a successful session token is saved in the Keychain.
+Fresh sign-in from an existing account refuses a different account and attempts
+to revoke that unwanted new app session. Cleanup uses the returned token, never
+the preserved account's token, with a bounded network timeout. The age step grants
+no private app access.
+
+For an operated C1 scenario with lane 1's fake provider, debug launch arguments
+`--harness-native-sub <synthetic-subject> --harness-provider-url
+http://127.0.0.1:<fake-provider-port>` replace only Apple's sheet. The real backend
+issues and consumes the nonce and returns the age decision. The hook is compiled
+out of release builds. The existing stack UI flow has an opt-in
+`testNativeSignInOnRealStack` scenario controlled by `QELVORA_SIGNIN_STACK_API` and
+`QELVORA_SIGNIN_FAKE_PROVIDER`; the real Apple sheet on a provisioned device remains
+separate acceptance.

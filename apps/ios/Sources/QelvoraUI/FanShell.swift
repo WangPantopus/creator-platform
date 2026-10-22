@@ -94,6 +94,13 @@ public final class FanSession: ObservableObject {
     @Published public var error = ""
     @Published public var busy = false
     @Published public var choosingDevelopmentActor = false
+    @Published private(set) var choosingIdentityProvider = false
+    @Published private(set) var signInProviders: [NativeIdentityProvider] = []
+    @Published private(set) var ageConfirmation: APIIdentitySignInResultAgeConfirmation?
+    @Published private(set) var adultEligibilityDenied = false
+    private var identityAttempt = UUID()
+    private var signInAccount: String?
+    var showsSignIn: Bool { choosingIdentityProvider || ageConfirmation != nil || adultEligibilityDenied }
     @Published public private(set) var arrival: ArrivalContext?
     @Published public private(set) var actors: [APIIdentityCapabilitiesDevelopmentActorsItem] = []
     @Published public private(set) var localPurgeFailed = false
@@ -276,7 +283,12 @@ public final class FanSession: ObservableObject {
             guard observedCredential == token else {
                 session = nil; error = "Your session changed. Refresh your account before continuing."; return
             }
-            if failure.status == 401 {
+            let code = Self.identityErrorCode(failure)
+            if code == "adult_eligibility_required" {
+                _ = await purge(); adultEligibilityDenied = true
+            } else if code == "authorization_ended" || code == "scope_revoked" || code == "session_changed" {
+                if await purge() { error = Self.message(failure) }
+            } else if failure.status == 401 {
                 if !busy { refreshingSession = false; await refreshCredentials() }
                 else { if await purge() { error = "Your session ended. Continue with Pantopus again." } }
             }
@@ -285,17 +297,118 @@ public final class FanSession: ObservableObject {
         catch { guard current == generation, !Task.isCancelled else { return }; confirmedCredential = nil; self.error = "Reconnect to refresh your account. Actions are unavailable while offline." }
     }
     public func beginSignIn() async {
-        guard !busy else { return }; busy = true; defer { busy = false }
+        guard !busy, !purgingPrivateState else { return }; busy = true; defer { busy = false }
         if localPurgeFailed, !(await purge()) { return }
-        guard let api else { error = QelvoraCopy.text("pantopusUnavailable"); return }
+        guard let api else { error = QelvoraCopy.text("signInUnavailable"); return }
+        let attempt = UUID(); identityAttempt = attempt; signInAccount = session?.accountId
+        error = ""; adultEligibilityDenied = false; ageConfirmation = nil
         do {
             let capabilities = try await api.identityCapabilities()
-            guard capabilities.signInAvailable else { error = QelvoraCopy.text("pantopusUnavailable"); return }
+            guard attempt == identityAttempt, !Task.isCancelled else { return }
+            guard capabilities.signInAvailable else { error = QelvoraCopy.text("signInUnavailable"); return }
             #if DEBUG
-            if capabilities.mode == .development, let available = capabilities.developmentActors, !available.isEmpty { actors = available; choosingDevelopmentActor = true; return }
+            if capabilities.mode == .development { actors = capabilities.developmentActors ?? [] }
             #endif
-            error = "Pantopus account authorization is not connected for this native app. Your destination is kept."
-        } catch { self.error = "Sign-in is unavailable. Reconnect and try again." }
+            signInProviders = NativeIdentityProvider.allCases.filter { $0.isConfigured && (capabilities.providers ?? []).map(\.rawValue).contains($0.rawValue) }
+            if !signInProviders.isEmpty { choosingIdentityProvider = true; return }
+            #if DEBUG
+            if !actors.isEmpty { choosingDevelopmentActor = true; return }
+            #endif
+            error = QelvoraCopy.text("signInUnavailable")
+        } catch is CancellationError { return }
+        catch { guard attempt == identityAttempt else { return }; self.error = QelvoraCopy.text("signInUnavailable") }
+    }
+    func cancelSignIn() {
+        identityAttempt = UUID(); choosingIdentityProvider = false; ageConfirmation = nil; signInAccount = nil
+        error = ""
+    }
+    func expireSignInAge(_ id: String) {
+        guard !busy, ageConfirmation?.ageContinuationId == id else { return }
+        ageConfirmation = nil; choosingIdentityProvider = true; error = QelvoraCopy.text("signInFailed")
+    }
+    func signIn(_ provider: NativeIdentityProvider, credential: @MainActor (String) async throws -> NativeIdentityCredential) async {
+        guard let api, !busy, choosingIdentityProvider, signInProviders.contains(provider) else { return }
+        busy = true; error = ""; let attempt = identityAttempt
+        defer { busy = false }
+        do {
+            let nonce = try await api.startNativeSignIn(body: APINativeSignInStart(provider: provider == .apple ? .apple : .google, platform: .ios, returnTo: destination, reauthenticate: signInAccount != nil))
+            guard attempt == identityAttempt, !Task.isCancelled else { return }
+            let proof = try await credential(nonce.nonce)
+            guard attempt == identityAttempt, !Task.isCancelled,
+                  let expiry = identityDeadline(nonce.expiresAt), expiry > Date() else { throw NativeIdentityFailure.invalidResponse }
+            let result = try await api.completeNativeSignIn(body: APINativeSignInComplete(continuationId: nonce.continuationId, provider: provider == .apple ? .apple : .google, idToken: proof.idToken, authorizationCode: proof.authorizationCode))
+            guard attempt == identityAttempt, !Task.isCancelled else { await revokeUninstalledSignIn(result); return }
+            try await applySignIn(result)
+        } catch is CancellationError { return }
+        catch NativeIdentityFailure.cancelled { return }
+        catch { guard attempt == identityAttempt else { return }; await signInFailed(error) }
+    }
+    func confirmSignInAge(_ birthDate: String) async {
+        guard let api, !busy, let age = ageConfirmation else { return }
+        guard let expiry = identityDeadline(age.expiresAt), expiry > Date() else { expireSignInAge(age.ageContinuationId); return }
+        busy = true; error = ""; let attempt = identityAttempt
+        defer {
+            busy = false
+            if let pending = ageConfirmation, identityDeadline(pending.expiresAt).map({ $0 <= Date() }) ?? true {
+                expireSignInAge(pending.ageContinuationId)
+            }
+        }
+        do {
+            let result = try await api.confirmIdentityAge(body: APIAgeConfirmationInput(ageContinuationId: age.ageContinuationId, birthDate: birthDate))
+            guard attempt == identityAttempt, !Task.isCancelled else { await revokeUninstalledSignIn(result); return }
+            try await applySignIn(result)
+        } catch is CancellationError { return }
+        catch { guard attempt == identityAttempt else { return }; await signInFailed(error) }
+    }
+    private func applySignIn(_ result: APIIdentitySignInResult) async throws {
+        switch result.status {
+        case .age_required:
+            guard result.completion == nil, let age = result.ageConfirmation,
+                  let deadline = identityDeadline(age.expiresAt), deadline > Date() else { throw NativeIdentityFailure.invalidResponse }
+            choosingIdentityProvider = false; ageConfirmation = age
+        case .signed_in:
+            guard result.ageConfirmation == nil, let completion = result.completion,
+                  !completion.token.isEmpty, ApplicationDestination.isPermitted(completion.returnTo) else { throw NativeIdentityFailure.invalidResponse }
+            if let expected = signInAccount, expected != completion.session.accountId {
+                await revokeUninstalledSignIn(result)
+                throw NativeIdentityFailure.invalidResponse
+            }
+            guard await purge(), !Task.isCancelled else { await revokeUninstalledSignIn(result); return }
+            let installing = generation
+            do { try await storage.save(completion.token) }
+            catch {
+                await revokeUninstalledSignIn(result)
+                if installing == generation, await purge() { self.error = QelvoraCopy.text("identitySessionSaveFailed") }
+                return
+            }
+            guard installing == generation else { await revokeUninstalledSignIn(result); return }
+            destination = completion.returnTo
+            await refresh()
+        }
+    }
+    /// Best-effort cleanup for a returned session that cannot be installed.
+    /// This client is bound to that returned token, never the current local one.
+    private func revokeUninstalledSignIn(_ result: APIIdentitySignInResult) async {
+        guard let baseURL, let token = result.completion?.token, !token.isEmpty else { return }
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.urlCache = nil; configuration.timeoutIntervalForRequest = 5; configuration.timeoutIntervalForResource = 5
+        let client = CreatorAPIClient(baseURL: baseURL, session: URLSession(configuration: configuration), maximumResponseBytes: 65_536, timeoutSeconds: 5, token: { token })
+        // An unstructured cleanup survives cancellation of the UI task.
+        let cleanup = Task { _ = try? await client.logout() }
+        await cleanup.value
+    }
+    private func signInFailed(_ failure: Error) async {
+        let code = Self.identityErrorCode(failure)
+        if code == "adult_eligibility_required" {
+            _ = await purge(); adultEligibilityDenied = true; return
+        }
+        if code != "invalid_request" { ageConfirmation = nil; choosingIdentityProvider = true }
+        if code == "invalid_request" { error = Self.message(failure); return }
+        error = QelvoraCopy.text(code == "rate_limited" ? "signInRateLimited" : code == "identity_provider_unavailable" || code == "sign_in_unconfigured" ? "signInUnavailable" : "signInFailed")
+    }
+    static func identityErrorCode(_ failure: Error) -> String? {
+        guard let error = failure as? CreatorAPIError else { return nil }
+        return (try? JSONDecoder().decode(APIError.self, from: error.body))?.error.code
     }
     public func selectActor(_ id: String) async {
         #if DEBUG
@@ -387,7 +500,8 @@ public final class FanSession: ObservableObject {
             guard current == generation else { return }
             generation += 1; rotatingCredential = false; await refresh()
         }
-        catch let failure as CreatorAPIError { guard current == generation, !Task.isCancelled else { return }; if failure.status == 401 { if await purge() { error = Self.message(failure) } } else { error = Self.message(failure) } }
+        catch let failure as CreatorAPIError { guard current == generation, !Task.isCancelled else { return }; if Self.identityErrorCode(failure) == "adult_eligibility_required" { _ = await purge(); adultEligibilityDenied = true }
+            else if failure.status == 401 || Self.identityErrorCode(failure) == "scope_revoked" { if await purge() { error = Self.message(failure) } } else { error = Self.message(failure) } }
         catch { guard current == generation, !Task.isCancelled else { return }; self.error = "Session refresh could not complete. Reconnect and try again." }
     }
     @discardableResult public func purge() async -> Bool {
@@ -395,6 +509,7 @@ public final class FanSession: ObservableObject {
         purgingPrivateState = true; localPurgeFailed = true
         defer { purgingPrivateState = false }
         generation += 1; confirmedCredential = nil; session = nil; hasSavedCredential = false; checkingSession = false; actors = []; choosingDevelopmentActor = false; error = ""; history = []
+        cancelSignIn(); adultEligibilityDenied = false
         navigationInitialized = false; navigationRestoreAllowed = false
         finishValidationWaiters()
         URLCache.shared.removeAllCachedResponses()
@@ -506,7 +621,9 @@ public struct FanAppShell: View {
                     shellNotices
                 }
             }
-            if model.choosingDevelopmentActor {
+            if model.showsSignIn {
+                NativeSignInPane(model: model)
+            } else if model.choosingDevelopmentActor {
                 ScrollView { VStack(spacing: 16) {
                     Notice(title: "Development identity", children: "Synthetic isolated accounts. Pantopus production sign-in is not connected.")
                     ForEach(model.actors, id: \.id) { actor in Button(actor.label, variant: .secondary, block: true, disabled: model.busy) { Task { await model.selectActor(actor.id) } } }
@@ -531,7 +648,7 @@ public struct FanAppShell: View {
                     }
                 }.padding(16)
             } else if model.session == nil {
-                Welcome(returnTo: model.destination, showContext: model.arrival != nil, contextSource: model.arrival?.source, contextTitle: model.arrival?.title, bodyCopy: model.arrival.map { "Every message says who wrote it: " + $0.creatorName + "'s AI, " + $0.creatorName + ", or their team. You'll always know which." } ?? "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext: model.removeArrival, onContinue: { Task { await model.beginSignIn() } }).id(model.arrival?.title)
+                Welcome(returnTo: model.destination, showContext: model.arrival != nil, contextSource: model.arrival?.source, contextTitle: model.arrival?.title, continueLabel: QelvoraCopy.text("growthSignInToContinue"), accountNote: "", bodyCopy: model.arrival.map { "Every message says who wrote it: " + $0.creatorName + "'s AI, " + $0.creatorName + ", or their team. You'll always know which." } ?? "Every message says who wrote it: the creator's AI, the creator, or their team. You'll always know which.", onRemoveContext: model.removeArrival, onContinue: { Task { await model.beginSignIn() } }).id(model.arrival?.title)
                     .disabled(model.busy || model.purgingPrivateState)
             } else if model.session?.fan == nil, let feature = features.first(where: { $0.matches(model.destination) && $0.allowsSignedOut(model.destination) }) {
                 feature.screen(model).id((model.session?.accountId ?? "") + (model.session?.sessionId ?? "") + model.destination)
@@ -547,6 +664,7 @@ public struct FanAppShell: View {
                             Button(QelvoraCopy.text(model.session?.fan == nil ? "identityChooseHandle" : "identityEditPublicProfile"), variant: .secondary, block: true) { model.destination = "/onboarding/handle" }
                             Button(QelvoraCopy.text("w5NativeTeamWorkspace"), variant: .secondary, block: true, disabled: model.busy || model.checkingSession || model.purgingPrivateState || model.localPurgeFailed || !model.error.isEmpty) { model.open("/studio/workspace") }
                             Button("Sign out", variant: .secondary, block: true) { Task { await model.logout() } }
+                            Button(QelvoraCopy.text("growthSignInToContinue"), variant: .secondary, block: true, disabled: model.busy) { Task { await model.beginSignIn() } }
                             Button("Refresh session", variant: .secondary, block: true, disabled: model.busy) { Task { await model.refreshCredentials() } }
                             Button("Sign out on all devices", variant: .quiet, block: true) { Task { await model.logout(all: true) } }
                             Button("Help and reports", variant: .quiet, block: true) { model.open("/support") }
@@ -582,7 +700,7 @@ public struct FanAppShell: View {
                 while !Task.isCancelled {
                     do { try await Task.sleep(for: .seconds(4)) } catch { return }
                     guard !Task.isCancelled else { return }
-                    if !model.busy && !model.choosingDevelopmentActor && (model.session != nil || model.hasSavedCredential) { await model.refresh() }
+                    if !model.busy && !model.choosingDevelopmentActor && !model.showsSignIn && (model.session != nil || model.hasSavedCredential) { await model.refresh() }
                 }
             }
             .task(id: model.destination + destinationDelivery.uuidString) { await model.loadArrival() }
@@ -635,7 +753,7 @@ public struct FanAppShell: View {
     }
     /// Back only when there is a screen to go back to that the person can see.
     private var backAvailable: Bool {
-        model.canGoBack && !model.choosingDevelopmentActor
+        model.canGoBack && !model.choosingDevelopmentActor && !model.showsSignIn
             && (model.session != nil || features.contains { $0.matches(model.destination) && $0.allowsSignedOut(model.destination) })
     }
     private var isConversation: Bool { model.destination.components(separatedBy: "?")[0].hasPrefix("/threads/") }
@@ -653,7 +771,7 @@ struct NativeHandleForm: View {
                     VStack(alignment: .leading, spacing: 24) {
                         HStack {
                             SwiftUI.Button { model.back() } label: { QelvoraGlyph(name: "back", size: 22).frame(width: 44, height: 44) }.buttonStyle(.plain).accessibilityLabel("Back")
-                            Spacer(); Text(model.session?.mode == .development ? "DEVELOPMENT SIGN-IN" : "SIGNED IN WITH PANTOPUS").qText("data-sm")
+                            Spacer(); Text(model.session?.mode == .development ? "DEVELOPMENT SIGN-IN" : "SIGNED IN").qText("data-sm")
                         }
                         Text("How creators will know you").qText("display-lg").accessibilityAddTraits(.isHeader)
                         VStack(alignment: .leading, spacing: 8) {
