@@ -29,9 +29,15 @@ import {
   type GenerationConsumerCustody,
 } from "./generation-consumer-catalogue.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
+import {
+  registeredWorkspaceLockReceipt,
+  workspaceLockSource,
+} from "../../db/workspace-lock-receipts.js";
 
 export const GENERATION_PROVIDER_MIGRATION =
   "0181_w2_generation_attempt_admission";
+const originalMigrationChecksum =
+  "eab8c8e07b8a1e6ba4384f5300560bd46853bf98509faade5a1b555e130c75ee";
 /** Replaces only the attempt admission function: an interrupted reply's
  * unknown cost counts as its whole hold instead of locking the creator. Its
  * receipt must cite this source once registered, and only then. */
@@ -176,9 +182,28 @@ export class PreparedGenerationProviderAccounting {
     const replaced = await registeredMigration(
       GENERATION_INTERRUPTED_COST_SOURCE,
     );
+    const workspaceLock = await registeredMigration(workspaceLockSource);
     const admission = GENERATION_PROVIDER_SIGNATURES[0];
-    const original = consumers.filter(
-      (c) => !replaced || c.signature !== admission,
+    const sourceAccepted = await Promise.all(
+      consumers.map(async (consumer) => {
+        // The lock wave replaces begin/open only. Completion still belongs
+        // to the original0181 source; never broaden all accounting receipts.
+        if (
+          workspaceLock &&
+          (consumer.signature === admission ||
+            consumer.signature === GENERATION_PROVIDER_SIGNATURES[1])
+        )
+          return registeredWorkspaceLockReceipt(consumer);
+        if (replaced && consumer.signature === admission)
+          return (
+            consumer.migration.version === replaced.version &&
+            consumer.migration.checksum === replaced.checksum
+          );
+        return (
+          consumer.migration.version === GENERATION_PROVIDER_MIGRATION &&
+          consumer.migration.checksum === originalMigrationChecksum
+        );
+      }),
     );
     invariant(
       Hash.safeParse(input.catalogueChecksum).success &&
@@ -188,17 +213,7 @@ export class PreparedGenerationProviderAccounting {
             consumers.filter((consumer) => consumer.signature === signature)
               .length === 1,
         ) &&
-        new Set(original.map((c) => c.migration.checksum)).size === 1 &&
-        original.every(
-          (c) => c.migration.version === GENERATION_PROVIDER_MIGRATION,
-        ) &&
-        (!replaced ||
-          consumers.some(
-            (c) =>
-              c.signature === admission &&
-              c.migration.version === replaced.version &&
-              c.migration.checksum === replaced.checksum,
-          )) &&
+        sourceAccepted.every(Boolean) &&
         consumers.every(
           (c) =>
             c.owner === owner &&
