@@ -1,5 +1,15 @@
 # Lane 7: Phone apps (iOS and Android) status
 
+## App-completion update, 2026-10-22
+
+The local app-completion branch now integrates native backend sign-in: Apple on
+iOS and Google on Android, nonce/age/session handling, secure restoration and
+under-18 policy refusal. Real-stack synthetic-provider journeys and builds
+passed; see [current native evidence](../../operations/native-sign-in-2026-10-22.md).
+iOS Google, platform age signals, real provider/device acceptance and the other
+phone work packages remain incomplete. The October 9 status below is history,
+not a claim about current PR or CI state.
+
 Updated: 2026-10-09, by the resumed lane 7 session (one session, both platforms).
 
 ## Resume update (2026-10-09)
