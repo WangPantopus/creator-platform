@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { ConversationSystemLinkSchema } from "./conversation/system-link.ts";
-import { identitySchemas, ReturnTargetSchema } from "./identity.ts";
+import {
+  identitySchemas,
+  IdentityProviderSchema,
+  ReturnTargetSchema,
+} from "./identity.ts";
 import * as agent from "./agent/contracts.ts";
 import * as commerce from "./commerce/contracts.ts";
 import * as media from "./media.ts";
@@ -90,7 +94,10 @@ export const IdentityRedirectSchema = z.strictObject({
 export const IdentityCapabilitiesSchema = z.strictObject({
   signInAvailable: z.boolean(),
   localAccountsAllowed: z.literal(false),
-  mode: z.enum(["development", "pantopus", "unconfigured"]).optional(),
+  mode: z
+    .enum(["development", "qelvora", "pantopus", "unconfigured"])
+    .optional(),
+  providers: z.array(IdentityProviderSchema).max(2).optional(),
   developmentActors: z
     .array(z.strictObject({ id: IdSchema, label: z.string() }))
     .optional(),

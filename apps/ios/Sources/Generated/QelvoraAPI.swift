@@ -6469,11 +6469,13 @@ public struct APIIdentityCapabilities: Codable, Sendable {
   public let `signInAvailable`: Bool
   public let `localAccountsAllowed`: APIIdentityCapabilitiesLocalAccountsAllowed
   public let `mode`: APIIdentityCapabilitiesMode?
+  public let `providers`: [APIIdentityCapabilitiesProvidersItem]?
   public let `developmentActors`: [APIIdentityCapabilitiesDevelopmentActorsItem]?
-  public init(signInAvailable: Bool, localAccountsAllowed: APIIdentityCapabilitiesLocalAccountsAllowed, mode: APIIdentityCapabilitiesMode? = nil, developmentActors: [APIIdentityCapabilitiesDevelopmentActorsItem]? = nil) {
+  public init(signInAvailable: Bool, localAccountsAllowed: APIIdentityCapabilitiesLocalAccountsAllowed, mode: APIIdentityCapabilitiesMode? = nil, providers: [APIIdentityCapabilitiesProvidersItem]? = nil, developmentActors: [APIIdentityCapabilitiesDevelopmentActorsItem]? = nil) {
     self.signInAvailable = signInAvailable
     self.localAccountsAllowed = localAccountsAllowed
     self.mode = mode
+    self.providers = providers
     self.developmentActors = developmentActors
   }
 }
@@ -6490,8 +6492,14 @@ public struct APIIdentityCapabilitiesLocalAccountsAllowed: Codable, Sendable {
 
 public enum APIIdentityCapabilitiesMode: String, Codable, Sendable {
   case `development` = "development"
+  case `qelvora` = "qelvora"
   case `pantopus` = "pantopus"
   case `unconfigured` = "unconfigured"
+}
+
+public enum APIIdentityCapabilitiesProvidersItem: String, Codable, Sendable {
+  case `apple` = "apple"
+  case `google` = "google"
 }
 
 public struct APIIdentityCapabilitiesDevelopmentActorsItem: Codable, Sendable {
@@ -11688,6 +11696,21 @@ public actor CreatorAPIClient {
   public func identitySession() async throws -> APISession {
     try await request("/v1/identity/session", method: "GET", authenticated: true)
   }
+  public func startWebSignIn(body: APIIdentityProviderContinue) async throws -> APIIdentityRedirect {
+    try await request("/v1/identity/web/start", method: "POST", body: JSONEncoder().encode(body), authenticated: false)
+  }
+  public func completeWebSignIn(body: APICompleteIdentity) async throws -> APIIdentitySignInResult {
+    try await request("/v1/identity/web/complete", method: "POST", body: JSONEncoder().encode(body), authenticated: false)
+  }
+  public func startNativeSignIn(body: APINativeSignInStart) async throws -> APINativeSignInNonce {
+    try await request("/v1/identity/native/nonce", method: "POST", body: JSONEncoder().encode(body), authenticated: false)
+  }
+  public func completeNativeSignIn(body: APINativeSignInComplete) async throws -> APIIdentitySignInResult {
+    try await request("/v1/identity/native/complete", method: "POST", body: JSONEncoder().encode(body), authenticated: false)
+  }
+  public func confirmIdentityAge(body: APIAgeConfirmationInput) async throws -> APIIdentitySignInResult {
+    try await request("/v1/identity/age", method: "POST", body: JSONEncoder().encode(body), authenticated: false)
+  }
   public func refreshSession() async throws -> APISessionToken {
     try await request("/v1/identity/refresh", method: "POST", authenticated: true)
   }
@@ -11881,7 +11904,7 @@ public actor CreatorAPIClient {
 
 public enum ApplicationDestination {
   public static func requiresFanProfile(_ value: String) -> Bool {
-    !isPermitted(value) || value.components(separatedBy: "?")[0].range(of: "^/(?:identity/account|status|ops(?:/.*)?|studio/(?:workspace|[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/team))$", options: .regularExpression) == nil
+    !isPermitted(value) || value.components(separatedBy: "?")[0].range(of: "^/(?:identity/account|status|ops(?:/.*)?|studio/(?:workspace|setup|[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/team))$", options: .regularExpression) == nil
   }
   public static func isPermitted(_ value: String) -> Bool {
     if value.count > 2048 || value.contains("%") || value.contains("\\") || value.contains("#") || value.rangeOfCharacter(from: .whitespacesAndNewlines) != nil { return false }
