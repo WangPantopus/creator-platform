@@ -5,6 +5,7 @@
 // log counts the row-lock refusals. Fakes: the development identity and the
 // model fake.
 //   node tests/scenarios/lane-3/e3a7-workspace-lock.mjs [--cases studio,two]
+//     [--container qelvora-lane3-postgres]
 // "studio": Maya's Studio reads her AI state every 150 ms while three fans ask
 //   three questions each (every Studio read locks the workspace row).
 // "two": a second backend on port 56437 with the stack's own settings file (so a
@@ -33,6 +34,7 @@ import {
 
 const { step, finish } = reporter();
 const cases = flag("--cases", "studio,two").split(",");
+const container = flag("--container", "qelvora-lane3-postgres");
 const root = new URL("../../..", import.meta.url).pathname;
 const stackDir = join(tmpdir(), "qelvora-stack", "lane3");
 const SECOND = "http://127.0.0.1:56437";
@@ -100,11 +102,11 @@ async function ask(f, text, api = API) {
 /** Row-lock refusals on the workspace row in lane 3's own database log. */
 const workspaceRefusals = (since) => {
   // PostgreSQL logs to stderr, which `docker logs` passes through as stderr.
-  const out = spawnSync(
-    "docker",
-    ["logs", "--since", since, "qelvora-lane3-postgres"],
-    { encoding: "utf8" },
-  );
+  const out = spawnSync("docker", ["logs", "--since", since, container], {
+    encoding: "utf8",
+  });
+  if (out.status !== 0)
+    throw new Error("The owned PostgreSQL container log is unavailable.");
   return `${out.stdout}${out.stderr}`
     .split("\n")
     .filter((l) =>

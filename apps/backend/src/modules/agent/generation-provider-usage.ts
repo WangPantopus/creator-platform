@@ -655,23 +655,14 @@ export class PreparedGenerationProviderAccounting {
   ): Promise<T> {
     signal.throwIfAborted();
     const admitted = await this.admit(task, attempt, category, signal, bookend);
-    let usage = this.unknownUsage();
-    let sourceFailure: { cause: unknown } | undefined;
-    try {
-      onAdmission?.(this.issuedCall(admitted, task, attempt));
-      signal.throwIfAborted();
-      const result = await call();
-      usage = result.usage;
-      return result;
-    } catch (error) {
-      sourceFailure = { cause: error };
-      if (error instanceof ProviderResponseError) usage = error.usage;
-      throw error;
-    } finally {
-      // No current read authority is required to record an already incurred
-      // charge after cancellation or invalid output. Missing usage stays unknown.
-      await this.finishRetainingFailure(admitted, usage, sourceFailure);
-    }
+    return this.withAdmittedUsage(
+      task,
+      attempt,
+      admitted,
+      signal,
+      call,
+      onAdmission,
+    );
   }
 
   async *withAdmittedStreamUsage(
@@ -711,21 +702,13 @@ export class PreparedGenerationProviderAccounting {
   ): AsyncIterable<StreamProposal> {
     signal.throwIfAborted();
     const admitted = await this.admit(task, attempt, "reply", signal, bookend);
-    let usage = this.unknownUsage();
-    let sourceFailure: { cause: unknown } | undefined;
-    try {
-      onAdmission?.(this.issuedCall(admitted, task, attempt));
-      signal.throwIfAborted();
-      for await (const proposal of call()) {
-        if ("usage" in proposal) usage = proposal.usage;
-        yield proposal;
-      }
-    } catch (error) {
-      sourceFailure = { cause: error };
-      if (error instanceof ProviderResponseError) usage = error.usage;
-      throw error;
-    } finally {
-      await this.finishRetainingFailure(admitted, usage, sourceFailure);
-    }
+    yield* this.withAdmittedStreamUsage(
+      task,
+      attempt,
+      admitted,
+      signal,
+      call,
+      onAdmission,
+    );
   }
 }
