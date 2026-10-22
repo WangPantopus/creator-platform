@@ -22,6 +22,7 @@ import {
 import type {
   Configuration,
   EvaluationCase,
+  FaqItem,
   Source,
   StudioState,
   Version,
@@ -30,6 +31,7 @@ import type {
 import {
   DEVELOPMENT_LICENSE_TERMS,
   DraftConfig as ConfigurationSchema,
+  FAQ_MAX_QUESTIONS,
   FAQ_MIN_QUESTIONS,
   FAQ_PASS_RATE,
   developmentProofReference,
@@ -78,6 +80,29 @@ function readDraft(key: string) {
   } catch {
     return null;
   }
+}
+function restoreConfiguration(value: unknown): Configuration | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const { faq, ...configuration } = value as Record<string, unknown>;
+  const restored = ConfigurationSchema.safeParse(configuration);
+  if (!restored.success) return null;
+  if (faq === undefined) return restored.data;
+  if (!Array.isArray(faq) || faq.length > FAQ_MAX_QUESTIONS) return null;
+  const items: FaqItem[] = [];
+  for (const item of faq) {
+    if (
+      !item ||
+      typeof item.question !== "string" ||
+      item.question.length > 500 ||
+      typeof item.answer !== "string" ||
+      item.answer.length > 2000
+    )
+      return null;
+    items.push({ question: item.question, answer: item.answer });
+  }
+  // A local editing buffer may have unfinished or duplicate rows. The server
+  // still validates complete, distinct questions when the creator saves.
+  return { ...restored.data, faq: items };
 }
 function storeDraft(key: string, value: unknown) {
   try {
@@ -623,9 +648,9 @@ export function CreatorAI({
             revision?: number;
             configuration?: unknown;
           } | null;
-          const restored = ConfigurationSchema.safeParse(draft?.configuration);
-          if (restored.success && Number.isInteger(draft?.revision)) {
-            setConfiguration(restored.data);
+          const restored = restoreConfiguration(draft?.configuration);
+          if (restored && Number.isInteger(draft?.revision)) {
+            setConfiguration(restored);
             draftRevision.current = draft!.revision!;
             dirtyRef.current = true;
             setDirty(true);

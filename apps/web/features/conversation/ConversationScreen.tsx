@@ -185,6 +185,7 @@ export function ConversationScreen({
     current.current = null;
     gate.current = null;
     setPage(null);
+    setMemory(null);
     setOlder([]);
     setBefore(null);
     setOnline(false);
@@ -267,7 +268,12 @@ export function ConversationScreen({
     const revision = lifecycle.current;
     try {
       const list = await request<MemoryList>(`${root}/memory`);
-      if (mounted.current && lifecycle.current === revision) setMemory(list);
+      if (mounted.current && lifecycle.current === revision)
+        // A background read can finish after a fan's memory decision. Keep
+        // the newer revision so a forgotten item cannot reappear.
+        setMemory((current) =>
+          !current || list.revision >= current.revision ? list : current,
+        );
     } catch {
       /* Memory prompts are optional; the memory view stays available. */
     }
@@ -329,6 +335,7 @@ export function ConversationScreen({
         current.current = null;
         gate.current = null;
         setPage(null);
+        setMemory(null);
         setOlder([]);
         setBefore(null);
         setDraft("");
@@ -350,6 +357,7 @@ export function ConversationScreen({
     mounted.current = true;
     lifecycle.current++;
     setPage(null);
+    setMemory(null);
     setIntroOfferId(null);
     setOlder([]);
     setDraft("");
@@ -744,7 +752,10 @@ export function ConversationScreen({
         expectedRevision: memory.revision,
         action,
       });
-      if (mounted.current && lifecycle.current === revision) setMemory(list);
+      if (mounted.current && lifecycle.current === revision)
+        setMemory((current) =>
+          !current || list.revision >= current.revision ? list : current,
+        );
     } catch (error) {
       if (mounted.current && lifecycle.current === revision) {
         setFailure(
