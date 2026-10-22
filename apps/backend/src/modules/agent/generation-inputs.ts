@@ -8,6 +8,7 @@ import {
 } from "../../../../../packages/api/src/agent/contracts.js";
 import { canonical, contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
+import { registeredWorkspaceLockReceipt } from "../../db/workspace-lock-receipts.js";
 import { PreparedContentGenerationOrigins } from "../content/generation-origin.js";
 import { generationHostDatabase } from "../identity/generation-host-database.js";
 import {
@@ -173,10 +174,13 @@ export class PreparedGenerationAgentInputs {
       migration: Object.freeze({ ...input.consumer.migration }),
     });
     input.identity.assertConsumerRegistered(receipt);
+    const workspaceLock = await registeredWorkspaceLockReceipt(receipt);
+    input.signal?.throwIfAborted();
     invariant(
       receipt.signature === GENERATION_INPUT_SIGNATURE &&
         receipt.owner === owner &&
-        receipt.migration.version === GENERATION_INPUT_MIGRATION &&
+        (receipt.migration.version === GENERATION_INPUT_MIGRATION ||
+          workspaceLock) &&
         Hash.safeParse(receipt.migration.checksum).success &&
         Hash.safeParse(receipt.definitionChecksum).success &&
         Hash.safeParse(input.catalogueChecksum).success,

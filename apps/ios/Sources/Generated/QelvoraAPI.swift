@@ -52,7 +52,8 @@ public struct APIAgentDraftConfig: Codable, Sendable {
   public let `sessionNudgeMinutes`: Int
   public let `usefulnessCriteria`: String
   public let `styleCriteria`: String
-  public init(mode: APIAgentDraftConfigMode, tone: APIAgentDraftConfigTone, styleCard: String, examples: [APIAgentDraftConfigExamplesItem], rules: [String], neverReveal: [String], handoff: String, dailyCostCapMicros: Int, sessionNudgeMinutes: Int, usefulnessCriteria: String, styleCriteria: String) {
+  public let `faq`: [APIAgentDraftConfigFaqItem]?
+  public init(mode: APIAgentDraftConfigMode, tone: APIAgentDraftConfigTone, styleCard: String, examples: [APIAgentDraftConfigExamplesItem], rules: [String], neverReveal: [String], handoff: String, dailyCostCapMicros: Int, sessionNudgeMinutes: Int, usefulnessCriteria: String, styleCriteria: String, faq: [APIAgentDraftConfigFaqItem]? = nil) {
     self.mode = mode
     self.tone = tone
     self.styleCard = styleCard
@@ -64,6 +65,7 @@ public struct APIAgentDraftConfig: Codable, Sendable {
     self.sessionNudgeMinutes = sessionNudgeMinutes
     self.usefulnessCriteria = usefulnessCriteria
     self.styleCriteria = styleCriteria
+    self.faq = faq
   }
 }
 
@@ -92,6 +94,15 @@ public struct APIAgentDraftConfigExamplesItem: Codable, Sendable {
   }
 }
 
+public struct APIAgentDraftConfigFaqItem: Codable, Sendable {
+  public let `question`: String
+  public let `answer`: String
+  public init(question: String, answer: String) {
+    self.question = question
+    self.answer = answer
+  }
+}
+
 public struct APIAgentDraftWrite: Codable, Sendable {
   public let `expectedRevision`: Int
   public let `configuration`: APIAgentDraftWriteConfiguration
@@ -113,7 +124,8 @@ public struct APIAgentDraftWriteConfiguration: Codable, Sendable {
   public let `sessionNudgeMinutes`: Int
   public let `usefulnessCriteria`: String
   public let `styleCriteria`: String
-  public init(mode: APIAgentDraftWriteConfigurationMode, tone: APIAgentDraftWriteConfigurationTone, styleCard: String, examples: [APIAgentDraftWriteConfigurationExamplesItem], rules: [String], neverReveal: [String], handoff: String, dailyCostCapMicros: Int, sessionNudgeMinutes: Int, usefulnessCriteria: String, styleCriteria: String) {
+  public let `faq`: [APIAgentDraftWriteConfigurationFaqItem]?
+  public init(mode: APIAgentDraftWriteConfigurationMode, tone: APIAgentDraftWriteConfigurationTone, styleCard: String, examples: [APIAgentDraftWriteConfigurationExamplesItem], rules: [String], neverReveal: [String], handoff: String, dailyCostCapMicros: Int, sessionNudgeMinutes: Int, usefulnessCriteria: String, styleCriteria: String, faq: [APIAgentDraftWriteConfigurationFaqItem]? = nil) {
     self.mode = mode
     self.tone = tone
     self.styleCard = styleCard
@@ -125,6 +137,7 @@ public struct APIAgentDraftWriteConfiguration: Codable, Sendable {
     self.sessionNudgeMinutes = sessionNudgeMinutes
     self.usefulnessCriteria = usefulnessCriteria
     self.styleCriteria = styleCriteria
+    self.faq = faq
   }
 }
 
@@ -153,6 +166,15 @@ public struct APIAgentDraftWriteConfigurationExamplesItem: Codable, Sendable {
   }
 }
 
+public struct APIAgentDraftWriteConfigurationFaqItem: Codable, Sendable {
+  public let `question`: String
+  public let `answer`: String
+  public init(question: String, answer: String) {
+    self.question = question
+    self.answer = answer
+  }
+}
+
 public struct APIAgentEvaluationRequest: Codable, Sendable {
   public let `expectedRevision`: Int
   public init(expectedRevision: Int) {
@@ -170,6 +192,15 @@ public struct APIAgentExample: Codable, Sendable {
     self.text = text
     self.fixed = fixed
     self.approved = approved
+  }
+}
+
+public struct APIAgentFaqItem: Codable, Sendable {
+  public let `question`: String
+  public let `answer`: String
+  public init(question: String, answer: String) {
+    self.question = question
+    self.answer = answer
   }
 }
 
@@ -7786,7 +7817,8 @@ public struct APIConversationConversationOfflineSnapshotPage: Codable, Sendable 
   public let `canSend`: Bool
   public let `unavailableReason`: String?
   public let `feedbackPolicy`: APIConversationConversationOfflineSnapshotPageFeedbackPolicy?
-  public init(threadId: String, creatorId: String, fanId: String, creatorName: String, fanHandle: String, control: APIConversationConversationOfflineSnapshotPageControl, epoch: Int, cursor: Int, revision: Int, generationSequences: [String: Int], messages: [APIConversationConversationOfflineSnapshotPageMessagesItem], before: Int? = nil, offTheRecord: Bool, introShared: Bool, consentCurrent: Bool, canSend: Bool, unavailableReason: String? = nil, feedbackPolicy: APIConversationConversationOfflineSnapshotPageFeedbackPolicy? = nil) {
+  public let `stepInAvailable`: Bool?
+  public init(threadId: String, creatorId: String, fanId: String, creatorName: String, fanHandle: String, control: APIConversationConversationOfflineSnapshotPageControl, epoch: Int, cursor: Int, revision: Int, generationSequences: [String: Int], messages: [APIConversationConversationOfflineSnapshotPageMessagesItem], before: Int? = nil, offTheRecord: Bool, introShared: Bool, consentCurrent: Bool, canSend: Bool, unavailableReason: String? = nil, feedbackPolicy: APIConversationConversationOfflineSnapshotPageFeedbackPolicy? = nil, stepInAvailable: Bool? = nil) {
     self.threadId = threadId
     self.creatorId = creatorId
     self.fanId = fanId
@@ -7805,6 +7837,7 @@ public struct APIConversationConversationOfflineSnapshotPage: Codable, Sendable 
     self.canSend = canSend
     self.unavailableReason = unavailableReason
     self.feedbackPolicy = feedbackPolicy
+    self.stepInAvailable = stepInAvailable
   }
   private enum CodingKeys: String, CodingKey {
     case `threadId`
@@ -7825,6 +7858,7 @@ public struct APIConversationConversationOfflineSnapshotPage: Codable, Sendable 
     case `canSend`
     case `unavailableReason`
     case `feedbackPolicy`
+    case `stepInAvailable`
   }
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -7846,6 +7880,7 @@ public struct APIConversationConversationOfflineSnapshotPage: Codable, Sendable 
     self.canSend = try container.decode(Bool.self, forKey: .canSend)
     self.unavailableReason = try container.decode(String?.self, forKey: .unavailableReason)
     self.feedbackPolicy = try container.decodeIfPresent(APIConversationConversationOfflineSnapshotPageFeedbackPolicy.self, forKey: .feedbackPolicy)
+    self.stepInAvailable = try container.decodeIfPresent(Bool.self, forKey: .stepInAvailable)
   }
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
@@ -7867,6 +7902,7 @@ public struct APIConversationConversationOfflineSnapshotPage: Codable, Sendable 
     try container.encode(canSend, forKey: .canSend)
     try container.encode(unavailableReason, forKey: .unavailableReason)
     try container.encodeIfPresent(feedbackPolicy, forKey: .feedbackPolicy)
+    try container.encodeIfPresent(stepInAvailable, forKey: .stepInAvailable)
   }
 }
 
@@ -8080,7 +8116,8 @@ public struct APIConversationConversationPage: Codable, Sendable {
   public let `canSend`: Bool
   public let `unavailableReason`: String?
   public let `feedbackPolicy`: APIConversationConversationPageFeedbackPolicy?
-  public init(threadId: String, creatorId: String, fanId: String, creatorName: String, fanHandle: String, control: APIConversationConversationPageControl, epoch: Int, cursor: Int, revision: Int, generationSequences: [String: Int], messages: [APIConversationConversationPageMessagesItem], before: Int? = nil, offTheRecord: Bool, introShared: Bool, consentCurrent: Bool, canSend: Bool, unavailableReason: String? = nil, feedbackPolicy: APIConversationConversationPageFeedbackPolicy? = nil) {
+  public let `stepInAvailable`: Bool?
+  public init(threadId: String, creatorId: String, fanId: String, creatorName: String, fanHandle: String, control: APIConversationConversationPageControl, epoch: Int, cursor: Int, revision: Int, generationSequences: [String: Int], messages: [APIConversationConversationPageMessagesItem], before: Int? = nil, offTheRecord: Bool, introShared: Bool, consentCurrent: Bool, canSend: Bool, unavailableReason: String? = nil, feedbackPolicy: APIConversationConversationPageFeedbackPolicy? = nil, stepInAvailable: Bool? = nil) {
     self.threadId = threadId
     self.creatorId = creatorId
     self.fanId = fanId
@@ -8099,6 +8136,7 @@ public struct APIConversationConversationPage: Codable, Sendable {
     self.canSend = canSend
     self.unavailableReason = unavailableReason
     self.feedbackPolicy = feedbackPolicy
+    self.stepInAvailable = stepInAvailable
   }
   private enum CodingKeys: String, CodingKey {
     case `threadId`
@@ -8119,6 +8157,7 @@ public struct APIConversationConversationPage: Codable, Sendable {
     case `canSend`
     case `unavailableReason`
     case `feedbackPolicy`
+    case `stepInAvailable`
   }
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -8140,6 +8179,7 @@ public struct APIConversationConversationPage: Codable, Sendable {
     self.canSend = try container.decode(Bool.self, forKey: .canSend)
     self.unavailableReason = try container.decode(String?.self, forKey: .unavailableReason)
     self.feedbackPolicy = try container.decodeIfPresent(APIConversationConversationPageFeedbackPolicy.self, forKey: .feedbackPolicy)
+    self.stepInAvailable = try container.decodeIfPresent(Bool.self, forKey: .stepInAvailable)
   }
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
@@ -8161,6 +8201,7 @@ public struct APIConversationConversationPage: Codable, Sendable {
     try container.encode(canSend, forKey: .canSend)
     try container.encode(unavailableReason, forKey: .unavailableReason)
     try container.encodeIfPresent(feedbackPolicy, forKey: .feedbackPolicy)
+    try container.encodeIfPresent(stepInAvailable, forKey: .stepInAvailable)
   }
 }
 

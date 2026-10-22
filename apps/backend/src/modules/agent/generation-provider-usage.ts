@@ -1,7 +1,10 @@
 import { createHash, randomBytes } from "node:crypto";
 import type { Pool, PoolClient } from "pg";
 import { z } from "zod";
-import type { Usage } from "../../../../../packages/api/src/agent/contracts.js";
+import {
+  DraftConfig,
+  type Usage,
+} from "../../../../../packages/api/src/agent/contracts.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import {
   GenerationIdentityAuthority,
@@ -18,6 +21,7 @@ import {
 import { PreparedGenerationJournal } from "./generation-journal.js";
 import { AgentService } from "./service.js";
 import type { AgentModel } from "./model.js";
+import { CONTEXT_BUDGET, maximumGenerationCalls } from "./pipeline.js";
 import { ProviderResponseError } from "./response-usage.js";
 import type { StreamProposal } from "./streaming.js";
 import {
@@ -25,9 +29,15 @@ import {
   type GenerationConsumerCustody,
 } from "./generation-consumer-catalogue.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
+import {
+  registeredWorkspaceLockReceipt,
+  workspaceLockSource,
+} from "../../db/workspace-lock-receipts.js";
 
 export const GENERATION_PROVIDER_MIGRATION =
   "0181_w2_generation_attempt_admission";
+const originalMigrationChecksum =
+  "eab8c8e07b8a1e6ba4384f5300560bd46853bf98509faade5a1b555e130c75ee";
 /** Replaces only the attempt admission function: an interrupted reply's
  * unknown cost counts as its whole hold instead of locking the creator. Its
  * receipt must cite this source once registered, and only then. */
@@ -68,6 +78,8 @@ export type GenerationProviderAttempt = Readonly<{
   modelFingerprint: string;
 }>;
 type Admitted = Readonly<{ id: string }>;
+/** A provider call admitted inside another held purpose (A4: the preflight). */
+export type GenerationProviderAdmission = Admitted;
 type Category = "reply" | "guardrail" | "memory";
 /** Nonsecret reference to one actually committed original provider admission.
  * Its private WeakMap binding, never these copied fields, supplies provenance. */
@@ -170,9 +182,28 @@ export class PreparedGenerationProviderAccounting {
     const replaced = await registeredMigration(
       GENERATION_INTERRUPTED_COST_SOURCE,
     );
+    const workspaceLock = await registeredMigration(workspaceLockSource);
     const admission = GENERATION_PROVIDER_SIGNATURES[0];
-    const original = consumers.filter(
-      (c) => !replaced || c.signature !== admission,
+    const sourceAccepted = await Promise.all(
+      consumers.map(async (consumer) => {
+        // The lock wave replaces begin/open only. Completion still belongs
+        // to the original0181 source; never broaden all accounting receipts.
+        if (
+          workspaceLock &&
+          (consumer.signature === admission ||
+            consumer.signature === GENERATION_PROVIDER_SIGNATURES[1])
+        )
+          return registeredWorkspaceLockReceipt(consumer);
+        if (replaced && consumer.signature === admission)
+          return (
+            consumer.migration.version === replaced.version &&
+            consumer.migration.checksum === replaced.checksum
+          );
+        return (
+          consumer.migration.version === GENERATION_PROVIDER_MIGRATION &&
+          consumer.migration.checksum === originalMigrationChecksum
+        );
+      }),
     );
     invariant(
       Hash.safeParse(input.catalogueChecksum).success &&
@@ -182,17 +213,7 @@ export class PreparedGenerationProviderAccounting {
             consumers.filter((consumer) => consumer.signature === signature)
               .length === 1,
         ) &&
-        new Set(original.map((c) => c.migration.checksum)).size === 1 &&
-        original.every(
-          (c) => c.migration.version === GENERATION_PROVIDER_MIGRATION,
-        ) &&
-        (!replaced ||
-          consumers.some(
-            (c) =>
-              c.signature === admission &&
-              c.migration.version === replaced.version &&
-              c.migration.checksum === replaced.checksum,
-          )) &&
+        sourceAccepted.every(Boolean) &&
         consumers.every(
           (c) =>
             c.owner === owner &&
@@ -290,9 +311,27 @@ export class PreparedGenerationProviderAccounting {
       licensedFacts ?? (await this.inputs.currentInTransaction(client, scope));
     if (licensedFacts)
       await this.inputs.authorizeLicensedInTransaction(facts, scope, client);
-    const ceiling = this.model.maximumRunCostMicros(
-      Buffer.byteLength(facts.version.compiledPrefix, "utf8"),
-    );
+    // A strict bound on what this run can send for this creator's actual
+    // configuration and message (founder decision 2026-10-15), each call at
+    // its own model's rate. Models without the bound keep the old envelope.
+    const ceiling =
+      this.model.maximumBoundedRunCostMicros &&
+      this.model.contextTokenCeiling &&
+      this.model.outputTokenCap
+        ? this.model.maximumBoundedRunCostMicros(
+            maximumGenerationCalls({
+              compiledPrefix: facts.version.compiledPrefix,
+              message: context.acceptedText,
+              configuration: DraftConfig.parse(facts.version.configuration),
+              sponsors: facts.sponsors,
+              contextTokenCeiling:
+                this.model.contextTokenCeiling(CONTEXT_BUDGET),
+              outputTokenCap: this.model.outputTokenCap,
+            }),
+          )
+        : this.model.maximumRunCostMicros(
+            Buffer.byteLength(facts.version.compiledPrefix, "utf8"),
+          );
     invariant(
       ceiling !== null &&
         Number.isSafeInteger(ceiling) &&
@@ -443,16 +482,17 @@ export class PreparedGenerationProviderAccounting {
     return this.identity.withGeneration(
       task,
       async (client, scope) => {
+        // One fresh read of the answer's authority and inputs precedes the
+        // admission; W1 still checks authority before its sole COMMIT, and
+        // every sentence's append re-checks its approval before and after.
         const facts = await bookend?.(client, scope);
-        const admitted = await this.openInTransaction(
+        return this.openInTransaction(
           client,
           scope,
           attempt,
           category,
           facts || undefined,
         );
-        await bookend?.(client, scope);
-        return admitted;
       },
       signal,
     );
@@ -549,6 +589,61 @@ export class PreparedGenerationProviderAccounting {
     }
   }
 
+  /** Admits one call inside the caller's own held W1 purpose, with the same
+   * checks as a separate admission. The caller must use it once through
+   * withAdmittedUsage, or release it unused. */
+  async admitInTransaction(
+    client: PoolClient,
+    scope: GenerationTaskScope,
+    attempt: GenerationProviderAttempt,
+    category: Category,
+    licensedFacts?: GenerationAgentFacts,
+  ): Promise<GenerationProviderAdmission> {
+    return this.openInTransaction(
+      client,
+      scope,
+      attempt,
+      category,
+      licensedFacts,
+    );
+  }
+
+  /** An admitted call that was never made sent no request: a known zero. */
+  async releaseUnused(admitted: GenerationProviderAdmission): Promise<void> {
+    await this.finish(admitted, {
+      ...this.unknownUsage(),
+      costMicros: 0,
+    });
+  }
+
+  async withAdmittedUsage<T extends { usage: Usage }>(
+    task: GenerationTask,
+    attempt: GenerationProviderAttempt,
+    admitted: GenerationProviderAdmission,
+    signal: AbortSignal,
+    call: () => Promise<T>,
+    onAdmission?: (call: GenerationProviderCall) => void,
+  ): Promise<T> {
+    // A committed admission is still a known zero until the provider call
+    // starts. Cancellation before that point must release its unused budget.
+    let usage: Usage = { ...this.unknownUsage(), costMicros: 0 };
+    let sourceFailure: { cause: unknown } | undefined;
+    try {
+      onAdmission?.(this.issuedCall(admitted, task, attempt));
+      signal.throwIfAborted();
+      usage = this.unknownUsage();
+      const result = await call();
+      usage = result.usage;
+      return result;
+    } catch (error) {
+      sourceFailure = { cause: error };
+      if (error instanceof ProviderResponseError) usage = error.usage;
+      throw error;
+    } finally {
+      await this.finishRetainingFailure(admitted, usage, sourceFailure);
+    }
+  }
+
   async withUsage<T extends { usage: Usage }>(
     task: GenerationTask,
     attempt: GenerationProviderAttempt,
@@ -560,21 +655,39 @@ export class PreparedGenerationProviderAccounting {
   ): Promise<T> {
     signal.throwIfAborted();
     const admitted = await this.admit(task, attempt, category, signal, bookend);
-    let usage = this.unknownUsage();
+    return this.withAdmittedUsage(
+      task,
+      attempt,
+      admitted,
+      signal,
+      call,
+      onAdmission,
+    );
+  }
+
+  async *withAdmittedStreamUsage(
+    task: GenerationTask,
+    attempt: GenerationProviderAttempt,
+    admitted: GenerationProviderAdmission,
+    signal: AbortSignal,
+    call: () => AsyncIterable<StreamProposal>,
+    onAdmission?: (call: GenerationProviderCall) => void,
+  ): AsyncIterable<StreamProposal> {
+    let usage: Usage = { ...this.unknownUsage(), costMicros: 0 };
     let sourceFailure: { cause: unknown } | undefined;
     try {
       onAdmission?.(this.issuedCall(admitted, task, attempt));
       signal.throwIfAborted();
-      const result = await call();
-      usage = result.usage;
-      return result;
+      usage = this.unknownUsage();
+      for await (const proposal of call()) {
+        if ("usage" in proposal) usage = proposal.usage;
+        yield proposal;
+      }
     } catch (error) {
       sourceFailure = { cause: error };
       if (error instanceof ProviderResponseError) usage = error.usage;
       throw error;
     } finally {
-      // No current read authority is required to record an already incurred
-      // charge after cancellation or invalid output. Missing usage stays unknown.
       await this.finishRetainingFailure(admitted, usage, sourceFailure);
     }
   }
@@ -589,21 +702,13 @@ export class PreparedGenerationProviderAccounting {
   ): AsyncIterable<StreamProposal> {
     signal.throwIfAborted();
     const admitted = await this.admit(task, attempt, "reply", signal, bookend);
-    let usage = this.unknownUsage();
-    let sourceFailure: { cause: unknown } | undefined;
-    try {
-      onAdmission?.(this.issuedCall(admitted, task, attempt));
-      signal.throwIfAborted();
-      for await (const proposal of call()) {
-        if ("usage" in proposal) usage = proposal.usage;
-        yield proposal;
-      }
-    } catch (error) {
-      sourceFailure = { cause: error };
-      if (error instanceof ProviderResponseError) usage = error.usage;
-      throw error;
-    } finally {
-      await this.finishRetainingFailure(admitted, usage, sourceFailure);
-    }
+    yield* this.withAdmittedStreamUsage(
+      task,
+      attempt,
+      admitted,
+      signal,
+      call,
+      onAdmission,
+    );
   }
 }

@@ -13528,6 +13528,30 @@
             "default": "",
             "type": "string",
             "maxLength": 2000
+          },
+          "faq": {
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                },
+                "answer": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2000
+                }
+              },
+              "required": [
+                "question",
+                "answer"
+              ],
+              "additionalProperties": false
+            }
           }
         },
         "required": [
@@ -13659,6 +13683,30 @@
                 "default": "",
                 "type": "string",
                 "maxLength": 2000
+              },
+              "faq": {
+                "maxItems": 50,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "question": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 500
+                    },
+                    "answer": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 2000
+                    }
+                  },
+                  "required": [
+                    "question",
+                    "answer"
+                  ],
+                  "additionalProperties": false
+                }
               }
             },
             "required": [
@@ -13724,6 +13772,27 @@
           "text",
           "fixed",
           "approved"
+        ],
+        "additionalProperties": false
+      },
+      "AgentFaqItem": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "answer": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "question",
+          "answer"
         ],
         "additionalProperties": false
       },
@@ -27184,6 +27253,9 @@
                     "type": "null"
                   }
                 ]
+              },
+              "stepInAvailable": {
+                "type": "boolean"
               }
             },
             "required": [
@@ -27774,6 +27846,9 @@
                 "type": "null"
               }
             ]
+          },
+          "stepInAvailable": {
+            "type": "boolean"
           }
         },
         "required": [
