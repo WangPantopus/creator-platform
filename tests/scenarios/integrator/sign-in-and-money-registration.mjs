@@ -1,7 +1,7 @@
 // Registration of the 20261015-sign-in-and-money wave (0249_w1_qelvora_sign_in
 // from #431, 0250_w4_capture_guard from #410, 0251_w2_interrupted_cost_estimate
-// from #433): on a stack built from nothing, the pins match, the ledger holds the
-// wave, the database grants exactly the reviewed reach, and an export and a
+// from #433), plus 0252 workspace-lock when registered: on a fresh stack the
+// pins match, the ledger holds the wave, the database grants exactly the reviewed reach, and an export and a
 // delete run through the real privacy API. Runs once against a freshly built
 // lane 0 stack (a deleted fan stays closed; add --growth for the Growth login):
 //   node infra/local/stack.mjs reset --lane 0 [--growth]
@@ -14,12 +14,27 @@ import { ACTORS, call, key, reporter, signIn, sleep } from "../lane-2/lib.mjs";
 
 const { step, advise, finish } = reporter();
 const repo = join(dirname(fileURLToPath(import.meta.url)), "../../..");
-const BASE = "http://127.0.0.1:56401";
+const lane = process.env.REGISTRATION_LANE ?? "0";
+const basePort = Number(process.env.REGISTRATION_BASE_PORT ?? 56400);
+if (
+  !/^[a-z0-9-]+$/u.test(lane) ||
+  !Number.isSafeInteger(basePort) ||
+  basePort < 1024 ||
+  basePort > 65526
+)
+  throw new Error("Use an owned local stack lane and valid base port.");
+const BASE = `http://127.0.0.1:${basePort + 1}`;
+const registry = JSON.parse(
+  readFileSync(join(repo, "infra/migrations.json"), "utf8"),
+);
+const workspaceLock = registry.migrations.some(
+  (source) => source.version === "0252_w2_workspace_lock_wait",
+);
 const growth = process.argv.includes("--growth");
 const sql = (text) =>
   execFileSync(
     "docker",
-    ["exec", "qelvora-lane0-postgres", "psql", "-U", "postgres"].concat([
+    ["exec", `qelvora-lane${lane}-postgres`, "psql", "-U", "postgres"].concat([
       "-d",
       "creator_stack",
       "-qtA",
@@ -36,31 +51,46 @@ const WAVE = [
   "0249_w1_qelvora_sign_in",
   "0250_w4_capture_guard",
   "0251_w2_interrupted_cost_estimate",
+  ...(workspaceLock ? ["0252_w2_workspace_lock_wait"] : []),
 ];
 
 const pins = spawnSync(
   process.execPath,
-  [join(repo, "infra/local/stack.mjs"), "catalogues", "check", "--lane", "0"],
+  [
+    join(repo, "infra/local/stack.mjs"),
+    "catalogues",
+    "check",
+    "--lane",
+    lane,
+    "--base-port",
+    String(basePort),
+  ],
   { cwd: repo, encoding: "utf8" },
 );
 const summary =
   (pins.stdout ?? "").split("\n").find((l) => /pin groups match/u.test(l)) ??
   "";
+const pinFailures = (pins.stdout ?? "")
+  .split("\n")
+  .filter((line) => line.startsWith("FAIL  "));
+const expectedGrowthDifference =
+  pins.status === 1 &&
+  /44 of 45/u.test(summary) &&
+  pinFailures.length === 1 &&
+  pinFailures[0].startsWith("FAIL  runtimeCatalogues.family  ");
 step(
   "the pinned catalogues match this database",
-  growth ? /44 of 45/u.test(summary) : pins.status === 0,
+  growth ? expectedGrowthDifference : pins.status === 0,
   growth
     ? `${summary} (with the Growth login: the known runtimeCatalogues.family difference)`
     : summary,
 );
-const registered = JSON.parse(
-  readFileSync(join(repo, "infra/migrations.json"), "utf8"),
-).migrations.length;
+const registered = registry.migrations.length;
 const ledger = sql(
   `SELECT count(*)||' '||string_agg(version,',' ORDER BY version) FILTER (WHERE version IN (${WAVE.map((v) => `'${v}'`).join(",")})) FROM creator.schema_migration`,
 );
 step(
-  "the ledger holds the whole registry, the three wave sources included",
+  "the ledger holds the whole registry, all registered wave sources included",
   ledger === `${registered} ${WAVE.join(",")}`,
   ledger,
 );
@@ -106,23 +136,30 @@ step(
   guard === "O creator_owner false",
   guard,
 );
-const definition = sql(
-  "SELECT encode(sha256(convert_to(pg_get_functiondef('creator.generation_begin_agent_attempt(uuid,uuid,text,text,bigint,text)'::regprocedure),'UTF8')),'hex')",
-);
 const review = JSON.parse(
   readFileSync(
-    join(repo, "infra/migrations/reviews/20261015-sign-in-and-money.json"),
+    join(
+      repo,
+      workspaceLock
+        ? "infra/migrations/reviews/20261022-workspace-lock.json"
+        : "infra/migrations/reviews/20261015-sign-in-and-money.json",
+    ),
     "utf8",
   ),
 );
-step(
-  "the admission function carries the reviewed 0251 definition",
-  definition ===
-    review.generationDefinitions[
-      "creator.generation_begin_agent_attempt(uuid,uuid,text,text,bigint,text)"
-    ].definitionChecksum,
-  definition.slice(0, 12),
-);
+for (const [signature, receipt] of Object.entries(
+  review.generationDefinitions,
+)) {
+  const quoted = signature.replaceAll("'", "''");
+  const actual = sql(
+    `SELECT pg_get_userbyid(proowner)||' '||encode(sha256(convert_to(pg_get_functiondef(oid),'UTF8')),'hex') FROM pg_proc WHERE oid='${quoted}'::regprocedure`,
+  );
+  step(
+    `generation definition and owner match: ${signature}`,
+    actual === `${receipt.owner} ${receipt.definitionChecksum}`,
+    receipt.source,
+  );
+}
 
 /** Create a privacy job as one account and poll its tasks until they settle. */
 async function job(account, kind) {
