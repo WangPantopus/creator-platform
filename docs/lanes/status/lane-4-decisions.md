@@ -1,68 +1,117 @@
 # Lane 4: decisions for the founder
 
-Each question has a proposed default. Lane 4 keeps working on other things meanwhile and changes
-nothing below until you answer. Reply with the number and "yes" (take the default), or your choice.
+On 2026-10-16 the founder told lane 4 to stop waiting on yes/no decisions and to take the proposed
+default for each one. Each such decision below says "taken as the proposed default". It is built in
+its own pull request, so you can still veto it there before it merges: reply with the number and
+your choice.
 
-## 1. Does a refunded payment count against the fan's monthly spend limit? (WP 4.3, E4.8)
+## Open
 
-**Today:** yes. The limit counts every payment captured this calendar month (UTC), plus every open
-hold. A refund does not give the room back. The money suite records this as an open product
-question (`OBSERVATION (INV-16, D-21)` in `commerce-money-recovery.test.ts`).
+### Q16. A fan's money records and open requests when the fan deletes their account
 
-**Example:** a fan with a $60 limit pays $50, Maya misses her deadline, and the $50 is refunded.
-Today the fan can spend only $10 more this month, although they kept their money.
+**Today:** commerce refuses a deletion (`commerce_retention_unconfigured`,
+`modules/commerce/operations.ts`), so every account deletion is blocked (lane 1's #409). The part
+of Q16 that W8 approved (a 30-day ordinary purge; detached AI costs after 12 months) does not cover
+how long commerce keeps payment and request records. That retention period is a legal question,
+for counsel, so lane 4 has not taken a default for it.
 
-**Proposed default: a refund gives the room back.** A payment counts in the month it was captured,
-minus whatever of it has been refunded successfully. A refund still in flight keeps counting until
-it succeeds. A refund in a later month gives back only that earlier month's room, never extra room
-in the new month.
+**Proposed default for the product part** (not built; it needs the retention period above and
+lane 1's deletion flow):
 
-Alternative: keep today's rule. It is simpler, and it stops a fan from quickly re-spending money that
-was returned.
+- requests not yet accepted are withdrawn at once, and their holds released (nothing charged);
+- accepted requests keep their deadline, and are refunded if it passes, as in P1;
+- the ledger, receipts and the request rows are kept for the legal period, with the fan's summary,
+  disclosure and messages redacted;
+- the spend limit and its notices are deleted.
 
-## 2. Does a refunded commitment free its weekly slot? (E4.9)
+### Stripe test keys (WP 4.7, E4.13)
 
-**Today:** no. A request Maya accepted and then missed keeps its slot in that week's capacity. The
-lane brief's E4.9 expects "expiry, decline and refund each free a slot".
+Lane 4 needs a Stripe test-mode secret and publishable key, supplied through the approved secret
+channel, to run the scripted Stripe test. It cannot proceed without them.
 
-**Proposed default: yes.** When an accepted request is refunded because it was not delivered, its
-slot in that week's window is freed, as the brief says. Capacity shown then equals open plus
-accepted-and-unrefunded requests. Expiry, decline and withdrawal already free their slots.
+## Taken as the proposed default (2026-10-16)
 
-Alternative: keep the slot used for that week, on the view that a creator who just missed a
-deadline should not take on another request in the same week.
+### 1. A refunded payment gives its room under the monthly limit back (WP 4.3, E4.8): #485
 
-## 3. One signature for accept and send? (WP 4.4, INV-22)
+A payment counts in the month it was captured, less whatever of it has been refunded
+successfully. A refund still in flight counts until it succeeds. A refund in a later month gives
+back only that earlier month's room, never extra room in the new month. Example: a fan with a $60
+limit pays $50, Maya misses her deadline, and the $50 is refunded; the fan can spend $60 again.
 
-**Today:** accepting and replying are two separate signed acts, so two passkey ceremonies. Contract
-C3 (`lane-4-c3-accept-and-send.md`) keeps them separate. That is already two taps once delivery is
-automatic.
+Built for paid requests. Memberships and the pass still count in full until their refunds can be
+exercised end to end (Stripe test keys, or a Billing fake); their ledger rows can be matched
+exactly.
 
-**Proposed default: keep two signatures for the pilot.** Each ceremony binds exactly what the
-creator sees: the acceptance of a price, then the reply text. A single combined act would bind both
-in one hash. INV-22 allows that ("bound to a hash of that exact content"), but it changes what one
-signature means, so it waits for your review.
+_The alternative was to keep the old rule: simpler, and it stops quick re-spending of returned
+money._
 
-## 4. Never place a hold for a request that is already ending (found in E4.9)
+### 2. A refunded commitment frees its weekly slot (E4.9): #486
 
-**Today:** suppose the processor never answered while a hold was being placed, and the request then
-times out and is released. If a retry of that hold later reaches the processor, a new hold is placed
-and then immediately cancelled. Nothing is captured and no slot leaks, but the fan's bank may show a
-hold appear and vanish.
+When an accepted request is refunded in full because it was not delivered, its slot in that
+week's window is freed, as the lane brief's E4.9 says. Capacity shown then equals open plus
+accepted-and-unrefunded requests.
 
-**Proposed default: fix it.** If the request is being released or has ended, and the processor has
-no hold for it, the retry places no new hold. It records that nothing was held, and the release
-finishes. This places fewer holds and never changes a charge.
+_The alternative was to keep the slot used for that week._
 
-## 5. Do expired requests count toward "usually decides in"? (WP 4.9, C8)
+### 3. One signature for accept and send? (WP 4.4, INV-22): no change
 
-**Today:** no range is shown anywhere. The public summary (#427) leaves `reliability` empty until
-the creator's decision record exists. That record needs a migration, proposed in #427.
+Two signatures for the pilot, as contract C3 has it. Each passkey ceremony binds exactly what the
+creator sees: the acceptance of a price, then the reply text. Nothing to build.
 
-**Proposed default: count an expiry at its deadline.** The range ("Maya usually decides in 1 to 2
-days") is then honest about how long a fan waits, including requests nobody answered. Show it only
-once there are at least five outcomes in the last 90 days, as the middle half of them (25th to 75th
-percentile), rounded to hours or days.
+### 4. Never place a hold for a request that is already ending (E4.9): #484
 
-Alternative: count only accepts and declines. The range is then about Maya's decisions, but a
-creator who lets requests expire would look faster than fans experience her.
+If a request is being released or has ended, and the processor has no hold for it, the retry
+places no new hold. It records that nothing was held, and the release finishes. It concludes
+"nothing held" only once no earlier try can still reach the processor: on the first try, or five
+minutes after the release began. Until then the request waits, with its slot kept. This places
+fewer holds and never changes a charge.
+
+### 5. Expired requests count toward "usually decides in" (WP 4.9, C8): #487
+
+An expiry counts at its deadline. The range ("Maya usually decides in 1 to 2 days") is the middle
+half (25th to 75th percentile) of the outcomes in the last 90 days. It is shown only once there
+are at least five, and rounded to hours or days. Withdrawals do not count. It needs the decision
+record's migration, which the integrator must register (catalogue pins regenerated).
+
+_The alternative was to count only accepts and declines._
+
+### #467: the `text` fallback for "Ask for more information": no change
+
+`decide` keeps reading `text` alone as the question for older clients until lane 6's WP 6.6 sends
+`question`. This is already built in #467.
+
+### #453: when the commitment reminder fires: no change
+
+The reminder fires when the smaller of 24 hours and a quarter of the delivery window is left.
+This is already built in #453.
+
+## Decided
+
+### 6. What the fan reads when Maya lets her AI answer (WP 4.12): approved 2026-10-16
+
+The founder approved the proposed default. When Maya chooses "Let AI answer" (`reason='ai_answer'`,
+end state `declined`), the fan's request status and request list read:
+
+- `declinedForAi`: "{name} suggests asking {name}'s AI · nothing charged"
+- `askAiInstead`: "Ask {name}'s AI", a button that opens the fan's conversation with her.
+
+While a question waits for the fan, the step that showed "Decision due" reads `moreInfoAnswerBy`:
+"Answer by". Its date is when the request lapses unless the fan answers.
+
+### 7. The refund rule on the Offers page (WP 4.12): approved 2026-10-16
+
+The founder approved the proposed default. The creator's Offers table has one "Delivery" column
+(`offerDeliveryHeading`), and each row reads `offerDeliveryRule`: "Within {deadline} of accepting,
+or a full refund" ({deadline} reads "72 hours" or "3 days"). The "Refund if late" column goes away.
+
+### P1. A paused creator's open paid requests (lane 1's G1, #463): confirmed 2026-10-15
+
+The founder confirmed lane 1's proposed default, as built in #463. When ops pauses a creator or
+revokes her license:
+
+- **Requests she has not accepted** are released at once, and nothing is charged. They end with
+  the existing "expired" outcome, and the fan sees "Maya's queue didn't get to this · nothing
+  charged". It neither blames the creator nor reveals the ops action. There is no new copy and no
+  new end state.
+- **Accepted requests** keep their deadline, and refund if it passes. They are not refunded at
+  once, in case the pause is lifted (P2) and she delivers.

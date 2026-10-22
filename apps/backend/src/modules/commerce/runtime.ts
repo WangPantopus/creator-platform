@@ -36,6 +36,7 @@ import type { PassPurchaseJournal } from "./pass-purchase-journal.js";
 import type { GenerationPrivacyConfiguration } from "./generation-privacy.js";
 import {
   CommerceRequestNotifications,
+  type CommerceNoticeRecords,
   type CommerceNotificationRecipientAuthority,
 } from "./notifications.js";
 import { invariant } from "../../core/errors.js";
@@ -275,16 +276,20 @@ export async function createCommerceRuntime(input: {
     generationCostPrivacyReconciliation,
     // The host enumerates genuine current scopes. This factory cannot mint one
     // or authorize recipients; no notification source is mounted by default.
+    // `notices` is growth's notice records (its runtime's `notices`): with
+    // them each notice is recorded before the relay enqueues its event.
     requestNotifications: (
       scope: import("../access/scope.js").ThreadScope,
       assertRecipientAllowed: CommerceNotificationRecipientAuthority,
       assertPrivacyRegistered: () => Promise<void>,
+      notices?: CommerceNoticeRecords,
     ) =>
       CommerceRequestNotifications.prepare({
         database: input.database,
         scope,
         assertRecipientAllowed,
         assertPrivacyRegistered,
+        ...(notices ? { notices } : {}),
       }),
     audiences: createCommerceAudience(input.database, input.groupAudience),
     feature: commerceFeature(service, extended),

@@ -12,7 +12,9 @@
  * /v1/commerce/provider-notifications/stripe, written with the runtime login,
  * which may only insert them. COMMERCE_INBOX_DATABASE_URL names the separate
  * login that may claim them; without it notifications wait and the due scan
- * still finishes every request.
+ * still finishes every request. With growth's settings (GROWTH_ENABLED and its
+ * worker login, from the stack's --growth) it also hands request events to
+ * growth after each pass: the fan's and the creator's request notices.
  */
 import express from "express";
 import { createServer } from "node:http";
@@ -24,6 +26,10 @@ import { AccessService } from "../access/scope.js";
 import { DevelopmentIdentityAdapter } from "../identity/development.js";
 import { CommerceService } from "../commerce/service.js";
 import { readCommerceEnvironment } from "../commerce/environment.js";
+import { createGrowthAPIPool } from "../../db/growth-api-pool.js";
+import { unavailableOwners } from "../growth/contracts.js";
+import { noticeSnapshots, withNoticeSnapshots } from "../growth/notices.js";
+import { createGrowthRuntime } from "../growth/runtime.js";
 import { createStripeInboxRouter } from "./inbox.js";
 import { createDevelopmentCommerceRecovery } from "./recovery.js";
 
@@ -35,7 +41,9 @@ if (
   config.identityAdapter !== "development" ||
   !loopback(config.databaseUrl) ||
   (process.env.COMMERCE_INBOX_DATABASE_URL &&
-    !loopback(process.env.COMMERCE_INBOX_DATABASE_URL))
+    !loopback(process.env.COMMERCE_INBOX_DATABASE_URL)) ||
+  (process.env.GROWTH_WORKER_DATABASE_URL &&
+    !loopback(process.env.GROWTH_WORKER_DATABASE_URL))
 )
   throw new Error(
     "The commerce scheduler host runs only beside a loopback development backend.",
@@ -66,13 +74,46 @@ inbox?.on("error", () => {
 const commerce = readCommerceEnvironment(pool);
 if (!commerce || !("payments" in commerce))
   throw new Error("The commerce scheduler needs the payment settings.");
+const access = new AccessService(pool);
 const service = new CommerceService(
   pool,
   db,
-  new AccessService(pool),
+  access,
   { ...commerce.policy, costAllowanceIntegrated: false },
   commerce.payments,
 );
+// Growth's own relay and notice records, only to hand request events over.
+// Its worker loop, which turns them into notifications, runs in the backend.
+const growthWorker =
+  process.env.GROWTH_ENABLED === "true" &&
+  process.env.GROWTH_WORKER_DATABASE_URL &&
+  /^[a-f0-9]{64}$/iu.test(process.env.GROWTH_ENCRYPTION_KEY ?? "")
+    ? new pg.Pool({
+        connectionString: process.env.GROWTH_WORKER_DATABASE_URL,
+        max: 2,
+        connectionTimeoutMillis: 5000,
+      })
+    : undefined;
+growthWorker?.on("error", () => {
+  console.error("An idle growth connection failed and was discarded.");
+});
+const growthAPI = growthWorker
+  ? await createGrowthAPIPool(config.databaseUrl)
+  : null;
+const growth = growthWorker
+  ? await createGrowthRuntime({
+      runtimePool: growthAPI ?? pool,
+      workerPool: growthWorker,
+      secret: Buffer.from(process.env.GROWTH_ENCRYPTION_KEY!, "hex"),
+      owners: {
+        ...unavailableOwners,
+        notificationState: withNoticeSnapshots(
+          unavailableOwners.notificationState,
+          noticeSnapshots(growthWorker),
+        ),
+      },
+    })
+  : undefined;
 const requested = Number(process.env.COMMERCE_RECOVERY_INTERVAL_MS ?? 15_000);
 const interval =
   Number.isSafeInteger(requested) && requested >= 200 ? requested : 15_000;
@@ -85,10 +126,20 @@ const recovery = await createDevelopmentCommerceRecovery({
   ),
   ...(inbox ? { inbox } : {}),
   intervalMs: interval,
+  ...(growth
+    ? {
+        notices: {
+          relay: growth.relay,
+          records: growth.notices,
+          access,
+          database: db,
+        },
+      }
+    : {}),
 });
 recovery.start();
 process.stdout.write(
-  `Commerce scheduler: a recovery pass every ${interval} ms on the development database${inbox ? ", claiming notifications" : ""}.\n`,
+  `Commerce scheduler: a recovery pass every ${interval} ms on the development database${inbox ? ", claiming notifications" : ""}${growth ? ", handing request notices to growth" : ""}.\n`,
 );
 
 let listener: ReturnType<typeof createServer> | undefined;
@@ -136,7 +187,14 @@ const stop = () => {
   listener?.close();
   void recovery
     .close()
-    .then(() => Promise.all([pool.end(), inbox?.end()]))
+    .then(() =>
+      Promise.all([
+        pool.end(),
+        inbox?.end(),
+        growthWorker?.end(),
+        growthAPI?.end(),
+      ]),
+    )
     .then(() => process.exit(0));
 };
 process.on("SIGTERM", stop);
