@@ -208,9 +208,10 @@ try {
               usageAccounting,
             );
             if (generationHost) onClose(() => generationHost.close());
+            // Existing conversation sources need lifecycle readers even while
+            // interactive media has no configured storage or retention policy.
             const conversationPrivacy =
               usageAccounting &&
-              mediaHost &&
               process.env.W3_DEVELOPMENT_ECONOMICS_FILE &&
               process.env.COMMERCE_CURRENCY
                 ? await registeredConversationPrivacyReview()
