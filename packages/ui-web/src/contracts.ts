@@ -130,6 +130,8 @@ export interface MessageProps extends SignedActPresentation {
 /** A Note: the creator's one-to-many post, always labeled with its audience. */
 export interface NoteProps extends SignedActPresentation {
   name?: string;
+  /** Preserve the exact authorized C4 label when supplied by the reader. */
+  authorLabel?: string;
   /** Default "Kiln Club members". */
   audience?: string;
   time?: string;
@@ -148,6 +150,8 @@ export interface NoteProps extends SignedActPresentation {
 /** The pill that shows the creator reacted to a fan's message. */
 export interface ReactionChipProps extends SignedActPresentation {
   name?: string;
+  /** Preserve the exact authorized C4 label when supplied by the reader. */
+  authorLabel?: string;
 }
 
 /** A source the AI used, shown inside its panel and linking to the source. */
@@ -330,6 +334,9 @@ export interface QueueCardProps {
   shared?: string;
   draftReady?: boolean;
   overdue?: boolean;
+  /** Actions render only when the host supplies their actual behavior. */
+  onOpen?: () => void;
+  onDecline?: () => void;
 }
 
 export interface CapacityRow {

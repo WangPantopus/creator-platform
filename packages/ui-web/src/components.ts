@@ -1019,6 +1019,7 @@ export function Note(p: NoteProps) {
     {
       className: "qv qv-note qv-on-maya",
       "aria-label":
+        p.authorLabel ??
         "Note from " + name + " to " + (p.audience || "Kiln Club members"),
       style: { "--qv-cut": "var(--maya-surface)" },
     },
@@ -1030,10 +1031,11 @@ export function Note(p: NoteProps) {
       h(
         "span",
         null,
-        formatCopy("noteAudience", {
-          name,
-          audience: p.audience || "Kiln Club members",
-        }),
+        p.authorLabel ??
+          formatCopy("noteAudience", {
+            name,
+            audience: p.audience || "Kiln Club members",
+          }),
       ),
       h(
         "span",
@@ -1107,6 +1109,7 @@ export function Note(p: NoteProps) {
 export function ReactionChip(p: ReactionChipProps) {
   const name = p.name || "Maya";
   const href = signatureHref(p);
+  const label = p.authorLabel ?? formatCopy("reaction", { name });
   return h(
     href ? "a" : "span",
     {
@@ -1114,8 +1117,7 @@ export function ReactionChip(p: ReactionChipProps) {
       ...(href
         ? {
             href,
-            "aria-label":
-              formatCopy("reaction", { name }) + ". " + copy.openVerification,
+            "aria-label": label + ". " + copy.openVerification,
           }
         : {}),
     },
@@ -1125,7 +1127,7 @@ export function ReactionChip(p: ReactionChipProps) {
       { className: "qv-ink-maya-accent", style: { display: "inline-flex" } },
       G.heart(13),
     ),
-    formatCopy("reaction", { name }),
+    label,
   );
 }
 export function CitationChip(p: CitationChipProps) {
@@ -1794,21 +1796,30 @@ export function QueueCard(p: QueueCardProps) {
         ? h("span", { className: "qv-badge qv-ink-ai" }, "AI draft ready")
         : null,
       h("span", { style: { flexGrow: 1 } }),
-      k === "commitment"
+      k === "commitment" || !p.onDecline
         ? null
         : h(
             "button",
-            { className: "qv-btn qv-btn--quiet", style: { fontSize: 13 } },
+            {
+              type: "button",
+              className: "qv-btn qv-btn--quiet",
+              style: { fontSize: 13 },
+              onClick: p.onDecline,
+            },
             "Decline · no charge",
           ),
-      h(
-        "button",
-        {
-          className: "qv-btn qv-btn--secondary",
-          style: { minHeight: 44, fontSize: 14 },
-        },
-        k === "commitment" ? "Deliver" : "Open",
-      ),
+      p.onOpen
+        ? h(
+            "button",
+            {
+              type: "button",
+              className: "qv-btn qv-btn--secondary",
+              style: { minHeight: 44, fontSize: 14 },
+              onClick: p.onOpen,
+            },
+            k === "commitment" ? "Deliver" : "Open",
+          )
+        : null,
     ),
   );
 }

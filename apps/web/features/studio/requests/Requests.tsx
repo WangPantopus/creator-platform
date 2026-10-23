@@ -182,15 +182,12 @@ export function Requests({ creator }: { creator: Creator }) {
           <div className="w5-queue-section" key={section}>
             <h2>{section}</h2>
             {items.map((p) => (
-              <button
-                key={p.id}
-                className="w5-queue-open"
-                onClick={() => {
-                  rememberPosition();
-                  router.push(`/studio/${creator.id}/packets/${p.id}`);
-                }}
-              >
+              <div key={p.id} className="w5-queue-open">
                 <QueueCard
+                  onOpen={() => {
+                    rememberPosition();
+                    router.push(`/studio/${creator.id}/packets/${p.id}`);
+                  }}
                   kind={index === 0 ? "commitment" : "packet"}
                   handle={`@${p.handle}`}
                   mode={p.snapshot.title}
@@ -202,7 +199,7 @@ export function Requests({ creator }: { creator: Creator }) {
                     index < 2 && new Date(p.deadline).getTime() < Date.now()
                   }
                 />
-              </button>
+              </div>
             ))}
           </div>
         );
