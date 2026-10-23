@@ -1,0 +1,101 @@
+# Private Note reply review qualification, 2026-10-22
+
+Status: feasibility audit complete; implementation and qualification are pending.
+This is a separate local increment after the app-completion branch. It does not
+record a deployment, production acceptance, an Ops decision, or completed erasure.
+
+## Scope and verified baseline
+
+The active graph has 120 migrations through `0252_w2_workspace_lock_wait`.
+The unchanged proposal is `apps/backend/migrations/0069_w8_reply_review.sql`,
+SHA-256 `65a86e17256a872bcbf640006274512a29e3bda31232838c68fe3aa5df2a958a`.
+Historical reservation `0156_w8_reply_review` and the frozen held-version map
+remain preserved. At audit time 0253 was the next unallocated version; allocation
+must be checked again before registering the proposed new wave.
+
+The minimum SQL addition is this one source. The existing graph already supplies
+0045 Content review storage, 0053 runtime audience/denial projection, and the
+0074/0082 current Content and denial fences. The stock server already prepares
+the Trust reviewer from the genuine backend runtime and passes the original held
+Content transaction. No additional held SQL or provider credential is required.
+
+Read-only metadata on the owned integrated stack confirmed all function
+signatures, the three expected PUBLIC policies, and the original safety-case
+kind list. The new projection role and both Trust review tables were absent.
+Two unexpired development Ops memberships currently have safety-queue authority.
+Those synthetic accounts do not establish production staffing or human acceptance.
+
+The proposal creates one review case per exact reply/version/hash. Private text
+stays in Content. Only an actual purpose-leased Ops decision can return allowed
+or flagged; an unavailable reviewer leaves the reply pending. It does not approve
+automatic moderation or expanded paid-tenure limits.
+
+## Required integration
+
+- [ ] Recheck allocation and propose one new source registration after 0252,
+  retaining the historical reservation and immutable SQL/frozen-map bytes.
+- [ ] Add a reviewed wave with the exact 120-source predecessor and a new
+  complete-graph profile. Extend fresh installation, canonical bootstrap head
+  recognition, the closed upgrade operator and fixed predecessor role/privacy
+  checks without weakening their custody requirements.
+- [ ] Select the new profile only through the exact active executable source.
+  Preserve earlier profiles and the original reply-review catalogue pin
+  `2f477720a8ab473540e541dd3e15a7433bcd023e58b0aed586ca57a5003c1664`.
+- [ ] Teach the catalogue tool to measure the reply-review purpose catalogue;
+  its current review-file groups do not cover that feature-module constant.
+- [ ] Review every intentional reach change: isolated NOLOGIN purpose role,
+  exact grants/functions, forced RLS on the new tables, three PUBLIC policies
+  restricted to the core runtime, and the lock-only UPDATE(version) grant whose
+  policy refuses writes. New tables change every full-relation catalogue even
+  for roles without access; digest regeneration alone is not a reach review.
+
+## Qualification gates
+
+- [ ] On an owned PostgreSQL 17 stack, preserve a 120-source baseline snapshot
+  before candidate DDL. Qualify original SQL in a rollback-contained transaction;
+  repeat actual role/grant/policy/function/source drift refusals. A matching
+  manually inserted ledger must not activate an unregistered proposal.
+- [ ] Build a fresh 121-source graph and independently restore the 120-source
+  predecessor. Use the real closed-traffic operator with a current private,
+  hash-verified backup/manifest and independent restore. Compare ledger, schema,
+  business data, security, roles and sequences; preserve all old rows/history,
+  original deletion clocks, unresolved costs and existing role credentials.
+- [ ] Measure fresh and restored profiles with and without the incoming Growth
+  login. Review the exact catalogue diff, then capture fixed pins. The existing
+  Growth diagnostic is 44/45 because its single family pin has no incoming
+  alternative; preserve that evidence unless separately fixing the diagnostic.
+- [ ] Start the real application, publish a synthetic signed Note through its
+  actual creator workflow, and create a reply using the original author session.
+  Operate queue, purpose lease, exact evidence, allow/flag decision, author retry,
+  creator delivery/reaction, idempotency and withdrawal. Check saved case,
+  decision, review, source and signature records; no direct approval row writes.
+- [ ] Refuse another author, wrong version/hash, revoked session, expired Ops
+  membership/lease, changed or withdrawn source, creator denial and restored
+  closed traffic. Review failure must not deliver a pending reply or expand
+  access. Run relevant existing static/backend checks and real browser journeys.
+- [ ] Operate export and deletion through original owner paths. Verify Trust
+  exports only the author's review metadata, Content owns the actual body, and
+  cross-account downloads are denied. Verify Trust review deletion cascades to
+  decision rows; keep unfinished domain tasks visibly unfinished. No forged
+  completion receipt, clock advancement or bypass of Content's refusal.
+
+## Authority and remaining limitations
+
+Local source/profile qualification needs no new product-policy decision. Ordinary
+data already has the approved immediate-denial/day-30 purge policy in
+`W8-approved-retention-20261002.json`; detached known costs retain twelve calendar
+months, and unknown costs preserve their original bounded reconciliation period.
+The older continuation's statement that Q16 is unanswered is historical.
+
+Deletion is still an implementation gap: `content/privacy.ts` refuses every
+non-export operation with `content_retention_unconfigured`. Trust already has
+conditional export/delete handling for the new metadata, including decision
+cascade, but it also retains minimal receipt/tombstone shells and has separate
+account-dispute handling. A successful reply-review increment cannot be called
+whole-account erasure acceptance. Existing original deletion maturity is not
+changed by this work.
+
+Production staffing/escalation, real creator/provider ownership and physical
+device/provider acceptance remain separate. Hosting remains undecided. Local
+synthetic sessions, passkey fixtures and decisions must remain explicitly
+labelled as development evidence.
