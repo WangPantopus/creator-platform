@@ -88,16 +88,57 @@ The exact SDK resolved. The installed SDK source confirmed `/oauth2callback`
 and the managed-account `/emmcallback` path. The versioned Swift manifest of the
 existing custom-dump dependency requires the resolved xctest-dynamic-overlay
 1.13.1 pin; unrelated top-level native dependencies retain their versions.
-The subsequent build and expanded fake-provider cancellation journey were
-interrupted before a final result was recorded. They must be rerun; earlier
-native passes above predate this SDK addition. The approved source and lockfile
-are preserved in the app-completion branch.
+After the interrupted initial attempt, the approved source at `84af90a9c`
+passed a fresh Xcode 26.5 `build-for-testing` for both arm64 and x86_64 simulator
+architectures. GoogleSignIn resolved to exactly 10.0.0, revision
+`7823e518f5d4db765ccac3e140dd3265ef0a1cf1`; the tracked package lock did not change.
+The built application's public iOS/server identifiers and reversed-client URL
+scheme matched the synthetic configuration used by the backend.
+
+The existing `testNativeSignInOnRealStack` then passed **1/1, zero skipped, zero
+failures**, in 50.160 seconds on an isolated iPhone 17 simulator running iOS 26.5.
+The provider selection was Google. The real app and C1 backend used the lane's
+PostgreSQL database with all 120 migrations; only the provider credential edge
+was fake. The journey checked a cancelled attempt followed by a late signed
+proof, invalid birth-date refusal, cancellation and reopening of the age form
+with an empty field, adult admission, secure-session restoration without the
+provider hook, single-device logout, and a separate final under-18 refusal.
+The three retained screenshots were inspected: cancelled welcome, adult account,
+and expanded under-18 policy.
+
+Read-only SQL checks used the exact three synthetic subjects from this run and
+a known development key configured only for this disposable stack. No credential
+file was read. All five assertions passed:
+
+| Observed subject          | Database result                                                                 |
+| ------------------------- | ------------------------------------------------------------------------------- |
+| Cancelled proof           | Zero identities, zero age locks, no account                                     |
+| Adult                     | One identity, one adult attestation, active account, zero under-18 signals      |
+| Adult after logout        | Zero active app sessions and one revoked app session                            |
+| Under 18                  | One age lock, one under-18 signal, deleted account, zero grants or app sessions |
+| Under-18 provider profile | Email and refresh-token ciphertext both cleared                                 |
+
+Single-device logout revokes the app session. Its internal identity grant remains
+until expiration or all-device revocation, matching the existing backend
+contract; this check does not claim that single-device logout revokes a provider
+grant. No change to that contract was needed.
+
+Temporary evidence for this completed follow-up is outside git:
+
+- `/tmp/qelvora-ios-google-final-build.log` and `-build-result`
+- `/tmp/qelvora-ios-google-final-test.log` and `-test-result`
+- `/tmp/qelvora-ios-google-final-attachments/`
+- `/tmp/qelvora-ios-google-final-state.json`
+
+These paths describe local verification artifacts and may disappear on a host
+restart. The observed results above are recorded here so the implementation does
+not depend on their continued availability.
 
 ## Remaining acceptance
 
-The new iOS Google adapter needs its final compilation and operated journey.
 Native platform age-signal adapters are not implemented in this
-increment. Real Apple/Google sheets, cancellation behavior, device provisioning,
+increment. Real Apple/Google sheets, SDK browser cancellation, managed-account
+callback handling, SDK credential-cache deletion and crash recovery, device provisioning,
 store signing, platform age signals, and provider grant revocation require their
 configured device/provider acceptance. The fake-provider journey does not prove
 those behaviors. Same-account rejection and late-token cleanup were reviewed in
