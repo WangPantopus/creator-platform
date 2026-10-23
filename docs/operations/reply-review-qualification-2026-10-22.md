@@ -1,7 +1,8 @@
 # Private Note reply review qualification, 2026-10-22
 
-Status: candidate source and closed qualification are implemented; restored
-upgrade, application journeys and privacy operation are still pending.
+Status: candidate source, fresh installation and preserved upgrade are qualified.
+Actual review decisions and source denials work; creator delivery is blocked by
+held 0173, and complete export/erasure remain unaccepted.
 This is a separate local increment after the app-completion branch. It does not
 record a deployment, production acceptance, an Ops decision, or completed erasure.
 
@@ -18,7 +19,9 @@ The minimum SQL addition is this one source. The existing graph already supplies
 0045 Content review storage, 0053 runtime audience/denial projection, and the
 0074/0082 current Content and denial fences. The stock server already prepares
 the Trust reviewer from the genuine backend runtime and passes the original held
-Content transaction. No additional held SQL or provider credential is required.
+Content transaction. No additional held SQL is needed for the review producer itself. The later
+application journey exposed a separate creator-feed dependency on held 0173;
+see the runtime findings below. No provider credential is needed locally.
 
 Read-only metadata on the owned integrated stack confirmed all function
 signatures, the three expected PUBLIC policies, and the original safety-case
@@ -52,16 +55,16 @@ automatic moderation or expanded paid-tenure limits.
 
 ## Qualification gates
 
-- [ ] On an owned PostgreSQL 17 stack, preserve a 120-source baseline snapshot
+- [x] On an owned PostgreSQL 17 stack, preserve a 120-source baseline snapshot
   before candidate DDL. Qualify original SQL in a rollback-contained transaction;
   repeat actual role/grant/policy/function/source drift refusals. A matching
   manually inserted ledger must not activate an unregistered proposal.
-- [ ] Build a fresh 121-source graph and independently restore the 120-source
+- [x] Build a fresh 121-source graph and independently restore the 120-source
   predecessor. Use the real closed-traffic operator with a current private,
   hash-verified backup/manifest and independent restore. Compare ledger, schema,
   business data, security, roles and sequences; preserve all old rows/history,
   original deletion clocks, unresolved costs and existing role credentials.
-- [ ] Measure fresh and restored profiles with and without the incoming Growth
+- [x] Measure fresh and restored profiles with and without the incoming Growth
   login. Review the exact catalogue diff, then capture fixed pins. The existing
   Growth diagnostic is 44/45 because its single family pin has no incoming
   alternative; preserve that evidence unless separately fixing the diagnostic.
@@ -155,7 +158,7 @@ node --import tsx tests/scenarios/lane-2/e2-reply-review-source.mjs \
 node infra/local/stack.mjs catalogues check --lane reply-fresh-1022 --base-port 56670
 ```
 
-Use only an owned loopback PostgreSQL17 database with the exact120 or121 source
+Use only an owned loopback PostgreSQL17 database with the exact 120 or121 source
 graph and a private output directory. The probe always rolls proposal SQL,
 metadata ledger entries and adversarial drift back; it creates no product proof,
 case, decision or erasure receipt. Detailed metadata, initial harness failure
@@ -166,21 +169,21 @@ under `/tmp/qelvora-reply-review-1022/`.
 
 The actual `activate-wave` operator accepted the current private backup and
 independent restore manifest for the closed `reply_restored120` target. It applied
-only `0253_w8_reply_review`:120 prior ledger rows were preserved,121 rows remained.
+only `0253_w8_reply_review`: 120 prior ledger rows were preserved, 121 rows remained.
 Before operating, all six custody dimensions matched the independent
-`reply_verified120` restore. Afterwards all six original business rows in189
-tables,63 existing roles, the original sequence and the prior source history
-were preserved. The backup/restore security capture covered17,597 records.
-The operator reported34 purpose roles, two checked private purposes, traffic
+`reply_verified120` restore. Afterwards all six original business rows in 189
+tables, 63 existing roles, the original sequence and the prior source history
+were preserved. The backup/restore security capture covered 17,597 records.
+The operator reported 34 purpose roles, two checked private purposes, traffic
 closed and `releaseReady:false`; this is not permission to reopen production.
 
 The upgraded target and the separate fresh cluster both passed **46/46 catalogue
-groups,51 pinned digests**, without incoming Growth. Private receipts are
+groups, 51 pinned digests**, without incoming Growth. Private receipts are
 `upgrade121.json`, `upgrade121.manifest.json`, `upgrade121.log`, and
 `restored121-check.log` under the evidence directory above. The repeatable actual
 operator scenario is `tests/scenarios/lane-2/e2-reply-review-upgrade.mjs`.
 
-Prepare an owned exact120 PostgreSQL17 target, close traffic (`CONNECTION LIMIT
+Prepare an owned exact 120 PostgreSQL17 target, close traffic (`CONNECTION LIMIT
 0` and the `creator-platform:restored-traffic-closed` database comment), then take
 a current custom-format dump and restore it into a **distinct** owned database.
 The scenario deliberately does not silently create, reset or repair either DB.
@@ -210,3 +213,112 @@ Do not rerun these commands over the now-upgraded target or an existing restore.
 The operator scenario requires a backup less than one hour old and private file
 permissions. Syntax and focused lint passed. Runtime author/Ops and privacy
 journeys remain separate gates.
+
+## Runtime findings and remaining delivery dependency
+
+The live fresh stack with incoming Growth reports **45/46 groups**, with the
+sole diagnostic difference in `runtimeCatalogues.family`. The explicit
+original-incoming family and purpose profiles and with-Growth provenance pin
+match. This preserves the earlier graph's documented family diagnostic; no pin
+was overwritten to hide it.
+
+`tests/scenarios/lane-6/e6-reply-review.mjs` operates real web/API flows. Synthetic
+boundaries are development identities, a virtual signing device, a clearly
+labelled external-proof claim and opt-in membership rows standing in for a
+completed purchase. The proof itself was submitted and approved through the
+actual verification case, purpose lease and Ops decision APIs. It was not an
+inserted approved-proof row or a real external-owner verification.
+
+Observed application results:
+
+- Creator setup registered the passkey and the composer published a signed
+  members Note. The fan submitted a private reply with both sharing permissions
+  false. One exact review tuple was queued and pending text was absent from the
+  creator feed.
+- The Ops queue did not show private text. Without a purpose lease, detail
+  returned 403; an actual browser lease revealed the exact source. No body was
+  copied into `case_evidence`. The browser confirmation recorded the actual
+  `allow_reply` decision by synthetic Ops actor four.
+- Wrong-author and stale-version API retries returned 403. The current author's
+  browser retry consumed the decision and persisted `allowed` with its exact
+  W8 decision reference.
+- Creator delivery then returned **503 `scope_denial_unconfigured`**. The
+  creator-tenure host prepares actual candidate negatives before positive
+  permissions and calls the absent `creator_trust.creator_fan_denial`. Its
+  source `0089_w8_creator_fan_denial.sql` is still reservation
+  `0173_w8_creator_fan_denial`. The browser scenario correctly fails at creator
+  visibility; **signed reaction and delivery are not passed**.
+
+The next minimum additive SQL wave is that unchanged 37-line source, SHA-256
+`0a738e0a29c77e65274931d4054b5db26a340b8c10a498e8c016457ab1a22860`.
+Its 0053/0074/0082 dependencies are already active. It adds one function owned by
+the existing isolated `creator_trust_denial` role, EXECUTE only for
+`creator_runtime`, and no table, role, membership or paid-tenure capability.
+It requires the actual current session and owner/fan pair, uses nonwaiting
+negative locks, incorporates an existing thread's negatives, and rechecks the
+pair and session. Reservation 0172's longer-reply cap is not a dependency.
+Qualification must add a new reviewed function/ACL pin and full graph profiles,
+preserve reservation 0173 and all source bytes, use exact 121-source predecessor
+custody, and operate cross-pair/session/denial/lock-contention/restoration tests
+before repeating creator delivery and signed reaction. No ad hoc activation or
+denial bypass was made here.
+
+The lifecycle scenario, `tests/scenarios/lane-6/e6-reply-review-lifecycle.mjs`,
+operates actual decisions, withdrawals and privacy jobs on the same owned
+synthetic account. Its rollback-only direct probes use a genuine current author
+session and the real runtime login; wrong source hash and version both returned
+PT409. API logout made a retry return 401. A real flag decision persisted flagged;
+withdrawal redacted case evidence and subsequent approval returned 410. A real
+one-minute Ops lease expired (403 after 62.082 seconds). Unpublishing the Note
+made approval of a pending reply return 403.
+
+Export job `cead9b3d-7c2d-4585-9e7a-4cab9d3b5454` completed six of eight domains,
+including the actual Content and Trust owners. Content's completed output held
+the private body; Trust's completed output held the author's review metadata
+without body or reviewer identity. These were verified as owner task outputs,
+not as a successful download. Whole-account download correctly stayed 409;
+another account received 404. Conversation retries with `domain_hook_error` and
+Agent waits with `accounting_boundary_pending`. The existing sanitized failure
+does not establish the underlying cause. All original jobs and clocks are
+preserved; whole export acceptance remains open.
+
+Reproduction on a fresh owned stack (the browser run intentionally remains
+failing until the missing creator/fan authority is separately qualified):
+
+```sh
+node tests/scenarios/lane-6/e6-reply-review.mjs \
+  --api http://127.0.0.1:56671 --web http://localhost:56672 \
+  --db postgresql://postgres:foundation-test-only@127.0.0.1:56670/creator_stack \
+  --out /tmp/qelvora-reply-review-1022/browser --allow-membership-fixture
+node tests/scenarios/lane-6/e6-reply-review-lifecycle.mjs \
+  --api http://127.0.0.1:56671 \
+  --db postgresql://postgres:foundation-test-only@127.0.0.1:56670/creator_stack \
+  --runtime-db postgresql://creator_runtime:foundation-test-only@127.0.0.1:56670/creator_stack \
+  --out /tmp/qelvora-reply-review-1022/lifecycle \
+  --note <published-note-id> --reply <allowed-private-reply-id> \
+  --allow-synthetic-account-delete
+```
+
+Use the actual IDs from that run. The lifecycle scenario withdraws/unpublishes
+its supplied sources and requests account deletion for synthetic actor six; it
+must not be pointed at unrelated local work. `--existing-export <job-id>` reuses
+an existing same-account export without changing its clock or creating a new job.
+
+The real deletion request was `85c4767a-2b24-4d73-858a-73ec7aecac3d`. At the
+lifecycle checkpoint, Content was blocked by `content_retention_unconfigured`,
+Commerce by `commerce_retention_unconfigured`, Conversation by
+`conversation_provenance_purge_unavailable`, and Trust was waiting on
+`comparison_artifact_purge_pending`. Agent and Identity also remained pending.
+Only Growth and Media were complete. Therefore the scenario correctly failed
+the expected Trust cascade gate; **neither Trust deletion nor whole erasure is
+claimed**. Content's refusal is its retention/source-revocation implementation
+gap despite approved ordinary retention. Commerce financial retention is a
+separate unresolved policy/configuration boundary. No clock or tombstone was
+reset. This deletion also makes the prior export unavailable; later export
+acceptance must use another current synthetic account.
+
+The existing backend regression suite passed **157/157 tests in nine files** on
+the separate owned 56650 fixture (404.85 seconds, including the existing 10,000
+random-pair property check). Both browser/lifecycle scenario files pass syntax
+and focused lint. The browser and lifecycle workflows remain deliberately
+failing at the explicitly recorded delivery and deletion gates above.
