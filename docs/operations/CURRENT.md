@@ -8,8 +8,7 @@ founder in chat, not from this file.
 ## Current integration
 
 The app branch is `codex/app-completion-2026-10-22`, based on `origin/main` at
-`b154252e3806ba86aea06c1b7ad9dfb23acd9008`. The AI engine work is being qualified
-on `codex/engine-qualification-2026-10-22`, carrying
+`b154252e3806ba86aea06c1b7ad9dfb23acd9008`. The branch locally integrates `codex/engine-qualification-2026-10-22`, carrying
 `origin/lane-3/merge-wave-2026-10-16` plus current main and integration fixes.
 GitHub PR #511 was still open and unmerged when checked this session; the older
 lane 3 claim that its wave was already on main was incorrect.
@@ -31,6 +30,10 @@ planning estimates, not an infrastructure choice.
   age confirmation and secure session restoration. Birth dates and provider
   continuations stay in memory. Late or mismatched returned sessions receive
   bounded cleanup. See [native sign-in evidence](native-sign-in-2026-10-22.md).
+- The approved GoogleSignIn 10.0.0 dependency and iOS Google credential adapter
+  are committed. Final compilation and the expanded fake-provider journey are
+  being rerun after the interrupted local session; the earlier native passes
+  predate this SDK addition.
 - The stock development host composes commerce recovery with the canonical
   service and identity adapter, plus signed raw Stripe notification ingress.
   Expired requests release holds; overdue accepted commitments refund. Optional
@@ -47,18 +50,27 @@ planning estimates, not an infrastructure choice.
   locks wait instead of immediately failing during concurrent workspace reads.
   Exact owner/source/definition checks remain in place. Fresh and restored
   qualification is in [workspace-lock evidence](workspace-lock-qualification-2026-10-22.md).
+- Conversation privacy now prepares its concrete recording-association metadata
+  reader independently of interactive media. A populated text-account export
+  completes all eight domains, with actual artifact contents and access controls
+  verified. See [export evidence](conversation-export-completion-2026-10-22.md).
+- FAQ evaluations and comparison replay stop new admissions during shutdown and
+  drain admitted provider work and final database writes before releasing their
+  pool. Actual active-provider and database-lock-wait shutdown cases passed.
 
 ## Verification observed this session
 
 | Area | Result and limit |
 | --- | --- |
-| Main app changes | Typecheck 7/7, lint, generated-contract check, backend build and web production build passed before AI integration |
+| Combined app static checks | Typecheck 7/7, lint, formatting and generated web/native contracts (124 operations) passed together |
 | Existing backend regressions | 157/157 passed on both the app baseline and the 120-migration qualification environment |
 | Identity web flows | E1.1 40/40, E1.2 28/28, sign-in 19/19, passkey 8/8; typed client HTTP checks passed |
 | Studio | E6.1 26 Light/Night captures, Note 10/10, Today 10/10 |
 | Native sign-in | iOS build and real-stack UI journey 1/1; Android build, existing contract tests 2/2, and five operated real-stack checkpoints passed |
 | Commerce stock host | Eight workflow steps and nine invariant checks passed; signed duplicate webhook deduplicated; invalid/stale/wrong-account events and four invalid startup configurations refused |
-| Database upgrade | Fresh 120-source install, separate canonical-61 bootstrap, independently restored 119 → 120 operator qualification with original data/security preserved |
+| Database upgrade | Fresh 120-source installs in both isolated engine and combined app; separate canonical-61 bootstrap; restored 119 → 120 operator with original data/security preserved |
+| Combined privacy API | Exact registration/owner/grant checks passed; a new populated text-account export completed all eight domains, matched actual database records, and refused anonymous/wrong-account downloads; deletion remains blocked by existing owner/retention requirements |
+| FAQ and streaming | FAQ publication 12/12; A7 8/8 and focused follow-up 5/5; one initial latency sample remained unmeasured |
 | Catalogue checks | Fresh/restored without Growth 45/45; with Growth 44/45, solely the known single family-pin diagnostic; accepted runtime family profiles match |
 | AI replies | Full-host smoke 14/14; five repeated short/maximum-length replies complete under unchanged $5 cap with Growth running; three adversarial cost-rounding checks pass |
 
@@ -68,9 +80,15 @@ physical-device acceptance or real-provider cancellation/revocation behavior.
 The full combined-tree gates and final runtime results are recorded in the linked
 qualification reports as they complete.
 
+After a host restart, the workspace source and Git history were intact, but
+temporary `/tmp` evidence and unfinished test processes were absent. The final
+backend regression run had not reported completion and is not counted as a new
+pass. Its required final checks and the iOS SDK checks are being rerun. Earlier
+observed results remain recorded above with their original scope.
+
 ## Work still required
 
-- **Native:** iOS Google credential adapter, native platform age signals,
+- **Native:** final iOS Google adapter verification, native platform age signals,
   configured provider sheets and device/store acceptance. Store accounts,
   provisioning, domain associations and push credentials are still needed.
 - **Privacy:** whole-account deletion remains incomplete across conversation,

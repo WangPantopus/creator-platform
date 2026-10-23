@@ -1,14 +1,31 @@
 # Lane 3: AI engine status
 
-Updated: 2026-10-16, by the lane 3 session
-Working on: nothing unblocked is left. Last done: the merge wave (#433 to #495 land together, at the founder's request)
-Done: merged A1 #411, A3 #426, A6a #434, A6b (#433's code and 0251 through #442); through the merge wave: #433 (status), A6c #436, hold sizing #438, B2 #441, A2 #444, B9 #446, finding 15 #451 (SQL proposal), finding 8 #455, finding 9 #456 (status only), A4 #464, B4 #468, B1 #473, B3 #477, A7 #482, A5 #489, B5 #490 (SQL proposal), B5 web #491, finding 18 #492 (SQL proposal), finding 5 #494, finding 6 #495
-Next: B8 (the `CreatorAI.tsx` split, now unblocked: #441 and #446 are in); B6 waits on the provider key and the embedding choice; the real-model halves (B4, B1, finding 13) when the gateway is up; finding 7
-Blocked on: nothing. Later: the integrator registers the three SQL proposals (#451, #490, #492: inactive until then); the embedding choice (B6); the real model (gateway)
+## Local integration update, 2026-10-22
+
+The app-completion branch now carries the AI wave from
+`lane-3/merge-wave-2026-10-16` plus current main and qualification fixes.
+PR #511 was verified **open and unmerged** this session. The earlier statement
+below that the wave had reached main was incorrect; this is local integration.
+
+Cost accounting now rounds individual calls conservatively and records zero
+until a provider call actually starts. Wake-listener shutdown is bounded.
+Partial FAQ drafts survive recovery and stale memory responses cannot restore a
+dismissed prompt. The unchanged workspace-lock proposal is now registered as
+0252 with exact runtime receipts, fresh/restored qualification and a guarded
+fresh installer. See [migration evidence](../../operations/workspace-lock-qualification-2026-10-22.md)
+and the [current status](../../operations/CURRENT.md).
+
+The memory and context-exclusion proposals remain unregistered and inactive.
+Real-model checks and embeddings require the actual gateway/provider decision.
+The October 16 record below retains historical scenario evidence; it is not a
+current claim that every feature is complete or every PR is on main.
+
+## Historical lane checkpoint, 2026-10-16
 
 ## Resume here (2026-10-16, after the merge wave)
 
-- Everything lane 3 had open is on main through the merge wave (branch `lane-3/merge-wave-2026-10-16`).
+- Correction (2026-10-22): the merge-wave branch `lane-3/merge-wave-2026-10-16`
+  was prepared but PR #511 is still open. Its code is now carried on the local app-completion branch.
   Start new work from the latest origin/main in your own worktree (a session hook refuses writes to
   another session's worktree); `.claude/worktrees/lane-3-resume-0d9ef8` was the last one.
 - Tools: node and pnpm from the Codex runtime (`NB=$HOME/.cache/codex-runtimes/codex-primary-runtime/dependencies;

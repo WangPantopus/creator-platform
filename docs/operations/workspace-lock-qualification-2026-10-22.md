@@ -67,6 +67,44 @@ Do not represent that diagnostic as 45 of 45 or remove the failed row. The
 new review retains the no-Growth single pin instead of replacing it with whichever
 profile was measured last.
 
+## Combined app verification
+
+The app branch locally merged the qualified engine work with native sign-in,
+public identity contracts, Studio and stock-host commerce recovery. A second
+owned stack (`integrated-1022`, ports 56630–56633) built from an empty database
+using the final installer. All 120 migrations installed and all 14 full-host
+smoke checks passed. The final preflight verifies complete executable registry
+and packet equality before database connection. Independent temporary admission
+probes passed 10/10, including valid admission and missing/duplicate/drifted
+sources or broken predecessor rejection; no unit test files were added.
+
+The existing registration/privacy scenario also passed its bounded assertions
+on this combined stack. All four new function definitions and owners match,
+original sign-in grants and capture guard are unchanged, and no unexpected role
+can read the sign-in tables. The scenario now accepts the known Growth mismatch
+only when the sole failed group is exactly `runtimeCatalogues.family`.
+
+This is **not complete export or deletion acceptance**. Actual API jobs reported:
+
+- Export: commerce, content, growth, identity, media and trust completed;
+  conversation blocked at `conversation_recordings_unavailable`; Agent retained
+  `accounting_boundary_pending`.
+- Delete: growth and media completed; commerce and content blocked at their
+  unconfigured retention policy; conversation blocked at recordings; identity
+  waited for erasure, Agent for accounting, and trust for comparison artifact
+  purge. The existing data and unfinished jobs remain intact.
+
+Whole-account completion must resolve those owner/policy dependencies. The
+migration does not bypass or relabel their refusal as completed privacy work.
+
+The later [conversation export repair](conversation-export-completion-2026-10-22.md)
+prepares actual recording-association metadata without enabling interactive
+media. A new populated text-account export on the same stack completed all eight
+domains, and the downloaded contents matched the database. Anonymous and
+wrong-account access were refused. The earlier partial jobs above remain
+unchanged. Binary recording archives and whole-account deletion remain outside
+that bounded result.
+
 ## Reproduction and limits
 
 Use an owned fresh lane and unused port range:
