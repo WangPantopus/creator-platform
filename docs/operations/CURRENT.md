@@ -1,9 +1,12 @@
 # Current state
 
-Updated 2026-10-22 during the founder-authorized app-completion work. This is a
+Updated 2026-10-23 during the founder-authorized app-completion work. This is a
 local implementation checkpoint, not launch acceptance. Earlier lane notes and
 pull request maps are historical unless reverified here. Decisions come from the
 founder in chat, not from this file.
+
+Continue from the [October 23 handoff](session-handoff-2026-10-23.md), which names
+the exact branches, evidence, owned resources and next unstarted migration wave.
 
 ## Current integration
 
@@ -45,9 +48,19 @@ planning estimates, not an infrastructure choice.
   feed with messages, preserving the server's exact labels and signatures.
   Reads expire within the existing five-second access window and revalidate
   after failures, hidden tabs and reconnects. The signed Note workflow passed
-  10/10, with a focused freshness/lifecycle follow-up passing 4/4. Positive
-  reaction approval remains unavailable while migration 0156 is held.
+  10/10, with a focused freshness/lifecycle follow-up passing 4/4. A separate
+  52-publication member/tier browser journey passed 5/5 after fixing older-page
+  starvation during automatic refresh. The final bounded concurrent reader also
+  passes that real 5/5 workflow, lifecycle 4/4 and separate seven-cursor fixture
+  4/4. Follower access still refuses at its held metadata reader.
   See [web presence evidence](fan-presence-web-2026-10-22.md).
+- The separate [native feed PR #516](https://github.com/WangPantopus/creator-platform/pull/516)
+  adds authorized Notes/reactions to both phone timelines. Both apps build and
+  have operated actual signed Notes. The latest iOS journey passes again on the
+  concurrent-read source; its seven-cursor fixture also passes, including actual
+  HTTP sibling cancellation. Android's final actual Note journey passes 5/5 and
+  its expanded fixture passes 9/9. This
+  source is in its stacked branch, not yet integrated into the app branch.
 - The request queue renders working keyboard actions without nested buttons
   and wraps metadata at 320 pixels. Eight browser journeys plus unchanged-state
   and invariant checks passed, preserving holds, captures and commitments.
@@ -68,6 +81,9 @@ planning estimates, not an infrastructure choice.
 - FAQ evaluations and comparison replay stop new admissions during shutdown and
   drain admitted provider work and final database writes before releasing their
   pool. Actual active-provider and database-lock-wait shutdown cases passed.
+- Pull requests now check committed evidence size and duplicate blobs against
+  their actual base/head. Eleven real Git workflows passed; historical artifacts
+  remain untouched. See [evidence-budget checks](evidence-budget-2026-10-22.md).
 
 ## Verification observed this session
 
@@ -77,7 +93,7 @@ planning estimates, not an infrastructure choice.
 | Existing backend regressions | Final rerun: all nine files and 157 tests passed in 327.74 seconds, including money, PostgreSQL scope, shadow and worker-lifetime coverage |
 | Identity web flows | E1.1 40/40, E1.2 28/28, sign-in 19/19, passkey 8/8; typed client HTTP checks passed |
 | Studio | E6.1 26 Light/Night captures, Note 10/10, Today 10/10 |
-| Web conversation presence | Signed Note workflow 10/10; affected freshness/lifecycle checks 4/4; positive signed reactions and multi-page browser checks not yet verified |
+| Web conversation presence | Signed Note workflow 10/10; affected freshness/lifecycle checks 4/4; actual two-page member/tier browser journey 5/5; positive signed reactions remain unverified |
 | Request queue | 10/10 browser/state steps at desktop and phone widths in both themes, plus nine money invariants; no API writes or financial changes |
 | Native sign-in | Apple iOS and Android Google journeys passed earlier; approved iOS Google SDK now builds for both architectures and passes its expanded real-stack journey 1/1 with five database assertions; real provider sheets remain unverified |
 | Commerce stock host | Eight workflow steps and nine invariant checks passed; signed duplicate webhook deduplicated; invalid/stale/wrong-account events and four invalid startup configurations refused |
@@ -86,7 +102,7 @@ planning estimates, not an infrastructure choice.
 | FAQ and streaming | FAQ publication 12/12; A7 8/8 and focused follow-up 5/5; one initial latency sample remained unmeasured |
 | Catalogue checks | Fresh/restored without Growth 45/45; with Growth 44/45, solely the known single family-pin diagnostic; accepted runtime family profiles match |
 | AI replies | Full-host smoke 14/14; five repeated short/maximum-length replies complete under unchanged $5 cap with Growth running; three adversarial cost-rounding checks pass |
-| Final web build | Optimized production build passed after the freshness/lifecycle changes; all seven typechecks and scoped lint passed on the same source |
+| Final web build | Optimized production build passed after the final bounded concurrent paging changes at 80310c601; all seven typechecks, scoped lint and formatting passed on that source |
 
 These are synthetic local journeys. External identity, Stripe and model providers
 were fakes. They do not establish production operation, real-model quality,
@@ -104,13 +120,14 @@ original scope in the linked reports.
 
 ## Work still required
 
-- **Native:** thread rendering of the separate Content Note/reaction feed,
-  native platform age signals,
+- **Native:** actual signed reaction delivery; native platform age signals,
   configured provider sheets and device/store acceptance. Store accounts,
   provisioning, domain associations and push credentials are still needed.
 - **Privacy:** whole-account deletion remains incomplete across conversation,
-  commerce and content. Retention and redaction decisions and complete owner
-  adapters are required. Existing preserved deletion clocks must not be advanced.
+  commerce and content. Ordinary-data retention is approved; Content source
+  revocation and deletion, Conversation provenance purge and other owner adapters
+  remain implementation work. Commerce financial retention remains a separate
+  unresolved policy decision. Existing preserved deletion clocks must not be advanced.
 - **AI:** memory-writer and context-exclusion SQL proposals remain unregistered
   and inactive. Their full source/custody/privacy upgrade qualification and real
   UI workflows remain. Real-model safety, grounding and latency need the
@@ -118,9 +135,18 @@ original scope in the linked reports.
 - **Commerce and reach:** inbox claimant registration and background recipient
   authority for request notices remain unfinished. This host does not invent
   recipient authority to publish those notices. Real Stripe test acceptance is
-  still needed. Private-reply review and positive reaction delivery need the
-  separate reviewed activation wave for the held reply-review proposal; local
-  source/catalogue and fresh/restored qualification are now underway.
+  still needed. [Reply-review PR #515](https://github.com/WangPantopus/creator-platform/pull/515)
+  qualifies the unchanged source as additive 0253: fresh 121 and independently
+  restored 120→121 pass 46/46 without Growth, and its existing 157 backend tests
+  pass. Actual Ops approval and refusal paths passed, but creator delivery found
+  a further held creator/fan denial dependency. Its original populated Content
+  and Trust outputs passed separately. A different current actor's export
+  recovered from a bounded timeout on normal retry, then all eight domains and
+  all four streamed artifact checks passed after a stock-runtime restart. That
+  actor had no conversation families; neither this export nor the completed
+  owner outputs establish whole-account deletion.
+  [Follower metadata](core-follow-custody-audit-2026-10-22.md) needs a subsequent
+  separate wave; no missing denial or audience guard is bypassed.
 - **Production:** the production host still fails closed where its real adapters
   are absent. Hosting, region, account, domain and budget remain undecided;
   production secrets, backups/restore drills and deployment acceptance follow.
@@ -145,7 +171,10 @@ provider credentials. No real secret belongs in a report or commit.
 
 All source from the interrupted session has been committed and pushed in
 [draft PR #514](https://github.com/WangPantopus/creator-platform/pull/514).
-Verified follow-ups continue there. The Codex CI reader could not access the
+Verified follow-ups continue there, with stacked
+[reply-review #515](https://github.com/WangPantopus/creator-platform/pull/515)
+and [native presence #516](https://github.com/WangPantopus/creator-platform/pull/516).
+All three are drafts. The Codex CI reader could not access the
 selected GitHub account, but the connected GitHub reader subsequently reported
 Foundation checks pending and Trust release compilation in progress at commit
 `3cbcedbb7`. Remote success is not claimed; no CLI fallback or CI polling was
