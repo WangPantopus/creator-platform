@@ -125,7 +125,8 @@ reservation, frozen map, source SQL and all earlier review files are unchanged.
 - A separate owned PostgreSQL17 cluster built all121 migrations from empty
   through the real fresh installer. Without Growth, the actual catalogue check
   passed **46/46 groups, 51 digests**. The additional group covers reply-review.
-  A live Growth catalogue check and the preserved upgrade are still pending.
+  A live Growth catalogue check was pending at this source checkpoint; the
+  independent preserved upgrade is recorded below.
   The earlier graph's documented44/45 Growth diagnostic is not relabelled here.
 - Backend typecheck and the focused source lint passed before this checkpoint.
 
@@ -160,3 +161,52 @@ metadata ledger entries and adversarial drift back; it creates no product proof,
 case, decision or erasure receipt. Detailed metadata, initial harness failure
 (missing bounded driver timeout), corrected captures and backups remain private
 under `/tmp/qelvora-reply-review-1022/`.
+
+## Preserved upgrade observed
+
+The actual `activate-wave` operator accepted the current private backup and
+independent restore manifest for the closed `reply_restored120` target. It applied
+only `0253_w8_reply_review`:120 prior ledger rows were preserved,121 rows remained.
+Before operating, all six custody dimensions matched the independent
+`reply_verified120` restore. Afterwards all six original business rows in189
+tables,63 existing roles, the original sequence and the prior source history
+were preserved. The backup/restore security capture covered17,597 records.
+The operator reported34 purpose roles, two checked private purposes, traffic
+closed and `releaseReady:false`; this is not permission to reopen production.
+
+The upgraded target and the separate fresh cluster both passed **46/46 catalogue
+groups,51 pinned digests**, without incoming Growth. Private receipts are
+`upgrade121.json`, `upgrade121.manifest.json`, `upgrade121.log`, and
+`restored121-check.log` under the evidence directory above. The repeatable actual
+operator scenario is `tests/scenarios/lane-2/e2-reply-review-upgrade.mjs`.
+
+Prepare an owned exact120 PostgreSQL17 target, close traffic (`CONNECTION LIMIT
+0` and the `creator-platform:restored-traffic-closed` database comment), then take
+a current custom-format dump and restore it into a **distinct** owned database.
+The scenario deliberately does not silently create, reset or repair either DB.
+For the owned cluster in this run, the backup ceremony was equivalent to:
+
+```sh
+umask 077
+mkdir -p /tmp/qelvora-reply-review-1022
+docker exec qelvora-lanereply-1022-postgres \
+  pg_dump -U postgres -Fc reply_restored120 \
+  > /tmp/qelvora-reply-review-1022/restored120.dump
+docker exec qelvora-lanereply-1022-postgres \
+  createdb -U postgres -T template0 reply_verified120
+docker exec -i qelvora-lanereply-1022-postgres \
+  pg_restore -U postgres -d reply_verified120 \
+  < /tmp/qelvora-reply-review-1022/restored120.dump
+docker exec qelvora-lanereply-1022-postgres psql -U postgres -d postgres -c \
+  "ALTER DATABASE reply_verified120 CONNECTION LIMIT 0; COMMENT ON DATABASE reply_verified120 IS 'creator-platform:restored-traffic-closed';"
+node --import tsx tests/scenarios/lane-2/e2-reply-review-upgrade.mjs \
+  --db postgresql://postgres:foundation-test-only@127.0.0.1:56650/reply_restored120 \
+  --verify-db postgresql://postgres:foundation-test-only@127.0.0.1:56650/reply_verified120 \
+  --backup /tmp/qelvora-reply-review-1022/restored120.dump \
+  --out /tmp/qelvora-reply-review-1022/upgrade121.json
+```
+
+Do not rerun these commands over the now-upgraded target or an existing restore.
+The operator scenario requires a backup less than one hour old and private file
+permissions. Syntax and focused lint passed. Runtime author/Ops and privacy
+journeys remain separate gates.
