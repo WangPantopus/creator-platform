@@ -281,6 +281,9 @@ export function createGrowthRouter(
       .status(201)
       .json(await service.createInvite(await actorFor(req), req.body)),
   );
+  router.get("/launch", async (req, res) =>
+    res.json(await service.launchKit(await actorFor(req))),
+  );
   router.get("/insights", async (req, res) =>
     res.json({ clusters: await service.insights(await actorFor(req)) }),
   );
