@@ -31,9 +31,9 @@ planning estimates, not an infrastructure choice.
   continuations stay in memory. Late or mismatched returned sessions receive
   bounded cleanup. See [native sign-in evidence](native-sign-in-2026-10-22.md).
 - The approved GoogleSignIn 10.0.0 dependency and iOS Google credential adapter
-  are committed. Final compilation and the expanded fake-provider journey are
-  being rerun after the interrupted local session; the earlier native passes
-  predate this SDK addition.
+  are committed. Both simulator architectures compile, and the expanded Google
+  fake-provider journey passes with cancellation, age refusal, adult admission,
+  restoration and logout. Five exact-subject database assertions also pass.
 - The stock development host composes commerce recovery with the canonical
   service and identity adapter, plus signed raw Stripe notification ingress.
   Expired requests release holds; overdue accepted commitments refund. Optional
@@ -41,6 +41,10 @@ planning estimates, not an infrastructure choice.
   See [commerce evidence](commerce-host-completion-2026-10-22.md).
 - Studio opens on Today. Note composition preserves paragraphs and direction,
   names the member audience, and retains Today navigation while composing.
+- Web fan conversations now merge the authorized Content Notes and reaction
+  feed with messages, preserving the server's exact labels and signatures.
+  The request queue renders working actions without nested buttons. Final
+  operated checks for these two web changes are in progress.
 - The AI wave adds bounded cost holds, refusal-path safety, wake-on-accept,
   streaming/reconnect improvements, FAQ-based publication and retrieval/citation
   improvements. Integration fixes round each billed call conservatively, retain
@@ -63,10 +67,10 @@ planning estimates, not an infrastructure choice.
 | Area | Result and limit |
 | --- | --- |
 | Combined app static checks | Typecheck 7/7, lint, formatting and generated web/native contracts (124 operations) passed together |
-| Existing backend regressions | 157/157 passed on both the app baseline and the 120-migration qualification environment |
+| Existing backend regressions | Final rerun: all nine files and 157 tests passed in 327.74 seconds, including money, PostgreSQL scope, shadow and worker-lifetime coverage |
 | Identity web flows | E1.1 40/40, E1.2 28/28, sign-in 19/19, passkey 8/8; typed client HTTP checks passed |
 | Studio | E6.1 26 Light/Night captures, Note 10/10, Today 10/10 |
-| Native sign-in | iOS build and real-stack UI journey 1/1; Android build, existing contract tests 2/2, and five operated real-stack checkpoints passed |
+| Native sign-in | Apple iOS and Android Google journeys passed earlier; approved iOS Google SDK now builds for both architectures and passes its expanded real-stack journey 1/1 with five database assertions; real provider sheets remain unverified |
 | Commerce stock host | Eight workflow steps and nine invariant checks passed; signed duplicate webhook deduplicated; invalid/stale/wrong-account events and four invalid startup configurations refused |
 | Database upgrade | Fresh 120-source installs in both isolated engine and combined app; separate canonical-61 bootstrap; restored 119 → 120 operator with original data/security preserved |
 | Combined privacy API | Exact registration/owner/grant checks passed; a new populated text-account export completed all eight domains, matched actual database records, and refused anonymous/wrong-account downloads; deletion remains blocked by existing owner/retention requirements |
@@ -81,14 +85,17 @@ The full combined-tree gates and final runtime results are recorded in the linke
 qualification reports as they complete.
 
 After a host restart, the workspace source and Git history were intact, but
-temporary `/tmp` evidence and unfinished test processes were absent. The final
-backend regression run had not reported completion and is not counted as a new
-pass. Its required final checks and the iOS SDK checks are being rerun. Earlier
-observed results remain recorded above with their original scope.
+temporary `/tmp` evidence and unfinished test processes were absent. The
+interrupted run was not counted as a pass. Backend regressions, all seven
+typechecks, generated contracts, lint, formatting, shared-resource tests and
+the backend build have now passed again. The iOS SDK also passed the fresh
+build and operated checks described above. Earlier observations retain their
+original scope in the linked reports.
 
 ## Work still required
 
-- **Native:** final iOS Google adapter verification, native platform age signals,
+- **Native:** thread rendering of the separate Content Note/reaction feed,
+  native platform age signals,
   configured provider sheets and device/store acceptance. Store accounts,
   provisioning, domain associations and push credentials are still needed.
 - **Privacy:** whole-account deletion remains incomplete across conversation,
@@ -123,6 +130,12 @@ implementation. It does not choose policy, authorize purchases or supply missing
 provider credentials. No real secret belongs in a report or commit.
 
 ## History
+
+All source from the interrupted session has been committed and pushed in
+[draft PR #514](https://github.com/WangPantopus/creator-platform/pull/514).
+Verified follow-ups continue there. The Codex CI reader could not access the
+selected GitHub account, so remote check status is unverified. No CLI fallback
+or CI polling was used.
 
 The [October 15 handoff](integrator-handoff-2026-10-15.md),
 [launch plan](../LAUNCH_PLAN.md), [finish plan](product-finish-plan-2026-10-08.md)

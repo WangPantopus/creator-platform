@@ -2,11 +2,12 @@
 
 ## App-completion update, 2026-10-22
 
-The local app-completion branch now integrates native backend sign-in: Apple on
-iOS and Google on Android, nonce/age/session handling, secure restoration and
+The local app-completion branch now integrates native backend sign-in: Apple and
+the approved GoogleSignIn 10.0.0 SDK on iOS, Google on Android, nonce/age/session handling, secure restoration and
 under-18 policy refusal. Real-stack synthetic-provider journeys and builds
 passed; see [current native evidence](../../operations/native-sign-in-2026-10-22.md).
-iOS Google, platform age signals, real provider/device acceptance and the other
+The expanded iOS Google journey also passes cancellation/retry and exact-subject
+database checks. Platform age signals, real provider/device acceptance and the other
 phone work packages remain incomplete. The October 9 status below is history,
 not a claim about current PR or CI state.
 
