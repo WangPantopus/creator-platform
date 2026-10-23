@@ -320,6 +320,9 @@ public final class FanSession: ObservableObject {
     }
     func cancelSignIn() {
         identityAttempt = UUID(); choosingIdentityProvider = false; ageConfirmation = nil; signInAccount = nil
+        #if os(iOS)
+        GoogleIdentityCeremony.shared.cancelCurrent()
+        #endif
         error = ""
     }
     func expireSignInAge(_ id: String) {
@@ -715,6 +718,9 @@ public struct FanAppShell: View {
             #endif
             .onOpenURL { url in
                 #if os(iOS)
+                // The SDK consumes only its configured OAuth callback. It owns
+                // provider state/PKCE; callbacks never carry an app session.
+                if GoogleIdentityCeremony.shared.handleCallback(url) { return }
                 let initialLink = !hasEnteredForeground
                 #else
                 let initialLink = false

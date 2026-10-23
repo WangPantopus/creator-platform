@@ -16,18 +16,25 @@ targets:
       properties:
         CreatorAPIURL: $(CREATOR_API_URL)
         CreatorLinkHost: $(CREATOR_LINK_HOST)
+        CreatorGoogleClientID: $(GOOGLE_IOS_CLIENT_ID)
+        CreatorGoogleServerClientID: $(GOOGLE_SERVER_CLIENT_ID)
         NSMicrophoneUsageDescription: Use your microphone for voice notes and calls you choose.
         NSCameraUsageDescription: Share your camera in a video call you choose to join.
         UIBackgroundModes: [audio]
         CFBundleURLTypes:
           - CFBundleURLName: local-development-entry
             CFBundleURLSchemes: [qelvora]
+          - CFBundleURLName: google-sign-in
+            CFBundleURLSchemes: [$(GOOGLE_REVERSED_IOS_CLIENT_ID)]
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
     settings:
       base:
         CREATOR_API_URL: ""
         CREATOR_LINK_HOST: ""
+        GOOGLE_IOS_CLIENT_ID: ""
+        GOOGLE_SERVER_CLIENT_ID: ""
+        GOOGLE_REVERSED_IOS_CLIENT_ID: "qelvora-google-unconfigured"
         PRODUCT_BUNDLE_IDENTIFIER: com.pantopus.qelvora
         CODE_SIGN_ENTITLEMENTS: App/QelvoraApp.entitlements
         GENERATE_INFOPLIST_FILE: YES

@@ -7,9 +7,7 @@ enum NativeIdentityProvider: String, CaseIterable, Identifiable {
     var title: String { QelvoraCopy.text(self == .apple ? "signInWithApple" : "signInWithGoogle") }
     var isConfigured: Bool {
         #if os(iOS)
-        // Google needs its own reviewed platform adapter. Never send a person
-        // through a browser callback that carries an app bearer in its URL.
-        return self == .apple
+        return self == .apple || GoogleIdentityConfiguration.current != nil
         #else
         return false
         #endif
@@ -88,19 +86,26 @@ struct NativeSignInPane: View {
             birthDate = ""
             #if os(iOS)
             ceremony?.cancel()
+            GoogleIdentityCeremony.shared.cancelCurrent()
             #endif
         }
     }
     private func signIn(_ provider: NativeIdentityProvider) async {
         #if os(iOS)
         await model.signIn(provider) { nonce in
-            guard provider == .apple,
-                  let anchor = UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene })
+            guard let anchor = UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene })
                     .flatMap(\.windows).first(where: \.isKeyWindow) else { throw NativeIdentityFailure.unavailable }
-            let current = AppleIdentityCeremony(anchor: anchor)
-            ceremony = current
-            defer { ceremony = nil }
-            return try await current.perform(nonce: nonce)
+            switch provider {
+            case .apple:
+                let current = AppleIdentityCeremony(anchor: anchor)
+                ceremony = current
+                defer { ceremony = nil }
+                return try await current.perform(nonce: nonce)
+            case .google:
+                guard var presenter = anchor.rootViewController else { throw NativeIdentityFailure.unavailable }
+                while let presented = presenter.presentedViewController { presenter = presented }
+                return try await GoogleIdentityCeremony.shared.perform(nonce: nonce, presenting: presenter)
+            }
         }
         #endif
     }

@@ -33,18 +33,29 @@ enum DebugHarness {
                   origin.scheme == "http", ["127.0.0.1", "localhost"].contains(origin.host ?? ""),
                   origin.user == nil, origin.password == nil, origin.query == nil, origin.fragment == nil,
                   origin.path.isEmpty || origin.path == "/", let url = origin.url else { return }
+            guard let provider = NativeIdentityProvider(rawValue: argument("--harness-native-provider") ?? "apple") else { return }
+            let audience = provider == .apple ? "com.pantopus.qelvora" : Bundle.main.object(forInfoDictionaryKey: "CreatorGoogleServerClientID") as? String
+            guard let audience, !audience.isEmpty else { return }
             await model.beginSignIn()
-            await model.signIn(.apple) { nonce in
+            await model.signIn(provider) { nonce in
                 // Only the external provider is faked. The real app obtains and
                 // consumes the real backend's one-use nonce, then renders its age step.
-                let hashed = SHA256.hash(data: Data(nonce.utf8)).map { String(format: "%02x", $0) }.joined()
+                let providerNonce = provider == .apple ? SHA256.hash(data: Data(nonce.utf8)).map { String(format: "%02x", $0) }.joined() : nonce
                 var request = URLRequest(url: url.appendingPathComponent("__mint"))
                 request.httpMethod = "POST"; request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-                request.httpBody = try JSONSerialization.data(withJSONObject: ["provider": "apple", "aud": "com.pantopus.qelvora", "sub": subject, "nonce": hashed])
+                request.httpBody = try JSONSerialization.data(withJSONObject: ["provider": provider.rawValue, "aud": audience, "sub": subject, "nonce": providerNonce])
                 let (data, response) = try await URLSession.shared.data(for: request)
                 guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw NativeIdentityFailure.unavailable }
                 struct Token: Decodable { let idToken: String }
-                return NativeIdentityCredential(idToken: try JSONDecoder().decode(Token.self, from: data).idToken)
+                let proof = NativeIdentityCredential(idToken: try JSONDecoder().decode(Token.self, from: data).idToken)
+                if arguments.contains("--harness-cancel-native-before-proof") {
+                    // Keep the provider pane visible for operated verification,
+                    // cancel the actual app attempt, then deliver a late proof.
+                    // This does not simulate or prove SDK sheet cancellation.
+                    try await Task.sleep(for: .seconds(2))
+                    model.cancelSignIn()
+                }
+                return proof
             }
             return
         }
