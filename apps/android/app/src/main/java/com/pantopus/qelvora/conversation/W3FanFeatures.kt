@@ -393,7 +393,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 item { BasicText("Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.", style = qText("caption").copy(color = qColor("ink"))) }
                 if (offline) item { Notice(title = "You're offline", children = "Saved conversation is available briefly while its reading permission is current. Reconnect to send.") }
                 if (current.offTheRecord) item { SystemLine(text = "Off the record · the AI keeps no memory from this conversation.") }
-                if (before != null || contentFeed.canReadEarlier) item { Button(QelvoraCopy.text("growthEarlier"), variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground || contentFeed.loading) { scope.launch {
+                if (before != null || contentFeed.canReadEarlier) item { Button(QelvoraCopy.text("growthEarlier"), variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground) { scope.launch {
                     busy = true
                     try { if (before != null) { val previous = client.page("$root?before=$before"); older = (previous.messages + older).distinctBy { it.id }.take(250); before = previous.before }; contentFeed.earlier() }
                     catch (failure: Throwable) { fail(failure) } finally { busy = false }

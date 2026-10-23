@@ -144,7 +144,7 @@ final class Lane7StackNavigationFlow: XCTestCase {
         let earlier = app.buttons["EARLIER"]
         for _ in 0..<8 { if earlier.isHittable { break }; app.swipeDown() }
         XCTAssertTrue(earlier.isHittable); earlier.tap()
-        for _ in 0..<8 { if note.exists { break }; app.swipeUp() }
+        for _ in 0..<8 { if reaction.isHittable { break }; app.swipeUp() }
         XCTAssertTrue(note.waitForExistence(timeout: 10)); XCTAssertTrue(reaction.waitForExistence(timeout: 10))
         _ = try await control("threads/maya/presence", ["mode": "removed"])
         try await Task.sleep(for: .seconds(3))
@@ -178,9 +178,28 @@ final class Lane7StackNavigationFlow: XCTestCase {
             XCTAssertTrue(earlier.isHittable); earlier.tap()
             try await Task.sleep(for: .milliseconds(600))
         }
-        for _ in 0..<8 { if note.exists { break }; app.swipeUp() }
+        for _ in 0..<8 { if reaction.isHittable { break }; app.swipeUp() }
         XCTAssertTrue(note.waitForExistence(timeout: 10)); XCTAssertTrue(reaction.waitForExistence(timeout: 10))
         print("Native C4: seven older cursors advance beyond the five-page retained window.")
+        let older = "2026-10-01T00:00:00.000000Z~d1000000-0000-4000-8000-000000000903"
+        let bodyPage = "2026-10-01T00:00:00.000000Z~d1000000-0000-4000-8000-000000000906"
+        _ = try await control("faults", ["rules": [
+            ["match": "/v1/content/.*/presence", "before": older, "status": 503, "delayMs": 300, "remaining": -1],
+            ["match": "/v1/content/.*/presence", "before": bodyPage, "delayMs": 4000, "remaining": -1]]])
+        XCTAssertTrue(unavailable.waitForExistence(timeout: 10)); XCTAssertFalse(note.exists)
+        try await Task.sleep(for: .seconds(5))
+        XCTAssertFalse(note.exists); XCTAssertFalse(reaction.exists)
+        let (logData, _) = try await URLSession.shared.data(from: URL(string: api + "/__harness/log?limit=1000")!)
+        let log = try JSONSerialization.jsonObject(with: logData) as! [[String: Any]]
+        XCTAssertTrue(log.contains { ($0["before"] as? String) == bodyPage && ($0["cancelled"] as? Bool) == true && ($0["cancelledAtMs"] as? Int ?? 4000) < 4000 }, "A failed sibling cancels the delayed body HTTP connection.")
+        _ = try await control("faults", ["rules": []])
+        XCTAssertTrue(note.waitForExistence(timeout: 15))
+        _ = try await control("faults", ["rules": [["match": "/v1/content/.*/presence", "before": older, "delayMs": 6000, "remaining": -1]]])
+        try await Task.sleep(for: .milliseconds(7500))
+        XCTAssertFalse(note.exists); XCTAssertFalse(reaction.exists)
+        _ = try await control("faults", ["rules": []])
+        XCTAssertTrue(note.waitForExistence(timeout: 18))
+        print("Native C4: slow/failing sibling conceals all pages; no late body restoration.")
     }
 
     func testNavigationOnRealStack() async throws {

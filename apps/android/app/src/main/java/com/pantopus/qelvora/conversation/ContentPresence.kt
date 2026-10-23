@@ -17,6 +17,9 @@ import androidx.compose.ui.unit.dp
 import com.pantopus.qelvora.generated.*
 import com.pantopus.qelvora.generated.QelvoraTokens as T
 import com.pantopus.qelvora.ui.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -81,7 +84,6 @@ class ContentPresenceFeed(private val client: ConversationClient, private val cr
     var items by mutableStateOf<List<ContentPresenceItem>>(emptyList()); private set
     var nextBefore by mutableStateOf<String?>(null); private set
     var unavailable by mutableStateOf(false); private set
-    var loading by mutableStateOf(false); private set
     var pages by mutableStateOf(1); private set
     var retry by mutableStateOf(0); private set
     private val cursors = mutableListOf<String?>(null)
@@ -90,7 +92,7 @@ class ContentPresenceFeed(private val client: ConversationClient, private val cr
     val canReadEarlier get() = nextBefore != null
     fun earlier() {
         val next = nextBefore ?: return
-        if (loading || cursors.contains(next)) return
+        if (cursors.contains(next)) return
         cursors.add(next)
         // Retain the head plus four older pages, without limiting how far the
         // final opaque cursor can advance through history.
@@ -98,7 +100,7 @@ class ContentPresenceFeed(private val client: ConversationClient, private val cr
         pages++
     }
     fun refresh() { retry++ }
-    fun conceal() { generation++; items = emptyList(); nextBefore = null; deadline = 0; loading = false }
+    fun conceal() { generation++; items = emptyList(); nextBefore = null; deadline = 0 }
     fun expire() { if (deadline != 0L && SystemClock.elapsedRealtime() >= deadline) { items = emptyList(); nextBefore = null; deadline = 0; unavailable = true } }
     suspend fun run(active: Boolean) {
         conceal()
@@ -107,17 +109,20 @@ class ContentPresenceFeed(private val client: ConversationClient, private val cr
         try {
             while (run == generation) {
                 currentCoroutineContext().ensureActive()
-                loading = true
                 val started = SystemClock.elapsedRealtime()
                 try {
+                    val requested = cursors.toList()
+                    val loaded = coroutineScope {
+                        // awaitAll preserves cursor order; failure or parent
+                        // cancellation cancels every sibling HTTP request.
+                        requested.map { before -> async { client.contentPresence(creatorId, before) } }.awaitAll()
+                    }
+                    currentCoroutineContext().ensureActive()
+                    if (run != generation) return
                     val collected = mutableListOf<ContentPresenceItem>()
                     var cursor: String? = null
                     val seen = mutableSetOf<String>()
-                    for (before in cursors.toList()) {
-                        require(SystemClock.elapsedRealtime() - started < 5000)
-                        val page = client.contentPresence(creatorId, before)
-                        currentCoroutineContext().ensureActive()
-                        if (run != generation) return
+                    for ((before, page) in requested.zip(loaded)) {
                         require(page.nextBefore == null || page.nextBefore != before)
                         // A changing head can overlap a retained older page.
                         collected.addAll(page.items.filter { seen.add(it.id) })
@@ -133,7 +138,6 @@ class ContentPresenceFeed(private val client: ConversationClient, private val cr
                     if (run != generation) return
                     items = emptyList(); nextBefore = null; deadline = 0; unavailable = true
                 }
-                loading = false
                 delay(2000)
             }
         } finally { if (run == generation) conceal() }

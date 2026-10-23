@@ -133,7 +133,8 @@ if (real) {
   assert(!has(text));
   for (let i = 0; i < 8 && !has("EARLIER"); i++) ui.swipe(540, 600, 540, 1800);
   await ui.tap("EARLIER");
-  for (let i = 0; i < 8 && !has(text); i++) ui.swipe(540, 1800, 540, 600);
+  for (let i = 0; i < 8 && !hasReaction(reaction); i++)
+    ui.swipe(540, 1800, 540, 600);
   await ui.waitFor(text, 10000);
   await ui.waitFor(reaction, 10000);
   console.log(
@@ -176,11 +177,69 @@ if (real) {
     await ui.tap("EARLIER");
     await sleep(600);
   }
-  for (let step = 0; step < 8 && !has(text); step++)
+  for (let step = 0; step < 8 && !hasReaction(reaction); step++)
     ui.swipe(540, 1800, 540, 600);
   await ui.waitFor(text, 10000);
   assert(hasReaction(reaction));
   console.log(
     "PASS: seven older cursors advance beyond the five-page retained window",
+  );
+  const older =
+    "2026-10-01T00:00:00.000000Z~d1000000-0000-4000-8000-000000000903";
+  const bodyPage =
+    "2026-10-01T00:00:00.000000Z~d1000000-0000-4000-8000-000000000906";
+  await control("faults", {
+    rules: [
+      {
+        match: "/v1/content/.*/presence",
+        before: older,
+        status: 503,
+        delayMs: 300,
+        remaining: -1,
+      },
+      {
+        match: "/v1/content/.*/presence",
+        before: bodyPage,
+        delayMs: 4000,
+        remaining: -1,
+      },
+    ],
+  });
+  await ui.waitFor("Content could not be refreshed", 10000);
+  assert(!has(text));
+  await sleep(5000);
+  assert(!has(text));
+  assert(!hasReaction(reaction));
+  const cancelled = await (
+    await fetch(api + "/__harness/log?limit=1000")
+  ).json();
+  assert(
+    cancelled.some(
+      (entry) =>
+        entry.before === bodyPage &&
+        entry.cancelled &&
+        entry.cancelledAtMs < 4000,
+    ),
+  );
+  console.log("PASS: failing sibling cancels the delayed body HTTP connection");
+  await control("faults", { rules: [] });
+  await ui.waitFor(text, 15000);
+  await control("faults", {
+    rules: [
+      {
+        match: "/v1/content/.*/presence",
+        before: older,
+        delayMs: 6000,
+        remaining: -1,
+      },
+    ],
+  });
+  await sleep(7500);
+  assert(!has(text));
+  assert(!hasReaction(reaction));
+  await control("faults", { rules: [] });
+  await ui.waitFor(text, 18000);
+  console.log(
+    "PASS: failing/slow sibling conceals the full window and late successful bodies do not restore it",
   );
 }

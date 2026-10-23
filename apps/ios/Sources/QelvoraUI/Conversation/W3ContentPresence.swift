@@ -62,7 +62,6 @@ final class W3ContentPresenceFeed: ObservableObject {
     @Published private(set) var items: [W3ContentPresenceItem] = []
     @Published private(set) var nextBefore: String?
     @Published private(set) var unavailable = false
-    @Published private(set) var loading = false
     @Published private(set) var pages = 1
     @Published private(set) var retry = 0
     private var cursors: [String?] = [nil]
@@ -73,7 +72,7 @@ final class W3ContentPresenceFeed: ObservableObject {
     init(client: W3ConversationClient, creatorId: String) { self.client = client; self.creatorId = creatorId }
     var canReadEarlier: Bool { nextBefore != nil }
     func earlier() {
-        guard !loading, let nextBefore, !cursors.contains(where: { $0 == nextBefore }) else { return }
+        guard let nextBefore, !cursors.contains(where: { $0 == nextBefore }) else { return }
         cursors.append(nextBefore)
         // Keep the current head plus the four most recently requested older
         // pages. The last opaque cursor can still advance without a page cap.
@@ -81,7 +80,7 @@ final class W3ContentPresenceFeed: ObservableObject {
         pages += 1
     }
     func refresh() { retry += 1 }
-    func conceal() { generation += 1; items = []; nextBefore = nil; deadline = nil; loading = false }
+    func conceal() { generation += 1; items = []; nextBefore = nil; deadline = nil }
     func expire() { if let deadline, .now >= deadline { items = []; nextBefore = nil; self.deadline = nil; unavailable = true } }
     func run(active: Bool) async {
         conceal()
@@ -89,15 +88,22 @@ final class W3ContentPresenceFeed: ObservableObject {
         let run = generation
         defer { if run == generation { conceal() } }
         while !Task.isCancelled && run == generation {
-            loading = true
             let started = ContinuousClock.now
             do {
+                let requested = cursors, client = self.client, creatorId = self.creatorId
+                let loaded = try await withThrowingTaskGroup(of: (Int, W3ContentPresencePage).self) { group in
+                    for (index, before) in requested.enumerated() {
+                        group.addTask { (index, try await client.contentPresence(creatorId: creatorId, before: before)) }
+                    }
+                    var result: [(Int, W3ContentPresencePage)] = []
+                    // Structured cancellation stops every sibling on failure.
+                    for try await page in group { result.append(page) }
+                    return result.sorted { $0.0 < $1.0 }.map { $0.1 }
+                }
+                guard !Task.isCancelled, run == generation else { return }
                 var collected: [W3ContentPresenceItem] = [], cursor: String?
                 var seen = Set<String>()
-                for before in cursors {
-                    guard started.duration(to: .now) < .seconds(5) else { throw W3Failure(message: "Content access expired.", status: 503) }
-                    let page = try await client.contentPresence(creatorId: creatorId, before: before)
-                    guard !Task.isCancelled, run == generation else { return }
+                for (before, page) in zip(requested, loaded) {
                     guard page.nextBefore == nil || page.nextBefore != before else { throw W3Failure(message: "Invalid content cursor.", status: 503) }
                     // A changing head can overlap a retained older page.
                     collected += page.items.filter { seen.insert($0.id).inserted }
@@ -112,7 +118,6 @@ final class W3ContentPresenceFeed: ObservableObject {
                 guard !Task.isCancelled, run == generation else { return }
                 items = []; nextBefore = nil; deadline = nil; unavailable = true
             }
-            loading = false
             do { try await Task.sleep(for: .seconds(2)) } catch { return }
         }
     }

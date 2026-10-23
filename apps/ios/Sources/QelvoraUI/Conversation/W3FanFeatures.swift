@@ -81,7 +81,7 @@ private struct W3ThreadScreen: View {
                             Text("Conversations with a creator’s AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.").qText("caption").padding(12).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusMd))
                             if model.offline { Notice(tone: .offline, title: "You're offline", children: "You're seeing a saved conversation with a short reading lease. Reconnect to send.") }
                             if page.offTheRecord { SystemLine(children: "Off the record · the AI keeps no memory from this conversation.") }
-                            if model.before != nil || contentFeed.canReadEarlier { Button(QelvoraCopy.text("growthEarlier"), variant: .quiet, disabled: model.busy || model.offline || contentFeed.loading) { Task { if model.before != nil { await model.earlier() }; contentFeed.earlier() } } }
+                            if model.before != nil || contentFeed.canReadEarlier { Button(QelvoraCopy.text("growthEarlier"), variant: .quiet, disabled: model.busy || model.offline) { Task { if model.before != nil { await model.earlier() }; contentFeed.earlier() } } }
                             timeline(page)
                             if contentFeed.unavailable {
                                 Text(QelvoraCopy.text("w5ContentRefreshUnavailable")).qText("caption")
