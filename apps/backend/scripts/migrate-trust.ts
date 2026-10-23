@@ -23,6 +23,7 @@ import comparisonReview from "../../../infra/migrations/reviews/20261008-compari
 import { registeredComparisonProfile } from "../src/db/comparison-profile.js";
 import noticesReview from "../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
 import signInAndMoneyReview from "../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
+import replyReview from "../../../infra/migrations/reviews/20261023-reply-review.json" with { type: "json" };
 import workspaceLockReview from "../../../infra/migrations/reviews/20261022-workspace-lock.json" with { type: "json" };
 import generationReview from "../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
 
@@ -164,6 +165,19 @@ try {
     throw new Error(
       "Workspace-lock registry requires its exact source and complete sign-in and money predecessor.",
     );
+  const replyReviewVersions = new Set(
+    replyReview.sources.map((source) => source.version),
+  );
+  const replyReviewRegistered = registry.migrations.some((source) =>
+    replyReviewVersions.has(source.version),
+  );
+  if (
+    replyReviewRegistered &&
+    (!workspaceLock || !(await registeredComparisonProfile()))
+  )
+    throw new Error(
+      "Reply-review registry requires its exact source and complete workspace-lock predecessor.",
+    );
   const registeredFiles = registry.migrations
     .filter(
       (file) =>
@@ -291,6 +305,18 @@ try {
     throw new Error(
       "Incomplete or unregistered workspace-lock wave; no per-file repair was attempted.",
     );
+  const installedReplyReview = applied.filter((source) =>
+    replyReviewVersions.has(source.version),
+  ).length;
+  if (
+    installedReplyReview &&
+    (!replyReviewRegistered ||
+      installedWorkspaceLock !== workspaceLockVersions.size ||
+      installedReplyReview !== replyReviewVersions.size)
+  )
+    throw new Error(
+      "Incomplete or unregistered reply-review wave; no per-file repair was attempted.",
+    );
   // Fresh databases still bootstrap the exact canonical61. The complete new
   // wave is only installed atomically by activate-wave after private backup,
   // separate restore and closed-admission checks. Registered code alone cannot
@@ -309,7 +335,8 @@ try {
       (installedNotices || !noticesVersions.has(source.version)) &&
       (installedSignInAndMoney ||
         !signInAndMoneyVersions.has(source.version)) &&
-      (installedWorkspaceLock || !workspaceLockVersions.has(source.version)),
+      (installedWorkspaceLock || !workspaceLockVersions.has(source.version)) &&
+      (installedReplyReview || !replyReviewVersions.has(source.version)),
   );
   const historical = localLegacy
     ? new Set<string>()
@@ -336,6 +363,9 @@ try {
     outputBeforePublic: installedOutput && !installedPublic,
     publicBeforeComparison: Boolean(installedPublic && !installedComparison),
     comparisonBeforeNotices: Boolean(installedComparison && !installedNotices),
+    workspaceLockBeforeReplyReview: Boolean(
+      installedWorkspaceLock && !installedReplyReview,
+    ),
     signInAndMoneyBeforeWorkspaceLock: Boolean(
       installedSignInAndMoney && !installedWorkspaceLock,
     ),
@@ -364,25 +394,27 @@ try {
       if (installedGeneration)
         await assertGenerationWaveRoleSafety(
           client,
-          installedWorkspaceLock
-            ? "workspace-lock"
-            : installedSignInAndMoney
-              ? "sign-in-and-money"
-              : installedNotices
-                ? "notices"
-                : installedComparison
-                  ? "comparison"
-                  : installedPartialRecovery
-                    ? "partial-generation-recovery"
-                    : installedRecovery
-                      ? "generation-recovery"
-                      : installedPublic
-                        ? "public-ai"
-                        : installedOutput
-                          ? "generation-output"
-                          : installedContent
-                            ? "content-privacy"
-                            : undefined,
+          installedReplyReview
+            ? "reply-review"
+            : installedWorkspaceLock
+              ? "workspace-lock"
+              : installedSignInAndMoney
+                ? "sign-in-and-money"
+                : installedNotices
+                  ? "notices"
+                  : installedComparison
+                    ? "comparison"
+                    : installedPartialRecovery
+                      ? "partial-generation-recovery"
+                      : installedRecovery
+                        ? "generation-recovery"
+                        : installedPublic
+                          ? "public-ai"
+                          : installedOutput
+                            ? "generation-output"
+                            : installedContent
+                              ? "content-privacy"
+                              : undefined,
         );
       else await assertWaveRoleSafety(client, installedRoles(applied));
       if (continuation)
@@ -472,25 +504,27 @@ try {
       if (installedGeneration)
         await assertGenerationWaveRoleSafety(
           client,
-          installedWorkspaceLock
-            ? "workspace-lock"
-            : installedSignInAndMoney
-              ? "sign-in-and-money"
-              : installedNotices
-                ? "notices"
-                : installedComparison
-                  ? "comparison"
-                  : installedPartialRecovery
-                    ? "partial-generation-recovery"
-                    : installedRecovery
-                      ? "generation-recovery"
-                      : installedPublic
-                        ? "public-ai"
-                        : installedOutput
-                          ? "generation-output"
-                          : installedContent
-                            ? "content-privacy"
-                            : undefined,
+          installedReplyReview
+            ? "reply-review"
+            : installedWorkspaceLock
+              ? "workspace-lock"
+              : installedSignInAndMoney
+                ? "sign-in-and-money"
+                : installedNotices
+                  ? "notices"
+                  : installedComparison
+                    ? "comparison"
+                    : installedPartialRecovery
+                      ? "partial-generation-recovery"
+                      : installedRecovery
+                        ? "generation-recovery"
+                        : installedPublic
+                          ? "public-ai"
+                          : installedOutput
+                            ? "generation-output"
+                            : installedContent
+                              ? "content-privacy"
+                              : undefined,
         );
       else await assertWaveRoleSafety(client, installedRoles(files));
       if (continuation)
@@ -520,6 +554,10 @@ try {
   if (notices && !installedNotices)
     process.stdout.write(
       "Notices sources remain unapplied. After comparison114, use W8_MIGRATION_WAVE=20261015-notices with verified private backup/restore and closed admission.\n",
+    );
+  if (replyReviewRegistered && !installedReplyReview)
+    process.stdout.write(
+      "Reply-review source remains unapplied. After workspace-lock120, use W8_MIGRATION_WAVE=20261023-reply-review with verified private backup/restore and closed admission.\n",
     );
   if (workspaceLock && !installedWorkspaceLock)
     process.stdout.write(

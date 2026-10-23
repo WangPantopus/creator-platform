@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "scope": "Private Note reply review wave0253 follows exact120. Unchanged0069 source creates one isolated NOLOGIN purpose, two forced-RLS review tables and three purpose functions; three existing PUBLIC policies become core-runtime-only. Private text remains with Content and delivery requires an exact purpose-leased Ops decision. Candidate qualification is recorded separately; no production or erasure acceptance.",
+  "sources": [
+    {
+      "version": "0253_w8_reply_review",
+      "owner": "W8",
+      "path": "apps/backend/migrations/0069_w8_reply_review.sql",
+      "checksum": "65a86e17256a872bcbf640006274512a29e3bda31232838c68fe3aa5df2a958a",
+      "name": "w8_reply_review"
+    }
+  ],
+  "purposeProfiles": [
+    {
+      "review": "original",
+      "sha256": "4330ec0b4dba903d8edca5e398bbd61b4a391ca86b435a691431b4953ea25cc9"
+    },
+    {
+      "review": "original-incoming",
+      "sha256": "e16949824bd5ffc19cc4acfbff6625354153896ee2525fa5b6749bff7bd44cd9"
+    },
+    {
+      "review": "populated-original",
+      "sha256": "6ecda56434924a118bab0bc635f1bc2c495c71c622bb9faf9a3336eb2243e61a"
+    },
+    {
+      "review": "populated-original-incoming",
+      "sha256": "be7d5c199136be31e4ed6be9ba4df787b40fcab29d6bd7b233886f7fee1c62a0"
+    }
+  ],
+  "runtimeCatalogues": {
+    "output": "58f13273c43d977fc0ca0b05bcd514d4a42e54f993f4ec020be75d21131d1851",
+    "terminal": "6d179b7dc84fd8ab58aa2356fae989181bea9357d9dd840bc0724e4cf8fe4b5b",
+    "financial": "d43aa215b273b3b2ae02cf961d11fe4e542cb9dd9e88e6df816632f9c5561e87",
+    "expiry": "a7e728a7b52d4e9e462e85f44cca78ac52e091234db341509f6bde0d728b2166",
+    "detached": "8211fda209a0fd57c1971d7ace8b1b56c0e2cfa0eb2a4120d990764015993c1a",
+    "boundary": "469b9b9d66ec96c4e30afb50d8c128c14db67f07d35fb6f7299e07bf6569b04c",
+    "family": "a694274fd26fe8986e10fc2800267ae392206c6a3bee1ac82926452637ff781e"
+  },
+  "originalFamilyProfiles": [
+    {
+      "review": "original",
+      "sha256": "a694274fd26fe8986e10fc2800267ae392206c6a3bee1ac82926452637ff781e"
+    },
+    {
+      "review": "original-incoming",
+      "sha256": "ecd53bbf2c0c42500e49662fb055d53c041aa865b73d88a3c2eda38dea869675"
+    }
+  ],
+  "outputCatalogueChecksum": "eaea17126e91ba10c99140c02c58010ec80b5a84b0f29e758f0e7e2f3fa08d53",
+  "publicCatalogueChecksum": "a50632010a031c7b2380b711b3f8d9689184788a864019bd3fd273a279842f75",
+  "agentExportCatalogueChecksum": "4dcdd2f845250d5981c292345e0985d0858a1b6e76776eb8eaf47acd0ec1b462",
+  "conversationCursorCatalogueChecksum": "351d170721dd8286b13a6b0db16002ff74e2d4d5262d9ffaff7ca6b55c3f1eb9",
+  "provenancePurgeCatalogueChecksum": "77c06a09be6b38261011698e20d717083efcfb5b197c4aa6bc0b0324c3b17891",
+  "provenancePurgeIncomingCatalogueChecksum": "d228755d492e8e4f86b9a68df280eb93a33b9cedec5a66d63f1a071b9d8e217c",
+  "workerCatalogues": {
+    "creator_commerce_public_read": "5d95a571295cff8769f2744c799ab1bfa97830e23900d2f4972a13b969ee7ce3",
+    "creator_generation_authority": "1fdb3f85ca24a39deb1cd4a1206ff5bc33f237d5b226c389f3f1eaf0b28d199d",
+    "creator_generation_conversation_context": "db3dc437bc64ead4cef77888f63de79333af2422c16e15ce16abcdbce5c70743",
+    "creator_generation_cursor_authority": "3ebcb9c0d79a87405124d0632158f78afcb549c23451bb7c12c5e6d5d378abee",
+    "creator_generation_terminal_authority": "f798047a4a7cc62eeaed9d0640115ad2633bcb303e523c7d5a03117c8bc7ab8f",
+    "creator_generation_terminal_discovery": "defda8501a09063c563355d02840848c3ede31a033dc957d2f255fbc4b6d3508",
+    "creator_generation_worker": "9d783a079f7292bf501c837acd25bdf58fc72b1070abcb6d1b098723a5c8066c",
+    "creator_privacy_accounting_boundary": "7bf0c305d1c12fa4f7173f868940ad5b2d407c6d44da2775ca683b7e5bae6a1c",
+    "creator_privacy_family": "fb4e0715bf3cf570b4a54d8994d597a5090afa1d73a13f04a6760f10c25d54cb",
+    "creator_privacy_ownership_metadata": "9d783a079f7292bf501c837acd25bdf58fc72b1070abcb6d1b098723a5c8066c",
+    "creator_signature_read_authority": "b844e331da1ba39eb716d1af12835a8eb946f21cfdbc6665f833f39fc1873cfd",
+    "creator_usage_detachment": "72be258e66708a6041cf806be61c866cde49b917fb51bcc445fb443bd52f888e",
+    "creator_usage_expiry": "589340e23ece1521bc110abeef3e0753092905681cc2cda28a69437c61b879dd",
+    "creator_w2_generation_guardrail": "edf6f8e06cadc6b9fe3cf1c8b8f29ea841e71ae92c0326416b25cad52f8de642",
+    "creator_w2_generation_input": "f8f736a7dafddeca88541ac33682d453d5b374567cfe21025cd51e68b71c0529",
+    "creator_w2_generation_journal": "520a6756344f8b62127f071019ea1dc971e9a7f85b32ac3e93733fc80f74b888",
+    "creator_w2_generation_metadata": "1aa70b25f7c5ed2f09368a43e9485b7d4c68a212a6861a45df5dbc9fa4a82678",
+    "creator_w2_generation_retrieval": "b4efa121041b5295fc2a3f0e7534f82e302cedcc0dee4bd89e998958ddc6e7ce",
+    "creator_w2_generation_terminal_journal": "bb2eea8ed0478eacc12ec5c3bc87742d66e621c728fe8d5cf22477b5398ee2c6",
+    "creator_w2_privacy_export": "4dcdd2f845250d5981c292345e0985d0858a1b6e76776eb8eaf47acd0ec1b462",
+    "creator_w3_generation_output": "fac6feb029d000687e2adfe1076e773ab0cf67610ed00c06af5c4b8dc6210dc6",
+    "creator_w3_generation_privacy": "eb9bbb487704983ff8bbab87074149c10d2ebf0813f88a1a3aa508e24674c113",
+    "creator_w3_privacy_export": "7473b29f87bdba9a11f35b8c9a3dc3be046bc90ee3b2a1fd030d8b49883dda2f",
+    "creator_w3_terminal_output": "6ae1d48269873a0db44b84136b7f43abede798e8950071314e5947fa9f20554f",
+    "creator_w4_generation_audience": "c52b67a9e0ebf80cbc2b9f76211cfadc28f4f17ea03e39ef68dd8ad3c4dfbe6e",
+    "creator_w4_generation_safety_terminal": "676ddba218bfd9446f4b1e2842f72145ea5adcacad53a3e298cddc593e2461c9",
+    "creator_w4_generation_terminal": "3fb607790c97197f1b7a40f4eeb3b96861e479c1fec4709e52f28917ed233832",
+    "creator_w5_generation_origin": "294f9d338f7c1263272335a44c1d5fe997d14ea317c753bdfa795319b0c7be57"
+  },
+  "conversationCursorDefinitions": {
+    "creator.conversation_privacy_export_rows(uuid,uuid)": "53656e429461ca73c2fb2a4d9b9ffd0a234b4b9cf3e6c2793ac78da9205965fd",
+    "creator.fence_conversation_privacy_export(uuid,uuid,text,uuid,uuid,uuid)": "c20292458ff54df47f4a7a590529109424a143ee62b0e29cb531f7a6891d7033",
+    "creator.finish_conversation_privacy_export_scope()": "a18d439512f89abe047fcfd2494cf48b366aa38ff5c4e5beaf153e98e9819bf8"
+  },
+  "comparison": {
+    "readerCatalogueChecksum": "59273ef85e65203d0fbb6f616d22f453b1999945fe4447ea19a816f0b92ab604",
+    "privacy": {
+      "definitionSha256": "5b39ca6d3af5cd279117e614e955ca88c4eaef50c5735ad4ac42531942f1cbab",
+      "catalogueChecksum": "ccacc5f1a3cf83652c8ddd87915740a7af4acea2b9f2729c27ab7a6c0e7eca18"
+    },
+    "artifactsCatalogueChecksum": "0ce407934142792fc93c89f37f4d439987ede499e9103cf9ead4a6920af83b6f"
+  },
+  "baselineWave": {
+    "path": "infra/migrations/waves/20261022-workspace-lock.json",
+    "sha256": "7414a806f92bd12cf6149cfcc813a77df4d605793217df3684ef30c7abbc7da7"
+  },
+  "replyReviewCatalogueChecksum": "b3b253b77e290d1f6fcb79aa5963aba47b51ba66c8973c184c2c8216286a61ba"
+}

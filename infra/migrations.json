@@ -756,6 +756,13 @@
       "owner": "W2",
       "sourceSha256": "d95eeb56126bae8c64d3112b45072d773ae16b00bd5c7fcc572efdc3c4368e89",
       "wave": "20261022-workspace-lock"
+    },
+    {
+      "version": "0253_w8_reply_review",
+      "path": "apps/backend/migrations/0069_w8_reply_review.sql",
+      "owner": "W8",
+      "sourceSha256": "65a86e17256a872bcbf640006274512a29e3bda31232838c68fe3aa5df2a958a",
+      "wave": "20261023-reply-review"
     }
   ],
   "reserved": [

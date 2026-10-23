@@ -15,6 +15,7 @@ import { accountingBoundaryCatalogue } from "../../modules/trust/accounting-boun
 import { comparisonArtifactCatalogue } from "../../modules/trust/comparison-artifacts.js";
 import { originalPrivacyFamilyPurposeCatalogue } from "../../modules/trust/privacy-family-catalog.js";
 import { usageExpiryCatalogue } from "../../modules/trust/usage-expiry-catalogue.js";
+import { replyReviewPurposeCatalogue } from "../../modules/trust/reply-review-catalog.js";
 import { generationWavePurposeCatalogue } from "../../../scripts/migration-generation-roles.js";
 import type { JsonPath } from "./json-text.js";
 
@@ -118,6 +119,14 @@ export function pinGroups(review: Review, outputShapeTables: string[]) {
   const add = (group: PinGroup | undefined) => group && groups.push(group);
   const role = (name: string) => (client: PoolClient) =>
     generationConsumerCatalogue(client, name);
+
+  add(
+    single(review, ["replyReviewCatalogueChecksum"], {
+      covers:
+        "exact Note reply review: role, grants, source, tables and policies",
+      read: (client) => replyReviewPurposeCatalogue(client),
+    }),
+  );
 
   for (const [name, pinned] of Object.entries(record(review.workerCatalogues)))
     if (hex(pinned))

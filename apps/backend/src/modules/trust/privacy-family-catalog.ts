@@ -4,6 +4,7 @@ import contentPrivacyReview from "../../../../../infra/migrations/reviews/202610
 import publicAIReview from "../../../../../infra/migrations/reviews/20261007-public-ai.json" with { type: "json" };
 import comparisonReview from "../../../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
 import noticesReview from "../../../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
+import workspaceLockReview from "../../../../../infra/migrations/reviews/20261022-workspace-lock.json" with { type: "json" };
 import signInAndMoneyReview from "../../../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
 import { registeredContentPrivacyProfile } from "../../db/content-privacy-profile.js";
 import { registeredPublicAIProfile } from "../../db/public-ai-profile.js";
@@ -415,6 +416,19 @@ export async function assertOriginalPrivacyFamilySignInAndMoneyCatalogForReview(
     signInAndMoneyReview.originalFamilyProfiles.map(
       (profile) => profile.sha256,
     ),
+    signal,
+  );
+}
+
+/** Fixed120 predecessor metadata; no runtime task authority. */
+export async function assertOriginalPrivacyFamilyWorkspaceLockCatalogForReview(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  await assertOriginalPrivacyFamilyCaller(client, signal);
+  await assertPurposeCatalogue(
+    client,
+    workspaceLockReview.originalFamilyProfiles.map((profile) => profile.sha256),
     signal,
   );
 }
