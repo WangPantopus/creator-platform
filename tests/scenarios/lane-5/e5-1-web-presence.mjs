@@ -8,8 +8,15 @@
 // membership for native read checks, and prints their identifiers (no tokens).
 // No held migration or safety approval is invented: 0156 reaction acceptance is
 // explicitly not run while its review authority remains reserved_unapplied.
+// --pagination requires PRESENCE_PAGINATION_FIXTURE=followers|members and an
+// isolated creator. The members fixture uses existing documented purchase/tier
+// stand-ins; followers uses the real follow API and needs qualified 0185 custody.
+// PRESENCE_PAGINATION_REUSE may name this mode's manifest of 52 task-owned
+// Notes on the same stack: each is edited and freshly signed at a new version.
+// --pagination-checks-only reuses all 52 still-published versions for browser
+// checks and cleanup, without another publication or passkey registration.
 import * as L from "../lane-6/e6-2-lib.mjs";
-import { mkdir } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 const { expect, step, sql, api, MAYA, WEB } = L;
 const out = process.env.PRESENCE_OUT ?? "/tmp/qelvora-presence-web";
 const memberActor = Number(process.env.PRESENCE_MEMBER_ACTOR ?? 6);
@@ -36,6 +43,12 @@ expect(
   "Use an owned local creator_stack database",
 );
 const accounts = [3, outsiderActor, memberActor].map(L.account);
+// This mode requires a separate, fresh creator fixture. It never changes the
+// member/Note retained by the lifecycle scenario for native verification.
+if (process.argv.includes("--pagination")) {
+  await paginationChecks();
+  await L.finish();
+}
 expect(
   (
     await sql(
@@ -102,6 +115,416 @@ async function login(page, n, path) {
   await page.locator(`button[name="code"][value="${L.account(n)}"]`).click();
   await page.waitForURL((u) => !u.pathname.startsWith("/auth"));
   if (new URL(page.url()).pathname !== path) await page.goto(WEB + path);
+}
+
+async function paginationChecks() {
+  const actor = Number(process.env.PRESENCE_PAGINATION_FAN_ACTOR ?? 1);
+  const fixtureKind = process.env.PRESENCE_PAGINATION_FIXTURE;
+  expect(
+    ["followers", "members"].includes(fixtureKind),
+    "Set PRESENCE_PAGINATION_FIXTURE=followers or members explicitly",
+  );
+  const reuse = process.env.PRESENCE_PAGINATION_REUSE
+    ? JSON.parse(await readFile(process.env.PRESENCE_PAGINATION_REUSE, "utf8"))
+    : null;
+  const checksOnly = process.argv.includes("--pagination-checks-only");
+  if (checksOnly)
+    expect(
+      reuse?.fixtureKind === fixtureKind,
+      "Checks-only requires a matching fixture manifest",
+    );
+  const fixtureRun = checksOnly ? reuse.run : L.run;
+  if (reuse)
+    expect(
+      reuse.web === WEB &&
+        reuse.api === L.API &&
+        reuse.creatorId === MAYA &&
+        reuse.notes?.length === 52 &&
+        new Set(reuse.notes.map((note) => note.id)).size === 52,
+      "Reuse only this mode's 52-Note manifest on the exact same stack",
+    );
+  expect([1, 2, 4, 5, 6].includes(actor), "Use an eligible fan actor");
+  expect(
+    (
+      await sql(
+        "SELECT id FROM creator_trust.privacy_job WHERE account_id=ANY($1::uuid[]) AND kind='delete'",
+        [[L.account(3), L.account(actor)]],
+      )
+    ).length === 0,
+    "Pagination actors have deletion state; leave them untouched",
+  );
+  const existing = await sql(
+    "SELECT id,version,state FROM creator.content_index WHERE creator_id=$1",
+    [MAYA],
+  );
+  expect(
+    reuse
+      ? existing.length === 52 &&
+          existing.every(
+            (row) =>
+              ["unpublished", "published"].includes(row.state) &&
+              reuse.notes.some(
+                (note) => note.id === row.id && note.version === row.version,
+              ),
+          )
+      : existing.length === 0,
+    "Use a fresh isolated creator or this mode's exact, unchanged-version manifest",
+  );
+  if (checksOnly)
+    expect(
+      existing.every((row) => row.state === "published"),
+      "Checks-only requires all52current publications",
+    );
+  const fan = await L.fan(actor),
+    token = await L.apiSession(3);
+  if (reuse) expect(reuse.fanId === fan.id, "Reuse requires the original fan");
+  const activeMemberships = await sql(
+    "SELECT id,grant_id FROM creator.commerce_membership WHERE creator_id=$1 AND fan_id=$2 AND state IN('active','grace') AND coalesce(grace_end,period_end)>now()",
+    [MAYA, fan.id],
+  );
+  const ownActiveMembership =
+    fixtureKind === "members" &&
+    activeMemberships.length === 1 &&
+    activeMemberships[0].id === reuse?.membership?.membership &&
+    activeMemberships[0].grant_id === reuse?.membership?.grant;
+  expect(
+    activeMemberships.length === 0 || ownActiveMembership,
+    "Retain unrelated memberships; only this mode's own fixture can be resumed",
+  );
+  const followPath = `/v1/growth/follow/${MAYA}`;
+  if (fixtureKind === "followers") {
+    const prior = await api("GET", followPath, fan.token);
+    expect(
+      prior.status === 200 && prior.json.following === false,
+      "Use a fresh non-follower; retain existing follow state",
+    );
+  }
+  const caps = await api("GET", "/v1/conversations/capabilities", fan.token);
+  const begun = await api("POST", "/v1/conversations/begin", fan.token, {
+    creatorId: MAYA,
+    policyVersion: caps.json.providers.version,
+    accessNoticeAccepted: true,
+    idempotencyKey: crypto.randomUUID(),
+  });
+  expect(
+    begun.status === 200,
+    `Pagination conversation begin ${begun.status} ${JSON.stringify(begun.json)}`,
+  );
+  let membership, excludedTier;
+  if (fixtureKind === "followers") {
+    const followed = await api("PUT", followPath, fan.token, {
+      following: true,
+    });
+    expect(followed.status === 200, `Follow failed ${followed.status}`);
+  } else {
+    // Same purchase/tier stand-ins as the original C4 scenario. They establish
+    // only this fan's audience; every Note and signature remains a real act.
+    membership = ownActiveMembership
+      ? reuse.membership
+      : await L.member(fan.id, await L.tier("Pagination reader"));
+    excludedTier = checksOnly
+      ? reuse.excludedTier
+      : await L.tier("Pagination excluded");
+    console.log(
+      "OWNED_MEMBERSHIP",
+      JSON.stringify({ run: L.run, ...membership, excludedTier }),
+    );
+  }
+  await mkdir(out, { recursive: true });
+  const browser = await L.launch(),
+    creator = await L.phone(browser),
+    reader = await L.phone(browser),
+    notes = [];
+  const fixturePath = `${out}/pagination-fixture.json`;
+  const saveFixture = () =>
+    writeFile(
+      fixturePath,
+      JSON.stringify(
+        {
+          run: fixtureRun,
+          web: WEB,
+          api: L.API,
+          creatorId: MAYA,
+          fanId: fan.id,
+          fixtureKind,
+          membership,
+          excludedTier,
+          notes,
+        },
+        null,
+        2,
+      ) + "\n",
+      { mode: 0o600 },
+    );
+  const retract = async (note) => {
+    const command = {
+      version: note.version,
+      idempotencyKey: crypto.randomUUID(),
+    };
+    let result;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      result = await api(
+        "POST",
+        `/v1/content/${MAYA}/${note.id}/unpublish`,
+        token,
+        command,
+      );
+      if (result.status < 500) break;
+      console.log(
+        `RETRY unpublish ${note.id} ${result.status} ${result.json?.error?.code}`,
+      );
+      await L.sleep(300);
+    }
+    expect(
+      result.status === 200,
+      `Unpublish ${note.id}: ${result.status} ${JSON.stringify(result.json)}`,
+    );
+    note.retracted = true;
+    await saveFixture();
+  };
+  try {
+    if (checksOnly)
+      notes.push(...reuse.notes.map((note) => ({ ...note, retracted: false })));
+    else {
+      await login(creator.page, 3, `/studio/${MAYA}/today`);
+      await L.approvedProof(); // External-verification stand-in only.
+      await L.registerPasskey(creator.page); // Real browser registration.
+    }
+    // Each publication uses Compose, exact-content review and a new browser
+    // passkey assertion. No credentials, signatures, content or reviews are
+    // inserted in SQL. Audience fixture kind is explicit in the manifest.
+    for (let index = 0; !checksOnly && index < 52; index++) {
+      const visible = index === 0 || index === 51;
+      const audience =
+        fixtureKind === "followers"
+          ? visible
+            ? "Followers"
+            : "All members"
+          : visible
+            ? "All members"
+            : "Tiers";
+      const text = `Pagination ${L.run} ${index}: ${visible ? "eligible" : "outside audience"} Note`;
+      const previous = reuse?.notes[index];
+      await creator.page.goto(
+        `${WEB}/studio/${MAYA}/compose${previous ? `/${previous.id}` : ""}?from=today`,
+      );
+      await creator.page
+        .getByRole("button", { name: audience, exact: true })
+        .click();
+      if (audience === "Tiers")
+        await creator.page
+          .getByLabel(`Pagination excluded ${L.run}`, { exact: true })
+          .check();
+      await creator.page.locator("#note-text").fill(text);
+      await creator.page
+        .getByRole("button", { name: "Review and sign", exact: true })
+        .click();
+      await creator.page
+        .getByRole("button", { name: "Sign with your passkey", exact: true })
+        .click();
+      await creator.page.waitForURL((u) => u.pathname.endsWith("/today"));
+      const [note] = await sql(
+        "SELECT i.id,i.version,i.state,p.signed_act_id FROM creator.content_index i JOIN creator.content_revision r ON r.content_id=i.id AND r.version=i.version JOIN creator.content_publication p ON p.content_id=i.id AND p.version=i.version WHERE i.creator_id=$1 AND r.document->>'text'=$2",
+        [MAYA, text],
+      );
+      expect(
+        note?.state === "published" && note.signed_act_id,
+        "Publication missing",
+      );
+      if (previous)
+        expect(
+          note.id === previous.id &&
+            note.version > previous.version &&
+            note.signed_act_id !== previous.signed_act_id,
+          "Reused Note requires a newly signed version",
+        );
+      notes.push({ ...note, text, visible });
+      await saveFixture();
+      console.log(`PUBLISHED pagination ${index + 1}/52 ${note.id}`);
+      if (index === 0) {
+        const read = await api(
+          "GET",
+          `/v1/content/${MAYA}/presence?limit=50`,
+          fan.token,
+        );
+        expect(
+          read.status === 200 &&
+            read.json.items.some((item) => item.id === note.id),
+          `PAGINATION_AUDIENCE_BLOCKED ${read.status} ${JSON.stringify(read.json)}; stop before publishing the remaining51Notes`,
+        );
+      }
+    }
+    const oldest = notes[0],
+      newest = notes[51];
+    const item = (note) =>
+      reader.page.locator(`[data-presence-id="${note.id}"]`);
+    const path = `/threads/${MAYA}/${fan.id}`;
+    const page = (before) =>
+      api(
+        "GET",
+        `/v1/content/${MAYA}/presence?limit=50${before ? `&before=${encodeURIComponent(before)}` : ""}`,
+        fan.token,
+      );
+    const noIneligibleText = async () => {
+      expect(
+        (await reader.page
+          .getByText(`Pagination ${fixtureRun}`, { exact: false })
+          .filter({ hasText: "outside audience" })
+          .count()) === 0,
+        "Ineligible Note text leaked",
+      );
+    };
+    await step(
+      "C4-pagination-window",
+      "52 real publications produce two audience-filtered candidate windows",
+      async () => {
+        const first = await page();
+        expect(
+          first.status === 200,
+          `Presence read ${first.status} ${JSON.stringify(first.json)}`,
+        );
+        expect(
+          first.status === 200 &&
+            first.json.items.length === 1 &&
+            first.json.items[0].id === newest.id &&
+            first.json.nextBefore,
+          "First candidate window differs",
+        );
+        const older = await page(first.json.nextBefore);
+        expect(
+          older.status === 200 &&
+            older.json.items.length === 1 &&
+            older.json.items[0].id === oldest.id &&
+            older.json.nextBefore === null,
+          "Older candidate window differs",
+        );
+        return `${fixtureKind}: newest eligible Note + cursor; older: oldest eligible Note, end`;
+      },
+    );
+    await login(reader.page, actor, path);
+    await step(
+      "C4-pagination-browser",
+      "Earlier messages reveals the older signed Note without duplicates or audience leakage",
+      async () => {
+        await item(newest).waitFor();
+        expect(
+          (await item(oldest).count()) === 0,
+          "Older Note appeared before pagination",
+        );
+        // Observe a real automatic request in flight; no response is mocked,
+        // delayed or substituted. This fixture's50candidate scan is measurable.
+        const refresh = await reader.page.waitForRequest(
+          (request) => request.url().includes(`/api/content/${MAYA}/presence?`),
+          { timeout: 10_000 },
+        );
+        let finished = false;
+        const response = refresh.response().then((value) => {
+          finished = true;
+          return value;
+        });
+        const earlier = reader.page.getByRole("button", {
+          name: "Earlier messages",
+          exact: true,
+        });
+        expect(
+          await earlier.isEnabled(),
+          "Automatic refresh disabled pagination",
+        );
+        await earlier.click();
+        expect(
+          !finished,
+          "Refresh already ended; queued-click premise was not exercised",
+        );
+        expect(
+          await earlier.isDisabled(),
+          "Explicit pagination did not prevent duplicate clicks",
+        );
+        expect((await response)?.status() === 200, "Automatic refresh failed");
+        await item(oldest).waitFor();
+        expect(
+          (await item(newest).count()) === 1 &&
+            (await item(oldest).count()) === 1,
+          "Duplicate or missing Note",
+        );
+        expect(
+          (await item(oldest)
+            .locator("a")
+            .filter({ hasText: "Signed by Maya" })
+            .getAttribute("href")) === `/verify/${oldest.signed_act_id}`,
+          "Older signature target differs",
+        );
+        await noIneligibleText();
+        await reader.page.screenshot({ path: `${out}/pagination-older.png` });
+      },
+    );
+    await retract(newest);
+    await step(
+      "C4-pagination-empty",
+      "an empty eligible first page keeps its cursor and the browser can reach the older Note",
+      async () => {
+        const first = await page();
+        expect(
+          first.status === 200 &&
+            first.json.items.length === 0 &&
+            first.json.nextBefore,
+          "Expected empty eligible window with cursor",
+        );
+        await reader.page.reload();
+        const earlier = reader.page.getByRole("button", {
+          name: "Earlier messages",
+          exact: true,
+        });
+        await earlier.waitFor();
+        expect(
+          (await item(oldest).count()) === 0,
+          "Empty initial page included older Note",
+        );
+        await earlier.click();
+        await item(oldest).waitFor();
+        expect(
+          (await item(newest).count()) === 0,
+          "Retracted latest Note returned",
+        );
+        await noIneligibleText();
+        await reader.page.screenshot({
+          path: `${out}/pagination-empty-then-older.png`,
+        });
+        return `empty window followed opaque cursor to ${oldest.id}`;
+      },
+    );
+    await step(
+      "C4-pagination-retraction",
+      "refresh removes a retracted Note from the loaded older window",
+      async () => {
+        await item(oldest).waitFor(); // A never-visible Note is not retraction evidence.
+        await retract(oldest);
+        await item(oldest).waitFor({ state: "detached", timeout: 10_000 });
+        await noIneligibleText();
+      },
+    );
+  } finally {
+    await browser.close(); // Stop this scenario's polling before bounded cleanup.
+    // Preserve all records/signatures as evidence; unpublish only this run's
+    // Notes and restore only the follow relationship created above.
+    await step(
+      "C4-pagination-cleanup",
+      "own publications and audience fixture are withdrawn",
+      async () => {
+        for (const note of notes) if (!note.retracted) await retract(note);
+        if (membership) await L.leave(membership);
+        else {
+          const unfollowed = await api("PUT", followPath, fan.token, {
+            following: false,
+          });
+          expect(
+            unfollowed.status === 200,
+            `Unfollow failed ${unfollowed.status}`,
+          );
+        }
+        return `${notes.length} owned Notes retained unpublished; ${fixtureKind} fixture ended`;
+      },
+    );
+  }
 }
 const memberPath = `/threads/${MAYA}/${member.id}`,
   outsiderPath = `/threads/${MAYA}/${outsider.id}`;

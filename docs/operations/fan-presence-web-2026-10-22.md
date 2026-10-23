@@ -46,7 +46,7 @@ points and the real database. No signature or safety-review result was inserted.
 | Pending reply withdrawal                    | Author withdrew the reply through the real API; no reaction existed                                                                                           | Pass    |
 | Note retraction                             | Creator unpublish succeeded; focus/refetch removed the Note, database state was `unpublished`, and no stored message contained its text                       | Pass    |
 | Signed reaction display/withdrawal          | Not run: migration `0156_w8_reply_review` is `reserved_unapplied`; the actual review authority/table is absent                                                | Not run |
-| More than one C4 page, empty candidate page | Implementation follows the existing schema, but this browser run had fewer than 50 candidates                                                                 | Not run |
+| More than one C4 page, empty candidate page | Separate member/tier fixture published 52 genuine signed Notes; real browser followed an empty first window's cursor to the eligible older Note               | Pass    |
 
 The full available workflow passed **10/10** checks. After adding the existing
 five-second freshness behavior, the affected lifecycle/failure/expiry subset
@@ -104,3 +104,65 @@ The retained native fixture from this run is Note
 `9ffdfdfa-f349-485f-b3c3-f934642423df` and grant is
 `5f0892f8-e836-49a9-adaa-c06c6bea8d36`. These synthetic records are retained for the
 parallel native check; hosting remains undecided and no live deployment occurred.
+
+## Operated pagination checkpoint
+
+A separate owned stack, `presence1022` on PostgreSQL 56660/API 56661/web 56662,
+was created with the existing qualified fresh installer and Growth enabled.
+Integrated Maya and the retained native fixture were untouched. An earlier
+read-only inspection found actor 2's deletion job, and Devon conversation begin
+refused `403 ai_paused`; neither state was changed.
+
+The first attempt used actual follow GET/PUT, two followers Notes and 50 members
+Notes, all published through Compose and a fresh browser passkey assertion for
+each exact document. Follower content reads returned
+`503 growth_core_follow_unconfigured`: held migration 0185 and its core function
+are absent. All 52 records/signatures were retained unpublished and the follow
+was undone. The raw script printed 2/5, but its retraction check had never observed
+the Note, so that apparent pass is invalid. Only cleanup was proven. The scenario
+now stops after the first genuine audience read if unavailable and requires a
+visible Note before retraction. [The read-only custody audit](core-follow-custody-audit-2026-10-22.md)
+records the exact prerequisite; follower acceptance remains blocked.
+
+The member variant used the existing documented tier/membership purchase stand-in
+and reused the same 52 Note IDs through Studio edits, new versions and new
+signatures. The oldest and newest Notes targeted all members; the other 50 targeted
+a tier this fan did not hold. Real HTTP windows passed, but the browser exposed
+an “Earlier messages” starvation bug: automatic reads took approximately 2.1–4.6
+seconds, and the two-second refresh queue kept the control disabled. The hook now
+allows one explicit older-page request during an automatic refresh, snapshots each
+read's depth and prevents duplicate explicit requests without disabling the
+control for background work. The five-second freshness rule is unchanged.
+
+The first member run recorded 1/5 and a 503 during cleanup. Its exact Notes and own
+membership were resumed; no unrelated fixture was changed. A subsequent request
+interception harness failed with “Route is already handled”; that result was
+discarded as browser-test infrastructure failure. The final focused run observed
+a genuine automatic request in flight, clicked before its response, and used no
+interception. It passed **5/5**: candidate windows, the queued browser click with
+deduplication and signature link, empty eligible first page, older-page retraction,
+and scoped cleanup. All 52 Notes remain unpublished, and the own membership ended.
+Typecheck, scoped ESLint, syntax and formatting checks passed. Deeper rolling-window
+mechanics are a separate follow-up; this checkpoint proves two candidate pages.
+
+Preserved evidence:
+[follower refusal](../../artifacts/lane-5/fan-presence-2026-10-22/pagination/followers-refusal.txt),
+[member starvation](../../artifacts/lane-5/fan-presence-2026-10-22/pagination/member-starvation.txt),
+[harness failure](../../artifacts/lane-5/fan-presence-2026-10-22/pagination/harness-route-failure.txt),
+[5/5 result](../../artifacts/lane-5/fan-presence-2026-10-22/pagination/member-passed.txt),
+[fixture IDs and signed versions](../../artifacts/lane-5/fan-presence-2026-10-22/pagination/member-fixture.json),
+[older page](../../artifacts/lane-5/fan-presence-2026-10-22/pagination/older.png),
+[empty then older](../../artifacts/lane-5/fan-presence-2026-10-22/pagination/empty-then-older.png).
+The harness trace's workspace prefix is normalized; the original temporary log is
+retained. Both screenshots were inspected at 390×844.
+
+To reproduce against a fresh owned stack with Growth enabled, use the same address
+variables above and add `PRESENCE_PAGINATION_FIXTURE=members`,
+`PRESENCE_PAGINATION_FAN_ACTOR=1` and `--pagination`. Explicit `followers` mode uses
+the real follow relationship and requires qualified 0185 authority; it cannot
+stand in for member success. A saved `PRESENCE_PAGINATION_REUSE=<manifest>` can edit
+only this mode's exact 52 IDs at unchanged versions on the same stack, with new
+signatures. `--pagination-checks-only` instead requires all 52 still-published
+versions and reruns the browser checks and cleanup without signing again. The
+manifest stores identifiers, not credentials; unrelated memberships and changed
+Note versions are refused.

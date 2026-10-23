@@ -40,6 +40,7 @@ export function useThreadPresence(creatorId: string, online: boolean) {
     const controller = new AbortController();
     let readController: AbortController | undefined;
     let depth = 1,
+      olderPending = false,
       running = false,
       again = false,
       suspended = document.visibilityState !== "visible",
@@ -63,6 +64,11 @@ export function useThreadPresence(creatorId: string, online: boolean) {
       do {
         again = false;
         const started = generation;
+        // A click during an automatic refresh queues one deeper read. Keep
+        // this read's window fixed; only its successor may consume the click.
+        const includesOlder = olderPending;
+        const readDepth = depth + (includesOlder ? 1 : 0);
+        let loadedDepth = readDepth;
         const freshUntil = performance.now() + 5000;
         readController = new AbortController();
         const signal = AbortSignal.any([
@@ -70,11 +76,11 @@ export function useThreadPresence(creatorId: string, online: boolean) {
           readController.signal,
           AbortSignal.timeout(5000),
         ]);
-        setState((previous) => ({ ...previous, busy: true }));
+        setState((previous) => ({ ...previous, busy: olderPending }));
         try {
           const items = new Map<string, ThreadPresenceItem>();
           let before: string | null = null;
-          for (let index = 0; index < depth; index++) {
+          for (let index = 0; index < readDepth; index++) {
             const query = new URLSearchParams({ limit: "50" });
             if (before) query.set("before", before);
             const page = ThreadPresencePage.parse(
@@ -91,13 +97,15 @@ export function useThreadPresence(creatorId: string, online: boolean) {
             }
             before = page.nextBefore;
             if (!before) {
-              depth = index + 1;
+              loadedDepth = index + 1;
               break;
             }
           }
           signal.throwIfAborted();
           if (suspended || started !== generation) continue;
           if (performance.now() >= freshUntil) throw new Error("Read expired");
+          depth = loadedDepth;
+          if (includesOlder) olderPending = false;
           setState({
             scope,
             items: [...items.values()].sort(
@@ -106,7 +114,7 @@ export function useThreadPresence(creatorId: string, online: boolean) {
                 a.id.localeCompare(b.id),
             ),
             hasOlder: before !== null,
-            busy: false,
+            busy: olderPending,
             failed: false,
             freshUntil,
           });
@@ -115,26 +123,33 @@ export function useThreadPresence(creatorId: string, online: boolean) {
             !controller.signal.aborted &&
             !suspended &&
             started === generation
-          )
+          ) {
+            if (includesOlder) olderPending = false;
             setState({
               scope,
               items: [],
               hasOlder: false,
-              busy: false,
+              busy: olderPending,
               failed: true,
               freshUntil: 0,
             });
+          }
         }
       } while (again && !controller.signal.aborted && !suspended);
       running = false;
     };
     load.current = (older = false) => {
-      if (older && !running) depth++;
+      if (older) {
+        if (olderPending) return;
+        olderPending = true;
+        setState((previous) => ({ ...previous, busy: true }));
+      }
       void refresh();
     };
     const conceal = () => {
       suspended = true;
       generation++;
+      olderPending = false;
       readController?.abort();
       clear();
     };
