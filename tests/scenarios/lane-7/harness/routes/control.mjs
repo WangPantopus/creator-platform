@@ -183,6 +183,71 @@ export function register(router) {
   });
 
   // The person shows up in a thread while it is open.
+  // C4 UI fixtures only: these are separate read-time items, never stored
+  // messages. This does not prove Trust review or a real signing ceremony.
+  router.add("POST", "/__harness/threads/:handle/presence", (ctx) => {
+    const thread = threadOf(ctx);
+    // Legacy lane-7 seeded these two kinds as stored-message UI examples.
+    // Opting into the C4 fixture replaces those examples with authorized feed
+    // items, so concealment checks cannot mistake a legacy example for C4.
+    thread.messages = thread.messages.filter(
+      (message) =>
+        !["human_broadcast", "human_reaction"].includes(message.authorKind),
+    );
+    const mode = ctx.body?.mode ?? "live";
+    if (!["live", "empty_first", "deep", "removed"].includes(mode))
+      throw new Failure(
+        400,
+        "invalid_request",
+        "Unknown presence fixture mode.",
+      );
+    const at = new Date(ctx.world.now()).toISOString();
+    const noteId = "d1000000-0000-4000-8000-000000000901";
+    const replyId = "d1000000-0000-4000-8000-000000000902";
+    const items =
+      mode === "removed"
+        ? []
+        : [
+            {
+              authorKind: "human_broadcast",
+              id: noteId,
+              version: 1,
+              creatorId: thread.creatorId,
+              creatorName: thread.creatorName,
+              authorLabel: copy("noteAudience", {
+                name: thread.creatorName,
+                audience: "all members",
+              }),
+              glyph: "broadcast",
+              audience: {
+                kind: "members",
+                label: "all members",
+                glyph: "broadcast",
+              },
+              text: "Native C4 fixture: a signed Note.\n\nThe kiln opens at nine 🔥",
+              signedActId: "5a000000-0000-4000-8000-000000000901",
+              occurredAt: at,
+            },
+            {
+              authorKind: "human_reaction",
+              id: replyId,
+              creatorId: thread.creatorId,
+              creatorName: thread.creatorName,
+              authorLabel: copy("reaction", { name: thread.creatorName }),
+              glyph: "heart",
+              reaction: "helpful",
+              replyId,
+              noteId,
+              signedActId: "5a000000-0000-4000-8000-000000000902",
+              occurredAt: at,
+            },
+          ];
+    ctx.world.contentPresence.set(
+      `${thread.creatorId}/${thread.fanAccountId}`,
+      { mode, items },
+    );
+    return { mode, items };
+  });
   const first = (thread) => thread.creatorName;
   router.add("POST", "/__harness/threads/:handle/note", (ctx) =>
     addMessage(

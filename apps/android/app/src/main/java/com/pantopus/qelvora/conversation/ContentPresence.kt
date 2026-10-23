@@ -84,10 +84,19 @@ class ContentPresenceFeed(private val client: ConversationClient, private val cr
     var loading by mutableStateOf(false); private set
     var pages by mutableStateOf(1); private set
     var retry by mutableStateOf(0); private set
+    private val cursors = mutableListOf<String?>(null)
     private var generation = 0
     private var deadline = 0L
-    val canReadEarlier get() = nextBefore != null && pages < 5
-    fun earlier() { if (!loading && canReadEarlier) pages++ }
+    val canReadEarlier get() = nextBefore != null
+    fun earlier() {
+        val next = nextBefore ?: return
+        if (loading || cursors.contains(next)) return
+        cursors.add(next)
+        // Retain the head plus four older pages, without limiting how far the
+        // final opaque cursor can advance through history.
+        if (cursors.size > 5) cursors.removeAt(1)
+        pages++
+    }
     fun refresh() { retry++ }
     fun conceal() { generation++; items = emptyList(); nextBefore = null; deadline = 0; loading = false }
     fun expire() { if (deadline != 0L && SystemClock.elapsedRealtime() >= deadline) { items = emptyList(); nextBefore = null; deadline = 0; unavailable = true } }
@@ -104,19 +113,20 @@ class ContentPresenceFeed(private val client: ConversationClient, private val cr
                     val collected = mutableListOf<ContentPresenceItem>()
                     var cursor: String? = null
                     val seen = mutableSetOf<String>()
-                    for (index in 0 until pages) {
-                        val page = client.contentPresence(creatorId, cursor)
+                    for (before in cursors.toList()) {
+                        require(SystemClock.elapsedRealtime() - started < 5000)
+                        val page = client.contentPresence(creatorId, before)
                         currentCoroutineContext().ensureActive()
                         if (run != generation) return
-                        collected.addAll(page.items)
-                        val next = page.nextBefore
-                        if (next == null) { cursor = null; break }
-                        require(next != cursor && seen.add(next))
-                        cursor = next
+                        require(page.nextBefore == null || page.nextBefore != before)
+                        // A changing head can overlap a retained older page.
+                        collected.addAll(page.items.filter { seen.add(it.id) })
+                        cursor = page.nextBefore
                     }
+                    require(cursor == null || !cursors.contains(cursor))
                     currentCoroutineContext().ensureActive()
                     if (run != generation) return
-                    require(SystemClock.elapsedRealtime() - started < 5000 && collected.map { it.id }.distinct().size == collected.size)
+                    require(SystemClock.elapsedRealtime() - started < 5000)
                     items = collected; nextBefore = cursor; unavailable = false; deadline = started + 5000
                 } catch (failure: Exception) {
                     if (failure is CancellationException) throw failure

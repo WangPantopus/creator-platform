@@ -65,13 +65,21 @@ final class W3ContentPresenceFeed: ObservableObject {
     @Published private(set) var loading = false
     @Published private(set) var pages = 1
     @Published private(set) var retry = 0
+    private var cursors: [String?] = [nil]
     private var generation = 0
     private var deadline: ContinuousClock.Instant?
     let client: W3ConversationClient
     let creatorId: String
     init(client: W3ConversationClient, creatorId: String) { self.client = client; self.creatorId = creatorId }
-    var canReadEarlier: Bool { nextBefore != nil && pages < 5 }
-    func earlier() { guard !loading, canReadEarlier else { return }; pages += 1 }
+    var canReadEarlier: Bool { nextBefore != nil }
+    func earlier() {
+        guard !loading, let nextBefore, !cursors.contains(where: { $0 == nextBefore }) else { return }
+        cursors.append(nextBefore)
+        // Keep the current head plus the four most recently requested older
+        // pages. The last opaque cursor can still advance without a page cap.
+        if cursors.count > 5 { cursors.remove(at: 1) }
+        pages += 1
+    }
     func refresh() { retry += 1 }
     func conceal() { generation += 1; items = []; nextBefore = nil; deadline = nil; loading = false }
     func expire() { if let deadline, .now >= deadline { items = []; nextBefore = nil; self.deadline = nil; unavailable = true } }
@@ -86,17 +94,19 @@ final class W3ContentPresenceFeed: ObservableObject {
             do {
                 var collected: [W3ContentPresenceItem] = [], cursor: String?
                 var seen = Set<String>()
-                for _ in 0..<pages {
-                    let page = try await client.contentPresence(creatorId: creatorId, before: cursor)
+                for before in cursors {
+                    guard started.duration(to: .now) < .seconds(5) else { throw W3Failure(message: "Content access expired.", status: 503) }
+                    let page = try await client.contentPresence(creatorId: creatorId, before: before)
                     guard !Task.isCancelled, run == generation else { return }
-                    collected += page.items
-                    guard let next = page.nextBefore else { cursor = nil; break }
-                    guard next != cursor, seen.insert(next).inserted else { throw W3Failure(message: "Invalid content cursor.", status: 503) }
-                    cursor = next
+                    guard page.nextBefore == nil || page.nextBefore != before else { throw W3Failure(message: "Invalid content cursor.", status: 503) }
+                    // A changing head can overlap a retained older page.
+                    collected += page.items.filter { seen.insert($0.id).inserted }
+                    cursor = page.nextBefore
                 }
+                guard cursor == nil || !cursors.contains(where: { $0 == cursor }) else { throw W3Failure(message: "Invalid content cursor.", status: 503) }
                 guard !Task.isCancelled, run == generation else { return }
                 // Charge network time to the display lease, including all pages.
-                guard started.duration(to: .now) < .seconds(5), Set(collected.map(\.id)).count == collected.count else { throw W3Failure(message: "Content access expired.", status: 503) }
+                guard started.duration(to: .now) < .seconds(5) else { throw W3Failure(message: "Content access expired.", status: 503) }
                 items = collected; nextBefore = cursor; unavailable = false; deadline = started.advanced(by: .seconds(5))
             } catch {
                 guard !Task.isCancelled, run == generation else { return }
