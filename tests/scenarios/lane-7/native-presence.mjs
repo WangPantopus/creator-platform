@@ -48,6 +48,25 @@ function launch(actor, route) {
 const has = (text) => ui.texts().some((v) => v.includes(text));
 const hasReaction = (label) =>
   ui.screen().some((node) => node.desc === label && node.h > 0);
+async function tapStableVisible(label) {
+  // Back restores the thread before its asynchronous Content row has settled.
+  // Use two matching visible bounds, not a transient accessibility position.
+  let previous;
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const node = await ui.waitFor(label, 15000);
+    if (
+      node.h > 0 &&
+      previous &&
+      ["x", "y", "w", "h"].every((key) => node[key] === previous[key])
+    ) {
+      ui.tapAt(node.x, node.y);
+      return;
+    }
+    previous = node;
+    await sleep(300);
+  }
+  assert.fail("Content row did not settle before tapping");
+}
 function capture(name) {
   ui.adb("shell", "screencap", "-p", `/data/local/tmp/${name}.png`);
   ui.adb("pull", `/data/local/tmp/${name}.png`, `/tmp/${name}.png`);
@@ -85,7 +104,7 @@ if (real) {
   console.log("PASS: signature opens distinct public verification");
   ui.key("BACK");
   await ui.waitFor(text, 15000);
-  await ui.tap(text);
+  await tapStableVisible(text);
   await ui.waitFor("Your private replies", 15000);
   console.log("PASS: Note opens Content/private replies");
   launch(
