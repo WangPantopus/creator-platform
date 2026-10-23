@@ -76,14 +76,20 @@ private object ConversationTransport {
 /** Uses W1's encrypted credential supplier and disables HTTP response caching. */
 class ConversationClient(private val baseURL: String, private val token: () -> String?, private val expectedAccountId: String?) {
     val json = Json { ignoreUnknownKeys = true }
-    suspend fun request(path: String, body: JsonObject? = null, publicRead: Boolean = false): JsonElement = withContext(Dispatchers.IO) {
+    suspend fun request(path: String, body: JsonObject? = null, publicRead: Boolean = false): JsonElement = transport(path, body, publicRead, false)
+    suspend fun contentPresence(creatorId: String, before: String?): ContentPresencePage {
+        require(UUID.fromString(creatorId).toString() == creatorId.lowercase() && (before == null || ContentPresencePage.validCursor(before)))
+        val query = android.net.Uri.Builder().appendQueryParameter("limit", "50").apply { if (before != null) appendQueryParameter("before", before) }.build().encodedQuery
+        return ContentPresencePage.decode(json, transport("$creatorId/presence?$query", null, false, true), creatorId)
+    }
+    private suspend fun transport(path: String, body: JsonObject?, publicRead: Boolean, contentRead: Boolean): JsonElement = withContext(Dispatchers.IO) {
         if (!publicRead && expectedAccountId == null) throw ConversationFailure(401, "Reopen this page with your current account.")
         val credential = if (publicRead) null else token() ?: throw ConversationFailure(401, "Your session ended. Continue with Pantopus again.")
         val timeout = if (body != null && path.endsWith("/comparison")) 65L else 15L
-        val builder = Request.Builder().url(baseURL.trimEnd('/') + "/v1/conversations/" + path)
+        val builder = Request.Builder().url(baseURL.trimEnd('/') + (if (contentRead) "/v1/content/" else "/v1/conversations/") + path)
             .header("Accept", "application/json").header("X-Correlation-Id", UUID.randomUUID().toString())
         credential?.let { builder.header("Authorization", "Bearer $it") }
-        if (!publicRead) builder.header("X-Expected-Account-Id", expectedAccountId!!)
+        if (!publicRead) builder.header(if (contentRead) "x-qelvora-expected-account" else "X-Expected-Account-Id", expectedAccountId!!)
         if (body != null) builder.post(body.toString().toRequestBody("application/json".toMediaType()))
         val call = ConversationTransport.http.newBuilder().readTimeout(timeout, TimeUnit.SECONDS)
             .callTimeout(timeout, TimeUnit.SECONDS).build().newCall(builder.build())

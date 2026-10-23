@@ -59,13 +59,19 @@ async function readBody(req) {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /** Faults are set through the control API: { match, method?, status?,
- * delayMs?, drop?, remaining? }. `drop` destroys the socket, as a dead
+ * before?, delayMs?, drop?, remaining? }. `drop` destroys the socket, as a dead
  * network does; `remaining` counts requests that still receive the fault. */
 function applyFault(world, req, path) {
   for (const fault of world.faults) {
     if (fault.remaining === 0) continue;
     if (fault.method && fault.method !== req.method) continue;
     if (!new RegExp(fault.match, "u").test(path)) continue;
+    if (
+      fault.before !== undefined &&
+      new URL(req.url, "http://harness").searchParams.get("before") !==
+        fault.before
+    )
+      continue;
     if (fault.remaining > 0) fault.remaining -= 1;
     return fault;
   }
@@ -86,7 +92,16 @@ export function createHandler(world, router) {
       ms: 0,
       account: null,
       client: clientOf(req),
+      ...(url.searchParams.has("before")
+        ? { before: url.searchParams.get("before") }
+        : {}),
     };
+    res.once("close", () => {
+      if (!res.writableFinished) {
+        entry.cancelled = true;
+        entry.cancelledAtMs = Date.now() - started;
+      }
+    });
     world.log.push(entry);
     if (world.log.length > 5000) world.log.shift();
     const finish = (status, body) => {
