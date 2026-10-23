@@ -30,6 +30,6 @@ There is an existing handle-change conflict to resolve explicitly: creation is u
 
 ## Preserved local resources
 
-No native build or operated test is running after the final C4 evidence checkpoint. The owned iOS simulator `CC067095-D127-4FFD-941A-CE445A547889` and Android AVD `qelvora-signin-20261022` / `emulator-5586` remain available for the pending qualified actual-reaction run. The isolated native worktree is `/Users/yingpengwang/.codex/worktrees/native-presence-completion/creator-platform`, branch `codex/native-presence-2026-10-22`, draft PR 516.
+No native build or operated test is running after the final C4 evidence checkpoint. The owned iOS simulator `CC067095-D127-4FFD-941A-CE445A547889` and Android AVD `qelvora-signin-20261022` / `emulator-5586` remain available for the pending qualified actual-reaction run. The isolated native checkout is `native-presence-completion/creator-platform` in the task's managed worktrees, branch `codex/native-presence-2026-10-22`, draft PR 516.
 
 Disposable native harnesses remain on ports 56646 (Android) and 56647 (iOS). The integrated signed Maya Note and member grant were not mutated; both native and web read-only checks are complete, but root coordinates cleanup. Actual reaction evidence is still pending qualification of the separate backend candidate; the committed native reaction evidence is explicitly fixture-only.
