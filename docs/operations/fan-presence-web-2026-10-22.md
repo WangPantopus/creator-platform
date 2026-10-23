@@ -1,7 +1,7 @@
 # Fan conversation Notes and reactions — 2026-10-22
 
 Fans can now see the C4 presence feed in their web conversation. The BFF permits
-the existing content presence read, validates its schema, and renders the server's
+the existing content presence read; the client validates its schema and renders the server's
 exact author label, audience and signed-act link through the shared Note and
 ReactionChip components. Notes link to the existing private-reply page.
 
