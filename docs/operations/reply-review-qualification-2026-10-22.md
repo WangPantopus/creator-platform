@@ -1,10 +1,11 @@
 # Private Note reply review qualification, 2026-10-22
 
 Status: candidate source, fresh installation and preserved upgrade are qualified.
-Actual review decisions and source denials work; creator delivery is blocked by
-held 0173, and complete export/erasure remain unaccepted.
+Actual review decisions and source denials work; complete export passed on a
+separate current synthetic account. Creator delivery is blocked by held 0173,
+and complete erasure remains unaccepted.
 This is a separate local increment after the app-completion branch. It does not
-record a deployment, production acceptance, an Ops decision, or completed erasure.
+record a deployment, production acceptance, or completed erasure.
 
 ## Scope and verified baseline
 
@@ -322,3 +323,48 @@ the separate owned 56650 fixture (404.85 seconds, including the existing 10,000
 random-pair property check). Both browser/lifecycle scenario files pass syntax
 and focused lint. The browser and lifecycle workflows remain deliberately
 failing at the explicitly recorded delivery and deletion gates above.
+
+## Completed export retry and stock-runtime download verification
+
+A separate current synthetic account (actor one) reproduced the export failure
+in job `5fbe7422-43e0-49d1-93aa-22beb3c9bd6f`, originally created at
+`2026-10-23T06:56:36.687Z`. Scoped temporary diagnostics used the existing worker
+failure callback and logged only error type/stack frames, without error messages,
+private bodies or token values. The observed Conversation cause was an
+AbortSignal `TimeoutError`, not an observed SQL permission error. The stack did
+not identify a more precise operation. The run overlapped the host's existing
+10,000-pair regression workload.
+
+After that workload finished, the **same job** completed on ordinary retries
+without any source, permission, policy or timeout change: Conversation attempt
+two, Agent attempt three, all other domains attempt one. All eight domains were
+complete. This supports a transient bounded-work timeout; it does not establish
+a new permissions defect or justify relaxing any deadline. The original actor
+six export/deletion and tombstone remain intact.
+
+The diagnostic-only edit was removed, the ordinary stack restarted, and
+`tests/scenarios/lane-6/e6-reply-review-export-recheck.mjs` verified:
+
+- Whole export manifest 200 with eight complete domains.
+- Actual Agent, Commerce, Conversation and Growth streamed downloads all 200;
+  each byte count and SHA-256 exactly matched its original manifest, with valid
+  JSONL. The other four domains use inline owner outputs.
+- Cross-account download 404 and original creation time unchanged.
+
+The four artifact sizes were 39, 935, 38 and 565 bytes respectively. This current
+account had no conversation families; the earlier actor-six completed Content
+and Trust owner outputs provide the populated private-reply evidence. Do not
+combine these into a claim that actor six's deleted-account export downloaded.
+Private before/retry/stock-runtime receipts remain under the existing evidence
+directory (`diagnostic-export-result.json`, `export-normal-recheck.json` and
+`export-normal-recheck.log`). No temporary runtime instrumentation is committed.
+
+```sh
+node tests/scenarios/lane-6/e6-reply-review-export-recheck.mjs \
+  --api http://127.0.0.1:56671 --actor 1 \
+  --job 5fbe7422-43e0-49d1-93aa-22beb3c9bd6f \
+  --out /tmp/qelvora-reply-review-1022/export-normal-recheck.json
+```
+
+The read-only recheck passes syntax and focused lint. It creates no new privacy
+job, changes no clock and refuses an incomplete export.
