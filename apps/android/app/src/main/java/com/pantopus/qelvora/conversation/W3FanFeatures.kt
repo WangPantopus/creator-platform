@@ -69,7 +69,7 @@ object W3FanFeatures {
         if (baseURL == null) Notice(title = "Conversation unavailable", children = "Reconnect to open this conversation from your account.")
         else if (parts.size == 3 && parts[0] == "threads") {
             val valid = runCatching { UUID.fromString(parts[1]); UUID.fromString(parts[2]); true }.getOrDefault(false)
-            if (valid) ConversationScreen(baseURL, parts[1], parts[2], session) else Notice(title = "Conversation unavailable", children = "Open this conversation from your account.")
+            if (valid) key(session.session?.accountId, session.session?.sessionId, session.destination) { ConversationScreen(baseURL, parts[1], parts[2], session) } else Notice(title = "Conversation unavailable", children = "Open this conversation from your account.")
         } else if (parts.size == 3 && parts[0] == "creators" && parts[2] == "chat") key(session.session?.accountId, session.session?.sessionId, session.destination) { FirstConversation(baseURL, parts[1], session) }
         else if (Uri.parse(session.destination).path == "/you") {
             val destination = Uri.parse(session.destination)
@@ -90,6 +90,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     val client = remember(baseURL, session.session?.accountId) { ConversationClient(baseURL, session::currentToken, session.session?.accountId) }
     val root = "$creatorId/$fanId"
     val accountId = session.session?.accountId ?: "signed-out"
+    val contentFeed = remember(client, root, accountId, session.session?.sessionId) { ContentPresenceFeed(client, creatorId) }
     val context = LocalContext.current
     val resumeStorage = remember(context) { ConversationResumeStorage(context) }
     val storageScope = "$baseURL/$root"
@@ -128,6 +129,10 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     var positionedConversation by remember(root, accountId) { mutableStateOf(false) }
     var followingReply by remember(root, accountId) { mutableStateOf(true) }
     var positioningReply by remember(root, accountId) { mutableStateOf(false) }
+    val contentActive = foreground && !privacy && comparisonQuestion == null && source == null && !offline && page != null
+    LaunchedEffect(contentFeed, contentActive, contentFeed.pages, contentFeed.retry) { contentFeed.run(contentActive) }
+    LaunchedEffect(contentFeed) { while (isActive) { contentFeed.expire(); delay(100) } }
+    DisposableEffect(contentFeed) { onDispose { contentFeed.conceal() } }
     // Observe completed user/accessibility scrolls, rather than treating a
     // newly enlarged reply as a request to stop following it.
     LaunchedEffect(scroll) {
@@ -141,6 +146,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         val observer = LifecycleEventObserver { _,_ ->
             foreground = lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
             if (!foreground) {
+                contentFeed.conceal()
                 viewRun++; offlineShowing = false; transportReady = false; offline = true
                 page = null; older = emptyList(); before = null; gate = null; source = null; comparisonQuestion = null
                 offlineContext?.let { ConversationOfflineStorage.purge(it) }; offlineContext = null
@@ -387,12 +393,14 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 item { BasicText("Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.", style = qText("caption").copy(color = qColor("ink"))) }
                 if (offline) item { Notice(title = "You're offline", children = "Saved conversation is available briefly while its reading permission is current. Reconnect to send.") }
                 if (current.offTheRecord) item { SystemLine(text = "Off the record · the AI keeps no memory from this conversation.") }
-                if (before != null) item { Button("Earlier messages", variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground) { scope.launch {
+                if (before != null || contentFeed.canReadEarlier) item { Button(QelvoraCopy.text("growthEarlier"), variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground || contentFeed.loading) { scope.launch {
                     busy = true
-                    try { val previous = client.page("$root?before=$before"); older = (previous.messages + older).distinctBy { it.id }.take(250); before = previous.before }
+                    try { if (before != null) { val previous = client.page("$root?before=$before"); older = (previous.messages + older).distinctBy { it.id }.take(250); before = previous.before }; contentFeed.earlier() }
                     catch (failure: Throwable) { fail(failure) } finally { busy = false }
                 } } }
-                items(older.filter { old -> current.messages.none { it.id == old.id } } + current.messages, key = { it.id }) { message ->
+                items(ContentTimelineItem.merge(older.filter { old -> current.messages.none { it.id == old.id } } + current.messages, if (contentActive) contentFeed.items else emptyList()), key = { it.id }) { timelineItem ->
+                    val message = timelineItem.message
+                    if (message == null) { timelineItem.content?.let { ContentPresenceRow(it) { target -> session.open(target) } } } else {
                     if (message.recording == null) ConversationMessageRow(message, current.creatorName, current.control, creatorId = current.creatorId, onLink = { session.open(it) }, connected = !offline && foreground, original = (older + current.messages).firstOrNull { it.id == message.correction?.originalMessageId && it.version == message.correction.originalVersion && it.authorKind == APIMessageAuthorKind.AI }, onOriginal = { message.correction?.let { correction -> scope.launch { try { val original = client.json.decodeFromJsonElement<ConversationMessage>(client.request("$root/messages/${correction.originalMessageId}")); if (original.id != correction.originalMessageId || original.version != correction.originalVersion || original.authorKind != APIMessageAuthorKind.AI) throw ConversationFailure(409, "The original reply changed."); source = "Original AI reply · version ${original.version}" to original.text } catch (failure: Throwable) { fail(failure) } } } }, onVerify = { message.signedActId?.let { session.open("/verify/$it") } }, onReport = { session.open("/support?creatorId=$creatorId" + if (message.authorKind == APIMessageAuthorKind.AI) "&messageId=${message.id}" else "") }, onForget = if (busy || offline) null else { { scope.launch { busy=true;try { client.request("$root/messages/${message.id}/dont-remember",buildJsonObject { put("expectedRevision",current.revision) });refresh() } catch(failure:Throwable) { fail(failure) } finally {busy=false} } } }, onCitation = { id -> scope.launch { try { val passage = client.request("$root/citations/$id").jsonObject; source = passage["title"]?.jsonPrimitive?.content.orEmpty() to passage["text"]?.jsonPrimitive?.content.orEmpty() } catch (failure: Throwable) { fail(failure) } } })
                     if (comparisonsAvailable && message.authorKind == APIMessageAuthorKind.FAN && !message.offTheRecord && !current.offTheRecord && message.deliveryState in listOf(APIMessageDeliveryState.ACCEPTED, APIMessageDeliveryState.DELIVERED)) {
                         Button("AI comparison options", variant = ButtonVariant.QUIET, disabled = busy || offline || !foreground, modifier = Modifier.testTag("comparison-options-${message.id}")) { comparisonQuestion = message }
@@ -455,6 +463,11 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                             }
                         }
                     }
+                }
+                }
+                if (contentFeed.unavailable) item {
+                    BasicText(QelvoraCopy.text("w5ContentRefreshUnavailable"), style = qText("caption").copy(color = qColor("ink")))
+                    Button(QelvoraCopy.text("w5ContentCheckCurrentAccess"), variant = ButtonVariant.QUIET, disabled = !contentActive) { contentFeed.refresh() }
                 }
                 pending?.let { pendingItem -> item { Message(kind = MessageKind.FAN, children = pendingItem.text, name = current.creatorName, delivery = if (pendingItem.rejected) Delivery.FAILED else if (pendingItem.uncertain) null else Delivery.PENDING); if (pendingItem.uncertain) { BasicText("Acceptance hasn't been confirmed. Retry checks the same message without a duplicate.", style = qText("caption").copy(color = qColor("ink"))); Button("Retry", variant = ButtonVariant.QUIET, disabled = busy || offline) { scope.launch { send(true) } } } else if (pendingItem.rejected) { BasicText("Not sent", style = qText("caption").copy(color = qColor("ink"))); Button("Keep editing", variant = ButtonVariant.QUIET) { draft = pendingItem.text; pending = null } } } }
                 if (error.isNotEmpty()) item { Notice(title = "Conversation status", children = error) }

@@ -16,7 +16,7 @@ public enum W3FanFeatures {
         FanFeatureRegistration(matches: { destination in
             let path = destination.components(separatedBy: "?")[0]
             return path == "/you" || path.hasPrefix("/threads/") || (path.hasPrefix("/creators/") && path.hasSuffix("/chat"))
-        }, screen: { session in AnyView(W3ConversationDestination(baseURL: baseURL, session: session).id((session.session?.accountId ?? "signed-out") + session.destination)) })
+        }, screen: { session in AnyView(W3ConversationDestination(baseURL: baseURL, session: session).id((session.session?.accountId ?? "signed-out") + (session.session?.sessionId ?? "") + session.destination)) })
     }
 }
 
@@ -44,6 +44,7 @@ private struct W3ConversationDestination: View {
 private struct W3ThreadScreen: View {
     let baseURL: URL
     @StateObject private var model: W3ThreadModel
+    @StateObject private var contentFeed: W3ContentPresenceFeed
     @ObservedObject var session: FanSession
     @State private var privacy = false
     @State private var backStep = UUID()
@@ -56,8 +57,13 @@ private struct W3ThreadScreen: View {
     @FocusState private var composerFocused: Bool
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var scheme
+    private var contentActive: Bool { scenePhase == .active && !privacy && source == nil && originalReply == nil && comparisonQuestion == nil && !model.offline && model.page != nil }
     init(baseURL: URL, creatorId: String, fanId: String, session: FanSession) {
-        self.baseURL = baseURL; _model = StateObject(wrappedValue: W3ThreadModel(baseURL: baseURL, creatorId: creatorId, fanId: fanId, accountId: session.session?.accountId ?? "signed-out", sessionId: session.session?.sessionId ?? "")); self.session = session
+        self.baseURL = baseURL
+        let model = W3ThreadModel(baseURL: baseURL, creatorId: creatorId, fanId: fanId, accountId: session.session?.accountId ?? "signed-out", sessionId: session.session?.sessionId ?? "")
+        _model = StateObject(wrappedValue: model)
+        _contentFeed = StateObject(wrappedValue: W3ContentPresenceFeed(client: model.client, creatorId: creatorId))
+        self.session = session
     }
     var body: some View {
         VStack(spacing: 0) {
@@ -75,9 +81,11 @@ private struct W3ThreadScreen: View {
                             Text("Conversations with a creator’s AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.").qText("caption").padding(12).background(qColor("surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusMd))
                             if model.offline { Notice(tone: .offline, title: "You're offline", children: "You're seeing a saved conversation with a short reading lease. Reconnect to send.") }
                             if page.offTheRecord { SystemLine(children: "Off the record · the AI keeps no memory from this conversation.") }
-                            if model.before != nil { Button("Earlier messages", variant: .quiet, disabled: model.busy || model.offline) { Task { await model.earlier() } } }
-                            ForEach(model.older.filter { old in !page.messages.contains { $0.id == old.id } } + page.messages) { message in
-                                row(message, page: page).id(message.id)
+                            if model.before != nil || contentFeed.canReadEarlier { Button(QelvoraCopy.text("growthEarlier"), variant: .quiet, disabled: model.busy || model.offline || contentFeed.loading) { Task { if model.before != nil { await model.earlier() }; contentFeed.earlier() } } }
+                            timeline(page)
+                            if contentFeed.unavailable {
+                                Text(QelvoraCopy.text("w5ContentRefreshUnavailable")).qText("caption")
+                                Button(QelvoraCopy.text("w5ContentCheckCurrentAccess"), variant: .quiet, disabled: model.offline) { contentFeed.refresh() }
                             }
                             if let pending = model.pending {
                                 Message(kind: .fan, children: pending.text, name: page.creatorName, delivery: pending.rejected ? .failed : pending.uncertain ? nil : .pending)
@@ -126,6 +134,13 @@ private struct W3ThreadScreen: View {
                 Spacer()
             }
         }.frame(maxWidth: 390).foregroundStyle(qColor("ink", scheme)).background(qColor("ground", scheme))
+            .task(id: "\(contentActive)-\(contentFeed.pages)-\(contentFeed.retry)") {
+                await contentFeed.run(active: contentActive)
+            }
+            .task {
+                while !Task.isCancelled { contentFeed.expire(); do { try await Task.sleep(for: .milliseconds(100)) } catch { return } }
+            }
+            .onDisappear { contentFeed.conceal() }
             .task(id: "\(scenePhase)-\(privacy)-\(source != nil)-\(originalReply != nil || comparisonQuestion != nil)-\(connectionRetry)") {
                 let active = scenePhase == .active && !privacy && source == nil && originalReply == nil && comparisonQuestion == nil
                 model.setActive(active)
@@ -137,6 +152,7 @@ private struct W3ThreadScreen: View {
                 }
             }
             .onChange(of: scenePhase) { _, value in
+                if value != .active { contentFeed.conceal() }
                 if value != .active { source = nil; originalReply = nil; comparisonQuestion = nil; sourceFailure = "" }
                 model.setActive(value == .active && !privacy && source == nil && originalReply == nil && comparisonQuestion == nil)
             }
@@ -170,6 +186,15 @@ private struct W3ThreadScreen: View {
             .sheet(item: $source) { passage in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original source").qText("data-sm"); Text(passage.title).qText("display-md"); Text(passage.text).qText("body").textSelection(.enabled) }.padding(16) } }
             .sheet(item: $originalReply) { original in ScrollView { VStack(alignment: .leading, spacing: 16) { Text("Original AI reply · version \(original.version)").qText("data-sm"); Text(original.text).qText("body").textSelection(.enabled) }.padding(16) } }
             .alert("Source unavailable", isPresented: Binding(get: { !sourceFailure.isEmpty }, set: { if !$0 { sourceFailure = "" } })) { SwiftUI.Button("Close") { sourceFailure = "" } } message: { Text(sourceFailure) }
+    }
+    private func timeline(_ page: W3Page) -> some View {
+        let currentIds = Set(page.messages.map(\.id))
+        let messages = model.older.filter { !currentIds.contains($0.id) } + page.messages
+        let items = W3TimelineItem.merge(messages: messages, content: contentActive ? contentFeed.items : [])
+        return ForEach(items) { item in
+            if let message = item.message { row(message, page: page).id(item.id) }
+            else if let content = item.content { W3ContentPresenceRow(item: content, open: { session.open($0) }).id(item.id) }
+        }
     }
     @ViewBuilder private func row(_ message: W3Message, page: W3Page) -> some View {
         if message.authorKind == .system {

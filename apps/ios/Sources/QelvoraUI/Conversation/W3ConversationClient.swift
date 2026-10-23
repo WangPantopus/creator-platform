@@ -89,8 +89,18 @@ actor W3ConversationClient {
         try JSONDecoder().decode(T.self, from: await requestData(path, body: body, publicRead: publicRead))
     }
     func requestData(_ path: String, body: Data? = nil, publicRead: Bool = false) async throws -> Data {
+        try await transport(path, body: body, publicRead: publicRead, contentRead: false)
+    }
+    func contentPresence(creatorId: String, before: String?) async throws -> W3ContentPresencePage {
+        guard UUID(uuidString: creatorId) != nil, before == nil || W3ContentPresencePage.validCursor(before!) else { throw URLError(.badURL) }
+        var path = URLComponents(); path.path = creatorId + "/presence"
+        path.queryItems = [URLQueryItem(name: "limit", value: "50")] + (before.map { [URLQueryItem(name: "before", value: $0)] } ?? [])
+        let data = try await transport(path.string!, body: nil, publicRead: false, contentRead: true)
+        return try W3ContentPresencePage(JSONDecoder().decode(APIThreadPresencePage.self, from: data), creatorId: creatorId)
+    }
+    private func transport(_ path: String, body: Data?, publicRead: Bool, contentRead: Bool) async throws -> Data {
         guard let components = URLComponents(string: path) else { throw URLError(.badURL) }
-        var target = URLComponents(url: baseURL.appendingPathComponent("v1/conversations/" + components.path), resolvingAgainstBaseURL: false)!
+        var target = URLComponents(url: baseURL.appendingPathComponent((contentRead ? "v1/content/" : "v1/conversations/") + components.path), resolvingAgainstBaseURL: false)!
         target.queryItems = components.queryItems
         var request = URLRequest(url: target.url!)
         request.httpMethod = body == nil ? "GET" : "POST"; request.httpBody = body; request.timeoutInterval = body != nil && path.hasSuffix("/comparison") ? 65 : 15
@@ -101,7 +111,7 @@ actor W3ConversationClient {
             guard let accountId = expectedAccountId, UUID(uuidString: accountId) != nil else { throw W3Failure(message: "Reopen this page with your current account.", status: 401) }
             guard let token = requestCredential else { throw W3Failure(message: "Your session ended. Continue with Pantopus again.", status: 401) }
             request.setValue("Bearer " + token, forHTTPHeaderField: "Authorization")
-            request.setValue(accountId, forHTTPHeaderField: "X-Expected-Account-Id")
+            request.setValue(accountId, forHTTPHeaderField: contentRead ? "x-qelvora-expected-account" : "X-Expected-Account-Id")
         }
         if body != nil { request.setValue("application/json", forHTTPHeaderField: "Content-Type") }
         let (data, response) = try await session.data(for: request)
