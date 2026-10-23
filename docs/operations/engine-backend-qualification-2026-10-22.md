@@ -144,3 +144,42 @@ retained in `/tmp/qelvora-engine-1022-ack-disconnect.log`.
 
 Multi-worker qualification, real providers, memory writes, context exclusions
 and production hosting remain separate work.
+
+## Studio background work during shutdown
+
+A later read-only shutdown review found that FAQ evaluations and comparison
+replays were detached from the stock host's close path. Their active provider
+calls and final database writes could outlive the shared pool. Agent and Shadow
+now track both pending start transactions and actual background work, reject new
+starts while closing, and abort through their owned lifetime signals. Close waits
+for pending starts before draining the work they may have created. The FAQ
+monitor's in-flight transaction is also drained. The conversation host closes
+both owners alongside its existing ingestion and conversation owners.
+
+Unexpected background finalization errors are retained and reported by close as
+an `AggregateError` after all work settles. The explicit `ai_deleted` tombstone
+case retains its existing precedence; expected HTTP start-validation failures do
+not become shutdown failures. No cost is invented when a provider response is
+missing.
+
+The existing FAQ scenario has opt-in `shutdown`, `shutdown-start` and `recovery`
+cases. Shutdown requires an explicit PID that owns the selected loopback API
+listener and leaves restarting to the owning operator. The active-provider check
+on the combined `integrated-1022` stack (API 56631, model 56633, PostgreSQL 56630)
+passed all three steps: a real delayed provider request was admitted, SIGTERM
+exited in 463 ms, the evaluation was durably failed and its original usage row
+completed with the missing cost still unknown. The fake returned to `ok` with
+100 ms delay. Evidence is in `/tmp/qelvora-engine-1022-faq-shutdown.log`.
+
+The pending-start race passed all three steps after a coordinated restart.
+A transaction held the actual creator workspace row while a real evaluation
+request waited; `pg_blocking_pids` verified that wait. SIGTERM closed the listener
+before the lock was released. The request then returned HTTP 403 with
+`evaluation_host_closing`, and the process exited. No new evaluation job, usage
+row or provider request was created. The lock was rolled back and its connection
+closed; no stored state was fabricated for the check. Evidence is in
+`/tmp/qelvora-engine-1022-faq-shutdown-start.log`.
+
+Backend type checking, lint/format and the existing shadow compatibility and
+evidence suites passed (15 tests). Those shadow checks use their documented
+scripted ports; they are not a real comparison sanitizer/shutdown journey.

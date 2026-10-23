@@ -129,6 +129,11 @@ export class AgentService {
   readonly repository: AgentRepository;
   readonly pipeline: AgentPipeline;
   private readonly evaluations = new Map<string, AbortController>();
+  private readonly evaluationLifetime = new AbortController();
+  private readonly evaluationStarts = new Set<Promise<unknown>>();
+  private readonly evaluationTasks = new Set<Promise<void>>();
+  private readonly evaluationFailures: unknown[] = [];
+  private closing?: Promise<void>;
   constructor(
     repository: AgentRepository,
     pipeline: AgentPipeline,
@@ -733,6 +738,41 @@ export class AgentService {
     });
   }
   async evaluate(scope: CreatorScope, key: string, raw: unknown) {
+    invariant(
+      !this.evaluationLifetime.signal.aborted,
+      "evaluation_host_closing",
+      "Evaluations are unavailable while the host is closing.",
+    );
+    const starting = this.startEvaluation(scope, key, raw);
+    this.evaluationStarts.add(starting);
+    try {
+      return await starting;
+    } finally {
+      this.evaluationStarts.delete(starting);
+    }
+  }
+
+  /** Stop new admissions immediately, then keep the shared pool alive through
+   * any in-flight admission, provider completion and final evaluation write. */
+  close(): Promise<void> {
+    this.evaluationLifetime.abort();
+    this.closing ??= (async () => {
+      await Promise.allSettled([...this.evaluationStarts]);
+      await Promise.allSettled([...this.evaluationTasks]);
+      if (this.evaluationFailures.length)
+        throw new AggregateError(
+          this.evaluationFailures,
+          "Evaluation shutdown could not finish its background work.",
+        );
+    })();
+    return this.closing;
+  }
+
+  private async startEvaluation(
+    scope: CreatorScope,
+    key: string,
+    raw: unknown,
+  ) {
     const input = EvaluationRequest.parse(raw);
     if (!this.pipeline.model)
       throw new DomainError(
@@ -747,6 +787,11 @@ export class AgentService {
       key,
       { operation: "evaluate", input },
       async (client, workspace, creator) => {
+        invariant(
+          !this.evaluationLifetime.signal.aborted,
+          "evaluation_host_closing",
+          "Evaluations are unavailable while the host is closing.",
+        );
         exactRevision(workspace, input.expectedRevision);
         invariant(
           workspace.configuration.usefulnessCriteria.trim() &&
@@ -789,17 +834,27 @@ export class AgentService {
     if (!created) return started;
     const controller = new AbortController();
     this.evaluations.set(scope.creatorId, controller);
-    void this.performEvaluation(
+    const pending = this.performEvaluation(
       scope,
       started.id,
       AbortSignal.any([
         controller.signal,
+        this.evaluationLifetime.signal,
         // Six boundary cases and regressions, plus about ten seconds per FAQ question.
         AbortSignal.timeout(480_000 + 10_000 * faqCount),
       ]),
-    ).finally(() => {
+    );
+    this.evaluationTasks.add(pending);
+    // Observe both outcomes without creating a detached rejecting finally().
+    // The original task remains tracked until its own accounting has settled.
+    const settled = () => {
+      this.evaluationTasks.delete(pending);
       if (this.evaluations.get(scope.creatorId) === controller)
         this.evaluations.delete(scope.creatorId);
+    };
+    void pending.then(settled, (cause: unknown) => {
+      this.evaluationFailures.push(cause);
+      settled();
     });
     return started;
   }
@@ -812,6 +867,7 @@ export class AgentService {
     const controller = new AbortController();
     signal = AbortSignal.any([signal, controller.signal]);
     let timer: ReturnType<typeof setTimeout> | undefined;
+    let monitoring: Promise<void> | undefined;
     const monitor = async () => {
       try {
         await this.repository.transaction(
@@ -842,7 +898,8 @@ export class AgentService {
       }
       if (!signal.aborted)
         timer = setTimeout(() => {
-          void monitor();
+          timer = undefined;
+          monitoring = monitor();
         }, 1000);
     };
     try {
@@ -1007,10 +1064,23 @@ export class AgentService {
             [id, scope.creatorId, JSON.stringify(cases)],
           ),
         )
-        .catch(() => undefined);
+        .catch((completionFailure: unknown) => {
+          // A tombstone already owns the removed job. Other failures must be
+          // visible to the host instead of reporting a successful drain.
+          if (
+            completionFailure instanceof DomainError &&
+            completionFailure.code === "ai_deleted"
+          )
+            return;
+          throw new AggregateError(
+            [error, completionFailure],
+            "Evaluation interruption and finalization failed.",
+          );
+        });
     } finally {
       controller.abort();
       if (timer) clearTimeout(timer);
+      await monitoring;
     }
   }
   async cancelEvaluation(scope: CreatorScope) {

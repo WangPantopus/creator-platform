@@ -27,7 +27,48 @@ const synthetic: ThreadSnapshot = {
 /** A trusted W3/W7 sanitizer supplies only deidentified paraphrases, never source fan messages/IDs. */
 export class ShadowReplay {
   private readonly running = new Set<string>();
+  private readonly lifetime = new AbortController();
+  private readonly starts = new Set<Promise<unknown>>();
+  private readonly tasks = new Set<Promise<unknown>>();
+  private readonly finalizers = new Set<Promise<void>>();
+  private readonly finalizerFailures: unknown[] = [];
+  private closing?: Promise<void>;
   async start(scope: CreatorScope, key: string, expectedRevision: number) {
+    invariant(
+      !this.lifetime.signal.aborted,
+      "comparison_host_closing",
+      "Comparisons are unavailable while the host is closing.",
+    );
+    const starting = this.startReplay(scope, key, expectedRevision);
+    this.starts.add(starting);
+    try {
+      return await starting;
+    } finally {
+      this.starts.delete(starting);
+    }
+  }
+
+  /** Preserve the original pool until all admitted calls and final job writes
+   * settle, including a start that was committing when shutdown began. */
+  close(): Promise<void> {
+    this.lifetime.abort();
+    this.closing ??= (async () => {
+      await Promise.allSettled([...this.starts]);
+      await Promise.allSettled([...this.tasks, ...this.finalizers]);
+      if (this.finalizerFailures.length)
+        throw new AggregateError(
+          this.finalizerFailures,
+          "Comparison shutdown could not finish its background work.",
+        );
+    })();
+    return this.closing;
+  }
+
+  private async startReplay(
+    scope: CreatorScope,
+    key: string,
+    expectedRevision: number,
+  ) {
     invariant(
       this.service.pipeline.model,
       "model_unconfigured",
@@ -38,6 +79,11 @@ export class ShadowReplay {
     await this.service.repository.transaction(
       scope,
       async (client, workspace, creator) => {
+        invariant(
+          !this.lifetime.signal.aborted,
+          "comparison_host_closing",
+          "Comparisons are unavailable while the host is closing.",
+        );
         invariant(
           workspace.revision === expectedRevision,
           "draft_changed",
@@ -63,6 +109,11 @@ export class ShadowReplay {
       key,
       { operation: "shadow.start", expectedRevision },
       async (client, workspace, creator) => {
+        invariant(
+          !this.lifetime.signal.aborted,
+          "comparison_host_closing",
+          "Comparisons are unavailable while the host is closing.",
+        );
         invariant(
           workspace.revision === expectedRevision,
           "draft_changed",
@@ -119,22 +170,43 @@ export class ShadowReplay {
         return { id, state: "running" as const };
       },
     );
-    if (created)
-      void this.run(
+    if (created) {
+      const pending = this.run(
         scope,
         expectedRevision,
         AbortSignal.timeout(30 * 60000),
         receipt.id,
-      ).catch(async () => {
-        await this.service.repository
-          .transaction(scope, async (client) => {
-            await client.query(
-              "UPDATE creator.ai_shadow_evaluation SET state='failed',error='Comparison interrupted or changed. Run it again.',updated_at=now() WHERE id=$1 AND creator_id=$2 AND state='running'",
-              [receipt.id, scope.creatorId],
-            );
-          })
-          .catch(() => undefined); // Purge/tombstone wins; the read path also expires interrupted jobs.
+      )
+        .then(() => {})
+        .catch(async (cause: unknown) => {
+          await this.service.repository
+            .transaction(scope, async (client) => {
+              await client.query(
+                "UPDATE creator.ai_shadow_evaluation SET state='failed',error='Comparison interrupted or changed. Run it again.',updated_at=now() WHERE id=$1 AND creator_id=$2 AND state='running'",
+                [receipt.id, scope.creatorId],
+              );
+            })
+            .catch((completionFailure: unknown) => {
+              // Purge/tombstone wins. An unrelated write failure must remain a
+              // failed drain while the host still owns its original pool.
+              if (
+                completionFailure instanceof DomainError &&
+                completionFailure.code === "ai_deleted"
+              )
+                return;
+              throw new AggregateError(
+                [cause, completionFailure],
+                "Comparison interruption and finalization failed.",
+              );
+            });
+        });
+      this.finalizers.add(pending);
+      const settled = () => this.finalizers.delete(pending);
+      void pending.then(settled, (cause: unknown) => {
+        this.finalizerFailures.push(cause);
+        settled();
       });
+    }
     return receipt;
   }
   constructor(
@@ -215,6 +287,31 @@ export class ShadowReplay {
     });
   }
   async run(
+    scope: CreatorScope,
+    expectedRevision: number,
+    signal: AbortSignal,
+    jobId?: string,
+  ) {
+    invariant(
+      !this.lifetime.signal.aborted,
+      "comparison_host_closing",
+      "Comparisons are unavailable while the host is closing.",
+    );
+    const pending = this.performReplay(
+      scope,
+      expectedRevision,
+      AbortSignal.any([signal, this.lifetime.signal]),
+      jobId,
+    );
+    this.tasks.add(pending);
+    try {
+      return await pending;
+    } finally {
+      this.tasks.delete(pending);
+    }
+  }
+
+  private async performReplay(
     scope: CreatorScope,
     expectedRevision: number,
     signal: AbortSignal,
