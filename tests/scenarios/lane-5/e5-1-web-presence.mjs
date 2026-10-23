@@ -8,6 +8,9 @@
 // membership for native read checks, and prints their identifiers (no tokens).
 // No held migration or safety approval is invented: 0156 reaction acceptance is
 // explicitly not run while its review authority remains reserved_unapplied.
+// --deep-fixture checks seven cursor advances using explicit browser response
+// fixtures matching lane-7 C4 contracts. It proves UI mechanics only, with no
+// claim of real publication, membership, review or signatures.
 // --pagination requires PRESENCE_PAGINATION_FIXTURE=followers|members and an
 // isolated creator. The members fixture uses existing documented purchase/tier
 // stand-ins; followers uses the real follow API and needs qualified 0185 custody.
@@ -43,6 +46,10 @@ expect(
   "Use an owned local creator_stack database",
 );
 const accounts = [3, outsiderActor, memberActor].map(L.account);
+if (process.argv.includes("--deep-fixture")) {
+  await deepFixtureChecks();
+  await L.finish();
+}
 // This mode requires a separate, fresh creator fixture. It never changes the
 // member/Note retained by the lifecycle scenario for native verification.
 if (process.argv.includes("--pagination")) {
@@ -115,6 +122,264 @@ async function login(page, n, path) {
   await page.locator(`button[name="code"][value="${L.account(n)}"]`).click();
   await page.waitForURL((u) => !u.pathname.startsWith("/auth"));
   if (new URL(page.url()).pathname !== path) await page.goto(WEB + path);
+}
+
+async function deepFixtureChecks() {
+  // Match lane-7's seven-cursor fixture, without controlling a native agent's
+  // harness or changing any real content. The surrounding session/thread is real.
+  const actor = Number(process.env.PRESENCE_PAGINATION_FAN_ACTOR ?? 1);
+  expect([1, 4, 5, 6].includes(actor), "Use an eligible fan actor");
+  expect(
+    (
+      await sql(
+        "SELECT id FROM creator_trust.privacy_job WHERE account_id=$1 AND kind='delete'",
+        [L.account(actor)],
+      )
+    ).length === 0,
+    "Fixture actor has deletion state; leave it untouched",
+  );
+  const [fan] = await sql(
+    "SELECT id FROM creator.fan_profile WHERE account_id=$1",
+    [L.account(actor)],
+  );
+  expect(fan, "Use an existing fan/thread from the owned pagination stack");
+  await mkdir(out, { recursive: true });
+  const browser = await L.launch(),
+    reader = await L.phone(browser);
+  const cursors = Array.from(
+    { length: 7 },
+    (_, index) =>
+      `2026-10-01T00:00:00.000000Z~d1000000-0000-4000-8000-000000000${900 + index}`,
+  );
+  const note = {
+    authorKind: "human_broadcast",
+    id: "d1000000-0000-4000-8000-000000000901",
+    version: 1,
+    creatorId: MAYA,
+    creatorName: "Maya",
+    authorLabel: "Maya · to all members",
+    glyph: "broadcast",
+    audience: { kind: "members", label: "all members", glyph: "broadcast" },
+    text: "UI fixture only: the seventh older page.",
+    signedActId: "5a000000-0000-4000-8000-000000000901",
+    occurredAt: "2026-10-01T00:00:00.000Z",
+  };
+  const reaction = {
+    authorKind: "human_reaction",
+    id: "d1000000-0000-4000-8000-000000000902",
+    creatorId: MAYA,
+    creatorName: "Maya",
+    authorLabel: "Maya reacted to your reply",
+    glyph: "heart",
+    reaction: "helpful",
+    replyId: "d1000000-0000-4000-8000-000000000902",
+    noteId: note.id,
+    signedActId: "5a000000-0000-4000-8000-000000000902",
+    occurredAt: note.occurredAt,
+  };
+  let mode = "deep",
+    active = 0,
+    maxActive = 0;
+  const batches = [];
+  const pattern = `**/api/content/${MAYA}/presence?*`;
+  await reader.page.route(pattern, async (route) => {
+    const before = new URL(route.request().url()).searchParams.get("before");
+    const index = before ? cursors.indexOf(before) + 1 : 0;
+    const currentMode = mode;
+    if (!before) batches.push([]);
+    batches.at(-1)?.push(before);
+    active++;
+    maxActive = Math.max(maxActive, active);
+    const delay =
+      currentMode === "slow" && before === cursors[4]
+        ? 6500
+        : currentMode === "overlap"
+          ? 1200
+          : 200;
+    try {
+      await L.sleep(delay);
+      if (currentMode === "fail" && before === cursors[4]) {
+        await route.fulfill({
+          status: 503,
+          contentType: "application/json",
+          body: JSON.stringify({ error: "fixture_sibling_failure" }),
+        });
+        return;
+      }
+      const empty = index < 7;
+      const items =
+        currentMode === "overlap"
+          ? [
+              {
+                ...note,
+                version: before ? 1 : 2,
+                text: before
+                  ? "Stale overlapping fixture"
+                  : "Current head fixture",
+              },
+              ...(index === 7 ? [reaction] : []),
+            ]
+          : empty
+            ? []
+            : [
+                currentMode === "slow"
+                  ? { ...note, text: "Uncommitted sibling fixture" }
+                  : note,
+                reaction,
+              ];
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          items,
+          nextBefore: empty ? cursors[index] : null,
+          serverTime: new Date().toISOString(),
+        }),
+      });
+    } catch {
+      // Aborted sibling reads and browser teardown deliberately close routes.
+    } finally {
+      active--;
+    }
+  });
+  const noteElement = reader.page.locator(`[data-presence-id="${note.id}"]`);
+  const reactionElement = reader.page.locator(
+    `[data-presence-id="${reaction.id}"]`,
+  );
+  const earlier = reader.page.getByRole("button", {
+    name: "Earlier messages",
+    exact: true,
+  });
+  const focus = () =>
+    reader.page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  try {
+    await login(reader.page, actor, `/threads/${MAYA}/${fan.id}`);
+    await step(
+      "C4-web-deep-fixture",
+      "UI fixture: seven empty candidate advances reach Note/reaction with at most five retained cursors",
+      async () => {
+        for (let index = 0; index < 7; index++) {
+          const response = reader.page.waitForResponse(
+            (res) =>
+              new URL(res.url()).searchParams.get("before") === cursors[index],
+          );
+          await earlier.click();
+          await response;
+          if (index < 6)
+            await reader.page.waitForFunction(() =>
+              [...document.querySelectorAll("button")].some(
+                (button) =>
+                  button.textContent === "Earlier messages" && !button.disabled,
+              ),
+            );
+        }
+        await noteElement.waitFor();
+        await reactionElement.waitFor();
+        expect(
+          (await earlier.count()) === 0,
+          "Final cursor still offers an older page",
+        );
+        expect(
+          batches.every((batch) => batch.length <= 5),
+          "A refresh retained more than five cursors",
+        );
+        expect(
+          JSON.stringify(batches.at(-1)) ===
+            JSON.stringify([null, ...cursors.slice(3)]),
+          "Rolling window did not keep head and latest four older cursors",
+        );
+        await reader.page.screenshot({ path: `${out}/deep-fixture.png` });
+        return JSON.stringify({
+          advances: 7,
+          retained: batches.at(-1),
+          maxConcurrent: maxActive,
+        });
+      },
+    );
+    await step(
+      "C4-web-overlap-fixture",
+      "UI fixture: five concurrent reads preserve head-first deduplication under the shared deadline",
+      async () => {
+        mode = "overlap";
+        const started = Date.now();
+        await focus();
+        await noteElement
+          .getByText("Current head fixture", { exact: true })
+          .waitFor();
+        expect(
+          Date.now() - started < 4500,
+          "Five retained reads exceeded the shared freshness budget",
+        );
+        expect(
+          (await noteElement.count()) === 1 &&
+            (await reactionElement.count()) === 1,
+          "Overlapping pages duplicated items",
+        );
+        expect(
+          (await reader.page
+            .getByText("Stale overlapping fixture", { exact: true })
+            .count()) === 0,
+          "Older overlap replaced the head version",
+        );
+        expect(maxActive === 5, "Retained pages were not read concurrently");
+      },
+    );
+    await step(
+      "C4-web-sibling-fixture",
+      "UI fixture: one failed retained page clears all siblings; Retry restores the window",
+      async () => {
+        mode = "fail";
+        await focus();
+        await noteElement.waitFor({ state: "detached" });
+        expect(
+          (await reactionElement.count()) === 0,
+          "A sibling reaction survived the failed window",
+        );
+        mode = "deep";
+        await reader.page
+          .getByRole("button", { name: "Retry", exact: true })
+          .click();
+        await noteElement.waitFor();
+        await reactionElement.waitFor();
+      },
+    );
+    await step(
+      "C4-web-deep-expiry-fixture",
+      "UI fixture: one slow retained page expires the entire window and cannot restore stale siblings",
+      async () => {
+        mode = "slow";
+        const started = Date.now();
+        await focus();
+        await L.sleep(600);
+        expect(
+          (await reader.page
+            .getByText("Uncommitted sibling fixture", { exact: true })
+            .count()) === 0,
+          "A successful sibling was partially published before the slow page",
+        );
+        await noteElement.waitFor({ state: "detached", timeout: 4900 });
+        expect(
+          Date.now() - started < 5500 && (await reactionElement.count()) === 0,
+          "Slow sibling extended the five-second window",
+        );
+        mode = "deep";
+        await reader.page
+          .getByRole("button", { name: "Retry", exact: true })
+          .click();
+        await noteElement.waitFor();
+        await reactionElement.waitFor();
+        await L.sleep(Math.max(0, 6800 - (Date.now() - started)));
+        expect(
+          (await reader.page
+            .getByText("Uncommitted sibling fixture", { exact: true })
+            .count()) === 0,
+          "An expired sibling restored stale text after recovery",
+        );
+      },
+    );
+  } finally {
+    await browser.close();
+  }
 }
 
 async function paginationChecks() {

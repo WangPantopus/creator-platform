@@ -13,8 +13,8 @@ import { useConversationRequest } from "./api";
 const noPresence: ThreadPresenceItem[] = [];
 
 /** C4 is a current audience projection, never a stored message or an offline
- * snapshot. Re-read every loaded page so withdrawal, edits and lost membership
- * replace the whole projection rather than leaving older private text behind. */
+ * snapshot. Re-read the head and latest four older cursors together so withdrawal,
+ * edits and lost membership replace the whole visible projection atomically. */
 export function useThreadPresence(creatorId: string, online: boolean) {
   const request = useConversationRequest("content");
   const identity = useIdentityRequest();
@@ -39,9 +39,10 @@ export function useThreadPresence(creatorId: string, online: boolean) {
   useEffect(() => {
     const controller = new AbortController();
     let readController: AbortController | undefined;
-    let depth = 1,
-      olderPending = false,
-      running = false,
+    let cursors: (string | null)[] = [null];
+    let nextBefore: string | null = null;
+    let olderPending: string | null = null;
+    let running = false,
       again = false,
       suspended = document.visibilityState !== "visible",
       generation = 0;
@@ -64,11 +65,13 @@ export function useThreadPresence(creatorId: string, online: boolean) {
       do {
         again = false;
         const started = generation;
-        // A click during an automatic refresh queues one deeper read. Keep
-        // this read's window fixed; only its successor may consume the click.
-        const includesOlder = olderPending;
-        const readDepth = depth + (includesOlder ? 1 : 0);
-        let loadedDepth = readDepth;
+        // A click during a refresh queues one cursor for the next cycle. Keep
+        // each cycle fixed, bounded and concurrent under one freshness budget.
+        const includesOlder = olderPending !== null;
+        const readCursors = includesOlder
+          ? [...cursors, olderPending]
+          : [...cursors];
+        if (readCursors.length > 5) readCursors.splice(1, 1);
         const freshUntil = performance.now() + 5000;
         readController = new AbortController();
         const signal = AbortSignal.any([
@@ -76,36 +79,41 @@ export function useThreadPresence(creatorId: string, online: boolean) {
           readController.signal,
           AbortSignal.timeout(5000),
         ]);
-        setState((previous) => ({ ...previous, busy: olderPending }));
+        setState((previous) => ({ ...previous, busy: olderPending !== null }));
         try {
+          const pages = await Promise.all(
+            readCursors.map(async (before) => {
+              const query = new URLSearchParams({ limit: "50" });
+              if (before) query.set("before", before);
+              return ThreadPresencePage.parse(
+                await request<unknown>(
+                  `${creatorId}/presence?${query}`,
+                  undefined,
+                  signal,
+                ),
+              );
+            }),
+          );
           const items = new Map<string, ThreadPresenceItem>();
-          let before: string | null = null;
-          for (let index = 0; index < readDepth; index++) {
-            const query = new URLSearchParams({ limit: "50" });
-            if (before) query.set("before", before);
-            const page = ThreadPresencePage.parse(
-              await request<unknown>(
-                `${creatorId}/presence?${query}`,
-                undefined,
-                signal,
-              ),
-            );
+          // Promise.all keeps cursor order even when responses arrive out of
+          // order. Prefer the head's current version over overlapping pages.
+          for (const page of pages) {
             for (const item of page.items) {
               if (item.creatorId !== creatorId)
                 throw new Error("Wrong creator");
-              items.set(`${item.authorKind}:${item.id}`, item);
-            }
-            before = page.nextBefore;
-            if (!before) {
-              loadedDepth = index + 1;
-              break;
+              const key = `${item.authorKind}:${item.id}`;
+              if (!items.has(key)) items.set(key, item);
             }
           }
+          const before = pages[pages.length - 1]!.nextBefore;
+          if (before !== null && readCursors.includes(before))
+            throw new Error("Repeated cursor");
           signal.throwIfAborted();
           if (suspended || started !== generation) continue;
           if (performance.now() >= freshUntil) throw new Error("Read expired");
-          depth = loadedDepth;
-          if (includesOlder) olderPending = false;
+          cursors = readCursors;
+          nextBefore = before;
+          if (includesOlder) olderPending = null;
           setState({
             scope,
             items: [...items.values()].sort(
@@ -114,22 +122,24 @@ export function useThreadPresence(creatorId: string, online: boolean) {
                 a.id.localeCompare(b.id),
             ),
             hasOlder: before !== null,
-            busy: olderPending,
+            busy: olderPending !== null,
             failed: false,
             freshUntil,
           });
         } catch {
+          // One failed sibling invalidates the entire retained window.
+          readController.abort();
           if (
             !controller.signal.aborted &&
             !suspended &&
             started === generation
           ) {
-            if (includesOlder) olderPending = false;
+            if (includesOlder) olderPending = null;
             setState({
               scope,
               items: [],
               hasOlder: false,
-              busy: olderPending,
+              busy: olderPending !== null,
               failed: true,
               freshUntil: 0,
             });
@@ -140,8 +150,8 @@ export function useThreadPresence(creatorId: string, online: boolean) {
     };
     load.current = (older = false) => {
       if (older) {
-        if (olderPending) return;
-        olderPending = true;
+        if (olderPending !== null || nextBefore === null) return;
+        olderPending = nextBefore;
         setState((previous) => ({ ...previous, busy: true }));
       }
       void refresh();
@@ -149,7 +159,7 @@ export function useThreadPresence(creatorId: string, online: boolean) {
     const conceal = () => {
       suspended = true;
       generation++;
-      olderPending = false;
+      olderPending = null;
       readController?.abort();
       clear();
     };
