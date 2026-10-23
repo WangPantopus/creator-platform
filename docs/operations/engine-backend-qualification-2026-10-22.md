@@ -183,3 +183,30 @@ closed; no stored state was fabricated for the check. Evidence is in
 Backend type checking, lint/format and the existing shadow compatibility and
 evidence suites passed (15 tests). Those shadow checks use their documented
 scripted ports; they are not a real comparison sanitizer/shutdown journey.
+
+## Recovery after the shutdown checks
+
+After restarting the preserved `integrated-1022` stack, the existing FAQ
+scenario's `--cases recovery` passed both steps. Maya's published version
+remained live with its unchanged 5,000,000-micro daily cap, and the preserved
+draft completed a new evaluation with all five FAQ cases passing. The new
+evaluation is `6366a658-d818-49b9-be51-dc38b133428e`.
+
+A read-only comparison of PostgreSQL rows before and after this run confirmed
+that the entire published-version row was unchanged. The prior shutdown
+evaluation `37bde76b-35c0-4610-bfc6-a38ce99a3a53` remained failed, and its one
+completed usage row with unknown cost was unchanged. Recovery did not rewrite
+the failed attempt or invent a receipt. The local fake model was returned to
+`ok` with a 100 ms delay; no real-provider result is claimed.
+
+```sh
+node tests/scenarios/lane-3/e3b2-faq-publish.mjs \
+  --cases recovery --cap 5000000 \
+  --api http://127.0.0.1:56631 --model http://127.0.0.1:56633 \
+  --db postgresql://postgres:foundation-test-only@127.0.0.1:56630/creator_stack
+```
+
+The recovery log and read-only snapshots are locally retained at
+`/tmp/qelvora-runtime-review-1022/faq-recovery.log`, `faq-before.json` and
+`faq-after.json`. The independent final backend regression run passed all 157
+tests across nine files before the API restarted.

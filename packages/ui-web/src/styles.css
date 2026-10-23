@@ -1362,11 +1362,20 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
 .qv-queue__handle {
   font-size: 15px;
   font-weight: 600;
   flex-grow: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.qv.qv-queue .qv-meta,
+.qv.qv-queue .qv-due {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 .qv-queue__summary {
   margin: 0;
