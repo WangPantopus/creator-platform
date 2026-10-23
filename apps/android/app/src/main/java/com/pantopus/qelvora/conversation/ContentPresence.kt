@@ -142,7 +142,7 @@ data class ContentTimelineItem(val id: String, val at: Instant, val message: Con
 @Composable
 fun ContentPresenceRow(item: ContentPresenceItem, open: (String) -> Unit) {
     Column(Modifier.fillMaxWidth().testTag("content-presence-${item.id}").background(qColor("maya-surface"), RoundedCornerShape(T.radiusMd)).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Column(Modifier.fillMaxWidth().clickable(role = Role.Button) { open(item.destination) }.semantics { contentDescription = item.accessibleLabel }.padding(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.fillMaxWidth().heightIn(min = T.touchTarget).clickable(role = Role.Button) { open(item.destination) }.semantics { contentDescription = item.accessibleLabel }.padding(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Column(Modifier.clearAndSetSemantics {}) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { Glyph(item.glyph, T.space4, qColor("maya-accent")); BasicText(item.authorLabel, style = qText("label").copy(color = qColor("maya-accent"))) }
             if (item is ContentPresenceItem.Note) BasicText(item.value.text, style = qText("body").copy(color = qColor("on-maya")))

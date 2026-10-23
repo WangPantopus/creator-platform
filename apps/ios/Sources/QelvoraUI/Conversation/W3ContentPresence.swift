@@ -130,7 +130,7 @@ struct W3ContentPresenceRow: View {
                 VStack(alignment: .leading, spacing: QelvoraTokens.space3) {
                     HStack { QelvoraGlyph(name: item.glyph, size: QelvoraTokens.space4, color: qColor("maya-accent", scheme)); Text(item.authorLabel).qText("label").foregroundStyle(qColor("maya-accent", scheme)) }
                     if case .note(let note) = item { Text(note.text).qText("body").foregroundStyle(qColor("on-maya", scheme)) }
-                }.frame(maxWidth: .infinity, alignment: .leading).contentShape(Rectangle())
+                }.frame(maxWidth: .infinity, minHeight: QelvoraTokens.touchTarget, alignment: .leading).contentShape(Rectangle())
             }.buttonStyle(.plain).accessibilityLabel(item.accessibleLabel)
             SignedMarker(name: item.creatorName, onMaya: true) { open("/verify/" + item.signedActId) }
         }.padding(QelvoraTokens.space4).background(qColor("maya-surface", scheme), in: RoundedRectangle(cornerRadius: QelvoraTokens.radiusMd))

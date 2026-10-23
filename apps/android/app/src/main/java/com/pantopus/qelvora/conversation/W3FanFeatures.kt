@@ -329,7 +329,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     val heightWithoutKeyboard = maxHeight + with(density) { WindowInsets.ime.getBottom(this).toDp() }
     val keyboardVisible = WindowInsets.ime.getBottom(density) > 0
     val scrollControls = density.fontScale >= 1.5f || heightWithoutKeyboard < 480.dp
-    LaunchedEffect(current?.threadId, current?.messages?.lastOrNull(), pending?.key, scrollControls, maxHeight) {
+    LaunchedEffect(current?.threadId, current?.messages?.lastOrNull(), contentFeed.items.map { it.id }, pending?.key, scrollControls, maxHeight) {
         if (current != null && followingReply && !scroll.isScrollInProgress) {
             positioningReply = true
             try {
