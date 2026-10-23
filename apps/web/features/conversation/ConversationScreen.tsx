@@ -178,7 +178,7 @@ export function ConversationScreen({
         behavior: "instant",
       });
     }
-  }, [page, pending]);
+  }, [page, pending, presence.items]);
   const cursorKey = `qelvora:conversation:${accountId}:${creatorId}:${fanId}`;
   const lifecycle = useRef(0);
   const mounted = useRef(true);
