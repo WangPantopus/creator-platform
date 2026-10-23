@@ -1,6 +1,7 @@
 # Private Note reply review qualification, 2026-10-22
 
-Status: feasibility audit complete; implementation and qualification are pending.
+Status: candidate source and closed qualification are implemented; restored
+upgrade, application journeys and privacy operation are still pending.
 This is a separate local increment after the app-completion branch. It does not
 record a deployment, production acceptance, an Ops decision, or completed erasure.
 
@@ -32,18 +33,18 @@ automatic moderation or expanded paid-tenure limits.
 
 ## Required integration
 
-- [ ] Recheck allocation and propose one new source registration after 0252,
+- [x] Recheck allocation and propose one new source registration after 0252,
   retaining the historical reservation and immutable SQL/frozen-map bytes.
-- [ ] Add a reviewed wave with the exact 120-source predecessor and a new
+- [x] Add a reviewed wave with the exact 120-source predecessor and a new
   complete-graph profile. Extend fresh installation, canonical bootstrap head
   recognition, the closed upgrade operator and fixed predecessor role/privacy
   checks without weakening their custody requirements.
-- [ ] Select the new profile only through the exact active executable source.
+- [x] Select the new profile only through the exact active executable source.
   Preserve earlier profiles and the original reply-review catalogue pin
   `2f477720a8ab473540e541dd3e15a7433bcd023e58b0aed586ca57a5003c1664`.
-- [ ] Teach the catalogue tool to measure the reply-review purpose catalogue;
+- [x] Teach the catalogue tool to measure the reply-review purpose catalogue;
   its current review-file groups do not cover that feature-module constant.
-- [ ] Review every intentional reach change: isolated NOLOGIN purpose role,
+- [x] Review every intentional reach change: isolated NOLOGIN purpose role,
   exact grants/functions, forced RLS on the new tables, three PUBLIC policies
   restricted to the core runtime, and the lock-only UPDATE(version) grant whose
   policy refuses writes. New tables change every full-relation catalogue even
@@ -99,3 +100,63 @@ Production staffing/escalation, real creator/provider ownership and physical
 device/provider acceptance remain separate. Hosting remains undecided. Local
 synthetic sessions, passkey fixtures and decisions must remain explicitly
 labelled as development evidence.
+
+## Source checkpoint observed
+
+Candidate `0253_w8_reply_review` is registered only on this isolated branch under
+`20261023-reply-review` (UTC date). The new filename also follows the workspace
+review in the existing catalogue tool's chronological selection. The 0156
+reservation, frozen map, source SQL and all earlier review files are unchanged.
+
+- The unchanged source compiled and was inspected in a rollback-contained
+  transaction on the owned 120-source database. Ledger, schema, data, roles,
+  security and sequences matched after rollback: six business rows in 189
+  tables were preserved. Before executable registration, an actual matching
+  hand-installed ledger row still did not activate the proposal.
+- The candidate checks accept the fixed120 predecessor and the proposed121
+  role/privacy graph. Both request-role catalogue checks passed as explicitly
+  administrator-selected metadata checks. Ten real role/grant/RLS/policy/function
+  drifts were refused and rolled back. These do not issue author or Ops authority.
+- Four catalogue profiles were measured with proposed SQL inside rollback on
+  the original120 and independently restored120 databases, each with and without
+  the incoming Growth login. Only purpose, original-family and provenance-purge
+  variants differ. Fixed values are in the new review; nothing is captured at
+  application startup.
+- A separate owned PostgreSQL17 cluster built all121 migrations from empty
+  through the real fresh installer. Without Growth, the actual catalogue check
+  passed **46/46 groups, 51 digests**. The additional group covers reply-review.
+  A live Growth catalogue check and the preserved upgrade are still pending.
+  The earlier graph's documented44/45 Growth diagnostic is not relabelled here.
+- Backend typecheck and the focused source lint passed before this checkpoint.
+
+The two existing source relations were inspected for every existing application
+role:47 roles /94 role-relation pairs. All prior SELECT/UPDATE column privileges
+are identical. Effective policy changes for roles with relevant privileges are:
+
+| Existing role | Effect of restricting the old PUBLIC policies |
+| --- | --- |
+| `creator_runtime` | Same policies and predicates still apply. |
+| `creator_w5_content_privacy_export` | The unchanged explicit `w5_content_export_metadata` SELECT policy remains on both relations. Its original body, scope, lease and deferred-COMMIT guard still own exports. |
+| `creator_commerce_public_read` | The unchanged `public_packet_metadata` SELECT policy remains on publication. |
+| `creator_w5_generation_origin` | Its unchanged `w5_generation_origin_read` and lock policies remain on publication. |
+| `creator_owner` | Loses the PUBLIC reads/update on these forced-RLS relations. It is NOLOGIN; no SECURITY DEFINER owned by it references either source relation. It is not a runtime body reader. |
+
+All other existing roles either retain the same effective policies or have no
+relevant source privilege. This metadata review establishes the intended narrowed
+reach. Actual export, generation, packet and reply behavior still need operation.
+
+The repeatable rollback probe is checked in:
+
+```sh
+node --import tsx tests/scenarios/lane-2/e2-reply-review-source.mjs \
+  --db postgresql://postgres:foundation-test-only@127.0.0.1:56650/creator_stack \
+  --out /tmp/qelvora-reply-review-1022/source-repeat.json
+node infra/local/stack.mjs catalogues check --lane reply-fresh-1022 --base-port 56670
+```
+
+Use only an owned loopback PostgreSQL17 database with the exact120 or121 source
+graph and a private output directory. The probe always rolls proposal SQL,
+metadata ledger entries and adversarial drift back; it creates no product proof,
+case, decision or erasure receipt. Detailed metadata, initial harness failure
+(missing bounded driver timeout), corrected captures and backups remain private
+under `/tmp/qelvora-reply-review-1022/`.

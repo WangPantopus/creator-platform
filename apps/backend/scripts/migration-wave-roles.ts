@@ -3,6 +3,7 @@ import type { PoolClient } from "pg";
 import generationReview from "../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
 import generationDenial from "../../../infra/migrations/reviews/20261007-generation-denial-roles.json" with { type: "json" };
 import publicAIReview from "../../../infra/migrations/reviews/20261007-public-ai.json" with { type: "json" };
+import replyReview from "../../../infra/migrations/reviews/20261023-reply-review.json" with { type: "json" };
 import comparisonReview from "../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
 import { canonical, repositoryRoot, sha256 } from "./migration-custody.js";
 
@@ -90,6 +91,7 @@ export async function assertWaveRoleSafety(
     generationDenial?: boolean;
     publicAI?: boolean;
     comparison?: boolean;
+    replyReview?: boolean;
   },
 ) {
   const fail = (role: string): never => {
@@ -207,6 +209,21 @@ export async function assertWaveRoleSafety(
       )
         fail("complete comparison source graph");
   }
+  if (installed.replyReview) {
+    if (!installed.comparison) fail("reply review predecessor");
+    for (const source of replyReview.sources)
+      if (
+        sha256(await readFile(new URL(source.path, repositoryRoot))) !==
+          source.checksum ||
+        !(
+          await client.query(
+            "SELECT 1 FROM creator.schema_migration WHERE version=$1 AND checksum=$2",
+            [source.version, source.checksum],
+          )
+        ).rowCount
+      )
+        fail("exact reply review source");
+  }
   const expected = [
     ...pins.functions,
     ...additions.functions.filter((f) =>
@@ -228,6 +245,21 @@ export async function assertWaveRoleSafety(
             grants: [
               ...f.grants,
               "creator_comparison_reader=X/creator_trust_denial",
+            ].sort(),
+          }
+        : f,
+    )
+    .map((f) =>
+      installed.replyReview &&
+      [
+        "creator_trust.denial_projection(uuid, uuid, uuid, uuid)",
+        "creator_trust.runtime_audience_denial(uuid, uuid)",
+      ].includes(f.name)
+        ? {
+            ...f,
+            grants: [
+              ...f.grants,
+              "creator_trust_reply_projection=X/creator_trust_denial",
             ].sort(),
           }
         : f,

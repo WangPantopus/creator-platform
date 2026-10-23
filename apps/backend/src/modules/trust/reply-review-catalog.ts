@@ -3,6 +3,7 @@ import { contentHash } from "../../core/canonical.js";
 import { DomainError } from "../../core/errors.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
+import { registeredComparisonProfile } from "../../db/comparison-profile.js";
 
 export const replyReviewMigration = Object.freeze({
   version: "0156_w8_reply_review",
@@ -122,10 +123,12 @@ export async function replyReviewPurposeCatalogue(client: PoolClient) {
  * executable registry and their original request/case authority below. */
 export async function assertReplyReviewPurposeCatalog(client: PoolClient) {
   try {
-    if (
-      contentHash(await replyReviewPurposeCatalogue(client)) !==
-      catalogueChecksum
-    )
+    const profile = await registeredComparisonProfile();
+    const expected =
+      profile && "replyReviewCatalogueChecksum" in profile
+        ? profile.replyReviewCatalogueChecksum
+        : catalogueChecksum;
+    if (contentHash(await replyReviewPurposeCatalogue(client)) !== expected)
       unavailable();
   } catch (cause) {
     unavailable(cause);

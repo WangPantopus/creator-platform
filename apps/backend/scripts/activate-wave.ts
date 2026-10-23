@@ -31,6 +31,7 @@ import comparisonReview from "../../../infra/migrations/reviews/20261008-compari
 import { registeredComparisonProfile } from "../src/db/comparison-profile.js";
 import noticesReview from "../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
 import signInAndMoneyReview from "../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
+import replyReview from "../../../infra/migrations/reviews/20261023-reply-review.json" with { type: "json" };
 import workspaceLockReview from "../../../infra/migrations/reviews/20261022-workspace-lock.json" with { type: "json" };
 import partialRecoveryReview from "../../../infra/migrations/reviews/20261007-partial-generation-recovery.json" with { type: "json" };
 import recoveryReview from "../../../infra/migrations/reviews/20261007-generation-recovery.json" with { type: "json" };
@@ -78,16 +79,18 @@ async function activate() {
       "20261015-notices",
       "20261015-sign-in-and-money",
       "20261022-workspace-lock",
+      "20261023-reply-review",
     ].includes(process.env.W8_MIGRATION_WAVE ?? ""),
-    "Select a reviewed W8_MIGRATION_WAVE (20261002, 20261002-privacy, 20261007-generation, 20261007-content 20261007-generation-output 20261007-public-ai 20261007-generation-recovery 20261007-partial-generation-recovery 20261008-comparison 20261015-notices 20261015-sign-in-and-money or 20261022-workspace-lock).",
+    "Select a reviewed W8_MIGRATION_WAVE (20261002, 20261002-privacy, 20261007-generation, 20261007-content 20261007-generation-output 20261007-public-ai 20261007-generation-recovery 20261007-partial-generation-recovery 20261008-comparison 20261015-notices 20261015-sign-in-and-money 20261022-workspace-lock or 20261023-reply-review).",
   );
   const connection = process.env.DATABASE_MIGRATION_URL;
   check(
     connection,
     "Provide a separate DATABASE_MIGRATION_URL; never a runtime credential.",
   );
+  const reply = process.env.W8_MIGRATION_WAVE === "20261023-reply-review";
   const workspaceLock =
-    process.env.W8_MIGRATION_WAVE === "20261022-workspace-lock";
+    reply || process.env.W8_MIGRATION_WAVE === "20261022-workspace-lock";
   const signInAndMoney =
     workspaceLock ||
     process.env.W8_MIGRATION_WAVE === "20261015-sign-in-and-money";
@@ -127,6 +130,7 @@ async function activate() {
     "20261015-notices",
     "20261015-sign-in-and-money",
     "20261022-workspace-lock",
+    "20261023-reply-review",
   ];
   const packets = await Promise.all(
     ids.map(
@@ -152,7 +156,9 @@ async function activate() {
     noticesPacket,
     signInAndMoneyPacket,
     workspaceLockPacket,
+    replyReviewPacket,
   ] = packets as [
+    Packet,
     Packet,
     Packet,
     Packet,
@@ -172,8 +178,10 @@ async function activate() {
         entry.schemaVersion === 1 &&
         entry.id === ids[index] &&
         entry.baseline.length ===
-          [40, 57, 61, 100, 101, 102, 104, 105, 106, 114, 116, 119][index] &&
-        entry.wave.length === [17, 4, 39, 1, 1, 2, 1, 1, 8, 2, 3, 1][index],
+          [40, 57, 61, 100, 101, 102, 104, 105, 106, 114, 116, 119, 120][
+            index
+          ] &&
+        entry.wave.length === [17, 4, 39, 1, 1, 2, 1, 1, 8, 2, 3, 1, 1][index],
     ) &&
       canonical(prior.baseline) ===
         canonical([...initial.baseline, ...initial.wave]) &&
@@ -360,8 +368,26 @@ async function activate() {
         await readFile(
           new URL(workspaceLockReview.baselineWave.path, repositoryRoot),
         ),
-      ) === workspaceLockReview.baselineWave.sha256,
-    "The exact reviewed 40/57/61/100/101/102/104/105/106/114/116/119/120-source migration chain is required.",
+      ) === workspaceLockReview.baselineWave.sha256 &&
+      canonical(replyReviewPacket.baseline) ===
+        canonical([
+          ...workspaceLockPacket.baseline,
+          ...workspaceLockPacket.wave,
+        ]) &&
+      canonical(replyReviewPacket.wave) ===
+        canonical(
+          replyReview.sources.map(({ version, path, checksum }) => ({
+            version,
+            path,
+            checksum,
+          })),
+        ) &&
+      canonical(replyReviewPacket.outOfOrderException) ===
+        canonical(workspaceLockPacket.outOfOrderException) &&
+      sha256(
+        await readFile(new URL(replyReview.baselineWave.path, repositoryRoot)),
+      ) === replyReview.baselineWave.sha256,
+    "The exact reviewed 40/57/61/100/101/102/104/105/106/114/116/119/120/121-source migration chain is required.",
   );
   check(
     await generationPrivacySourcesRegistered(),
@@ -385,7 +411,7 @@ async function activate() {
   );
   check(
     await registeredComparisonProfile(),
-    "The complete comparison, notices, sign-in and money, and workspace-lock source registrations are required.",
+    "The complete comparison, notices, sign-in and money, workspace-lock and reply-review source registrations are required.",
   );
   const packet = packets.find(
     (entry) => entry.id === process.env.W8_MIGRATION_WAVE,
@@ -395,8 +421,8 @@ async function activate() {
   ) as { migrations: { version: string; path: string }[] };
   const sources = [...packet.baseline, ...packet.wave];
   const registeredSources = [
-    ...workspaceLockPacket.baseline,
-    ...workspaceLockPacket.wave,
+    ...replyReviewPacket.baseline,
+    ...replyReviewPacket.wave,
   ];
   check(
     new Set(registeredSources.map((s) => s.version.slice(0, 4))).size ===
@@ -649,28 +675,47 @@ async function activate() {
         installedSignInAndMoney === signInAndMoneyPacket.wave.length,
       "Workspace-lock cannot precede sign-in and money.",
     );
+    const installedReplyReview = before.filter((row) =>
+      replyReviewPacket.wave.some((source) => source.version === row.version),
+    ).length;
+    check(
+      installedReplyReview === 0 ||
+        installedReplyReview === replyReviewPacket.wave.length,
+      "Partial reply-review wave is not an accepted baseline.",
+    );
+    check(
+      !reply || installedWorkspaceLock === workspaceLockPacket.wave.length,
+      "Reply-review activation requires the complete reviewed120 predecessor.",
+    );
+    check(
+      !installedReplyReview ||
+        installedWorkspaceLock === workspaceLockPacket.wave.length,
+      "Reply review cannot precede workspace locking.",
+    );
     if (generationInstalled)
       await assertGenerationWaveRoleSafety(
         client,
-        installedWorkspaceLock
-          ? "workspace-lock"
-          : installedSignInAndMoney
-            ? "sign-in-and-money"
-            : installedNotices
-              ? "notices"
-              : installedComparison
-                ? "comparison"
-                : installedPartialRecovery
-                  ? "partial-generation-recovery"
-                  : installedRecovery
-                    ? "generation-recovery"
-                    : installedPublic
-                      ? "public-ai"
-                      : outputInstalled
-                        ? "generation-output"
-                        : contentInstalled
-                          ? "content-privacy"
-                          : undefined,
+        installedReplyReview
+          ? "reply-review"
+          : installedWorkspaceLock
+            ? "workspace-lock"
+            : installedSignInAndMoney
+              ? "sign-in-and-money"
+              : installedNotices
+                ? "notices"
+                : installedComparison
+                  ? "comparison"
+                  : installedPartialRecovery
+                    ? "partial-generation-recovery"
+                    : installedRecovery
+                      ? "generation-recovery"
+                      : installedPublic
+                        ? "public-ai"
+                        : outputInstalled
+                          ? "generation-output"
+                          : contentInstalled
+                            ? "content-privacy"
+                            : undefined,
       );
     else
       await assertWaveRoleSafety(client, {
@@ -702,6 +747,9 @@ async function activate() {
         ),
         comparisonBeforeNotices: Boolean(
           installedComparison && !installedNotices,
+        ),
+        workspaceLockBeforeReplyReview: Boolean(
+          installedWorkspaceLock && !installedReplyReview,
         ),
         signInAndMoneyBeforeWorkspaceLock: Boolean(
           installedSignInAndMoney && !installedWorkspaceLock,
@@ -800,25 +848,27 @@ async function activate() {
     const roleSafety = generation
       ? await assertGenerationWaveRoleSafety(
           client,
-          workspaceLock
-            ? "workspace-lock"
-            : signInAndMoney
-              ? "sign-in-and-money"
-              : notices
-                ? "notices"
-                : comparison
-                  ? "comparison"
-                  : partialRecovery
-                    ? "partial-generation-recovery"
-                    : recovery
-                      ? "generation-recovery"
-                      : publicAI
-                        ? "public-ai"
-                        : output
-                          ? "generation-output"
-                          : content
-                            ? "content-privacy"
-                            : undefined,
+          reply
+            ? "reply-review"
+            : workspaceLock
+              ? "workspace-lock"
+              : signInAndMoney
+                ? "sign-in-and-money"
+                : notices
+                  ? "notices"
+                  : comparison
+                    ? "comparison"
+                    : partialRecovery
+                      ? "partial-generation-recovery"
+                      : recovery
+                        ? "generation-recovery"
+                        : publicAI
+                          ? "public-ai"
+                          : output
+                            ? "generation-output"
+                            : content
+                              ? "content-privacy"
+                              : undefined,
         )
       : await assertWaveRoleSafety(client, {
           trust: true,
@@ -838,6 +888,7 @@ async function activate() {
           comparisonBeforeNotices: comparison && !notices,
           noticesBeforeSignInAndMoney: notices && !signInAndMoney,
           signInAndMoneyBeforeWorkspaceLock: signInAndMoney && !workspaceLock,
+          workspaceLockBeforeReplyReview: workspaceLock && !reply,
         })
       : undefined;
     check(
