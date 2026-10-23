@@ -60,6 +60,40 @@ Local artifacts are under `/tmp/qelvora-runtime-review-1022/`: the final log is
 The original navigation and intermediate layout logs are retained there too.
 These temporary files are local evidence, not durable deployment artifacts.
 
+## Repeat the navigation check
+
+The reusable probe is now preserved as
+`tests/scenarios/lane-6/e6-requests-navigation.mjs`. It accepts existing packet
+IDs and configurable loopback API, web, database and fake-processor URLs. It
+uses the existing lane 3 database helper and lane 4 invariant sweep. The
+portable extraction was syntax-checked, linted and formatted; the operated
+results above came from its temporary predecessor.
+
+Prepare the two fixtures through the existing lane 4 APIs: sign in as a fan,
+create an offer as its creator, submit two requests with distinct summaries,
+then accept one with the creator's actual signed-act flow. The fixtures must
+belong to the same creator and retain a submitted hold and accepted/due
+commitment. The processor must retain their original intent state. The probe
+does not create fixtures, enroll a passkey, approve a request or alter payment
+state. Its development actor label defaults to Maya's actor three; use
+`--actor` for a different configured development creator.
+
+For the preserved fixtures from this run:
+
+```sh
+node tests/scenarios/lane-6/e6-requests-navigation.mjs \
+  --api http://127.0.0.1:56631 --web http://localhost:56632 \
+  --stripe http://127.0.0.1:56584 \
+  --db postgresql://postgres:foundation-test-only@127.0.0.1:56630/creator_stack \
+  --submitted 7192ec4b-6f4a-4323-95c0-466462a4a60e \
+  --accepted 96c02e96-9862-405d-bea7-221a5059d9f1 \
+  --out /tmp/qelvora-requests-repeat
+```
+
+This is a read-navigation check against a running local development host,
+not an authority substitute or a production-payment scenario. Fixtures that
+have naturally expired or changed require fresh setup through their APIs.
+
 The restored database had no commerce packets or effects before this fixture,
 so the newly started fake Stripe state had no older payment references to
 reconcile. The existing published AI version, unknown-cost receipt and deletion
