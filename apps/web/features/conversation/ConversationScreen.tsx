@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Fragment,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -33,10 +34,18 @@ import { useConversationRequest, ConversationError } from "./api";
 import { copy, formatCopy } from "@qelvora/copy";
 import { useIdentityRequest } from "../identity/session-boundary";
 import { ConversationOfflineStorage } from "./offline-storage";
+import { paintFrame } from "./frames";
+import {
+  MemoryPrompt,
+  memoryByAnswer,
+  type MemoryDecision,
+  type MemoryList,
+} from "./MemoryPrompt";
 import { VoicePlayer } from "../media/VoicePlayer";
 import { IntroOffer } from "../identity/intro-offer";
 import { ReplyFeedbackResultSchema } from "../../../../packages/api/src/conversation/contracts";
 import { ConversationSystemLinkSchema } from "../../../../packages/api/src/conversation/system-link";
+import { PresenceItem, useThreadPresence } from "./ThreadPresence";
 
 function SystemMessage({
   message,
@@ -129,8 +138,11 @@ export function ConversationScreen({
   const offlineRetryAt = useRef(0);
   const root = `${creatorId}/${fanId}`;
   const [page, setPage] = useState<ConversationPage | null>(null);
+  // B5: the fan's memory for this thread, asked about under each answer.
+  const [memory, setMemory] = useState<MemoryList | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [online, setOnline] = useState(false);
+  const presence = useThreadPresence(creatorId, online && page !== null);
   const comparisonsAvailable = useComparisonsAvailable(online);
   const [comparisonQuestion, setComparisonQuestion] =
     useState<ConversationMessage | null>(null);
@@ -166,7 +178,7 @@ export function ConversationScreen({
         behavior: "instant",
       });
     }
-  }, [page, pending]);
+  }, [page, pending, presence.items]);
   const cursorKey = `qelvora:conversation:${accountId}:${creatorId}:${fanId}`;
   const lifecycle = useRef(0);
   const mounted = useRef(true);
@@ -175,6 +187,7 @@ export function ConversationScreen({
     current.current = null;
     gate.current = null;
     setPage(null);
+    setMemory(null);
     setOlder([]);
     setBefore(null);
     setOnline(false);
@@ -253,6 +266,20 @@ export function ConversationScreen({
     },
     [root, request],
   );
+  const loadMemory = useCallback(async () => {
+    const revision = lifecycle.current;
+    try {
+      const list = await request<MemoryList>(`${root}/memory`);
+      if (mounted.current && lifecycle.current === revision)
+        // A background read can finish after a fan's memory decision. Keep
+        // the newer revision so a forgotten item cannot reappear.
+        setMemory((current) =>
+          !current || list.revision >= current.revision ? list : current,
+        );
+    } catch {
+      /* Memory prompts are optional; the memory view stays available. */
+    }
+  }, [root, request]);
   const refresh = useCallback(async () => {
     const revision = lifecycle.current;
     try {
@@ -275,6 +302,7 @@ export function ConversationScreen({
       );
       offlineShowing.current = false;
       setPage(fresh);
+      void loadMemory();
       void renewOffline(fresh);
       setOnline(navigator.onLine && transportReady.current);
       setFailure(null);
@@ -309,6 +337,7 @@ export function ConversationScreen({
         current.current = null;
         gate.current = null;
         setPage(null);
+        setMemory(null);
         setOlder([]);
         setBefore(null);
         setDraft("");
@@ -324,12 +353,13 @@ export function ConversationScreen({
           : "This conversation is unavailable.",
       );
     }
-  }, [root, cursorKey, request, renewOffline, showOffline]);
+  }, [root, cursorKey, request, renewOffline, showOffline, loadMemory]);
 
   useEffect(() => {
     mounted.current = true;
     lifecycle.current++;
     setPage(null);
+    setMemory(null);
     setIntroOfferId(null);
     setOlder([]);
     setDraft("");
@@ -402,7 +432,29 @@ export function ConversationScreen({
       if (!parsed.success || !gate.current) return;
       try {
         const visible: Frame[] = gate.current.receive(parsed.data);
-        if (visible.length) void orderedRefresh();
+        if (!visible.length) return;
+        // Paint approved AI sentences straight from their frames (C5); fetch
+        // the page only for what a frame does not carry.
+        let next = current.current;
+        let reconcile = false;
+        for (const frame of visible) {
+          const painted = next ? paintFrame(next, frame) : null;
+          if (!painted) {
+            reconcile = true;
+            break;
+          }
+          next = painted.page;
+          reconcile ||= painted.reconcile;
+        }
+        if (next && next !== current.current && !refreshing) {
+          current.current = next;
+          setPage(next);
+          sessionStorage.setItem(
+            cursorKey,
+            JSON.stringify({ cursor: next.cursor, epoch: next.epoch }),
+          );
+        } else if (next !== current.current) reconcile = true;
+        if (reconcile) void orderedRefresh();
       } catch {
         void orderedRefresh();
       }
@@ -694,6 +746,29 @@ export function ConversationScreen({
       if (mounted.current && lifecycle.current === revision) setBusy(false);
     }
   };
+  const decideMemory: MemoryDecision = async (item, action) => {
+    if (!memory) return;
+    const revision = lifecycle.current;
+    try {
+      const list = await request<MemoryList>(`${root}/memory/${item.id}`, {
+        expectedRevision: memory.revision,
+        action,
+      });
+      if (mounted.current && lifecycle.current === revision)
+        setMemory((current) =>
+          !current || list.revision >= current.revision ? list : current,
+        );
+    } catch (error) {
+      if (mounted.current && lifecycle.current === revision) {
+        setFailure(
+          error instanceof Error
+            ? error.message
+            : "This memory change is unavailable.",
+        );
+        void loadMemory();
+      }
+    }
+  };
   const forget = async (message: ConversationMessage) => {
     if (busy || !online || !page) return;
     const revision = lifecycle.current;
@@ -789,7 +864,20 @@ export function ConversationScreen({
     ...older.filter((m) => !page.messages.some((latest) => latest.id === m.id)),
     ...page.messages,
   ];
+  const timeline = [
+    ...all.map((message) => ({
+      kind: "message" as const,
+      message,
+      at: message.createdAt,
+    })),
+    ...presence.items.map((item) => ({
+      kind: "presence" as const,
+      item,
+      at: item.occurredAt,
+    })),
+  ].sort((a, b) => Date.parse(a.at) - Date.parse(b.at));
   const active = Object.keys(page.generationSequences).length > 0;
+  const memoryItems = memoryByAnswer(all, memory?.items ?? []);
   return (
     <main className="conversation-screen">
       <div className="conversation-pinned">
@@ -852,278 +940,311 @@ export function ConversationScreen({
             Off the record · the AI keeps no memory from this conversation.
           </SystemLine>
         )}
-        {before && (
+        {(before || presence.hasOlder) && (
           <button
-            disabled={busy || !online}
+            disabled={busy || presence.busy || !online}
             className="qv-btn qv-btn--quiet"
-            onClick={() => void loadOlder()}
+            onClick={() => {
+              if (before) void loadOlder();
+              if (presence.hasOlder) presence.loadOlder();
+            }}
           >
             Earlier messages
           </button>
         )}
-        {all.length === 0 && (
+        {presence.failed && (
+          <Notice title={copy.w5ContentAccessUnavailable}>
+            <button className="qv-btn qv-btn--quiet" onClick={presence.refresh}>
+              {copy.retry}
+            </button>
+          </Notice>
+        )}
+        {timeline.length === 0 && (
           <Notice title={`Start with ${page.creatorName}'s AI`}>
             Ask about their work. Every AI reply is labeled, and remembered
             facts need your agreement.
           </Notice>
         )}
-        {all.map((message) => (
-          <article
-            key={message.id}
-            id={`message-${message.id}`}
-            aria-label={author(message, page.creatorName)}
-          >
-            {message.authorKind === "system" ? (
-              <SystemMessage
-                message={message}
-                creatorId={page.creatorId}
-                online={online}
+        {timeline.map((entry) => {
+          if (entry.kind === "presence")
+            return (
+              <PresenceItem
+                key={`presence:${entry.item.authorKind}:${entry.item.id}`}
+                item={entry.item}
               />
-            ) : message.recording ? (
-              message.recording.state === "available" &&
-              message.threadId === page.threadId &&
-              message.recording.asset.threadId === page.threadId &&
-              message.recording.asset.state === "ready" &&
-              message.recording.asset.mimeType === "audio/mp4" &&
-              message.recording.asset.purpose === "human_reply" &&
-              message.authorKind === "human_creator" &&
-              message.signedActId != null &&
-              message.recording.asset.signedActId === message.signedActId ? (
-                <VoicePlayer
-                  asset={message.recording.asset}
-                  creatorId={creatorId}
-                  fanId={fanId}
-                  creatorName={page.creatorName}
-                  time={message.createdAt}
-                  expectedAccountId={accountId}
-                />
-              ) : (
-                <div>
-                  <span className="qv-author">
-                    {author(message, page.creatorName)}
-                  </span>
-                  <p className="qv-help" role="status">
-                    This recording is unavailable for this conversation.
-                  </p>
-                  {message.signedActId && (
-                    <SignedMarker
-                      name={page.creatorName}
-                      signedActId={message.signedActId}
-                    />
-                  )}
-                </div>
-              )
-            ) : message.correction &&
-              all.some(
-                (original) =>
-                  original.id === message.correction?.originalMessageId &&
-                  original.version === message.correction.originalVersion &&
-                  original.authorKind === "ai",
-              ) ? (
-              <Correction
-                name={page.creatorName}
-                aiText={
-                  all.find(
-                    (original) =>
-                      original.id === message.correction?.originalMessageId,
-                  )!.text
-                }
-                signedActId={message.signedActId ?? undefined}
+            );
+          const message = entry.message;
+          return (
+            <Fragment key={message.id}>
+              <article
+                id={`message-${message.id}`}
+                aria-label={author(message, page.creatorName)}
               >
-                {message.text}
-              </Correction>
-            ) : [
-                "fan",
-                "ai",
-                "team",
-                "human_creator",
-                "approved_draft",
-              ].includes(message.authorKind) ? (
-              <Message
-                kind={
-                  message.authorKind as
-                    | "fan"
-                    | "ai"
-                    | "team"
-                    | "human_creator"
-                    | "approved_draft"
-                }
-                name={page.creatorName}
-                member={message.member ?? "Authorized team member"}
-                signedActId={message.signedActId ?? undefined}
-                actions={false}
-                live={
-                  online &&
-                  !message.correction &&
+                {message.authorKind === "system" ? (
+                  <SystemMessage
+                    message={message}
+                    creatorId={page.creatorId}
+                    online={online}
+                  />
+                ) : message.recording ? (
+                  message.recording.state === "available" &&
+                  message.threadId === page.threadId &&
+                  message.recording.asset.threadId === page.threadId &&
+                  message.recording.asset.state === "ready" &&
+                  message.recording.asset.mimeType === "audio/mp4" &&
+                  message.recording.asset.purpose === "human_reply" &&
                   message.authorKind === "human_creator" &&
-                  page.control === "human_active"
-                }
-                delivery={
-                  message.deliveryState === "generating"
-                    ? message.text
-                      ? "streaming"
-                      : "accepted"
-                    : message.deliveryState === "interrupted"
-                      ? "interrupted"
-                      : undefined
-                }
-                citation={
-                  <>
-                    {message.citations.map((id) => (
-                      <CitationChip
-                        key={id}
-                        title="Source"
-                        meta="Read the original passage"
-                        href={`/threads/${creatorId}/${fanId}/citations/${id}`}
-                      />
-                    ))}
-                  </>
-                }
-              >
-                <span style={{ whiteSpace: "pre-wrap" }}>{message.text}</span>
-                {message.correction && (
-                  <div>
-                    <span>
-                      {formatCopy("correctionAuthor", {
-                        name: page.creatorName,
-                      })}
-                    </span>
-                    <a
-                      href={`/threads/${creatorId}/${fanId}/messages/${message.correction.originalMessageId}`}
-                    >
-                      Original AI reply · version{" "}
-                      {message.correction.originalVersion}
-                    </a>
-                  </div>
-                )}
-                {message.deliveryState === "failed" && (
-                  <span className="qv-tag">
-                    {copy.conversationReplyUnavailable}
-                  </span>
-                )}
-              </Message>
-            ) : (
-              <div className="qv qv-msg">
-                {message.authorKind === "human_call" ? (
-                  <span className="qv-author">
-                    {formatCopy("callAuthor", { name: page.creatorName })}
-                  </span>
-                ) : (
-                  <AuthorLabel
+                  message.signedActId != null &&
+                  message.recording.asset.signedActId ===
+                    message.signedActId ? (
+                    <VoicePlayer
+                      asset={message.recording.asset}
+                      creatorId={creatorId}
+                      fanId={fanId}
+                      creatorName={page.creatorName}
+                      time={message.createdAt}
+                      expectedAccountId={accountId}
+                    />
+                  ) : (
+                    <div>
+                      <span className="qv-author">
+                        {author(message, page.creatorName)}
+                      </span>
+                      <p className="qv-help" role="status">
+                        This recording is unavailable for this conversation.
+                      </p>
+                      {message.signedActId && (
+                        <SignedMarker
+                          name={page.creatorName}
+                          signedActId={message.signedActId}
+                        />
+                      )}
+                    </div>
+                  )
+                ) : message.correction &&
+                  all.some(
+                    (original) =>
+                      original.id === message.correction?.originalMessageId &&
+                      original.version === message.correction.originalVersion &&
+                      original.authorKind === "ai",
+                  ) ? (
+                  <Correction
+                    name={page.creatorName}
+                    aiText={
+                      all.find(
+                        (original) =>
+                          original.id === message.correction?.originalMessageId,
+                      )!.text
+                    }
+                    signedActId={message.signedActId ?? undefined}
+                  >
+                    {message.text}
+                  </Correction>
+                ) : [
+                    "fan",
+                    "ai",
+                    "team",
+                    "human_creator",
+                    "approved_draft",
+                  ].includes(message.authorKind) ? (
+                  <Message
                     kind={
-                      message.authorKind === "human_broadcast"
-                        ? "human_broadcast"
-                        : "human_reaction"
+                      message.authorKind as
+                        | "fan"
+                        | "ai"
+                        | "team"
+                        | "human_creator"
+                        | "approved_draft"
                     }
                     name={page.creatorName}
-                    audience="Audience details unavailable"
-                  />
-                )}
-                <p className="qv-voice" style={{ whiteSpace: "pre-wrap" }}>
-                  {message.text}
-                </p>
-                {message.signedActId && (
-                  <SignedMarker
-                    name={page.creatorName}
-                    signedActId={message.signedActId}
-                  />
-                )}
-              </div>
-            )}
-            {message.authorKind === "fan" &&
-              (message.offTheRecord ? (
-                <span className="qv-help">Not used for memory</span>
-              ) : (
-                <button
-                  className="qv-link-btn"
-                  disabled={busy || !online}
-                  onClick={() => void forget(message)}
-                >
-                  Don’t remember this
-                </button>
-              ))}
-            {comparisonsAvailable &&
-              message.authorKind === "fan" &&
-              !message.offTheRecord &&
-              !page.offTheRecord &&
-              ["accepted", "delivered"].includes(message.deliveryState) && (
-                <button
-                  className="qv-link-btn"
-                  disabled={busy || !online}
-                  onClick={() => setComparisonQuestion(message)}
-                >
-                  AI comparison options
-                </button>
-              )}
-            {message.authorKind === "ai" &&
-              message.agentVersion &&
-              ["delivered", "interrupted"].includes(message.deliveryState) &&
-              page.feedbackPolicy && (
-                <details className="conversation-feedback">
-                  <summary>{formatCopy("thisHelped", {})}</summary>
-                  <p className="qv-help">{page.feedbackPolicy.notice}</p>
-                  <div className="conversation-actions">
-                    <button
-                      className="qv-link-btn"
-                      disabled={busy || !online}
-                      aria-pressed={message.feedback === "helpful"}
-                      onClick={() => void feedback(message, "helpful")}
-                    >
-                      {formatCopy("thisHelped", {})}
-                    </button>
-                    <button
-                      className="qv-link-btn"
-                      disabled={busy || !online}
-                      aria-pressed={message.feedback === "not_helpful"}
-                      onClick={() => void feedback(message, "not_helpful")}
-                    >
-                      Not helpful
-                    </button>
-                    {message.feedback && (
-                      <button
-                        className="qv-link-btn"
-                        disabled={busy || !online}
-                        onClick={() => void feedback(message, null)}
-                      >
-                        Remove my response
-                      </button>
+                    member={message.member ?? "Authorized team member"}
+                    signedActId={message.signedActId ?? undefined}
+                    actions={false}
+                    live={
+                      online &&
+                      !message.correction &&
+                      message.authorKind === "human_creator" &&
+                      page.control === "human_active"
+                    }
+                    delivery={
+                      message.deliveryState === "generating"
+                        ? message.text
+                          ? "streaming"
+                          : "accepted"
+                        : message.deliveryState === "interrupted"
+                          ? "interrupted"
+                          : undefined
+                    }
+                    citation={
+                      <>
+                        {message.citations.map((id) => (
+                          <CitationChip
+                            key={id}
+                            title="Source"
+                            meta="Read the original passage"
+                            href={`/threads/${creatorId}/${fanId}/citations/${id}`}
+                          />
+                        ))}
+                      </>
+                    }
+                  >
+                    <span style={{ whiteSpace: "pre-wrap" }}>
+                      {message.text}
+                    </span>
+                    {message.correction && (
+                      <div>
+                        <span>
+                          {formatCopy("correctionAuthor", {
+                            name: page.creatorName,
+                          })}
+                        </span>
+                        <a
+                          href={`/threads/${creatorId}/${fanId}/messages/${message.correction.originalMessageId}`}
+                        >
+                          Original AI reply · version{" "}
+                          {message.correction.originalVersion}
+                        </a>
+                      </div>
+                    )}
+                    {message.deliveryState === "failed" && (
+                      <span className="qv-tag">
+                        {copy.conversationReplyUnavailable}
+                      </span>
+                    )}
+                  </Message>
+                ) : (
+                  <div className="qv qv-msg">
+                    {message.authorKind === "human_call" ? (
+                      <span className="qv-author">
+                        {formatCopy("callAuthor", { name: page.creatorName })}
+                      </span>
+                    ) : (
+                      <AuthorLabel
+                        kind={
+                          message.authorKind === "human_broadcast"
+                            ? "human_broadcast"
+                            : "human_reaction"
+                        }
+                        name={page.creatorName}
+                        audience="Audience details unavailable"
+                      />
+                    )}
+                    <p className="qv-voice" style={{ whiteSpace: "pre-wrap" }}>
+                      {message.text}
+                    </p>
+                    {message.signedActId && (
+                      <SignedMarker
+                        name={page.creatorName}
+                        signedActId={message.signedActId}
+                      />
                     )}
                   </div>
-                  {message.feedback && (
-                    <p className="qv-help" role="status">
-                      Your response is saved.
-                    </p>
+                )}
+                {message.authorKind === "fan" &&
+                  (message.offTheRecord ? (
+                    <span className="qv-help">Not used for memory</span>
+                  ) : (
+                    <button
+                      className="qv-link-btn"
+                      disabled={busy || !online}
+                      onClick={() => void forget(message)}
+                    >
+                      Don’t remember this
+                    </button>
+                  ))}
+                {comparisonsAvailable &&
+                  message.authorKind === "fan" &&
+                  !message.offTheRecord &&
+                  !page.offTheRecord &&
+                  ["accepted", "delivered"].includes(message.deliveryState) && (
+                    <button
+                      className="qv-link-btn"
+                      disabled={busy || !online}
+                      onClick={() => setComparisonQuestion(message)}
+                    >
+                      AI comparison options
+                    </button>
                   )}
-                </details>
-              )}
-            {message.feedback && !page.feedbackPolicy && (
-              <button
-                className="qv-link-btn"
-                disabled={busy || !online}
-                onClick={() => void feedback(message, null)}
-              >
-                Remove my response
-              </button>
-            )}
-            {message.authorKind !== "fan" &&
-              message.authorKind !== "system" && (
-                <div className="conversation-actions">
-                  <a
+                {message.authorKind === "ai" &&
+                  message.agentVersion &&
+                  ["delivered", "interrupted"].includes(
+                    message.deliveryState,
+                  ) &&
+                  page.feedbackPolicy && (
+                    <details className="conversation-feedback">
+                      <summary>{formatCopy("thisHelped", {})}</summary>
+                      <p className="qv-help">{page.feedbackPolicy.notice}</p>
+                      <div className="conversation-actions">
+                        <button
+                          className="qv-link-btn"
+                          disabled={busy || !online}
+                          aria-pressed={message.feedback === "helpful"}
+                          onClick={() => void feedback(message, "helpful")}
+                        >
+                          {formatCopy("thisHelped", {})}
+                        </button>
+                        <button
+                          className="qv-link-btn"
+                          disabled={busy || !online}
+                          aria-pressed={message.feedback === "not_helpful"}
+                          onClick={() => void feedback(message, "not_helpful")}
+                        >
+                          Not helpful
+                        </button>
+                        {message.feedback && (
+                          <button
+                            className="qv-link-btn"
+                            disabled={busy || !online}
+                            onClick={() => void feedback(message, null)}
+                          >
+                            Remove my response
+                          </button>
+                        )}
+                      </div>
+                      {message.feedback && (
+                        <p className="qv-help" role="status">
+                          Your response is saved.
+                        </p>
+                      )}
+                    </details>
+                  )}
+                {message.feedback && !page.feedbackPolicy && (
+                  <button
                     className="qv-link-btn"
-                    href={`/support?creatorId=${creatorId}${message.authorKind === "ai" ? `&messageId=${message.id}` : ""}`}
+                    disabled={busy || !online}
+                    onClick={() => void feedback(message, null)}
                   >
-                    Report
-                  </a>
-                  <a
-                    className="qv-link-btn"
-                    href={`/you?creatorId=${creatorId}&fanId=${fanId}#memory`}
-                  >
-                    What it remembers
-                  </a>
-                </div>
+                    Remove my response
+                  </button>
+                )}
+                {message.authorKind !== "fan" &&
+                  message.authorKind !== "system" && (
+                    <div className="conversation-actions">
+                      <a
+                        className="qv-link-btn"
+                        href={`/support?creatorId=${creatorId}${message.authorKind === "ai" ? `&messageId=${message.id}` : ""}`}
+                      >
+                        Report
+                      </a>
+                      <a
+                        className="qv-link-btn"
+                        href={`/you?creatorId=${creatorId}&fanId=${fanId}#memory`}
+                      >
+                        What it remembers
+                      </a>
+                    </div>
+                  )}
+              </article>
+              {memoryItems.get(message.id) && (
+                <MemoryPrompt
+                  items={memoryItems.get(message.id)!}
+                  online={online}
+                  decide={decideMemory}
+                />
               )}
-          </article>
-        ))}
+            </Fragment>
+          );
+        })}
         {comparisonQuestion && online && (
           <ComparisonQuestionSheet
             root={root}
@@ -1235,9 +1356,14 @@ export function ConversationScreen({
             </button>
           </div>
         </form>
-        <Button variant="maya" href={`/commerce/packet?creatorId=${creatorId}`}>
-          Ask {page.creatorName} to step in
-        </Button>
+        {page.stepInAvailable !== false && (
+          <Button
+            variant="maya"
+            href={`/commerce/packet?creatorId=${creatorId}`}
+          >
+            Ask {page.creatorName} to step in
+          </Button>
+        )}
         <div className="conversation-actions">
           <a href={`/you?creatorId=${creatorId}&fanId=${fanId}`}>
             Me and privacy

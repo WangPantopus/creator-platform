@@ -313,8 +313,8 @@ async function check(options: Options) {
     if (changed || context.unknown.length) say();
     if (changed)
       say(
-        "The product would refuse export, delete and generation, or the migration operator would refuse, on this database. " +
-          "If the database is right and the repository is stale, run: write (see the procedure).",
+        "A live catalogue differs from a pinned digest. Review the differing groups and the runtime's accepted profiles " +
+          "before changing metadata; never overwrite a pin merely to make this check pass.",
       );
     if (context.unknown.length)
       say(
@@ -418,8 +418,8 @@ async function diff(options: Options) {
     say();
     if (!changes.roles.length)
       say(
-        "No purpose role gained or lost access to anything. The pins changed only because the list of relations did, " +
-          "so regenerating them is mechanical.",
+        "No direct relation privileges changed in the captured purpose roles. Review changed function definitions " +
+          "and other catalogue differences against the migration before accepting new pins.",
       );
     else
       say(

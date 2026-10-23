@@ -3,7 +3,7 @@ import type { PrivacyHook } from "../trust/contracts.js";
 import { DomainError, invariant } from "../../core/errors.js";
 import { copy } from "@qelvora/copy";
 import type { AuthorKind } from "@qelvora/api";
-import type { ConversationRecordings } from "./recordings.js";
+import type { PreparedConversationRecordingAssociations } from "./recording-associations.js";
 import type { ConversationLineage } from "./lineage.js";
 import { generationJournalInstalled } from "../agent/generation-journal.js";
 import type { GenerationAccountingLifecycle } from "../agent/journal-privacy.js";
@@ -146,7 +146,7 @@ export type ConversationPrivacyInput = {
   authority: ConversationPrivacyAuthority;
   retention?: ConversationPrivacyRetention;
   lineage?: ConversationLineage;
-  recordings?: ConversationRecordings;
+  recordings?: PreparedConversationRecordingAssociations;
   accounting?: ConversationAccountingLifecycle;
   /** Original W8 result persisted with this deletion's own COMMIT. */
   deletionReceipts?: PreparedPrivacyAccountingBoundary;

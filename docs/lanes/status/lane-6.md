@@ -1,5 +1,18 @@
 # Lane 6: Creator Studio (web) status
 
+## Integration update, 2026-10-22
+
+The first-tab ticket, all-members composer preview, and signed Note paragraph
+breaks are implemented in the current integration worktree. Today uses the
+existing home glyph on phone and desktop, and stays selected on Notes and the
+composer. Creator setup also bypasses the fan-handle step. Web/shared UI
+typechecks and scoped lint/format pass; E6.2 Note and Today each pass 10/10 against
+the real backend/PostgreSQL with development identity and virtual passkeys.
+E6.1 completed 26 selected Light/Night captures. Details and limits are in the
+[integration report](../../operations/studio-completion-2026-10-22.md).
+
+The following is the prior lane handoff; PR #488's polling work remains separate.
+
 Updated: 2026-10-16, at the handoff of the session that did WP 6.2.
 
 Working on: nothing. WP 6.2 (Today and the Note composer) is done in #443 on

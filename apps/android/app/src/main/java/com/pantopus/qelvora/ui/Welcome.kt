@@ -25,7 +25,7 @@ class PantopusUnavailable : IllegalStateException("Pantopus sign-in is not conne
 object UnavailablePantopusSignIn : PantopusSignInProvider { override suspend fun signIn(returnTo: String): PantopusIdentity = throw PantopusUnavailable() }
 
 @Composable
-fun Welcome(returnTo: String = "/creators/maya", signIn: PantopusSignInProvider = UnavailablePantopusSignIn, showContext: Boolean = true, contextSource: String? = null, contextTitle: String? = null, bodyCopy: String? = null, onRemoveContext: (() -> Unit)? = null, onContinue: (() -> Unit)? = null, busy: Boolean = false, onAuthenticated: (PantopusIdentity, String) -> Unit = { _, _ -> }) {
+fun Welcome(returnTo: String = "/creators/maya", signIn: PantopusSignInProvider = UnavailablePantopusSignIn, showContext: Boolean = true, contextSource: String? = null, contextTitle: String? = null, continueLabel: String? = null, accountNote: String? = null, bodyCopy: String? = null, onRemoveContext: (() -> Unit)? = null, onContinue: (() -> Unit)? = null, busy: Boolean = false, onAuthenticated: (PantopusIdentity, String) -> Unit = { _, _ -> }) {
     var hasContext by remember(showContext, contextTitle) { mutableStateOf(showContext) }
     var connecting by remember { mutableStateOf(false) }
     var unavailable by remember { mutableStateOf(false) }
@@ -50,14 +50,14 @@ fun Welcome(returnTo: String = "/creators/maya", signIn: PantopusSignInProvider 
         }
         Column(verticalArrangement = Arrangement.spacedBy(QelvoraTokens.messagePadding)) {
             if (hasContext) ContextCard(contextSource ?: QelvoraCopy.text("welcomeSource"), contextTitle ?: QelvoraCopy.text("welcomeContext")) { hasContext = false; onRemoveContext?.invoke() }
-            Button(QelvoraCopy.text("continueWithPantopus"), ButtonVariant.SECONDARY, "lg", block = true, disabled = connecting || busy) {
+            Button(continueLabel ?: QelvoraCopy.text("continueWithPantopus"), ButtonVariant.SECONDARY, "lg", block = true, disabled = connecting || busy) {
                 if (onContinue != null) { onContinue(); return@Button }
                 if (!connecting) scope.launch {
                     connecting = true; unavailable = false
                     try { onAuthenticated(signIn.signIn(returnTo), returnTo) } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled } catch (_: Exception) { unavailable = true } finally { connecting = false }
                 }
             }
-            BasicText(QelvoraCopy.text("pantopusAccount"), style = qText("caption").copy(color = qColor("ink-muted"), textAlign = TextAlign.Center))
+            if (accountNote != "") BasicText(accountNote ?: QelvoraCopy.text("pantopusAccount"), style = qText("caption").copy(color = qColor("ink-muted"), textAlign = TextAlign.Center))
             if (unavailable) BasicText(QelvoraCopy.text("pantopusUnavailable"), style = qText("caption").copy(color = qColor("alert")))
         }
     }

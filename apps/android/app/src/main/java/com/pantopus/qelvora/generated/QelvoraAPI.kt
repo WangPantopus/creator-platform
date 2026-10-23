@@ -52,7 +52,8 @@ data class APIAgentDraftConfig(
   val `dailyCostCapMicros`: Long,
   val `sessionNudgeMinutes`: Long,
   val `usefulnessCriteria`: String,
-  val `styleCriteria`: String
+  val `styleCriteria`: String,
+  val `faq`: List<APIAgentDraftConfigFaqItem>? = null
 )
 
 @Serializable
@@ -78,6 +79,12 @@ data class APIAgentDraftConfigExamplesItem(
 )
 
 @Serializable
+data class APIAgentDraftConfigFaqItem(
+  val `question`: String,
+  val `answer`: String
+)
+
+@Serializable
 data class APIAgentDraftWrite(
   val `expectedRevision`: Long,
   val `configuration`: APIAgentDraftWriteConfiguration
@@ -95,7 +102,8 @@ data class APIAgentDraftWriteConfiguration(
   val `dailyCostCapMicros`: Long,
   val `sessionNudgeMinutes`: Long,
   val `usefulnessCriteria`: String,
-  val `styleCriteria`: String
+  val `styleCriteria`: String,
+  val `faq`: List<APIAgentDraftWriteConfigurationFaqItem>? = null
 )
 
 @Serializable
@@ -121,6 +129,12 @@ data class APIAgentDraftWriteConfigurationExamplesItem(
 )
 
 @Serializable
+data class APIAgentDraftWriteConfigurationFaqItem(
+  val `question`: String,
+  val `answer`: String
+)
+
+@Serializable
 data class APIAgentEvaluationRequest(
   val `expectedRevision`: Long
 )
@@ -131,6 +145,12 @@ data class APIAgentExample(
   val `text`: String,
   val `fixed`: Boolean,
   val `approved`: Boolean
+)
+
+@Serializable
+data class APIAgentFaqItem(
+  val `question`: String,
+  val `answer`: String
 )
 
 @Serializable
@@ -3533,6 +3553,7 @@ data class APIIdentityCapabilities(
   val `signInAvailable`: Boolean,
   val `localAccountsAllowed`: APIIdentityCapabilitiesLocalAccountsAllowed,
   val `mode`: APIIdentityCapabilitiesMode? = null,
+  val `providers`: List<APIIdentityCapabilitiesProvidersItem>? = null,
   val `developmentActors`: List<APIIdentityCapabilitiesDevelopmentActorsItem>? = null
 )
 
@@ -3550,8 +3571,15 @@ object APIIdentityCapabilitiesLocalAccountsAllowedSerializer : KSerializer<APIId
 @Serializable
 enum class APIIdentityCapabilitiesMode {
   @SerialName("development") DEVELOPMENT,
+  @SerialName("qelvora") QELVORA,
   @SerialName("pantopus") PANTOPUS,
   @SerialName("unconfigured") UNCONFIGURED
+}
+
+@Serializable
+enum class APIIdentityCapabilitiesProvidersItem {
+  @SerialName("apple") APPLE,
+  @SerialName("google") GOOGLE
 }
 
 @Serializable
@@ -4305,7 +4333,8 @@ data class APIConversationConversationOfflineSnapshotPage(
   val `canSend`: Boolean,
   @Required
   val `unavailableReason`: String? = null,
-  val `feedbackPolicy`: APIConversationConversationOfflineSnapshotPageFeedbackPolicy? = null
+  val `feedbackPolicy`: APIConversationConversationOfflineSnapshotPageFeedbackPolicy? = null,
+  val `stepInAvailable`: Boolean? = null
 )
 
 @Serializable
@@ -4428,7 +4457,8 @@ data class APIConversationConversationPage(
   val `canSend`: Boolean,
   @Required
   val `unavailableReason`: String? = null,
-  val `feedbackPolicy`: APIConversationConversationPageFeedbackPolicy? = null
+  val `feedbackPolicy`: APIConversationConversationPageFeedbackPolicy? = null,
+  val `stepInAvailable`: Boolean? = null
 )
 
 @Serializable
@@ -6300,6 +6330,11 @@ class CreatorAPIClient(private val baseURL: String, private val maximumResponseB
   suspend fun continueWithPantopus(body: APIIdentityContinue): APIIdentityRedirect = json.decodeFromString(request("/v1/identity/continue", "POST", body = json.encodeToString(body), authenticated = false))
   suspend fun completeIdentity(body: APICompleteIdentity): APIIdentityCompletion = json.decodeFromString(request("/v1/identity/complete", "POST", body = json.encodeToString(body), authenticated = false))
   suspend fun identitySession(): APISession = json.decodeFromString(request("/v1/identity/session", "GET", authenticated = true))
+  suspend fun startWebSignIn(body: APIIdentityProviderContinue): APIIdentityRedirect = json.decodeFromString(request("/v1/identity/web/start", "POST", body = json.encodeToString(body), authenticated = false))
+  suspend fun completeWebSignIn(body: APICompleteIdentity): APIIdentitySignInResult = json.decodeFromString(request("/v1/identity/web/complete", "POST", body = json.encodeToString(body), authenticated = false))
+  suspend fun startNativeSignIn(body: APINativeSignInStart): APINativeSignInNonce = json.decodeFromString(request("/v1/identity/native/nonce", "POST", body = json.encodeToString(body), authenticated = false))
+  suspend fun completeNativeSignIn(body: APINativeSignInComplete): APIIdentitySignInResult = json.decodeFromString(request("/v1/identity/native/complete", "POST", body = json.encodeToString(body), authenticated = false))
+  suspend fun confirmIdentityAge(body: APIAgeConfirmationInput): APIIdentitySignInResult = json.decodeFromString(request("/v1/identity/age", "POST", body = json.encodeToString(body), authenticated = false))
   suspend fun refreshSession(): APISessionToken = json.decodeFromString(request("/v1/identity/refresh", "POST", authenticated = true))
   suspend fun logout(): APIDone = json.decodeFromString(request("/v1/identity/logout", "POST", authenticated = true))
   suspend fun revokeSessions(): APIDone = json.decodeFromString(request("/v1/identity/revoke-sessions", "POST", authenticated = true))
@@ -6366,7 +6401,7 @@ class CreatorAPIClient(private val baseURL: String, private val maximumResponseB
 }
 
 object ApplicationDestination {
-  fun requiresFanProfile(value: String): Boolean = !isPermitted(value) || !Regex("^/(?:identity/account|status|ops(?:/.*)?|studio/(?:workspace|[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/team))$").matches(value.substringBefore('?'))
+  fun requiresFanProfile(value: String): Boolean = !isPermitted(value) || !Regex("^/(?:identity/account|status|ops(?:/.*)?|studio/(?:workspace|setup|[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/team))$").matches(value.substringBefore('?'))
   fun isPermitted(value: String): Boolean {
     if (value.length > 2048 || value.contains('%') || value.contains('\\') || value.contains('#') || value.any { it.isWhitespace() }) return false
     val parts = value.split('?')

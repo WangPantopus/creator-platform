@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { Router } from "express";
 import { createApp } from "./app.js";
 import { readConfig } from "./config.js";
 import { createConfiguredBackend } from "./integration.js";
@@ -45,6 +46,7 @@ import { InteractiveCallControl } from "./modules/session/interactive-control.js
 import { AccountCallMetadata } from "./modules/session/account-call-metadata.js";
 import { createDevelopmentGenerationHost } from "./workers/generation-host.js";
 import { lifecycleFailure } from "./operations/telemetry.js";
+import { createDevelopmentCommerceHost } from "./modules/payments/development-host.js";
 
 // Production hosts inject genuine identity, W8 denials and provider dependencies
 // into the same configured-host seam. Development identity is always explicit.
@@ -70,14 +72,20 @@ if (config.identityAdapter === "development" && !config.identitySessionKey)
   throw new Error(
     "Development identity requires an explicit IDENTITY_SESSION_KEY.",
   );
+const developmentIdentity =
+  config.identityAdapter === "development"
+    ? canonicalDevelopmentIdentity()
+    : undefined;
 const growthAPIPool = await createGrowthAPIPool(config.databaseUrl);
+const stripeIngress = Router();
 let configured: Awaited<ReturnType<typeof createConfiguredBackend>> | undefined;
 try {
   configured =
     config.identityAdapter === "development"
       ? await createConfiguredBackend({
           config,
-          identity: canonicalDevelopmentIdentity(),
+          identity: developmentIdentity!,
+          stripeNotifications: stripeIngress,
           guardrails: {
             checkSentence: async () => {
               throw new Error("AI generation is unconfigured.");
@@ -200,9 +208,10 @@ try {
               usageAccounting,
             );
             if (generationHost) onClose(() => generationHost.close());
+            // Existing conversation sources need lifecycle readers even while
+            // interactive media has no configured storage or retention policy.
             const conversationPrivacy =
               usageAccounting &&
-              mediaHost &&
               process.env.W3_DEVELOPMENT_ECONOMICS_FILE &&
               process.env.COMMERCE_CURRENCY
                 ? await registeredConversationPrivacyReview()
@@ -340,6 +349,17 @@ try {
             });
             const growth = features.growth;
             if (growth) onClose(() => growth.close());
+            if (commerce) {
+              const commerceHost = await createDevelopmentCommerceHost({
+                config,
+                runtime,
+                identity: developmentIdentity!,
+                service: commerce.service,
+                stripeIngress,
+              });
+              onClose(() => commerceHost.close());
+              features.start.push(() => commerceHost.start());
+            }
             const contentHost = composeContentHost({
               pool: runtime.pool,
               owners: {

@@ -1019,6 +1019,7 @@ export function Note(p: NoteProps) {
     {
       className: "qv qv-note qv-on-maya",
       "aria-label":
+        p.authorLabel ??
         "Note from " + name + " to " + (p.audience || "Kiln Club members"),
       style: { "--qv-cut": "var(--maya-surface)" },
     },
@@ -1030,10 +1031,11 @@ export function Note(p: NoteProps) {
       h(
         "span",
         null,
-        formatCopy("noteAudience", {
-          name,
-          audience: p.audience || "Kiln Club members",
-        }),
+        p.authorLabel ??
+          formatCopy("noteAudience", {
+            name,
+            audience: p.audience || "Kiln Club members",
+          }),
       ),
       h(
         "span",
@@ -1107,6 +1109,7 @@ export function Note(p: NoteProps) {
 export function ReactionChip(p: ReactionChipProps) {
   const name = p.name || "Maya";
   const href = signatureHref(p);
+  const label = p.authorLabel ?? formatCopy("reaction", { name });
   return h(
     href ? "a" : "span",
     {
@@ -1114,8 +1117,7 @@ export function ReactionChip(p: ReactionChipProps) {
       ...(href
         ? {
             href,
-            "aria-label":
-              formatCopy("reaction", { name }) + ". " + copy.openVerification,
+            "aria-label": label + ". " + copy.openVerification,
           }
         : {}),
     },
@@ -1125,7 +1127,7 @@ export function ReactionChip(p: ReactionChipProps) {
       { className: "qv-ink-maya-accent", style: { display: "inline-flex" } },
       G.heart(13),
     ),
-    formatCopy("reaction", { name }),
+    label,
   );
 }
 export function CitationChip(p: CitationChipProps) {
@@ -1794,21 +1796,30 @@ export function QueueCard(p: QueueCardProps) {
         ? h("span", { className: "qv-badge qv-ink-ai" }, "AI draft ready")
         : null,
       h("span", { style: { flexGrow: 1 } }),
-      k === "commitment"
+      k === "commitment" || !p.onDecline
         ? null
         : h(
             "button",
-            { className: "qv-btn qv-btn--quiet", style: { fontSize: 13 } },
+            {
+              type: "button",
+              className: "qv-btn qv-btn--quiet",
+              style: { fontSize: 13 },
+              onClick: p.onDecline,
+            },
             "Decline · no charge",
           ),
-      h(
-        "button",
-        {
-          className: "qv-btn qv-btn--secondary",
-          style: { minHeight: 44, fontSize: 14 },
-        },
-        k === "commitment" ? "Deliver" : "Open",
-      ),
+      p.onOpen
+        ? h(
+            "button",
+            {
+              type: "button",
+              className: "qv-btn qv-btn--secondary",
+              style: { minHeight: 44, fontSize: 14 },
+              onClick: p.onOpen,
+            },
+            k === "commitment" ? "Deliver" : "Open",
+          )
+        : null,
     ),
   );
 }
@@ -2459,7 +2470,7 @@ export function DigestItem(p: DigestItemProps) {
 /* ---------- navigation ---------- */
 export function StudioTabBar(p: StudioTabBarProps) {
   const tabs: [string, (s?: number) => React.ReactElement][] = [
-    ["Notes", G.broadcast],
+    ["Today", G.home],
     ["Requests", G.inbox],
     ["Threads", G.threads],
     ["My AI", G.ring],
@@ -2486,12 +2497,7 @@ export function StudioTabBar(p: StudioTabBarProps) {
           className: cx("qv-tab", active === t[0] && "is-active"),
           "aria-current": active === t[0] ? "page" : undefined,
         },
-        h(
-          "span",
-          { className: "qv-tab__icon" },
-          t[1](t[0] === "Notes" ? 17 : 22),
-          badge,
-        ),
+        h("span", { className: "qv-tab__icon" }, t[1](22), badge),
         t[0],
       );
     }),
@@ -2501,7 +2507,7 @@ export function Sidebar(p: SidebarProps) {
   const name = p.name || "Maya",
     active = p.active || "Requests";
   const main: [string, (s?: number) => React.ReactElement][] = [
-    ["Notes", G.broadcast],
+    ["Today", G.home],
     ["Requests", G.inbox],
     ["Threads", G.threads],
     ["My AI", G.ring],
@@ -2526,11 +2532,7 @@ export function Sidebar(p: SidebarProps) {
         className: cx("qv-side__item", active === t[0] && "is-active"),
         "aria-current": active === t[0] ? "page" : undefined,
       },
-      h(
-        "span",
-        { className: "qv-side__icon" },
-        t[1](t[0] === "Notes" ? 15 : 20),
-      ),
+      h("span", { className: "qv-side__icon" }, t[1](20)),
       h("span", { className: "qv-side__label" }, t[0]),
       count,
     );

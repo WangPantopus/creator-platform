@@ -4,7 +4,7 @@ import SwiftUI
 @main
 struct QelvoraApp: App {
     @UIApplicationDelegateAdaptor(GrowthPushAppDelegate.self) private var pushDelegate
-    init() { QelvoraFonts.register() }
+    init() { QelvoraFonts.register(); NativeGoogleSignIn.prepareForLaunch() }
     var body: some Scene {
         WindowGroup {
             Group {

@@ -36,6 +36,23 @@ export type GenerationWorkerPass = Readonly<{
 
 const code = (cause: unknown) =>
   cause instanceof DomainError ? cause.code : "generation_worker_unavailable";
+/** The answer's own authority ended after its claim (a takeover, pause,
+ * withdrawn consent, sign-out): not a database or provider failure. */
+const authorityEnded = (cause: unknown) =>
+  cause instanceof DomainError &&
+  [
+    "generation_metadata_unavailable",
+    "generation_task_changed",
+    "generation_scope_changed",
+    "generation_denied",
+  ].includes(cause.code);
+
+/** Between passes without a wakeup. Accepted work wakes the worker at once
+ * while its wakeup session listens; this interval then covers only lease
+ * expiry, terminal recovery and deferred work. Without a session the worker
+ * polls as often as before wakeups existed. */
+const IDLE_LISTENING_MS = 5000;
+const IDLE_POLLING_MS = 1000;
 
 /** Serial executor for the original one-connection generation authority. It
  * claims only when ready to execute; no accepted lease waits in a JS queue.
@@ -43,6 +60,8 @@ const code = (cause: unknown) =>
 export class GenerationWorker {
   private busy = false;
   private lifetime = false;
+  private woken = false;
+  private sleeping?: AbortController;
   private readonly recovery: GenerationTerminalRecovery;
 
   private constructor(private readonly owners: Owners) {
@@ -183,11 +202,13 @@ export class GenerationWorker {
             continue;
           }
           let failed = false;
+          const progress = { committed: task.lastSequence };
           try {
             await this.owners.pipeline.generate(
               task,
               signal,
               this.owners.output,
+              progress,
             );
           } catch (cause) {
             // generate() awaits provider-usage cleanup before rejecting. Never
@@ -198,22 +219,61 @@ export class GenerationWorker {
           }
           // Read the cursor through a fresh original purpose, including after
           // partial output or a lost ACK. Denial/expiry leaves it for recovery.
-          const lastSequence = await this.owners.identity.withGeneration(
-            task,
-            async (_client, scope) => scope.lastSequence,
-            signal,
-          );
-          await this.owners.terminal.withTerminal(
-            { mode: "completion", task, lastSequence, failed },
-            async (client, scope) => {
-              await this.owners.finalization.finalizeInTransaction(
-                client,
-                scope,
+          let lastSequence = progress.committed;
+          let reconcile = false;
+          try {
+            lastSequence = await this.owners.identity.withGeneration(
+              task,
+              async (_client, scope) => scope.lastSequence,
+              signal,
+            );
+          } catch (cause) {
+            if (signal.aborted || !failed || !authorityEnded(cause))
+              throw cause;
+            reconcile = true;
+          }
+          const settle = async (
+            client: Parameters<
+              Parameters<GenerationTerminalAuthority["withTerminal"]>[1]
+            >[0],
+            scope: Parameters<
+              Parameters<GenerationTerminalAuthority["withTerminal"]>[1]
+            >[1],
+          ) => {
+            await this.owners.finalization.finalizeInTransaction(client, scope);
+            await this.owners.settlement.settleInTransaction(client, scope);
+          };
+          if (!reconcile)
+            try {
+              await this.owners.terminal.withTerminal(
+                { mode: "completion", task, lastSequence, failed },
+                settle,
+                signal,
               );
-              await this.owners.settlement.settleInTransaction(client, scope);
-            },
-            signal,
-          );
+            } catch (cause) {
+              if (
+                signal.aborted ||
+                !failed ||
+                !(cause instanceof DomainError) ||
+                cause.code !== "generation_terminal_denied"
+              )
+                throw cause;
+              reconcile = true;
+            }
+          // A failed answer whose authority ended cannot be completed by its
+          // worker (W8 denies completion), but its own failed cursor may be
+          // reconciled now instead of after the 60 s lease. W1 accepts only
+          // the exact durable cursor; anything else stays for recovery.
+          if (reconcile)
+            await this.owners.terminal.withTerminal(
+              {
+                mode: "reconciliation",
+                generationId: task.generationId,
+                lastSequence,
+              },
+              settle,
+              signal,
+            );
           // Only W1's successful final COMMIT can increment either counter.
           if (failed) result.failed++;
           else result.completed++;
@@ -244,11 +304,19 @@ export class GenerationWorker {
     return this.pass(signal, limit);
   }
 
+  /** Asks for a pass now. A wakeup during a pass runs one more pass right
+   * after it; it never interrupts a pass or carries work of its own. */
+  wake(): void {
+    this.woken = true;
+    this.sleeping?.abort();
+  }
+
   /** The owning host must abort and await this promise before closing pools.
    * No timeout race abandons an in-flight provider receipt or held COMMIT. */
   async run(
     signal: AbortSignal,
     onPass?: (result: GenerationWorkerPass) => void,
+    listening: () => boolean = () => false,
   ): Promise<void> {
     invariant(
       !this.lifetime && !this.busy && !requestAuthority.getStore(),
@@ -258,12 +326,22 @@ export class GenerationWorker {
     this.lifetime = true;
     try {
       while (!signal.aborted) {
+        this.woken = false;
         const result = await this.pass(signal, 20);
         onPass?.(result);
+        if (this.woken) continue;
+        const sleeping = new AbortController();
+        this.sleeping = sleeping;
         try {
-          await delay(1000, undefined, { signal });
+          await delay(
+            listening() ? IDLE_LISTENING_MS : IDLE_POLLING_MS,
+            undefined,
+            { signal: AbortSignal.any([signal, sleeping.signal]) },
+          );
         } catch (cause) {
-          if (!signal.aborted) throw cause;
+          if (!signal.aborted && !sleeping.signal.aborted) throw cause;
+        } finally {
+          this.sleeping = undefined;
         }
       }
     } catch (cause) {

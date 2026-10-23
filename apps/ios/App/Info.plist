@@ -26,6 +26,14 @@
 				<string>qelvora</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>google-sign-in</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>$(GOOGLE_REVERSED_IOS_CLIENT_ID)</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
@@ -33,6 +41,10 @@
 	<string>$(CREATOR_API_URL)</string>
 	<key>CreatorLinkHost</key>
 	<string>$(CREATOR_LINK_HOST)</string>
+	<key>CreatorGoogleClientID</key>
+	<string>$(GOOGLE_IOS_CLIENT_ID)</string>
+	<key>CreatorGoogleServerClientID</key>
+	<string>$(GOOGLE_SERVER_CLIENT_ID)</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsLocalNetworking</key>

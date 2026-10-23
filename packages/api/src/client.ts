@@ -20,6 +20,12 @@ import {
 import type { z } from "zod";
 import {
   CompleteIdentitySchema,
+  IdentityProviderContinueSchema,
+  IdentitySignInResultSchema,
+  NativeSignInStartSchema,
+  NativeSignInNonceSchema,
+  NativeSignInCompleteSchema,
+  AgeConfirmationInputSchema,
   IdentityCompletionSchema,
   SessionSchema,
   SessionTokenSchema,
@@ -98,6 +104,46 @@ export class CreatorApiClient {
   }
   identitySession() {
     return this.request("/v1/identity/session", SessionSchema);
+  }
+  startWebSignIn(body: z.input<typeof IdentityProviderContinueSchema>) {
+    return this.request(
+      "/v1/identity/web/start",
+      IdentityRedirectSchema,
+      IdentityProviderContinueSchema.parse(body),
+      false,
+    );
+  }
+  completeWebSignIn(body: z.input<typeof CompleteIdentitySchema>) {
+    return this.request(
+      "/v1/identity/web/complete",
+      IdentitySignInResultSchema,
+      CompleteIdentitySchema.parse(body),
+      false,
+    );
+  }
+  startNativeSignIn(body: z.input<typeof NativeSignInStartSchema>) {
+    return this.request(
+      "/v1/identity/native/nonce",
+      NativeSignInNonceSchema,
+      NativeSignInStartSchema.parse(body),
+      false,
+    );
+  }
+  completeNativeSignIn(body: z.input<typeof NativeSignInCompleteSchema>) {
+    return this.request(
+      "/v1/identity/native/complete",
+      IdentitySignInResultSchema,
+      NativeSignInCompleteSchema.parse(body),
+      false,
+    );
+  }
+  confirmIdentityAge(body: z.input<typeof AgeConfirmationInputSchema>) {
+    return this.request(
+      "/v1/identity/age",
+      IdentitySignInResultSchema,
+      AgeConfirmationInputSchema.parse(body),
+      false,
+    );
   }
   refreshSession() {
     return this.request("/v1/identity/refresh", SessionTokenSchema, {});

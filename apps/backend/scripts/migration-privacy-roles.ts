@@ -7,6 +7,7 @@ import {
   assertPublicPrivacyTaskCatalogForReview,
   assertComparisonPrivacyTaskCatalogForReview,
   assertNoticesPrivacyTaskCatalogForReview,
+  assertSignInAndMoneyPrivacyTaskCatalogForReview,
   assertContentPrivacyTaskCatalogForReview,
   assertPrivacyTaskCatalog,
 } from "../src/modules/trust/privacy-catalog.js";
@@ -14,6 +15,7 @@ import {
   assertDomainPrivacyTaskCatalog,
   assertDomainPrivacyTaskCatalogForComparisonReview,
   assertDomainPrivacyTaskCatalogForNoticesReview,
+  assertDomainPrivacyTaskCatalogForSignInAndMoneyReview,
 } from "../src/modules/trust/domain-privacy-catalog.js";
 import { repositoryRoot, sha256 } from "./migration-custody.js";
 import { WaveRoleSafetyError } from "./migration-wave-roles.js";
@@ -52,6 +54,7 @@ export async function assertPrivacyWaveRoleSafety(
     publicBeforeComparison?: boolean;
     comparisonBeforeNotices?: boolean;
     noticesBeforeSignInAndMoney?: boolean;
+    signInAndMoneyBeforeWorkspaceLock?: boolean;
   },
 ) {
   const fail = (purpose: string): never => {
@@ -142,6 +145,8 @@ export async function assertPrivacyWaveRoleSafety(
         await assertComparisonPrivacyTaskCatalogForReview(client);
       else if (installed.noticesBeforeSignInAndMoney)
         await assertNoticesPrivacyTaskCatalogForReview(client);
+      else if (installed.signInAndMoneyBeforeWorkspaceLock)
+        await assertSignInAndMoneyPrivacyTaskCatalogForReview(client);
       else await assertPrivacyTaskCatalog(client);
       await client.query("RESET SESSION AUTHORIZATION");
     }
@@ -150,7 +155,9 @@ export async function assertPrivacyWaveRoleSafety(
         ? assertDomainPrivacyTaskCatalogForComparisonReview
         : installed.noticesBeforeSignInAndMoney
           ? assertDomainPrivacyTaskCatalogForNoticesReview
-          : assertDomainPrivacyTaskCatalog;
+          : installed.signInAndMoneyBeforeWorkspaceLock
+            ? assertDomainPrivacyTaskCatalogForSignInAndMoneyReview
+            : assertDomainPrivacyTaskCatalog;
       await client.query("SET SESSION AUTHORIZATION creator_trust_worker");
       await domainCatalog(client, "trust");
       await client.query("RESET SESSION AUTHORIZATION");
