@@ -13,6 +13,7 @@ import { Retention } from "./retention.js";
 import { Engagement } from "./engagement.js";
 import { GrowthExperiments } from "./experiments.js";
 import type { PostEntryContext } from "./entry-context.js";
+import { CreatorProfileFields } from "./profile-fields.js";
 
 /** W1 mounts this router before its 404, supplies the canonical session resolver. */
 export function createGrowthRouter(
@@ -32,6 +33,7 @@ export function createGrowthRouter(
   const retention = options.retention ?? new Retention(service);
   const engagement = options.engagement ?? new Engagement(service);
   const experiments = options.experiments ?? new GrowthExperiments(service);
+  const profileFields = new CreatorProfileFields(service);
   router.use((_req, res, next) => {
     res.setHeader("Cache-Control", "no-store");
     next();
@@ -217,6 +219,12 @@ export function createGrowthRouter(
   );
   router.get("/home", async (req, res) =>
     res.json(await service.home(await actorFor(req), req.query)),
+  );
+  router.get("/profile", async (req, res) =>
+    res.json(await profileFields.read(await actorFor(req))),
+  );
+  router.put("/profile", async (req, res) =>
+    res.json(await profileFields.save(await actorFor(req), req.body)),
   );
   router.put("/follow/:creatorId", async (req, res) =>
     res.json(
