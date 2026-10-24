@@ -221,7 +221,7 @@ export interface ShareSource {
   creatorName: string;
   version: number;
   text: string;
-  authorKind: "human_creator" | "approved_draft";
+  authorKind: "human_creator";
   signedActId: string;
   signedAt: string;
   contentHash: string;
