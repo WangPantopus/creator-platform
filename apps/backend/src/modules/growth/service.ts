@@ -29,6 +29,7 @@ import type { GrowthDatabase } from "./database.js";
 import { Notifications, type DeliveryProvider } from "./notifications.js";
 import { GrowthErasure } from "./erasure.js";
 import { GrowthDeviceSessions } from "./device-session.js";
+import { WebSubscriptionToken } from "./web-push.js";
 import type { CreatorProjectionSource } from "./creator-projection.js";
 import { compareHomeActivity } from "./home-composition.js";
 
@@ -825,7 +826,7 @@ export class GrowthService {
     const value = z
       .strictObject({
         installationId: z.uuid(),
-        platform: z.enum(["ios", "android"]),
+        platform: z.enum(["ios", "android", "web"]),
         token: z.string().min(16).max(4096),
         permission: z.enum(["granted", "denied"]),
         registrationRevision: z
@@ -835,6 +836,10 @@ export class GrowthService {
           .max(Number.MAX_SAFE_INTEGER),
       })
       .parse(input);
+    if (value.platform === "web") {
+      if (value.permission === "granted") await this.requireCreator(actor);
+      value.token = JSON.stringify(WebSubscriptionToken.parse(value.token));
+    }
     const hash = createHash("sha256").update(value.token).digest("hex");
     return this.db.fencedWorkerActor(
       actor,
@@ -940,7 +945,7 @@ export class GrowthService {
           .int()
           .min(1)
           .max(Number.MAX_SAFE_INTEGER),
-        platform: z.enum(["ios", "android"]),
+        platform: z.enum(["ios", "android", "web"]),
       })
       .parse(input ?? {});
     const revision = value.registrationRevision;

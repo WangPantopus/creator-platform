@@ -12,7 +12,7 @@ const Tombstone = z.strictObject({
   version: z.literal(1),
   accountId: z.uuid(),
   installationId: z.uuid(),
-  platform: z.enum(["ios", "android"]),
+  platform: z.enum(["ios", "android", "web"]),
   registrationRevision: Revision,
 });
 const Registration = z.strictObject({
@@ -20,7 +20,7 @@ const Registration = z.strictObject({
   accountId: z.uuid(),
   sessionId: z.uuid(),
   installationId: z.uuid(),
-  platform: z.enum(["ios", "android"]),
+  platform: z.enum(["ios", "android", "web"]),
   token: z.string().min(16).max(4096),
   registrationRevision: z
     .number()
@@ -47,7 +47,7 @@ export class GrowthDeviceSessions {
     accountId: string,
     token: string,
     installationId: string,
-    platform: "ios" | "android",
+    platform: "ios" | "android" | "web",
     registrationRevision: number,
   ) {
     const authority = requestAuthority.getStore();
@@ -183,7 +183,7 @@ export class GrowthDeviceSessions {
   tombstone(
     accountId: string,
     installationId: string,
-    platform: "ios" | "android",
+    platform: "ios" | "android" | "web",
     revision: number,
   ) {
     const value = Tombstone.parse({
