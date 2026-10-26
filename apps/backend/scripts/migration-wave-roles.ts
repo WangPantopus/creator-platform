@@ -4,6 +4,7 @@ import generationReview from "../../../infra/migrations/reviews/20261007-generat
 import generationDenial from "../../../infra/migrations/reviews/20261007-generation-denial-roles.json" with { type: "json" };
 import publicAIReview from "../../../infra/migrations/reviews/20261007-public-ai.json" with { type: "json" };
 import replyReview from "../../../infra/migrations/reviews/20261023-reply-review.json" with { type: "json" };
+import studioReplyAuthorityReview from "../../../infra/migrations/reviews/20261023-studio-reply-authority.json" with { type: "json" };
 import comparisonReview from "../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
 import { canonical, repositoryRoot, sha256 } from "./migration-custody.js";
 
@@ -92,6 +93,7 @@ export async function assertWaveRoleSafety(
     publicAI?: boolean;
     comparison?: boolean;
     replyReview?: boolean;
+    studioReplyAuthority?: boolean;
   },
 ) {
   const fail = (role: string): never => {
@@ -224,8 +226,26 @@ export async function assertWaveRoleSafety(
       )
         fail("exact reply review source");
   }
+  if (installed.studioReplyAuthority) {
+    if (!installed.replyReview) fail("creator/fan denial predecessor");
+    for (const source of studioReplyAuthorityReview.sources)
+      if (
+        sha256(await readFile(new URL(source.path, repositoryRoot))) !==
+          source.checksum ||
+        !(
+          await client.query(
+            "SELECT 1 FROM creator.schema_migration WHERE version=$1 AND checksum=$2",
+            [source.version, source.checksum],
+          )
+        ).rowCount
+      )
+        fail("exact creator/fan denial source");
+  }
   const expected = [
     ...pins.functions,
+    ...(installed.studioReplyAuthority
+      ? [studioReplyAuthorityReview.denialFunction]
+      : []),
     ...additions.functions.filter((f) =>
       f.name === "creator_trust.runtime_content_denial(uuid)"
         ? installed.content

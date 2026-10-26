@@ -5,7 +5,7 @@
 // this is engineering qualification, not verification of a real external owner.
 // Run only on an owned loopback stack, never against production.
 import assert from "node:assert/strict";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
@@ -92,6 +92,15 @@ try {
   const opsToken = await L.apiSession(4);
   const member = await L.fan(6);
   const outsider = await L.fan(5);
+  evidence.actors = Object.fromEntries(
+    Object.entries({ creator: 3, ops: 4, member: 6, outsider: 5 }).map(
+      ([name, developmentActor]) => [
+        name,
+        { developmentActor, accountId: L.account(developmentActor) },
+      ],
+    ),
+  );
+  evidence.fanIds = { member: member.id, outsider: outsider.id };
   await step("explicit synthetic membership fixture", async () => {
     const fixture = await L.member(
       member.id,
@@ -199,7 +208,7 @@ try {
     );
     assert.equal(note?.state, "published");
     assert(note.signed_act_id);
-    evidence.note = note;
+    evidence.note = { ...note, text: noteText };
     return note;
   });
   const replyText = `Private local reply ${run}: thank you for sharing this Note.`;
@@ -226,7 +235,7 @@ try {
       assert.equal(reply?.safety_state, "pending");
       assert.equal(reply.share_text, false);
       assert.equal(reply.show_handle, false);
-      evidence.reply = reply;
+      evidence.reply = { ...reply, text: replyText };
       const feed = ok(
         await api("GET", `/v1/content/${MAYA}/studio/replies`, creatorToken),
       );
@@ -346,9 +355,17 @@ try {
       );
     },
   );
+  let reaction;
   await step(
     "creator signs reaction; author sees the signed reaction",
     async () => {
+      const reactionPath = `/api/content/${MAYA}/replies/${reply.id}/reaction`;
+      const submitted = creator.page.waitForResponse(
+        (response) =>
+          new URL(response.url()).pathname === reactionPath &&
+          response.request().method() === "POST",
+        { timeout: 60000 },
+      );
       await creator.page
         .locator(".w5-reply")
         .filter({ hasText: replyText })
@@ -357,17 +374,203 @@ try {
       await creator.page
         .getByRole("button", { name: "Sign with your passkey" })
         .click();
+      const response = await submitted;
+      assert.equal(response.status(), 200, await response.text());
+      const request = response.request();
+      const requestBody = request.postData();
+      assert(requestBody, "browser reaction POST did not include its command");
+      const command = JSON.parse(requestBody);
+      assert.equal(command.version, reply.version);
+      assert.equal(command.kind, "heart");
+      assert(command.idempotencyKey);
+      const result = await response.json();
+      assert.equal(result.replyId, reply.id);
+      assert.equal(result.signedActId, command.signedActId);
+      // Retain the exact original command and identity fence, never cookies or
+      // bearer credentials. The replay below uses the same live browser session.
+      const headers = Object.fromEntries(
+        Object.entries(request.headers()).filter(([name]) =>
+          [
+            "content-type",
+            "x-qelvora-expected-account",
+            "x-expected-session-id",
+          ].includes(name),
+        ),
+      );
+      assert.equal(headers["x-qelvora-expected-account"], L.account(3));
+      assert(headers["x-expected-session-id"]);
+      evidence.reactionRequest = {
+        url: request.url(),
+        method: request.method(),
+        headers,
+        body: requestBody,
+        result,
+      };
       await fan.page.reload();
       await fan.page
         .getByText("Maya reacted to your reply", { exact: true })
         .waitFor();
-      const [row] = await sql(
-        "SELECT r.signed_act_id,a.act_type,a.account_id FROM creator.content_reaction r JOIN creator.signed_act a ON a.id=r.signed_act_id WHERE r.reply_id=$1",
+      [reaction] = await sql(
+        "SELECT r.reply_id,r.kind,r.signed_act_id,a.act_type,a.account_id,a.content_hash FROM creator.content_reaction r JOIN creator.signed_act a ON a.id=r.signed_act_id WHERE r.reply_id=$1",
         [reply.id],
       );
-      assert.equal(row?.act_type, "reaction");
-      assert.equal(row.account_id, L.account(3));
-      return row;
+      assert.equal(reaction?.act_type, "reaction");
+      assert.equal(reaction.account_id, L.account(3));
+      assert.equal(reaction.signed_act_id, command.signedActId);
+      evidence.reaction = reaction;
+      await fan.page.screenshot({
+        path: resolve(OUT, `reply-content-${run}.png`),
+        fullPage: true,
+      });
+      return reaction;
+    },
+  );
+  await step(
+    "exact browser reaction replay creates no extra reaction or signature",
+    async () => {
+      const records = async () => {
+        const [row] = await sql(
+          "SELECT (SELECT coalesce(jsonb_agg(signed_act_id ORDER BY signed_act_id),'[]'::jsonb) FROM creator.content_reaction WHERE reply_id=$1) AS reactions,(SELECT coalesce(jsonb_agg(id ORDER BY id),'[]'::jsonb) FROM creator.signed_act WHERE subject_id=$1 AND act_type='reaction') AS signatures",
+          [reply.id],
+        );
+        return row;
+      };
+      const before = await records();
+      assert.deepEqual(before.reactions, [reaction.signed_act_id]);
+      assert.deepEqual(before.signatures, [reaction.signed_act_id]);
+      const replay = await creator.page.evaluate(async (original) => {
+        const response = await fetch(original.url, {
+          method: original.method,
+          headers: original.headers,
+          body: original.body,
+          credentials: "same-origin",
+        });
+        return { status: response.status, json: await response.json() };
+      }, evidence.reactionRequest);
+      assert.equal(replay.status, 200, JSON.stringify(replay));
+      assert.deepEqual(replay.json, evidence.reactionRequest.result);
+      const after = await records();
+      assert.deepEqual(after, before);
+      return { status: replay.status, before, after };
+    },
+  );
+  await step(
+    "public signed act verifies the exact reaction command hash",
+    async () => {
+      // This fixed command is serialized in canonical key order, independently
+      // of the stored hash and of the public verification response.
+      const exactCommand = {
+        actType: "reaction",
+        content: {
+          creatorId: MAYA,
+          kind: "content_reaction",
+          reaction: reaction.kind,
+          replyVersion: reply.version,
+        },
+        subjectId: reply.id,
+      };
+      const expectedHash = createHash("sha256")
+        .update(JSON.stringify(exactCommand))
+        .digest("hex");
+      assert.equal(reaction.content_hash, expectedHash);
+      const signature = ok(
+        await api("GET", `/v1/identity/signed-acts/${reaction.signed_act_id}`),
+      );
+      assert.equal(signature.signedActId, reaction.signed_act_id);
+      assert.equal(signature.status, "valid");
+      assert.equal(signature.actType, "reaction");
+      assert.equal(signature.contentHash, expectedHash);
+      assert(!JSON.stringify(signature).includes(replyText));
+      evidence.publicSignature = signature;
+      return signature;
+    },
+  );
+  await step(
+    "fan web thread renders real Note and reaction with signature navigation",
+    async () => {
+      const presence = ok(
+        await api("GET", `/v1/content/${MAYA}/presence?limit=50`, member.token),
+      );
+      const noteItem = presence.items.find((item) => item.id === note.id);
+      const reactionItem = presence.items.find(
+        (item) => item.replyId === reply.id,
+      );
+      assert.equal(noteItem?.authorKind, "human_broadcast");
+      assert.equal(noteItem.text, noteText);
+      assert.equal(noteItem.signedActId, note.signed_act_id);
+      assert.equal(reactionItem?.authorKind, "human_reaction");
+      assert.equal(reactionItem.signedActId, reaction.signed_act_id);
+      assert.equal(
+        reactionItem.authorLabel,
+        `${reactionItem.creatorName} reacted to your reply`,
+      );
+      assert(!JSON.stringify(reactionItem).includes(replyText));
+      const threadPath = `/threads/${MAYA}/${member.id}`;
+      await fan.page.goto(WEB + threadPath);
+      const threadNote = fan.page.locator(`[data-presence-id='${note.id}']`);
+      await threadNote.getByText(noteText, { exact: true }).waitFor();
+      const threadReaction = fan.page.locator(
+        `[data-presence-id='${reply.id}']`,
+      );
+      const marker = threadReaction.locator(
+        `a[href='/verify/${reaction.signed_act_id}']`,
+      );
+      await marker.waitFor();
+      assert.equal(await marker.innerText(), reactionItem.authorLabel);
+      await fan.page.screenshot({
+        path: resolve(OUT, `reply-thread-${run}.png`),
+        fullPage: true,
+      });
+      await marker.click();
+      await fan.page.waitForURL(
+        (url) => url.pathname === `/verify/${reaction.signed_act_id}`,
+      );
+      await fan.page
+        .getByRole("heading", {
+          name: `Signed by ${reactionItem.creatorName}`,
+          exact: true,
+        })
+        .waitFor();
+      await fan.page.getByText("Valid when checked", { exact: true }).waitFor();
+      await fan.page
+        .locator(".verification-rows")
+        .getByText("Reaction", { exact: true })
+        .waitFor();
+      assert(
+        (await fan.page.locator(".verification-hash").innerText()).includes(
+          reaction.content_hash,
+        ),
+      );
+      await fan.page.screenshot({
+        path: resolve(OUT, `reply-signature-${run}.png`),
+        fullPage: true,
+      });
+      evidence.nativeFixture = {
+        creatorId: MAYA,
+        creatorName: reactionItem.creatorName,
+        noteId: note.id,
+        noteSignedActId: note.signed_act_id,
+        noteText,
+        replyId: reply.id,
+        replyText,
+        signedActId: reaction.signed_act_id,
+        contentHash: reaction.content_hash,
+        authorLabel: reactionItem.authorLabel,
+        actors: evidence.actors,
+        fanIds: evidence.fanIds,
+        threadPath,
+        contentPath: `/content/${MAYA}/${note.id}`,
+      };
+      await writeFile(
+        resolve(OUT, `native-fixture-${run}.json`),
+        JSON.stringify(evidence.nativeFixture, null, 2),
+        { mode: 0o600 },
+      );
+      return {
+        note: noteItem,
+        reaction: reactionItem,
+        verificationPath: new URL(fan.page.url()).pathname,
+      };
     },
   );
   await save();

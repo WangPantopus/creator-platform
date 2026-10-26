@@ -5,6 +5,7 @@ import { registeredComparisonProfile } from "../../db/comparison-profile.js";
 import { contentHash } from "../../core/canonical.js";
 import comparisonReview from "../../../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
 import noticesReview from "../../../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
+import replyReview from "../../../../../infra/migrations/reviews/20261023-reply-review.json" with { type: "json" };
 import workspaceLockReview from "../../../../../infra/migrations/reviews/20261022-workspace-lock.json" with { type: "json" };
 import signInAndMoneyReview from "../../../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
 import {
@@ -138,6 +139,18 @@ export async function assertDomainPrivacyTaskCatalogForWorkspaceLockReview(
     client,
     domain,
     async () => workspaceLockReview.comparison.artifactsCatalogueChecksum,
+  );
+}
+
+/** Fixed121 predecessor metadata; no runtime task authority. */
+export async function assertDomainPrivacyTaskCatalogForReplyReview(
+  client: PoolClient,
+  domain: "trust" | "growth",
+) {
+  return assertDomainPrivacyTask(
+    client,
+    domain,
+    async () => replyReview.comparison.artifactsCatalogueChecksum,
   );
 }
 

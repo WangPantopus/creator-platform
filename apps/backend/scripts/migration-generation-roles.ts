@@ -9,6 +9,8 @@ import comparisonReview from "../../../infra/migrations/reviews/20261008-compari
 import noticesReview from "../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
 import signInAndMoneyReview from "../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
 import replyReview from "../../../infra/migrations/reviews/20261023-reply-review.json" with { type: "json" };
+import studioReplyAuthorityReview from "../../../infra/migrations/reviews/20261023-studio-reply-authority.json" with { type: "json" };
+import { assertCreatorFanDenialPurposeCatalog } from "../src/modules/trust/creator-fan-denial-catalog.js";
 import workspaceLockReview from "../../../infra/migrations/reviews/20261022-workspace-lock.json" with { type: "json" };
 import { comparisonReaderCatalogue } from "../src/modules/conversation/comparison-feed.js";
 import { comparisonPrivacyCatalogue } from "../src/modules/conversation/comparison-privacy.js";
@@ -177,7 +179,8 @@ export async function assertGenerationWaveRoleSafety(
     | "notices"
     | "sign-in-and-money"
     | "workspace-lock"
-    | "reply-review",
+    | "reply-review"
+    | "studio-reply-authority",
 ) {
   if (
     purposeReview.schemaVersion !== 1 ||
@@ -189,22 +192,25 @@ export async function assertGenerationWaveRoleSafety(
     throw new WaveRoleSafetyError(
       "Generation-purpose wave review is unavailable.",
     );
-  const reply = extension === "reply-review";
+  const studio = extension === "studio-reply-authority";
+  const reply = studio || extension === "reply-review";
   const workspaceLock = reply || extension === "workspace-lock";
   const signInAndMoney = workspaceLock || extension === "sign-in-and-money";
   const notices = signInAndMoney || extension === "notices";
   const comparison = notices || extension === "comparison";
   // Every pinned catalogue lists every relation, so the newest installed
   // wave's review holds the current pins.
-  const head = reply
-    ? replyReview
-    : workspaceLock
-      ? workspaceLockReview
-      : signInAndMoney
-        ? signInAndMoneyReview
-        : notices
-          ? noticesReview
-          : comparisonReview;
+  const head = studio
+    ? studioReplyAuthorityReview
+    : reply
+      ? replyReview
+      : workspaceLock
+        ? workspaceLockReview
+        : signInAndMoney
+          ? signInAndMoneyReview
+          : notices
+            ? noticesReview
+            : comparisonReview;
   const recovery =
     comparison ||
     extension === "generation-recovery" ||
@@ -222,6 +228,7 @@ export async function assertGenerationWaveRoleSafety(
     publicAI: extension === "public-ai" || recovery,
     comparison,
     replyReview: reply,
+    studioReplyAuthority: studio,
   });
   const catalogue = await generationWavePurposeCatalogue(client);
   const accepted = extension
@@ -398,6 +405,7 @@ export async function assertGenerationWaveRoleSafety(
     }
   }
   if (reply) await assertReplyReviewPurposeCatalog(client);
+  if (studio) await assertCreatorFanDenialPurposeCatalog(client);
   return {
     original,
     purposeRoles:

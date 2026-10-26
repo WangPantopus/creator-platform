@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "scope": "Creator/fan denial wave0254 follows exact121. Unchanged0089 adds one negative projection owned by the existing isolated denial role and executable only by core runtime. No role, relation, paid tenure or positive authority is added. Qualification remains separate from production and erasure acceptance.",
+  "sources": [
+    {
+      "version": "0254_w8_creator_fan_denial",
+      "path": "apps/backend/migrations/0089_w8_creator_fan_denial.sql",
+      "checksum": "0a738e0a29c77e65274931d4054b5db26a340b8c10a498e8c016457ab1a22860",
+      "owner": "W8",
+      "name": "w8_creator_fan_denial"
+    }
+  ],
+  "purposeProfiles": [
+    {
+      "review": "original",
+      "sha256": "df263d0acbe495d6226411ab345833379fadcafd77b24f85dd3eb5f0c2afacfe"
+    },
+    {
+      "review": "original-incoming",
+      "sha256": "fb676622cc0660fb46138ea0961b4e61c2702dd4a79b615ae8d148a0d424ce2c"
+    },
+    {
+      "review": "populated-original",
+      "sha256": "f2f9214851f2cff6dc3dac0de103d7c4bdd2ed04e192f98a274e48ce0003afcf"
+    },
+    {
+      "review": "populated-original-incoming",
+      "sha256": "7b567d0571e8f28afe82165c617f733c5c2b755be8e1e82ae37f64011e98861d"
+    }
+  ],
+  "runtimeCatalogues": {
+    "output": "58f13273c43d977fc0ca0b05bcd514d4a42e54f993f4ec020be75d21131d1851",
+    "terminal": "6d179b7dc84fd8ab58aa2356fae989181bea9357d9dd840bc0724e4cf8fe4b5b",
+    "financial": "60f5a1866b564419d79752b3bf2f2fbf54c1716a0f118814f0026046d2684fd1",
+    "expiry": "a7e728a7b52d4e9e462e85f44cca78ac52e091234db341509f6bde0d728b2166",
+    "detached": "8211fda209a0fd57c1971d7ace8b1b56c0e2cfa0eb2a4120d990764015993c1a",
+    "boundary": "469b9b9d66ec96c4e30afb50d8c128c14db67f07d35fb6f7299e07bf6569b04c",
+    "family": "a9c5c5ff4b6d8d264241b69d76fae60e42961ae932bfa3540a6b8361c614dd16"
+  },
+  "originalFamilyProfiles": [
+    {
+      "review": "original",
+      "sha256": "a9c5c5ff4b6d8d264241b69d76fae60e42961ae932bfa3540a6b8361c614dd16"
+    },
+    {
+      "review": "original-incoming",
+      "sha256": "5bf3919378d09fe30c053b7ffc29824541952cca219bd1c1ad44798073497f87"
+    }
+  ],
+  "outputCatalogueChecksum": "eaea17126e91ba10c99140c02c58010ec80b5a84b0f29e758f0e7e2f3fa08d53",
+  "publicCatalogueChecksum": "a50632010a031c7b2380b711b3f8d9689184788a864019bd3fd273a279842f75",
+  "agentExportCatalogueChecksum": "4dcdd2f845250d5981c292345e0985d0858a1b6e76776eb8eaf47acd0ec1b462",
+  "conversationCursorCatalogueChecksum": "48000fd8ebe6a6317803355b8e07a25c7f4df1b4f31d0ee3a39557dff0563d28",
+  "provenancePurgeCatalogueChecksum": "77c06a09be6b38261011698e20d717083efcfb5b197c4aa6bc0b0324c3b17891",
+  "provenancePurgeIncomingCatalogueChecksum": "d228755d492e8e4f86b9a68df280eb93a33b9cedec5a66d63f1a071b9d8e217c",
+  "workerCatalogues": {
+    "creator_commerce_public_read": "5d95a571295cff8769f2744c799ab1bfa97830e23900d2f4972a13b969ee7ce3",
+    "creator_generation_authority": "1fdb3f85ca24a39deb1cd4a1206ff5bc33f237d5b226c389f3f1eaf0b28d199d",
+    "creator_generation_conversation_context": "db3dc437bc64ead4cef77888f63de79333af2422c16e15ce16abcdbce5c70743",
+    "creator_generation_cursor_authority": "3ebcb9c0d79a87405124d0632158f78afcb549c23451bb7c12c5e6d5d378abee",
+    "creator_generation_terminal_authority": "f798047a4a7cc62eeaed9d0640115ad2633bcb303e523c7d5a03117c8bc7ab8f",
+    "creator_generation_terminal_discovery": "defda8501a09063c563355d02840848c3ede31a033dc957d2f255fbc4b6d3508",
+    "creator_generation_worker": "9d783a079f7292bf501c837acd25bdf58fc72b1070abcb6d1b098723a5c8066c",
+    "creator_privacy_accounting_boundary": "7bf0c305d1c12fa4f7173f868940ad5b2d407c6d44da2775ca683b7e5bae6a1c",
+    "creator_privacy_family": "fb4e0715bf3cf570b4a54d8994d597a5090afa1d73a13f04a6760f10c25d54cb",
+    "creator_privacy_ownership_metadata": "9d783a079f7292bf501c837acd25bdf58fc72b1070abcb6d1b098723a5c8066c",
+    "creator_signature_read_authority": "b844e331da1ba39eb716d1af12835a8eb946f21cfdbc6665f833f39fc1873cfd",
+    "creator_usage_detachment": "72be258e66708a6041cf806be61c866cde49b917fb51bcc445fb443bd52f888e",
+    "creator_usage_expiry": "589340e23ece1521bc110abeef3e0753092905681cc2cda28a69437c61b879dd",
+    "creator_w2_generation_guardrail": "edf6f8e06cadc6b9fe3cf1c8b8f29ea841e71ae92c0326416b25cad52f8de642",
+    "creator_w2_generation_input": "f8f736a7dafddeca88541ac33682d453d5b374567cfe21025cd51e68b71c0529",
+    "creator_w2_generation_journal": "520a6756344f8b62127f071019ea1dc971e9a7f85b32ac3e93733fc80f74b888",
+    "creator_w2_generation_metadata": "1aa70b25f7c5ed2f09368a43e9485b7d4c68a212a6861a45df5dbc9fa4a82678",
+    "creator_w2_generation_retrieval": "b4efa121041b5295fc2a3f0e7534f82e302cedcc0dee4bd89e998958ddc6e7ce",
+    "creator_w2_generation_terminal_journal": "bb2eea8ed0478eacc12ec5c3bc87742d66e621c728fe8d5cf22477b5398ee2c6",
+    "creator_w2_privacy_export": "4dcdd2f845250d5981c292345e0985d0858a1b6e76776eb8eaf47acd0ec1b462",
+    "creator_w3_generation_output": "fac6feb029d000687e2adfe1076e773ab0cf67610ed00c06af5c4b8dc6210dc6",
+    "creator_w3_generation_privacy": "eb9bbb487704983ff8bbab87074149c10d2ebf0813f88a1a3aa508e24674c113",
+    "creator_w3_privacy_export": "7473b29f87bdba9a11f35b8c9a3dc3be046bc90ee3b2a1fd030d8b49883dda2f",
+    "creator_w3_terminal_output": "6ae1d48269873a0db44b84136b7f43abede798e8950071314e5947fa9f20554f",
+    "creator_w4_generation_audience": "c52b67a9e0ebf80cbc2b9f76211cfadc28f4f17ea03e39ef68dd8ad3c4dfbe6e",
+    "creator_w4_generation_safety_terminal": "676ddba218bfd9446f4b1e2842f72145ea5adcacad53a3e298cddc593e2461c9",
+    "creator_w4_generation_terminal": "3fb607790c97197f1b7a40f4eeb3b96861e479c1fec4709e52f28917ed233832",
+    "creator_w5_generation_origin": "294f9d338f7c1263272335a44c1d5fe997d14ea317c753bdfa795319b0c7be57"
+  },
+  "conversationCursorDefinitions": {
+    "creator.conversation_privacy_export_rows(uuid,uuid)": "53656e429461ca73c2fb2a4d9b9ffd0a234b4b9cf3e6c2793ac78da9205965fd",
+    "creator.fence_conversation_privacy_export(uuid,uuid,text,uuid,uuid,uuid)": "c20292458ff54df47f4a7a590529109424a143ee62b0e29cb531f7a6891d7033",
+    "creator.finish_conversation_privacy_export_scope()": "a18d439512f89abe047fcfd2494cf48b366aa38ff5c4e5beaf153e98e9819bf8"
+  },
+  "comparison": {
+    "readerCatalogueChecksum": "59273ef85e65203d0fbb6f616d22f453b1999945fe4447ea19a816f0b92ab604",
+    "privacy": {
+      "definitionSha256": "5b39ca6d3af5cd279117e614e955ca88c4eaef50c5735ad4ac42531942f1cbab",
+      "catalogueChecksum": "ccacc5f1a3cf83652c8ddd87915740a7af4acea2b9f2729c27ab7a6c0e7eca18"
+    },
+    "artifactsCatalogueChecksum": "0ce407934142792fc93c89f37f4d439987ede499e9103cf9ead4a6920af83b6f"
+  },
+  "baselineWave": {
+    "path": "infra/migrations/waves/20261023-reply-review.json",
+    "sha256": "09e09244e943f77311beb51f2b908b8bc7b2f01d0d5ec5ee5a8b7f943034e041"
+  },
+  "replyReviewCatalogueChecksum": "b3b253b77e290d1f6fcb79aa5963aba47b51ba66c8973c184c2c8216286a61ba",
+  "denialFunction": {
+    "name": "creator_trust.creator_fan_denial(uuid, uuid)",
+    "owner": "creator_trust_denial",
+    "sha256": "56617e812fddf0f407afe208213289de2a84c34daf7074828b90a06409d7bcf1",
+    "grants": [
+      "creator_runtime=X/creator_trust_denial",
+      "creator_trust_denial=X/creator_trust_denial"
+    ]
+  },
+  "creatorFanDenialCatalogueChecksum": "ae50c7d3268bb653a3b9735c6cc9d1bc4e7f4b41b8f3fbe420ec12a8e414c8f5",
+  "creatorFanDenialIncomingCatalogueChecksum": "0853777868bfc493b05caaa87360019f82028ec036094de2ac10b320f5a7ca3b"
+}
