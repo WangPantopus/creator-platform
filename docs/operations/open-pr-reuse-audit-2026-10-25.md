@@ -9,7 +9,7 @@ No PR was merged, closed or retargeted by this audit.
 ## What must be reused
 
 Twenty-one older PR heads are exact ancestors of both #514 and #515. They include
-#511 and its20 listed constituent open heads. Their source is already integrated;
+#511 and its 20 listed constituent open heads. Their source is already integrated;
 open status alone does not mean the work is missing. Memory/context proposals
 #490/#492 are included as source but remain inactive, requiring separate qualified
 waves. #451's workspace-lock SQL is already registered as0252.
@@ -17,10 +17,10 @@ waves. #451's workspace-lock SQL is already registered as0252.
 The three current integration PRs #514/#515/#516 remain preserved. The remaining
 41 PR heads carry work outside #514; many overlap one another in cumulative
 stacks. Non-ancestry is not a recommendation to blindly apply whole branches.
-`git cherry` found no patch-equivalent commits for those41 heads against #514,
+`git cherry` found no patch-equivalent commits for those 41 heads against #514,
 but semantic overlaps still require the reconciliation below.
 
-The native stack through #508 contains all23 lane7 heads and74 nonmerge patches
+The native stack through #508 contains all 23 lane7 heads and 74 nonmerge patches
 outside both #514 and #516. #452 already implemented native Notes/reactions with
 older caching rules. #516's newer five-second access window and atomic concealment
 must survive reconciliation; #452 retains valuable ordering/accessibility/scroll
@@ -30,7 +30,7 @@ session and authority checks when reusing either stack. #394 is a separate patch
 Share-card work already exists in #392 and #459. Use their original source and
 adapters before filling native grant/handle/composition gaps. #400 already covers
 background reaction-notice suppression; do not rewrite it as a new implementation
-or combine its extra SQL into0254. #488 already contains Studio live updates.
+or combine its extra SQL into 0254. #488 already contains Studio live updates.
 #512/#513 contain the remaining scenario correction and My AI split; the split
 must retain #514's later FAQ draft restoration fix.
 
@@ -38,7 +38,7 @@ must retain #514's later FAQ draft restoration fix.
 
 Across every one of the65 live heads:
 
-- #515 alone registers0253; #514/#516 stop at0252; no head registers0254.
+- #515 alone registers 0253; #514/#516 stop at0252; no head registers 0254.
 - `0089_w8_creator_fan_denial.sql` is byte-identical everywhere, SHA-256
   `0a738e0a29c77e65274931d4054b5db26a340b8c10a498e8c016457ab1a22860`.
 - No head contains the new creator/fan catalogue guard file. All-ref history
@@ -46,7 +46,7 @@ Across every one of the65 live heads:
   `creatorFanDenialCatalogue` implementation.
 
 The original SQL and SQL-by-name callback already exist and are being reused.
-Only additive registration, exact executable/ledger/catalogue admission, fresh122
+Only additive registration, exact executable/ledger/catalogue admission, fresh 122
 and independently restored121→122 qualification, and actual signed workflow
 acceptance are new. Historical W8 purpose-denial work is already in the baseline;
 the old reply-review branch has broader historical work and is not declared
@@ -67,7 +67,7 @@ qualification to continue without recreating the SQL or existing UI.
 | --- | --- | --- | --- |
 | [#516](https://github.com/WangPantopus/creator-platform/pull/516) | Draft | `codex/native-presence-2026-10-22` | Continue existing PR; strict freshness reader supersedes #452 reader. Actual reaction acceptance pending. |
 | [#515](https://github.com/WangPantopus/creator-platform/pull/515) | Draft | `codex/reply-review-2026-10-22` | Preserved qualified121 predecessor; new0254 stacks here. |
-| [#514](https://github.com/WangPantopus/creator-platform/pull/514) | Draft | `codex/app-completion-2026-10-22` | Preserved current application integration; includes #511 and its20 constituent open heads. |
+| [#514](https://github.com/WangPantopus/creator-platform/pull/514) | Draft | `codex/app-completion-2026-10-22` | Preserved current application integration; includes #511 and its 20 constituent open heads. |
 | [#513](https://github.com/WangPantopus/creator-platform/pull/513) | Open | `lane-3/b8-split-creator-ai` | Reuse existing My AI split; retain newer FAQ restoration fix from #514. |
 | [#512](https://github.com/WangPantopus/creator-platform/pull/512) | Open | `lane-3/f7-hold-counted` | Reuse existing authority scenario correction; no product implementation needed. |
 | [#511](https://github.com/WangPantopus/creator-platform/pull/511) | Open | `lane-3/merge-wave-2026-10-16` | Included in #514 and #515 by exact ancestry; do not recreate. |
@@ -133,7 +133,7 @@ qualification to continue without recreating the SQL or existing UI.
 
 ## Execution order after audit
 
-Finish0254 and the signed Note → private reply → purpose-leased Ops approval →
+Finish 0254 and the signed Note → private reply → purpose-leased Ops approval →
 creator reaction workflow, then qualify the existing held follower source0185 in
 its own wave. Reuse #392/#459 for share cards next. Reconcile the native cumulative
 stack, #488 and the remaining existing proposals in the handoff order. Existing
@@ -142,6 +142,6 @@ checks or real operated acceptance. No new unit tests, forced pushes, applied-SQ
 rewrites, clock changes or hosting decision are part of this audit.
 
 This is an overlap/reuse inventory, not a full security review or acceptance of
-all65 PRs. Live metadata, head SHAs, changed files, ancestry and patch comparisons
+all 65 PRs. Live metadata, head SHAs, changed files, ancestry and patch comparisons
 were retained privately under `/tmp/qelvora-studio-reply-1025/`; the large API
 response and artifact blobs are not duplicated in Git.
