@@ -52,3 +52,55 @@ node tests/scenarios/lane-7/native-presence.mjs
 `native-presence.mjs real` additionally requires `QELVORA_PRESENCE_CREATOR`, `QELVORA_PRESENCE_NOTE_TEXT`, `QELVORA_PRESENCE_MEMBER_ACTOR`, `QELVORA_PRESENCE_MEMBER_FAN`, `QELVORA_PRESENCE_OUTSIDER_ACTOR`, and `QELVORA_PRESENCE_OUTSIDER_FAN`. Reverse the selected loopback port through adb before launching. The script writes compact screenshot/tree evidence under `/tmp/native-c4-android-*`; it never modifies the real fixture.
 
 Owned devices are the iOS simulator `CC067095-D127-4FFD-941A-CE445A547889` and Android AVD `qelvora-signin-20261022` on `emulator-5586`. Original user simulators and emulators were not used. Final local evidence is `/tmp/qelvora-native-presence-ios-concurrent.xcresult`, `/tmp/qelvora-native-presence-ios-final-real.xcresult`, `/tmp/qelvora-native-presence-android-fixture.log`, and `/tmp/qelvora-native-presence-android-final-real.log`. Live hosting remains undecided.
+
+## Real reaction continuation prepared — 2026-10-25
+
+The owned simulator and AVD still exist after the host restart, but both were
+stopped and the earlier `/tmp` evidence was absent. The earlier observations
+retain their stated scope. No earlier acceptance result was rerun during this
+preparation, and actual reactions remain unaccepted until the separate 0254
+source/fresh/restored qualification and real web review/signing workflow pass.
+
+The existing operated checks now have an explicit reaction mode. They read an
+already approved, creator-signed reaction; they do not create a reaction or
+approval, reset a backend, or operate the fixture harness. Both fetch the exact
+public signed act, require its `reaction` type and `valid` status, then tap the
+native reaction's signature control and match its displayed hash to the server.
+They also check healthy refresh, source navigation and outsider exclusion. The
+backend workflow must independently record the private reply, purpose-leased
+approval and creator passkey provenance; a native rendering check alone does
+not establish backend acceptance.
+
+After that workflow, supply these values from its actual records:
+
+- `QELVORA_PRESENCE_CREATOR`, `QELVORA_PRESENCE_CREATOR_NAME`
+- `QELVORA_PRESENCE_MEMBER_ACTOR`, `QELVORA_PRESENCE_MEMBER_FAN`
+- `QELVORA_PRESENCE_OUTSIDER_ACTOR`, `QELVORA_PRESENCE_OUTSIDER_FAN`
+- `QELVORA_PRESENCE_NOTE_ID`, `QELVORA_PRESENCE_NOTE_TEXT`
+- `QELVORA_PRESENCE_REACTION_REPLY` (the reply ID used by the presence item),
+  `QELVORA_PRESENCE_REACTION_SIGNED_ACT`, and
+  `QELVORA_PRESENCE_REACTION_LABEL` (the exact server `authorLabel`)
+
+Set `QELVORA_PRESENCE_API` for Android and `QELVORA_PRESENCE_STACK_API` for iOS
+to the qualified loopback API. Keep the actual Note and reply published/current
+until both phone checks finish; later withdrawal should use the same real owner
+workflow. Do not reuse the tombstoned actor six on the preserved reply stack.
+
+```sh
+# After building/installing on the existing owned Android AVD, reverse the API
+# port on emulator-5586 and run the existing operated journey.
+LANE7_ANDROID=emulator-5586 \
+node tests/scenarios/lane-7/native-presence.mjs real-reaction
+
+# After build-for-testing, this runner forwards QELVORA_PRESENCE_* to XCTest.
+# It rejects skipped or failed execution and uses the shared heavy-build lock.
+LANE7_IOS=CC067095-D127-4FFD-941A-CE445A547889 \
+node tests/scenarios/lane-7/ios-navigation.mjs \
+  /absolute/path/to/built.xctestrun --presence-reaction
+```
+
+The runner also supports `--presence-real` for the existing Note-only check and
+`--presence-harness` for the explicitly synthetic lifecycle check. The iOS real
+check accepts actor labels rather than requiring the previous fixed actor six.
+JavaScript syntax, focused ESLint, formatting and Swift parsing passed for this
+preparation. A fresh native build and operated reaction result remain pending.

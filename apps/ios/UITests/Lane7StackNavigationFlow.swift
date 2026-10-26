@@ -80,15 +80,66 @@ final class Lane7StackNavigationFlow: XCTestCase {
         continueAfterFailure = false
         let app = XCUIApplication()
         let arguments = ["--api-url", api, "--appearance", "light", "-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
-        app.launchArguments = arguments + ["--harness-reset", "--harness-actor", "verification reviewer", "--return-to", "/threads/" + creator + "/" + fan]
+        let creatorName = environment["QELVORA_PRESENCE_CREATOR_NAME"] ?? "Maya"
+        let memberActor = environment["QELVORA_PRESENCE_MEMBER_ACTOR"] ?? "verification reviewer"
+        let outsiderActor = environment["QELVORA_PRESENCE_OUTSIDER_ACTOR"] ?? "support reviewer"
+        let requiresReaction = environment["QELVORA_PRESENCE_REQUIRE_REACTION"] == "1"
+        var reactionLabel: String?, reactionReply: String?, reactionHash: String?
+        if requiresReaction {
+            reactionLabel = try XCTUnwrap(environment["QELVORA_PRESENCE_REACTION_LABEL"])
+            reactionReply = try XCTUnwrap(environment["QELVORA_PRESENCE_REACTION_REPLY"])
+            let signedAct = try XCTUnwrap(environment["QELVORA_PRESENCE_REACTION_SIGNED_ACT"])
+            XCTAssertNotNil(UUID(uuidString: signedAct)); XCTAssertNotNil(UUID(uuidString: reactionReply!))
+            var request = URLRequest(url: try XCTUnwrap(URL(string: api + "/v1/identity/signed-acts/" + signedAct)))
+            request.timeoutInterval = 10
+            let (data, response) = try await URLSession.shared.data(for: request)
+            XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200)
+            let proof = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+            XCTAssertEqual(proof["signedActId"] as? String, signedAct)
+            XCTAssertEqual(proof["actType"] as? String, "reaction")
+            XCTAssertEqual(proof["status"] as? String, "valid")
+            XCTAssertEqual(proof["creatorName"] as? String, creatorName)
+            reactionHash = try XCTUnwrap(proof["contentHash"] as? String)
+            XCTAssertEqual(reactionHash?.count, 64)
+            print("Native real C4 reaction signed act: \(signedAct)")
+        }
+        app.launchArguments = arguments + ["--harness-reset", "--harness-actor", memberActor, "--return-to", "/threads/" + creator + "/" + fan]
         app.launch()
         let note = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", text)).firstMatch
         XCTAssertTrue(note.waitForExistence(timeout: 30))
-        XCTAssertTrue(note.label.hasPrefix("Maya"), "The spoken author precedes the full Note body.")
-        for _ in 0..<7 { try await Task.sleep(for: .seconds(1)); XCTAssertTrue(note.exists, "Healthy refresh keeps the Note visible across the five-second UI freshness window.") }
+        XCTAssertTrue(note.label.hasPrefix(creatorName), "The spoken author precedes the full Note body.")
+        if let reactionLabel { XCTAssertTrue(app.buttons[reactionLabel].waitForExistence(timeout: 10)) }
+        for _ in 0..<7 {
+            try await Task.sleep(for: .seconds(1))
+            XCTAssertTrue(note.exists, "Healthy refresh keeps the Note visible across the five-second UI freshness window.")
+            if let reactionLabel { XCTAssertTrue(app.buttons[reactionLabel].exists, "The actual reaction survives healthy refresh.") }
+        }
         print("Native real C4 accessible Note: \(note.label)")
         let member = XCTAttachment(screenshot: app.screenshot()); member.name = "native-c4-real-member-note"; member.lifetime = .keepAlways; add(member)
-        let signed = app.buttons["Signed by Maya. Open the verification page"]
+        let marker = "Signed by " + creatorName + ". Open the verification page"
+        if let reactionLabel, let reactionReply, let reactionHash {
+            let card = app.descendants(matching: .any).matching(identifier: "content-presence-reaction:" + reactionReply).firstMatch
+            XCTAssertTrue(card.waitForExistence(timeout: 10))
+            let signedReaction = card.buttons[marker]
+            XCTAssertTrue(signedReaction.waitForExistence(timeout: 5)); signedReaction.tap()
+            XCTAssertTrue(app.staticTexts["Signature verification"].waitForExistence(timeout: 15))
+            let hash = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", reactionHash)).firstMatch
+            for _ in 0..<8 { if hash.isHittable { break }; app.swipeUp() }
+            XCTAssertTrue(hash.waitForExistence(timeout: 10), "The reaction control must open its exact live server hash.")
+            XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Reaction")).firstMatch.exists)
+            let verified = XCTAttachment(screenshot: app.screenshot()); verified.name = "native-c4-real-reaction-verification"; verified.lifetime = .keepAlways; add(verified)
+            app.terminate(); app.launch()
+            XCTAssertTrue(app.buttons[reactionLabel].waitForExistence(timeout: 30)); app.buttons[reactionLabel].tap()
+            XCTAssertTrue(app.staticTexts["Your private replies"].waitForExistence(timeout: 15))
+            XCTAssertTrue(app.buttons["Verify reaction"].waitForExistence(timeout: 10))
+            app.terminate(); app.launch()
+            XCTAssertTrue(note.waitForExistence(timeout: 30))
+        }
+        let signed: XCUIElement
+        if requiresReaction {
+            let noteId = try XCTUnwrap(environment["QELVORA_PRESENCE_NOTE_ID"])
+            signed = app.descendants(matching: .any).matching(identifier: "content-presence-note:" + noteId).firstMatch.buttons[marker]
+        } else { signed = app.buttons[marker] }
         XCTAssertTrue(signed.waitForExistence(timeout: 5)); signed.tap()
         XCTAssertTrue(app.staticTexts["Signature verification"].waitForExistence(timeout: 15))
         XCTAssertFalse(app.staticTexts["Your private replies"].exists)
@@ -97,11 +148,12 @@ final class Lane7StackNavigationFlow: XCTestCase {
         XCTAssertTrue(app.staticTexts["Your private replies"].waitForExistence(timeout: 15))
         XCTAssertFalse(app.buttons["Me and privacy"].exists, "The Note opens the Content/private-reply route.")
         app.terminate()
-        app.launchArguments = arguments + ["--harness-reset", "--harness-actor", "support reviewer", "--return-to", "/threads/" + creator + "/" + outsider]
+        app.launchArguments = arguments + ["--harness-reset", "--harness-actor", outsiderActor, "--return-to", "/threads/" + creator + "/" + outsider]
         app.launch()
         XCTAssertTrue(app.buttons["Me and privacy"].waitForExistence(timeout: 30))
         try await Task.sleep(for: .seconds(4))
         XCTAssertFalse(note.exists, "An outsider cannot receive the members Note in C4.")
+        if let reactionLabel { XCTAssertFalse(app.buttons[reactionLabel].exists, "Another fan cannot receive the author's reaction.") }
         let refused = XCTAttachment(screenshot: app.screenshot()); refused.name = "native-c4-real-outsider"; refused.lifetime = .keepAlways; add(refused)
     }
 

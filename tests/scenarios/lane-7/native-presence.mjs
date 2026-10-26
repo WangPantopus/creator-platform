@@ -2,14 +2,19 @@ import assert from "node:assert/strict";
 import { writeFileSync } from "node:fs";
 import * as ui from "./android-ui.mjs";
 // Operated Android C4 checks. Use an explicitly owned emulator and API.
-// Real mode only reads the supplied signed Note/member/outsider fixture.
+// Real modes only read the supplied signed Note/member/outsider fixture.
+// real-reaction additionally requires an actual approved, creator-signed reply
+// reaction. The backend workflow must establish its provenance separately.
 // Default mode owns/reset the disposable lane-7 UI harness; fixture reactions
 // do not qualify Trust review, creator signing, or held migration activation.
 assert(
   process.env.LANE7_ANDROID,
   "Select an owned emulator with LANE7_ANDROID",
 );
-const real = process.argv[2] === "real";
+const mode = process.argv[2] ?? "harness";
+assert(["harness", "real", "real-reaction"].includes(mode), "Unknown mode");
+const real = mode !== "harness";
+const realReaction = mode === "real-reaction";
 const api = process.env.QELVORA_PRESENCE_API;
 assert(
   api && /^http:\/\/127\.0\.0\.1:\d+$/.test(api),
@@ -48,6 +53,14 @@ function launch(actor, route) {
 const has = (text) => ui.texts().some((v) => v.includes(text));
 const hasReaction = (label) =>
   ui.screen().some((node) => node.desc === label && node.h > 0);
+async function scrollTo(label) {
+  for (let attempt = 0; attempt < 8; attempt++) {
+    if (has(label)) return;
+    ui.swipe(540, 1800, 540, 600);
+    await sleep(300);
+  }
+  await ui.waitFor(label, 10000);
+}
 async function tapStableVisible(label) {
   // Back restores the thread before its asynchronous Content row has settled.
   // Use two matching visible bounds, not a transient accessibility position.
@@ -84,21 +97,89 @@ async function control(path, body = {}) {
 if (real) {
   const text = required("QELVORA_PRESENCE_NOTE_TEXT");
   const creator = required("QELVORA_PRESENCE_CREATOR");
+  const creatorName = process.env.QELVORA_PRESENCE_CREATOR_NAME ?? "Maya";
+  const marker = `Signed by ${creatorName}. Open the verification page`;
+  const reactionLabel = realReaction
+    ? required("QELVORA_PRESENCE_REACTION_LABEL")
+    : null;
+  let reactionProof;
+  if (realReaction) {
+    const signedActId = required("QELVORA_PRESENCE_REACTION_SIGNED_ACT");
+    assert(/^[0-9a-f-]{36}$/i.test(signedActId));
+    const response = await fetch(
+      `${api}/v1/identity/signed-acts/${signedActId}`,
+      { signal: AbortSignal.timeout(10000) },
+    );
+    assert.equal(response.status, 200);
+    reactionProof = await response.json();
+    assert.equal(reactionProof.signedActId, signedActId);
+    assert.equal(reactionProof.actType, "reaction");
+    assert.equal(reactionProof.status, "valid");
+    assert.equal(reactionProof.creatorName, creatorName);
+    assert.match(reactionProof.contentHash, /^[0-9a-f]{64}$/);
+  }
   launch(
     required("QELVORA_PRESENCE_MEMBER_ACTOR"),
     `/threads/${creator}/${required("QELVORA_PRESENCE_MEMBER_FAN")}`,
   );
   const note = await ui.waitFor(text, 30000);
-  assert(note.desc.startsWith("Maya"));
+  assert(note.desc.startsWith(creatorName));
   assert(note.desc.includes(text));
   console.log("PASS: author-first complete accessibility body", note.desc);
+  if (reactionLabel) await ui.waitFor(reactionLabel, 10000);
   for (let i = 0; i < 3; i++) {
     await sleep(2500);
     assert(has(text));
+    if (reactionLabel) assert(hasReaction(reactionLabel));
   }
   console.log("PASS: member Note survives healthy refresh >7.5s");
   capture("native-c4-android-real-member");
-  await ui.tap("Signed by Maya. Open the verification page");
+  if (reactionLabel) {
+    const nodes = ui.screen();
+    const reaction = nodes.find(
+      (node) => node.desc === reactionLabel && node.h > 0,
+    );
+    assert(reaction, "The supplied current reaction must be visible");
+    // Its signature control is the first visible marker below this card body.
+    // Verify the target's exact server hash after the tap, so another Note or
+    // reaction marker cannot satisfy this check.
+    const signature = nodes
+      .filter(
+        (node) => node.desc === marker && node.h > 0 && node.y > reaction.y,
+      )
+      .sort((a, b) => a.y - b.y)[0];
+    assert(signature, "Reaction signature control must be visible");
+    ui.tapAt(signature.x, signature.y);
+    await ui.waitFor("Signature verification", 15000);
+    await scrollTo(reactionProof.contentHash);
+    assert(has("Reaction"));
+    assert(has(reactionProof.contentHash));
+    capture("native-c4-android-real-reaction-verification");
+    console.log(
+      "PASS: actual reaction opens exact signed-act hash",
+      reactionProof.signedActId,
+    );
+    ui.key("BACK");
+    await ui.waitFor(reactionLabel, 15000);
+    await tapStableVisible(reactionLabel);
+    await ui.waitFor("Your private replies", 15000);
+    await ui.waitFor("Verify reaction", 10000);
+    console.log("PASS: actual reaction opens its private-reply source");
+    ui.key("BACK");
+    await ui.waitFor(text, 15000);
+  }
+  const noteNodes = ui.screen();
+  const currentNote = noteNodes.find(
+    (node) => node.desc.includes(text) && node.h > 0,
+  );
+  assert(currentNote);
+  const noteSignature = noteNodes
+    .filter(
+      (node) => node.desc === marker && node.h > 0 && node.y > currentNote.y,
+    )
+    .sort((a, b) => a.y - b.y)[0];
+  assert(noteSignature);
+  ui.tapAt(noteSignature.x, noteSignature.y);
   await ui.waitFor("Signature verification", 15000);
   assert(!has("Your private replies"));
   console.log("PASS: signature opens distinct public verification");
@@ -114,8 +195,11 @@ if (real) {
   await ui.waitFor("Me and privacy", 30000);
   await sleep(3500);
   assert(!has(text));
+  if (reactionLabel) assert(!hasReaction(reactionLabel));
   capture("native-c4-android-real-outsider");
-  console.log("PASS: outsider receives no members Note");
+  console.log(
+    "PASS: outsider receives no members Note or author-only reaction",
+  );
 } else {
   await control("reset");
   const seeded = await control("threads/maya/presence", { mode: "live" });
