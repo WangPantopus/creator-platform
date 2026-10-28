@@ -93,6 +93,12 @@ export async function generationProvenancePurgeCatalogue(
   signal?: AbortSignal,
 ) {
   signal?.throwIfAborted();
+  // Match the independent review's type-name rendering, as the Conversation
+  // cursor catalogue does. Preserve the caller's search path on success; after
+  // any uncertain read its original custodian settles or destroys the client,
+  // so no helper cleanup SQL is submitted on that failure path.
+  await metadata(client, "SAVEPOINT w3_provenance_display", [], signal);
+  await metadata(client, "SET LOCAL search_path=pg_catalog", [], signal);
   const permissions = await generationConsumerCatalogue(client, purpose, {
     queryTimeout: metadataBudget(client),
     signal,
@@ -179,6 +185,13 @@ export async function generationProvenancePurgeCatalogue(
       signal,
     )
   ).rows;
+  await metadata(
+    client,
+    "ROLLBACK TO SAVEPOINT w3_provenance_display",
+    [],
+    signal,
+  );
+  await metadata(client, "RELEASE SAVEPOINT w3_provenance_display", [], signal);
   return { permissions, roles, dependencies, executables, relation };
 }
 

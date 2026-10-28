@@ -260,3 +260,31 @@ The real committed-tree evidence guard against #515 passed **16 changed files,
 intact. New session screenshots and private receipts remain outside Git.
 The unchanged native blobs retain their operated same-reaction evidence;
 combined web pagination/lifecycle verification uses separate fresh actors.
+
+## Conversation catalogue rendering repair
+
+The actual Conversation deletion refusal exposed an existing metadata-display
+defect. With the default runtime search path, `pg_get_functiondef` rendered the
+extension types as `halfvec`/`vector`; the independently reviewed catalogue used
+`public.halfvec`/`public.vector`. The exact0217 source/function and original
+privacy-family guard already matched. This was not a missing migration.
+
+The existing provenance catalogue reader now uses the Conversation cursor's
+bounded, same-client savepoint pattern: read under `pg_catalog`, then restore the
+caller's original search path on success. A failed or uncertain read escapes to
+the original connection custodian without helper cleanup queries. No SQL,
+registry entry, review pin, retention policy or authority check changed.
+
+Six metadata qualification groups passed on56710: actual prepared-owner
+construction, three caller search paths with unchanged client/outer transaction,
+a real extra column grant refused in an administrator-owned rollback transaction,
+and acceptance restored after rollback. All three legitimate paths match the
+existing incoming pin
+`d228755d492e8e4f86b9a68df280eb93a33b9cedec5a66d63f1a071b9d8e217c`.
+Backend typecheck, focused lint/format and whitespace checks passed. Private
+evidence is `/tmp/qelvora-provenance-1027-dzP1aO/metadata-qualification.json`.
+
+This is metadata-preparation acceptance, not completion of the original deletion
+job. No fresh actor6 session, retry, erasure receipt or job-clock change was
+created to claim completion. The fresh combined-web stack on56730–56733 started
+with this source repair;56710's original job remains preserved and blocked.
