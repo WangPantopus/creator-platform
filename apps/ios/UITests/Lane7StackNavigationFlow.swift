@@ -118,14 +118,18 @@ final class Lane7StackNavigationFlow: XCTestCase {
         let member = XCTAttachment(screenshot: app.screenshot()); member.name = "native-c4-real-member-note"; member.lifetime = .keepAlways; add(member)
         let marker = "Signed by " + creatorName + ". Open the verification page"
         if let reactionLabel, let reactionReply, let reactionHash {
-            let card = app.descendants(matching: .any).matching(identifier: "content-presence-reaction:" + reactionReply).firstMatch
-            XCTAssertTrue(card.waitForExistence(timeout: 10))
-            let signedReaction = card.buttons[marker]
+            // SwiftUI exposes the body and marker as siblings, both carrying
+            // the row identifier. Match the exact marker within that identity.
+            let signedReaction = app.buttons.matching(NSPredicate(format: "identifier == %@ AND label == %@", "content-presence-reaction:" + reactionReply, marker)).firstMatch
             XCTAssertTrue(signedReaction.waitForExistence(timeout: 5)); signedReaction.tap()
             XCTAssertTrue(app.staticTexts["Signature verification"].waitForExistence(timeout: 15))
             let hash = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", reactionHash)).firstMatch
-            for _ in 0..<8 { if hash.isHittable { break }; app.swipeUp() }
+            for _ in 0..<8 {
+                if hash.exists && hash.frame.minY > app.frame.minY + 80 && hash.frame.maxY < app.frame.maxY - 110 { break }
+                app.swipeUp()
+            }
             XCTAssertTrue(hash.waitForExistence(timeout: 10), "The reaction control must open its exact live server hash.")
+            XCTAssertLessThan(hash.frame.maxY, app.frame.maxY - 110, "The complete hash remains above the tab bar.")
             XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Reaction")).firstMatch.exists)
             let verified = XCTAttachment(screenshot: app.screenshot()); verified.name = "native-c4-real-reaction-verification"; verified.lifetime = .keepAlways; add(verified)
             app.terminate(); app.launch()
@@ -138,7 +142,7 @@ final class Lane7StackNavigationFlow: XCTestCase {
         let signed: XCUIElement
         if requiresReaction {
             let noteId = try XCTUnwrap(environment["QELVORA_PRESENCE_NOTE_ID"])
-            signed = app.descendants(matching: .any).matching(identifier: "content-presence-note:" + noteId).firstMatch.buttons[marker]
+            signed = app.buttons.matching(NSPredicate(format: "identifier == %@ AND label == %@", "content-presence-note:" + noteId, marker)).firstMatch
         } else { signed = app.buttons[marker] }
         XCTAssertTrue(signed.waitForExistence(timeout: 5)); signed.tap()
         XCTAssertTrue(app.staticTexts["Signature verification"].waitForExistence(timeout: 15))
@@ -150,7 +154,12 @@ final class Lane7StackNavigationFlow: XCTestCase {
         app.terminate()
         app.launchArguments = arguments + ["--harness-reset", "--harness-actor", outsiderActor, "--return-to", "/threads/" + creator + "/" + outsider]
         app.launch()
-        XCTAssertTrue(app.buttons["Me and privacy"].waitForExistence(timeout: 30))
+        if environment["QELVORA_PRESENCE_OUTSIDER_BLOCKED"] == "1" {
+            let closed = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "This scope is closed.")).firstMatch
+            XCTAssertTrue(closed.waitForExistence(timeout: 30), "The supplied blocked outsider remains denied.")
+        } else {
+            XCTAssertTrue(app.buttons["Me and privacy"].waitForExistence(timeout: 30))
+        }
         try await Task.sleep(for: .seconds(4))
         XCTAssertFalse(note.exists, "An outsider cannot receive the members Note in C4.")
         if let reactionLabel { XCTAssertFalse(app.buttons[reactionLabel].exists, "Another fan cannot receive the author's reaction.") }

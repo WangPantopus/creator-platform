@@ -104,3 +104,59 @@ The runner also supports `--presence-real` for the existing Note-only check and
 check accepts actor labels rather than requiring the previous fixed actor six.
 JavaScript syntax, focused ESLint, formatting and Swift parsing passed for this
 preparation. A fresh native build and operated reaction result remain pending.
+
+## Actual signed reaction verified — October 27, 2026
+
+Both native apps operated the same backend-accepted fixture on the isolated122
+stack at API56711 / DB56710, after the real browser proof, passkey, private-reply,
+purpose-leased Ops approval, exact-author retry and reaction workflow passed.
+Identity, external proof and membership remain the documented synthetic edges;
+no native harness reaction, approval row or signature was substituted.
+
+| Record              | Exact identifier                                                   |
+| ------------------- | ------------------------------------------------------------------ |
+| Note                | `588a98e7-3c71-4ef2-a562-48b6b8e9b6b2`                             |
+| Private reply       | `adb46a76-8ba7-4c1d-b1a5-16e9e5dc75c6`                             |
+| Reaction signed act | `10a493ff-9d4d-480a-b0a3-46331d5f7896`                             |
+| Reaction SHA-256    | `df7e088bef1e046282d5824a3d5560441e349f104df73507b299fee6030b87b0` |
+
+- iOS: final operated run passed **1/1, zero failures or skips**, 53.022 seconds.
+  A fresh Xcode26.5 x86_64 signed simulator `build-for-testing` used the existing
+  owned simulator and pinned packages; `Package.resolved` remained byte-identical.
+  The first run exposed a prepared locator error: SwiftUI exposes body and
+  signature as sibling buttons sharing the row identifier. The scenario now
+  selects the exact identifier and signature label. A subsequent passing run
+  revealed a partially obscured hash capture; the final scenario additionally
+  requires the complete hash above the bottom navigation. Product source and
+  the five-second concurrent/atomic Content reader are unchanged.
+- Android: the real-reaction journey passed **all seven reported groups**, exit0,
+  on the existing owned AVD. It reused the preserved October22 APK, SHA-256
+  `d75e70ce3ab4807c981740d25c0d6cda0ad784d39f9c6005e453a49342581082`.
+  Changes since that app build concern scenarios/documentation. A fresh Android
+  build was not claimed; the Java toolchain is currently absent.
+- Both runs checked author-first full Note accessibility, healthy refresh with
+  the actual reaction, exact public reaction hash, reaction/private-reply source,
+  separate Note verification/source navigation, and denial for the supplied
+  outsider. Member, signature and outsider captures were visually inspected.
+
+The supplied outsider is synthetic actor5, whose real block from the runtime
+probe remains in force. This run proves **blocked-outsider exclusion**, not an
+independent nonmember-only denial. Both scenarios accept the explicit
+`QELVORA_PRESENCE_OUTSIDER_BLOCKED=1` mode, require the observed “This scope is
+closed.” refusal, and assert that neither Note nor reaction appears. Default
+nonblocked mode still requires the ordinary conversation screen. Actor labels
+were resolved from live identity capabilities by the fixture's account IDs.
+No block was removed or bypassed.
+
+The accepted fixture remains unchanged. Both owned devices were shut down after
+verification without erasing their state. No backend rows, clocks, applied SQL,
+app freshness rules or dependency pins were changed by the native work.
+Physical devices, real provider acceptance and whole-account erasure remain
+separate gates.
+
+Private evidence under `/tmp/qelvora-studio-reply-1027/` includes the source fixture
+`browser-resume-verified/native-fixture-bd188efc.json`, the original failed and
+first passing iOS runs, final
+`native-ios-real-reaction-final/ios-navigation-1793160226708.xcresult`, and
+`native-android-real-reaction/run.log` with its three screenshot/tree captures.
+Screenshots and result bundles remain outside Git.

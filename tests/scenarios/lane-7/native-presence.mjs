@@ -192,13 +192,19 @@ if (real) {
     required("QELVORA_PRESENCE_OUTSIDER_ACTOR"),
     `/threads/${creator}/${required("QELVORA_PRESENCE_OUTSIDER_FAN")}`,
   );
-  await ui.waitFor("Me and privacy", 30000);
+  const outsiderBlocked = process.env.QELVORA_PRESENCE_OUTSIDER_BLOCKED === "1";
+  await ui.waitFor(
+    outsiderBlocked ? "This scope is closed." : "Me and privacy",
+    30000,
+  );
   await sleep(3500);
   assert(!has(text));
   if (reactionLabel) assert(!hasReaction(reactionLabel));
   capture("native-c4-android-real-outsider");
   console.log(
-    "PASS: outsider receives no members Note or author-only reaction",
+    outsiderBlocked
+      ? "PASS: blocked outsider scope stays closed with no Note or reaction"
+      : "PASS: outsider receives no members Note or author-only reaction",
   );
 } else {
   await control("reset");
