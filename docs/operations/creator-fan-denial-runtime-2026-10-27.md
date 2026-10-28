@@ -288,3 +288,30 @@ This is metadata-preparation acceptance, not completion of the original deletion
 job. No fresh actor6 session, retry, erasure receipt or job-clock change was
 created to claim completion. The fresh combined-web stack on56730–56733 started
 with this source repair;56710's original job remains preserved and blocked.
+
+## Combined web rerun
+
+The separate `studio-web-1027` stack runs fresh122 with Growth on
+DB56730/API56731/web56732/model56733. Its stock `tsx` host executes source; no
+backend dist bundle existed or was used. The startup receipt records
+`8d4e09000` plus the then-uncommitted provenance repair. That repair is now
+committed in`2268d8d99`; all captured backend source bytes stayed unchanged
+through these checks.
+
+The existing real `members` pagination workflow, with its existing lifecycle
+checks invoked before scoped cleanup, passed **9/9, exit0**. It published52
+actual signed Notes, checked two audience-filtered windows, older-page loading,
+empty-window cursor continuation, retraction and duplicate exclusion, plus
+offline/pagehide/failure/five-second expiry behavior. All52 Notes were then
+unpublished through the existing cleanup; their records and52 signatures remain.
+No privacy job was created. The small `--pagination-lifecycle` scenario option
+reuses those same four checks while a real Note remains authorized.
+
+The separate seven-cursor browser fixture passed **4/4, exit0**, covering five
+retained cursors/concurrent reads, head-first deduplication, atomic sibling-failure
+concealment and shared expiry with late-response refusal. This establishes UI
+mechanics only; actual reaction acceptance is the earlier preserved fixture.
+Screenshots were inspected. Live Growth catalogue remains **46/47,53 digests,
+zero unknown groups**, solely the same family-pin diagnostic; both provenance
+and incoming profiles pass. Private receipts/logs/source hashes are under
+`/tmp/qelvora-studio-reply-1027/combined-web/`.

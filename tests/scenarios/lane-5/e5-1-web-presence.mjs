@@ -16,6 +16,8 @@
 // stand-ins; followers uses the real follow API and needs qualified 0185 custody.
 // PRESENCE_PAGINATION_REUSE may name this mode's manifest of 52 task-owned
 // Notes on the same stack: each is edited and freshly signed at a new version.
+// --pagination-lifecycle also runs the existing four lifecycle checks on the
+// visible newest real Note before retraction/cleanup; no extra fixture is made.
 // --pagination-checks-only reuses all 52 still-published versions for browser
 // checks and cleanup, without another publication or passkey registration.
 import * as L from "../lane-6/e6-2-lib.mjs";
@@ -46,6 +48,11 @@ expect(
   "Use an owned local creator_stack database",
 );
 const accounts = [3, outsiderActor, memberActor].map(L.account);
+expect(
+  !process.argv.includes("--pagination-lifecycle") ||
+    process.argv.includes("--pagination"),
+  "--pagination-lifecycle requires the real --pagination workflow",
+);
 if (process.argv.includes("--deep-fixture")) {
   await deepFixtureChecks();
   await L.finish();
@@ -722,6 +729,12 @@ async function paginationChecks() {
         await reader.page.screenshot({ path: `${out}/pagination-older.png` });
       },
     );
+    if (process.argv.includes("--pagination-lifecycle")) {
+      // The newest Note is still genuinely published and visible in the head
+      // window. Recovery can therefore revalidate it before any retraction.
+      await item(newest).waitFor();
+      await lifecycleChecks(reader, `[data-presence-id="${newest.id}"]`);
+    }
     await retract(newest);
     await step(
       "C4-pagination-empty",

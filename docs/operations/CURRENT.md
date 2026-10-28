@@ -25,8 +25,10 @@ backend regression passed157/157 across nine files in158.15 seconds on an
 isolated56720 cluster; whole erasure remains unclaimed. #516 preserves its
 operated native checks at`26915e9f2`. Exact #514`47188ddba` and #516`26915e9f2`
 are now integrated into #517, preserving their web/native readers and evidence
-guard. The combined evidence check passes16 files/678,029 bytes; combined web
-workflow verification follows on fresh actors.
+guard. The combined evidence check passes16 files/678,029 bytes. Fresh122 on
+56730–56733 passed real52-Note member pagination plus lifecycle9/9 and the
+separate seven-cursor UI fixture4/4. Its Growth catalogue retains the known
+46/47 family-pin diagnostic; all52 unpublished Notes/signatures are preserved.
 The concrete Conversation provenance metadata-display mismatch is repaired and
 verified against the unchanged reviewed pin, including a true-grant drift
 refusal. This does not claim completion of the preserved blocked deletion job.
