@@ -128,3 +128,6 @@ Pending: fresh123 installation/catalogues, genuine same-client/session/fan/
 negative runtime admission, real natural expiry,
 privacy behavior and the existing52-publication followers pagination. No actual
 follower acceptance, whole erasure, physical device or production claim is made.
+The prepared runtime script passes syntax/lint/format only. Durable same-stack
+resume and private original expiry-token checkpoints are still unfinished and
+must precede its first operation; its current preflight refuses existing state.

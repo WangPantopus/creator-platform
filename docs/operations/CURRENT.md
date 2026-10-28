@@ -1,13 +1,15 @@
 # Current state
 
-The founder requested a commit/push/handoff on October27. Additive0255 now has
+The founder requested a commit/push/handoff on October27. Start with the
+[latest handoff](session-handoff-2026-10-27.md). Additive0255 now has
 four measured fresh/restored profiles, two30-check restored source probes with
 25 drift refusals each, and a successful closed122→123 upgrade on56780 with
 49/49 catalogue groups and56 digests. See the
 [follower qualification report](core-follow-qualification-2026-10-27.md).
 Fresh123 on56760 has **not** been created; genuine follower runtime/privacy,
 natural expiry and real followers pagination remain unrun. The prepared scenario
-is not acceptance. Existing122 results below remain distinct;157 tests were not
+is not acceptance; its durable same-stack resume remains unfinished. Existing122
+results below remain distinct;157 tests were not
 rerun after0255. The upgraded target stays traffic-closed/releaseReady:false.
 
 Continuation resumed October 27, 2026 in the same worktree and draft #517.
