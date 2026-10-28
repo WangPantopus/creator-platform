@@ -21,8 +21,12 @@ is preserved. The current-account export completed all eight domains, and all
 four streamed artifacts matched their original byte counts and hashes. The
 subsequent deletion remains blocked by existing owner/retention gates. Its job
 and clocks are preserved;56710 actor6 must not be reused/reset. The separate
-157-test regression is running on an isolated56720 cluster; whole erasure
-remains unclaimed. #516 now preserves its operated native checks at`26915e9f2`.
+backend regression passed157/157 across nine files in158.15 seconds on an
+isolated56720 cluster; whole erasure remains unclaimed. #516 preserves its
+operated native checks at`26915e9f2`. Exact #514`47188ddba` and #516`26915e9f2`
+are now integrated into #517, preserving their web/native readers and evidence
+guard. The combined evidence check passes16 files/678,029 bytes; combined web
+workflow verification follows on fresh actors.
 The following October25 checkpoint remains historical.
 
 Updated October 25, 2026 for the founder-requested handoff. Start with the

@@ -238,3 +238,25 @@ not evidence that the accepted signed reaction failed.
 The157-test backend rerun uses a separate owned PostgreSQL cluster on56720,
 `qelvora-regress122-1027-postgres`, so its disposable regression databases and
 test-role setup cannot mutate any application or restored cluster.
+
+That rerun passed **157/157 in nine files,158.15 seconds**, with no skipped
+files/tests. It included the existing10,000-pair PostgreSQL scope check, money,
+shadow, historical pipeline and worker-lifetime coverage. No unit tests were
+added. Private output is `backend-157.log`; the tested backend subtree is exactly
+the accepted122 source before the subsequent catalogue-display repair.
+
+## Reused app branches
+
+After the operated122 results, exact #514`47188ddba` and #516`26915e9f2` were
+merged into this existing #517 branch. The sole textual conflict was historical
+CURRENT prose; current acceptance results and #514's historical details were
+both retained. No backend, SQL, registry, API-contract or dependency bytes changed
+in those merges. Exact Git-object comparisons confirm #514's final web reader,
+evidence checker and CI job, plus #516's full iOS/Android/lane7 trees, are retained.
+No PR was merged to main and no existing branch history was rewritten.
+
+The real committed-tree evidence guard against #515 passed **16 changed files,
+678,029/1,000,000 bytes**, with the300,000-byte per-file cap and duplicate checks
+intact. New session screenshots and private receipts remain outside Git.
+The unchanged native blobs retain their operated same-reaction evidence;
+combined web pagination/lifecycle verification uses separate fresh actors.
