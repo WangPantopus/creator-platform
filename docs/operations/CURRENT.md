@@ -1,5 +1,19 @@
 # Current state
 
+Continuation resumed October 27, 2026 in the same worktree and draft #517.
+The [runtime continuation report](creator-fan-denial-runtime-2026-10-27.md)
+records current remote heads, owned resources and operated results. All 65
+previously audited remote heads are unchanged; GitHub now lists those PRs plus
+#517. Original fresh122 remains healthy on56700–56703. All15 runtime groups
+pass there, including compiled descriptor drift and genuine session/block/
+restoration checks. Its seeded Ops memberships have expired; their original
+clocks were preserved. A separate fresh122 acceptance stack now runs on
+56710–56713 with current normal synthetic seed. Its runtime probe also passes
+15/15. Both live Growth checks are **46/47**, solely the existing family-pin
+diagnostic; accepted incoming profiles match. The full signed browser workflow
+is running on56711/56712; actual reaction/native acceptance is not yet claimed.
+The following October25 checkpoint remains historical.
+
 Updated October 25, 2026 for the founder-requested handoff. Start with the
 [latest handoff](session-handoff-2026-10-25.md),
 [65-PR reuse audit](open-pr-reuse-audit-2026-10-25.md) and

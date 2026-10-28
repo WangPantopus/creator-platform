@@ -35,6 +35,33 @@ const adminLocation = new URL(DB),
 assert.equal(adminLocation.host, runtimeLocation.host);
 assert.equal(adminLocation.pathname, runtimeLocation.pathname);
 assert.equal(runtimeLocation.username, "creator_runtime");
+function isolatedRoleUrl(name, role) {
+  const value = process.env[name];
+  assert(value, `${name} must supply the existing isolated role credentials.`);
+  let location;
+  try {
+    location = new URL(value);
+  } catch {
+    throw new Error(`${name} must be a valid PostgreSQL URL.`);
+  }
+  assert(["postgres:", "postgresql:"].includes(location.protocol));
+  assert(["localhost", "127.0.0.1", "[::1]"].includes(location.hostname));
+  assert.equal(location.host, adminLocation.host);
+  assert.equal(location.pathname, adminLocation.pathname);
+  assert.equal(location.username, role);
+  assert.equal(location.search, "", "Database URL overrides are not allowed.");
+  assert.equal(location.hash, "");
+  assert(location.password, `${name} must supply the existing role password.`);
+  return location.href;
+}
+const trustDb = isolatedRoleUrl(
+  "TRUST_API_DATABASE_URL",
+  "creator_trust_runtime",
+);
+const workerDb = isolatedRoleUrl(
+  "TRUST_WORKER_DATABASE_URL",
+  "creator_trust_worker",
+);
 const out = resolve(flag("--out", ""));
 assert(out !== root && !out.startsWith(root + sep));
 assert(process.argv.includes("--allow-owned-block-and-restoration"));
@@ -59,7 +86,9 @@ const save = () =>
     JSON.stringify(evidence, null, 2),
     { mode: 0o600 },
   );
+let currentStep = "initial authority and sessions";
 async function step(name, fn) {
+  currentStep = name;
   const detail = await fn();
   evidence.steps.push({ name, detail });
   await save();
@@ -136,17 +165,13 @@ const configuration = {
 };
 const admin = new Client({ ...configuration, connectionString: DB });
 const core = new Pool({ ...configuration, connectionString: runtimeDb });
-const trustUrl = new URL(runtimeDb),
-  workerUrl = new URL(runtimeDb);
-trustUrl.username = "creator_trust_runtime";
-workerUrl.username = "creator_trust_worker";
 const trustPool = new Pool({
   ...configuration,
-  connectionString: trustUrl.href,
+  connectionString: trustDb,
 });
 const workerPool = new Pool({
   ...configuration,
-  connectionString: workerUrl.href,
+  connectionString: workerDb,
 });
 const restriction = trustCreatorFanRestrictionInTransaction();
 let host;
@@ -241,51 +266,114 @@ try {
       expected: "scope_denial_unavailable",
     }),
   }));
+  const registryPath = join(root, "infra/migrations.json");
+  const registryBytes = await readFile(registryPath);
+  const registry = JSON.parse(registryBytes.toString("utf8"));
+  const executable = Object.create(null);
+  for (const entry of registry.migrations) {
+    const checksum = createHash("sha256")
+      .update(await readFile(join(root, entry.path)))
+      .digest("hex");
+    if (entry.sourceSha256) assert.equal(checksum, entry.sourceSha256);
+    executable[entry.version] = {
+      path: entry.path,
+      owner: entry.owner,
+      checksum,
+    };
+  }
+  assert.equal(Object.keys(executable).length, 122);
+  const version = "0254_w8_creator_fan_denial";
+  const registered = executable[version];
+  assert.deepEqual(registered, {
+    path: "apps/backend/migrations/0089_w8_creator_fan_denial.sql",
+    owner: "W8",
+    checksum:
+      "0a738e0a29c77e65274931d4054b5db26a340b8c10a498e8c016457ab1a22860",
+  });
+  async function compiledCallback(variant, sources, expected) {
+    const outfile = join(out, `${variant}-callback-${run}.mjs`);
+    await build({
+      stdin: {
+        contents: `import {requestAuthority} from './apps/backend/src/modules/identity/request-authority.ts'; import {trustCreatorFanRestrictionInTransaction} from './apps/backend/src/modules/trust/scope-restriction.ts'; const restrict=trustCreatorFanRestrictionInTransaction(); export const check=(client,actor,pair,sessionId)=>requestAuthority.run({accountId:actor.accountId,sessionId},()=>restrict(client,actor,pair));`,
+        resolveDir: root,
+        sourcefile: `${variant}-callback.ts`,
+        loader: "ts",
+      },
+      outfile,
+      bundle: true,
+      platform: "node",
+      target: "node22",
+      format: "esm",
+      define: {
+        __QELVORA_REGISTERED_MIGRATION_SOURCES__: JSON.stringify(sources),
+      },
+      logLevel: "silent",
+    });
+    const candidate = await import(pathToFileURL(outfile).href);
+    return invoke(
+      owner,
+      pair,
+      (client, actor, tuple) =>
+        candidate.check(client, actor, tuple, owner.sessionId),
+      { expected },
+    );
+  }
+  // The same compiled callback must work with the exact122 registration. Each
+  // refusal then changes only its embedded descriptor, never SQL, registry files
+  // or the installed ledger. Separate bundles prevent module-cache reuse.
+  await step(
+    "exact compiled executable registration admits current owner",
+    () => compiledCallback("registered", executable, "allowed"),
+  );
   await step(
     "installed function and matching ledger do not activate an unregistered callback",
     async () => {
-      const registry = JSON.parse(
-        await readFile(join(root, "infra/migrations.json"), "utf8"),
+      const omitted = { ...executable };
+      delete omitted[version];
+      assert.equal(Object.keys(omitted).length, 121);
+      return compiledCallback(
+        "unregistered",
+        omitted,
+        "scope_denial_unconfigured",
       );
-      const executable = Object.create(null);
-      for (const entry of registry.migrations) {
-        if (entry.version === "0254_w8_creator_fan_denial") continue;
-        const checksum = createHash("sha256")
-          .update(await readFile(join(root, entry.path)))
-          .digest("hex");
-        executable[entry.version] = {
-          path: entry.path,
-          owner: entry.owner,
-          checksum,
-        };
-      }
-      assert.equal(Object.keys(executable).length, 121);
-      const outfile = join(out, `unregistered-callback-${run}.mjs`);
-      await build({
-        stdin: {
-          contents: `import {requestAuthority} from './apps/backend/src/modules/identity/request-authority.ts'; import {trustCreatorFanRestrictionInTransaction} from './apps/backend/src/modules/trust/scope-restriction.ts'; const restrict=trustCreatorFanRestrictionInTransaction(); export const check=(client,actor,pair,sessionId)=>requestAuthority.run({accountId:actor.accountId,sessionId},()=>restrict(client,actor,pair));`,
-          resolveDir: root,
-          sourcefile: "unregistered-callback.ts",
-          loader: "ts",
-        },
-        outfile,
-        bundle: true,
-        platform: "node",
-        target: "node22",
-        format: "esm",
-        define: {
-          __QELVORA_REGISTERED_MIGRATION_SOURCES__: JSON.stringify(executable),
-        },
-        logLevel: "silent",
-      });
-      const candidate = await import(pathToFileURL(outfile).href);
-      return invoke(
-        owner,
-        pair,
-        (client, actor, tuple) =>
-          candidate.check(client, actor, tuple, owner.sessionId),
-        { expected: "scope_denial_unconfigured" },
+    },
+  );
+  for (const [field, drift] of [
+    ["checksum", "0".repeat(64)],
+    [
+      "path",
+      "apps/backend/migrations/0082_w8_interactive_denial_try_fence.sql",
+    ],
+    ["owner", "W1"],
+  ]) {
+    assert.notEqual(registered[field], drift);
+    await step(`compiled executable ${field} drift refuses`, () =>
+      compiledCallback(
+        `wrong-${field}`,
+        { ...executable, [version]: { ...registered, [field]: drift } },
+        "scope_denial_unconfigured",
+      ),
+    );
+  }
+  await step(
+    "compiled drift leaves source and installed authority intact",
+    async () => {
+      assert.deepEqual(await readFile(registryPath), registryBytes);
+      assert.equal(
+        createHash("sha256")
+          .update(await readFile(join(root, registered.path)))
+          .digest("hex"),
+        registered.checksum,
       );
+      assert.deepEqual(
+        (
+          await admin.query(
+            "SELECT version,checksum FROM creator.schema_migration ORDER BY version",
+          )
+        ).rows,
+        installed,
+      );
+      return compiledCallback("restored-registration", executable, "allowed");
     },
   );
   await step(
@@ -335,6 +423,7 @@ try {
     TRUST_LOCAL_DEVELOPMENT: "true",
   });
   const restored = trustLocalRestorationInTransaction(env);
+  currentStep = "configure Trust runtime with existing isolated roles";
   host = await createTrustRuntime({
     environment: "local-development",
     identityMode: "development",
@@ -414,22 +503,125 @@ try {
       return { closed, reopened };
     },
   );
+  const blockedPair = { creatorId, fanId: blocker.fanId };
+  const blockInput = {
+    creatorId,
+    reason:
+      "Synthetic creator/fan denial qualification on this owned local stack.",
+    idempotencyKey: `denial-runtime-${creatorId}-${blocker.actor.accountId}`,
+  };
+  let priorBlock;
+  await step(
+    "genuine blocker conversation and current provider consent",
+    async () => {
+      const existing = (
+        await admin.query(
+          "SELECT case_id FROM creator_trust.block WHERE account_id=$1 AND creator_id=$2 AND revoked_at IS NULL",
+          [blocker.actor.accountId, creatorId],
+        )
+      ).rows[0];
+      const command = (
+        await admin.query(
+          "SELECT response FROM creator_trust.command WHERE account_id=$1 AND operation='block' AND key=$2",
+          [blocker.actor.accountId, blockInput.idempotencyKey],
+        )
+      ).rows[0];
+      if (existing || command) {
+        // A successful prior run closes its own evidence path. Only replay this
+        // scenario's exact persisted command; never reopen or replace an old block.
+        assert(
+          existing && command,
+          "Existing block does not match this scenario's receipt.",
+        );
+        assert.equal(command.response.blocked, true);
+        assert.equal(command.response.caseId, existing.case_id);
+        priorBlock = command.response;
+        return {
+          mode: "preserved successful block; no thread or consent rewrite",
+          caseId: existing.case_id,
+        };
+      }
+      const current = ok(
+        await api("GET", "/v1/identity/session", blocker.token),
+      );
+      assert.equal(current.accountId, blocker.actor.accountId);
+      const caps = ok(
+        await api("GET", "/v1/conversations/capabilities", blocker.token),
+      );
+      assert.equal(typeof caps.providers?.version, "string");
+      assert(caps.providers.version.length > 0);
+      assert.equal(caps.generationAvailable, true);
+      const beforeGrants = (
+        await admin.query(
+          "SELECT id FROM creator.access_grant WHERE creator_id=$1 AND fan_id=$2 ORDER BY id",
+          [creatorId, blocker.fanId],
+        )
+      ).rows.map((row) => row.id);
+      const begun = ok(
+        await api("POST", "/v1/conversations/begin", blocker.token, {
+          creatorId,
+          policyVersion: caps.providers.version,
+          accessNoticeAccepted: true,
+          idempotencyKey: `denial-begin-${run}`,
+        }),
+      );
+      assert.equal(begun.creatorId, creatorId);
+      assert.equal(begun.fanId, blocker.fanId);
+      assert.equal(begun.canSend, true);
+      assert.equal(begun.consentCurrent, true);
+      const thread = (
+        await admin.query(
+          "SELECT t.creator_id,t.fan_id,t.processor_consent_version,f.account_id FROM creator.thread t JOIN creator.fan_profile f ON f.id=t.fan_id WHERE t.id=$1 AND t.deleted_at IS NULL",
+          [begun.threadId],
+        )
+      ).rows[0];
+      assert.deepEqual(thread, {
+        creator_id: creatorId,
+        fan_id: blocker.fanId,
+        processor_consent_version: caps.providers.version,
+        account_id: blocker.actor.accountId,
+      });
+      const afterGrants = (
+        await admin.query(
+          "SELECT id,source FROM creator.access_grant WHERE creator_id=$1 AND fan_id=$2 ORDER BY id",
+          [creatorId, blocker.fanId],
+        )
+      ).rows;
+      for (const id of beforeGrants)
+        assert(afterGrants.some((grant) => grant.id === id));
+      const created = afterGrants.filter(
+        (grant) => !beforeGrants.includes(grant.id),
+      );
+      assert(created.every((grant) => grant.source === "trial"));
+      return {
+        mode: "actual begin API with current policy and synthetic fan consent",
+        threadId: begun.threadId,
+        policyVersion: caps.providers.version,
+        createdTrialGrantIds: created.map((grant) => grant.id),
+      };
+    },
+  );
   await step(
     "actual separate fan block denies creator and fan without changing the unblocked pair",
     async () => {
-      const blockedPair = { creatorId, fanId: blocker.fanId };
-      await invoke(owner, blockedPair, restriction, { expected: "allowed" });
+      await invoke(owner, blockedPair, restriction, {
+        expected: priorBlock ? "scope_revoked" : "allowed",
+      });
       const block = ok(
-        await api("POST", "/v1/trust/blocks", blocker.token, {
-          creatorId,
-          reason:
-            "Synthetic creator/fan denial qualification on this owned local stack.",
-          idempotencyKey: randomUUID(),
-        }),
+        await api("POST", "/v1/trust/blocks", blocker.token, blockInput),
       );
       assert.equal(block.blocked, true);
+      if (priorBlock) assert.deepEqual(block, priorBlock);
+      const replay = ok(
+        await api("POST", "/v1/trust/blocks", blocker.token, blockInput),
+      );
+      assert.deepEqual(replay, block);
       return {
+        mode: priorBlock
+          ? "existing exact API command replay"
+          : "new actual API block",
         caseId: block.caseId,
+        replay: "identical persisted result",
         owner: await invoke(owner, blockedPair, restriction, {
           expected: "scope_revoked",
         }),
@@ -442,13 +634,27 @@ try {
       };
     },
   );
+  evidence.completed = true;
+} catch (error) {
+  // Codes only: diagnostics must not serialize connection URLs, session tokens,
+  // private source bodies or database error messages into the evidence receipt.
+  const code = String(error?.code ?? error?.name ?? "unknown");
+  evidence.failure = {
+    step: currentStep,
+    code: /^[a-zA-Z0-9_]{1,64}$/u.test(code) ? code : "unknown",
+    observedAt: new Date().toISOString(),
+  };
+  throw error;
 } finally {
-  await host?.stop();
-  await Promise.allSettled([
-    core.end(),
-    trustPool.end(),
-    workerPool.end(),
-    admin.end(),
-  ]);
-  await save();
+  try {
+    await host?.stop();
+  } finally {
+    await Promise.allSettled([
+      core.end(),
+      trustPool.end(),
+      workerPool.end(),
+      admin.end(),
+    ]);
+    await save();
+  }
 }
