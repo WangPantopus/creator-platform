@@ -10,8 +10,12 @@ restoration checks. Its seeded Ops memberships have expired; their original
 clocks were preserved. A separate fresh122 acceptance stack now runs on
 56710–56713 with current normal synthetic seed. Its runtime probe also passes
 15/15. Both live Growth checks are **46/47**, solely the existing family-pin
-diagnostic; accepted incoming profiles match. The full signed browser workflow
-is running on56711/56712; actual reaction/native acceptance is not yet claimed.
+diagnostic; accepted incoming profiles match. Actual proof/passkey/Note/private
+reply/Ops/exact-author retry/creator feed/reaction signing succeeded on56711/56712.
+After correcting scenario selectors, same-fixture continuation passed7/7 with
+exact command replay, independent public signature hash, web thread navigation
+and unchanged source/signature/command rows. Native checks now use that actual
+accepted fixture; lifecycle/privacy and157 regressions remain pending.
 The following October25 checkpoint remains historical.
 
 Updated October 25, 2026 for the founder-requested handoff. Start with the

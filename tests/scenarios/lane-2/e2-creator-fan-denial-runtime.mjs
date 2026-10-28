@@ -634,7 +634,6 @@ try {
       };
     },
   );
-  evidence.completed = true;
 } catch (error) {
   // Codes only: diagnostics must not serialize connection URLs, session tokens,
   // private source bodies or database error messages into the evidence receipt.
@@ -658,3 +657,6 @@ try {
     await save();
   }
 }
+// Only a successful probe and host cleanup can produce a completed receipt.
+evidence.completed = true;
+await save();

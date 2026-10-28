@@ -103,3 +103,72 @@ including the new actual block/replay and unaffected actor six. Receipts are
 `acceptance-runtime/runtime-*.json`. Substitute56711/56710 and
 `lanestudio122-1027/backend.env` in the runtime command above for this stack.
 The new stack's block is separate from original56700's block.
+
+## Signed browser workflow and preserved-fixture acceptance
+
+On56711/56712, the real browser workflow completed synthetic external-proof
+submission and purpose-leased Ops verification, virtual-device passkey
+registration, signed Note publication, private reply, private evidence lease,
+confirmed Ops approval, wrong-author/stale-version refusals and exact-author
+retry. Creator feed delivery returned200. The creator then signed a reaction:
+the actual reaction POST returned200 and its matching signed row persisted.
+
+The next UI assertion timed out because it used exact plain text for a reaction
+link whose accessible label includes verification navigation and whose child
+seal contributes visible text. This is not a complete browser acceptance result.
+The accepted tuple remains preserved for continuation, replay and native checks:
+
+| Object | Actual56710 identifier |
+| --- | --- |
+| Note | `588a98e7-3c71-4ef2-a562-48b6b8e9b6b2` |
+| Note signed act | `738af0c3-451f-4460-a183-faa8e47799ec` |
+| Private reply | `adb46a76-8ba7-4c1d-b1a5-16e9e5dc75c6` |
+| Reaction signed act | `10a493ff-9d4d-480a-b0a3-46331d5f7896` |
+
+The original accepted command and result are private in
+`acceptance-browser/reply-review-5d3f44b0.json`; no credentials are committed.
+Continuation must reuse this tuple, not publish/sign a replacement to hide the
+failed assertion. Native and lifecycle qualification remain pending.
+
+The continuation corrected both Content and thread assertions to use the actual
+accessible link label (`Open the verification page`). An initial continuation
+used an incorrect abbreviated suffix and timed out; it did not replace or
+re-sign the accepted fixture. The final continuation passed **7/7 groups, exit0**:
+
+- Bound the original browser origin, stack configuration, session owner,
+  approved reply tuple, signed acts and persisted idempotency receipt to56710.
+- Fresh genuine creator and reply-author browser sessions read the accepted
+  Content reaction and creator feed.
+- The exact original command replayed from a fresh current creator API session
+  returned200 and the identical result. There remained exactly one reaction and
+  one reaction signature. This is a fresh-session replay, not a replay in the
+  now-closed original browser session.
+- An independently serialized reaction command hashed to
+  `df7e088bef1e046282d5824a3d5560441e349f104df73507b299fee6030b87b0`, matching
+  stored and public signed-act hashes. Public verification returned valid and
+  disclosed no private reply body.
+- The actual author opened a conversation through the normal API with current
+  synthetic provider consent; its existing membership needed no new trial grant.
+  The web thread rendered the real Note/reaction and navigated to the exact
+  public signature. Screenshots were inspected.
+- Complete compared Note/publication/reply/review/reaction/signature/command
+  rows remained byte-equivalent as JSON, including their original timestamps.
+
+Private final evidence is `browser-resume-verified/reply-review-bd188efc.json`
+and `native-fixture-bd188efc.json`. That native fixture contains the original IDs
+above and its source-evidence checksum. It is not a synthetic reaction fixture.
+The existing scenario supports `--resume` for accepted evidence; new receipts
+include explicit API/web/database/system-identifier binding. Legacy receipts
+additionally require the original private stack environment file:
+
+```sh
+node tests/scenarios/lane-6/e6-reply-review.mjs \
+  --api http://127.0.0.1:56711 --web http://localhost:56712 \
+  --db postgresql://postgres:foundation-test-only@127.0.0.1:56710/creator_stack \
+  --out /tmp/qelvora-studio-reply-1027/browser-resume-verified \
+  --resume /tmp/qelvora-studio-reply-1027/acceptance-browser/reply-review-5d3f44b0.json \
+  --resume-stack-env "$TMPDIR/qelvora-stack/lanestudio122-1027/backend.env"
+```
+
+Native verification is now running from unchanged #516 after a successful signed
+x86_64 simulator build. Lifecycle/privacy and157 backend tests remain pending.
