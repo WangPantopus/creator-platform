@@ -1,3 +1,4 @@
+import coreFollowReview from "../../../infra/migrations/reviews/20261027-core-follow.json" with { type: "json" };
 import { readFile, stat } from "node:fs/promises";
 import { resolve, sep } from "node:path";
 import pg from "pg";
@@ -82,15 +83,18 @@ async function activate() {
       "20261022-workspace-lock",
       "20261023-reply-review",
       "20261023-studio-reply-authority",
+      "20261027-core-follow",
     ].includes(process.env.W8_MIGRATION_WAVE ?? ""),
-    "Select a reviewed W8_MIGRATION_WAVE (20261002, 20261002-privacy, 20261007-generation, 20261007-content 20261007-generation-output 20261007-public-ai 20261007-generation-recovery 20261007-partial-generation-recovery 20261008-comparison 20261015-notices 20261015-sign-in-and-money 20261022-workspace-lock 20261023-reply-review or 20261023-studio-reply-authority).",
+    "Select a reviewed W8_MIGRATION_WAVE (20261002, 20261002-privacy, 20261007-generation, 20261007-content 20261007-generation-output 20261007-public-ai 20261007-generation-recovery 20261007-partial-generation-recovery 20261008-comparison 20261015-notices 20261015-sign-in-and-money 20261022-workspace-lock 20261023-reply-review 20261023-studio-reply-authority or 20261027-core-follow).",
   );
   const connection = process.env.DATABASE_MIGRATION_URL;
   check(
     connection,
     "Provide a separate DATABASE_MIGRATION_URL; never a runtime credential.",
   );
+  const follow = process.env.W8_MIGRATION_WAVE === "20261027-core-follow";
   const studio =
+    follow ||
     process.env.W8_MIGRATION_WAVE === "20261023-studio-reply-authority";
   const reply =
     studio || process.env.W8_MIGRATION_WAVE === "20261023-reply-review";
@@ -137,6 +141,7 @@ async function activate() {
     "20261022-workspace-lock",
     "20261023-reply-review",
     "20261023-studio-reply-authority",
+    "20261027-core-follow",
   ];
   const packets = await Promise.all(
     ids.map(
@@ -164,7 +169,9 @@ async function activate() {
     workspaceLockPacket,
     replyReviewPacket,
     studioReplyAuthorityPacket,
+    coreFollowPacket,
   ] = packets as [
+    Packet,
     Packet,
     Packet,
     Packet,
@@ -186,11 +193,12 @@ async function activate() {
         entry.schemaVersion === 1 &&
         entry.id === ids[index] &&
         entry.baseline.length ===
-          [40, 57, 61, 100, 101, 102, 104, 105, 106, 114, 116, 119, 120, 121][
-            index
-          ] &&
+          [
+            40, 57, 61, 100, 101, 102, 104, 105, 106, 114, 116, 119, 120, 121,
+            122,
+          ][index] &&
         entry.wave.length ===
-          [17, 4, 39, 1, 1, 2, 1, 1, 8, 2, 3, 1, 1, 1][index],
+          [17, 4, 39, 1, 1, 2, 1, 1, 8, 2, 3, 1, 1, 1, 1][index],
     ) &&
       canonical(prior.baseline) ===
         canonical([...initial.baseline, ...initial.wave]) &&
@@ -410,8 +418,28 @@ async function activate() {
         await readFile(
           new URL(studioReplyAuthorityReview.baselineWave.path, repositoryRoot),
         ),
-      ) === studioReplyAuthorityReview.baselineWave.sha256,
-    "The exact reviewed 40/57/61/100/101/102/104/105/106/114/116/119/120/121/122-source migration chain is required.",
+      ) === studioReplyAuthorityReview.baselineWave.sha256 &&
+      canonical(coreFollowPacket.baseline) ===
+        canonical([
+          ...studioReplyAuthorityPacket.baseline,
+          ...studioReplyAuthorityPacket.wave,
+        ]) &&
+      canonical(coreFollowPacket.wave) ===
+        canonical(
+          coreFollowReview.sources.map(({ version, path, checksum }) => ({
+            version,
+            path,
+            checksum,
+          })),
+        ) &&
+      canonical(coreFollowPacket.outOfOrderException) ===
+        canonical(studioReplyAuthorityPacket.outOfOrderException) &&
+      sha256(
+        await readFile(
+          new URL(coreFollowReview.baselineWave.path, repositoryRoot),
+        ),
+      ) === coreFollowReview.baselineWave.sha256,
+    "The exact reviewed 40/57/61/100/101/102/104/105/106/114/116/119/120/121/122/123-source migration chain is required.",
   );
   check(
     await generationPrivacySourcesRegistered(),
@@ -435,7 +463,7 @@ async function activate() {
   );
   check(
     await registeredComparisonProfile(),
-    "The complete comparison, notices, sign-in and money, workspace-lock, reply-review and creator/fan denial source registrations are required.",
+    "The complete comparison, notices, sign-in and money, workspace-lock, reply-review, creator/fan denial and core Follow source registrations are required.",
   );
   const packet = packets.find(
     (entry) => entry.id === process.env.W8_MIGRATION_WAVE,
@@ -445,8 +473,8 @@ async function activate() {
   ) as { migrations: { version: string; path: string }[] };
   const sources = [...packet.baseline, ...packet.wave];
   const registeredSources = [
-    ...studioReplyAuthorityPacket.baseline,
-    ...studioReplyAuthorityPacket.wave,
+    ...coreFollowPacket.baseline,
+    ...coreFollowPacket.wave,
   ];
   check(
     new Set(registeredSources.map((s) => s.version.slice(0, 4))).size ===
@@ -736,32 +764,54 @@ async function activate() {
         installedReplyReview === replyReviewPacket.wave.length,
       "Creator/fan denial cannot precede reply review.",
     );
+    const installedCoreFollow = before.filter((row) =>
+      coreFollowPacket.wave.some((source) => source.version === row.version),
+    ).length;
+    check(
+      installedCoreFollow === 0 ||
+        installedCoreFollow === coreFollowPacket.wave.length,
+      "Partial core Follow wave is not an accepted baseline.",
+    );
+    check(
+      !follow ||
+        installedStudioReplyAuthority ===
+          studioReplyAuthorityPacket.wave.length,
+      "Core Follow activation requires the complete reviewed122 predecessor.",
+    );
+    check(
+      !installedCoreFollow ||
+        installedStudioReplyAuthority ===
+          studioReplyAuthorityPacket.wave.length,
+      "Core Follow cannot precede creator/fan denial.",
+    );
     if (generationInstalled)
       await assertGenerationWaveRoleSafety(
         client,
-        installedStudioReplyAuthority
-          ? "studio-reply-authority"
-          : installedReplyReview
-            ? "reply-review"
-            : installedWorkspaceLock
-              ? "workspace-lock"
-              : installedSignInAndMoney
-                ? "sign-in-and-money"
-                : installedNotices
-                  ? "notices"
-                  : installedComparison
-                    ? "comparison"
-                    : installedPartialRecovery
-                      ? "partial-generation-recovery"
-                      : installedRecovery
-                        ? "generation-recovery"
-                        : installedPublic
-                          ? "public-ai"
-                          : outputInstalled
-                            ? "generation-output"
-                            : contentInstalled
-                              ? "content-privacy"
-                              : undefined,
+        installedCoreFollow
+          ? "core-follow"
+          : installedStudioReplyAuthority
+            ? "studio-reply-authority"
+            : installedReplyReview
+              ? "reply-review"
+              : installedWorkspaceLock
+                ? "workspace-lock"
+                : installedSignInAndMoney
+                  ? "sign-in-and-money"
+                  : installedNotices
+                    ? "notices"
+                    : installedComparison
+                      ? "comparison"
+                      : installedPartialRecovery
+                        ? "partial-generation-recovery"
+                        : installedRecovery
+                          ? "generation-recovery"
+                          : installedPublic
+                            ? "public-ai"
+                            : outputInstalled
+                              ? "generation-output"
+                              : contentInstalled
+                                ? "content-privacy"
+                                : undefined,
       );
     else
       await assertWaveRoleSafety(client, {
@@ -793,6 +843,9 @@ async function activate() {
         ),
         comparisonBeforeNotices: Boolean(
           installedComparison && !installedNotices,
+        ),
+        studioReplyAuthorityBeforeCoreFollow: Boolean(
+          installedStudioReplyAuthority && !installedCoreFollow,
         ),
         replyReviewBeforeStudioReplyAuthority: Boolean(
           installedReplyReview && !installedStudioReplyAuthority,
@@ -897,29 +950,31 @@ async function activate() {
     const roleSafety = generation
       ? await assertGenerationWaveRoleSafety(
           client,
-          studio
-            ? "studio-reply-authority"
-            : reply
-              ? "reply-review"
-              : workspaceLock
-                ? "workspace-lock"
-                : signInAndMoney
-                  ? "sign-in-and-money"
-                  : notices
-                    ? "notices"
-                    : comparison
-                      ? "comparison"
-                      : partialRecovery
-                        ? "partial-generation-recovery"
-                        : recovery
-                          ? "generation-recovery"
-                          : publicAI
-                            ? "public-ai"
-                            : output
-                              ? "generation-output"
-                              : content
-                                ? "content-privacy"
-                                : undefined,
+          follow
+            ? "core-follow"
+            : studio
+              ? "studio-reply-authority"
+              : reply
+                ? "reply-review"
+                : workspaceLock
+                  ? "workspace-lock"
+                  : signInAndMoney
+                    ? "sign-in-and-money"
+                    : notices
+                      ? "notices"
+                      : comparison
+                        ? "comparison"
+                        : partialRecovery
+                          ? "partial-generation-recovery"
+                          : recovery
+                            ? "generation-recovery"
+                            : publicAI
+                              ? "public-ai"
+                              : output
+                                ? "generation-output"
+                                : content
+                                  ? "content-privacy"
+                                  : undefined,
         )
       : await assertWaveRoleSafety(client, {
           trust: true,
@@ -941,6 +996,7 @@ async function activate() {
           signInAndMoneyBeforeWorkspaceLock: signInAndMoney && !workspaceLock,
           workspaceLockBeforeReplyReview: workspaceLock && !reply,
           replyReviewBeforeStudioReplyAuthority: reply && !studio,
+          studioReplyAuthorityBeforeCoreFollow: studio && !follow,
         })
       : undefined;
     check(
@@ -949,9 +1005,24 @@ async function activate() {
       "Original business rows changed; rolling back the wave.",
     );
     check(
-      !studio || afterRoles.length === beforeRoles.length,
+      !studio || follow || afterRoles.length === beforeRoles.length,
       "Creator/fan denial must not add a role.",
     );
+    if (follow) {
+      const added = afterRoles.filter(
+        (row) => !beforeRoles.some((old) => old.role === row.role),
+      );
+      check(
+        added.length ===
+          (pending.some(
+            (source) => source.version === "0255_w7_core_follow_metadata",
+          )
+            ? 1
+            : 0) &&
+          added.every((row) => row.role === "creator_growth_follow_metadata"),
+        "Core Follow may add only its isolated metadata role.",
+      );
+    }
     check(
       beforeRoles.every((old) =>
         afterRoles.some((row) => canonical(row) === canonical(old)),

@@ -170,7 +170,12 @@ export async function recognizedAdoptionVersions(
  * PG17 reference captures use this same query and fixed search path. */
 export async function schemaCustody(client: PoolClient) {
   await client.query("SET LOCAL search_path=pg_catalog");
-  const schemas = ["creator", "creator_trust", "growth"];
+  const schemas = [
+    "creator",
+    "creator_trust",
+    "growth",
+    "creator_growth_metadata",
+  ];
   const result: Record<string, unknown> = {};
   result.schemas = (
     await client.query(

@@ -1,3 +1,4 @@
+import studioReplyAuthorityReview from "../../../../../infra/migrations/reviews/20261023-studio-reply-authority.json" with { type: "json" };
 import type { PoolClient, QueryConfig, QueryResultRow } from "pg";
 import generationPrivacyReview from "../../../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
 import contentPrivacyReview from "../../../../../infra/migrations/reviews/20261007-content-privacy.json" with { type: "json" };
@@ -443,6 +444,21 @@ export async function assertOriginalPrivacyFamilyReplyReviewCatalogForReview(
   await assertPurposeCatalogue(
     client,
     replyReview.originalFamilyProfiles.map((profile) => profile.sha256),
+    signal,
+  );
+}
+
+/** Fixed122 predecessor metadata; no runtime task authority. */
+export async function assertOriginalPrivacyFamilyStudioReplyAuthorityCatalogForReview(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  await assertOriginalPrivacyFamilyCaller(client, signal);
+  await assertPurposeCatalogue(
+    client,
+    studioReplyAuthorityReview.originalFamilyProfiles.map(
+      (profile) => profile.sha256,
+    ),
     signal,
   );
 }
