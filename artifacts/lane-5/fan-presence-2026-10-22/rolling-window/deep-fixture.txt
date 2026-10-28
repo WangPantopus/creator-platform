@@ -1,0 +1,6 @@
+PASS C4-web-deep-fixture UI fixture: seven empty candidate advances reach Note/reaction with at most five retained cursors :: {"advances":7,"retained":[null,"2026-10-01T00:00:00.000000Z~d1000000-0000-4000-8000-000000000903","2026-10-01T00:00:00.000000Z~d1000000-0000-4000-8000-000000000904","2026-10-01T00:00:00.000000Z~d1000000-0000-4000-8000-000000000905","2026-10-01T00:00:00.000000Z~d1000000-0000-4000-8000-000000000906"],"maxConcurrent":5}
+PASS C4-web-overlap-fixture UI fixture: five concurrent reads preserve head-first deduplication under the shared deadline
+PASS C4-web-sibling-fixture UI fixture: one failed retained page clears all siblings; Retry restores the window
+PASS C4-web-deep-expiry-fixture UI fixture: one slow retained page expires the entire window and cannot restore stale siblings
+
+4/4 steps passed

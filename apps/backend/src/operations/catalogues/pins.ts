@@ -1,3 +1,4 @@
+import { coreFollowPurposeCatalogue } from "../../modules/growth/core-follow-catalogue.js";
 import type { PoolClient } from "pg";
 import { contentHash } from "../../core/canonical.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
@@ -15,6 +16,7 @@ import { accountingBoundaryCatalogue } from "../../modules/trust/accounting-boun
 import { comparisonArtifactCatalogue } from "../../modules/trust/comparison-artifacts.js";
 import { originalPrivacyFamilyPurposeCatalogue } from "../../modules/trust/privacy-family-catalog.js";
 import { usageExpiryCatalogue } from "../../modules/trust/usage-expiry-catalogue.js";
+import { creatorFanDenialPurposeCatalogue } from "../../modules/trust/creator-fan-denial-catalog.js";
 import { replyReviewPurposeCatalogue } from "../../modules/trust/reply-review-catalog.js";
 import { generationWavePurposeCatalogue } from "../../../scripts/migration-generation-roles.js";
 import type { JsonPath } from "./json-text.js";
@@ -62,6 +64,8 @@ const hex = (value: unknown): value is string =>
  * change only when that text changes, never when a relation is added. */
 const IMMUTABLE: readonly RegExp[] = [
   /^sources\.\d+\.checksum$/u,
+  /^denialFunction\.sha256$/u,
+  /^coreFollowDefinitionSha256$/u,
   /^conversationCursorDefinitions\..+$/u,
   /^comparison\.privacy\.definitionSha256$/u,
   /^baselineWave\.sha256$/u,
@@ -127,6 +131,70 @@ export function pinGroups(review: Review, outputShapeTables: string[]) {
       read: (client) => replyReviewPurposeCatalogue(client),
     }),
   );
+
+  const denial = review.creatorFanDenialCatalogueChecksum;
+  const denialIncoming = review.creatorFanDenialIncomingCatalogueChecksum;
+  if (hex(denial) || hex(denialIncoming))
+    groups.push({
+      id: "creatorFanDenialCatalogueChecksum",
+      covers:
+        "exact creator/fan negative projection: source, role, definition and ACL",
+      members: [
+        ...(hex(denial)
+          ? [
+              {
+                label: "without growth_api",
+                path: ["creatorFanDenialCatalogueChecksum"],
+                pinned: denial,
+              },
+            ]
+          : []),
+        ...(hex(denialIncoming)
+          ? [
+              {
+                label: "with growth_api",
+                path: ["creatorFanDenialIncomingCatalogueChecksum"],
+                pinned: denialIncoming,
+              },
+            ]
+          : []),
+      ],
+      read: (client) => creatorFanDenialPurposeCatalogue(client),
+      select: (facts) =>
+        facts.growthApi ? "with growth_api" : "without growth_api",
+    });
+
+  const follow = review.coreFollowCatalogueChecksum;
+  const followIncoming = review.coreFollowIncomingCatalogueChecksum;
+  if (hex(follow) || hex(followIncoming))
+    groups.push({
+      id: "coreFollowCatalogueChecksum",
+      covers:
+        "exact core Follow metadata: source, isolated purpose, session columns, Follow policies and effective reach",
+      members: [
+        ...(hex(follow)
+          ? [
+              {
+                label: "without growth_api",
+                path: ["coreFollowCatalogueChecksum"],
+                pinned: follow,
+              },
+            ]
+          : []),
+        ...(hex(followIncoming)
+          ? [
+              {
+                label: "with growth_api",
+                path: ["coreFollowIncomingCatalogueChecksum"],
+                pinned: followIncoming,
+              },
+            ]
+          : []),
+      ],
+      read: (client) => coreFollowPurposeCatalogue(client),
+      select: (facts) =>
+        facts.growthApi ? "with growth_api" : "without growth_api",
+    });
 
   for (const [name, pinned] of Object.entries(record(review.workerCatalogues)))
     if (hex(pinned))

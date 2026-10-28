@@ -1,3 +1,4 @@
+import coreFollowReview from "../../../infra/migrations/reviews/20261027-core-follow.json" with { type: "json" };
 import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import pg from "pg";
@@ -24,6 +25,7 @@ import { registeredComparisonProfile } from "../src/db/comparison-profile.js";
 import noticesReview from "../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
 import signInAndMoneyReview from "../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
 import replyReview from "../../../infra/migrations/reviews/20261023-reply-review.json" with { type: "json" };
+import studioReplyAuthorityReview from "../../../infra/migrations/reviews/20261023-studio-reply-authority.json" with { type: "json" };
 import workspaceLockReview from "../../../infra/migrations/reviews/20261022-workspace-lock.json" with { type: "json" };
 import generationReview from "../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
 
@@ -178,6 +180,32 @@ try {
     throw new Error(
       "Reply-review registry requires its exact source and complete workspace-lock predecessor.",
     );
+  const studioReplyAuthorityVersions = new Set(
+    studioReplyAuthorityReview.sources.map((source) => source.version),
+  );
+  const studioReplyAuthority = registry.migrations.some((source) =>
+    studioReplyAuthorityVersions.has(source.version),
+  );
+  if (
+    studioReplyAuthority &&
+    (!replyReviewRegistered || !(await registeredComparisonProfile()))
+  )
+    throw new Error(
+      "Creator/fan denial registry requires its exact source and complete reply-review predecessor.",
+    );
+  const coreFollowVersions = new Set(
+    coreFollowReview.sources.map((source) => source.version),
+  );
+  const coreFollow = registry.migrations.some((source) =>
+    coreFollowVersions.has(source.version),
+  );
+  if (
+    coreFollow &&
+    (!studioReplyAuthority || !(await registeredComparisonProfile()))
+  )
+    throw new Error(
+      "Core Follow registry requires its exact source and complete creator/fan denial predecessor.",
+    );
   const registeredFiles = registry.migrations
     .filter(
       (file) =>
@@ -317,6 +345,30 @@ try {
     throw new Error(
       "Incomplete or unregistered reply-review wave; no per-file repair was attempted.",
     );
+  const installedStudioReplyAuthority = applied.filter((source) =>
+    studioReplyAuthorityVersions.has(source.version),
+  ).length;
+  if (
+    installedStudioReplyAuthority &&
+    (!studioReplyAuthority ||
+      installedReplyReview !== replyReviewVersions.size ||
+      installedStudioReplyAuthority !== studioReplyAuthorityVersions.size)
+  )
+    throw new Error(
+      "Incomplete or unregistered creator/fan denial wave; no per-file repair was attempted.",
+    );
+  const installedCoreFollow = applied.filter((source) =>
+    coreFollowVersions.has(source.version),
+  ).length;
+  if (
+    installedCoreFollow &&
+    (!coreFollow ||
+      installedStudioReplyAuthority !== studioReplyAuthorityVersions.size ||
+      installedCoreFollow !== coreFollowVersions.size)
+  )
+    throw new Error(
+      "Incomplete or unregistered core Follow wave; no per-file repair was attempted.",
+    );
   // Fresh databases still bootstrap the exact canonical61. The complete new
   // wave is only installed atomically by activate-wave after private backup,
   // separate restore and closed-admission checks. Registered code alone cannot
@@ -336,7 +388,10 @@ try {
       (installedSignInAndMoney ||
         !signInAndMoneyVersions.has(source.version)) &&
       (installedWorkspaceLock || !workspaceLockVersions.has(source.version)) &&
-      (installedReplyReview || !replyReviewVersions.has(source.version)),
+      (installedReplyReview || !replyReviewVersions.has(source.version)) &&
+      (installedStudioReplyAuthority ||
+        !studioReplyAuthorityVersions.has(source.version)) &&
+      (installedCoreFollow || !coreFollowVersions.has(source.version)),
   );
   const historical = localLegacy
     ? new Set<string>()
@@ -363,6 +418,12 @@ try {
     outputBeforePublic: installedOutput && !installedPublic,
     publicBeforeComparison: Boolean(installedPublic && !installedComparison),
     comparisonBeforeNotices: Boolean(installedComparison && !installedNotices),
+    studioReplyAuthorityBeforeCoreFollow: Boolean(
+      installedStudioReplyAuthority && !installedCoreFollow,
+    ),
+    replyReviewBeforeStudioReplyAuthority: Boolean(
+      installedReplyReview && !installedStudioReplyAuthority,
+    ),
     workspaceLockBeforeReplyReview: Boolean(
       installedWorkspaceLock && !installedReplyReview,
     ),
@@ -394,27 +455,31 @@ try {
       if (installedGeneration)
         await assertGenerationWaveRoleSafety(
           client,
-          installedReplyReview
-            ? "reply-review"
-            : installedWorkspaceLock
-              ? "workspace-lock"
-              : installedSignInAndMoney
-                ? "sign-in-and-money"
-                : installedNotices
-                  ? "notices"
-                  : installedComparison
-                    ? "comparison"
-                    : installedPartialRecovery
-                      ? "partial-generation-recovery"
-                      : installedRecovery
-                        ? "generation-recovery"
-                        : installedPublic
-                          ? "public-ai"
-                          : installedOutput
-                            ? "generation-output"
-                            : installedContent
-                              ? "content-privacy"
-                              : undefined,
+          installedCoreFollow
+            ? "core-follow"
+            : installedStudioReplyAuthority
+              ? "studio-reply-authority"
+              : installedReplyReview
+                ? "reply-review"
+                : installedWorkspaceLock
+                  ? "workspace-lock"
+                  : installedSignInAndMoney
+                    ? "sign-in-and-money"
+                    : installedNotices
+                      ? "notices"
+                      : installedComparison
+                        ? "comparison"
+                        : installedPartialRecovery
+                          ? "partial-generation-recovery"
+                          : installedRecovery
+                            ? "generation-recovery"
+                            : installedPublic
+                              ? "public-ai"
+                              : installedOutput
+                                ? "generation-output"
+                                : installedContent
+                                  ? "content-privacy"
+                                  : undefined,
         );
       else await assertWaveRoleSafety(client, installedRoles(applied));
       if (continuation)
@@ -504,27 +569,31 @@ try {
       if (installedGeneration)
         await assertGenerationWaveRoleSafety(
           client,
-          installedReplyReview
-            ? "reply-review"
-            : installedWorkspaceLock
-              ? "workspace-lock"
-              : installedSignInAndMoney
-                ? "sign-in-and-money"
-                : installedNotices
-                  ? "notices"
-                  : installedComparison
-                    ? "comparison"
-                    : installedPartialRecovery
-                      ? "partial-generation-recovery"
-                      : installedRecovery
-                        ? "generation-recovery"
-                        : installedPublic
-                          ? "public-ai"
-                          : installedOutput
-                            ? "generation-output"
-                            : installedContent
-                              ? "content-privacy"
-                              : undefined,
+          installedCoreFollow
+            ? "core-follow"
+            : installedStudioReplyAuthority
+              ? "studio-reply-authority"
+              : installedReplyReview
+                ? "reply-review"
+                : installedWorkspaceLock
+                  ? "workspace-lock"
+                  : installedSignInAndMoney
+                    ? "sign-in-and-money"
+                    : installedNotices
+                      ? "notices"
+                      : installedComparison
+                        ? "comparison"
+                        : installedPartialRecovery
+                          ? "partial-generation-recovery"
+                          : installedRecovery
+                            ? "generation-recovery"
+                            : installedPublic
+                              ? "public-ai"
+                              : installedOutput
+                                ? "generation-output"
+                                : installedContent
+                                  ? "content-privacy"
+                                  : undefined,
         );
       else await assertWaveRoleSafety(client, installedRoles(files));
       if (continuation)
@@ -554,6 +623,14 @@ try {
   if (notices && !installedNotices)
     process.stdout.write(
       "Notices sources remain unapplied. After comparison114, use W8_MIGRATION_WAVE=20261015-notices with verified private backup/restore and closed admission.\n",
+    );
+  if (coreFollow && !installedCoreFollow)
+    process.stdout.write(
+      "Core Follow metadata remains unapplied. After creator/fan denial122, use W8_MIGRATION_WAVE=20261027-core-follow with verified private backup/restore and closed admission.\n",
+    );
+  if (studioReplyAuthority && !installedStudioReplyAuthority)
+    process.stdout.write(
+      "Creator/fan denial source remains unapplied. After reply-review121, use W8_MIGRATION_WAVE=20261023-studio-reply-authority with verified private backup/restore and closed admission.\n",
     );
   if (replyReviewRegistered && !installedReplyReview)
     process.stdout.write(

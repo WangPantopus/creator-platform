@@ -1,8 +1,10 @@
+import coreFollowReview from "../../../../infra/migrations/reviews/20261027-core-follow.json" with { type: "json" };
 import review from "../../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
 import noticesReview from "../../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
 import signInAndMoneyReview from "../../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
 import workspaceLockReview from "../../../../infra/migrations/reviews/20261022-workspace-lock.json" with { type: "json" };
 import replyReview from "../../../../infra/migrations/reviews/20261023-reply-review.json" with { type: "json" };
+import studioReplyAuthorityReview from "../../../../infra/migrations/reviews/20261023-studio-reply-authority.json" with { type: "json" };
 import type { PoolClient } from "pg";
 import { invariant } from "../core/errors.js";
 import {
@@ -100,6 +102,47 @@ async function registeredReplyReviewProfile(signal?: AbortSignal) {
   return freeze(replyReview);
 }
 
+/** Exact additive creator/fan denial source; reservations cannot select this graph. */
+async function registeredStudioReplyAuthorityProfile(signal?: AbortSignal) {
+  signal?.throwIfAborted();
+  const active = await Promise.all(
+    studioReplyAuthorityReview.sources.map(registeredMigration),
+  );
+  signal?.throwIfAborted();
+  if (active.every((source) => !source)) return undefined;
+  invariant(
+    active.every(
+      (source, index) =>
+        source?.version ===
+          studioReplyAuthorityReview.sources[index]!.version &&
+        source.checksum === studioReplyAuthorityReview.sources[index]!.checksum,
+    ),
+    "comparison_unconfigured",
+    "The complete reviewed creator/fan denial source graph is required.",
+  );
+  return freeze(studioReplyAuthorityReview);
+}
+
+/** Exact additive Follow metadata source; a reservation cannot select this graph. */
+async function registeredCoreFollowProfile(signal?: AbortSignal) {
+  signal?.throwIfAborted();
+  const active = await Promise.all(
+    coreFollowReview.sources.map(registeredMigration),
+  );
+  signal?.throwIfAborted();
+  if (active.every((source) => !source)) return undefined;
+  invariant(
+    active.every(
+      (source, index) =>
+        source?.version === coreFollowReview.sources[index]!.version &&
+        source.checksum === coreFollowReview.sources[index]!.checksum,
+    ),
+    "comparison_unconfigured",
+    "The complete reviewed core Follow source graph is required.",
+  );
+  return freeze(coreFollowReview);
+}
+
 /** Exact executable source selects independently reviewed metadata only.
  * Reservations and hand-installed ledger entries cannot activate this profile.
  * Original owners still check their actual source, purpose and transaction. */
@@ -121,6 +164,18 @@ export async function registeredComparisonProfile(signal?: AbortSignal) {
   const next = await registeredSignInAndMoneyProfile(signal);
   const workspace = await registeredWorkspaceLockProfile(signal);
   const reply = await registeredReplyReviewProfile(signal);
+  const studio = await registeredStudioReplyAuthorityProfile(signal);
+  const follow = await registeredCoreFollowProfile(signal);
+  invariant(
+    studio || !follow,
+    "comparison_unconfigured",
+    "Core Follow metadata requires the complete creator/fan denial predecessor.",
+  );
+  invariant(
+    reply || !studio,
+    "comparison_unconfigured",
+    "Creator/fan denial requires the complete reply-review predecessor.",
+  );
   invariant(
     workspace || !reply,
     "comparison_unconfigured",
@@ -143,12 +198,16 @@ export async function registeredComparisonProfile(signal?: AbortSignal) {
         ...next,
         ...workspace,
         ...reply,
+        ...studio,
+        ...follow,
         sources: [
           ...profile.sources,
           ...head.sources,
           ...(next?.sources ?? []),
           ...(workspace?.sources ?? []),
           ...(reply?.sources ?? []),
+          ...(studio?.sources ?? []),
+          ...(follow?.sources ?? []),
         ],
       })
     : profile;

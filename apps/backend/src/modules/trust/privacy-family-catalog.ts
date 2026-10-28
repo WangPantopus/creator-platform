@@ -1,9 +1,11 @@
+import studioReplyAuthorityReview from "../../../../../infra/migrations/reviews/20261023-studio-reply-authority.json" with { type: "json" };
 import type { PoolClient, QueryConfig, QueryResultRow } from "pg";
 import generationPrivacyReview from "../../../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
 import contentPrivacyReview from "../../../../../infra/migrations/reviews/20261007-content-privacy.json" with { type: "json" };
 import publicAIReview from "../../../../../infra/migrations/reviews/20261007-public-ai.json" with { type: "json" };
 import comparisonReview from "../../../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
 import noticesReview from "../../../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
+import replyReview from "../../../../../infra/migrations/reviews/20261023-reply-review.json" with { type: "json" };
 import workspaceLockReview from "../../../../../infra/migrations/reviews/20261022-workspace-lock.json" with { type: "json" };
 import signInAndMoneyReview from "../../../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
 import { registeredContentPrivacyProfile } from "../../db/content-privacy-profile.js";
@@ -429,6 +431,34 @@ export async function assertOriginalPrivacyFamilyWorkspaceLockCatalogForReview(
   await assertPurposeCatalogue(
     client,
     workspaceLockReview.originalFamilyProfiles.map((profile) => profile.sha256),
+    signal,
+  );
+}
+
+/** Fixed121 predecessor metadata; no runtime task authority. */
+export async function assertOriginalPrivacyFamilyReplyReviewCatalogForReview(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  await assertOriginalPrivacyFamilyCaller(client, signal);
+  await assertPurposeCatalogue(
+    client,
+    replyReview.originalFamilyProfiles.map((profile) => profile.sha256),
+    signal,
+  );
+}
+
+/** Fixed122 predecessor metadata; no runtime task authority. */
+export async function assertOriginalPrivacyFamilyStudioReplyAuthorityCatalogForReview(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  await assertOriginalPrivacyFamilyCaller(client, signal);
+  await assertPurposeCatalogue(
+    client,
+    studioReplyAuthorityReview.originalFamilyProfiles.map(
+      (profile) => profile.sha256,
+    ),
     signal,
   );
 }

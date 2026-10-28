@@ -1,0 +1,6 @@
+PASS C4-web-offline offline conceals projected text and reconnect restores it
+PASS C4-web-lifecycle pagehide clears projection; pageshow revalidates
+PASS C4-web-failure transport failure clears projection; Retry recovers
+PASS C4-web-expiry a stalled audience read cannot extend the five-second current-access window
+
+4/4 steps passed

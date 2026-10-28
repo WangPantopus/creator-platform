@@ -1,0 +1,59 @@
+PUBLISHED pagination 1/52 28833fe3-bb4b-4f44-9659-94a018c977b4
+PUBLISHED pagination 2/52 263de111-fddb-4968-95cb-0e902ad89644
+PUBLISHED pagination 3/52 c01d563e-97eb-471a-9ca6-5d853d744534
+PUBLISHED pagination 4/52 4a108417-8958-4948-a506-312901b68097
+PUBLISHED pagination 5/52 2f8989c0-05fd-41ca-91da-5dfb9edce4e6
+PUBLISHED pagination 6/52 71bd7acf-c5ea-4ddb-a346-efb05eb2c4b9
+PUBLISHED pagination 7/52 ef891902-7ebf-4407-a0e3-43d9c327a9a4
+PUBLISHED pagination 8/52 084197ca-b91a-4124-ab4b-8c4d4d9db987
+PUBLISHED pagination 9/52 ed1ceb9b-3e9d-48e2-b836-71b3f074f217
+PUBLISHED pagination 10/52 7a6a28f1-00bf-416f-961c-0094729d8026
+PUBLISHED pagination 11/52 938fce87-c662-4c1d-95c8-2a3a908c0661
+PUBLISHED pagination 12/52 3cce2e84-e711-48de-a231-0141c5db6a67
+PUBLISHED pagination 13/52 354b1de9-42ec-4ddf-aa64-514c629db870
+PUBLISHED pagination 14/52 3f46a6a8-eabb-4039-b23c-e84fa9f94a4b
+PUBLISHED pagination 15/52 e10e97e9-3bed-4a5d-8cd5-802195991ee8
+PUBLISHED pagination 16/52 8473661a-96c3-4c0e-9e6d-f884801a3836
+PUBLISHED pagination 17/52 99c4d0ce-baea-4a47-a761-528b4aa521da
+PUBLISHED pagination 18/52 8317f802-4ea1-4666-a55b-9da63768fa1a
+PUBLISHED pagination 19/52 e3d78a43-2c31-4d2d-868c-6f2710df63dd
+PUBLISHED pagination 20/52 bc5e5d8d-8906-421f-a260-ad3eb25854e2
+PUBLISHED pagination 21/52 5bc70021-b1b5-4346-8966-467afcf5cb91
+PUBLISHED pagination 22/52 a365ace5-bb52-47d6-8ffb-f015091a72ec
+PUBLISHED pagination 23/52 c3a716b6-f6fe-410b-933c-9df5a811f19c
+PUBLISHED pagination 24/52 95faa578-8544-4fc9-b980-e2dc2aa7e107
+PUBLISHED pagination 25/52 bc658097-cf95-4581-a9d5-90bdeed8368f
+PUBLISHED pagination 26/52 941547af-b079-4d93-84f8-294bd8abe3d3
+PUBLISHED pagination 27/52 5bbdfbd3-e131-4701-85cc-9d52585d8dc9
+PUBLISHED pagination 28/52 ea541152-5cd1-4d5b-b391-9ad5c5eb6bde
+PUBLISHED pagination 29/52 14fb51e4-df10-4180-8d1e-0a75adc62454
+PUBLISHED pagination 30/52 61865d4d-3d7a-4fe2-92c9-fb77814656a9
+PUBLISHED pagination 31/52 899c11ca-5a78-49ba-93af-98e1cf962012
+PUBLISHED pagination 32/52 f987939b-a83c-4ab3-b94d-731040547bdb
+PUBLISHED pagination 33/52 9272eb73-6f3a-46d2-aacc-3ada9eabd73c
+PUBLISHED pagination 34/52 5c3fc7f7-2a6d-4b78-aad3-231c860765e3
+PUBLISHED pagination 35/52 fcc48fb9-aa6c-4789-99e6-0bb9270280bc
+PUBLISHED pagination 36/52 2ca172f3-f14e-4267-ae96-1d5d68cf904d
+PUBLISHED pagination 37/52 b37f86a0-b9b8-478c-9631-6cb78da57083
+PUBLISHED pagination 38/52 17362ca8-fa31-42e0-bf79-c72d1b2aa026
+PUBLISHED pagination 39/52 9c5f76d4-8f62-4232-812a-1f610ff93141
+PUBLISHED pagination 40/52 e4df60be-57de-48a5-8de4-730f9fcabbe0
+PUBLISHED pagination 41/52 26d8cebc-73bb-498b-a9e3-4db38219196f
+PUBLISHED pagination 42/52 907103fd-4ea0-467e-a46a-f486608e7aad
+PUBLISHED pagination 43/52 ab46862c-d931-4699-af4e-8743658d3743
+PUBLISHED pagination 44/52 8d0e3960-9659-49a7-a47c-5088d9e8ce6a
+PUBLISHED pagination 45/52 d5905b34-9f97-4eb6-b81f-92fd6122e787
+PUBLISHED pagination 46/52 ed1d6b71-05d0-41b5-928f-761aa91abc3c
+PUBLISHED pagination 47/52 687abe26-b270-443a-87a1-5c76953b2d0a
+PUBLISHED pagination 48/52 88891628-394b-46cc-b208-baa48357075d
+PUBLISHED pagination 49/52 d5914ad4-50f9-4931-9ab7-507ac02ef9ec
+PUBLISHED pagination 50/52 3e6c3072-88ed-4487-8f61-5201c8672746
+PUBLISHED pagination 51/52 7f715235-3596-4d1b-adb1-79c4405e6460
+PUBLISHED pagination 52/52 1d94d669-d9f1-425a-a6a8-d45906ec0e57
+FAIL C4-pagination-window 52 real publications produce two audience-filtered candidate windows :: First candidate window differs
+FAIL C4-pagination-browser Earlier messages reveals the older signed Note without duplicates or audience leakage :: locator.waitFor: Timeout 30000ms exceeded.
+FAIL C4-pagination-empty an empty eligible first page keeps its cursor and the browser can reach the older Note :: locator.click: Timeout 30000ms exceeded.
+PASS C4-pagination-retraction refresh removes a retracted Note from the loaded older window
+PASS C4-pagination-cleanup own publications and follow relationship are withdrawn :: 52 owned Notes retained unpublished; no membership created
+
+2/5 steps passed

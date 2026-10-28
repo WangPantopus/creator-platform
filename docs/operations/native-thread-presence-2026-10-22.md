@@ -1,0 +1,162 @@
+# Native C4 conversation presence qualification — 2026-10-22
+
+Native fan conversations now read `/v1/content/:creatorId/presence` separately from stored conversation messages, then merge authorized Notes and the fan's own creator reactions by `occurredAt` / `createdAt`. Both clients use the generated Content contracts, the exact server author label, broadcast/heart glyph, and a separate signature control. The body opens the existing Note/private-reply route; the signature opens public verification.
+
+## Authority and lifecycle
+
+- Content requests carry `x-qelvora-expected-account`; conversation requests keep their existing account header. Both clients compare their credential before and after the request and reject oversized responses.
+- Content has its own opaque cursor. An eligible page may be empty and still have an older cursor. The reader retains the current head and the four most recently requested older pages (at most 250 items), reauthorizes those pages concurrently, and can continue paging beyond that window. Results keep cursor order, deduplicate overlapping IDs head-first, and replace the window atomically only after every page passes one shared read-start deadline. A failed request or lifecycle cancellation cancels its sibling requests. Automatic refresh does not disable the Earlier control.
+- Content bodies stay in memory. They never enter the conversation offline snapshot, resume state, or stored-message list. Loss of foreground, account/session, conversation authority, or current Content authorization conceals the body. A failed or over-budget refresh clears the whole retained Content window.
+- The two-second refresh and five-second display freshness budget follow the existing native Content reader (`ContentFeature.swift` / `ContentFeature.kt`). Network time counts against the budget. Healthy refresh keeps the current body visible; this is UI freshness behavior, not a new retention policy.
+- Accessibility exposes the server author first and then the full Note body, including line breaks and Unicode. Signature and body controls are separate, with the existing creator-card contrast tokens and minimum touch target.
+
+## Real stack evidence
+
+Read-only checks used the integrated API on port 56631. The existing development identity and membership grant are synthetic boundaries; the Note was published through the actual creator passkey ceremony by the web presence journey. No content row or signature was fabricated for these reads.
+
+| Fixture                | Identifier                                                                      |
+| ---------------------- | ------------------------------------------------------------------------------- |
+| Maya                   | `20000000-0000-4000-8000-000000000001`                                          |
+| Member account / fan   | `10000000-0000-4000-8000-000000000006` / `205e09a9-d4de-4170-9b85-1212acffcbde` |
+| Outsider account / fan | `10000000-0000-4000-8000-000000000005` / `5524820a-74b5-411d-afa4-0ac8a570a4ea` |
+| Note / signed act      | `2910d98f-0dd8-41ff-a896-5fb31cf0eb38` / `c2ddf773-beec-41bd-af1a-b739d6412c81` |
+
+Observed text: “Native presence 9af2de: signed and shared with all members.” followed by “The kiln opens at nine 🔥”.
+
+- iOS `testContentPresenceOnRealStack`: **1 passed, 0 failed, 0 skipped**, 43.679 seconds on the final concurrent reader. It checked member visibility across seven seconds of healthy refresh, complete author-first accessibility, separate public verification and private-reply navigation, and outsider exclusion. The member and outsider screenshots were inspected; the [member capture](../../artifacts/qualification/native-presence-2026-10-22/ios-real-member-note.png) is retained.
+- Android real stack: all five reported groups passed on the final reader: complete author-first accessibility, member visibility across more than 7.5 seconds, distinct signature/public verification, Note/private-reply navigation after Back, and outsider exclusion. The [member capture](../../artifacts/qualification/native-presence-2026-10-22/android-real-member-note.png) was inspected and retained. The operated script waits for stable visible row bounds after Back; an initial tap at transient bounds missed, while a fresh tap and the final complete run passed.
+- The integrated stack intentionally holds migration `0156_w8_reply_review`. Its actual private reply remains pending and reaction signing is refused. The fixture reaction below proves native rendering and lifecycle only; it does not prove Trust review, creator signing, or migration activation.
+
+## Operated fixture coverage
+
+The existing lane-7 harness now has an opt-in C4 feed control. Opting in replaces its legacy stored Note/reaction examples with separate Content items, so a visibility assertion cannot mistake an old stored-message example for a current Content card. Other scenarios retain their original fixtures. The Content route checks the expected account, and unseeded accounts receive no fixture content.
+
+`Lane7StackNavigationFlow.testContentPresenceLifecycleInHarness` and `tests/scenarios/lane-7/native-presence.mjs` operate the actual apps. They cover Note/own-reaction rendering, healthy refresh, failure/recovery, an empty first page with a cursor, removal of Note and reaction after refresh, background/foreground loss, slow response expiry, session revocation, account switch, and a seven-cursor chain beyond the retained five-page window. The expanded journey also injects a failing sibling alongside a delayed body page and observes that HTTP connection closing before its response, then a slow sibling alongside successful pages to reject partial or late restoration. They do not add product unit-test files or bypass backend review/signing gates.
+
+The expanded iOS lifecycle journey passed **1/1, zero skips**, 126.206 seconds, including seven older cursor advances and the concurrent sibling checks. The harness observed the three delayed-body connections closing after 301, 309, and 318 milliseconds, before their four-second responses; no body returned to the UI. Android's expanded journey completed all nine reported groups, with eight delayed-body connections closing after 274–350 milliseconds.
+
+## Reproduction and current limits
+
+Builds use `scripts/with-heavy-build-lock.mjs`. iOS `xcodebuild build-for-testing` passed for arm64 and x86_64; Android `./gradlew --offline :app:assembleDebug` passed. No new dependencies or generated contracts changed.
+
+For iOS, add the documented `QELVORA_PRESENCE_*` environment values to the built XCTest run and select the two opt-in methods in `Lane7StackNavigationFlow`. `QELVORA_PRESENCE_HARNESS_API` points to an owned lane-7 harness. The real method needs stack API, creator, member fan, outsider fan, and Note text values and performs reads only.
+
+For Android, start an owned lane-7 harness and explicitly select an owned emulator:
+
+```sh
+LANE7_ANDROID=emulator-5586 \
+QELVORA_PRESENCE_API=http://127.0.0.1:56646 \
+node tests/scenarios/lane-7/native-presence.mjs
+```
+
+`native-presence.mjs real` additionally requires `QELVORA_PRESENCE_CREATOR`, `QELVORA_PRESENCE_NOTE_TEXT`, `QELVORA_PRESENCE_MEMBER_ACTOR`, `QELVORA_PRESENCE_MEMBER_FAN`, `QELVORA_PRESENCE_OUTSIDER_ACTOR`, and `QELVORA_PRESENCE_OUTSIDER_FAN`. Reverse the selected loopback port through adb before launching. The script writes compact screenshot/tree evidence under `/tmp/native-c4-android-*`; it never modifies the real fixture.
+
+Owned devices are the iOS simulator `CC067095-D127-4FFD-941A-CE445A547889` and Android AVD `qelvora-signin-20261022` on `emulator-5586`. Original user simulators and emulators were not used. Final local evidence is `/tmp/qelvora-native-presence-ios-concurrent.xcresult`, `/tmp/qelvora-native-presence-ios-final-real.xcresult`, `/tmp/qelvora-native-presence-android-fixture.log`, and `/tmp/qelvora-native-presence-android-final-real.log`. Live hosting remains undecided.
+
+## Real reaction continuation prepared — 2026-10-25
+
+The owned simulator and AVD still exist after the host restart, but both were
+stopped and the earlier `/tmp` evidence was absent. The earlier observations
+retain their stated scope. No earlier acceptance result was rerun during this
+preparation, and actual reactions remain unaccepted until the separate 0254
+source/fresh/restored qualification and real web review/signing workflow pass.
+
+The existing operated checks now have an explicit reaction mode. They read an
+already approved, creator-signed reaction; they do not create a reaction or
+approval, reset a backend, or operate the fixture harness. Both fetch the exact
+public signed act, require its `reaction` type and `valid` status, then tap the
+native reaction's signature control and match its displayed hash to the server.
+They also check healthy refresh, source navigation and outsider exclusion. The
+backend workflow must independently record the private reply, purpose-leased
+approval and creator passkey provenance; a native rendering check alone does
+not establish backend acceptance.
+
+After that workflow, supply these values from its actual records:
+
+- `QELVORA_PRESENCE_CREATOR`, `QELVORA_PRESENCE_CREATOR_NAME`
+- `QELVORA_PRESENCE_MEMBER_ACTOR`, `QELVORA_PRESENCE_MEMBER_FAN`
+- `QELVORA_PRESENCE_OUTSIDER_ACTOR`, `QELVORA_PRESENCE_OUTSIDER_FAN`
+- `QELVORA_PRESENCE_NOTE_ID`, `QELVORA_PRESENCE_NOTE_TEXT`
+- `QELVORA_PRESENCE_REACTION_REPLY` (the reply ID used by the presence item),
+  `QELVORA_PRESENCE_REACTION_SIGNED_ACT`, and
+  `QELVORA_PRESENCE_REACTION_LABEL` (the exact server `authorLabel`)
+
+Set `QELVORA_PRESENCE_API` for Android and `QELVORA_PRESENCE_STACK_API` for iOS
+to the qualified loopback API. Keep the actual Note and reply published/current
+until both phone checks finish; later withdrawal should use the same real owner
+workflow. Do not reuse the tombstoned actor six on the preserved reply stack.
+
+```sh
+# After building/installing on the existing owned Android AVD, reverse the API
+# port on emulator-5586 and run the existing operated journey.
+LANE7_ANDROID=emulator-5586 \
+node tests/scenarios/lane-7/native-presence.mjs real-reaction
+
+# After build-for-testing, this runner forwards QELVORA_PRESENCE_* to XCTest.
+# It rejects skipped or failed execution and uses the shared heavy-build lock.
+LANE7_IOS=CC067095-D127-4FFD-941A-CE445A547889 \
+node tests/scenarios/lane-7/ios-navigation.mjs \
+  /absolute/path/to/built.xctestrun --presence-reaction
+```
+
+The runner also supports `--presence-real` for the existing Note-only check and
+`--presence-harness` for the explicitly synthetic lifecycle check. The iOS real
+check accepts actor labels rather than requiring the previous fixed actor six.
+JavaScript syntax, focused ESLint, formatting and Swift parsing passed for this
+preparation. A fresh native build and operated reaction result remain pending.
+
+## Actual signed reaction verified — October 27, 2026
+
+Both native apps operated the same backend-accepted fixture on the isolated122
+stack at API56711 / DB56710, after the real browser proof, passkey, private-reply,
+purpose-leased Ops approval, exact-author retry and reaction workflow passed.
+Identity, external proof and membership remain the documented synthetic edges;
+no native harness reaction, approval row or signature was substituted.
+
+| Record              | Exact identifier                                                   |
+| ------------------- | ------------------------------------------------------------------ |
+| Note                | `588a98e7-3c71-4ef2-a562-48b6b8e9b6b2`                             |
+| Private reply       | `adb46a76-8ba7-4c1d-b1a5-16e9e5dc75c6`                             |
+| Reaction signed act | `10a493ff-9d4d-480a-b0a3-46331d5f7896`                             |
+| Reaction SHA-256    | `df7e088bef1e046282d5824a3d5560441e349f104df73507b299fee6030b87b0` |
+
+- iOS: final operated run passed **1/1, zero failures or skips**, 53.022 seconds.
+  A fresh Xcode26.5 x86_64 signed simulator `build-for-testing` used the existing
+  owned simulator and pinned packages; `Package.resolved` remained byte-identical.
+  The first run exposed a prepared locator error: SwiftUI exposes body and
+  signature as sibling buttons sharing the row identifier. The scenario now
+  selects the exact identifier and signature label. A subsequent passing run
+  revealed a partially obscured hash capture; the final scenario additionally
+  requires the complete hash above the bottom navigation. Product source and
+  the five-second concurrent/atomic Content reader are unchanged.
+- Android: the real-reaction journey passed **all seven reported groups**, exit0,
+  on the existing owned AVD. It reused the preserved October22 APK, SHA-256
+  `d75e70ce3ab4807c981740d25c0d6cda0ad784d39f9c6005e453a49342581082`.
+  Changes since that app build concern scenarios/documentation. A fresh Android
+  build was not claimed; the Java toolchain is currently absent.
+- Both runs checked author-first full Note accessibility, healthy refresh with
+  the actual reaction, exact public reaction hash, reaction/private-reply source,
+  separate Note verification/source navigation, and denial for the supplied
+  outsider. Member, signature and outsider captures were visually inspected.
+
+The supplied outsider is synthetic actor5, whose real block from the runtime
+probe remains in force. This run proves **blocked-outsider exclusion**, not an
+independent nonmember-only denial. Both scenarios accept the explicit
+`QELVORA_PRESENCE_OUTSIDER_BLOCKED=1` mode, require the observed “This scope is
+closed.” refusal, and assert that neither Note nor reaction appears. Default
+nonblocked mode still requires the ordinary conversation screen. Actor labels
+were resolved from live identity capabilities by the fixture's account IDs.
+No block was removed or bypassed.
+
+The accepted fixture remains unchanged. Both owned devices were shut down after
+verification without erasing their state. No backend rows, clocks, applied SQL,
+app freshness rules or dependency pins were changed by the native work.
+Physical devices, real provider acceptance and whole-account erasure remain
+separate gates.
+
+Private evidence under `/tmp/qelvora-studio-reply-1027/` includes the source fixture
+`browser-resume-verified/native-fixture-bd188efc.json`, the original failed and
+first passing iOS runs, final
+`native-ios-real-reaction-final/ios-navigation-1793160226708.xcresult`, and
+`native-android-real-reaction/run.log` with its three screenshot/tree captures.
+Screenshots and result bundles remain outside Git.

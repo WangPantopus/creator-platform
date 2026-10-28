@@ -1,11 +1,15 @@
 // Continue e6-reply-review with real API denials, export and account deletion.
 // Destructive only to the explicit synthetic fan on an owned loopback stack.
 // No business-state SQL writes or invented review/erasure receipts are used.
+// --stop-after-export retains the supplied Note/reaction and current account.
 import assert from "node:assert/strict";
+import { execFile } from "node:child_process";
 import { randomUUID, createHash } from "node:crypto";
 import { createRequire } from "node:module";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
 const flag = (name, fallback) => {
   const i = process.argv.indexOf(name);
   return i < 0 ? fallback : process.argv[i + 1];
@@ -20,12 +24,26 @@ for (const value of [API, DB, runtimeDb]) {
       ["localhost", "127.0.0.1", "[::1]"].includes(new URL(value).hostname),
   );
 }
-assert(OUT && process.argv.includes("--allow-synthetic-account-delete"));
+const adminLocation = new URL(DB),
+  runtimeLocation = new URL(runtimeDb);
+assert.equal(adminLocation.host, runtimeLocation.host);
+assert.equal(adminLocation.pathname, runtimeLocation.pathname);
+assert.equal(runtimeLocation.username, "creator_runtime");
+assert(!adminLocation.search && !runtimeLocation.search);
+const stopAfterExport = process.argv.includes("--stop-after-export");
+assert(
+  OUT &&
+    (stopAfterExport ||
+      process.argv.includes("--allow-synthetic-account-delete")),
+);
 const noteId = flag("--note"),
   replyId = flag("--reply"),
   actor = Number(flag("--fan-actor", "6"));
-assert(noteId && replyId && Number.isInteger(actor));
+assert(
+  noteId && replyId && Number.isInteger(actor) && actor >= 1 && actor <= 6,
+);
 await mkdir(OUT, { recursive: true, mode: 0o700 });
+assert.equal((await stat(OUT)).mode & 0o077, 0);
 Object.assign(process.env, { LANE6_API: API, LANE6_DB: DB });
 const L = await import("./e6-2-lib.mjs");
 const { api, sql, MAYA } = L;
@@ -37,6 +55,7 @@ const evidence = {
   noteId,
   replyId,
   actor,
+  stopAfterExport,
   boundary:
     "explicit owned synthetic account; actual API decisions and privacy tasks; SQL reads and rollback-only denial probes",
   steps: [],
@@ -47,7 +66,9 @@ const save = () =>
     JSON.stringify(evidence, null, 2),
     { mode: 0o600 },
   );
+let currentStep = "owned source and deletion preflight";
 async function step(name, fn) {
+  currentStep = name;
   const detail = await fn();
   evidence.steps.push({ name, detail });
   await save();
@@ -102,7 +123,81 @@ async function decide(row, resolution) {
     idempotencyKey: randomUUID(),
   });
 }
+// Retry in the same private output directory (or pass --existing-export).
+// The immutable request is persisted before POST, so an unknown response reuses
+// its idempotency key. A separate immutable receipt retains the actual job ID
+// and original creation time; no retry edits an existing job or its clock.
+async function privacyCheckpoint(kind, suffix, binding, detail) {
+  const key = createHash("sha256")
+    .update(JSON.stringify(binding))
+    .digest("hex");
+  const file = resolve(OUT, `reply-${kind}-${key}-${suffix}.json`);
+  if (detail) {
+    try {
+      await writeFile(file, JSON.stringify({ binding, ...detail }, null, 2), {
+        mode: 0o600,
+        flag: "wx",
+      });
+    } catch (error) {
+      if (error.code !== "EEXIST") throw error;
+    }
+  }
+  try {
+    const saved = JSON.parse(await readFile(file, "utf8"));
+    assert.deepEqual(saved.binding, binding);
+    return saved;
+  } catch (error) {
+    if (error.code === "ENOENT" && !detail) return undefined;
+    throw error;
+  }
+}
+const database = new URL(DB);
+const binding = {
+  api: new URL(API).origin,
+  database: `${database.host}${database.pathname}`,
+  account: L.account(actor),
+  noteId,
+  replyId,
+};
+const exportCheckpoint = (suffix, binding, detail) =>
+  privacyCheckpoint("export", suffix, binding, detail);
+const deletionClocks = async (id) => {
+  const [row] = await sql(
+    "SELECT j.id,j.account_id,j.kind,j.scope,j.created_at::text AS created_at,j.verified_at::text AS verified_at,t.id AS tombstone_id,t.created_at::text AS tombstone_created_at FROM creator_trust.privacy_job j LEFT JOIN creator_trust.tombstone t ON t.job_id=j.id WHERE j.id=$1 AND j.account_id=$2 AND j.kind='delete' AND j.scope='account'",
+    [id, L.account(actor)],
+  );
+  assert(row, "Deletion must belong to the exact synthetic account");
+  assert(
+    row.tombstone_id,
+    "Account deletion must retain its original tombstone",
+  );
+  return row;
+};
+const acceptedTuple = async () => {
+  const [row] = await sql(
+    `SELECT jsonb_build_object(
+      'note',(SELECT to_jsonb(i) FROM creator.content_index i WHERE id=$1),
+      'publication',(SELECT jsonb_agg(to_jsonb(p) ORDER BY version) FROM creator.content_publication p WHERE content_id=$1),
+      'reply',(SELECT to_jsonb(r) FROM creator.content_reply r WHERE id=$2),
+      'reaction',(SELECT to_jsonb(r) FROM creator.content_reaction r WHERE reply_id=$2),
+      'signatures',(SELECT jsonb_agg(to_jsonb(a) ORDER BY id) FROM creator.signed_act a WHERE id IN (SELECT signed_act_id FROM creator.content_publication WHERE content_id=$1 UNION SELECT signed_act_id FROM creator.content_reaction WHERE reply_id=$2))
+    ) AS value`,
+    [noteId, replyId],
+  );
+  return row.value;
+};
 try {
+  const existingDeletes = await sql(
+    "SELECT id,state,created_at::text AS created_at FROM creator_trust.privacy_job WHERE account_id=$1 AND kind='delete' AND scope='account' ORDER BY created_at,id",
+    [L.account(actor)],
+  );
+  if (existingDeletes.length) {
+    evidence.existingAccountDeletions = existingDeletes;
+    evidence.refusal =
+      "Account deletion already requested; no fresh session or lifecycle mutation attempted. Observe the original job read-only.";
+    await save();
+    assert.fail(evidence.refusal);
+  }
   token = await L.apiSession(actor);
   ops = await L.apiSession(4);
   creator = await L.apiSession(3);
@@ -114,6 +209,7 @@ try {
     source,
     "Explicit reply must belong to the supplied synthetic fan and Note",
   );
+  const retainedTuple = stopAfterExport ? await acceptedTuple() : undefined;
   await step(
     "real runtime role refuses wrong exact source hash and version",
     async () => {
@@ -190,12 +286,13 @@ try {
       );
       assert.equal(stored.state, "flagged");
       const feed = await api("GET", path("studio/replies"), creator);
+      assert.equal(feed.status, 200, JSON.stringify(feed));
       assert(!JSON.stringify(feed).includes(flagged.text));
-      evidence.creatorFeedLimitation = {
-        status: feed.status,
-        code: feed.json?.error?.code,
+      return {
+        replyId: flagged.id,
+        state: stored.state,
+        creatorFeedStatus: feed.status,
       };
-      return { replyId: flagged.id, state: stored.state };
     },
   );
   await step(
@@ -235,42 +332,68 @@ try {
     },
   );
   let exported;
-  await step("actual Content and Trust export owners complete", async () => {
+  await step("all eight actual export owners complete", async () => {
     token = await L.apiSession(actor);
-    exported = flag("--existing-export")
-      ? { id: flag("--existing-export") }
-      : ok(
-          await api("POST", "/v1/trust/privacy/jobs", token, {
-            kind: "export",
-            scope: "account",
-            proof: "LOCAL DEVELOPMENT",
-            idempotencyKey: randomUUID(),
-          }),
-        );
+    const previous = await exportCheckpoint("job", binding);
+    const requested = flag("--existing-export");
+    if (previous && requested) assert.equal(previous.jobId, requested);
+    if (previous) exported = { id: previous.jobId };
+    else {
+      const request = await exportCheckpoint("request", binding, {
+        existingExport: requested ?? null,
+        idempotencyKey: randomUUID(),
+      });
+      if (requested) assert.equal(request.existingExport, requested);
+      exported = request.existingExport
+        ? { id: request.existingExport }
+        : ok(
+            await api("POST", "/v1/trust/privacy/jobs", token, {
+              kind: "export",
+              scope: "account",
+              proof: "LOCAL DEVELOPMENT",
+              idempotencyKey: request.idempotencyKey,
+            }),
+          );
+    }
+    assert(exported.id);
     evidence.exportId = exported.id;
+    await save();
+    const initial = ok(
+      await api("GET", `/v1/trust/privacy/jobs/${exported.id}`, token),
+    );
+    const receipt = await exportCheckpoint("job", binding, {
+      jobId: exported.id,
+      createdAt: initial.created_at,
+    });
+    assert.equal(receipt.jobId, exported.id);
+    assert.equal(initial.created_at, receipt.createdAt);
+    assert(initial.created_at);
+    evidence.exportOriginalCreatedAt = receipt.createdAt;
     const job = await until(
-      async () =>
-        ok(await api("GET", `/v1/trust/privacy/jobs/${exported.id}`, token)),
+      async () => {
+        const current = ok(
+          await api("GET", `/v1/trust/privacy/jobs/${exported.id}`, token),
+        );
+        assert.equal(current.created_at, receipt.createdAt);
+        evidence.exportTasks = current.tasks?.map((t) => ({
+          domain: t.domain,
+          state: t.state,
+          error: t.error_code,
+        }));
+        await save();
+        return current;
+      },
       (j) =>
-        ["content", "trust"].every((domain) =>
-          j.tasks?.some((t) => t.domain === domain && t.state === "complete"),
-        ),
+        j.state === "complete" &&
+        j.tasks?.length === 8 &&
+        j.tasks.every((t) => t.state === "complete"),
       90000,
     );
-    evidence.exportComplete = job.state === "complete";
-    evidence.exportTasks = job.tasks.map((t) => ({
-      domain: t.domain,
-      state: t.state,
-      error: t.error_code,
-    }));
-    if (!evidence.exportComplete)
-      console.log(
-        "LIMIT whole export incomplete: " +
-          JSON.stringify(evidence.exportTasks),
-      );
+    evidence.exportComplete = true;
     return {
       jobId: exported.id,
-      wholeExportComplete: evidence.exportComplete,
+      state: job.state,
+      originalCreatedAt: receipt.createdAt,
       tasks: evidence.exportTasks,
     };
   });
@@ -293,12 +416,8 @@ try {
         `/v1/trust/privacy/jobs/${exported.id}/download`,
         token,
       );
-      assert.equal(
-        own.status,
-        evidence.exportComplete ? 200 : 409,
-        JSON.stringify(own),
-      );
-      const other = await L.apiSession(5);
+      assert.equal(own.status, 200, JSON.stringify(own));
+      const other = await L.apiSession(actor === 5 ? 2 : 5);
       const cross = await api(
         "GET",
         `/v1/trust/privacy/jobs/${exported.id}/download`,
@@ -309,8 +428,36 @@ try {
         actualOwnerOutputsVerified: true,
         ownDownload: own.status,
         crossAccount: cross.status,
-        wholeExportAcceptance: evidence.exportComplete,
       };
+    },
+  );
+  await step(
+    "whole export streams match their original byte counts and SHA-256",
+    async () => {
+      const out = resolve(OUT, `reply-export-recheck-${evidence.run}.json`);
+      await promisify(execFile)(
+        process.execPath,
+        [
+          fileURLToPath(
+            new URL("./e6-reply-review-export-recheck.mjs", import.meta.url),
+          ),
+          "--api",
+          API,
+          "--actor",
+          String(actor),
+          "--job",
+          exported.id,
+          "--out",
+          out,
+        ],
+        { timeout: 180000 },
+      );
+      const checked = JSON.parse(await readFile(out, "utf8"));
+      assert.equal(checked.jobId, exported.id);
+      assert.equal(checked.account, L.account(actor));
+      assert.equal(checked.originalCreatedAt, evidence.exportOriginalCreatedAt);
+      evidence.wholeExportAcceptance = true;
+      return checked;
     },
   );
   await step("real one-minute Ops purpose lease expires", async () => {
@@ -320,77 +467,167 @@ try {
     assert.equal(result.status, 403, JSON.stringify(result));
     return { status: result.status, elapsedMs: Date.now() - started };
   });
-  await step(
-    "unpublished Note cannot authorize pending reply delivery",
-    async () => {
-      await lease(expiring);
-      const [note] = await sql(
-        "SELECT version FROM creator.content_index WHERE id=$1",
-        [noteId],
-      );
-      ok(
-        await api("POST", path(`${noteId}/unpublish`), creator, {
-          version: note.version,
+  if (stopAfterExport) {
+    await step(
+      "stop-after-export preserves the supplied accepted tuple and current account",
+      async () => {
+        const after = await acceptedTuple();
+        assert.deepEqual(after, retainedTuple);
+        const deletes = await sql(
+          "SELECT id FROM creator_trust.privacy_job WHERE account_id=$1 AND kind='delete' AND scope='account'",
+          [L.account(actor)],
+        );
+        assert.equal(deletes.length, 0);
+        const session = ok(await api("GET", "/v1/identity/session", token));
+        assert.equal(session.accountId, L.account(actor));
+        evidence.stoppedAfterExport = true;
+        return {
+          acceptedTupleSha256: createHash("sha256")
+            .update(JSON.stringify(after))
+            .digest("hex"),
+          accountDeleteJobs: 0,
+        };
+      },
+    );
+    console.log(
+      "STOP after verified export; supplied Note/reply/reaction and account retained",
+    );
+  } else {
+    await step(
+      "unpublished Note cannot authorize pending reply delivery",
+      async () => {
+        await lease(expiring);
+        const [note] = await sql(
+          "SELECT version FROM creator.content_index WHERE id=$1",
+          [noteId],
+        );
+        ok(
+          await api("POST", path(`${noteId}/unpublish`), creator, {
+            version: note.version,
+            idempotencyKey: randomUUID(),
+          }),
+        );
+        const denied = await decide(expiring, "allow_reply");
+        assert.equal(denied.status, 403, JSON.stringify(denied));
+        return { status: denied.status };
+      },
+    );
+    await step(
+      "actual account deletion preserves original clocks and requires completed Trust review purge",
+      async () => {
+        token = await L.apiSession(actor);
+        const request = await privacyCheckpoint("delete", "request", binding, {
           idempotencyKey: randomUUID(),
-        }),
-      );
-      const denied = await decide(expiring, "allow_reply");
-      assert.equal(denied.status, 403, JSON.stringify(denied));
-      return { status: denied.status };
-    },
-  );
-  await step(
-    "real deletion removes Trust review metadata; Content remains visibly unfinished",
-    async () => {
-      token = await L.apiSession(actor);
-      const deletion = ok(
-        await api("POST", "/v1/trust/privacy/jobs", token, {
-          kind: "delete",
-          scope: "account",
-          proof: "LOCAL DEVELOPMENT",
-          idempotencyKey: randomUUID(),
-        }),
-      );
-      evidence.deleteId = deletion.id;
-      const before = await sql(
-        "SELECT created_at FROM creator_trust.privacy_job WHERE id=$1",
-        [deletion.id],
-      );
-      const job = await until(
-        async () =>
-          ok(await api("GET", `/v1/trust/privacy/jobs/${deletion.id}`, token)),
-        (j) =>
-          j.tasks?.some(
-            (t) => t.domain === "trust" && t.state === "complete",
-          ) && j.tasks.some((t) => t.domain === "content" && t.error_code),
-        90000,
-      );
-      assert.notEqual(job.state, "complete");
-      const [count] = await sql(
-        "SELECT (SELECT count(*) FROM creator_trust.reply_review WHERE account_id=$1)::int AS reviews,(SELECT count(*) FROM creator_trust.reply_review_decision WHERE case_id=$2)::int AS decisions",
-        [L.account(actor), source.case_id],
-      );
-      assert.equal(count.reviews, 0);
-      assert.equal(count.decisions, 0);
-      const after = await sql(
-        "SELECT created_at FROM creator_trust.privacy_job WHERE id=$1",
-        [deletion.id],
-      );
-      assert.deepEqual(after, before);
-      return {
-        jobId: deletion.id,
-        state: job.state,
-        tasks: job.tasks.map((t) => ({
-          domain: t.domain,
-          state: t.state,
-          error: t.error_code,
-        })),
-        reviewMetadataRemoved: true,
-        originalClockPreserved: true,
-      };
-    },
-  );
+        });
+        evidence.deleteRequest = {
+          idempotencyKey: request.idempotencyKey,
+          binding,
+        };
+        await save();
+        let deletion;
+        try {
+          deletion = ok(
+            await api("POST", "/v1/trust/privacy/jobs", token, {
+              kind: "delete",
+              scope: "account",
+              proof: "LOCAL DEVELOPMENT",
+              idempotencyKey: request.idempotencyKey,
+            }),
+          );
+        } catch (error) {
+          // An interrupted response must never justify a second deletion. Recover
+          // only the committed command acknowledgment; do not issue another POST.
+          const [committed] = await sql(
+            "SELECT response FROM creator_trust.command WHERE account_id=$1 AND operation='privacy' AND key=$2",
+            [L.account(actor), request.idempotencyKey],
+          );
+          if (committed?.response?.id) {
+            evidence.deleteId = committed.response.id;
+            evidence.deleteResponseRecovery =
+              "Read-only original command lookup after failed POST response; acceptance not inferred";
+            const clocks = await deletionClocks(committed.response.id);
+            await privacyCheckpoint("delete", "job", binding, {
+              jobId: committed.response.id,
+              clocks,
+              provenance: evidence.deleteResponseRecovery,
+            });
+            evidence.deleteOriginalClocks = clocks;
+            await save();
+          }
+          throw error;
+        }
+        evidence.deleteId = deletion.id;
+        evidence.deleteAcknowledgment = deletion;
+        await save();
+        const before = await deletionClocks(deletion.id);
+        const receipt = await privacyCheckpoint("delete", "job", binding, {
+          jobId: deletion.id,
+          clocks: before,
+          provenance:
+            "Actual API acknowledgment followed by original job/tombstone read",
+        });
+        assert.equal(receipt.jobId, deletion.id);
+        assert.deepEqual(receipt.clocks, before);
+        evidence.deleteOriginalClocks = receipt.clocks;
+        await save();
+        const observe = async () => {
+          const clocks = await deletionClocks(deletion.id);
+          assert.deepEqual(clocks, receipt.clocks);
+          evidence.deleteOriginalClockPreserved = true;
+          const current = ok(
+            await api("GET", `/v1/trust/privacy/jobs/${deletion.id}`, token),
+          );
+          evidence.deleteState = current.state;
+          evidence.deleteTasks = current.tasks?.map((task) => ({
+            domain: task.domain,
+            state: task.state,
+            attempts: task.attempts,
+            error: task.error_code,
+          }));
+          evidence.wholeErasureComplete =
+            current.state === "complete" &&
+            current.tasks?.length === 8 &&
+            current.tasks.every((task) => task.state === "complete");
+          evidence.deleteObservedAt = new Date().toISOString();
+          await save();
+          return current;
+        };
+        let job;
+        try {
+          job = await until(
+            observe,
+            (current) =>
+              current.tasks?.some(
+                (task) => task.domain === "trust" && task.state === "complete",
+              ),
+            90000,
+          );
+        } finally {
+          const clocks = await deletionClocks(deletion.id);
+          assert.deepEqual(clocks, receipt.clocks);
+          evidence.deleteOriginalClockPreserved = true;
+          const [remaining] = await sql(
+            "SELECT (SELECT count(*) FROM creator_trust.reply_review WHERE account_id=$1)::int AS reviews,(SELECT count(*) FROM creator_trust.reply_review_decision WHERE case_id=$2)::int AS decisions",
+            [L.account(actor), source.case_id],
+          );
+          evidence.deleteRemainingReviewMetadata = remaining;
+          await save();
+        }
+        assert.equal(evidence.deleteRemainingReviewMetadata.reviews, 0);
+        assert.equal(evidence.deleteRemainingReviewMetadata.decisions, 0);
+        return {
+          jobId: deletion.id,
+          state: job.state,
+          tasks: evidence.deleteTasks,
+          reviewMetadataRemoved: true,
+          originalClockPreserved: true,
+          wholeErasureComplete: evidence.wholeErasureComplete,
+        };
+      },
+    );
+  }
 } catch (error) {
+  evidence.failedStep = currentStep;
   evidence.failure = error.stack;
   await save();
   console.error(error);

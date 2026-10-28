@@ -763,6 +763,20 @@
       "owner": "W8",
       "sourceSha256": "65a86e17256a872bcbf640006274512a29e3bda31232838c68fe3aa5df2a958a",
       "wave": "20261023-reply-review"
+    },
+    {
+      "version": "0254_w8_creator_fan_denial",
+      "path": "apps/backend/migrations/0089_w8_creator_fan_denial.sql",
+      "owner": "W8",
+      "sourceSha256": "0a738e0a29c77e65274931d4054b5db26a340b8c10a498e8c016457ab1a22860",
+      "wave": "20261023-studio-reply-authority"
+    },
+    {
+      "version": "0255_w7_core_follow_metadata",
+      "owner": "W7",
+      "path": "apps/backend/src/modules/growth/migrations/pending_w7_core_follow_metadata.sql",
+      "sourceSha256": "29c0261cdfce50be434d8b8b49c21e23df6057613d521c8e40a13c3928d63796",
+      "wave": "20261027-core-follow"
     }
   ],
   "reserved": [

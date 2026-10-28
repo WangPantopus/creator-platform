@@ -1,0 +1,8 @@
+OWNED_MEMBERSHIP {"run":"88a414","membership":"5afe50f6-545b-470f-a7c3-5be91593b2ca","grant":"7a1120fd-cf5c-46db-b93f-8f3037a64627","excludedTier":"b535a1b4-6a2c-484f-8dbf-6440fcde4308"}
+PASS C4-pagination-window 52 real publications produce two audience-filtered candidate windows :: members: newest eligible Note + cursor; older: oldest eligible Note, end
+PASS C4-pagination-browser Earlier messages reveals the older signed Note without duplicates or audience leakage
+PASS C4-pagination-empty an empty eligible first page keeps its cursor and the browser can reach the older Note :: empty window followed opaque cursor to 28833fe3-bb4b-4f44-9659-94a018c977b4
+PASS C4-pagination-retraction refresh removes a retracted Note from the loaded older window
+PASS C4-pagination-cleanup own publications and audience fixture are withdrawn :: 52 owned Notes retained unpublished; members fixture ended
+
+5/5 steps passed

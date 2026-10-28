@@ -1,3 +1,5 @@
+import coreFollowReview from "../../../infra/migrations/reviews/20261027-core-follow.json" with { type: "json" };
+import { assertCoreFollowPurposeCatalog } from "../src/modules/growth/core-follow-catalogue.js";
 import type { PoolClient, QueryConfig, QueryResultRow } from "pg";
 import { readFile } from "node:fs/promises";
 import purposeReview from "../../../infra/migrations/reviews/20261007-generation-purpose-roles.json" with { type: "json" };
@@ -9,13 +11,15 @@ import comparisonReview from "../../../infra/migrations/reviews/20261008-compari
 import noticesReview from "../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
 import signInAndMoneyReview from "../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
 import replyReview from "../../../infra/migrations/reviews/20261023-reply-review.json" with { type: "json" };
+import studioReplyAuthorityReview from "../../../infra/migrations/reviews/20261023-studio-reply-authority.json" with { type: "json" };
+import { creatorFanDenialPurposeCatalogue } from "../src/modules/trust/creator-fan-denial-catalog.js";
 import workspaceLockReview from "../../../infra/migrations/reviews/20261022-workspace-lock.json" with { type: "json" };
 import { comparisonReaderCatalogue } from "../src/modules/conversation/comparison-feed.js";
 import { comparisonPrivacyCatalogue } from "../src/modules/conversation/comparison-privacy.js";
 import { comparisonArtifactCatalogue } from "../src/modules/trust/comparison-artifacts.js";
 import publicAIReview from "../../../infra/migrations/reviews/20261007-public-ai.json" with { type: "json" };
 import { publicAIPurposeCatalogue } from "../src/modules/identity/public-ai-catalogue.js";
-import { assertReplyReviewPurposeCatalog } from "../src/modules/trust/reply-review-catalog.js";
+import { replyReviewPurposeCatalogue } from "../src/modules/trust/reply-review-catalog.js";
 import { ContentPrivacyExport } from "../src/modules/content/privacy-export.js";
 import { contentHash } from "../src/core/canonical.js";
 import { generationConsumerCatalogue } from "../src/core/purpose-catalogue.js";
@@ -177,7 +181,9 @@ export async function assertGenerationWaveRoleSafety(
     | "notices"
     | "sign-in-and-money"
     | "workspace-lock"
-    | "reply-review",
+    | "reply-review"
+    | "studio-reply-authority"
+    | "core-follow",
 ) {
   if (
     purposeReview.schemaVersion !== 1 ||
@@ -189,22 +195,28 @@ export async function assertGenerationWaveRoleSafety(
     throw new WaveRoleSafetyError(
       "Generation-purpose wave review is unavailable.",
     );
-  const reply = extension === "reply-review";
+  const follow = extension === "core-follow";
+  const studio = follow || extension === "studio-reply-authority";
+  const reply = studio || extension === "reply-review";
   const workspaceLock = reply || extension === "workspace-lock";
   const signInAndMoney = workspaceLock || extension === "sign-in-and-money";
   const notices = signInAndMoney || extension === "notices";
   const comparison = notices || extension === "comparison";
   // Every pinned catalogue lists every relation, so the newest installed
   // wave's review holds the current pins.
-  const head = reply
-    ? replyReview
-    : workspaceLock
-      ? workspaceLockReview
-      : signInAndMoney
-        ? signInAndMoneyReview
-        : notices
-          ? noticesReview
-          : comparisonReview;
+  const head = follow
+    ? coreFollowReview
+    : studio
+      ? studioReplyAuthorityReview
+      : reply
+        ? replyReview
+        : workspaceLock
+          ? workspaceLockReview
+          : signInAndMoney
+            ? signInAndMoneyReview
+            : notices
+              ? noticesReview
+              : comparisonReview;
   const recovery =
     comparison ||
     extension === "generation-recovery" ||
@@ -222,6 +234,7 @@ export async function assertGenerationWaveRoleSafety(
     publicAI: extension === "public-ai" || recovery,
     comparison,
     replyReview: reply,
+    studioReplyAuthority: studio,
   });
   const catalogue = await generationWavePurposeCatalogue(client);
   const accepted = extension
@@ -397,7 +410,42 @@ export async function assertGenerationWaveRoleSafety(
       await client.query("RESET SESSION AUTHORIZATION").catch(() => undefined);
     }
   }
-  if (reply) await assertReplyReviewPurposeCatalog(client);
+  if (
+    reply &&
+    (!("replyReviewCatalogueChecksum" in head) ||
+      contentHash(await replyReviewPurposeCatalogue(client)) !==
+        head.replyReviewCatalogueChecksum)
+  )
+    throw new WaveRoleSafetyError("Reply-review purpose catalogue changed.");
+  if (
+    studio &&
+    (!("creatorFanDenialCatalogueChecksum" in head) ||
+      !("creatorFanDenialIncomingCatalogueChecksum" in head) ||
+      ![
+        head.creatorFanDenialCatalogueChecksum,
+        head.creatorFanDenialIncomingCatalogueChecksum,
+      ].includes(contentHash(await creatorFanDenialPurposeCatalogue(client))))
+  )
+    throw new WaveRoleSafetyError(
+      "Creator/fan denial purpose catalogue changed.",
+    );
+  if (follow) {
+    for (const source of coreFollowReview.sources)
+      if (
+        sha256(await readFile(new URL(source.path, repositoryRoot))) !==
+          source.checksum ||
+        !(
+          await client.query(
+            "SELECT 1 FROM creator.schema_migration WHERE version=$1 AND checksum=$2",
+            [source.version, source.checksum],
+          )
+        ).rowCount
+      )
+        throw new WaveRoleSafetyError(
+          "Exact core Follow metadata source is required.",
+        );
+    await assertCoreFollowPurposeCatalog(client);
+  }
   return {
     original,
     purposeRoles:
@@ -405,6 +453,7 @@ export async function assertGenerationWaveRoleSafety(
       (extension ? 1 : 0) +
       (extension === "public-ai" || recovery ? 1 : 0) +
       (comparison ? 3 : 0) +
-      (reply ? 1 : 0),
+      (reply ? 1 : 0) +
+      (follow ? 1 : 0),
   };
 }

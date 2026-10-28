@@ -225,6 +225,7 @@ export function createWorld({ now = () => Date.now() } = {}) {
     log: [],
     requestCount: 0,
     faults: [],
+    contentPresence: new Map(),
     timers: new Set(),
     sockets: new Set(),
     sessions: new Map(),
@@ -264,6 +265,7 @@ export function seed(world) {
   world.notifications = [];
   world.devices = [];
   world.faults = [];
+  world.contentPresence.clear();
   world.generationAvailable = true;
   world.policy = structuredClone(POLICY);
   world.clockOffsetMs = 0;
