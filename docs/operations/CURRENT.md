@@ -14,8 +14,15 @@ diagnostic; accepted incoming profiles match. Actual proof/passkey/Note/private
 reply/Ops/exact-author retry/creator feed/reaction signing succeeded on56711/56712.
 After correcting scenario selectors, same-fixture continuation passed7/7 with
 exact command replay, independent public signature hash, web thread navigation
-and unchanged source/signature/command rows. Native checks now use that actual
-accepted fixture; lifecycle/privacy and157 regressions remain pending.
+and unchanged source/signature/command rows. The same actual reaction passed
+iOS1/1 with no skips and Android7/7; only prepared scenario selectors changed.
+Existing web lifecycle passed4/4. Native five-second/concurrent/atomic behavior
+is preserved. The current-account export completed all eight domains, and all
+four streamed artifacts matched their original byte counts and hashes. The
+subsequent deletion remains blocked by existing owner/retention gates. Its job
+and clocks are preserved;56710 actor6 must not be reused/reset. The separate
+157-test regression is running on an isolated56720 cluster; whole erasure
+remains unclaimed. #516 now preserves its operated native checks at`26915e9f2`.
 The following October25 checkpoint remains historical.
 
 Updated October 25, 2026 for the founder-requested handoff. Start with the

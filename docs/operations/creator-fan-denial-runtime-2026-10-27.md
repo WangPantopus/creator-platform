@@ -170,5 +170,71 @@ node tests/scenarios/lane-6/e6-reply-review.mjs \
   --resume-stack-env "$TMPDIR/qelvora-stack/lanestudio122-1027/backend.env"
 ```
 
-Native verification is now running from unchanged #516 after a successful signed
-x86_64 simulator build. Lifecycle/privacy and157 backend tests remain pending.
+## Same-reaction native and web lifecycle checks
+
+The same accepted fixture passed #516's actual iOS and Android journeys. iOS
+used a fresh signed x86_64 build for the observed Intel host and preserved owned
+simulator. The initial prepared locator assumed nested signature buttons; the
+observed hierarchy showed sibling buttons sharing a row identifier. Only the
+scenario was corrected. Its final run passed **1/1, zero failures/skips,53.022s**,
+including the full hash visible above the tab bar. Android reused the preserved
+APK (product source unchanged) and passed **all7 reported groups, exit0**. No
+fresh Android build is claimed; its JDK remains absent.
+
+Both checked actual Note/reaction visibility, healthy refresh, exact public
+reaction hash, distinct signature and private-source navigation. Actor five had
+the real block created by the runtime probe; native checks explicitly required
+the closed-scope response and absence of Note/reaction. This is blocked-outsider
+exclusion, not an independent membership-only denial. Normal nonmember modes
+remain available. Product source, five-second access window, concurrent reads
+and atomic concealment were unchanged. Screenshots were inspected; both owned
+devices were shut down afterwards.
+
+Native receipts remain under `native-ios-real-reaction-final/` and
+`native-android-real-reaction/` in the private evidence directory. No fixture
+reaction or approval was substituted. See #516's updated native qualification
+report for build/APK provenance and scenario details.
+
+The existing web `--lifecycle-only` workflow then passed **4/4** on this same
+Note: offline conceal/reconnect, pagehide/pageshow, transport failure/retry, and
+an actually stalled audience read that could not extend the five-second window.
+Its log is `web-lifecycle.log`. Lifecycle/privacy and157 backend tests follow
+separately; whole erasure remains unclaimed.
+
+## Actual export and deletion boundary
+
+After both native clients and the web lifecycle finished, the existing reply
+privacy workflow passed nine reported groups on56710: runtime hash/version
+refusals, revoked-author refusal, actual flagging with a successful creator-feed
+read, withdrawal/evidence refusal, complete eight-owner export, owner-output
+separation and download authority, streamed artifact integrity, real one-minute
+Ops lease expiry, and unpublished-Note refusal.
+
+Export `ce3bb8b6-6996-47f6-8218-dfbfd8e474a4` completed all eight domains. Its
+original creation time remained `2026-10-28T04:09:01.393Z`. The existing whole
+export recheck streamed Agent, Commerce, Conversation and Growth artifacts and
+matched every original byte count and SHA-256; another account received404.
+Content contained the private reply body while Trust exposed metadata without
+that body or reviewer identity. Private receipts and hashes are in `lifecycle/`
+and `lifecycle.log`.
+
+The workflow then unpublished the accepted Note and requested deletion for this
+new stack's actor6. These operations occurred only after its accepted reaction
+had been verified on web, iOS and Android. Do not reuse/reset this actor or rerun
+the browser continuation against its now-withdrawn fixture. The signed acceptance
+evidence and original signatures remain preserved.
+
+Deletion `4f6ebc7c-471e-46a0-b134-db72d1f700fa`, created at
+`2026-10-28T04:10:02.444Z`, did **not** complete. The scenario exited1 after its
+bounded wait. Growth and Media completed; Content reported
+`content_retention_unconfigured`, Commerce `commerce_retention_unconfigured`,
+Conversation `conversation_provenance_purge_unavailable`, Agent
+`accounting_boundary_pending`, Trust `comparison_artifact_purge_pending`, and
+Identity `identity_erasure_waiting`. No successful whole-erasure result is
+claimed. The job, its timestamps, receipts and tombstones are preserved without
+clock changes or forced completion. These are separate existing owner gates,
+not evidence that the accepted signed reaction failed.
+
+The157-test backend rerun uses a separate owned PostgreSQL cluster on56720,
+`qelvora-regress122-1027-postgres`, so its disposable regression databases and
+test-role setup cannot mutate any application or restored cluster.
