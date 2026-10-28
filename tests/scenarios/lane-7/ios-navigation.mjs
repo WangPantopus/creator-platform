@@ -1,6 +1,8 @@
 // Run the opt-in iOS navigation journeys, serially, on lane 7's simulator.
 // First build-for-testing; start the harness and ios-link-driver.mjs.
 // node tests/scenarios/lane-7/ios-navigation.mjs <built.xctestrun> [N2 N5 ... | --stack]
+// --presence-real, --presence-reaction or --presence-harness use explicit
+// LANE7_IOS and forward the documented QELVORA_PRESENCE_* values to XCTest.
 // LANE7_OUT is an off-repository directory for the xcresult evidence.
 import { execFileSync, spawnSync } from "node:child_process";
 import { readFileSync, writeFileSync, unlinkSync, mkdirSync } from "node:fs";
@@ -8,26 +10,45 @@ import { dirname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 
 const [source, ...ids] = process.argv.slice(2);
+const presence =
+  ids.length === 1 &&
+  ["--presence-real", "--presence-reaction", "--presence-harness"].includes(
+    ids[0],
+  )
+    ? ids[0]
+    : null;
 const stack = ids.length === 1 && ids[0] === "--stack";
-if (stack) ids.length = 0;
-const suite = stack ? "Lane7StackNavigationFlow" : "Lane7NavigationFlows";
-const flows = stack
-  ? { STACK: "testNavigationOnRealStack" }
-  : {
-      N1: "testN01ThreadBackAndGesture",
-      N2: "testN02ConsentIsReplaced",
-      N5: "testN05AccountBack",
-      N6: "testN06NotificationTrailAndLabel",
-      N8: "testN08ColdLink",
-      N13: "testN13AccountChangeClearsTrail",
-      N14: "testN14UnknownLink",
-      N15: "testN15RepeatedLinkAndQuickBack",
-      N16: "testN16LinkWhilePrivacyIsOpen",
-      N17: "testN17TrailBoundary",
-      N19: "testN19NewFanBack",
-      N20: "testN20EditProfileBack",
-      N21: "testN21CreatorAccessBack",
-    };
+if (presence && !process.env.LANE7_IOS)
+  throw new Error(
+    "Presence checks require an explicitly owned LANE7_IOS simulator.",
+  );
+if (stack || presence) ids.length = 0;
+const suite =
+  stack || presence ? "Lane7StackNavigationFlow" : "Lane7NavigationFlows";
+const flows = presence
+  ? {
+      PRESENCE:
+        presence === "--presence-harness"
+          ? "testContentPresenceLifecycleInHarness"
+          : "testContentPresenceOnRealStack",
+    }
+  : stack
+    ? { STACK: "testNavigationOnRealStack" }
+    : {
+        N1: "testN01ThreadBackAndGesture",
+        N2: "testN02ConsentIsReplaced",
+        N5: "testN05AccountBack",
+        N6: "testN06NotificationTrailAndLabel",
+        N8: "testN08ColdLink",
+        N13: "testN13AccountChangeClearsTrail",
+        N14: "testN14UnknownLink",
+        N15: "testN15RepeatedLinkAndQuickBack",
+        N16: "testN16LinkWhilePrivacyIsOpen",
+        N17: "testN17TrailBoundary",
+        N19: "testN19NewFanBack",
+        N20: "testN20EditProfileBack",
+        N21: "testN21CreatorAccessBack",
+      };
 if (!source || ids.some((id) => !flows[id]))
   throw new Error(
     "Pass a built .xctestrun and optional unfinished iOS flow IDs.",
@@ -45,6 +66,13 @@ const optIn = (value) => {
     value.EnvironmentVariables[
       stack ? "LANE7_REAL_STACK" : "LANE7_NAVIGATION"
     ] = "1";
+    if (presence) {
+      for (const [key, setting] of Object.entries(process.env))
+        if (key.startsWith("QELVORA_PRESENCE_"))
+          value.EnvironmentVariables[key] = setting;
+      value.EnvironmentVariables.QELVORA_PRESENCE_REQUIRE_REACTION =
+        presence === "--presence-reaction" ? "1" : "0";
+    }
     targets += 1;
   }
   for (const child of Object.values(value)) optIn(child);
@@ -82,7 +110,7 @@ try {
       "-xctestrun",
       scratch,
       "-destination",
-      "platform=iOS Simulator,id=62DDB9C8-4B10-48CB-94ED-1746980B54EA",
+      `platform=iOS Simulator,id=${process.env.LANE7_IOS ?? "62DDB9C8-4B10-48CB-94ED-1746980B54EA"}`,
       "-parallel-testing-enabled",
       "NO",
       "-resultBundlePath",
