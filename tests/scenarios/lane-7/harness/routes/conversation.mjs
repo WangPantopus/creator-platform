@@ -221,6 +221,32 @@ export function sendToAi(world, thread, text, key) {
 }
 
 export function register(router) {
+  router.add("GET", "/v1/content/:creatorId/presence", (ctx) => {
+    const { account } = authenticate(ctx);
+    if (ctx.req.headers["x-qelvora-expected-account"] !== account.id)
+      throw new Failure(
+        403,
+        "content_account_changed",
+        "The signed-in account changed.",
+      );
+    const held = ctx.world.contentPresence.get(
+      `${ctx.params.creatorId}/${account.id}`,
+    );
+    const cursors = Array.from(
+      { length: 7 },
+      (_, index) =>
+        `2026-10-01T00:00:00.000000Z~d1000000-0000-4000-8000-000000000${900 + index}`,
+    );
+    const page = ctx.query.before ? cursors.indexOf(ctx.query.before) + 1 : 0;
+    if (ctx.query.before && page === 0) throw invalid();
+    const deep = held?.mode === "deep";
+    const empty = deep ? page < 7 : held?.mode === "empty_first" && page === 0;
+    return {
+      items: empty ? [] : (held?.items ?? []),
+      nextBefore: empty ? cursors[deep ? page : 0] : null,
+      serverTime: new Date(ctx.world.now()).toISOString(),
+    };
+  });
   router.add("GET", "/v1/conversations/capabilities", ({ world }) => ({
     providers: world.policy,
     developmentSynthetic: !world.policy.verified,
