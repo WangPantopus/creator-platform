@@ -8,6 +8,8 @@ import {
   assertOriginalPrivacyFamilyComparisonCatalogForReview,
   assertOriginalPrivacyFamilyNoticesCatalogForReview,
   assertOriginalPrivacyFamilySignInAndMoneyCatalogForReview,
+  assertOriginalPrivacyFamilyWorkspaceLockCatalogForReview,
+  assertOriginalPrivacyFamilyReplyReviewCatalogForReview,
   originalPrivacyBindingSignature,
   originalPrivacyBindingDefinition,
 } from "./privacy-family-catalog.js";
@@ -17,6 +19,8 @@ import publicAIReview from "../../../../../infra/migrations/reviews/20261007-pub
 import outputReview from "../../../../../infra/migrations/reviews/20261007-generation-first-visible.json" with { type: "json" };
 import comparisonReview from "../../../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
 import noticesReview from "../../../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
+import replyReview from "../../../../../infra/migrations/reviews/20261023-reply-review.json" with { type: "json" };
+import workspaceLockReview from "../../../../../infra/migrations/reviews/20261022-workspace-lock.json" with { type: "json" };
 import signInAndMoneyReview from "../../../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
 import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 import { contentHash } from "../../core/canonical.js";
@@ -169,6 +173,21 @@ export async function assertSignInAndMoneyPrivacyTaskCatalogForReview(
   return assertPrivacyExtensionForReview(client, "sign-in-and-money", signal);
 }
 
+/** Fixed120 metadata before reply-review activation. */
+export async function assertWorkspaceLockPrivacyTaskCatalogForReview(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  return assertPrivacyExtensionForReview(client, "workspace-lock", signal);
+}
+
+export async function assertReplyReviewPrivacyTaskCatalogForReview(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  return assertPrivacyExtensionForReview(client, "reply-review", signal);
+}
+
 async function assertPrivacyExtensionForReview(
   client: PoolClient,
   profile:
@@ -178,7 +197,9 @@ async function assertPrivacyExtensionForReview(
     | "public"
     | "comparison"
     | "notices"
-    | "sign-in-and-money",
+    | "sign-in-and-money"
+    | "workspace-lock"
+    | "reply-review",
   signal?: AbortSignal,
 ) {
   for (const source of generationReview.sources)
@@ -191,20 +212,43 @@ async function assertPrivacyExtensionForReview(
       profile === "public" ||
       profile === "comparison" ||
       profile === "notices" ||
-      profile === "sign-in-and-money"
+      profile === "sign-in-and-money" ||
+      profile === "workspace-lock" ||
+      profile === "reply-review"
     ) {
       for (const source of publicAIReview.sources)
         await assertRegisteredMigration(client, source, signal);
-      if (profile === "notices" || profile === "sign-in-and-money") {
+      if (
+        profile === "notices" ||
+        profile === "sign-in-and-money" ||
+        profile === "workspace-lock" ||
+        profile === "reply-review"
+      ) {
         for (const source of [
           ...comparisonReview.sources,
           ...noticesReview.sources,
-          ...(profile === "sign-in-and-money"
+          ...(profile === "sign-in-and-money" ||
+          profile === "workspace-lock" ||
+          profile === "reply-review"
             ? signInAndMoneyReview.sources
             : []),
+          ...(["workspace-lock", "reply-review"].includes(profile)
+            ? workspaceLockReview.sources
+            : []),
+          ...(profile === "reply-review" ? replyReview.sources : []),
         ])
           await assertRegisteredMigration(client, source, signal);
-        if (profile === "sign-in-and-money")
+        if (profile === "reply-review")
+          await assertOriginalPrivacyFamilyReplyReviewCatalogForReview(
+            client,
+            signal,
+          );
+        else if (profile === "workspace-lock")
+          await assertOriginalPrivacyFamilyWorkspaceLockCatalogForReview(
+            client,
+            signal,
+          );
+        else if (profile === "sign-in-and-money")
           await assertOriginalPrivacyFamilySignInAndMoneyCatalogForReview(
             client,
             signal,
@@ -227,33 +271,41 @@ async function assertPrivacyExtensionForReview(
   } else await assertOriginalPrivacyFamilyGenerationCatalog(client, signal);
   if (
     contentHash(await accountDetachedUsageCatalogue(client, signal)) !==
-      (profile === "sign-in-and-money"
-        ? signInAndMoneyReview.runtimeCatalogues.detached
-        : profile === "notices"
-          ? noticesReview.runtimeCatalogues.detached
-          : profile === "comparison"
-            ? comparisonReview.runtimeCatalogues.detached
-            : profile === "public"
-              ? publicAIReview.runtimeCatalogues.detached
-              : profile === "output"
-                ? outputReview.runtimeCatalogues.detached
-                : profile === "content"
-                  ? contentReview.runtimeCatalogues.detached
-                  : accountDetachedUsageExpectedCatalogue) ||
+      (profile === "reply-review"
+        ? replyReview.runtimeCatalogues.detached
+        : profile === "workspace-lock"
+          ? workspaceLockReview.runtimeCatalogues.detached
+          : profile === "sign-in-and-money"
+            ? signInAndMoneyReview.runtimeCatalogues.detached
+            : profile === "notices"
+              ? noticesReview.runtimeCatalogues.detached
+              : profile === "comparison"
+                ? comparisonReview.runtimeCatalogues.detached
+                : profile === "public"
+                  ? publicAIReview.runtimeCatalogues.detached
+                  : profile === "output"
+                    ? outputReview.runtimeCatalogues.detached
+                    : profile === "content"
+                      ? contentReview.runtimeCatalogues.detached
+                      : accountDetachedUsageExpectedCatalogue) ||
     contentHash(await accountingBoundaryCatalogue(client, signal)) !==
-      (profile === "sign-in-and-money"
-        ? signInAndMoneyReview.runtimeCatalogues.boundary
-        : profile === "notices"
-          ? noticesReview.runtimeCatalogues.boundary
-          : profile === "comparison"
-            ? comparisonReview.runtimeCatalogues.boundary
-            : profile === "public"
-              ? publicAIReview.runtimeCatalogues.boundary
-              : profile === "output"
-                ? outputReview.runtimeCatalogues.boundary
-                : profile === "content"
-                  ? contentReview.runtimeCatalogues.boundary
-                  : accountingBoundaryExpectedCatalogue)
+      (profile === "reply-review"
+        ? replyReview.runtimeCatalogues.boundary
+        : profile === "workspace-lock"
+          ? workspaceLockReview.runtimeCatalogues.boundary
+          : profile === "sign-in-and-money"
+            ? signInAndMoneyReview.runtimeCatalogues.boundary
+            : profile === "notices"
+              ? noticesReview.runtimeCatalogues.boundary
+              : profile === "comparison"
+                ? comparisonReview.runtimeCatalogues.boundary
+                : profile === "public"
+                  ? publicAIReview.runtimeCatalogues.boundary
+                  : profile === "output"
+                    ? outputReview.runtimeCatalogues.boundary
+                    : profile === "content"
+                      ? contentReview.runtimeCatalogues.boundary
+                      : accountingBoundaryExpectedCatalogue)
   )
     throw new DomainError(
       "privacy_commit_fence_unavailable",

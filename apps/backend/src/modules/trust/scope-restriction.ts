@@ -10,6 +10,7 @@ import type { Actor } from "../identity/adapter.js";
 import type { TrustService } from "./service.js";
 import { DomainError } from "../../core/errors.js";
 import { querySettlementUncertain } from "../../core/query-settlement.js";
+import { assertCreatorFanDenialCatalog } from "./creator-fan-denial-catalog.js";
 import {
   assertCurrentSession,
   requestAuthority,
@@ -58,6 +59,7 @@ async function projectedDenial(
   actor: Actor,
   sql: string,
   values: (string | null)[],
+  assertCatalogue?: (client: PoolClient) => Promise<void>,
 ) {
   if (!actor.adultEligible)
     throw new DomainError(
@@ -85,6 +87,7 @@ async function projectedDenial(
     );
     if (current.rows[0]?.account !== actor.accountId)
       throw new DomainError("scope_unavailable", "This scope is unavailable.");
+    await assertCatalogue?.(client);
     const result = await denialQuery(client, sql, values);
     if (result !== "allowed" && result !== "denied")
       throw new DomainError(
@@ -195,6 +198,7 @@ export function trustCreatorFanRestrictionInTransaction() {
       actor,
       "SELECT creator_trust.creator_fan_denial($1,$2) AS denial",
       [pair.creatorId, pair.fanId],
+      assertCreatorFanDenialCatalog,
     );
   };
 }

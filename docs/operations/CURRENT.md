@@ -1,6 +1,80 @@
 # Current state
 
-Updated 2026-10-23 during the founder-authorized app-completion work. This is a
+Continuation resumed October 27, 2026 in the same worktree and draft #517.
+The [runtime continuation report](creator-fan-denial-runtime-2026-10-27.md)
+records current remote heads, owned resources and operated results. All 65
+previously audited remote heads are unchanged; GitHub now lists those PRs plus
+#517. Original fresh122 remains healthy on56700–56703. All15 runtime groups
+pass there, including compiled descriptor drift and genuine session/block/
+restoration checks. Its seeded Ops memberships have expired; their original
+clocks were preserved. A separate fresh122 acceptance stack now runs on
+56710–56713 with current normal synthetic seed. Its runtime probe also passes
+15/15. Both live Growth checks are **46/47**, solely the existing family-pin
+diagnostic; accepted incoming profiles match. Actual proof/passkey/Note/private
+reply/Ops/exact-author retry/creator feed/reaction signing succeeded on56711/56712.
+After correcting scenario selectors, same-fixture continuation passed7/7 with
+exact command replay, independent public signature hash, web thread navigation
+and unchanged source/signature/command rows. The same actual reaction passed
+iOS1/1 with no skips and Android7/7; only prepared scenario selectors changed.
+Existing web lifecycle passed4/4. Native five-second/concurrent/atomic behavior
+is preserved. The current-account export completed all eight domains, and all
+four streamed artifacts matched their original byte counts and hashes. The
+subsequent deletion remains blocked by existing owner/retention gates. Its job
+and clocks are preserved;56710 actor6 must not be reused/reset. The separate
+157-test regression is running on an isolated56720 cluster; whole erasure
+remains unclaimed. #516 now preserves its operated native checks at`26915e9f2`.
+The following October25 checkpoint remains historical.
+
+Updated October 25, 2026 for the founder-requested handoff. Start with the
+[latest handoff](session-handoff-2026-10-25.md),
+[65-PR reuse audit](open-pr-reuse-audit-2026-10-25.md) and
+[0254 qualification report](creator-fan-denial-qualification-2026-10-25.md).
+
+The active continuation is `codex/studio-reply-authority-2026-10-25` in
+`/Users/yingpengwang/.codex/worktrees/studio-reply-authority/creator-platform`,
+stacked on exact final #515. Source checkpoint `036e00877` is pushed in
+[draft #517](https://github.com/WangPantopus/creator-platform/pull/517).
+#514 remains `47188ddba`; #515 remains `7eefeaf5d`; #516 is `6023517ad` with
+prepared real-reaction operated scenarios. All four PRs remain drafts/unmerged.
+
+- Additive0254 preserves unchanged0089 SQL, reservation0173, all earlier SQL and
+  reviews. New exact executable/ledger/catalogue admission precedes the existing
+  creator/fan SQL callback; no role or positive authority is added.
+- Both restored source probes passed18 checks/13 drift refusals. Four profiles
+  cover fresh/restored and with/without Growth, with all existing role reach
+  preserved. Fresh122 and independently restored121→122 each passed47/47
+  catalogue groups,53 digests without Growth. Original data,64 roles, sequence
+  and121 prior ledger entries remain intact; upgraded target stays closed.
+- Fresh122 stock local backend/web/model are running at56701/56702/56703 with
+  database56700 and Growth. Startup passed; live Growth catalogue check was not
+  run before handoff. Do not infer that old API/web/fake Stripe services survived
+  the host restart; their database containers and prior history remain preserved.
+- Actual callback/session/negative/restoration probes, unregistered hand-installed
+  function refusal, signed Note/reply/Ops/reaction acceptance and native reaction
+  runs remain unexecuted. Prepared scenarios are not acceptance. Existing157
+  backend regressions and privacy/lifecycle reruns remain pending.
+- Final saved-source backend typecheck, focused lint, changed-code/JSON formatting,
+  whitespace and exact historical-map/source-preservation checks passed.
+- Audited all65 open PRs (21 drafts) before continuing. Twenty-one older heads
+  already belong to #514/#515. Reuse the cumulative native stack and existing
+  #392/#459 share cards, #400 queued reaction withdrawal, #488 Studio live updates,
+  #512/#513 and other mapped work instead of rebuilding them. #516's strict
+  freshness and #514's newer identity/FAQ fixes must survive reconciliation.
+
+After actual122 acceptance, qualify existing0185 follower metadata separately,
+then share cards and the remaining mapped work. No production or physical-device
+acceptance, whole-account erasure, merge/main push/force-push, hosting choice or
+preserved-clock change occurred. Ordinary retention remains approved; unfinished
+owner implementations and Commerce financial retention remain separate gates.
+Original deletion maturity stays **2026-10-30 08:48:22.966 UTC**; development
+comparison/reply-feedback authority expires **2026-11-01**.
+
+## Previous checkpoint (historical)
+
+The remaining text preserves the historical #514/#515 checkpoints and their scope.
+Use the latest handoff and reuse audit above for current continuation decisions.
+
+Updated 2026-10-22 during the founder-authorized app-completion work. This is a
 local implementation checkpoint, not launch acceptance. Earlier lane notes and
 pull request maps are historical unless reverified here. Decisions come from the
 founder in chat, not from this file.

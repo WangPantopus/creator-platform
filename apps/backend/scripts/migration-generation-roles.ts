@@ -8,12 +8,16 @@ import recoveryReview from "../../../infra/migrations/reviews/20261007-generatio
 import comparisonReview from "../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
 import noticesReview from "../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
 import signInAndMoneyReview from "../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
+import replyReview from "../../../infra/migrations/reviews/20261023-reply-review.json" with { type: "json" };
+import studioReplyAuthorityReview from "../../../infra/migrations/reviews/20261023-studio-reply-authority.json" with { type: "json" };
+import { assertCreatorFanDenialPurposeCatalog } from "../src/modules/trust/creator-fan-denial-catalog.js";
 import workspaceLockReview from "../../../infra/migrations/reviews/20261022-workspace-lock.json" with { type: "json" };
 import { comparisonReaderCatalogue } from "../src/modules/conversation/comparison-feed.js";
 import { comparisonPrivacyCatalogue } from "../src/modules/conversation/comparison-privacy.js";
 import { comparisonArtifactCatalogue } from "../src/modules/trust/comparison-artifacts.js";
 import publicAIReview from "../../../infra/migrations/reviews/20261007-public-ai.json" with { type: "json" };
 import { publicAIPurposeCatalogue } from "../src/modules/identity/public-ai-catalogue.js";
+import { assertReplyReviewPurposeCatalog } from "../src/modules/trust/reply-review-catalog.js";
 import { ContentPrivacyExport } from "../src/modules/content/privacy-export.js";
 import { contentHash } from "../src/core/canonical.js";
 import { generationConsumerCatalogue } from "../src/core/purpose-catalogue.js";
@@ -174,7 +178,9 @@ export async function assertGenerationWaveRoleSafety(
     | "comparison"
     | "notices"
     | "sign-in-and-money"
-    | "workspace-lock",
+    | "workspace-lock"
+    | "reply-review"
+    | "studio-reply-authority",
 ) {
   if (
     purposeReview.schemaVersion !== 1 ||
@@ -186,19 +192,25 @@ export async function assertGenerationWaveRoleSafety(
     throw new WaveRoleSafetyError(
       "Generation-purpose wave review is unavailable.",
     );
-  const workspaceLock = extension === "workspace-lock";
+  const studio = extension === "studio-reply-authority";
+  const reply = studio || extension === "reply-review";
+  const workspaceLock = reply || extension === "workspace-lock";
   const signInAndMoney = workspaceLock || extension === "sign-in-and-money";
   const notices = signInAndMoney || extension === "notices";
   const comparison = notices || extension === "comparison";
   // Every pinned catalogue lists every relation, so the newest installed
   // wave's review holds the current pins.
-  const head = workspaceLock
-    ? workspaceLockReview
-    : signInAndMoney
-      ? signInAndMoneyReview
-      : notices
-        ? noticesReview
-        : comparisonReview;
+  const head = studio
+    ? studioReplyAuthorityReview
+    : reply
+      ? replyReview
+      : workspaceLock
+        ? workspaceLockReview
+        : signInAndMoney
+          ? signInAndMoneyReview
+          : notices
+            ? noticesReview
+            : comparisonReview;
   const recovery =
     comparison ||
     extension === "generation-recovery" ||
@@ -215,6 +227,8 @@ export async function assertGenerationWaveRoleSafety(
     generationDenial: true,
     publicAI: extension === "public-ai" || recovery,
     comparison,
+    replyReview: reply,
+    studioReplyAuthority: studio,
   });
   const catalogue = await generationWavePurposeCatalogue(client);
   const accepted = extension
@@ -390,12 +404,15 @@ export async function assertGenerationWaveRoleSafety(
       await client.query("RESET SESSION AUTHORIZATION").catch(() => undefined);
     }
   }
+  if (reply) await assertReplyReviewPurposeCatalog(client);
+  if (studio) await assertCreatorFanDenialPurposeCatalog(client);
   return {
     original,
     purposeRoles:
       purposeReview.roles.length +
       (extension ? 1 : 0) +
       (extension === "public-ai" || recovery ? 1 : 0) +
-      (comparison ? 3 : 0),
+      (comparison ? 3 : 0) +
+      (reply ? 1 : 0),
   };
 }

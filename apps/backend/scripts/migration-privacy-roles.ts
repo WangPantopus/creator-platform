@@ -8,6 +8,8 @@ import {
   assertComparisonPrivacyTaskCatalogForReview,
   assertNoticesPrivacyTaskCatalogForReview,
   assertSignInAndMoneyPrivacyTaskCatalogForReview,
+  assertWorkspaceLockPrivacyTaskCatalogForReview,
+  assertReplyReviewPrivacyTaskCatalogForReview,
   assertContentPrivacyTaskCatalogForReview,
   assertPrivacyTaskCatalog,
 } from "../src/modules/trust/privacy-catalog.js";
@@ -16,6 +18,8 @@ import {
   assertDomainPrivacyTaskCatalogForComparisonReview,
   assertDomainPrivacyTaskCatalogForNoticesReview,
   assertDomainPrivacyTaskCatalogForSignInAndMoneyReview,
+  assertDomainPrivacyTaskCatalogForWorkspaceLockReview,
+  assertDomainPrivacyTaskCatalogForReplyReview,
 } from "../src/modules/trust/domain-privacy-catalog.js";
 import { repositoryRoot, sha256 } from "./migration-custody.js";
 import { WaveRoleSafetyError } from "./migration-wave-roles.js";
@@ -55,6 +59,8 @@ export async function assertPrivacyWaveRoleSafety(
     comparisonBeforeNotices?: boolean;
     noticesBeforeSignInAndMoney?: boolean;
     signInAndMoneyBeforeWorkspaceLock?: boolean;
+    workspaceLockBeforeReplyReview?: boolean;
+    replyReviewBeforeStudioReplyAuthority?: boolean;
   },
 ) {
   const fail = (purpose: string): never => {
@@ -147,6 +153,10 @@ export async function assertPrivacyWaveRoleSafety(
         await assertNoticesPrivacyTaskCatalogForReview(client);
       else if (installed.signInAndMoneyBeforeWorkspaceLock)
         await assertSignInAndMoneyPrivacyTaskCatalogForReview(client);
+      else if (installed.workspaceLockBeforeReplyReview)
+        await assertWorkspaceLockPrivacyTaskCatalogForReview(client);
+      else if (installed.replyReviewBeforeStudioReplyAuthority)
+        await assertReplyReviewPrivacyTaskCatalogForReview(client);
       else await assertPrivacyTaskCatalog(client);
       await client.query("RESET SESSION AUTHORIZATION");
     }
@@ -157,7 +167,11 @@ export async function assertPrivacyWaveRoleSafety(
           ? assertDomainPrivacyTaskCatalogForNoticesReview
           : installed.signInAndMoneyBeforeWorkspaceLock
             ? assertDomainPrivacyTaskCatalogForSignInAndMoneyReview
-            : assertDomainPrivacyTaskCatalog;
+            : installed.workspaceLockBeforeReplyReview
+              ? assertDomainPrivacyTaskCatalogForWorkspaceLockReview
+              : installed.replyReviewBeforeStudioReplyAuthority
+                ? assertDomainPrivacyTaskCatalogForReplyReview
+                : assertDomainPrivacyTaskCatalog;
       await client.query("SET SESSION AUTHORIZATION creator_trust_worker");
       await domainCatalog(client, "trust");
       await client.query("RESET SESSION AUTHORIZATION");

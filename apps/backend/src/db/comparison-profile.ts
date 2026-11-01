@@ -2,6 +2,8 @@ import review from "../../../../infra/migrations/reviews/20261008-comparison.jso
 import noticesReview from "../../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
 import signInAndMoneyReview from "../../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
 import workspaceLockReview from "../../../../infra/migrations/reviews/20261022-workspace-lock.json" with { type: "json" };
+import replyReview from "../../../../infra/migrations/reviews/20261023-reply-review.json" with { type: "json" };
+import studioReplyAuthorityReview from "../../../../infra/migrations/reviews/20261023-studio-reply-authority.json" with { type: "json" };
 import type { PoolClient } from "pg";
 import { invariant } from "../core/errors.js";
 import {
@@ -79,6 +81,47 @@ async function registeredWorkspaceLockProfile(signal?: AbortSignal) {
   return freeze(workspaceLockReview);
 }
 
+/** Exact additive reply-review source; reservations cannot select this graph. */
+async function registeredReplyReviewProfile(signal?: AbortSignal) {
+  signal?.throwIfAborted();
+  const active = await Promise.all(
+    replyReview.sources.map(registeredMigration),
+  );
+  signal?.throwIfAborted();
+  if (active.every((source) => !source)) return undefined;
+  invariant(
+    active.every(
+      (source, index) =>
+        source?.version === replyReview.sources[index]!.version &&
+        source.checksum === replyReview.sources[index]!.checksum,
+    ),
+    "comparison_unconfigured",
+    "The complete reviewed reply-review source graph is required.",
+  );
+  return freeze(replyReview);
+}
+
+/** Exact additive creator/fan denial source; reservations cannot select this graph. */
+async function registeredStudioReplyAuthorityProfile(signal?: AbortSignal) {
+  signal?.throwIfAborted();
+  const active = await Promise.all(
+    studioReplyAuthorityReview.sources.map(registeredMigration),
+  );
+  signal?.throwIfAborted();
+  if (active.every((source) => !source)) return undefined;
+  invariant(
+    active.every(
+      (source, index) =>
+        source?.version ===
+          studioReplyAuthorityReview.sources[index]!.version &&
+        source.checksum === studioReplyAuthorityReview.sources[index]!.checksum,
+    ),
+    "comparison_unconfigured",
+    "The complete reviewed creator/fan denial source graph is required.",
+  );
+  return freeze(studioReplyAuthorityReview);
+}
+
 /** Exact executable source selects independently reviewed metadata only.
  * Reservations and hand-installed ledger entries cannot activate this profile.
  * Original owners still check their actual source, purpose and transaction. */
@@ -99,6 +142,18 @@ export async function registeredComparisonProfile(signal?: AbortSignal) {
   const head = await registeredNoticesProfile(signal);
   const next = await registeredSignInAndMoneyProfile(signal);
   const workspace = await registeredWorkspaceLockProfile(signal);
+  const reply = await registeredReplyReviewProfile(signal);
+  const studio = await registeredStudioReplyAuthorityProfile(signal);
+  invariant(
+    reply || !studio,
+    "comparison_unconfigured",
+    "Creator/fan denial requires the complete reply-review predecessor.",
+  );
+  invariant(
+    workspace || !reply,
+    "comparison_unconfigured",
+    "Reply review requires the complete workspace-lock predecessor.",
+  );
   invariant(
     next || !workspace,
     "comparison_unconfigured",
@@ -115,11 +170,15 @@ export async function registeredComparisonProfile(signal?: AbortSignal) {
         ...head,
         ...next,
         ...workspace,
+        ...reply,
+        ...studio,
         sources: [
           ...profile.sources,
           ...head.sources,
           ...(next?.sources ?? []),
           ...(workspace?.sources ?? []),
+          ...(reply?.sources ?? []),
+          ...(studio?.sources ?? []),
         ],
       })
     : profile;
