@@ -7,4 +7,5 @@ import android.content.Context
 object HarnessLaunch {
     suspend fun resetIfRequested(context: Context, model: FanSession) = Unit
     suspend fun signInIfRequested(context: Context, model: FanSession) = Unit
+    fun longSession(context: Context): Pair<Long, Long>? = null
 }

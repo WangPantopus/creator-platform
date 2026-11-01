@@ -245,13 +245,25 @@ public struct SourceRow: View {
 }
 
 public enum NotificationKind: String, Sendable { case ai, maya, note, approved, reaction, team, system }
+/// A notification: the authorship tile, the sender in that authorship's color,
+/// the preview, the time, and while unread a dot and a stronger preview; a
+/// screen reader hears sender, preview, time, then "Unread" (WP 7.4 P2).
 public struct NotificationRow: View {
     public var kind: NotificationKind; public var name: String; public var audience: String; public var systemLabel: String
     public var time: String?; public var unread: Bool; public var children: String; public var onOpen: () -> Void
+    /// The sender the server built, shown verbatim instead of one assembled here.
+    public var senderLabel: String?
     @Environment(\.colorScheme) private var scheme
-    public init(kind: NotificationKind = .ai, name: String = "Maya", audience: String = "Kiln Club members", systemLabel: String? = nil, time: String? = nil, unread: Bool = false, children: String = "", onOpen: @escaping () -> Void = {}) { self.kind = kind; self.name = name; self.audience = audience; self.systemLabel = systemLabel ?? studioCopy("requestUpdate"); self.time = time; self.unread = unread; self.children = children; self.onOpen = onOpen }
+    public init(kind: NotificationKind = .ai, name: String = "Maya", audience: String = "Kiln Club members", systemLabel: String? = nil, sender: String? = nil, time: String? = nil, unread: Bool = false, children: String = "", onOpen: @escaping () -> Void = {}) { self.kind = kind; self.name = name; self.audience = audience; self.systemLabel = systemLabel ?? studioCopy("requestUpdate"); self.senderLabel = sender; self.time = time; self.unread = unread; self.children = children; self.onOpen = onOpen }
     private var sender: String {
-        switch kind { case .ai: studioCopy("aiAuthor", ["name": name]); case .maya: name; case .note: studioCopy("noteAudience", ["name": name, "audience": audience]); case .approved: studioCopy("approvedNotification", ["name": name]); case .reaction: studioCopy("reaction", ["name": name]); case .team: studioCopy("teamNotification", ["name": name]); case .system: systemLabel }
+        if let senderLabel { return senderLabel }
+        switch kind { case .ai: return studioCopy("aiAuthor", ["name": name]); case .maya: return name; case .note: return studioCopy("noteAudience", ["name": name, "audience": audience]); case .approved: return studioCopy("approvedNotification", ["name": name]); case .reaction: return studioCopy("reaction", ["name": name]); case .team: return studioCopy("teamNotification", ["name": name]); case .system: return systemLabel }
+    }
+    private var senderInk: String { kind == .ai ? "ai-ink" : kind == .team ? "team-ink" : kind == .system ? "ink" : "maya-ink" }
+    /// Sender, preview, time, then "Unread", as sentences (no doubled full stop).
+    private var spoken: String {
+        let parts = [sender, children] + [time, unread ? QelvoraCopy.text("growthUnread") : nil].compactMap { $0 }
+        return parts.enumerated().map { index, part in index == parts.count - 1 || part.hasSuffix(".") || part.hasSuffix("?") || part.hasSuffix("!") ? part : part + "." }.joined(separator: " ")
     }
     private var glyph: String { switch kind { case .ai: "ring"; case .note: "broadcast"; case .approved: "approved"; case .reaction: "heart"; case .team: "team"; case .system: "inbox"; case .maya: "ring" } }
     private var iconBackground: String { kind == .ai ? "ai-surface" : kind == .team ? "team-surface" : kind == .system ? "surface-sunken" : "maya-surface" }
@@ -259,12 +271,15 @@ public struct NotificationRow: View {
     public var body: some View {
         SwiftUI.Button(action: onOpen) {
             HStack(alignment: .top, spacing: studioSpace("space-3")) {
-                Group { if kind == .maya { Text(String(name.prefix(1))).qText("email-brand", italic: true) } else { QelvoraGlyph(name: glyph, size: studioSpace("space-4"), color: qColor(iconInk, scheme)) } }
+                Group { if kind == .maya { Text(creatorInitial(name)).qText("email-brand", italic: true) } else { QelvoraGlyph(name: glyph, size: studioSpace("space-4"), color: qColor(iconInk, scheme)) } }
                     .foregroundStyle(qColor(iconInk, scheme)).frame(width: studioSpace("avatar-size"), height: studioSpace("avatar-size")).background(qColor(iconBackground, scheme), in: RoundedRectangle(cornerRadius: studioSpace("notification-radius"))).overlay { if kind == .ai { RoundedRectangle(cornerRadius: studioSpace("notification-radius")).stroke(qColor("ai-line", scheme), lineWidth: studioSpace("hairline")) } }.accessibilityHidden(true)
-                VStack(alignment: .leading, spacing: 0) { Text(sender).qText("label"); Text(children).qText("control-body") }.frame(maxWidth: .infinity, alignment: .leading)
-                if let time { Text(time).qText("data-sm").foregroundStyle(qColor("ink-muted", scheme)).fixedSize(horizontal: true, vertical: false) }
+                VStack(alignment: .leading, spacing: 0) { Text(sender).qText("label").foregroundStyle(qColor(senderInk, scheme)); Text(children).qText("control-body", weight: unread ? .semibold : nil) }.frame(maxWidth: .infinity, alignment: .leading)
+                VStack(alignment: .trailing, spacing: studioSpace("space-2")) {
+                    if let time { Text(time).qText("data-sm").foregroundStyle(qColor("ink-muted", scheme)).fixedSize(horizontal: true, vertical: false) }
+                    if unread { Circle().fill(qColor("ink", scheme)).frame(width: studioSpace("space-2"), height: studioSpace("space-2")) }
+                }
             }.padding(.horizontal, studioSpace("space-4")).padding(.vertical, studioSpace("message-padding")).foregroundStyle(qColor("ink", scheme)).background(qColor(unread ? "surface" : "ground", scheme)).overlay(alignment: .bottom) { StudioRule() }
-        }.buttonStyle(.plain).accessibilityLabel("\(sender). \(children)\(time.map { ". \($0)" } ?? "")")
+        }.buttonStyle(.plain).accessibilityLabel(spoken)
     }
 }
 
@@ -291,7 +306,7 @@ public struct CallChip: View {
     public init(name: String = "Maya", time: String? = nil, end: String? = nil, recording: Bool = false) { self.name = name; self.time = time; self.end = end; self.recording = recording }
     public var body: some View {
         VStack(alignment: .leading, spacing: studioSpace("space-2")) {
-            HStack(spacing: studioSpace("space-2")) { Seal(initial: String(name.prefix(1)), size: studioSpace("space-6"), live: true, onMaya: true); Text(studioCopy("callAuthor", ["name": name])).qText("control-body", weight: .semibold) }.padding(.leading, studioSpace("space-2")).padding(.trailing, studioSpace("message-padding")).frame(height: studioSpace("call-person-height")).foregroundStyle(qColor("maya-accent", scheme)).background(qColor("maya-surface", scheme), in: Capsule()).qShadow("glow-maya", radius: studioSpace("radius-pill"))
+            HStack(spacing: studioSpace("space-2")) { Seal(initial: creatorInitial(name), size: studioSpace("space-6"), live: true, onMaya: true); Text(studioCopy("callAuthor", ["name": name])).qText("control-body", weight: .semibold) }.padding(.leading, studioSpace("space-2")).padding(.trailing, studioSpace("message-padding")).frame(height: studioSpace("call-person-height")).foregroundStyle(qColor("maya-accent", scheme)).background(qColor("maya-surface", scheme), in: Capsule()).qShadow("glow-maya", radius: studioSpace("radius-pill"))
             HStack(spacing: studioSpace("space-2") + studioSpace("space-1") / 2) {
                 HStack(spacing: studioSpace("space-2")) { Circle().fill(recording ? qColor("ink", scheme) : .clear).overlay(Circle().stroke(qColor(recording ? "ink" : "ink-muted", scheme), lineWidth: studioSpace("hairline") * 1.5)).frame(width: studioSpace("space-2"), height: studioSpace("space-2")).accessibilityHidden(true); Text(studioCopy(recording ? "agreedRecording" : "notRecording")).qText("label") }.padding(.horizontal, studioSpace("space-3")).frame(height: studioSpace("call-recording-height")).modifier(StudioBorder(radius: "radius-pill", border: "control-line"))
                 if let time { Text(end.map { studioCopy("timerOf", ["time": time, "end": $0]) } ?? time).qText("data-label").foregroundStyle(qColor("ink-muted", scheme)).fixedSize(horizontal: true, vertical: false).accessibilityHidden(true) }

@@ -4,7 +4,7 @@ import OSLog
 
 struct W3Message: Decodable, Identifiable, Sendable {
     let id: String; let threadId: String; let authorKind: APIMessageAuthorKind
-    let text: String; let deliveryState: APIMessageDeliveryState; let controlEpoch: Int
+    var text: String; var deliveryState: APIMessageDeliveryState; let controlEpoch: Int
     let sequence: Int; let signedActId: String?; let citations: [String]
     let createdAt: String; let member: String?; let offTheRecord: Bool; let version: Int
     let agentVersion: W3AgentVersion?; let feedback: String?
@@ -22,16 +22,18 @@ struct W3Message: Decodable, Identifiable, Sendable {
     }
     func authorLabel(name: String) -> String {
         if correction != nil { return QelvoraCopy.text("correctionAuthor", values: ["name": name]) }
-        if let kind = AuthorKind(rawValue: authorKind.rawValue) { return kind.label(name: name, audience: "audience details unavailable", member: member ?? "Authorized team member") }
-        if authorKind == .fan { return "You" }
+        // A Note never arrives as a thread message (C4); the fallback names no audience, as the row does.
+        if authorKind == .human_broadcast { return QelvoraCopy.text("nativeNoteFromNameAudienceDetailsUnavailable", values: ["name": name]) }
+        if let kind = AuthorKind(rawValue: authorKind.rawValue) { return kind.label(name: name, audience: "", member: member ?? QelvoraCopy.text("nativeAuthorizedTeamMember")) }
+        if authorKind == .fan { return QelvoraCopy.text("nativeYou") }
         if authorKind == .human_call { return QelvoraCopy.text("callAuthor", values: ["name":name]) }
-        return "Conversation update"
+        return QelvoraCopy.text("nativeConversationUpdate")
     }
 }
 struct W3Page: Decodable, Sendable {
     let threadId: String; let creatorId: String; let fanId: String; let creatorName: String; let fanHandle: String
-    let control: APIThreadControl; let epoch: Int; let cursor: Int; let revision: Int
-    let generationSequences: [String: Int]; let messages: [W3Message]; let before: Int?
+    let control: APIThreadControl; let epoch: Int; var cursor: Int; let revision: Int
+    var generationSequences: [String: Int]; var messages: [W3Message]; let before: Int?
     let offTheRecord: Bool; let introShared: Bool; let consentCurrent: Bool; let canSend: Bool; let unavailableReason: String?
     let feedbackPolicy: W3FeedbackPolicy?
 }
@@ -58,7 +60,7 @@ struct W3Memory: Decodable, Identifiable, Sendable {
 }
 struct W3MemoryView: Decodable, Sendable { let revision: Int; let offTheRecord: Bool; let introShared: Bool; let items: [W3Memory] }
 struct W3Audit: Decodable, Identifiable, Sendable { let id: String; let readerAccountId: String; let role: String; let readAt: String }
-struct W3Failure: Error, Sendable { let message: String; let status: Int }
+struct W3Failure: Error, Sendable { let message: String; let status: Int; var code: String? = nil }
 private struct W3ErrorEnvelope: Decodable { struct Failure: Decodable { let message: String; let code: String? }; let error: Failure }
 struct W3Status: Decodable, Sendable { let accepted: Bool }
 struct W3StatusQuery: Encodable { let idempotencyKey: String }
@@ -71,7 +73,6 @@ struct W3Usage: Decodable, Sendable {
     struct Day: Decodable, Sendable { let day: String; let seconds: Double; let companionSeconds: Double }
     let timezone: String; let days: [Day]; let modeAvailable: Bool; let measurement: String
 }
-
 /// W1's OS credential store supplies account authority; no model credential reaches a fan client.
 actor W3ConversationClient {
     let baseURL: URL
@@ -108,24 +109,24 @@ actor W3ConversationClient {
         request.setValue(UUID().uuidString.lowercased(), forHTTPHeaderField: "X-Correlation-Id")
         let requestCredential = publicRead ? nil : try await credentials.read()
         if !publicRead {
-            guard let accountId = expectedAccountId, UUID(uuidString: accountId) != nil else { throw W3Failure(message: "Reopen this page with your current account.", status: 401) }
-            guard let token = requestCredential else { throw W3Failure(message: "Your session ended. Continue with Pantopus again.", status: 401) }
+            guard let accountId = expectedAccountId, UUID(uuidString: accountId) != nil else { throw W3Failure(message: QelvoraCopy.text("nativeReopenThisPageWithYourCurrent"), status: 401) }
+            guard let token = requestCredential else { throw W3Failure(message: QelvoraCopy.text("nativeYourSessionEndedContinueWith"), status: 401) }
             request.setValue("Bearer " + token, forHTTPHeaderField: "Authorization")
             request.setValue(accountId, forHTTPHeaderField: contentRead ? "x-qelvora-expected-account" : "X-Expected-Account-Id")
         }
         if body != nil { request.setValue("application/json", forHTTPHeaderField: "Content-Type") }
         let (data, response) = try await session.data(for: request)
-        if !publicRead { guard try await credentials.read() == requestCredential else { throw W3Failure(message:"Your account changed. Open this conversation again.", status:401) } }
-        guard data.count <= 1_000_000 else { throw W3Failure(message:"This conversation response is too large. Refresh to try again.",status:503) }
+        if !publicRead { guard try await credentials.read() == requestCredential else { throw W3Failure(message:QelvoraCopy.text("nativeYourAccountChangedOpenThisConversation"), status:401) } }
+        guard data.count <= 1_000_000 else { throw W3Failure(message:QelvoraCopy.text("nativeThisConversationResponseIsToo"),status:503) }
         guard let response = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
         guard (200..<300).contains(response.statusCode) else {
             let error = try? JSONDecoder().decode(W3ErrorEnvelope.self, from: data).error
-            throw W3Failure(message: error?.message ?? "Reconnect to refresh. Your input is kept.", status: error?.code == "session_account_changed" ? 401 : response.statusCode)
+            throw W3Failure(message: error?.message ?? QelvoraCopy.text("nativeThisConversationIsUnavailable"), status: error?.code == "session_account_changed" ? 401 : response.statusCode, code: error?.code)
         }
         return data
     }
     func realtime(page: W3Page) async throws -> W3Realtime.Lease {
-        guard let accountId = expectedAccountId else { throw W3Failure(message: "Reopen this page with your current account.", status: 401) }
+        guard let accountId = expectedAccountId else { throw W3Failure(message: QelvoraCopy.text("nativeReopenThisPageWithYourCurrent"), status: 401) }
         return try await W3Realtime.shared.subscribe(baseURL: baseURL, accountId: accountId, page: page)
     }
 
@@ -133,10 +134,11 @@ actor W3ConversationClient {
 
 @MainActor
 final class W3ThreadModel: ObservableObject {
-    struct Pending { let key: String; let text: String; let clientSequence: Int; let destination: String; var uncertain = false; var rejected = false }
+    typealias Pending = W3DraftStorage.Pending
     @Published var page: W3Page?; @Published var older: [W3Message] = []; @Published var before: Int?
-    @Published var draft = ""; @Published var failure = ""; @Published var busy = false; @Published var offline = true
-    @Published var pending: Pending?
+    @Published var draft = "" { didSet { saveDraftSoon() } }
+    @Published var failure = ""; @Published var busy = false; @Published var offline = true
+    @Published var pending: Pending? { didSet { saveDraftSoon() } }
     @Published var introOfferId: String?
     private var introOfferChecked = false
     let client: W3ConversationClient; let creatorId: String; let fanId: String
@@ -154,23 +156,63 @@ final class W3ThreadModel: ObservableObject {
     private var connectionRun: UUID?
     private var activeLease: UUID?
     private var resumeActivated = false
+    private var draftTicket: W3DraftStorage.Ticket?
+    private var draftLease: W3DraftStorage.Lease?
+    private var draftRevision = 0
+    private var restoringDraft = false
+    private var refreshRevision = 0
     private let presenceId = UUID().uuidString.lowercased()
     private var storageScope: String { client.baseURL.absoluteString + "/" + root }
     var root: String { creatorId + "/" + fanId }
     private var gate: ThreadDeliveryGate?
     init(baseURL: URL, creatorId: String, fanId: String, accountId: String, sessionId: String) { self.sessionId = sessionId; client = W3ConversationClient(baseURL: baseURL, expectedAccountId: accountId); self.creatorId = creatorId; self.fanId = fanId; self.accountId = accountId }
+    private func saveDraftSoon() {
+        guard !restoringDraft, let lease = draftLease else { return }
+        draftRevision += 1
+        let revision = draftRevision, value = W3DraftStorage.Value(text: draft, pending: pending)
+        Task { [weak self] in
+            do { _ = try await W3DraftStorage.shared.save(value, lease: lease, revision: revision) }
+            catch {
+                guard let self, self.draftLease?.ticket.id == lease.ticket.id else { return }
+                self.failure = QelvoraCopy.text("nativeReconnectToRefreshYourInputIsKept")
+            }
+        }
+    }
+    private func saveDraftNow() async throws -> Bool {
+        guard let lease = draftLease else { return false }
+        draftRevision += 1
+        return try await W3DraftStorage.shared.save(.init(text: draft, pending: pending), lease: lease, revision: draftRevision)
+    }
     func refresh() async {
         let run = lifecycle
         guard active else { return }
+        refreshRevision += 1; let readRevision = refreshRevision
         do {
+            let currentDraft = if let draftLease { await W3DraftStorage.shared.current(draftLease) } else { false }
+            if draftTicket == nil || !currentDraft {
+                draftTicket = await W3DraftStorage.shared.begin(origin: client.baseURL.absoluteString, account: accountId, root: root)
+            }
+            let ticket = draftTicket
             if !resumeActivated {
                 await W3ResumeStorage.shared.activate(accountId: accountId)
                 resumeActivated = true
             }
             if offlineContext == nil { offlineContext = await W3OfflineStorage.shared.activate(origin: client.baseURL.absoluteString, account: accountId, session: sessionId, root: root) }
             let fresh: W3Page = try await client.request(root)
-            guard !Task.isCancelled, active, run == lifecycle else { return }
+            guard !Task.isCancelled, active, run == lifecycle, readRevision == refreshRevision else { return }
+            if let page, page.threadId != fresh.threadId { self.page = nil; older = []; before = nil }
             guard page == nil || (fresh.cursor >= page!.cursor && fresh.epoch >= page!.epoch && fresh.revision >= page!.revision) else { return }
+            let reusableDraft = if let draftLease { await W3DraftStorage.shared.current(draftLease) && draftLease.thread == fresh.threadId } else { false }
+            if !reusableDraft {
+                guard let ticket, let opened = try await W3DraftStorage.shared.open(ticket, thread: fresh.threadId) else {
+                    draftTicket = nil; draftLease = nil; draft = ""; pending = nil; conceal(); return
+                }
+                guard !Task.isCancelled, active, run == lifecycle, readRevision == refreshRevision else { return }
+                restoringDraft = true
+                draftLease = opened.lease; draft = opened.value?.text ?? ""; pending = opened.value?.pending
+                if pending != nil && pending?.rejected != true { pending?.uncertain = true }
+                restoringDraft = false; saveDraftSoon()
+            }
             offlineShowing = false
             page = fresh; if before == nil && older.isEmpty { before = fresh.before }
             gate = ThreadDeliveryGate(threadID: fresh.threadId, cursor: fresh.cursor, epoch: fresh.epoch, generationSequences: fresh.generationSequences)
@@ -186,7 +228,7 @@ final class W3ThreadModel: ObservableObject {
                 } catch { if Task.isCancelled { return } }
             }
             if let pending { let status: W3Status = try await client.request(root + "/messages/status", body: JSONEncoder().encode(W3StatusQuery(idempotencyKey: pending.key))); if status.accepted && self.pending?.key == pending.key { self.pending = nil; if draft.trimmingCharacters(in: .whitespacesAndNewlines) == pending.text { draft = "" } } }
-        } catch { if active && run == lifecycle { failed(error) } }
+        } catch { if active && run == lifecycle && readRevision == refreshRevision { failed(error, threadDenied: true) } }
     }
     private func conceal() { page = nil; older = []; before = nil; gate = nil }
     private func showOffline() async {
@@ -254,7 +296,9 @@ final class W3ThreadModel: ObservableObject {
                                     transportReady = true; delay = 1
                                     await refresh()
                                 case .frame(let frame):
-                                    if try !(gate?.receive(frame).isEmpty ?? true) { await refresh() }
+                                    // C5: paint what the frames carry; refetch only for the rest.
+                                    let ready = try gate?.receive(frame) ?? []
+                                    if !ready.map(paint).allSatisfy({ $0 }) { await refresh() }
                                 }
                                 if authorizationDenied { break }
                             }
@@ -272,18 +316,56 @@ final class W3ThreadModel: ObservableObject {
             delay = min(15, delay * 2)
         }
     }
+    /// Contract C5, as the web thread does it: an approved AI sentence is
+    /// appended to its message the moment its frame arrives. The answer's end
+    /// marks the message and asks for one refetch for what frames do not carry
+    /// (citations, version, feedback); any other frame asks for a refetch.
+    /// The delivery gate has already dropped duplicates, stale epochs and gaps.
+    private func paint(_ frame: APIFrame) -> Bool {
+        guard var next = page, frame.threadId == next.threadId, frame.epoch == next.epoch,
+              frame.authorKind == .ai, let generation = frame.generationId else { return false }
+        let at = next.messages.firstIndex { $0.id == frame.messageId }
+        switch frame.kind {
+        case .sentence:
+            if let at { next.messages[at].text += frame.text; next.messages[at].deliveryState = .generating }
+            else {
+                next.messages.append(W3Message(id: frame.messageId, threadId: frame.threadId, authorKind: .ai, text: frame.text, deliveryState: .generating, controlEpoch: frame.epoch, sequence: (next.messages.last?.sequence ?? 0) + 1, signedActId: nil, citations: [], createdAt: ISO8601DateFormatter().string(from: Date()), member: nil, offTheRecord: next.offTheRecord, version: 1, agentVersion: nil, feedback: nil, correction: nil, recording: nil, authorAccountId: nil, systemLink: nil))
+            }
+            next.generationSequences[generation] = frame.sequence; next.cursor = frame.cursor
+            page = next
+            return true
+        case .delivered, .interrupted:
+            if let at { next.messages[at].deliveryState = frame.kind == .delivered ? .delivered : .interrupted }
+            next.generationSequences.removeValue(forKey: generation); next.cursor = frame.cursor
+            page = next
+            return false
+        default: return false
+        }
+    }
     func send(retry: Bool = false) async {
         guard active, !busy, !offline, let page, page.canSend, page.generationSequences.isEmpty else { return }
         let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
         guard retry ? pending != nil : !text.isEmpty else { return }
-        let item = retry ? pending! : Pending(key: UUID().uuidString.lowercased(), text: text, clientSequence: (page.messages.last?.sequence ?? 0) + 1, destination: page.control == .human_active ? "fan-replies" : "messages")
+        var item = retry ? pending! : Pending(key: UUID().uuidString.lowercased(), text: text, clientSequence: (page.messages.last?.sequence ?? 0) + 1, destination: page.control == .human_active ? "fan-replies" : "messages")
+        item.uncertain = false; item.rejected = false
         pending = item; busy = true; defer { busy = false }
         do {
+            // Commit the original send key before HTTP. A stopped process can
+            // check acceptance or retry that key instead of creating a duplicate.
+            guard try await saveDraftNow() else { return }
             let body = try JSONEncoder().encode(APISendMessage(text: item.text, idempotencyKey: item.key, clientSequence: item.clientSequence))
             if item.destination == "fan-replies" { let _: APIMessage = try await client.request(root + "/fan-replies", body: body) }
             else { let _: APIAcceptedMessage = try await client.request(root + "/messages", body: body) }
-            pending = nil; if draft.trimmingCharacters(in: .whitespacesAndNewlines) == item.text { draft = "" }; await refresh()
-        } catch { let status = (error as? W3Failure)?.status; pending?.uncertain = status == nil || status! >= 500 || status == 409; pending?.rejected = !(pending?.uncertain ?? true); failed(error) }
+            pending = nil; if draft.trimmingCharacters(in: .whitespacesAndNewlines) == item.text { draft = "" }; _ = try await saveDraftNow(); await refresh()
+        } catch {
+            let rejection = error as? W3Failure, status = rejection?.status
+            pending?.uncertain = status == nil || status! >= 500 || status == 409
+            pending?.rejected = !(pending?.uncertain ?? true)
+            // A definite input rejection is an answered request, not a lost
+            // transport. Keep the live conversation and its Retry usable.
+            if let rejection, (400..<500).contains(rejection.status), ![401,403,404,409].contains(rejection.status) { failure = rejection.message }
+            else { failed(error) }
+        }
     }
     func earlier() async {
         guard active, !offline, let before, !busy else { return }; busy = true; defer { busy = false }
@@ -325,7 +407,7 @@ final class W3ThreadModel: ObservableObject {
             return true
         } catch { failed(error); return false }
     }
-    private func failed(_ error: Error) {
+    private func failed(_ error: Error, threadDenied: Bool = false) {
         #if DEBUG
         // Fixed domains/numeric codes only; never log errors' descriptions,
         // URLs, credentials, message content or account identifiers.
@@ -343,7 +425,13 @@ final class W3ThreadModel: ObservableObject {
         Task { [weak self] in await self?.showOffline() }
         if let failure = error as? W3Failure {
             self.failure = failure.message
-            if [401,403,404].contains(failure.status) { offlineShowing = false; let oldContext = offlineContext; offlineContext = nil; if let oldContext { Task { await W3OfflineStorage.shared.purge(oldContext) } }; authorizationDenied = true; page = nil; older = []; before = nil; draft = ""; pending = nil; introOfferId = nil; introOfferChecked = false; gate = nil; resumeActivated = false; Task { await W3ResumeStorage.shared.remove(accountId: accountId, scope: storageScope) } }
-        } else { offline = true; failure = "Reconnect to refresh. Your input is kept on this screen." }
+            if [401,403,404].contains(failure.status) {
+                let oldTicket = draftTicket; draftTicket = nil; draftLease = nil
+                // A failed message action (for example, human_unavailable 403)
+                // does not establish that the conversation itself is gone.
+                if let oldTicket, failure.status == 401 || threadDenied { Task { try? await W3DraftStorage.shared.discard(oldTicket) } }
+                offlineShowing = false; let oldContext = offlineContext; offlineContext = nil; if let oldContext { Task { await W3OfflineStorage.shared.purge(oldContext) } }; authorizationDenied = true; page = nil; older = []; before = nil; draft = ""; pending = nil; introOfferId = nil; introOfferChecked = false; gate = nil; resumeActivated = false; Task { await W3ResumeStorage.shared.remove(accountId: accountId, scope: storageScope) }
+            }
+        } else { offline = true; failure = QelvoraCopy.text("nativeReconnectToRefreshYourInputIsKept") }
     }
 }

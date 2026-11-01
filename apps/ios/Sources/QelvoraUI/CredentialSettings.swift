@@ -12,14 +12,14 @@ public struct CredentialSettings: View {
     public init(model: FanSession) { self.model = model }
     public var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Signing passkeys").qText("title").accessibilityAddTraits(.isHeader)
-            Text("External creator proof and fresh Pantopus authorization are required. Every named act needs its own exact-content signature.").qText("caption")
+            Text(QelvoraCopy.text("nativeSigningPasskeys")).qText("title").accessibilityAddTraits(.isHeader)
+            Text(QelvoraCopy.text("nativeExternalCreatorProofAndFresh")).qText("caption")
             if let keys { ForEach(keys.credentials, id: \.id) { key in
-                HStack { Text(key.revoked ? "Revoked passkey" : "Registered passkey").qText("body"); Spacer(); if !key.revoked { Button("Revoke", variant: .quiet, disabled: busy) { Task { await revoke(key.id) } } } }
+                HStack { Text(key.revoked ? QelvoraCopy.text("nativeRevokedPasskey") : QelvoraCopy.text("nativeRegisteredPasskey")).qText("body"); Spacer(); if !key.revoked { Button(QelvoraCopy.text("revoke"), variant: .quiet, disabled: busy) { Task { await revoke(key.id) } } } }
             } }
-            Button(busy ? "Waiting for device…" : "Register a signing passkey", variant: .secondary, block: true, disabled: busy) { Task { await register() } }
-            if busy { Button("Cancel", variant: .quiet) { ceremony?.cancel() } }
-            if !message.isEmpty { Notice(title: "Passkey status", children: message) }
+            Button(busy ? QelvoraCopy.text("nativeWaitingForDevice") : QelvoraCopy.text("nativeRegisterASigningPasskey"), variant: .secondary, block: true, disabled: busy) { Task { await register() } }
+            if busy { Button(QelvoraCopy.text("cancel"), variant: .quiet) { ceremony?.cancel() } }
+            if !message.isEmpty { Notice(title: QelvoraCopy.text("nativePasskeyStatus"), children: message) }
         }.task { await reload() }.onDisappear { ceremony?.cancel() }
     }
     private func reload() async { guard let api = model.api else { return }; do { keys = try await api.passkeys() } catch { message = FanSession.message(error) } }
@@ -33,8 +33,8 @@ public struct CredentialSettings: View {
             let action = PasskeyCeremony(anchor: window); ceremony = action
             let credential = try await action.register(options: begin.options)
             _ = try await api.registerPasskey(body: APIPasskeyRegistration(challengeId: begin.challengeId, credential: credential))
-            message = "Passkey registered. Nothing was published."; await reload()
-        } catch { if let challenge { _ = try? await api.cancelPasskey(challengeId: challenge) }; message = error is NativeSigningError ? "The device could not complete passkey registration. Check the relying-party association or try again. Nothing was published." : FanSession.message(error) }
+            message = QelvoraCopy.text("nativePasskeyRegisteredNothingWasPublished"); await reload()
+        } catch { if let challenge { _ = try? await api.cancelPasskey(challengeId: challenge) }; message = error is NativeSigningError ? QelvoraCopy.text("nativeTheDeviceCouldNotCompletePasskey") : FanSession.message(error) }
     }
 }
 #endif

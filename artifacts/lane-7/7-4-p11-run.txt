@@ -1,0 +1,14 @@
+WP 7.4 P11: the comparison placeholder, removed.
+Runs of 2026-10-16 (lane 7, shared Mac). Fake API (tests/scenarios/lane-7/harness), synthetic
+identities and data; the real apps on simulator qelvora-lane7-ios (iOS 26.5, XCUITest) and
+emulator-5574 (Android 15, adb). Run on the top of the WP 7.4 stack (lane-7/packet-terms), which
+contains this piece unchanged. Nothing here is the real backend.
+
+iOS (ios-navigation.mjs --comparison)
+  K1 off: no options button; Me and privacy has no section, no placeholder    pass 12.1 s
+  K2 on: choice from a question; turned off, Allow refused (403) -> closes    pass  9.9 s
+  K3 on: section in Me and privacy; turned off, Allow refused -> leaves       pass 17.1 s
+  K4 on, turned off while in the background -> section gone                    pass 18.1 s
+Android (e7-4-comparison.mjs): P11.1 to P11.4, 7 steps                         pass
+Contract check (harness): 64 of 64 (2 new: refused while off; consent state)
+Not run: the real stack; physical devices.

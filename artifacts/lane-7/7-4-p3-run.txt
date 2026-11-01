@@ -1,0 +1,39 @@
+WP 7.4 P3, the creator's seal. 2026-10-15.
+Fake API (synthetic identities and data); the apps and their layout are real.
+Branch lane-7/step-in-seal, stacked on #452 (itself stacked on #401).
+
+The seal is decorative (screen readers hear the button's words), so each
+flow captures the screen, and every capture was reviewed by eye.
+
+Android (e7-4-seal.mjs; qelvora-lane7-android): S3.1 Maya "M", Kiln Club "K"
+(also on its creator-colored Send), Glazeco "G". S3.2 at font scale 2.0,
+Light and Night: the step-in and Send letters inside their circles, and the
+in-thread "is here" line and Maya's reaction chip too. S3.3 Priya searches
+Discover for "fern", opens "🌿 fern studio", starts a first conversation: the
+header avatar and the step-in seal show "F". All 9 steps pass.
+iOS (Lane7SealFlows via ios-navigation.mjs --seal; qelvora-lane7-ios): the
+same S1 to S3, largest text AX5: 3 flows passed, none skipped.
+
+Failures on the way, each fixed and rerun:
+- Every seal showed "M": the thread passed no initial, other seals took the
+  name's first character (half of an emoji).
+- At the largest text the letter grew past its circle on both apps.
+- Android: the gap between seal and label shrank to about 4 dp at font scale
+  2.0 (two flexible spacers); now 10 dp, measured on the capture.
+- iOS: "Send" split into "Sen" and "d" beside the seal at AX5; now one line.
+  The normal-text composer is pixel-identical before and after (0 pixels).
+- Runner: an Android Back press in S3 would have left the thread; the first
+  scroll helpers stopped with a row half hidden under the header, and the
+  Android one first picked the development banner (it scrolls sideways).
+- Found here, fixed in #452: Android lost the bottom of the thread when
+  Notes arrived, at the largest text (R1.12).
+
+Gates: harness contract 62/62; generated files; typecheck; prettier; eslint.
+Android: unit and snapshot tests 19/19 after re-recording five images (in
+each, a full-width button's label moved 1 pixel; nothing else differs), lint
+0 errors, 9 device tests (4 pass, 5 skipped by design), release build.
+iOS: test build, existing UI tests (2 pass, 4 skipped by design), release
+build, package tests 18/18 with snapshots unchanged.
+Not run: a right-to-left display name; a name with no letter; the release
+hook scans (no debug hook changed); physical devices; the real stack (the
+seal reads the page's creatorName, which the real API serves the same way).

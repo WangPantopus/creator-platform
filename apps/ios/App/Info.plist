@@ -45,6 +45,8 @@
 	<string>$(GOOGLE_IOS_CLIENT_ID)</string>
 	<key>CreatorGoogleServerClientID</key>
 	<string>$(GOOGLE_SERVER_CLIENT_ID)</string>
+	<key>CreatorWebURL</key>
+	<string>$(CREATOR_WEB_URL)</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsLocalNetworking</key>

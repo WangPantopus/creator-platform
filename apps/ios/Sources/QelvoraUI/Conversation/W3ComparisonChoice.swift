@@ -6,10 +6,13 @@ struct W3ComparisonConsent: Decodable, Sendable { let policy: W3ComparisonPolicy
 struct W3ComparisonResult: Decodable, Sendable { let included: Bool }
 
 /// A live, separate-purpose choice. No choice or notice is persisted by the app.
+/// When comparisons are off, or turn off while it is open, it shows nothing and
+/// calls `onUnavailable` so the screen that opened it can close it (WP 7.4 P11).
 struct W3ComparisonChoice: View {
     let client: W3ConversationClient
     let root: String
     var messageId: String? = nil
+    var onUnavailable: () -> Void = {}
     @Environment(\.scenePhase) private var scenePhase
     @State private var choice: W3ComparisonConsent?
     @State private var available: Bool?
@@ -21,34 +24,40 @@ struct W3ComparisonChoice: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             if !failure.isEmpty {
-                Notice(tone: .error, title: "Comparison status", children: failure)
-                Button("Refresh comparison choice", variant: .secondary, disabled: busy) { operation = Task { await refresh() } }
+                Notice(tone: .error, title: QelvoraCopy.text("nativeComparisonStatus"), children: failure)
+                Button(QelvoraCopy.text("nativeRefreshComparisonChoice"), variant: .secondary, disabled: busy) { operation = Task { await refresh() } }
             }
-            if available == false { Text("AI comparisons are not available yet.").qText("body") }
-            if choice == nil && available != false && failure.isEmpty { Text("Loading your comparison choice…").qText("body") }
+            if choice == nil && available != false && failure.isEmpty { Text(QelvoraCopy.text("nativeLoadingYourComparisonChoice")).qText("body") }
             if let choice {
-                Text(choice.allowed ? "Allowed for this creator" : "Off · optional").qText("data-sm")
-                Text(choice.policy?.notice ?? "The current comparison notice is unavailable. No new questions can be included.").qText("body")
-                if choice.allowed, let expiry = choice.expiresAt { Text("Your choice ends " + expiry).qText("caption") }
-                if busy { Text("Saving your comparison choice or checking this question…").qText("body").accessibilityAddTraits(.updatesFrequently) }
+                Text(choice.allowed ? QelvoraCopy.text("nativeAllowedForThisCreator") : QelvoraCopy.text("nativeOffOptional")).qText("data-sm")
+                Text(choice.policy?.notice ?? QelvoraCopy.text("nativeTheCurrentComparisonNoticeIs")).qText("body")
+                if choice.allowed, let expiry = choice.expiresAt { Text(QelvoraCopy.text("nativeYourChoiceEndsDate", values: ["date": expiry])).qText("caption") }
+                if busy { Text(QelvoraCopy.text("nativeSavingYourComparisonChoiceOr")).qText("body").accessibilityAddTraits(.updatesFrequently) }
                 if !status.isEmpty { Text(status).qText("body").accessibilityAddTraits(.updatesFrequently) }
                 if choice.allowed {
-                    if messageId != nil { Button("Include this question", variant: .ai, block: true, disabled: busy) { run("include") } }
-                    Button("Withdraw comparison choice", variant: .secondary, block: true, disabled: busy) { run("withdraw") }
+                    if messageId != nil { Button(QelvoraCopy.text("nativeIncludeThisQuestion"), variant: .ai, block: true, disabled: busy) { run("include") } }
+                    Button(QelvoraCopy.text("nativeWithdrawComparisonChoice"), variant: .secondary, block: true, disabled: busy) { run("withdraw") }
                 } else if choice.policy != nil {
-                    Button("Allow questions for AI comparisons", variant: .ai, block: true, disabled: busy) { run("allow") }
+                    Button(QelvoraCopy.text("nativeAllowQuestionsForAIComparisons"), variant: .ai, block: true, disabled: busy) { run("allow") }
                 }
             }
         }
         .task(id: "\(root)-\(scenePhase)") { if scenePhase == .active { await refresh() } else { conceal() } }
         .onChange(of: scenePhase) { _, phase in if phase != .active { conceal() } }
         .onDisappear { conceal() }
+        .onChange(of: available) { _, value in if value == false { onUnavailable() } }
     }
     private func conceal() {
         revision += 1; operation?.cancel(); operation = nil
         choice = nil; available = nil; failure = ""; status = ""; busy = false
     }
     private func current(_ ticket: Int) -> Bool { revision == ticket && scenePhase == .active && !Task.isCancelled }
+    /// The server's answer when comparisons are off: the choice closes and nothing is said.
+    private func unavailable(_ error: any Error) -> Bool {
+        guard (error as? W3Failure)?.code == "comparison_unavailable" else { return false }
+        choice = nil; failure = ""; status = ""; available = false
+        return true
+    }
     private func refresh() async {
         revision += 1
         let ticket = revision; choice = nil; available = nil; failure = ""; status = ""
@@ -60,7 +69,7 @@ struct W3ComparisonChoice: View {
                 let fresh: W3ComparisonConsent = try await client.request(root + "/comparison-consent")
                 if current(ticket) { choice = fresh }
             }
-        } catch { if current(ticket) { failure = (error as? W3Failure)?.message ?? "Reconnect to view your comparison choice." } }
+        } catch { if current(ticket) && !unavailable(error) { failure = (error as? W3Failure)?.message ?? QelvoraCopy.text("nativeReconnectToViewYourComparison") } }
     }
     private func run(_ action: String) {
         guard !busy, scenePhase == .active, let choice else { return }
@@ -72,16 +81,16 @@ struct W3ComparisonChoice: View {
                     guard let messageId, choice.allowed else { return }
                     let result: W3ComparisonResult = try await client.request(root + "/messages/" + messageId + "/comparison", body: Data("{}".utf8))
                     guard current(ticket) else { return }
-                    status = result.included ? "A general version of this question is saved for AI comparisons. You can withdraw your choice in Me and privacy." : "This question was not included. It did not pass the comparison privacy checks."
+                    status = result.included ? QelvoraCopy.text("nativeAGeneralVersionOfThisQuestion") : QelvoraCopy.text("nativeThisQuestionWasNotIncludedIt")
                 } else {
                     var body: [String: Any] = ["action": action]
                     if action == "allow" { guard let policy = choice.policy else { return }; body["policyVersion"] = policy.version; body["consent"] = true }
                     let fresh: W3ComparisonConsent = try await client.request(root + "/comparison-consent", body: JSONSerialization.data(withJSONObject: body))
                     guard current(ticket) else { return }
                     self.choice = fresh
-                    status = action == "withdraw" ? "Your comparison choice is withdrawn. Saved comparison questions and text have been removed. Affected exports remain unavailable while their files are removed." : "Your comparison choice is saved. Choose a question in the conversation to include it."
+                    status = action == "withdraw" ? QelvoraCopy.text("nativeYourComparisonChoiceIsWithdrawn") : QelvoraCopy.text("nativeYourComparisonChoiceIsSavedChoose")
                 }
-            } catch { if current(ticket) { failure = (error as? W3Failure)?.message ?? "The result could not be confirmed. Refresh your choice before continuing." } }
+            } catch { if current(ticket) && !unavailable(error) { failure = (error as? W3Failure)?.message ?? QelvoraCopy.text("nativeTheResultCouldNotBeConfirmed") } }
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.pantopus.qelvora.content
 
+import com.pantopus.qelvora.generated.QelvoraCopy
+
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -181,12 +183,12 @@ internal fun NativeContentAttachment(context: Context, session: FanSession, dest
             require(origin.userInfo == null && UUID.fromString(accountId).toString() == accountId)
             if (transport?.isCurrent() != true) {
                 available = false; asset = null; clearBytes(); transport = null; epoch = generation
-                val capture = session.captureRequest(destination, maximumResponseBytes = 1_048_576, timeoutMs = 4000) ?: error("Your session ended.")
+                val capture = session.captureRequest(destination, maximumResponseBytes = 1_048_576, timeoutMs = 4000) ?: error(QelvoraCopy.text("nativeYourSessionEnded"))
                 check(capture.expectedAccountId == accountId)
                 if (epoch != generation || !active) return
                 transport = ContentMediaTransport(capture, creatorId, attachment.id)
             }
-            val api = transport ?: error("The media service is not connected.")
+            val api = transport ?: error(QelvoraCopy.text("nativeTheMediaServiceIsNotConnected"))
             check(api.audienceAvailable())
             val current = api.asset()
             check(matches(current))
@@ -198,7 +200,7 @@ internal fun NativeContentAttachment(context: Context, session: FanSession, dest
         catch (_: Exception) {
             if (epoch != generation || !active) return
             available = false; asset = null; clearBytes()
-            error = "Attachment access could not be confirmed. Check current access before retrying."
+            error = QelvoraCopy.text("nativeAttachmentAccessCouldNotBeConfirmed")
         }
     }
     fun load() {
@@ -207,7 +209,7 @@ internal fun NativeContentAttachment(context: Context, session: FanSession, dest
         val epoch = generation; busy = true
         loading = scope.launch {
             try {
-                val api = transport ?: error("The media service is not connected.")
+                val api = transport ?: error(QelvoraCopy.text("nativeTheMediaServiceIsNotConnected"))
                 check(api.isCurrent() && active && epoch == generation)
                 val ticket = api.playback()
                 val issued = AudienceAsset.read(ticket.getJSONObject("asset"))
@@ -233,7 +235,7 @@ internal fun NativeContentAttachment(context: Context, session: FanSession, dest
                         val metrics = context.resources.displayMetrics
                         val options = BitmapFactory.Options().apply { inSampleSize = 1 }
                         while (bounds.outWidth / options.inSampleSize > metrics.widthPixels || bounds.outHeight / options.inSampleSize > metrics.heightPixels) options.inSampleSize *= 2
-                        BitmapFactory.decodeFile(saved.path, options) ?: error("The photo is unreadable.")
+                        BitmapFactory.decodeFile(saved.path, options) ?: error(QelvoraCopy.text("nativeThePhotoIsUnreadable"))
                     }
                     if (!active || epoch != generation || transport !== api || !api.isCurrent() || !available || !issuedDeadline.current() || SystemClock.elapsedRealtime() - checkedAt >= 5000) {
                         if (epoch == generation) clearBytes()
@@ -251,7 +253,7 @@ internal fun NativeContentAttachment(context: Context, session: FanSession, dest
                                     runCatching {
                                         duration = minOf(playback.duration.toLong(), issued.durationMs ?: 0); check(duration > 0)
                                         ready = true; busy = false
-                                    }.onFailure { clearBytes(); error = "The recording could not be decoded. Check current access before retrying." }
+                                    }.onFailure { clearBytes(); error = QelvoraCopy.text("nativeTheRecordingCouldNotBeDecoded") }
                                 }
                                 else clearBytes()
                             } else runCatching { playback.release() }
@@ -270,7 +272,7 @@ internal fun NativeContentAttachment(context: Context, session: FanSession, dest
                             val currentCapture = api.isCurrent()
                             if (player === playback && epoch == generation) {
                                 clearBytes()
-                                if (currentCapture && transport === api && active) error = "The recording could not be played. Check current access before retrying."
+                                if (currentCapture && transport === api && active) error = QelvoraCopy.text("nativeTheRecordingCouldNotBePlayed")
                             } else runCatching { playback.release() }
                         }
                         true
@@ -291,7 +293,7 @@ internal fun NativeContentAttachment(context: Context, session: FanSession, dest
                 error = ""
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (_: Exception) {
-                if (epoch == generation && active) { clearBytes(); error = "The attachment could not be loaded. Check current access before retrying." }
+                if (epoch == generation && active) { clearBytes(); error = QelvoraCopy.text("nativeTheAttachmentCouldNotBeLoaded") }
             }
         }
     }
@@ -314,7 +316,7 @@ internal fun NativeContentAttachment(context: Context, session: FanSession, dest
                 checkedAt = started; position = playback.currentPosition.toLong().coerceIn(0L, duration); playing = playback.isPlaying
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (_: Exception) {
-                if (active && epoch == generation && transport === api) { clearBytes(); error = "The recording could not be played. Check current access before retrying." }
+                if (active && epoch == generation && transport === api) { clearBytes(); error = QelvoraCopy.text("nativeTheRecordingCouldNotBePlayed") }
             } finally { if (epoch == generation) { commanding = false; commandJob = null } }
         }
     }
@@ -331,29 +333,29 @@ internal fun NativeContentAttachment(context: Context, session: FanSession, dest
         val api = transport
         if (api != null && !api.isCurrent() && transport === api) { available = false; asset = null; clearBytes(); transport = null }
         if (SystemClock.elapsedRealtime() - checkedAt >= 5000) { available = false; asset = null; if (busy || file != null || player != null) clearBytes() }
-        if (deadline?.current() == false) { clearBytes(); error = "This attachment link expired. Load it again to check current access." }
+        if (deadline?.current() == false) { clearBytes(); error = QelvoraCopy.text("nativeThisAttachmentLinkExpiredLoad") }
         if (ready) player?.let { current -> runCatching {
             val actualPosition = current.currentPosition.toLong()
             if (actualPosition >= duration && current.isPlaying) current.pause()
             position = actualPosition.coerceIn(0L, duration); playing = current.isPlaying
-        }.onFailure { clearBytes(); error = "Playback could not continue. Check current access before retrying." } }
+        }.onFailure { clearBytes(); error = QelvoraCopy.text("nativePlaybackCouldNotContinueCheck") } }
         delay(500)
     } }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         if (error.isNotEmpty()) BasicText(error, style = qText("caption").copy(color = qColor("ink")))
-        if (!available) BasicText("Checking current attachment access…", style = qText("caption").copy(color = qColor("ink")))
+        if (!available) BasicText(QelvoraCopy.text("nativeCheckingCurrentAttachmentAccess"), style = qText("caption").copy(color = qColor("ink")))
         else if (attachment.kind == "photo") {
             val photo = image
             if (photo != null) Image(photo.asImageBitmap(), attachment.alt, modifier = Modifier.fillMaxWidth())
-            else Button(if (busy) "Loading photo…" else "Load photo", ButtonVariant.SECONDARY, disabled = busy) { load() }
+            else Button(if (busy) QelvoraCopy.text("nativeLoadingPhoto") else QelvoraCopy.text("nativeLoadPhoto"), ButtonVariant.SECONDARY, disabled = busy) { load() }
         } else {
-            BasicText("$creatorName’s recording", style = qText("label").copy(color = qColor("ink")))
-            Button(if (busy) "Loading recording…" else if (!ready) "Load recording" else if (playing) "Pause recording" else "Play recording", ButtonVariant.SECONDARY, disabled = busy || commanding) { command() }
+            BasicText(QelvoraCopy.text("nativeNamesRecording", mapOf("name" to creatorName)), style = qText("label").copy(color = qColor("ink")))
+            Button(if (busy) QelvoraCopy.text("nativeLoadingRecording") else if (!ready) QelvoraCopy.text("nativeLoadRecording") else if (playing) QelvoraCopy.text("nativePauseRecording") else QelvoraCopy.text("nativePlayRecording"), ButtonVariant.SECONDARY, disabled = busy || commanding) { command() }
             if (ready) {
                 fun elapsed(milliseconds: Long): String { val seconds = maxOf(0, milliseconds / 1000); return "${seconds / 60}:${(seconds % 60).toString().padStart(2, '0')}" }
                 BasicText("${elapsed(position)} / ${elapsed(duration)}", style = qText("data-sm").copy(color = qColor("ink")))
-                Button("Back 10 seconds", ButtonVariant.QUIET, disabled = busy || commanding) { command(-10_000) }
-                Button("Forward 10 seconds", ButtonVariant.QUIET, disabled = busy || commanding) { command(10_000) }
+                Button(QelvoraCopy.text("nativeBack10Seconds"), ButtonVariant.QUIET, disabled = busy || commanding) { command(-10_000) }
+                Button(QelvoraCopy.text("nativeForward10Seconds"), ButtonVariant.QUIET, disabled = busy || commanding) { command(10_000) }
             }
         }
     }

@@ -1,0 +1,42 @@
+WP 7.4, #471: the iOS thread freeze. Runs of 2026-10-16 (lane 7, shared Mac, load 10 to 55).
+Fake API (tests/scenarios/lane-7/harness), synthetic identities and data; the real iOS app on
+the simulator qelvora-lane7-ios (iOS 26.5), operated by XCUITest. A watchdog ended an app that
+held over 90% CPU for 20 s and sampled it first (samples kept outside git).
+
+1. First fix only (no bottom anchor, a 1-point end marker whose answer was view state)
+   R1 pass, R4 pass, R5 FROZE (after the 403 refusal cleared the Notes, during slow drags):
+   main thread 890 of 890 samples in GraphHost.flushTransactions -> AG::Subgraph::update ->
+   LazyLayout / StackLayout sizeThatFits (an endless view-graph transaction loop).
+
+2. The same flow on lane-7/status-7-4 (before #471: the bottom anchor)
+   R5 FROZE at its first scroll (main thread 178 of 178 samples in the same SwiftUI layout).
+   So R5's freeze is older than #471; the first fix did not remove it.
+
+3. A plain stack at every text size; the newest-row flag is not view state
+   R1 pass 45.6 s | R4 pass 25.9 s | R5 pass 51.6 s | R7 pass 184.5 s | R8 pass 113.6 s
+   R9 pass 14.8 s | R10 pass 15.8 s | no frozen app
+   E7.1 iOS: S1-S8, E1, L2 pass; L1, L3, L4, L5 FAIL: new rows landed below the fold
+   (lane-7/status-7-4, the bottom anchor: L1 to L5 all FAIL the same way)
+
+4. Final: only the reader moving the rows (their top edge) stops the following
+   build-for-testing pass
+   R1 pass 45.6 s | R4 pass 26.5 s | R5 pass 51.6 s | R7 pass 185.3 s | R8 pass 117.5 s
+   R9 pass 14.6 s | R10 pass 15.9 s | no frozen app
+   (R2, R3, R6 are steps inside these flows; R5 and R6 share a flow.)
+   D1 42.0 | D2 32.7 | D3 45.8 | D3T 77.9 | D4 70.2 | D4R 13.0 | D5 112.0 | D7 53.3 | D7U 22.5
+   D8 28.9 s: all pass
+   S1, S2, S3 (seal) pass | P1, P2, P3 (citations) pass
+   E7.1 iOS: S1-S8, E1, L1-L5 pass, 14 of 14 (L1 and L5 brought in line with C4: a Note is
+   presence, read on open, return to the front or reconnect, counted in the creator's presence)
+   E7.1 Android (unchanged by #471): 13 of 14; L5 FAIL (the Note below the fold after a
+   reconnect): an Android defect, fixed in lane-7/android-follow (L5 pass there)
+
+   An earlier D7 failure was my watchdog ending the app while it started under load (20 s of
+   CPU alone). The watchdog now also needs a sample whose main thread never idles; D7 then passed.
+
+Gates (run on lane-7/android-follow, whose iOS code is this branch's)
+   contract 62/62 | generate:check, typecheck (7 tasks), prettier, eslint: pass
+   iOS: build-for-testing (empty API) pass | existing UI tests 2 pass, 4 skipped by design
+   (real backend) | release build pass | swift test 18/18 (snapshots unchanged)
+   Android: see lane-7/android-follow (the emulator's display froze during the first device-test
+   run; the emulator was restarted, same AVD)

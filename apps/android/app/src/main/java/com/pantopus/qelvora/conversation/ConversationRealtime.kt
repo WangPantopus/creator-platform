@@ -1,5 +1,7 @@
 package com.pantopus.qelvora.conversation
 
+import com.pantopus.qelvora.generated.QelvoraCopy
+
 import android.util.Log
 import com.pantopus.qelvora.BuildConfig
 import com.pantopus.qelvora.generated.APIFrame
@@ -46,7 +48,7 @@ internal object ConversationRealtime {
 
     fun purge() = synchronized(connections) {
         connections.values.toList().forEach {
-            it.stop(ConversationFailure(401, "Your session ended. Continue with Pantopus again."))
+            it.stop(ConversationFailure(401, QelvoraCopy.text("nativeYourSessionEndedContinueWith")))
         }
     }
 
@@ -56,11 +58,11 @@ internal object ConversationRealtime {
         require(uri.scheme in listOf("http", "https") && uri.host != null && uri.userInfo == null)
         val origin = URI(uri.scheme, null, uri.host, uri.port, null, null, null).toString()
         val key = Key(origin, accountId)
-        val token = credential() ?: throw ConversationFailure(401, "Your session ended. Continue with Pantopus again.")
+        val token = credential() ?: throw ConversationFailure(401, QelvoraCopy.text("nativeYourSessionEndedContinueWith"))
         val id = UUID.randomUUID().toString()
         val connection = synchronized(connections) {
             val previous = connections[key]
-            if (previous != null && previous.token != token) previous.stop(ConversationFailure(401, "Your account changed. Open this conversation again."))
+            if (previous != null && previous.token != token) previous.stop(ConversationFailure(401, QelvoraCopy.text("nativeYourAccountChangedOpenThisConversation")))
             val current = connections[key] ?: Connection(key, token, credential).also { connections[key] = it }
             current.add(id, Subscription(page.creatorId, page.fanId, page.threadId, cursor,
                 { trySend(it).isSuccess }, { close(it) }))
@@ -77,7 +79,7 @@ internal object ConversationRealtime {
 
         fun add(id: String, subscription: Subscription) {
             if (stopped || subscriptions.size >= 64) {
-                subscription.fail(ConversationFailure(503, "Reconnect to refresh this conversation.")); return
+                subscription.fail(ConversationFailure(503, QelvoraCopy.text("nativeReconnectToRefreshThisConversation"))); return
             }
             subscriptions[id] = subscription
             if (socket == null) {
@@ -89,7 +91,7 @@ internal object ConversationRealtime {
         private fun send(command: JsonObject): Boolean {
             val current = socket ?: return false
             if (current.queueSize() > 65536 || !current.send(command.toString())) {
-                stop(ConversationFailure(503, "Reconnect to refresh this conversation.")); return false
+                stop(ConversationFailure(503, QelvoraCopy.text("nativeReconnectToRefreshThisConversation"))); return false
             }
             return true
         }
@@ -98,7 +100,7 @@ internal object ConversationRealtime {
                 put("kind", "subscribe"); put("creatorId", subscription.creatorId)
                 put("fanId", subscription.fanId); put("cursor", subscription.cursor)
             }) && !subscription.emit(ConversationRealtimeEvent.Connected))
-                stop(ConversationFailure(503, "Reconnect to refresh this conversation."))
+                stop(ConversationFailure(503, QelvoraCopy.text("nativeReconnectToRefreshThisConversation")))
         }
         fun remove(id: String) {
             val removed = subscriptions.remove(id) ?: return
@@ -113,28 +115,28 @@ internal object ConversationRealtime {
             if (connections[key] === this) connections.remove(key)
             socket?.cancel(); socket = null
             val previous = subscriptions.values.toList(); subscriptions.clear()
-            previous.forEach { it.fail(failure ?: ConversationFailure(503, "Reconnect to refresh this conversation.")) }
+            previous.forEach { it.fail(failure ?: ConversationFailure(503, QelvoraCopy.text("nativeReconnectToRefreshThisConversation"))) }
         }
         override fun onOpen(webSocket: WebSocket, response: Response) = synchronized(connections) {
             if (stopped) { webSocket.cancel(); return@synchronized }
-            if (credential() != token) { stop(ConversationFailure(401, "Your account changed. Open this conversation again.")); return@synchronized }
+            if (credential() != token) { stop(ConversationFailure(401, QelvoraCopy.text("nativeYourAccountChangedOpenThisConversation"))); return@synchronized }
             open = true
             subscriptions.values.toList().forEach { subscribe(it) }
         }
         override fun onMessage(webSocket: WebSocket, text: String) = synchronized(connections) {
             if (stopped) return@synchronized
-            if (credential() != token) { stop(ConversationFailure(401, "Your account changed. Open this conversation again.")); return@synchronized }
-            if (text.length > 1_000_000) { stop(ConversationFailure(503, "Reconnect to refresh this conversation.")); return@synchronized }
+            if (credential() != token) { stop(ConversationFailure(401, QelvoraCopy.text("nativeYourAccountChangedOpenThisConversation"))); return@synchronized }
+            if (text.length > 1_000_000) { stop(ConversationFailure(503, QelvoraCopy.text("nativeReconnectToRefreshThisConversation"))); return@synchronized }
             val frame = runCatching { json.decodeFromString<APIFrame>(text) }.getOrNull()
             if (frame == null || subscriptions.values.none { it.threadId == frame.threadId }) {
                 trace(if (frame == null) "frame_decode_failed" else "frame_owner_missing")
-                stop(ConversationFailure(503, "Reconnect to refresh this conversation.")); return@synchronized
+                stop(ConversationFailure(503, QelvoraCopy.text("nativeReconnectToRefreshThisConversation"))); return@synchronized
             }
             if (subscriptions.values.filter { it.threadId == frame.threadId }.any { !it.emit(ConversationRealtimeEvent.Frame(frame)) })
-                stop(ConversationFailure(503, "Reconnect to refresh this conversation."))
+                stop(ConversationFailure(503, QelvoraCopy.text("nativeReconnectToRefreshThisConversation")))
         }
         override fun onMessage(webSocket: WebSocket, bytes: ByteString) = synchronized(connections) {
-            stop(ConversationFailure(503, "Reconnect to refresh this conversation."))
+            stop(ConversationFailure(503, QelvoraCopy.text("nativeReconnectToRefreshThisConversation")))
         }
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) = synchronized(connections) {
             trace("socket_closing_code_$code")
@@ -144,11 +146,11 @@ internal object ConversationRealtime {
                 "Subscription refused" -> "server_subscription_refused"
                 else -> "server_close_other"
             })
-            stop(ConversationFailure(if (code == 1008) 401 else 503, "Reconnect to refresh this conversation."))
+            stop(ConversationFailure(if (code == 1008) 401 else 503, QelvoraCopy.text("nativeReconnectToRefreshThisConversation")))
         }
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) = synchronized(connections) {
             trace(if (response?.code == 401) "socket_authentication_failed" else "socket_transport_failed")
-            stop(ConversationFailure(if (response?.code == 401) 401 else 503, "Reconnect to refresh this conversation."))
+            stop(ConversationFailure(if (response?.code == 401) 401 else 503, QelvoraCopy.text("nativeReconnectToRefreshThisConversation")))
         }
     }
 }

@@ -79,6 +79,14 @@ export function launch(platform, ...args) {
       `launch ${platform} failed: ${result.stderr || result.stdout}`,
     );
 }
+/** The app goes to the background and comes back to the front. */
+export const background = (platform, ms = 2000) =>
+  spawnSync(process.execPath, [
+    join(here, "run-app.mjs"),
+    "background",
+    platform,
+    String(ms),
+  ]);
 export const stop = (platform) =>
   spawnSync(process.execPath, [join(here, "run-app.mjs"), "stop", platform]);
 

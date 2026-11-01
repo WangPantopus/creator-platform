@@ -1,0 +1,33 @@
+WP 7.4 P7, the 18+ refusal. 2026-10-15.
+Fake API (synthetic identities and data); the apps, storage and HTTP are real.
+Branch lane-7/adults-only, stacked on #460.
+
+Survey before the change: with every request refused with 403
+adult_eligibility_required after sign-in, both apps showed "We can't reach
+your account right now. Your session is kept on this device." with Retry and
+Crisis help, and each checked the session 4 times in 12 seconds. D-11 and C1
+say the answer is final, the session ends, and the person sees the designed
+under-18 state with the policy and nothing else.
+
+After: a 403 adult_eligibility_required on the session check, the session
+refresh or the development sign-in ends the session on the device (the
+sign-out purge) and shows the wordmark, adultOnlyTitle and adultOnlyBody,
+nothing else, as the web's /auth/adults-only.
+
+Android (e7-4-adults.mjs; qelvora-lane7-android), 6 steps, all pass:
+P7.1 Devon on Home, then flagged under 18 by the fake: only the under-18
+state; 1 refusal, then no request with the old session in 10 s; a relaunch
+shows the welcome. P7.2 the under-18 persona signs in: the same state, no
+session kept. P7.3 font scale 2.0, Night: the state in full.
+iOS (Lane7AdultFlows via ios-navigation.mjs --adults; qelvora-lane7-ios):
+the same A1 to A3, AX5 for A3: 3 flows passed, none skipped.
+
+Gates: harness contract 62/62; generated files; typecheck; prettier; eslint.
+Android: unit and snapshot tests 19/19 (no image changed), lint 0 errors, 9
+device tests (4 pass, 5 skipped by design), release build. iOS: test build,
+existing UI tests (2 pass, 4 skipped by design), release build, package
+tests 18/18.
+Not run: the release sign-in (WP 7.5, C1) meeting the answer at sign-in; a
+refusal first met by another screen (it shows its own unavailable state
+until the next session check, seconds later); the real stack; physical
+devices.

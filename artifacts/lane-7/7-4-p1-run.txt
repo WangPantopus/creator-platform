@@ -1,0 +1,44 @@
+WP 7.4 P1, C4 Notes and reactions in the thread. 2026-10-15/16.
+Fake API (synthetic identities and data); the apps, HTTP, paging, layout and
+storage are real. Branch lane-7/notes-reactions, stacked on #401.
+
+Contract: check-contract.mjs 62/62 against the real Zod schemas, including
+three presence pages (items 2, 0, 2), labels from copy, and the 401
+(session_required), 400 (presence_cursor_invalid, invalid_request) and 403
+(audience_unavailable) refusals.
+
+Android (e7-4-presence.mjs, one run, 30 steps, all pass):
+R1.2 three reads, cursors verbatim, the empty page followed; R1.1 order draft <
+label < body < reaction, tier Note hidden, older Notes above the first message;
+R1.3 label node directly before the body node; R1.4 frame 0 reads, foreground
++3 requests, lost connection +3; R1.6 500 one request and list kept, 20 s hold
+one request (no retry) and list kept, drop one request and Notes stay, 403 one
+request and list cleared, thread and Send untouched; R1.5 ineligible Note gone,
+reaction stays, good read 3 pages; R1.9 10 app files, 0 contain Note text;
+R1.8 long Unicode Note and its label at font scale 2.0, Light and Night.
+iOS (Lane7PresenceFlows via ios-navigation.mjs --presence): R1, R4, R5, R9 pass
+in one run; R8 failed there because the test took the first "Maya · to all
+members" element (the oldest Note at the top of a very tall thread) and passed
+after the test looked for the long Note's own label. iOS R1.9: 20 files in the
+data container, 0 hits. URLSession retries a dropped GET by itself (Android's
+client does not), so the keep rule is proven with a 500 and a timeout.
+D3T (WP 7.3 freeze guard) on this branch: iOS pass; Android pass, idle CPU 0%.
+Findings fixed here: Android lacked the Note head rule (four Note snapshots
+re-recorded); iOS parsed timestamps with a regex and a new formatter on every
+render (now a fixed-format parser, checked against Foundation); Android rebuilt
+the merged timeline on every recomposition (now memoized).
+R1.7 (a 66-message thread; the fake pages at 50): older Notes and the reaction
+stay hidden until "Earlier messages" loads, then appear: Android pass; iOS pass
+(its test now flings to the top of the page; slow drags did not reach it).
+Not run: R1.10 (sign-out to another fan); R1.11 (a Note published through the
+real content API: needs a signed act and membership rows).
+2026-10-15, found by the P3 seal flows: Android lost the bottom of the thread
+when presence arrived after the page. At font scale 2.0, where the thread's
+own controls are its last rows, the step-in button was pushed off screen;
+iOS keeps its bottom anchor. Fix: Android scrolls to the bottom again when
+presence changes, only while the reader is still at the bottom. New R1.12
+(R10 in both runners): Android failed before the fix and passes after it;
+iOS pass. Android full rerun after the fix: all steps pass (R1.1's order check
+now compares neighboring rows one pair per screen; it had relied on where the
+list happened to stop). Android gates: unit tests, snapshot verify, lint, 9
+device tests, release build. iOS app code is unchanged; its R10 passes.

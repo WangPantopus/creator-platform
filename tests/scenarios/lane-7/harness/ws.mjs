@@ -32,6 +32,12 @@ export class Connection {
   constructor(socket) {
     this.socket = socket;
     socket.on("data", (chunk) => this.#read(chunk));
+    // An app process can disappear without sending a WebSocket close frame.
+    // Upgraded HTTP sockets may remain half-open after the peer's TCP FIN.
+    socket.on("end", () => {
+      socket.end();
+      this.#finish();
+    });
     socket.on("close", () => this.#finish());
     socket.on("error", () => this.#finish());
   }

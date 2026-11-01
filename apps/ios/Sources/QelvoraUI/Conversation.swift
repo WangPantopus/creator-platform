@@ -30,11 +30,13 @@ public struct Message: View {
         VStack(alignment: kind == .fan ? .trailing : .leading, spacing: QelvoraLayout.authorGap) {
             switch kind {
             case .fan:
+                // Authorship first for screen readers too: the person's own message says "You".
                 Text(children).qText("body")
+                    .accessibilityLabel(QelvoraCopy.text("nativeYou") + ". " + children)
                     .padding(.horizontal, QelvoraTokens.token("message-padding"))
                     .padding(.vertical, QelvoraTokens.token("space-2") + QelvoraTokens.token("space-1") / 2)
                     .background(qColor("surface-sunken", scheme), in: BubbleShape(fan: true))
-                    .opacity(delivery == .pending ? 0.6 : 1)
+                    .opacity(delivery == .pending ? 0.7 : 1) // 0.6 gives 4.08:1 in Light; 0.7 keeps AA (5.57:1)
                 if delivery == .pending {
                     Text(QelvoraCopy.text("sending")).qText("caption").foregroundStyle(qColor("ink-muted", scheme))
                 } else if delivery == .failed {
@@ -118,7 +120,7 @@ public struct Message: View {
             VStack(alignment: .leading, spacing: 0) {
                 VStack(alignment: .leading, spacing: 0) {
                     HStack(spacing: QelvoraTokens.space2) { QelvoraGlyph(name: "ring", size: QelvoraTokens.authorLabelSize + QelvoraTokens.hairline, color: qColor("ai-ink", scheme)); Text(QelvoraCopy.text("preparedByAI")).qText("caption", weight: .semibold).foregroundStyle(qColor("ai-ink", scheme)) }.frame(minHeight: QelvoraTokens.space5)
-                    HStack(spacing: QelvoraTokens.space2) { Seal(initial: String(name.prefix(1)), size: QelvoraTokens.authorLabelSize + QelvoraTokens.hairline); Text(QelvoraCopy.text("approvedBy", values: ["name": name])).qText("caption", weight: .semibold).foregroundStyle(qColor("maya-ink", scheme)); if let time { Text("· \(time)").qText("data-sm").foregroundStyle(qColor("ink-muted", scheme)) } }.frame(minHeight: QelvoraTokens.space5)
+                    HStack(spacing: QelvoraTokens.space2) { Seal(initial: creatorInitial(name), size: QelvoraTokens.authorLabelSize + QelvoraTokens.hairline); Text(QelvoraCopy.text("approvedBy", values: ["name": name])).qText("caption", weight: .semibold).foregroundStyle(qColor("maya-ink", scheme)); if let time { Text("· \(time)").qText("data-sm").foregroundStyle(qColor("ink-muted", scheme)) } }.frame(minHeight: QelvoraTokens.space5)
                 }.padding(.horizontal, QelvoraTokens.messagePadding).padding(.vertical, QelvoraTokens.space2).frame(maxWidth: .infinity, alignment: .leading).background(qColor("ground", scheme))
                 Text(children).qText("body").padding(QelvoraTokens.token("message-padding"))
                 SignedMarker(name: name, action: onVerify).padding(.horizontal, QelvoraTokens.token("message-padding"))
@@ -127,7 +129,7 @@ public struct Message: View {
     }
 
     private var approvalLabel: some View {
-        HStack(spacing: QelvoraTokens.space2) { Seal(initial: String(name.prefix(1)), onMaya: true); Text(QelvoraCopy.text("approvedBy", values: ["name": name])).qText("caption", weight: .semibold).foregroundStyle(qColor("maya-accent", scheme)) }.fixedSize()
+        HStack(spacing: QelvoraTokens.space2) { Seal(initial: creatorInitial(name), onMaya: true); Text(QelvoraCopy.text("approvedBy", values: ["name": name])).qText("caption", weight: .semibold).foregroundStyle(qColor("maya-accent", scheme)) }.fixedSize()
     }
 }
 
@@ -141,19 +143,20 @@ public struct Note: View {
     public var reply: Bool
     public var replyId: String
     public var retracted: Bool
+    public var label: String?
     public var onVerify: () -> Void
     @State private var replyText = ""
     @Environment(\.colorScheme) private var scheme
 
-    public init(children: String, name: String = "Maya", audience: String = "Kiln Club members", audienceSize: String? = nil, time: String? = nil, media: String? = nil, reply: Bool = true, replyId: String = "qelvora-note-reply", retracted: Bool = false, onVerify: @escaping () -> Void = {}) {
-        self.children = children; self.name = name; self.audience = audience; self.audienceSize = audienceSize; self.time = time; self.media = media; self.reply = reply; self.replyId = replyId; self.retracted = retracted; self.onVerify = onVerify
+    public init(children: String, name: String = "Maya", audience: String = "Kiln Club members", audienceSize: String? = nil, time: String? = nil, media: String? = nil, reply: Bool = true, replyId: String = "qelvora-note-reply", retracted: Bool = false, label: String? = nil, onVerify: @escaping () -> Void = {}) {
+        self.children = children; self.name = name; self.audience = audience; self.audienceSize = audienceSize; self.time = time; self.media = media; self.reply = reply; self.replyId = replyId; self.retracted = retracted; self.label = label; self.onVerify = onVerify
     }
     public var body: some View {
         if retracted {
             Text(QelvoraCopy.text("noteRemoved", values: ["name": name])).qText("label").foregroundStyle(qColor("ink-muted", scheme)).padding(QelvoraTokens.token("message-padding")).frame(maxWidth: .infinity, alignment: .leading).overlay(RoundedRectangle(cornerRadius: QelvoraTokens.token("space-4")).stroke(qColor("line", scheme), style: StrokeStyle(lineWidth: 1, dash: [QelvoraTokens.token("space-1")])))
         } else {
             VStack(spacing: 0) {
-                AuthorLabel(kind: .humanBroadcast, name: name, audience: audience, time: time, onMaya: true)
+                AuthorLabel(kind: .humanBroadcast, name: name, audience: audience, time: time, onMaya: true, label: label)
                     .padding(.leading, QelvoraTokens.token("space-4"))
                     .padding(.trailing, QelvoraTokens.token("welcome-bottom"))
                     .padding(.vertical, QelvoraTokens.textStyles["label"]!.size)
@@ -164,7 +167,7 @@ public struct Note: View {
                     if let media {
                         HStack(spacing: QelvoraTokens.space2) { QelvoraGlyph(name: "image", size: QelvoraTokens.limitRadioSize, color: qColor("on-maya-muted", scheme)); Text(media).qText("label").foregroundStyle(qColor("on-maya-muted", scheme)) }.frame(maxWidth: .infinity).frame(height: QelvoraTokens.noteMediaHeight).overlay(RoundedRectangle(cornerRadius: QelvoraTokens.segmentRadius).stroke(Color.white.opacity(QelvoraTokens.noteMediaOpacity), style: StrokeStyle(lineWidth: QelvoraTokens.hairline, dash: [QelvoraTokens.space1])))
                     }
-                    SignedMarker(name: name, extra: audienceSize.map { "\($0) members" }, onMaya: true, action: onVerify)
+                    SignedMarker(name: name, extra: audienceSize.map { QelvoraCopy.text("nativeCountMembers", values: ["count": $0]) }, onMaya: true, action: onVerify)
                 }.padding(QelvoraTokens.token("space-4")).frame(maxWidth: .infinity, alignment: .leading)
                 if reply {
                     VStack(alignment: .leading, spacing: QelvoraLayout.authorGap) {

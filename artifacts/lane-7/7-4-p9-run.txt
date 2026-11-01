@@ -1,0 +1,14 @@
+WP 7.4 P9: the packet's terms, in the approved wording.
+Runs of 2026-10-16 (lane 7, shared Mac). Fake API (tests/scenarios/lane-7/harness), synthetic
+identities and data; the real apps on simulator qelvora-lane7-ios (iOS 26.5, XCUITest) and
+emulator-5574 (Android 15, adb). Run on the top of the WP 7.4 stack (lane-7/packet-terms), which
+contains this piece unchanged. Nothing here is the real backend.
+
+iOS (--packet)
+  M1 no terms before a choice; Maya's written reply: both rows, the rule, the hold, 48 h  pass 13.2 s
+  M2 Kiln Club's voice note: its own name, 72 h                                           pass 13.3 s
+  M3 largest text, Night: the block whole                                                 pass 51.8 s
+Android (e7-4-packet.mjs): M1 to M3                                                        pass
+Never "she", never an ETA line (no data). Snapshots: TermsBlock and Sheet re-recorded on
+both apps (light, night) and reviewed.
+Not run: the ETA line; the real stack; physical devices.

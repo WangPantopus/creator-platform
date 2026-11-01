@@ -1,0 +1,11 @@
+WP 7.4: a chat link opens the person's existing conversation.
+Runs of 2026-10-16 (lane 7, shared Mac). Fake API (tests/scenarios/lane-7/harness), synthetic
+identities and data; the real apps on simulator qelvora-lane7-ios (iOS 26.5, XCUITest) and
+emulator-5574 (Android 15, adb). Run on the top of the WP 7.4 stack (lane-7/packet-terms), which
+contains this piece unchanged. Nothing here is the real backend.
+
+iOS (--chat-link): H1 Devon -> /creators/maya/chat opens his thread, nothing begun  pass 5.8 s
+                   H2 Priya -> /creators/lenapark/chat: the first-conversation screen pass 6.6 s
+Android (e7-4-chat-link.mjs): H1, H2                                                pass
+The first-conversation flows still pass: iOS consent C1-C5, Android P6.1-P6.5.
+A notice opening the thread is P2's U2 (pass on both).

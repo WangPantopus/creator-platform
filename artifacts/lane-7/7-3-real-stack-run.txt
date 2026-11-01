@@ -1,0 +1,114 @@
+WP 7.3 focused real API/PostgreSQL proof, 2026-10-09.
+Disposable lane 7 stack; synthetic development identity and model-provider edges.
+No live model or payment service. Native app/HTTP/API/PostgreSQL/encryption are real.
+
+Android D6 PASS (draft-real-android-v5.log):
+- Authorized human-active thread; unsent input absent from API message history.
+- Kill/relaunch restores input; explicit Send accepts exactly one fan reply.
+- Acceptance removes the local encrypted draft; a subsequent unsent draft is saved.
+- Open privacy, choose thread scope, fill the actual synthetic creator/thread IDs.
+- Confirmation remains open across a six-second readiness-heartbeat wait.
+- Keep data retains API access (200) and the encrypted draft file.
+- Reopen, wait across another heartbeat, and confirm deletion.
+- Subsequent thread read is 403. PostgreSQL for this exact account/thread has
+  one deletion job, one tombstone, and eight domain tasks.
+- Local ciphertext count is zero. Back and process restart both show
+  Conversation unavailable, with no old input and no encrypted draft.
+
+Earlier Android attempts are retained:
+v1 tapped a caption instead of the input; v2 unnecessarily repeated takeover
+on an already human-active thread (403); v3 revealed a real UI bug that closed
+the confirmation during periodic session checks; v4 tapped during a keyboard
+transition. The final runner targets editable descriptions, observes keyboard
+focus/dismissal, and re-reads field bounds. Both apps now retain only the generic
+confirmation through same-session checks; actions remain disabled during checks
+and require the original fresh request capture. No authority is retained in it.
+
+Complete backend erasure is NOT proved. The Android job is blocked/retrying
+behind local domain integrations. Observed error codes by domain:
+agent: accounting_boundary_pending
+commerce: commerce_retention_unconfigured
+content: content_retention_unconfigured
+conversation: conversation_recordings_unavailable
+growth: domain_hook_error
+identity: identity_retention_unconfigured
+media: media_retention_unconfigured
+trust: comparison_artifact_purge_pending
+Recorded for lane 1 and domain owners in lane-7-keyboard-drafts.md.
+
+First iOS D6 attempt restored/sent once and checked local ciphertext, then failed
+because the runner overscrolled Conversation ID above the visible scroller.
+Bundle: ios-navigation-1791604369010.xcresult (1 failed, 0 passed, 0 skipped).
+The AX hierarchy confirms field y=92 was hidden behind the sticky header,
+above the visible scroller y=154.7..461. The corrected interaction checks actual frames,
+scrolls only in the visible area above the keyboard, and handles both directions.
+iOS v2 failed the unsent assertion because its fixture reused an already-sent
+marker. The host runner now adds a fresh marker per invocation. v3 filled the
+fields, but swipes inside the focused field did not scroll to the button.
+The runner now uses Return to dismiss the keyboard and the scroller margin.
+iOS v4 failed because the runner expected Keep data in the native popover.
+Recording frames show the confirmation stayed open across the heartbeat; iOS
+omits its cancel button in this presentation. The runner now taps outside it.
+
+iOS D6 PASS (draft-real-ios-v5.log):
+Bundle: ios-navigation-1791605313318.xcresult; 1 passed, 0 failed, 0 skipped.
+- Encrypted unsent draft restored after restart; exactly one accepted fan reply.
+- Accepted Send clears local ciphertext. A new unsent draft is encrypted.
+- Confirmation stays visible for six seconds across session readiness checks.
+- Native popover cancellation retains API access (200) and one encrypted draft.
+- Reopen, wait six seconds and confirm: draft count zero, conversation read 403.
+- Independent verify-ios: exact account/thread has one deletion job, one tombstone,
+  eight domain tasks (draft-real-ios-db.log).
+- Back and process restart both show Conversation unavailable, no old input/file.
+- Confirmation and final denied-screen captures reviewed visually.
+The own real stack was stopped and removed after verification, including its
+disposable container and data volume. The next real flow must prepare fresh data.
+
+Both final denied-screen captures are committed as 7-3-ios-deleted-thread.jpg
+and 7-3-android-deleted-thread.jpg (reviewed after compression).
+
+Not run: forced write interruption; deletion acknowledgement cancellation;
+account/creator-wide deletion; complete domain erasure; physical devices.
+
+Post-merge rerun, 2026-10-15 (main through 7ca3982fe merged; stack.mjs up --lane 7
+--no-web --growth --ack-only --provider anthropic: the fake Claude edge, no gateway,
+no model spend). The merge changed the backend behind D6, so D6 was rerun.
+
+Android v1 FAIL: adb's burst typing delivered 32 of a 36-character creator id
+under load (field showed 20000000-0000-4000-8000-00000000). Runner fix: type in
+6-character chunks. App not at fault.
+Android v2 FAIL, a real defect from WP 7.3: the API accepted the deletion (one
+job, tombstone, eight tasks, read 403) but the encrypted draft stayed (1 file).
+Cause, same on both apps: a routine session check flips "private ready", which
+cancels the screen's operation (Android LaunchedEffect -> operation?.cancel();
+iOS onChange(privateReady) -> operation?.cancel()). A confirmed deletion already
+sent was cancelled with it, so the app never saw the acceptance and never purged.
+Fix (Trust.kt, Trust.swift): a command with local consequences finishes once
+sent (Android NonCancellable; iOS an unstructured Task) and purges the original
+account's matching drafts on 2xx; only showing the answer still waits for the
+session checks. 2026-10-09's pass had the same race, not hit by its timing.
+Android v3 FAIL (runner): Send was tapped while the relaunched thread was still
+connecting (correctly disabled; the app never resends by itself). Runner waits
+for the enabled control. Android v4 PASS (first fix variant).
+iOS v1/v2 FAIL (runner): taps landed in the ~100 ms a session check disables the
+Trust actions (backend log: no POST /v1/trust/privacy/jobs after the tap; a GET
+/session at the same instant). Runners now wait for enabled controls and retry a
+tap that had no effect (same idempotency key). iOS v3 PASS (first fix variant).
+
+D6R, the race on demand (delay-proxy.mjs holds the API's answer to POST
+/v1/trust/privacy/jobs for 9 s; the API itself answers at once):
+- Android, pre-fix Trust.kt: FAIL as predicted. API 202 at 23:42:15, released
+  23:42:24; deletion accepted, ciphertext still 1 after 20 s.
+- Android, fixed: PASS. Hold 23:48:00.285-09.287; three session checks inside it
+  (00.824, 04.966, 09.068); ciphertext 0, read 403, exact DB scope.
+- iOS, fixed: PASS. Hold 23:54:22.218-31.219; four session checks inside it;
+  ciphertext 0, read 403, verify-ios exact DB scope. iOS pre-fix: not run (the
+  same cancel path is visible in the code).
+Final plain D6 on the final code, fresh stack: Android PASS; iOS PASS
+(ios-navigation-1792108690862.xcresult, 1 passed, 0 skipped) and verify-ios
+PASS. Both final denied screens reviewed: identical words; the Refresh button is
+centered on iOS and left-aligned on Android (pre-existing; a parity finding).
+After merging main through dea51a4ff (#442: the sign-in and money migration
+wave and trust privacy catalogs; the stack now installs 58 wave migrations,
+was 55), on a fresh stack with the freeze fix: Android D6 PASS; iOS D6 PASS and
+verify-ios PASS; still one deletion job, one tombstone, eight domain tasks.

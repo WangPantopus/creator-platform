@@ -14,6 +14,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import com.pantopus.qelvora.generated.QelvoraCopy
 import com.pantopus.qelvora.generated.QelvoraTokens
 import kotlinx.coroutines.launch
