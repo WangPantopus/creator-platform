@@ -40,6 +40,9 @@ export class NativeDeliveryProvider implements DeliveryProvider {
   constructor(
     private readonly service: () => GrowthService,
     private readonly config: NotificationProviderConfiguration,
+    /** Outer-edge transport seam for a local gateway. The production host
+     * leaves this absent and submits to the fixed FCM HTTPS endpoint. */
+    private readonly fcmFetch?: typeof fetch,
   ) {
     const origin = new URL(config.publicOrigin);
     if (
@@ -119,7 +122,7 @@ export class NativeDeliveryProvider implements DeliveryProvider {
               );
             } else {
               sending = true;
-              const response = await fetch(
+              const response = await (this.fcmFetch ?? fetch)(
                 `https://fcm.googleapis.com/v1/projects/${encodeURIComponent(this.config.fcm!.projectId)}/messages:send`,
                 {
                   method: "POST",
@@ -138,7 +141,10 @@ export class NativeDeliveryProvider implements DeliveryProvider {
                         notificationId: input.notificationId,
                       },
                       android: {
-                        ttl: "0s",
+                        // Preserve the opaque lookup ID while a device is
+                        // offline. The app must still fetch current account,
+                        // permission and owner state before showing anything.
+                        ttl: "86400s",
                         priority: "HIGH",
                         collapse_key: input.notificationId,
                       },
