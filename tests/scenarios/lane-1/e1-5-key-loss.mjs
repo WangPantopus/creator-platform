@@ -160,9 +160,17 @@ async function registerKey(page) {
     .waitFor({ timeout: 20_000 })
     .catch(() => {});
 }
+/** Studio's shell keeps one live stream open (WP 6.9), so the network never
+ * goes idle there; the stream's first answer means the page is up. */
+async function openStudio(page, path) {
+  const live = page.waitForResponse(
+    (response) => new URL(response.url()).pathname === "/api/studio/live",
+  );
+  await page.goto(`${WEB}${path}`);
+  await live;
+}
 async function publishNote(page, text) {
-  await page.goto(`${WEB}/studio/${MAYA}/compose`);
-  await page.waitForLoadState("networkidle");
+  await openStudio(page, `/studio/${MAYA}/compose`);
   await page.locator("#note-text").fill(text);
   await page.getByRole("button", { name: "Review and sign" }).click();
   await page.getByRole("button", { name: "Sign with your passkey" }).click();
@@ -226,8 +234,7 @@ step(
     `SELECT count(*) FROM creator.identity_event WHERE account_id='${ACCOUNT}' AND kind='creator_recovery_lost'`,
   ) !== "0",
 );
-await one.page.goto(`${WEB}/studio/${MAYA}/compose`);
-await one.page.waitForLoadState("networkidle");
+await openStudio(one.page, `/studio/${MAYA}/compose`);
 await one.page.locator("#note-text").fill(`Try after the loss ${Date.now()}`);
 await one.page.getByRole("button", { name: "Review and sign" }).click();
 const refusedBegin = one.page.waitForResponse("**/signed-acts/begin");
@@ -274,8 +281,7 @@ await one.page.route("**/signed-acts/begin", async (route) => {
   if (body.publicKey) body.publicKey.allowCredentials = [];
   await route.fulfill({ response, json: body });
 });
-await one.page.goto(`${WEB}/studio/${MAYA}/compose`);
-await one.page.waitForLoadState("networkidle");
+await openStudio(one.page, `/studio/${MAYA}/compose`);
 await one.page
   .locator("#note-text")
   .fill(`Forged from the lost phone ${Date.now()}`);

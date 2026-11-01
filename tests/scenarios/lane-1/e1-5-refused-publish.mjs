@@ -91,12 +91,17 @@ const credential = sql(
 );
 step("Maya registers a passkey on this device", Boolean(credential));
 
+// Studio's shell keeps one live stream open (WP 6.9), so the network never
+// goes idle there; the stream's first answer means the page is up.
+const live = page.waitForResponse(
+  (response) => new URL(response.url()).pathname === "/api/studio/live",
+);
 await page.goto(`${WEB}/studio/${MAYA}/threads/${fanId}`);
-await page.waitForLoadState("networkidle");
+await live;
 const takeover = page.getByRole("button", { name: "Take over" });
 if (await takeover.isEnabled().catch(() => false)) {
   await takeover.click();
-  await page.waitForLoadState("networkidle");
+  await page.getByLabel("Your words").waitFor();
 }
 const reply = `A personal note from the kiln ${Date.now()}`;
 await page.getByLabel("Your words").fill(reply);
