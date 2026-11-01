@@ -7,6 +7,7 @@ import { parseFragment, type DefaultTreeAdapterMap } from "parse5";
 import * as UI from "@qelvora/ui-web";
 import { brand } from "@qelvora/brand";
 import { copy, formatCopy } from "@qelvora/copy";
+import { ReferenceQueueCard } from "./design-reference";
 
 // The supplied design explicitly shows reminders on. Keep that fixture state
 // separate from product callers, whose missing state must remain unknown.
@@ -14,6 +15,7 @@ const referenceUI = {
   ...UI,
   SpendLimit: (props: React.ComponentProps<typeof UI.SpendLimit>) =>
     React.createElement(UI.SpendLimit, { ...props, remindersOn: true }),
+  QueueCard: ReferenceQueueCard,
 };
 
 type Node = DefaultTreeAdapterMap["node"];
@@ -295,10 +297,11 @@ export function renderScreen(
   screen: Screen,
   options: RenderOptions = {},
 ): React.ReactNode {
-  const source = fs.readFileSync(
-    path.join(designRoot, screen.group, screen.file),
-    "utf8",
-  );
+  // Today replaced Notes as the first Studio tab and stays selected on Notes
+  // (2026-10-15); the reference server applies the same correction.
+  const source = fs
+    .readFileSync(path.join(designRoot, screen.group, screen.file), "utf8")
+    .replaceAll('StudioTabBar" active="Notes"', 'StudioTabBar" active="Today"');
   const body = source.match(/<x-dc>([\s\S]*?)<\/x-dc>/)?.[1];
   if (!body) throw new Error(`Missing board ${screen.file}`);
   const tree = parseFragment(body);
