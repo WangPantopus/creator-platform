@@ -31,6 +31,7 @@ import { GrowthErasure } from "./erasure.js";
 import { GrowthDeviceSessions } from "./device-session.js";
 import type { CreatorProjectionSource } from "./creator-projection.js";
 import { compareHomeActivity } from "./home-composition.js";
+import type { PublicCreatorPage } from "./public-pages.js";
 
 const ShareSourceRecord = z.strictObject({
   id: z.uuid(),
@@ -490,11 +491,56 @@ export class GrowthService {
   }
   async posts(creatorId: string) {
     await this.refreshCreator(creatorId);
+    return this.publicPosts(creatorId);
+  }
+  private async publicPosts(creatorId: string) {
     const result = await this.db.runtime.query(
-      "SELECT p.document FROM growth.content_public p JOIN growth.creator_public c ON c.id=p.creator_id WHERE p.creator_id=$1 AND p.state='published' AND c.state='published' AND c.document->>'verified'='true' ORDER BY p.published_at DESC LIMIT 30",
+      "SELECT p.document FROM growth.content_public p JOIN growth.creator_public c ON c.id=p.creator_id WHERE p.creator_id=$1 AND p.state='published' AND c.state='published' AND c.document->>'verified'='true' ORDER BY p.published_at DESC,p.id LIMIT 30",
       [creatorId],
     );
     return result.rows.map((r) => r.document as PublicContent);
+  }
+  async creatorPage(handle: string): Promise<PublicCreatorPage | null> {
+    const creator = await this.creator(handle);
+    return creator
+      ? { creator, posts: await this.publicPosts(creator.id) }
+      : null;
+  }
+  /** A cached body never substitutes for current public authority. This path
+   * reads versions, not post bodies, and takes no growth row/advisory lock. */
+  async creatorPageCurrent(page: PublicCreatorPage) {
+    if (this.creatorSource) {
+      const current = await this.creatorSource.current(page.creator.id);
+      if (
+        !current ||
+        contentHash({
+          ...current,
+          version: page.creator.version,
+          updatedAt: page.creator.updatedAt,
+        }) !== contentHash(page.creator)
+      )
+        return false;
+    }
+    const row = (
+      await this.db.runtime.query<{
+        document: PublicCreator;
+        posts: [string, number][];
+      }>(
+        `SELECT c.document,coalesce((SELECT jsonb_agg(jsonb_build_array(p.id,p.version) ORDER BY p.published_at DESC,p.id)
+        FROM (SELECT id,version,published_at FROM growth.content_public
+          WHERE creator_id=c.id AND state='published' AND c.state='published'
+          ORDER BY published_at DESC,id LIMIT 30) p),'[]'::jsonb) AS posts
+       FROM growth.creator_public c WHERE c.id=$1 AND c.handle=$2
+         AND c.state IN ('published','paused') AND c.document->>'verified'='true'`,
+        [page.creator.id, page.creator.handle],
+      )
+    ).rows[0];
+    return Boolean(
+      row &&
+        contentHash(row.document) === contentHash(page.creator) &&
+        contentHash(row.posts) ===
+          contentHash(page.posts.map((p) => [p.id, p.version])),
+    );
   }
   async post(handle: string, id: string) {
     const creator = await this.creator(handle);
@@ -1324,6 +1370,28 @@ export class GrowthService {
         copy.growthErrorCreatorRequired,
       );
     return id;
+  }
+  async launchKit(actor: Actor) {
+    const id = await this.requireCreator(actor);
+    await this.refreshCreator(id);
+    return this.db.actor(actor, id, async (client) => {
+      const creator = (
+        await client.query<{ document: PublicCreator }>(
+          "SELECT document FROM growth.creator_public WHERE id=$1",
+          [id],
+        )
+      ).rows[0]?.document;
+      const visible =
+        creator?.verified &&
+        ["published", "paused"].includes(creator.state) &&
+        /^[a-z0-9_]{3,30}$/u.test(creator.handle);
+      return {
+        publicPage: visible
+          ? { path: `/creators/${creator.handle}`, name: creator.name }
+          : null,
+        canInvite: Boolean(visible && creator.state === "published"),
+      };
+    });
   }
   /** Privileged W3 ETL supplies categorical signals, never raw conversation text. */
   async signal(input: unknown) {

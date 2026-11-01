@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { brand } from "@qelvora/brand";
 import { Button, Seal } from "@qelvora/ui-web";
 import {
-  growthRequest,
   configuredOrigin,
+  GrowthUnavailable,
 } from "../../../features/growth/server";
 import { GrowthShell, Failure, NoData } from "../../../features/growth/shell";
 import { Follow, ShareLink } from "../../../features/growth/actions";
 import type { Creator, Post } from "../../../features/growth/types";
+import { publicCreatorPage } from "../../../features/growth/public-creator";
 import {
   ApprovedVariant,
   VoluntaryInvite,
@@ -21,14 +22,12 @@ export async function generateMetadata({
   params: Promise<{ handle: string }>;
 }): Promise<Metadata> {
   try {
-    const { creator } = await growthRequest<{ creator: Creator }>(
-      `public/creators/${encodeURIComponent((await params).handle)}`,
-    );
+    const { creator } = await publicCreatorPage((await params).handle);
     const origin = configuredOrigin(),
       canonical = origin ? `${origin}/creators/${creator.handle}` : undefined;
     return {
       title: `${creator.name} · ${brand.name}`,
-      description: creator.biography,
+      description: creator.biography || undefined,
       alternates: canonical ? { canonical } : undefined,
       robots: {
         index: creator.state === "published",
@@ -36,7 +35,7 @@ export async function generateMetadata({
       },
       openGraph: {
         title: creator.name,
-        description: creator.biography,
+        description: creator.biography || undefined,
         ...(canonical ? { url: canonical } : {}),
       },
     };
@@ -61,8 +60,16 @@ export default async function CreatorHome({
     : "Posts";
   let data: { creator: Creator; posts: Post[] };
   try {
-    data = await growthRequest(`public/creators/${encodeURIComponent(handle)}`);
+    data = await publicCreatorPage(handle);
   } catch (error) {
+    if (error instanceof GrowthUnavailable && error.status === 404)
+      return (
+        <GrowthShell active="Discover">
+          <NoData title={growthCopy.growthCreatorUnavailable}>
+            <a href="/discover">{growthCopy.growthBackToDiscover}</a>
+          </NoData>
+        </GrowthShell>
+      );
     return (
       <GrowthShell active="Discover">
         <Failure
@@ -76,7 +83,7 @@ export default async function CreatorHome({
     origin = configuredOrigin();
   return (
     <GrowthShell active="Discover">
-      <div className="growth-hero qv-on-maya">
+      <div className="growth-hero growth-public-profile qv-on-maya">
         <nav
           className="growth-actions"
           style={{ justifyContent: "space-between", alignItems: "center" }}
@@ -92,16 +99,25 @@ export default async function CreatorHome({
             title={growthFormat("growthSPage", { value1: c.name })}
           />
         </nav>
-        <div className="growth-portrait">{c.photoCaption}</div>
+        <div className="growth-portrait growth-portrait--initial">
+          <span className="growth-portrait-initial" aria-hidden="true">
+            {Array.from(c.name.trim())[0] ?? ""}
+          </span>
+          {c.photoCaption ? <span dir="auto">{c.photoCaption}</span> : null}
+        </div>
         <div>
           <span className="growth-meta" style={{ color: "var(--maya-accent)" }}>
-            {c.category.toUpperCase()}
+            {c.category ? c.category.toUpperCase() : `@${c.handle}`}
           </span>
-          <h1>{c.name}</h1>
+          <h1 dir="auto">{c.name}</h1>
         </div>
-        <p className="growth-voice">{c.biography}</p>
+        {c.biography ? (
+          <p className="growth-voice" dir="auto">
+            {c.biography}
+          </p>
+        ) : null}
         <div className="growth-mark growth-rule">
-          <Seal size={22} initial={c.name[0]} />
+          <Seal size={22} initial={Array.from(c.name)[0]} />
           <span className="growth-help">
             {growthFormat("growthOfficialAi", {
               value1: c.mode.replaceAll("_", " "),
@@ -109,7 +125,10 @@ export default async function CreatorHome({
           </span>
         </div>
       </div>
-      <section className="growth-stack" style={{ paddingBottom: 0, gap: 14 }}>
+      <section
+        className="growth-stack growth-public-profile"
+        style={{ paddingBottom: 0, gap: 14 }}
+      >
         {c.state === "published" ? (
           <Button
             variant="ai"
@@ -148,7 +167,7 @@ export default async function CreatorHome({
           ))}
         </nav>
       </section>
-      <section className="growth-stack">
+      <section className="growth-stack growth-public-profile">
         {section === "Posts" ? (
           <>
             <h2>{growthFormat("growthFrom2", { value1: c.name })}</h2>
@@ -156,8 +175,10 @@ export default async function CreatorHome({
               data.posts.map((p) => (
                 <article className="growth-card growth-card-body" key={p.id}>
                   <span className="growth-note-label">{p.authorLabel}</span>
-                  <h3>{p.title}</h3>
-                  <p className="growth-voice">{p.body}</p>
+                  <h3 dir="auto">{p.title}</h3>
+                  <p className="growth-voice" dir="auto">
+                    {p.body}
+                  </p>
                   <a href={`/creators/${handle}/posts/${p.id}`}>
                     {growthCopy.growthOpenPost}
                   </a>

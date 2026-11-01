@@ -374,3 +374,39 @@
     transition: none !important;
   }
 }
+
+.growth-public-profile {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.growth-portrait--initial {
+  height: auto;
+  min-height: 120px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 12px;
+  border-style: solid;
+}
+.growth-portrait-initial {
+  font-family: var(--font-serif);
+  font-size: 4.5rem;
+  line-height: 1;
+  color: var(--on-maya);
+}
+.growth-public-profile h1 {
+  font-size: 4rem;
+  line-height: 3.75rem;
+}
+.growth-public-profile h2 {
+  font-size: 1.625rem;
+  line-height: 1.875rem;
+}
+.growth-public-profile h3 {
+  font-size: 1.375rem;
+  line-height: 1.75rem;
+}
+.growth-public-profile .growth-voice {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
