@@ -7,7 +7,7 @@ personal attention.
 
 ## Start every session here
 
-For the order of work, read the [launch plan](docs/LAUNCH_PLAN.md); for the current state, [docs/operations/CURRENT.md](docs/operations/CURRENT.md). The older handoffs and the [project checkpoint](docs/operations/project-continuation-2026-10-07.md) are history. Refresh the Git/GitHub observations before resuming. If you are working on one of the seven lanes, start at [docs/lanes/README.md](docs/lanes/README.md).
+For the current state and the order of work, read the [coordination handoff](docs/operations/handoff-2026-11-01.md) and the [consolidation plan](docs/CONSOLIDATION_PLAN.md). [docs/operations/CURRENT.md](docs/operations/CURRENT.md) is out of date until Wave 5 replaces it with `docs/STATUS.md`. The [launch plan](docs/LAUNCH_PLAN.md) is the road to the pilot. The older handoffs and the [project checkpoint](docs/operations/project-continuation-2026-10-07.md) are history. Refresh the Git/GitHub observations before resuming. Since 2026-11-01, work runs as one coordinating session plus one work session per task (see the handoff). The lane docs ([docs/lanes/README.md](docs/lanes/README.md)) remain the reference for each area's scenarios.
 
 1. Read [docs/BRIEF.md](docs/BRIEF.md): the condensed product, identity system,
    screen inventory, copy system, decision log and open questions.
