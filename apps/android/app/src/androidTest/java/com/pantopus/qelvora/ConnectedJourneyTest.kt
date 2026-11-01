@@ -191,10 +191,10 @@ class ConnectedJourneyTest {
                 if (!resume) {
                     compose.waitUntil(30_000) {
                         compose.onAllNodes(composer).fetchSemanticsNodes().isNotEmpty() ||
-                            compose.onAllNodesWithText("Continue with Pantopus").fetchSemanticsNodes().isNotEmpty()
+                            compose.onAllNodesWithText("Sign in to continue").fetchSemanticsNodes().isNotEmpty()
                     }
-                    if (compose.onAllNodesWithText("Continue with Pantopus").fetchSemanticsNodes().isNotEmpty()) {
-                        clickReady("Continue with Pantopus")
+                    if (compose.onAllNodesWithText("Sign in to continue").fetchSemanticsNodes().isNotEmpty()) {
+                        clickReady("Sign in to continue")
                         awaitText(actor!!)
                         compose.onNodeWithText(actor).performClick()
                     }
@@ -259,8 +259,8 @@ class ConnectedJourneyTest {
             launch("/identity/account").use {
                 awaitText("Your account")
                 compose.onNodeWithText("Sign out", substring = false).performClick()
-                awaitText("Continue with Pantopus")
-                clickReady("Continue with Pantopus")
+                awaitText("Sign in to continue")
+                clickReady("Sign in to continue")
                 awaitText(otherActor)
                 compose.onNodeWithText(otherActor).performClick()
                 awaitText("Your account")
@@ -273,8 +273,8 @@ class ConnectedJourneyTest {
                 compose.onNodeWithContentDescription("Message $creator's AI").assertDoesNotExist()
                 capture("replacement-account-cold-route")
                 compose.onNodeWithText("Sign out", substring = false).performClick()
-                awaitText("Continue with Pantopus")
-                clickReady("Continue with Pantopus")
+                awaitText("Sign in to continue")
+                clickReady("Sign in to continue")
                 awaitText(actor!!)
                 compose.onNodeWithText(actor).performClick()
                 awaitText("Your account")
