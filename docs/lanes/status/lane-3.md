@@ -51,6 +51,31 @@ http://127.0.0.1:56499`; publish Maya on the fake first, then restart with the g
   `sh tests/scenarios/lane-3/fresh-stack.sh --env QELVORA_FAKE_MODEL_URL=http://127.0.0.1:56438`
   (port 56438 is lane 3's; the scenario opens the edge itself and forwards to the fake on 56433).
 
+## B8: My AI split into a hook, the layout and one file per screen
+
+B2 (#441) built the FAQ editor and the publish check in My AI, so B8's remaining part was splitting
+`apps/web/features/creator-ai/CreatorAI.tsx` (3,007 lines), which waited for #441 and #446 (decided
+2026-10-16). Nothing it renders or does changes:
+
+- `useCreatorAI.tsx`: every piece of state, effect and action, moved verbatim (state stays in the one
+  component, so text typed in a section survives switching sections as before); it returns the view the
+  screens read.
+- `CreatorAI.tsx` (286 lines): the sidebar, header, notices, the confirmation dialog and the section
+  switch.
+- One file per screen, each block moved verbatim: `OverviewScreen`, `SourcesScreen` (sources and
+  onboarding), `StyleScreen` (style and rules), `TestScreen` (test and versions), `LicenseScreen`,
+  `InterviewScreen`. Each destructures exactly the names it uses; the state and configuration they
+  render are passed already non-null, as the old block guarded them.
+- `shared.tsx`: the module-level helpers (draft storage, Button, Field, Panel, Lines, Glyph, types).
+
+The split was generated with the TypeScript compiler API (each block's free names resolved to their
+declarations), not by hand. Proof on lane 3's stack with the web app (real browser, API and
+PostgreSQL; fakes: development identity, model fake): as Maya, every My AI section (overview, sources,
+onboard, style, rules, test, versions, license, interview) and the same six sections after typing into
+their first field render byte-identical DOM on the monolith and on the split (15 of 15), with the same
+console messages; through the split, Save draft keeps a new rule across a reload and "Test it as a fan"
+completes its preview. Typecheck and lint pass.
+
 ## Merge wave (2026-10-16)
 
 At the founder's request every open lane 3 pull request lands at once through one merge-wave pull
