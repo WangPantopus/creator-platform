@@ -4,10 +4,13 @@ Written 2026-11-01 from a full review of `docs/`, `design/`, the code on `main` 
 request, the real CI logs, local runs on this Mac, and the October 27 handoff. Numbers were measured
 from Git, GitHub or a local run on 2026-11-01 unless marked otherwise.
 
-**Status:** the founder approved the plan on 2026-11-01, with the recommended defaults for the native
-sign-in wording ("Sign in to continue" and "Sign-in is unavailable right now. Try again in a moment."),
-the home glyph for Today, and the local installs. Wave 1 is in progress. The section 6 working rules
-and the other section 8 decisions are still open. The tables below record the state on the review day.
+**Status (end of 2026-11-01):** the founder approved the plan on 2026-11-01, with the recommended
+defaults for the native sign-in wording ("Sign in to continue" and "Sign-in is unavailable right now.
+Try again in a moment."), the home glyph for Today, and the local installs. Waves 1 to 3 are merged
+(#518 to #525), and open pull requests are down from 66 to 4. Wave 4 runs as "three now, rest later"
+(section 5). The current state and queue are in the
+[coordination handoff](operations/handoff-2026-11-01.md). The section 6 working rules and the other
+section 8 decisions are still open. The tables below record the state on the review day.
 
 ## 1. Bottom line
 
@@ -357,16 +360,19 @@ squash, so GitHub closes the contained PRs automatically.
 - Rework #513 (FAQ fix) and #389 (rate limit) first.
 - The lane-5 drafts never ran CI, so each one gets a CI run before it merges.
 
-**Wave 4: one pilot migration wave, 0256 onward (3–4 days).**
-- **One PR registers** #439 (passkey retirement), #400 (reaction availability), #425 (processor
-  login), #459 with #392 (share status) and #397's invite-note column.
-  - Each gets the registered-source guard its code is missing.
-  - Lane 1's ops SQL that merged without registration (#472, #475, #478) can join if the pilot needs
-    it.
-- **Close the originals** as "carried into" that PR.
-- **Park** #487 and #399, and defer #398. Each gets a backlog line, and its branch is kept.
-- **Simplify registration while we are there,** so the next wave is a small mechanical PR. Generate the
-  wave and review files with a script, and stop hand-editing baseline arrays.
+**Wave 4: one pilot migration wave, 0256 onward.** A trial on 2026-11-01 showed that registering all
+five files by hand would take three to four days, so the founder chose "three now, rest later".
+- **One PR registers** #439 (passkey retirement), #397's invite-note column and #425 (processor login)
+  as 0256 to 0258 in one wave. None of the three adds a function that needs its own catalogue check.
+- **Carried into feature work** (closed with notes, branches kept): #400 (reaction availability) into
+  the push work, and #459 with #392 (share status) into the share-card work. When they return, each
+  gets the registered-source guard its code is missing.
+  - Lane 1's ops SQL that merged without registration (#472, #475, #478) joins the next wave if it is
+    still unregistered.
+- **Parked** #487 and #399, and deferred #398. Each has a closing note, and its branch is kept.
+- **Simplify registration right after consolidation,** before the next migration-heavy feature, so a
+  wave is a small mechanical PR. Generate the wave and review files with a script, and stop
+  hand-editing baseline arrays.
 - **Defer restore and upgrade drills** until a production database exists. Keep the fresh install and
   the catalogue check in CI.
 
