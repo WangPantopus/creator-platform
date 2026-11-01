@@ -1073,31 +1073,14 @@ async function activate() {
           ? ["creator_commerce_inbox"]
           : []),
       ];
+      // The inbox login's attributes, memberships and settings were checked
+      // above by the generation role safety (assertCommerceInboxLogin).
       check(
         canonical(added.map((row) => row.role).sort()) ===
           canonical(expected.sort()),
-        "Core Follow may add only its isolated metadata role, and the pilot columns only the commerce inbox login.",
-      );
-      // The inbox claimant is a separate restricted login (0258): no inherited,
-      // elevated or member privileges and no settings; the host sets its password.
-      const inbox = added.find((row) => row.role === "creator_commerce_inbox");
-      check(
-        !inbox ||
-          (canonical(inbox.attributes) ===
-            canonical({
-              super: false,
-              inherit: false,
-              login: true,
-              createDb: false,
-              createRole: false,
-              replication: false,
-              bypassRls: false,
-              connections: -1,
-              validUntil: null,
-              configuration: null,
-            }) &&
-            canonical(inbox.memberships) === canonical([])),
-        "The commerce inbox login must be the reviewed restricted login.",
+        pilot
+          ? "The pilot-columns wave must add exactly the commerce inbox login; a login that already exists is refused."
+          : "Core Follow may add only its isolated metadata role.",
       );
     }
     check(

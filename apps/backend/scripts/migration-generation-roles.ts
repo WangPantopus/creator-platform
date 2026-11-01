@@ -26,6 +26,7 @@ import { contentHash } from "../src/core/canonical.js";
 import { generationConsumerCatalogue } from "../src/core/purpose-catalogue.js";
 import { repositoryRoot, schemaCustody, sha256 } from "./migration-custody.js";
 import {
+  assertCommerceInboxLogin,
   assertWaveRoleSafety,
   WaveRoleSafetyError,
 } from "./migration-wave-roles.js";
@@ -451,7 +452,7 @@ export async function assertGenerationWaveRoleSafety(
         );
     await assertCoreFollowPurposeCatalog(client);
   }
-  if (pilot)
+  if (pilot) {
     for (const source of pilotColumnsReview.sources)
       if (
         sha256(await readFile(new URL(source.path, repositoryRoot))) !==
@@ -466,6 +467,9 @@ export async function assertGenerationWaveRoleSafety(
         throw new WaveRoleSafetyError(
           "Exact complete pilot-columns source graph is required.",
         );
+    // 0258's login is outside the generation purposes; recheck it every run.
+    await assertCommerceInboxLogin(client);
+  }
   return {
     original,
     purposeRoles:

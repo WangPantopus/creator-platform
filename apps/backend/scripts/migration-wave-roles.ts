@@ -523,6 +523,35 @@ export async function assertWaveRoleSafety(
   };
 }
 
+/** The reviewed login that claims processor notifications (0258), checked on
+ * every run, not only at activation: LOGIN and NOINHERIT with nothing
+ * elevated, no connection limit or expiry, no membership either way, no
+ * setting for every database or this one, and in this database nothing owned
+ * and no grant beyond its schema USAGE and inbox columns. Which columns it
+ * reaches stays pinned by the purpose profiles; the host sets its password. */
+export async function assertCommerceInboxLogin(client: PoolClient) {
+  const reviewed = (
+    await client.query<{ reviewed: boolean }>(
+      `SELECT r.rolcanlogin AND NOT r.rolinherit AND NOT r.rolsuper AND NOT r.rolcreatedb
+       AND NOT r.rolcreaterole AND NOT r.rolreplication AND NOT r.rolbypassrls
+       AND r.rolconnlimit=-1 AND r.rolvaliduntil IS NULL AND r.rolconfig IS NULL
+       AND NOT EXISTS(SELECT FROM pg_auth_members m WHERE m.member=r.oid OR m.roleid=r.oid)
+       AND NOT EXISTS(SELECT FROM pg_db_role_setting s WHERE s.setrole=r.oid
+         AND s.setdatabase IN(0,(SELECT oid FROM pg_database WHERE datname=current_database())))
+       AND NOT EXISTS(SELECT FROM pg_shdepend d WHERE d.refclassid='pg_authid'::regclass AND d.refobjid=r.oid
+         AND d.dbid IN(0,(SELECT oid FROM pg_database WHERE datname=current_database()))
+         AND NOT (d.deptype='a' AND d.dbid<>0 AND (
+           (d.classid='pg_namespace'::regclass AND d.objid='creator'::regnamespace::oid)
+           OR (d.classid='pg_class'::regclass AND d.objid='creator.commerce_provider_inbox'::regclass::oid)))) AS reviewed
+       FROM pg_roles r WHERE r.rolname='creator_commerce_inbox'`,
+    )
+  ).rows[0]?.reviewed;
+  if (reviewed !== true)
+    throw new WaveRoleSafetyError(
+      "Unsafe migration purpose-role custody: commerce inbox login.",
+    );
+}
+
 /** The earlier wave guard stays exact by default. This additive operator
  * profile requires the reviewed full graph and actual executed SQL ledger;
  * it never changes the executable registry or issues a runtime capability. */
