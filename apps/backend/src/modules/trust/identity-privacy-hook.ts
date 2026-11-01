@@ -302,7 +302,7 @@ export function identityPrivacyHook(
             ],
             [
               "passkeys",
-              "SELECT id,transports,created_at,revoked_at FROM creator.passkey_credential WHERE account_id=$1",
+              "SELECT id,transports,created_at,revoked_at,retired_at FROM creator.passkey_credential WHERE account_id=$1",
             ],
             [
               "signedActs",
