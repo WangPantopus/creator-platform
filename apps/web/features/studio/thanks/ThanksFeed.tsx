@@ -1,93 +1,93 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { EmptyState, Notice } from "@qelvora/ui-web";
 import { studioRequest } from "../api";
 import { time } from "../shared/format";
 import type { Creator } from "../shared/types";
+import { useLiveReload, useLiveView } from "../shell/live";
 export function ThanksFeed({ creator }: { creator: Creator }) {
   const [rows, setRows] = useState<
       { id: string; text: string; handle: string | null; created_at: string }[]
     >([]),
     [error, setError] = useState(""),
-    [freshUntil, setFreshUntil] = useState(0);
+    [current, setCurrent] = useState(false);
+  // Studio's live stream re-checks this read on the server and says when it
+  // changed or was refused; nothing here runs on a timer.
+  const live = useLiveView({ view: "thanks" });
+  const reads = useRef({
+    generation: 0,
+    closed: false,
+    controller: null as AbortController | null,
+  });
+  const load = useCallback(async () => {
+    const r = reads.current;
+    if (r.closed || document.hidden || r.controller) return;
+    const request = ++r.generation;
+    const started = performance.now();
+    const currentController = new AbortController();
+    r.controller = currentController;
+    try {
+      const current = await studioRequest<typeof rows>(
+        "content",
+        `${creator.id}/studio/thanks`,
+        undefined,
+        creator.viewerAccountId,
+        {
+          signal: AbortSignal.any([
+            currentController.signal,
+            AbortSignal.timeout(4000),
+          ]),
+        },
+      );
+      if (r.closed || request !== r.generation) return;
+      if (document.hidden || performance.now() >= started + 5000)
+        throw new Error("Current sharing permission must be checked again.");
+      setRows(current);
+      setCurrent(true);
+      setError("");
+    } catch (failure) {
+      if (r.closed || request !== r.generation) return;
+      setRows([]);
+      setCurrent(false);
+      setError(
+        failure instanceof Error
+          ? failure.message
+          : "Current sharing permission is unavailable.",
+      );
+    } finally {
+      if (r.controller === currentController) r.controller = null;
+    }
+  }, [creator.id, creator.viewerAccountId]);
   useEffect(() => {
-    let generation = 0,
-      closed = false;
-    let controller: AbortController | null = null;
-    const load = async () => {
-      if (closed || document.hidden || controller) return;
-      const request = ++generation;
-      const started = performance.now();
-      const currentController = new AbortController();
-      controller = currentController;
-      try {
-        const current = await studioRequest<typeof rows>(
-          "content",
-          `${creator.id}/studio/thanks`,
-          undefined,
-          creator.viewerAccountId,
-          {
-            signal: AbortSignal.any([
-              currentController.signal,
-              AbortSignal.timeout(4000),
-            ]),
-          },
-        );
-        if (closed || request !== generation) return;
-        if (document.hidden || performance.now() >= started + 5000)
-          throw new Error("Current sharing permission must be checked again.");
-        setRows(current);
-        setFreshUntil(started + 5000);
-        setError("");
-      } catch (failure) {
-        if (closed || request !== generation) return;
-        setRows([]);
-        setFreshUntil(0);
-        setError(
-          failure instanceof Error
-            ? failure.message
-            : "Current sharing permission is unavailable.",
-        );
-      } finally {
-        if (controller === currentController) controller = null;
-      }
-    };
+    const r = reads.current;
+    r.closed = false;
     const onVisibility = () => {
       if (document.hidden) {
-        generation++;
-        controller?.abort();
-        controller = null;
+        r.generation++;
+        r.controller?.abort();
+        r.controller = null;
         setRows([]);
-        setFreshUntil(0);
-      } else void load();
+        setCurrent(false);
+      }
     };
     setRows([]);
-    setFreshUntil(0);
-    void load();
-    const timer = setInterval(() => void load(), 4000);
-    window.addEventListener("focus", load);
-    window.addEventListener("pageshow", load);
+    setCurrent(false);
     document.addEventListener("visibilitychange", onVisibility);
     return () => {
-      closed = true;
-      controller?.abort();
-      clearInterval(timer);
-      window.removeEventListener("focus", load);
-      window.removeEventListener("pageshow", load);
+      r.closed = true;
+      r.generation++;
+      r.controller?.abort();
+      r.controller = null;
       document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [creator.id, creator.viewerAccountId]);
+  useLiveReload(live, load);
   useEffect(() => {
-    if (!freshUntil) return;
-    const timer = setTimeout(
-      () => {
-        setRows([]);
-        setFreshUntil(0);
-      },
-      Math.max(0, freshUntil - performance.now()),
-    );
-    return () => clearTimeout(timer);
-  }, [freshUntil]);
+    if (!live.error) return;
+    setRows([]);
+    setCurrent(false);
+    setError(live.error.message);
+  }, [live.error]);
   return (
     <section className="w5-gutter">
       <header className="w5-heading">
@@ -101,13 +101,13 @@ export function ThanksFeed({ creator }: { creator: Creator }) {
       <p className="qv-help">
         Only notes fans consented to share with your digest appear here.
       </p>
-      {!error && freshUntil > 0 && rows.length === 0 && (
+      {!error && current && rows.length === 0 && (
         <EmptyState
           title="No shared thanks yet"
           body="When a fan chooses to share a thanks with your digest, it appears here. Their private thanks stay private."
         />
       )}
-      {!error && !freshUntil && (
+      {!error && !current && (
         <p role="status" className="qv-help">
           Checking current sharing permission…
         </p>

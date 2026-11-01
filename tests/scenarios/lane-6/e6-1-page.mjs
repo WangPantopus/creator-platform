@@ -47,10 +47,16 @@ export function record(page) {
         h["x-qelvora-expected-account"],
       ].map((v) => (v ? stable(v) : null)),
     };
-    state.pending.set(request, entry);
     state.entries.push(entry);
-    state.inflight++;
     state.last = Date.now();
+    // Studio's live stream stays open by design (WP 6.9): it is recorded as a
+    // call, but a page with it open can still be quiet.
+    if (url.pathname === "/api/studio/live") {
+      entry.status = "stream";
+      return;
+    }
+    state.pending.set(request, entry);
+    state.inflight++;
   });
   page.on("requestfinished", done);
   page.on("requestfailed", (request) => {

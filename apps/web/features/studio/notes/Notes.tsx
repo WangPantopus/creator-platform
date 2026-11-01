@@ -14,6 +14,7 @@ import { Feedback, useAction } from "../shared/action";
 import { contentStateLabel, key, time } from "../shared/format";
 import { Modal } from "../shared/Modal";
 import type { Creator, Page } from "../shared/types";
+import { useLiveReload, useLiveView } from "../shell/live";
 export function Notes({ creator }: { creator: Creator }) {
   const canReviewReplies = creator.owned || creator.roles.includes("triage");
   const [notes, setNotes] = useState<Page<ContentView>>({
@@ -25,11 +26,26 @@ export function Notes({ creator }: { creator: Creator }) {
       nextCursor: null,
     }),
     [replyFilter, setReplyFilter] = useState("all"),
+    [replyCursor, setReplyCursor] = useState<string | null>(null),
     [reaction, setReaction] = useState<PrivateNoteReply | null>(null),
-    [freshUntil, setFreshUntil] = useState(0),
+    [loaded, setLoaded] = useState(false),
     action = useAction();
   const reads = useRef({ generation: 0, mounted: true });
   const replyCursors = useRef<(string | null)[]>([null]);
+  // Studio's live stream re-checks this read on the server and says when it
+  // changed or was refused; nothing here runs on a timer.
+  const live = useLiveView({
+      view: "notes",
+      filter: replyFilter,
+      cursor: replyCursor,
+    }),
+    current = loaded && !live.error;
+  const page = (cursors: (string | null)[]) => {
+    replyCursors.current = cursors;
+    setReplyCursor(cursors.at(-1) ?? null);
+    setLoaded(false);
+    setReaction(null);
+  };
   const load = useCallback(async () => {
     const request = ++reads.current.generation;
     const started = performance.now();
@@ -60,7 +76,7 @@ export function Notes({ creator }: { creator: Creator }) {
       throw new Error("Current Note and reply access must be checked again.");
     setNotes(n);
     setReplies(current);
-    setFreshUntil(started + 5000);
+    setLoaded(true);
     setReaction((previous) =>
       previous
         ? (current.items.find(
@@ -74,42 +90,20 @@ export function Notes({ creator }: { creator: Creator }) {
   }, [canReviewReplies, creator.id, creator.viewerAccountId, replyFilter]);
   useEffect(() => {
     reads.current.mounted = true;
-    let pending = false;
-    const refresh = async () => {
-      if (pending || document.hidden) return;
-      pending = true;
-      try {
-        await action.run(load);
-      } finally {
-        pending = false;
-      }
-    };
     const visibility = () => {
       if (document.hidden) {
         reads.current.generation++;
-        setFreshUntil(0);
-      } else void refresh();
+        setLoaded(false);
+      }
     };
-    void refresh();
-    const interval = setInterval(() => void refresh(), 4000);
-    window.addEventListener("focus", refresh);
     document.addEventListener("visibilitychange", visibility);
     return () => {
       reads.current.mounted = false;
       reads.current.generation++;
-      clearInterval(interval);
-      window.removeEventListener("focus", refresh);
       document.removeEventListener("visibilitychange", visibility);
     };
-  }, [load]);
-  useEffect(() => {
-    if (!freshUntil) return;
-    const timer = setTimeout(
-      () => setFreshUntil(0),
-      Math.max(0, freshUntil - performance.now()),
-    );
-    return () => clearTimeout(timer);
-  }, [freshUntil]);
+  }, []);
+  useLiveReload(live, () => action.run(load));
   return (
     <section className="w5-notes">
       <header className="w5-heading">
@@ -123,8 +117,8 @@ export function Notes({ creator }: { creator: Creator }) {
           </Link>
         )}
       </header>
-      <Feedback action={action} />
-      {!freshUntil && (
+      <Feedback action={action} error={live.error?.message} />
+      {!current && (
         <div className="w5-gutter">
           <p role="status">Checking current Note and private reply access.</p>
           <button
@@ -136,7 +130,7 @@ export function Notes({ creator }: { creator: Creator }) {
           </button>
         </div>
       )}
-      <div hidden={!freshUntil} inert={!freshUntil}>
+      <div hidden={!current} inert={!current}>
         <div className="w5-note-list">
           {notes.items
             .filter((n) => n.document.kind === "note")
@@ -200,7 +194,7 @@ export function Notes({ creator }: { creator: Creator }) {
                 REPLIES ·{" "}
                 {action.busy
                   ? "loading"
-                  : action.error
+                  : action.error || live.error
                     ? "unavailable"
                     : `${replies.items.length} on this page`}
               </span>
@@ -213,8 +207,7 @@ export function Notes({ creator }: { creator: Creator }) {
               <select
                 value={replyFilter}
                 onChange={(e) => {
-                  replyCursors.current = [null];
-                  setFreshUntil(0);
+                  page([null]);
                   setReplyFilter(e.target.value);
                 }}
               >
@@ -297,14 +290,7 @@ export function Notes({ creator }: { creator: Creator }) {
                 <button
                   className="qv-btn qv-btn--secondary"
                   disabled={action.busy}
-                  onClick={() =>
-                    void action.run(async () => {
-                      replyCursors.current.pop();
-                      setFreshUntil(0);
-                      setReaction(null);
-                      await load();
-                    })
-                  }
+                  onClick={() => page(replyCursors.current.slice(0, -1))}
                 >
                   Previous replies
                 </button>
@@ -314,12 +300,7 @@ export function Notes({ creator }: { creator: Creator }) {
                   className="qv-btn qv-btn--secondary"
                   disabled={action.busy}
                   onClick={() =>
-                    void action.run(async () => {
-                      replyCursors.current.push(replies.nextCursor);
-                      setFreshUntil(0);
-                      setReaction(null);
-                      await load();
-                    })
+                    page([...replyCursors.current, replies.nextCursor])
                   }
                 >
                   Next replies
