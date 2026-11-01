@@ -765,6 +765,7 @@ async function writeBackendConfig(plan, secrets, options) {
       outputMicrosPerMillion: 0,
     },
   });
+  const extra = extraEnv(options.env);
   const values = {
     NODE_ENV: "development",
     IDENTITY_ADAPTER: "development",
@@ -783,6 +784,17 @@ async function writeBackendConfig(plan, secrets, options) {
       secrets,
       "creator_generation_worker",
     ),
+    // The restricted login that claims the processor's notifications (0258).
+    // The recovery scheduler refuses it when recovery is switched off.
+    ...(extra.COMMERCE_RECOVERY_ENABLED === "false"
+      ? {}
+      : {
+          COMMERCE_INBOX_DATABASE_URL: roleUrl(
+            plan,
+            secrets,
+            "creator_commerce_inbox",
+          ),
+        }),
     TRUST_PRIVATE_ARTIFACT_DIRECTORY: plan.file("artifacts"),
     COMMERCE_CURRENCY: "USD",
     W3_FAN_GENERATION: "development",
@@ -819,7 +831,7 @@ async function writeBackendConfig(plan, secrets, options) {
           GROWTH_ENCRYPTION_KEY: secrets.growthKey,
         }
       : {}),
-    ...extraEnv(options.env),
+    ...extra,
   };
   writeFileSync(
     plan.file("backend.env"),
