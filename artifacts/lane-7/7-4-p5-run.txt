@@ -1,0 +1,19 @@
+WP 7.4 P5: named pickers instead of typed ids.
+Runs of 2026-10-16 (lane 7, shared Mac). Fake API (tests/scenarios/lane-7/harness), synthetic
+identities and data; the real apps on simulator qelvora-lane7-ios (iOS 26.5, XCUITest) and
+emulator-5574 (Android 15, adb). Run on the top of the WP 7.4 stack (lane-7/packet-terms), which
+contains this piece unchanged. Nothing here is the real backend.
+
+iOS (--pickers)
+  V1 Block: "Creator", nothing chosen, Block waits; Kiln Club chosen -> its id sent        pass 51.2 s
+  V2 opened with Maya's id: "Maya" already chosen, never the id; the report carries it     pass 42.1 s
+  V3 Your data, one conversation: "Conversation", one picker; Glazeco -> thread export     pass 79.6 s
+  V4 Priya, no conversations: "You have no conversations yet."                              pass 14.4 s
+  V5 the list fails (503): said so with Try again; then the names                          pass 24.0 s
+Android (e7-4-pickers.mjs): V1 to V5                                                         pass
+  (first runs failed on the flow itself: it tapped a field's label, read a text node's
+  "enabled", and scrolled before the list loaded; the app was right each time)
+What the fake recorded: block {creatorId: Kiln Club}, report {kind: abuse, creatorId: Maya},
+export {scope: thread, creatorId: Glazeco, threadId: Glazeco's thread}.
+Not run: deletion (not served by the fake); more than one page of conversations; the
+real-stack draft deletion flow (--draft-stack), which still types ids; physical devices.

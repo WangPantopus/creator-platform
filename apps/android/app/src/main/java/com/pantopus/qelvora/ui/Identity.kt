@@ -29,6 +29,24 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.text.BasicText
 import com.pantopus.qelvora.R
 import com.pantopus.qelvora.generated.QelvoraTokens
+import com.pantopus.qelvora.generated.QelvoraCopy
+
+/** A creator's seal letter: the first letter of the name, uppercased, or the
+ * first character when the name has no letter. The same rule on iOS. */
+fun creatorInitial(name: String): String {
+    var i = 0
+    while (i < name.length) {
+        val cp = name.codePointAt(i)
+        if (Character.isLetter(cp)) {
+            val upper = String(Character.toChars(cp)).uppercase()
+            return String(Character.toChars(upper.codePointAt(0)))
+        }
+        i += Character.charCount(cp)
+    }
+    if (name.isEmpty()) return ""
+    val graphemes = java.text.BreakIterator.getCharacterInstance().apply { setText(name) }
+    return name.substring(0, graphemes.next())
+}
 
 @Composable
 fun Seal(initial: String = "M", size: Dp = 18.dp, live: Boolean = false, onMaya: Boolean = false) {
@@ -38,7 +56,7 @@ fun Seal(initial: String = "M", size: Dp = 18.dp, live: Boolean = false, onMaya:
             if (live) { drawCircle(accent, radius = this.size.width / 2 + 4.dp.toPx()); drawCircle(ground, radius = this.size.width / 2 + 3.dp.toPx()) }
             drawCircle(fill)
         }
-        BasicText(initial, style = TextStyle(color = ink, fontFamily = FontFamily(Font(R.font.newsreader_italic, style = FontStyle.Italic)), fontSize = (size.value * 0.62f).sp))
+        BasicText(initial, style = TextStyle(color = ink, fontFamily = FontFamily(Font(R.font.newsreader_italic, style = FontStyle.Italic)), fontSize = (size.value * 0.62f / androidx.compose.ui.platform.LocalDensity.current.fontScale).sp))
     }
 }
 
@@ -58,13 +76,15 @@ fun Mark(kind: AuthorKind = AuthorKind.AI, size: Dp? = null, initial: String = "
 }
 
 @Composable
-fun AuthorLabel(kind: AuthorKind = AuthorKind.AI, name: String = "Maya", audience: String = "Kiln Club members", member: String = "Priya", time: String? = null, onMaya: Boolean = false) {
-    Row(Modifier.clearAndSetSemantics { contentDescription = kind.label(name, audience, member) + (time?.let { " at $it" } ?: "") }, horizontalArrangement = Arrangement.spacedBy(QelvoraTokens.authorGap), verticalAlignment = Alignment.CenterVertically) {
-        Mark(kind, initial = name.take(1), onMaya = onMaya)
+fun AuthorLabel(kind: AuthorKind = AuthorKind.AI, name: String = "Maya", audience: String = "Kiln Club members", member: String = "Priya", time: String? = null, onMaya: Boolean = false, label: String? = null) {
+    // `label`: a label the server built (C4 `authorLabel`), shown verbatim instead of one assembled here.
+    val words = label ?: kind.label(name, audience, member)
+    Row(Modifier.clearAndSetSemantics { contentDescription = time?.let { QelvoraCopy.text("nativeLabelAtTime", mapOf("label" to words, "time" to it)) } ?: words }, horizontalArrangement = Arrangement.spacedBy(QelvoraTokens.authorGap), verticalAlignment = Alignment.CenterVertically) {
+        Mark(kind, initial = creatorInitial(name), onMaya = onMaya)
         val ai = qColor("ai-ink"); val creator = qColor(kind.colorToken(onMaya))
         val label = buildAnnotatedString {
             if (kind == AuthorKind.APPROVED_DRAFT) { withStyle(SpanStyle(color = ai)) { append(copy("preparedByAI")) }; withStyle(SpanStyle(color = creator)) { append(" · " + copy("approvedBy", "name" to name)) } }
-            else withStyle(SpanStyle(color = creator)) { append(kind.label(name, audience, member)) }
+            else withStyle(SpanStyle(color = creator)) { append(words) }
         }
         BasicText(label, style = qText("caption", strong = true))
         if (time != null) BasicText("· $time", style = qText("data-sm").copy(color = qColor(if (onMaya) "on-maya-muted" else "ink-muted")))

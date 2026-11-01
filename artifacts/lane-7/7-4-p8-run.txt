@@ -1,0 +1,14 @@
+WP 7.4 P8: the 3-hour reminder. Durations shortened by the debug launch: 20 s, break 6 s.
+Runs of 2026-10-16 (lane 7, shared Mac). Fake API (tests/scenarios/lane-7/harness), synthetic
+identities and data; the real apps on simulator qelvora-lane7-ios (iOS 26.5, XCUITest) and
+emulator-5574 (Android 15, adb). Run on the top of the WP 7.4 stack (lane-7/packet-terms), which
+contains this piece unchanged. Nothing here is the real backend.
+
+iOS (--long-session)
+  T1 the line once at 20 s, it blocks nothing, again at 40 s          pass 44.6 s
+  T2 Maya then Tomás Reyes: the count continues; the line names Tomás  pass 25.2 s
+  T3 a 9 s break starts the count again                                pass 49.7 s
+  T4 a 2 s break keeps it                                              pass 26.8 s
+  T5 Kiln Club (creator here) and Glazeco (paused): no line            pass 66.8 s
+Android (e7-4-long-session.mjs): T1 to T5                               pass
+Not run: real 3-hour and 15-minute durations; the screen turning off on a device.

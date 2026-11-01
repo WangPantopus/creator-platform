@@ -7,11 +7,14 @@ import * as L from "./lib.mjs";
 const THREADS = [
   { n: 1, name: "Maya", control: "ai_active", reason: null },
   { n: 2, name: "Kiln Club", control: "human_active", reason: null },
+  // While the AI is paused the composer shows the paused line in place of the
+  // input and no notice (the composer states, WP 7.4 P3).
   {
     n: 3,
     name: "Glazeco",
     control: "ai_paused",
-    reason: /AI messaging is paused in this conversation/u,
+    reason: /Glazeco's AI is paused/u,
+    absent: /AI messaging is paused in this conversation/u,
   },
   {
     n: 4,
@@ -65,10 +68,14 @@ for (const p of L.platforms(process.argv[2])) {
     const reason = t.reason
       ? await L.waitForText(p, t.reason, 8000)
       : { ok: true, text: screen.text };
+    const absent = !t.absent || !t.absent.test(reason.text);
     L.step(
       p,
       `S${t.n} ${t.name} (${t.control}${t.reason ? ", composer says why" : ""})`,
-      L.seen(entries, { status: 200 }).length > 0 && screen.ok && reason.ok,
+      L.seen(entries, { status: 200 }).length > 0 &&
+        screen.ok &&
+        reason.ok &&
+        absent,
     );
     L.screenshot(p, `state-${t.n}`);
   }
@@ -129,13 +136,17 @@ for (const p of L.platforms(process.argv[2])) {
   L.launch(p, "--to", open(1));
   await L.waitForText(p, /Maya/u);
   await L.sleep(3000);
+  // C4: Notes are read when the thread opens, comes back to the front or
+  // reconnects; no live frame carries them (WP 7.4 P1, R4). Before C4 they were
+  // messages and appeared without any action.
   await L.harness("POST", "/__harness/threads/maya/note", {
     text: "Studio note: closed on Monday for a kiln repair.",
   });
+  L.background(p);
   let screen = await L.waitForText(p, /closed on Monday/u, 15000);
   L.step(
     p,
-    "L1 a Note posted while the thread is open appears without any action",
+    "L1 a Note posted while the thread is open appears once it is back in front",
     screen.ok,
   );
 
@@ -194,6 +205,10 @@ for (const p of L.platforms(process.argv[2])) {
   screen = await L.waitForText(p, /left the conversation/u, 12000);
   L.step(p, "L4 handing back is announced", screen.ok);
 
+  const published = async () =>
+    (await L.state()).presence.find((c) => c.creator === "maya")?.published ??
+    0;
+  const before = await published();
   await L.harness("POST", "/__harness/sockets/close");
   await L.sleep(500);
   await L.harness("POST", "/__harness/threads/maya/note", {
@@ -201,9 +216,8 @@ for (const p of L.platforms(process.argv[2])) {
   });
   screen = await L.waitForText(p, /clinic starts at 6pm/u, 25000);
   const count = (screen.text.match(/clinic starts at 6pm/gu) ?? []).length;
-  const stored = (await thread("maya")).messages.filter((m) =>
-    /clinic starts at 6pm/u.test(m),
-  ).length;
+  // A Note is stored as presence (C4), not as a message.
+  const stored = (await published()) - before;
   L.step(
     p,
     "L5 the live connection drops: the app reconnects, catches up, shows the Note once",

@@ -17,22 +17,22 @@ fun CredentialSettings(activity: Activity, model: FanSession) {
     val scope = rememberCoroutineScope(); var request by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
     LaunchedEffect(model.session?.accountId) { runCatching { model.api?.passkeys() }.onSuccess { keys = it } }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        BasicText("Signing passkeys", style = qText("title").copy(color = qColor("ink")))
-        BasicText("External creator proof and fresh Pantopus authorization are required. Each named act needs its own exact-content signature.", style = qText("caption").copy(color = qColor("ink-muted")))
+        BasicText(QelvoraCopy.text("nativeSigningPasskeys"), style = qText("title").copy(color = qColor("ink")))
+        BasicText(QelvoraCopy.text("nativeExternalCreatorProofAndFresh"), style = qText("caption").copy(color = qColor("ink-muted")))
         keys?.credentials?.forEach { key -> Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            BasicText(if (key.revoked) "Revoked passkey" else "Registered passkey", style = qText("body").copy(color = qColor("ink")))
-            if (!key.revoked) Button("Revoke", ButtonVariant.QUIET, disabled = busy) { scope.launch { busy = true; try { model.api?.revokePasskey(APIPasskeyRevocation(key.id)); keys = model.api?.passkeys() } catch (cancelled: CancellationException) { throw cancelled } catch (_: Exception) { message = "Revocation could not complete. Reconnect and try again." } finally { busy = false } } }
+            BasicText(if (key.revoked) QelvoraCopy.text("nativeRevokedPasskey") else QelvoraCopy.text("nativeRegisteredPasskey"), style = qText("body").copy(color = qColor("ink")))
+            if (!key.revoked) Button(QelvoraCopy.text("revoke"), ButtonVariant.QUIET, disabled = busy) { scope.launch { busy = true; try { model.api?.revokePasskey(APIPasskeyRevocation(key.id)); keys = model.api?.passkeys() } catch (cancelled: CancellationException) { throw cancelled } catch (_: Exception) { message = QelvoraCopy.text("nativeRevocationCouldNotCompleteReconnect") } finally { busy = false } } }
         } }
-        Button(if (busy) "Waiting for device…" else "Register a signing passkey", ButtonVariant.SECONDARY, block = true, disabled = busy) {
+        Button(if (busy) QelvoraCopy.text("nativeWaitingForDevice") else QelvoraCopy.text("nativeRegisterASigningPasskey"), ButtonVariant.SECONDARY, block = true, disabled = busy) {
             request = scope.launch {
                 busy = true; message = ""; var challenge: String? = null
-                try { val api = model.api ?: error("unconfigured"); val begin = api.beginPasskey(); challenge = begin.challengeId; val credential = PasskeyCeremony(activity).register(begin.options); api.registerPasskey(APIPasskeyRegistration(begin.challengeId, credential)); keys = api.passkeys(); message = "Passkey registered. Nothing was published." }
-                catch (cancelled: CancellationException) { message = "Registration cancelled. Nothing was published."; throw cancelled }
-                catch (failure: Exception) { message = if (failure is CreatorAPIError) "Creator proof must be approved and Pantopus authorization must be fresh before enrollment." else failure.message ?: "The passkey provider could not complete registration." }
+                try { val api = model.api ?: error("unconfigured"); val begin = api.beginPasskey(); challenge = begin.challengeId; val credential = PasskeyCeremony(activity).register(begin.options); api.registerPasskey(APIPasskeyRegistration(begin.challengeId, credential)); keys = api.passkeys(); message = QelvoraCopy.text("nativePasskeyRegisteredNothingWasPublished") }
+                catch (cancelled: CancellationException) { message = QelvoraCopy.text("nativeRegistrationCancelledNothing"); throw cancelled }
+                catch (failure: Exception) { message = if (failure is CreatorAPIError) QelvoraCopy.text("nativeCreatorProofMustBeApprovedAnd") else failure.message ?: QelvoraCopy.text("nativeThePasskeyProviderCouldNotComplete") }
                 finally { challenge?.let { id -> kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable) { runCatching { model.api?.cancelPasskey(id) } } }; busy = false }
             }
         }
-        if (busy) Button("Cancel", ButtonVariant.QUIET) { request?.cancel() }
-        if (message.isNotEmpty()) Notice(title = "Passkey status", children = message)
+        if (busy) Button(QelvoraCopy.text("cancel"), ButtonVariant.QUIET) { request?.cancel() }
+        if (message.isNotEmpty()) Notice(title = QelvoraCopy.text("nativePasskeyStatus"), children = message)
     }
 }

@@ -6,6 +6,26 @@ import { Failure } from "../http.mjs";
 import { authenticate } from "./identity.mjs";
 
 const CURRENCY = "USD";
+// WP 7.4 P9: what a fan can ask for, so the packet shows its terms block.
+// Amounts are minor units, as the API sends them.
+const MODES = {
+  maya: {
+    n: 1,
+    title: "Written reply",
+    kind: "written",
+    amount: "2500",
+    decision: 48,
+    delivery: 96,
+  },
+  kilnclub: {
+    n: 2,
+    title: "Voice note",
+    kind: "voice",
+    amount: "1500",
+    decision: 72,
+    delivery: 120,
+  },
+};
 
 export function register(router) {
   router.add("GET", "/v1/commerce/overview", (ctx) => {
@@ -24,7 +44,28 @@ export function register(router) {
       owned: [],
       payoutAccounts: [],
       packets: [],
-      modes: [],
+      modes: [...world.creators.values()]
+        .filter((c) => MODES[c.handle])
+        .map((c) => {
+          const mode = MODES[c.handle];
+          return {
+            id: `30de0000-0000-4000-8000-00000000000${mode.n}`,
+            creator_id: c.id,
+            title: mode.title,
+            kind: mode.kind,
+            amount: mode.amount,
+            public_amount: mode.amount,
+            currency: CURRENCY,
+            weekly_limit: 3,
+            used: 0,
+            reserved: 0,
+            decision_hours: mode.decision,
+            delivery_hours: mode.delivery,
+            shareable: false,
+            state: "offered",
+            version: 1,
+          };
+        }),
       memberships: [],
       limits: [],
       exposure: {

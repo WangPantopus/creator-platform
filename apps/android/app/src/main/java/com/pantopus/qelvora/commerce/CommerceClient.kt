@@ -1,5 +1,7 @@
 package com.pantopus.qelvora.commerce
 
+import com.pantopus.qelvora.generated.QelvoraCopy
+
 import com.pantopus.qelvora.identity.FanSession
 import com.pantopus.qelvora.generated.CreatorAPIError
 import java.math.BigDecimal
@@ -50,9 +52,9 @@ class CommerceClient(private val model: FanSession, private val accountId: Strin
         !model.checkingSession && !model.busy && model.error.isEmpty() && !model.purgingPrivateState && !model.localPurgeFailed
     suspend fun request(path: String, body: JsonObject? = null): JsonElement {
         currentCoroutineContext().ensureActive()
-        if (!ready()) throw CommerceFailure(503, "Refresh your account before continuing. Your input is kept.")
+        if (!ready()) throw CommerceFailure(503, QelvoraCopy.text("nativeRefreshYourAccountBeforeContinuing"))
         val original = model.captureRequest(destination, maximumResponseBytes = 4_194_304, timeoutMs = 15_000)
-            ?: throw CommerceFailure(503, "Refresh your account before continuing. Your input is kept.")
+            ?: throw CommerceFailure(503, QelvoraCopy.text("nativeRefreshYourAccountBeforeContinuing"))
         if (original.expectedAccountId != accountId || original.sessionId != sessionId || !ready()) throw CancellationException("Your original account view changed.")
         try {
             val response = original.commerceBytes("/v1/commerce/$path", body = body?.toString()?.toByteArray(Charsets.UTF_8))
@@ -66,7 +68,7 @@ class CommerceClient(private val model: FanSession, private val accountId: Strin
             if (!original.isCurrent() || !ready()) throw CancellationException("Your original account view changed.")
             if (failure is CreatorAPIError) {
                 val detail = runCatching { json.parseToJsonElement(failure.body).jsonObject["error"]?.jsonObject }.getOrNull()
-                throw CommerceFailure(failure.status, detail?.get("message")?.jsonPrimitive?.content ?: "This action is unavailable. Your input is kept.", detail?.get("code")?.jsonPrimitive?.content)
+                throw CommerceFailure(failure.status, detail?.get("message")?.jsonPrimitive?.content ?: QelvoraCopy.text("nativeThisActionIsUnavailableYourInput"), detail?.get("code")?.jsonPrimitive?.content)
             }
             throw failure
         }
@@ -78,8 +80,8 @@ class CommerceClient(private val model: FanSession, private val accountId: Strin
 fun commerceMoney(amount: Long, currency: String): String = NumberFormat.getCurrencyInstance().apply { this.currency = Currency.getInstance(currency) }.format(BigDecimal.valueOf(amount).movePointLeft(Currency.getInstance(currency).defaultFractionDigits))
 fun commerceMinor(text: String, currency: String): Long {
     val digits = Currency.getInstance(currency).defaultFractionDigits
-    if (!Regex("^\\d+(?:\\.\\d{0,$digits})?$").matches(text)) throw CommerceFailure(400, "Enter a valid amount.")
-    val amount = try { text.toBigDecimal().movePointRight(digits).longValueExact() } catch (_: ArithmeticException) { throw CommerceFailure(400, "This amount is too large.") }
-    if (amount !in 0..9007199254740991L) throw CommerceFailure(400, "This amount is too large.")
+    if (!Regex("^\\d+(?:\\.\\d{0,$digits})?$").matches(text)) throw CommerceFailure(400, QelvoraCopy.text("nativeEnterAValidAmount"))
+    val amount = try { text.toBigDecimal().movePointRight(digits).longValueExact() } catch (_: ArithmeticException) { throw CommerceFailure(400, QelvoraCopy.text("nativeThisAmountIsTooLarge")) }
+    if (amount !in 0..9007199254740991L) throw CommerceFailure(400, QelvoraCopy.text("nativeThisAmountIsTooLarge"))
     return amount
 }

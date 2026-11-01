@@ -36,7 +36,7 @@ const SCREEN = {
   handle: /How creators will know you/u,
   requests: /Creator access[\s\S]*Manage membership/u,
   access: /YOU CAN/u,
-  welcome: /Continue with Pantopus/u,
+  welcome: /Sign in to continue/u,
   chooser: /Synthetic isolated accounts/u,
 };
 const only = process.argv.slice(2);
@@ -307,7 +307,7 @@ await flow("N12", "Sign-in chooser: Back closes it, then leaves", async () => {
   await L.harness("POST", "/__harness/reset");
   L.launch(p, "--reset");
   const r = [["welcome", await at("welcome")]];
-  await android.tap("Continue with Pantopus");
+  await android.tap("Sign in to continue");
   r.push(["chooser", await at("chooser")]);
   await back();
   r.push(["welcome", await at("welcome")]);
@@ -329,7 +329,7 @@ await flow(
     const since = (await L.log()).at(-1)?.n ?? 0;
     await android.tap("Sign out");
     r.push(["signed out", await at("welcome")]);
-    await android.tap("Continue with Pantopus");
+    await android.tap("Sign in to continue");
     r.push(["chooser", await at("chooser")]);
     await android.tap("Harness: Priya");
     // Signing in returns to the screen you signed in from: the account screen.

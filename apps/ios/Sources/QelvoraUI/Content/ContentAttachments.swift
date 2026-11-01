@@ -252,7 +252,7 @@ private struct ContentPlaybackDeadline: Sendable {
             if !available { clearBytes() }
         } catch {
             guard epoch == generation, active, !Task.isCancelled else { return }
-            available = false; asset = nil; clearBytes(); self.error = "Attachment access could not be confirmed. Check current access before retrying."
+            available = false; asset = nil; clearBytes(); self.error = QelvoraCopy.text("nativeAttachmentAccessCouldNotBeConfirmed")
         }
     }
     func tick() async {
@@ -261,7 +261,7 @@ private struct ContentPlaybackDeadline: Sendable {
             if transport === api && !current { available = false; asset = nil; clearBytes(); transport = nil }
         }
         if ProcessInfo.processInfo.systemUptime - checkedAt >= 5 { available = false; asset = nil; if busy || loaded || file != nil { clearBytes() } }
-        if deadline?.current == false { clearBytes(); error = "This attachment link expired. Load it again to check current access." }
+        if deadline?.current == false { clearBytes(); error = QelvoraCopy.text("nativeThisAttachmentLinkExpiredLoad") }
         if let player, loaded, duration > 0, player.currentTime >= duration { player.pause() }
         position = min(duration, max(0, player?.currentTime ?? 0))
         playing = player?.isPlaying ?? false
@@ -313,7 +313,7 @@ private struct ContentPlaybackDeadline: Sendable {
                 loaded = true; error = ""; busy = false; operation = nil
             } catch {
                 guard epoch == generation, active, !Task.isCancelled else { return }
-                clearBytes(); self.error = "The attachment could not be loaded. Check current access before retrying."
+                clearBytes(); self.error = QelvoraCopy.text("nativeTheAttachmentCouldNotBeLoaded")
             }
         }
     }
@@ -353,7 +353,7 @@ private struct ContentPlaybackDeadline: Sendable {
             checkedAt = started; position = min(duration, player.currentTime); playing = player.isPlaying
         } catch {
             guard epoch == generation, transport === api, active, !Task.isCancelled else { return }
-            clearBytes(); self.error = "The recording could not be played. Check current access before retrying."
+            clearBytes(); self.error = QelvoraCopy.text("nativeTheRecordingCouldNotBePlayed")
         }
     }
 }
@@ -370,30 +370,30 @@ private struct ContentPlaybackDeadline: Sendable {
         _model = StateObject(wrappedValue: ContentAttachmentModel(session: session, destination: destination, baseURL: baseURL, accountId: accountId, creatorId: creatorId, objectId: objectId, contentKind: contentKind, attachment: attachment))
     }
     private var recordingAction: String {
-        if model.busy { return "Loading recording…" }
-        if !model.loaded { return "Load recording" }
-        return model.playing ? "Pause recording" : "Play recording"
+        if model.busy { return QelvoraCopy.text("nativeLoadingRecording") }
+        if !model.loaded { return QelvoraCopy.text("nativeLoadRecording") }
+        return model.playing ? QelvoraCopy.text("nativePauseRecording") : QelvoraCopy.text("nativePlayRecording")
     }
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             if !model.error.isEmpty { Text(model.error).qText("caption") }
-            if !model.available { Text("Checking current attachment access…").qText("caption") }
+            if !model.available { Text(QelvoraCopy.text("nativeCheckingCurrentAttachmentAccess")).qText("caption") }
             else if attachment.kind == "photo" {
                 if let image = model.image { Image(uiImage: image).resizable().scaledToFit().accessibilityLabel(attachment.alt ?? "") }
-                else { Button(model.busy ? "Loading photo…" : "Load photo", variant: .secondary, disabled: model.busy) { model.load() } }
+                else { Button(model.busy ? QelvoraCopy.text("nativeLoadingPhoto") : QelvoraCopy.text("nativeLoadPhoto"), variant: .secondary, disabled: model.busy) { model.load() } }
             } else {
-                Text(creatorName + "’s recording").qText("label")
+                Text(QelvoraCopy.text("nativeNamesRecording", values: ["name": creatorName])).qText("label")
                 Button(recordingAction, variant: .secondary, disabled: model.busy) { Task { await model.toggle() } }
                 if model.loaded {
                     Text(elapsed(model.position) + " / " + elapsed(model.duration)).qText("data-sm")
                     ViewThatFits(in: .horizontal) {
                         HStack {
-                            Button("Back 10 seconds", variant: .quiet) { Task { await model.seek(by: -10) } }
-                            Button("Forward 10 seconds", variant: .quiet) { Task { await model.seek(by: 10) } }
+                            Button(QelvoraCopy.text("nativeBack10Seconds"), variant: .quiet) { Task { await model.seek(by: -10) } }
+                            Button(QelvoraCopy.text("nativeForward10Seconds"), variant: .quiet) { Task { await model.seek(by: 10) } }
                         }
                         VStack(alignment: .leading) {
-                            Button("Back 10 seconds", variant: .quiet) { Task { await model.seek(by: -10) } }
-                            Button("Forward 10 seconds", variant: .quiet) { Task { await model.seek(by: 10) } }
+                            Button(QelvoraCopy.text("nativeBack10Seconds"), variant: .quiet) { Task { await model.seek(by: -10) } }
+                            Button(QelvoraCopy.text("nativeForward10Seconds"), variant: .quiet) { Task { await model.seek(by: 10) } }
                         }
                     }
                 }
@@ -408,6 +408,6 @@ private struct ContentPlaybackDeadline: Sendable {
     }
     #else
     init(session: FanSession, destination: String, baseURL: URL, accountId: String, creatorId: String, objectId: String, contentKind: String, creatorName: String, attachment: ContentAttachmentValue) { self.creatorName = creatorName; self.attachment = attachment }
-    var body: some View { Text("Open this attachment in the iOS app.").qText("caption") }
+    var body: some View { Text(QelvoraCopy.text("nativeOpenThisAttachmentInTheIos")).qText("caption") }
     #endif
 }

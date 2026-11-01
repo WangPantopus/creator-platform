@@ -16,6 +16,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -25,6 +26,8 @@ import com.pantopus.qelvora.identity.FanFeatureRegistration
 import com.pantopus.qelvora.identity.FanSession
 import com.pantopus.qelvora.identity.FanSessionRequestCapture
 import com.pantopus.qelvora.generated.CreatorAPIError
+import com.pantopus.qelvora.generated.QelvoraCopy
+import com.pantopus.qelvora.conversation.ConversationClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -36,6 +39,7 @@ import kotlinx.serialization.json.*
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.UUID
+import androidx.compose.ui.semantics.heading
 
 private fun trustVisible(model: FanSession): Boolean = model.session != null && !model.busy && model.error.isEmpty() && !model.purgingPrivateState && !model.localPurgeFailed
 private fun trustReady(model: FanSession): Boolean = trustVisible(model) && !model.checkingSession
@@ -97,11 +101,12 @@ fun trustFanConfigurationBoundary(context: Context, baseURL: String?, model: Fan
 class TrustClient(private val baseURL: String, private val capture: FanSessionRequestCapture? = null) {
     suspend fun bytes(path: String, input: JsonObject? = null, binary: Boolean = false): ByteArray {
         if (input != null || path !in setOf("capabilities", "help", "status")) {
-            val original = capture ?: throw IllegalStateException("Refresh your account before continuing.")
+            val original = capture ?: throw IllegalStateException(QelvoraCopy.text("nativeRefreshYourAccountBeforeContinuing2"))
             try { return original.trustBytes("/v1/trust/$path", input?.toString()?.toByteArray(Charsets.UTF_8), binary).body }
             catch (failure: CreatorAPIError) {
                 val detail = runCatching { Json.parseToJsonElement(failure.body).jsonObject["error"]?.jsonObject }.getOrNull()
-                throw IllegalStateException((detail?.get("message")?.jsonPrimitive?.content ?: "Reconnect and try again.") + (detail?.get("correlationId")?.jsonPrimitive?.content?.let { " Reference $it" } ?: ""))
+                val message = detail?.get("message")?.jsonPrimitive?.content ?: QelvoraCopy.text("nativeReconnectAndTryAgain")
+                throw IllegalStateException(detail?.get("correlationId")?.jsonPrimitive?.content?.let { QelvoraCopy.text("nativeMessageReferenceReference", mapOf("message" to message, "reference" to it)) } ?: message)
             }
         }
         return withContext(Dispatchers.IO) {
@@ -115,11 +120,11 @@ class TrustClient(private val baseURL: String, private val capture: FanSessionRe
             val status = connection.responseCode
             val data = (if (status in 200..299) connection.inputStream else connection.errorStream)?.use { stream ->
                 val bytes = java.io.ByteArrayOutputStream(); val buffer = ByteArray(8192)
-                while (true) { currentCoroutineContext().ensureActive(); val count = stream.read(buffer); if (count < 0) break; if (bytes.size() + count > 1_048_576) throw IllegalStateException("The public help response exceeds the native limit."); bytes.write(buffer,0,count) }
+                while (true) { currentCoroutineContext().ensureActive(); val count = stream.read(buffer); if (count < 0) break; if (bytes.size() + count > 1_048_576) throw IllegalStateException(QelvoraCopy.text("nativeThePublicHelpResponseExceeds")); bytes.write(buffer,0,count) }
                 bytes.toByteArray()
             } ?: byteArrayOf()
             currentCoroutineContext().ensureActive()
-            if (status !in 200..299) throw IllegalStateException("Reconnect to load public help.")
+            if (status !in 200..299) throw IllegalStateException(QelvoraCopy.text("nativeReconnectToLoadPublicHelp"))
             data
         } finally { connection.disconnect() }
         }
@@ -183,14 +188,46 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
     var authorship by remember { mutableStateOf<Boolean?>(null) }
     var feedbackConsent by remember { mutableStateOf(false) }
     var feedbackComment by remember { mutableStateOf("") }
-    fun suspendPrivateResults() {
+    // The pickers' choices: null until loaded; memory only, cleared with the account view.
+    var conversations by remember { mutableStateOf<List<JsonObject>?>(null) }
+    var conversationsFailed by remember { mutableStateOf(false) }
+    fun suspendPrivateResults(keepConfirmation: Boolean = false) {
         workEpoch++; busy = false
-        pendingExport = null; confirmDelete = false; result = ""; error = ""
+        // The generic confirmation carries no authority. Keep it through a
+        // same-session readiness check; its action stays disabled and captured.
+        pendingExport = null; if (!keepConfirmation) confirmDelete = false; result = ""; error = ""
     }
     fun clearPrivateResults() {
         suspendPrivateResults()
         cases = emptyList(); notices = emptyList(); jobs = emptyList(); history = emptyList(); selectedJob = null
         local = false; verificationConfigured = false; verificationMethod = ""
+        conversations = null; conversationsFailed = false
+    }
+    /** Every page of the person's conversations (at most 20 pages of 50). */
+    suspend fun loadConversations() {
+        val origin = baseURL ?: return
+        val account = model.session?.accountId ?: return
+        if (!trustReady(model)) return
+        conversationsFailed = false
+        val api = ConversationClient(origin, model::currentToken, account)
+        try {
+            val all = mutableListOf<JsonObject>()
+            var cursor: String? = null
+            for (page in 0 until 20) {
+                val answer = api.request("account" + (cursor?.let { "?cursor=$it" } ?: "")).jsonObject
+                all += answer["threads"]?.jsonArray.orEmpty().map { it.jsonObject }
+                cursor = answer["nextCursor"]?.takeUnless { it is JsonNull }?.jsonPrimitive?.content
+                if (cursor == null) break
+            }
+            currentCoroutineContext().ensureActive()
+            if (!trustReady(model) || model.session?.accountId != account) return
+            conversations = all
+            // An id this screen cannot name is never sent: a choice not among the
+            // person's conversations is cleared, and they choose again.
+            if (creatorId.isNotEmpty() && all.none { it.text("creatorId") == creatorId.lowercase() }) creatorId = ""
+            if (threadId.isNotEmpty() && all.none { it.text("id") == threadId.lowercase() }) threadId = ""
+        } catch (cancelled: CancellationException) { throw cancelled }
+        catch (failure: Exception) { if (trustReady(model) && model.session?.accountId == account) { conversations = null; conversationsFailed = true } }
     }
     fun beginWork(): Int { workEpoch++; busy = true; return workEpoch }
     fun finishWork(epoch: Int) { if (workEpoch == epoch) busy = false }
@@ -200,13 +237,13 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
     }
     suspend fun capture(): FanSessionRequestCapture {
         currentCoroutineContext().ensureActive()
-        if (!trustReady(model)) throw CancellationException("Refresh your account before continuing.")
+        if (!trustReady(model)) throw CancellationException(QelvoraCopy.text("nativeRefreshYourAccountBeforeContinuing2"))
         val original = model.captureRequest(route, maximumResponseBytes = 32 * 1024 * 1024, timeoutMs = 15_000)
             ?: throw CancellationException("Your original account view changed.")
         if (!trustReady(model) || !original.isCurrent()) throw CancellationException("Your original account view changed.")
         return original
     }
-    suspend fun capturedClient(): TrustClient = TrustClient(baseURL ?: throw IllegalStateException("The trust service is not configured."), capture())
+    suspend fun capturedClient(): TrustClient = TrustClient(baseURL ?: throw IllegalStateException(QelvoraCopy.text("nativeTheTrustServiceIsNotConfigured")), capture())
     val saveExport = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
         val payload = pendingExport
         pendingExport = null
@@ -219,7 +256,7 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
                 withContext(Dispatchers.IO) {
                     currentCoroutineContext().ensureActive()
                     if (!withContext(Dispatchers.Main.immediate) { trustReady(model) && payload.capture.isCurrent() }) throw CancellationException("Your original account view changed.")
-                    val stream = context.contentResolver.openOutputStream(uri, "w") ?: throw IllegalStateException("Choose a writable export destination.")
+                    val stream = context.contentResolver.openOutputStream(uri, "w") ?: throw IllegalStateException(QelvoraCopy.text("nativeChooseAWritableExportDestination"))
                     wroteDestination = true
                     stream.use { output ->
                         var offset = 0
@@ -232,14 +269,14 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
                 currentCoroutineContext().ensureActive()
                 if (!trustReady(model) || !payload.capture.isCurrent() || workEpoch != epoch) throw CancellationException("Your original account view changed.")
                 saved = true
-                result = "Your export was saved to the destination you chose."
+                result = QelvoraCopy.text("nativeYourExportWasSavedToThe")
                 error = ""
             } catch (cancelled: CancellationException) { throw cancelled }
-            catch (failure: Exception) { if (trustReady(model) && workEpoch == epoch) error = failure.message ?: "The export could not be saved." }
+            catch (failure: Exception) { if (trustReady(model) && workEpoch == epoch) error = failure.message ?: QelvoraCopy.text("nativeTheExportCouldNotBeSaved") }
             finally {
                 if (!saved && wroteDestination) {
                     val removed = runCatching { context.contentResolver.delete(uri, null, null) > 0 }.getOrDefault(false)
-                    if (!removed && trustReady(model) && workEpoch == epoch) error = "The export was interrupted. Remove the incomplete file from the destination you chose."
+                    if (!removed && trustReady(model) && workEpoch == epoch) error = QelvoraCopy.text("nativeTheExportWasInterruptedRemove")
                 }
                 finishWork(epoch)
             }
@@ -249,7 +286,7 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
     // degraded host can refuse those while help stays available. A failed capability
     // read clears the old value so data requests cannot submit on stale verification.
     suspend fun load() {
-        if (client == null) { error = "The trust service is not configured."; return }
+        if (client == null) { error = QelvoraCopy.text("nativeTheTrustServiceIsNotConfigured"); return }
         val epoch = beginWork()
         var failure: Exception? = null
         suspend fun checkLoad(accountRequired: Boolean = true) {
@@ -293,15 +330,48 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (current: Exception) { checkLoad(); cases = emptyList(); notices = emptyList(); jobs = emptyList(); history = emptyList(); selectedJob = null; pendingExport = null; failure = failure ?: current }
             checkLoad()
-            error = failure?.let { it.message ?: "Reconnect and try again." } ?: ""
+            error = failure?.let { it.message ?: QelvoraCopy.text("nativeReconnectAndTryAgain") } ?: ""
+            if (!route.startsWith("/trust") && !route.contains("access") && !route.contains("feedback")) loadConversations()
         } finally { finishWork(epoch) }
     }
-    suspend fun perform(path: String, input: JsonObject): JsonObject? {
+    /** WP 7.4 P5: a creator or a conversation is picked by the creator's name,
+     * never typed as an id. Nothing is chosen until the person chooses; a
+     * screen opened from a thread arrives with that creator chosen. */
+    val conversationPicker: @Composable (Boolean) -> Unit = { thread ->
+        val label = QelvoraCopy.text(if (thread) "pickerConversation" else "pickerCreator")
+        var open by remember(thread) { mutableStateOf(false) }
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            TrustText(label, "label")
+            val loaded = conversations
+            when {
+                conversationsFailed -> { TrustText(QelvoraCopy.text("pickerConversationsFailed")); Button(QelvoraCopy.text("growthTryAgain"), ButtonVariant.SECONDARY, disabled = busy || !privateReady) { launchPrivate { loadConversations() } } }
+                loaded == null -> TrustText(QelvoraCopy.text("nativeLoading"))
+                loaded.isEmpty() -> TrustText(QelvoraCopy.text("pickerNoConversations"))
+                else -> {
+                    val choices = if (thread) loaded.map { it.text("id") to it } else loaded.distinctBy { it.text("creatorId") }.map { it.text("creatorId") to it }
+                    val chosen = choices.firstOrNull { it.first == (if (thread) threadId else creatorId).lowercase() }?.second?.text("name")
+                    val shown = chosen ?: QelvoraCopy.text(if (thread) "pickerChooseConversation" else "pickerChooseCreator")
+                    Button(shown, ButtonVariant.SECONDARY, block = true, modifier = Modifier.semantics { contentDescription = "$label, $shown" }) { open = !open }
+                    if (open) choices.forEach { (id, item) ->
+                        Button(item.text("name"), ButtonVariant.QUIET, block = true) {
+                            if (thread) { threadId = id; creatorId = item.text("creatorId") } else creatorId = id
+                            open = false
+                        }
+                    }
+                }
+            }
+        }
+    }
+    // A command with local consequences (`accepted`) finishes once sent, even if
+    // a routine session check cancels this screen's work meanwhile: the server
+    // may already have accepted it. Only showing the answer depends on the
+    // checks after it.
+    suspend fun perform(path: String, input: JsonObject, accepted: (suspend () -> Unit)? = null): JsonObject? {
         if (client == null || busy || !trustReady(model)) return null
         val epoch = beginWork()
-        return try { val value = capturedClient().request(path, input); currentCoroutineContext().ensureActive(); if (!trustReady(model) || workEpoch != epoch) throw CancellationException("Your original account view changed."); error = ""; key = UUID.randomUUID().toString(); value }
+        return try { val sender = capturedClient(); val value = if (accepted == null) sender.request(path, input) else withContext(kotlinx.coroutines.NonCancellable) { sender.request(path, input).also { accepted() } }; currentCoroutineContext().ensureActive(); if (!trustReady(model) || workEpoch != epoch) throw CancellationException("Your original account view changed."); error = ""; key = UUID.randomUUID().toString(); value }
         catch (cancelled: CancellationException) { throw cancelled }
-        catch (failure: Exception) { if (trustReady(model) && workEpoch == epoch) error = failure.message ?: "Reconnect and try again."; null }
+        catch (failure: Exception) { if (trustReady(model) && workEpoch == epoch) error = failure.message ?: QelvoraCopy.text("nativeReconnectAndTryAgain"); null }
         finally { finishWork(epoch) }
     }
     suspend fun jobDetail(id: String) {
@@ -317,16 +387,31 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
             error = ""
         }
         catch (cancelled: CancellationException) { throw cancelled }
-        catch (failure: Exception) { if (trustReady(model) && workEpoch == epoch) { selectedJob = null; error = failure.message ?: "Reconnect and try again." } }
+        catch (failure: Exception) { if (trustReady(model) && workEpoch == epoch) { selectedJob = null; error = failure.message ?: QelvoraCopy.text("nativeReconnectAndTryAgain") } }
         finally { finishWork(epoch) }
     }
     suspend fun privacyCommand(action: String) {
-        val input = buildJsonObject { put("kind", action); put("scope", scope); put("proof", if (verificationMethod == "current_session") "CURRENT_SESSION" else proof); put("idempotencyKey", key); if (scope != "account") put("creatorId", creatorId.lowercase()); if (scope == "thread") put("threadId", threadId.lowercase()) }
-        perform("privacy/jobs", input)?.let { result = "Request saved; inspect each domain's progress."; load(); jobDetail(it.text("id")) }
+        val origin = baseURL ?: return
+        val account = model.session?.accountId ?: return
+        val deletionScope = scope; val creator = creatorId.lowercase(); val thread = threadId.lowercase()
+        val input = buildJsonObject { put("kind", action); put("scope", deletionScope); put("proof", if (verificationMethod == "current_session") "CURRENT_SESSION" else proof); put("idempotencyKey", key); if (deletionScope != "account") put("creatorId", creator); if (deletionScope == "thread") put("threadId", thread) }
+        // An accepted deletion removes the original account's matching drafts
+        // even if the account view changes before the answer is shown.
+        var purgeFailed = false
+        val saved = perform("privacy/jobs", input, accepted = if (action != "delete") null else ({
+            try {
+                com.pantopus.qelvora.conversation.ConversationDraftStorage(context).purge(origin, account,
+                    creator = if (deletionScope == "account") null else creator,
+                    thread = if (deletionScope == "thread") thread else null)
+            } catch (_: Exception) { purgeFailed = true }
+        }))
+        if (purgeFailed) { model.purge(); return }
+        saved?.let { result = QelvoraCopy.text("nativeRequestSavedInspectEachDomains"); load(); jobDetail(it.text("id")) }
     }
+
     LaunchedEffect(route, privateReady, model.error) {
         operation?.cancel()
-        if (loadedRoute != route || model.error.isNotEmpty()) clearPrivateResults() else if (!privateReady) suspendPrivateResults()
+        if (loadedRoute != route || model.error.isNotEmpty()) clearPrivateResults() else if (!privateReady) suspendPrivateResults(keepConfirmation = privateVisible && model.checkingSession)
         loadedRoute = route; load()
     }
     LaunchedEffect(draftOwner, privateReady) {
@@ -355,57 +440,58 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
     } }
     LaunchedEffect(kind,reason,creatorId,messageId,requestId,threadId,scope,proof) { key=UUID.randomUUID().toString() }
     Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).imePadding().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        TrustText(if (route.contains("privacy")) "Your data" else if (route.contains("access")) "Case access history" else if (route.contains("feedback")) "Optional product feedback" else if (route.startsWith("/trust")) "Crisis help protocol" else "Help and reports", "display-md")
-        TrustText("Reports are available without paid access. Evidence is limited to what you report.")
-        Row { Button("Support", ButtonVariant.QUIET) { navigate("/support") }; Button("Your data", ButtonVariant.QUIET) { navigate("/support/privacy") } }
-        Row { Button("Access history", ButtonVariant.QUIET) { navigate("/support/access") }; Button("Feedback", ButtonVariant.QUIET) { navigate("/support/feedback") } }
-        Button("Crisis help", ButtonVariant.QUIET) { navigate("/trust/crisis") }
-        if (busy) TrustText("Loading…")
-        if (error.isNotEmpty()) Notice("error", "Could not complete", error)
-        if (privateVisible && result.isNotEmpty()) Notice(title = "Saved", children = result)
-        if (!privateVisible && !route.startsWith("/trust")) Notice(title = "Account unavailable", children = "Refresh your account before continuing. Unsaved input stays in this account view.")
+        TrustText(if (route.contains("privacy")) QelvoraCopy.text("nativeYourData") else if (route.contains("access")) QelvoraCopy.text("nativeCaseAccessHistory") else if (route.contains("feedback")) QelvoraCopy.text("nativeOptionalProductFeedback") else if (route.startsWith("/trust")) QelvoraCopy.text("nativeCrisisHelpProtocol") else QelvoraCopy.text("nativeHelpAndReports"), "display-md")
+        TrustText(QelvoraCopy.text("nativeReportsAreAvailableWithoutPaid"))
+        Row { Button(QelvoraCopy.text("nativeSupport"), ButtonVariant.QUIET) { navigate("/support") }; Button(QelvoraCopy.text("nativeYourData"), ButtonVariant.QUIET) { navigate("/support/privacy") } }
+        Row { Button(QelvoraCopy.text("nativeAccessHistory"), ButtonVariant.QUIET) { navigate("/support/access") }; Button(QelvoraCopy.text("nativeFeedback"), ButtonVariant.QUIET) { navigate("/support/feedback") } }
+        Button(QelvoraCopy.text("nativeCrisisHelp"), ButtonVariant.QUIET) { navigate("/trust/crisis") }
+        if (busy) TrustText(QelvoraCopy.text("nativeLoading"))
+        if (error.isNotEmpty()) Notice("error", QelvoraCopy.text("nativeCouldNotComplete"), error)
+        if (privateVisible && result.isNotEmpty()) Notice(title = QelvoraCopy.text("nativeSaved"), children = result)
+        if (!privateVisible && !route.startsWith("/trust")) Notice(title = QelvoraCopy.text("nativeAccountUnavailable"), children = QelvoraCopy.text("nativeRefreshYourAccountBeforeContinuingUnsaved"))
         if (route.startsWith("/trust")) {
             TrustCrisisHelp(context,help)
         } else if (route.contains("access")) {
-            TrustText("These records show when an authorized operations account opened your case evidence and its purpose. Opening a case does not mean someone read every word.")
-            if (privateVisible && history.isEmpty() && !busy) TrustText("No case accesses yet.","caption")
+            TrustText(QelvoraCopy.text("nativeTheseRecordsShowWhenAnAuthorized"))
+            if (privateVisible && history.isEmpty() && !busy) TrustText(QelvoraCopy.text("nativeNoCaseAccessesYet"),"caption")
             history.takeIf { privateVisible }.orEmpty().forEach { item -> TrustText(item.text("action").replace('_',' ') + " · " + item.text("created_at"),"caption"); TrustText(item.text("purpose")) }
         } else if (route.contains("feedback")) {
-            TrustText("Your answers help evaluate usefulness and clear authorship. They do not affect access, ranking or payment. Feedback is retained for 90 days and included in account deletion.")
-            TrustText("Was the conversation useful?" + (useful?.let { if(it) " Yes" else " No" } ?: " Choose an answer"),"label")
-            Row { Button("Yes",ButtonVariant.QUIET) { useful=true }; Button("No",ButtonVariant.QUIET) { useful=false } }
-            TrustText("Was it clear who wrote each message?" + (authorship?.let { if(it) " Yes" else " No" } ?: " Choose an answer"),"label")
-            Row { Button("Yes",ButtonVariant.QUIET) { authorship=true }; Button("No",ButtonVariant.QUIET) { authorship=false } }
-            TrustField("Anything to improve? (optional)",feedbackComment,true) { feedbackComment=it }
-            Box(Modifier.semantics { role=Role.Checkbox; stateDescription=if(feedbackConsent) "Agreed" else "Not agreed" }) { Button(if(feedbackConsent) "Agreed to share feedback" else "I agree to share these answers for product feedback",ButtonVariant.QUIET,block=true) { feedbackConsent=!feedbackConsent } }
-            Button("Send feedback",ButtonVariant.SECONDARY,block=true,disabled=busy || !privateReady || !feedbackConsent || useful==null || authorship==null) { launchPrivate {
-                if (perform("feedback",buildJsonObject { put("consent",true); put("cohort","unspecified"); put("useful",useful==true); put("authorshipClear",authorship==true); put("comment",feedbackComment) }) != null) { result="Your feedback is saved."; feedbackConsent=false; feedbackComment="" }
+            TrustText(QelvoraCopy.text("nativeYourAnswersHelpEvaluateUsefulness"))
+            TrustText(QelvoraCopy.text("nativeWasTheConversationUseful") + " " + (useful?.let { if(it) QelvoraCopy.text("nativeYes") else QelvoraCopy.text("nativeNo") } ?: QelvoraCopy.text("nativeChooseAnAnswer")),"label")
+            Row { Button(QelvoraCopy.text("nativeYes"),ButtonVariant.QUIET, modifier = Modifier.semantics { selected = useful == true }) { useful=true }; Button(QelvoraCopy.text("nativeNo"),ButtonVariant.QUIET, modifier = Modifier.semantics { selected = useful == false }) { useful=false } }
+            TrustText(QelvoraCopy.text("nativeWasItClearWhoWroteEach") + " " + (authorship?.let { if(it) QelvoraCopy.text("nativeYes") else QelvoraCopy.text("nativeNo") } ?: QelvoraCopy.text("nativeChooseAnAnswer")),"label")
+            Row { Button(QelvoraCopy.text("nativeYes"),ButtonVariant.QUIET, modifier = Modifier.semantics { selected = authorship == true }) { authorship=true }; Button(QelvoraCopy.text("nativeNo"),ButtonVariant.QUIET, modifier = Modifier.semantics { selected = authorship == false }) { authorship=false } }
+            TrustField(QelvoraCopy.text("nativeAnythingToImproveOptional"),feedbackComment,true) { feedbackComment=it }
+            ToggleRow(QelvoraCopy.text("nativeIAgreeToShareTheseAnswers"), checked = feedbackConsent) { feedbackConsent = it }
+            Button(QelvoraCopy.text("nativeSendFeedback"),ButtonVariant.SECONDARY,block=true,disabled=busy || !privateReady || !feedbackConsent || useful==null || authorship==null) { launchPrivate {
+                if (perform("feedback",buildJsonObject { put("consent",true); put("cohort","unspecified"); put("useful",useful==true); put("authorshipClear",authorship==true); put("comment",feedbackComment) }) != null) { result=QelvoraCopy.text("nativeYourFeedbackIsSaved"); feedbackConsent=false; feedbackComment="" }
             } }
         } else if (route.contains("privacy")) {
-            TrustText("Export and deletion are separate from canceling store billing. A job finishes only after every data domain acknowledges it.")
-            Button("Manage Google Play subscriptions", ButtonVariant.SECONDARY, block = true) { context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://play.google.com/store/account/subscriptions"))) }
-            Row { listOf("account", "creator", "thread").forEach { value -> Button(value, ButtonVariant.QUIET) { scope = value } } }
-            TrustText("Data scope: $scope", "label")
-            if (scope != "account") TrustField("Creator ID", creatorId) { creatorId = it }
-            if (scope == "thread") TrustField("Conversation ID", threadId) { threadId = it }
-            if (local) { TrustText("Synthetic local account: type LOCAL DEVELOPMENT to confirm.", "caption"); TrustField("Local confirmation", proof) { proof = it } }
-            else if (verificationMethod == "current_session") TrustText("Your sign-in must be recent. Continue with Pantopus again if asked to verify your account.", "caption")
-            else if (verificationConfigured) TrustField("Account verification receipt", proof) { proof = it }
-            else TrustText("Fresh account verification must be connected before requesting data changes.", "caption")
+            TrustText(QelvoraCopy.text("nativeExportAndDeletionAreSeparate"))
+            Button(QelvoraCopy.text("nativeManageGooglePlaySubscriptions"), ButtonVariant.SECONDARY, block = true) { context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://play.google.com/store/account/subscriptions"))) }
+            // The same names as iOS's picker; the chosen one is announced as selected.
+            val scopes = mapOf("account" to QelvoraCopy.text("nativeAccount"), "creator" to QelvoraCopy.text("pickerCreator"), "thread" to QelvoraCopy.text("nativeConversation"))
+            Row { scopes.forEach { (value, name) -> Button(name, ButtonVariant.QUIET, modifier = Modifier.semantics { selected = scope == value }) { scope = value } } }
+            TrustText(QelvoraCopy.text("nativeDataScopeScope", mapOf("scope" to (scopes[scope] ?: scope))), "label")
+            if (scope != "account") conversationPicker(scope == "thread")
+            if (local) { TrustText(QelvoraCopy.text("nativeSyntheticLocalAccountTypeLOCAL"), "caption"); TrustField(QelvoraCopy.text("nativeLocalConfirmation"), proof) { proof = it } }
+            else if (verificationMethod == "current_session") TrustText(QelvoraCopy.text("nativeYourSignInMustBeRecent"), "caption")
+            else if (verificationConfigured) TrustField(QelvoraCopy.text("nativeAccountVerificationReceipt"), proof) { proof = it }
+            else TrustText(QelvoraCopy.text("nativeFreshAccountVerificationMust"), "caption")
             val disabled = busy || !privateReady || !verificationConfigured || (if (local) proof != "LOCAL DEVELOPMENT" else verificationMethod != "current_session" && proof.isEmpty()) || (scope != "account" && !validTrustId(creatorId)) || (scope == "thread" && !validTrustId(threadId))
-            Button("Request export", ButtonVariant.SECONDARY, block = true, disabled = disabled) { launchPrivate { privacyCommand("export") } }
-            Button("Request deletion", ButtonVariant.SECONDARY, block = true, disabled = disabled) { confirmDelete = true }
+            Button(QelvoraCopy.text("nativeRequestExport"), ButtonVariant.SECONDARY, block = true, disabled = disabled) { launchPrivate { privacyCommand("export") } }
+            Button(QelvoraCopy.text("nativeRequestDeletion"), ButtonVariant.SECONDARY, block = true, disabled = disabled) { confirmDelete = true }
             jobs.takeIf { privateVisible }.orEmpty().forEach { job -> key(job.text("id")) {
-                TrustText("Requested " + job.text("created_at"), "caption")
-                val label = job.text("kind") + ", " + job.text("scope") + ", " + job.text("state").replace('_', ' ') + ", requested " + job.text("created_at") + ", job " + job.text("id")
+                TrustText(QelvoraCopy.text("nativeRequestedTime", mapOf("time" to job.text("created_at"))), "caption")
+                val label = QelvoraCopy.text("nativeKindScopeStateRequestedCreatedat", mapOf("kind" to job.text("kind"), "scope" to job.text("scope"), "state" to job.text("state").replace('_', ' '), "createdAt" to job.text("created_at"), "id" to job.text("id")))
                 Button(job.text("kind") + " · " + job.text("scope") + " · " + job.text("state").replace('_', ' '), ButtonVariant.QUIET, block = true, disabled = busy || !privateReady, modifier = Modifier.semantics { contentDescription = label }) { launchPrivate { jobDetail(job.text("id")) } }
             } }
             selectedJob?.takeIf { privateVisible }?.let { job ->
-                TrustText("Job " + job.text("id"), "caption")
+                TrustText(QelvoraCopy.text("nativeJobId", mapOf("id" to job.text("id"))), "caption")
                 job["tasks"]?.jsonArray?.forEach { item -> val task = item.jsonObject; TrustText(task.text("domain") + ": " + task.text("state").replace('_', ' ') + task.text("error_code").takeIf { it.isNotEmpty() }?.let { " · " + it.replace('_', ' ') }.orEmpty()) }
-                job["retained"]?.jsonArray?.forEach { item -> val retained = item.jsonObject; TrustText("Retained: " + retained.text("category").replace('_',' '),"label"); TrustText(retained.text("reason")); retained.text("until").takeIf { it.isNotEmpty() }?.let { TrustText("Until $it","caption") } }
-                if (job.text("state") != "complete") Button("Retry incomplete domains", ButtonVariant.SECONDARY, block = true, disabled = busy || !privateReady) { launchPrivate { if (perform("privacy/jobs/" + job.text("id") + "/retry", buildJsonObject {}) != null) { result = "Incomplete domains queued again."; jobDetail(job.text("id")) } } }
-                if (job.text("state") == "complete" && job.text("kind") == "export") Button("Save export", ButtonVariant.SECONDARY, block = true, disabled = busy || !privateReady) { launchPrivate {
+                job["retained"]?.jsonArray?.forEach { item -> val retained = item.jsonObject; TrustText(QelvoraCopy.text("nativeRetainedCategory", mapOf("category" to retained.text("category").replace('_',' '))),"label"); TrustText(retained.text("reason")); retained.text("until").takeIf { it.isNotEmpty() }?.let { TrustText(QelvoraCopy.text("nativeUntilDate", mapOf("date" to it)),"caption") } }
+                if (job.text("state") != "complete") Button(QelvoraCopy.text("nativeRetryIncompleteDomains"), ButtonVariant.SECONDARY, block = true, disabled = busy || !privateReady) { launchPrivate { if (perform("privacy/jobs/" + job.text("id") + "/retry", buildJsonObject {}) != null) { result = QelvoraCopy.text("nativeIncompleteDomainsQueuedAgain"); jobDetail(job.text("id")) } } }
+                if (job.text("state") == "complete" && job.text("kind") == "export") Button(QelvoraCopy.text("nativeSaveExport"), ButtonVariant.SECONDARY, block = true, disabled = busy || !privateReady) { launchPrivate {
                     if (baseURL != null && trustReady(model)) {
                         val epoch = beginWork()
                         try {
@@ -417,45 +503,46 @@ fun TrustFanFeature(context: Context, baseURL: String?, model: FanSession) {
                             saveExport.launch("creator-data.json")
                             error = ""
                         } catch (cancelled: CancellationException) { throw cancelled }
-                        catch (failure: Exception) { if (trustReady(model) && workEpoch == epoch) { pendingExport = null; error = failure.message ?: "Reconnect and retry your export." } }
+                        catch (failure: Exception) { if (trustReady(model) && workEpoch == epoch) { pendingExport = null; error = failure.message ?: QelvoraCopy.text("nativeReconnectAndRetryYourExport") } }
                         finally { finishWork(epoch) }
                     }
                 } }
             }
         } else {
-            listOf("support", "ai_report", "abuse", "block", "crisis").chunked(2).forEach { choices -> Row { choices.forEach { value -> Button(value.replace('_', ' '), ButtonVariant.QUIET) { kind = value } } } }
-            TrustText("Report type: " + kind.replace('_', ' '), "label")
-            if (kind == "ai_report" || kind == "abuse" || kind == "block") TrustField("Creator ID", creatorId) { creatorId = it }
-            if (kind == "ai_report") TrustField("AI message ID", messageId) { messageId = it }
-            if (kind == "support") TrustField("Request ID (optional)", requestId) { requestId = it }
+            val kinds = mapOf("support" to QelvoraCopy.text("nativeSupportRequest"), "ai_report" to QelvoraCopy.text("nativeReportAIMessage"), "abuse" to QelvoraCopy.text("nativeAbuseReport"), "block" to QelvoraCopy.text("nativeBlockCreator"), "crisis" to QelvoraCopy.text("nativeCrisisHelp"))
+            kinds.entries.chunked(2).forEach { choices -> Row { choices.forEach { (value, name) -> Button(name, ButtonVariant.QUIET, modifier = Modifier.semantics { selected = kind == value }) { kind = value } } } }
+            TrustText(QelvoraCopy.text("nativeReportTypeKind", mapOf("kind" to (kinds[kind] ?: kind))), "label")
+            if (kind == "ai_report" || kind == "abuse" || kind == "block") conversationPicker(false)
+            if (kind == "ai_report") TrustField(QelvoraCopy.text("nativeAIMessageID"), messageId) { messageId = it }
+            if (kind == "support") TrustField(QelvoraCopy.text("nativeRequestIDOptional"), requestId) { requestId = it }
             if (kind == "crisis") TrustCrisisHelp(context,help)
-            TrustField("What happened?", reason, true) { reason = it }
-            Button(if(kind=="block") "Block creator" else "Send report", ButtonVariant.SECONDARY, block = true, disabled = busy || !privateReady || reason.trim().length < 12 || (kind=="support" && requestId.isNotEmpty() && !validTrustId(requestId)) || (kind=="block" && !validTrustId(creatorId)) || (kind=="ai_report" && (!validTrustId(creatorId) || !validTrustId(messageId)))) { launchPrivate {
+            TrustField(QelvoraCopy.text("nativeWhatHappened"), reason, true) { reason = it }
+            Button(if(kind=="block") QelvoraCopy.text("nativeBlockCreator") else QelvoraCopy.text("nativeSendReport"), ButtonVariant.SECONDARY, block = true, disabled = busy || !privateReady || reason.trim().length < 12 || (kind=="support" && requestId.isNotEmpty() && !validTrustId(requestId)) || (kind=="block" && !validTrustId(creatorId)) || (kind=="ai_report" && (!validTrustId(creatorId) || !validTrustId(messageId)))) { launchPrivate {
                 if(kind=="block") {
-                    if(perform("blocks",buildJsonObject { put("creatorId",creatorId.lowercase()); put("reason",reason); put("idempotencyKey",key) }) != null) { result="Your block is saved. Enforcement in connected domains follows their current denial checks."; reason=""; load() }
+                    if(perform("blocks",buildJsonObject { put("creatorId",creatorId.lowercase()); put("reason",reason); put("idempotencyKey",key) }) != null) { result=QelvoraCopy.text("nativeYourBlockIsSavedEnforcementIn"); reason=""; load() }
                     return@launchPrivate
                 }
                 val input = buildJsonObject { put("kind", kind); put("reason", reason); put("idempotencyKey", key); if (kind!="support" && creatorId.isNotEmpty()) put("creatorId", creatorId.lowercase()); if (kind == "ai_report") put("messageId", messageId.lowercase()); if (kind == "support" && requestId.isNotEmpty()) put("requestId",requestId.lowercase()) }
-                perform("reports", input)?.let { result = "CASE-" + it.text("number") + " is saved. No provider action is implied."; reason = ""; load() }
+                perform("reports", input)?.let { result = QelvoraCopy.text("nativeCASENumberIsSavedNoProvider", mapOf("number" to it.text("number"))); reason = ""; load() }
             } }
-            TrustText("Your cases", "title")
+            TrustText(QelvoraCopy.text("nativeYourCases"), "title")
             cases.takeIf { privateVisible }.orEmpty().forEach { item ->
                 TrustText("CASE-" + item.text("number") + " · " + item.text("kind").replace('_', ' ') + " · " + item.text("state"), "body-strong")
-                if (item.text("state") == "resolved") Button("Appeal CASE-" + item.text("number"), ButtonVariant.SECONDARY, disabled = busy || !privateReady || reason.trim().length < 12) { launchPrivate {
-                    if (perform("cases/" + item.text("id") + "/appeals", buildJsonObject { put("version", item["version"]!!); put("reason", reason); put("idempotencyKey", key) }) != null) { result = "Your appeal is saved for a different reviewer."; reason = ""; load() }
+                if (item.text("state") == "resolved") Button(QelvoraCopy.text("nativeAppealCASENumber", mapOf("number" to item.text("number"))), ButtonVariant.SECONDARY, disabled = busy || !privateReady || reason.trim().length < 12) { launchPrivate {
+                    if (perform("cases/" + item.text("id") + "/appeals", buildJsonObject { put("version", item["version"]!!); put("reason", reason); put("idempotencyKey", key) }) != null) { result = QelvoraCopy.text("nativeYourAppealIsSavedForA"); reason = ""; load() }
                 } }
             }
-            TrustText("Trust inbox", "title")
+            TrustText(QelvoraCopy.text("nativeTrustInbox"), "title")
             notices.takeIf { privateVisible }.orEmpty().forEach { item -> TrustText(item.text("type").replace('_', ' '), "label"); TrustText(item.text("reason")) }
         }
-        Button("Refresh", ButtonVariant.SECONDARY, block = true, disabled = busy || model.checkingSession || model.busy) { refreshOperation?.cancel(); refreshOperation = coroutine.launch { model.refresh() } }
+        Button(QelvoraCopy.text("nativeRefresh"), ButtonVariant.SECONDARY, block = true, disabled = busy || model.checkingSession || model.busy) { refreshOperation?.cancel(); refreshOperation = coroutine.launch { model.refresh() } }
     }
-    if (confirmDelete && privateReady) Dialog(onDismissRequest = { confirmDelete = false }) {
+    if (confirmDelete && privateVisible) Dialog(onDismissRequest = { confirmDelete = false }) {
         Column(Modifier.background(qColor("surface")).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            TrustText("Delete this data scope?", "title")
-            TrustText("Access closes immediately. Purging waits for every domain. Store subscriptions must be canceled separately.")
-            Button("Request deletion", ButtonVariant.SECONDARY, block = true, disabled = busy || !privateReady) { confirmDelete = false; launchPrivate { privacyCommand("delete") } }
-            Button("Keep data", ButtonVariant.QUIET, block = true) { confirmDelete = false }
+            TrustText(QelvoraCopy.text("nativeDeleteThisDataScope"), "title")
+            TrustText(QelvoraCopy.text("nativeAccessClosesImmediatelyPurging"))
+            Button(QelvoraCopy.text("nativeRequestDeletion"), ButtonVariant.SECONDARY, block = true, disabled = busy || !privateReady) { confirmDelete = false; launchPrivate { privacyCommand("delete") } }
+            Button(QelvoraCopy.text("nativeKeepData"), ButtonVariant.QUIET, block = true) { confirmDelete = false }
         }
     }
 }
@@ -463,13 +550,14 @@ private fun JsonObject.text(key: String): String = get(key)?.takeUnless { it is 
 private fun JsonObject.items(): List<JsonObject> = get("items")?.jsonArray?.map { it.jsonObject }.orEmpty()
 private fun validTrustId(value: String) = runCatching { UUID.fromString(value).toString() == value.lowercase() }.getOrDefault(false)
 @Composable private fun TrustCrisisHelp(context: Context,help: JsonObject?) {
-    TrustText(help?.text("emergencyMessage")?.takeIf { it.isNotEmpty() } ?: "If you are in immediate danger, contact local emergency services. An AI cannot provide emergency help.","body-strong")
-    TrustText("Reports do not require paid access. Urgent cases need a staffed safety responder. This service does not claim continuous emergency monitoring or a guaranteed response time.")
+    TrustText(help?.text("emergencyMessage")?.takeIf { it.isNotEmpty() } ?: QelvoraCopy.text("nativeIfYouAreInImmediateDanger"),"body-strong")
+    TrustText(QelvoraCopy.text("nativeReportsDoNotRequirePaidAccess"))
     val resources=help?.get("resources")?.jsonArray.orEmpty()
-    if(help!=null && resources.isEmpty()) TrustText("Regional help resources are not configured in this environment.","caption")
+    if(help!=null && resources.isEmpty()) TrustText(QelvoraCopy.text("nativeRegionalHelpResourcesAreNotConfigured"),"caption")
     resources.forEach { item -> val resource=item.jsonObject; val uri=android.net.Uri.parse(resource.text("url")); if(uri.scheme=="https") Button(resource.text("name") + " · " + resource.text("region"),ButtonVariant.QUIET,block=true) { context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW,uri)) }; resource.text("phone").takeIf { it.isNotEmpty() }?.let { TrustText(it) } }
 }
-@Composable private fun TrustText(text: String, style: String = "body") { BasicText(text, style = qText(style).copy(color = qColor("ink"))) }
+// A screen or section title is a heading, as on iOS.
+@Composable private fun TrustText(text: String, style: String = "body") { BasicText(text, if (style.startsWith("display") || style == "title") Modifier.semantics { heading() } else Modifier, style = qText(style).copy(color = qColor("ink"))) }
 @Composable private fun TrustField(label: String, value: String, multiline: Boolean = false, changed: (String) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { TrustText(label, "label"); BasicTextField(value, { changed(it.take(if (multiline) 2000 else 2048)) }, Modifier.fillMaxWidth().heightIn(min = if (multiline) 96.dp else 48.dp).background(qColor("surface")).padding(12.dp).semantics { contentDescription = label }, textStyle = qText("body").copy(color = qColor("ink")), singleLine = !multiline) }
 }

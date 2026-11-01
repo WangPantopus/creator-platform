@@ -1,0 +1,17 @@
+WP 7.4 P3: the composer states (the design reference's Composer).
+Runs of 2026-10-16 (lane 7, shared Mac). Fake API (tests/scenarios/lane-7/harness), synthetic
+identities and data; the real apps on simulator qelvora-lane7-ios (iOS 26.5, XCUITest) and
+emulator-5574 (Android 15, adb). Run on the top of the WP 7.4 stack (lane-7/packet-terms), which
+contains this piece unchanged. Nothing here is the real backend.
+
+iOS (--composer)
+  Q1 AI on: "Message Maya's AI", one step-in, no notice                           pass  7.1 s
+  Q2 creator here: "Reply to Kiln Club", no step-in; a reply -> fan-replies once  pass 11.2 s
+  Q3 paused: paused line, one step-in, no input, no notice; step-in -> packet     pass  8.3 s
+  Q4 live: pause, takeover, handback with a draft typed; draft kept; nothing sent pass 13.6 s
+  Q5 largest text, Night: paused and creator-here layouts                         pass 14.4 s
+Android (e7-4-composer.mjs): P3.1 to P3.5, 10 steps                               pass
+Flows that knew the old states, updated and run again
+  seal S1, S2: iOS pass, Android pass | drafts D2: iOS pass, Android pass
+  E7.1 S1-S8, E1, L1-L5: iOS 14 of 14, Android 14 of 14 (S3: the paused line, no notice)
+Not run: trial, ended, capacity (no contract); the real stack; physical devices.
