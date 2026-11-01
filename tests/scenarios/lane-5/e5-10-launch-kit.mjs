@@ -26,6 +26,11 @@ const context = await browser.newContext({
   viewport: { width: 390, height: 844 },
   permissions: ["clipboard-read", "clipboard-write"],
 });
+// Headless Chrome on macOS exposes the system share sheet, which never answers
+// without a person; take the copy path the page uses when sharing is absent.
+await context.addInitScript(() => {
+  Object.defineProperty(Navigator.prototype, "share", { value: undefined });
+});
 const page = await context.newPage();
 page.setDefaultTimeout(30000);
 const errors = [];
