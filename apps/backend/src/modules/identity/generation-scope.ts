@@ -12,6 +12,12 @@ import {
 } from "./generation-output-cursor.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
 import {
+  registeredWorkspaceLockReceipt,
+  reviewedWorkspaceLockReceipt,
+  workspaceLockSource,
+  workspaceLockTerminalReceipt,
+} from "../../db/workspace-lock-receipts.js";
+import {
   generationRecoverySource,
   generationPartialRecoverySource,
 } from "../../db/generation-recovery-profile.js";
@@ -151,6 +157,11 @@ const supersededTerminalContracts = [
   },
 ] as const;
 function reviewedTerminalConsumer(consumer: GenerationTerminalPurposeConsumer) {
+  if (
+    consumer.signature === workspaceLockTerminalReceipt &&
+    reviewedWorkspaceLockReceipt(consumer)
+  )
+    return true;
   return terminalContracts.some(
     (contract) =>
       consumer.owner === contract.owner &&
@@ -556,6 +567,14 @@ export class GenerationIdentityAuthority {
           );
       }
       const combined = [...consumers, ...terminalConsumers];
+      for (const consumer of combined)
+        if (
+          consumer.migration.version === workspaceLockSource.version &&
+          !(await registeredWorkspaceLockReceipt(consumer))
+        )
+          throw new Error(
+            "Workspace-lock consumers require their exact registered source and definition",
+          );
       if (
         new Set(combined.map((consumer) => consumer.signature)).size !==
           combined.length ||

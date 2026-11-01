@@ -599,3 +599,25 @@ details[open] > summary:before {
     scroll-behavior: auto !important;
   }
 }
+
+/* Questions fans ask you (the FAQ set checked before a new version goes live). */
+.w2-faq {
+  display: grid;
+  gap: 12px;
+}
+.w2-faq__list {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.w2-faq__item {
+  display: grid;
+  gap: 8px;
+  padding-block-end: 12px;
+  border-block-end: 1px solid var(--line);
+}
+.w2-faq__item .qv-btn {
+  justify-self: start;
+}

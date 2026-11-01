@@ -19,6 +19,12 @@ export const GENERATION_CONTEXT_MIGRATION =
   "0179_w3_generation_purpose_consumers";
 export const GENERATION_CONTEXT_SOURCE_SHA256 =
   "9449f7f9254aa1c9c77713b1683d5c85076b357f13e573882ee5d2d03d1715e0";
+/** Finding 18: the reviewed replacement (exclusions remove only what they
+ * name); the integrator assigns the number when it registers it. */
+export const GENERATION_CONTEXT_EXCLUSIONS_MIGRATION =
+  /^\d{4}_w3_generation_context_exclusions$/u;
+export const GENERATION_CONTEXT_EXCLUSIONS_SHA256 =
+  "5937065f6f26019c57360470f04bca488244ff216daf0ca6ed88c476de577dc4";
 export const GENERATION_CONTEXT_SIGNATURE =
   "creator.generation_conversation_context(uuid,uuid)";
 export const generationContextProfileBoundSource = Object.freeze({
@@ -179,8 +185,13 @@ export class PreparedGenerationConversationContext {
     invariant(
       receipt.signature === GENERATION_CONTEXT_SIGNATURE &&
         receipt.owner === owner &&
-        receipt.migration.version === GENERATION_CONTEXT_MIGRATION &&
-        receipt.migration.checksum === GENERATION_CONTEXT_SOURCE_SHA256 &&
+        ((receipt.migration.version === GENERATION_CONTEXT_MIGRATION &&
+          receipt.migration.checksum === GENERATION_CONTEXT_SOURCE_SHA256) ||
+          (GENERATION_CONTEXT_EXCLUSIONS_MIGRATION.test(
+            receipt.migration.version,
+          ) &&
+            receipt.migration.checksum ===
+              GENERATION_CONTEXT_EXCLUSIONS_SHA256)) &&
         Hash.safeParse(receipt.definitionChecksum).success &&
         Hash.safeParse(input.catalogueChecksum).success,
       "generation_context_unconfigured",

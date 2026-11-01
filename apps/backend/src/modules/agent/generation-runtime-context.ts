@@ -15,7 +15,10 @@ import {
   type GenerationTask,
   type GenerationTaskScope,
 } from "../identity/generation-scope.js";
-import { PreparedGenerationConversationContext } from "../conversation/generation-context.js";
+import {
+  PreparedGenerationConversationContext,
+  type GenerationConversationContext,
+} from "../conversation/generation-context.js";
 import {
   PreparedGenerationAgentInputs,
   type GenerationAgentFacts,
@@ -96,6 +99,7 @@ export class PreparedGenerationRuntimeContext {
     {
       vector: readonly number[];
       acceptedHash: string;
+      queryHash: string;
       sourceMessageId: string;
       compiledHash: string;
       attempt: GenerationProviderAttempt;
@@ -262,6 +266,18 @@ export class PreparedGenerationRuntimeContext {
     );
   }
 
+  private queryText(
+    facts: GenerationAgentFacts,
+    conversation: GenerationConversationContext,
+  ): string {
+    return this.service.pipeline
+      .publishedEngine(facts.version.pipelineHash)
+      .retrievalQuery(
+        conversation.acceptedText,
+        conversation.snapshot.messages,
+      );
+  }
+
   async embedAcceptedMessage(
     task: GenerationTask,
     attempt: GenerationProviderAttempt,
@@ -280,10 +296,14 @@ export class PreparedGenerationRuntimeContext {
         );
         await this.inputs.authorizeInTransaction(facts, scope, client);
         await this.context.assertCurrentInTransaction(client, scope, context);
+        // The published version's own engine decides what it embeds: the
+        // accepted turn, and from revision 15 this thread's previous fan turn.
+        const text = this.queryText(facts, context);
         return {
-          text: context.acceptedText,
+          text,
           sourceMessageId: scope.fanMessageId,
           acceptedHash: contentHash({ text: context.acceptedText }),
+          queryHash: contentHash({ text }),
           compiledHash: facts.version.compiledHash,
         };
       },
@@ -310,6 +330,7 @@ export class PreparedGenerationRuntimeContext {
     this.embeddings.set(embedding, {
       vector: Object.freeze([...vector]),
       acceptedHash: accepted.acceptedHash,
+      queryHash: accepted.queryHash,
       sourceMessageId: accepted.sourceMessageId,
       compiledHash: accepted.compiledHash,
       attempt,
@@ -368,6 +389,12 @@ export class PreparedGenerationRuntimeContext {
       licensedFacts ?? (await this.inputs.currentInTransaction(client, scope));
     if (licensedFacts)
       await this.inputs.authorizeLicensedInTransaction(facts, scope, client);
+    invariant(
+      contentHash({ text: this.queryText(facts, conversation) }) ===
+        query.queryHash,
+      "generation_query_embedding_changed",
+      "The privately embedded accepted turn changed.",
+    );
     const raw = (
       await client.query<{ context: unknown }>(
         "SELECT creator.generation_agent_runtime_context($1,$2,$3,$4) AS context",

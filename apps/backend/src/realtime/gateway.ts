@@ -152,9 +152,14 @@ export function attachRealtime(
               // A bounded authority read timed out; it did not establish an
               // access denial. Close immediately, but let clients reconnect
               // through a fresh authorized snapshot instead of treating this
-              // operational deadline as a revoked session (1008).
+              // operational deadline as a revoked session (1008). The read
+              // revalidates authority under a share lock on the thread row, so
+              // it waits for the generation transaction writing that thread
+              // (up to the 5 s scope window); 2 s closed sockets mid-answer
+              // under load (lane 3 finding 5). Nothing is sent before the
+              // authority read completes.
               connection.close(1013, "Reconnect with current authority");
-            }, 2000);
+            }, 5000);
             deadline.unref();
             const batchStart = performance.now();
             let batchStopped = false;

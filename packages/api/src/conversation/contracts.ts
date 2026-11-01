@@ -244,6 +244,10 @@ export const ConversationPageSchema = z.strictObject({
   canSend: z.boolean(),
   unavailableReason: z.string().nullable(),
   feedbackPolicy: ReplyFeedbackPolicySchema.nullable().optional(),
+  /** False while the latest AI turn is the crisis response or a safety
+   * refusal: the thread then shows no way to the creator's paid attention
+   * (INV-19, INV-21). Absent means available. */
+  stepInAvailable: z.boolean().optional(),
 });
 export type ConversationPage = z.infer<typeof ConversationPageSchema>;
 /** A short server-issued read lease, never a credential or offline write grant. */

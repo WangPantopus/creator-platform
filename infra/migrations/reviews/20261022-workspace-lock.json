@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "scope": "Workspace-lock wave0252: four bounded workspace locks wait instead of failing immediately. Source inspected against real PostgreSQL17 definitions: exactly four NOWAIT removals; function owners, ACLs, settings, lock order and all other definition bytes unchanged. Runtime catalogues require this exact registered source and independently qualified database profiles. No new role, table, grant, provider permission, consent or privacy policy.",
+  "sources": [
+    {
+      "version": "0252_w2_workspace_lock_wait",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_workspace_lock_wait.sql",
+      "checksum": "d95eeb56126bae8c64d3112b45072d773ae16b00bd5c7fcc572efdc3c4368e89",
+      "name": "w2_workspace_lock_wait"
+    }
+  ],
+  "generationDefinitions": {
+    "creator.generation_begin_agent_attempt(uuid,uuid,text,text,bigint,text)": {
+      "source": "0252_w2_workspace_lock_wait",
+      "owner": "creator_w2_generation_journal",
+      "definitionChecksum": "72bafd9503d06aea1f4c99ee2defe14d0b83a205ff7c276e7c8063b11bb16de4"
+    },
+    "creator.generation_agent_inputs(uuid,uuid)": {
+      "source": "0252_w2_workspace_lock_wait",
+      "owner": "creator_w2_generation_input",
+      "definitionChecksum": "58ab4f5b9a40d12dbaf286aa77ecc7854cd214cf66b8b3c716a739592ef7a54a"
+    },
+    "creator.generation_open_provider_usage(uuid,uuid,text,text,text,text)": {
+      "source": "0252_w2_workspace_lock_wait",
+      "owner": "creator_w2_generation_journal",
+      "definitionChecksum": "730c96640aa6ae3b55b8a89d734a7e61e2b77a4730a2b853891f0d87dbb3a245"
+    },
+    "creator.generation_agent_journal_receipt(uuid,uuid)": {
+      "source": "0252_w2_workspace_lock_wait",
+      "owner": "creator_w2_generation_terminal_journal",
+      "definitionChecksum": "3870c5a9a72089a48ab542d01051718097cbaac7c0c8151861bf4ee66658654a"
+    }
+  },
+  "purposeProfiles": [
+    {
+      "review": "original",
+      "sha256": "84a97ad8d968a646592d37ee7d53b50f8095ba91946d1386e9d0d8e982ec5308"
+    },
+    {
+      "review": "original-incoming",
+      "sha256": "547fecfca99c6dcdf4961decbadb846fe9b0a7f26cfe42a118d23e11700e37fd"
+    },
+    {
+      "review": "populated-original",
+      "sha256": "7c213f833d59a3d66276a793a571ab865f81142d4c1bf7a34a2740c8ed0ae868"
+    },
+    {
+      "review": "populated-original-incoming",
+      "sha256": "e36efc83780bd81b6bd7334d9f7492d271c5aa0e68d881b3082bfe95adb9fa8c"
+    }
+  ],
+  "runtimeCatalogues": {
+    "output": "b5a561c6ac33009f3dba8a21c986fdc6eb40a60b92b0b985482564d5643fe51d",
+    "terminal": "7dee73e474e7bb304c9c909dab85ab79210af8cb15863495594d235f29df7e1e",
+    "financial": "d9c17e144902459f46ea6e1cd43ff16659a75cb87428df9c15502b2c39564c66",
+    "expiry": "9f535b6023e7aebf9337b44df5414d42a942b753be0118aad1527da7aa0c58dd",
+    "detached": "4fe6b84160dff4b33093c26100af2d505fa3d69b622ebf36c0f3deecd56f6dd3",
+    "boundary": "cd902bb708eb25e5879b2d9c96f0c00fed23846cd474a0e56c8b0e0beee8530d",
+    "family": "c839d2874ffbebe6b602f719fd24169ee3efc95faed97177b9469f8be9b0097e"
+  },
+  "originalFamilyProfiles": [
+    {
+      "review": "original",
+      "sha256": "c839d2874ffbebe6b602f719fd24169ee3efc95faed97177b9469f8be9b0097e"
+    },
+    {
+      "review": "original-incoming",
+      "sha256": "085f71e9c5dab30837a222f88ad388e74f7e85c48ddb4836919ddce2316b9d78"
+    }
+  ],
+  "outputCatalogueChecksum": "cb7dce08aa6bfd1e04050cf86d8669d926a15254822373f52716a53f13e4cb05",
+  "publicCatalogueChecksum": "ef77af025b22e9c4e644f2ca64ac7cd8595c55397b5ea1d48b89c9022a6cbe9f",
+  "agentExportCatalogueChecksum": "a6ea3891d32157a6551e69e84edb8b4b47da940ac858b6d2fd67ac83851425e7",
+  "conversationCursorCatalogueChecksum": "a7ea6387197b85a5497d13d35fbecf89fb8a8ef944b559770fe23d8c3e80dd1c",
+  "provenancePurgeCatalogueChecksum": "b4734737ed619a897232c00267690a31d8be35edf9b5881fb74fdec10fd64930",
+  "provenancePurgeIncomingCatalogueChecksum": "2d1c31c95f2f74f6147c9d4d94ec7aeae59f39d39c5f3cde002d8a82cd78bad0",
+  "workerCatalogues": {
+    "creator_commerce_public_read": "033e8fb51b7d92669bb04a452004fee08f94fe90b35727d196ea0def1539a8aa",
+    "creator_generation_authority": "1147d13ee86c423378b101814a9ad09b82639da4ffa4a36296c094c851fc1373",
+    "creator_generation_conversation_context": "cc53b54726646bf2d40b5a6df4454d494cd05be0b6f51bf622652362fa40c410",
+    "creator_generation_cursor_authority": "6afa9f26b9207d240c1ee41c5340daa6ad644ef10b779f20eb88de3f7d7cbd1a",
+    "creator_generation_terminal_authority": "4aeaf82833fa62d8baa3ad3c2e17caabcf72901707508dd40f904274c630df9a",
+    "creator_generation_terminal_discovery": "9ec9e797565e2fb9f41108f9c97d8b167af8fe15f36c843d2c8a8fa3e12f9684",
+    "creator_generation_worker": "f65fbdf42981bbe8862cb02e41b0d73d3ce3b4f27682d8cb58349f18b62715b7",
+    "creator_privacy_accounting_boundary": "657a5afc394c999c9c31df8622c8692f899e7f636d1db3c859171c950f72fed5",
+    "creator_privacy_family": "53a82dff659e005726303958c8134d6485a937c54d45c8920613e606f20288d1",
+    "creator_privacy_ownership_metadata": "f65fbdf42981bbe8862cb02e41b0d73d3ce3b4f27682d8cb58349f18b62715b7",
+    "creator_signature_read_authority": "50762651609adaa8ab2b0236aa02ec2ec1ce91b2fa344e5f7d7e2c6948ba8c97",
+    "creator_usage_detachment": "b82e3dd842948706846f94bd505337255b830f0aacc1eb47dc49394c3b4c7a57",
+    "creator_usage_expiry": "644f2bb0cff93b44e53e5c33f8bda4d93fbb23ed4bc5768d271bb18cad5632fd",
+    "creator_w2_generation_guardrail": "dcc3f73518afe4ea0c5ded4eb6593a3a0d33fd647293088685e1964982dfdc34",
+    "creator_w2_generation_input": "362930709feab65dc340ed08b6ef659ff5b43a5589db47d1cfdad41dd3297b7f",
+    "creator_w2_generation_journal": "49bc6a028dee1cdd4b02ad6dc4186c7d63acfca1908615e7eac926029fd5d287",
+    "creator_w2_generation_metadata": "975620e2b672a5c97459ffd147ceb7dbe71274c34c55cb6287494bc05ea3c916",
+    "creator_w2_generation_retrieval": "2931b8e69194ce1dec52954214998cbeb34edeed68a8873ee5fb3f9507c2bd52",
+    "creator_w2_generation_terminal_journal": "223d930a4fe05584ccb559c1277f9feecaa705871df2bd7f563b84a6d0023430",
+    "creator_w2_privacy_export": "a6ea3891d32157a6551e69e84edb8b4b47da940ac858b6d2fd67ac83851425e7",
+    "creator_w3_generation_output": "25bc4594762283b90c2c9618cccbfbf1d59c214367159b4c546f482406b7a972",
+    "creator_w3_generation_privacy": "5ca66f583e06831b02c361e13d785bd3e33745f1d1c281589d8faf8f09ff267c",
+    "creator_w3_privacy_export": "bff80fd8a62b74e88f0396e9caba32a0f8973361d39c5112520567e67d41c038",
+    "creator_w3_terminal_output": "8bd1587ac9abac7bd0aeab858a9e190c8f060d14f86e9b748d08eb8757ddad56",
+    "creator_w4_generation_audience": "48dcf6841ec14090bb7a234e703aaa6823ba3c7c63de7b6fca02e2ac709dc146",
+    "creator_w4_generation_safety_terminal": "2d1f88954989e80500747600f361d94c04f7d8b7d1376df19a34b28ae14f16d4",
+    "creator_w4_generation_terminal": "b3448a5314540886c22c0cd48746046fef62408743e2ed53e347ee646d966313",
+    "creator_w5_generation_origin": "fb1dbd5c5498b93040e1cc633af9e6e453f4db297d66d4f02b87eb4acd09216e"
+  },
+  "conversationCursorDefinitions": {
+    "creator.conversation_privacy_export_rows(uuid,uuid)": "53656e429461ca73c2fb2a4d9b9ffd0a234b4b9cf3e6c2793ac78da9205965fd",
+    "creator.fence_conversation_privacy_export(uuid,uuid,text,uuid,uuid,uuid)": "c20292458ff54df47f4a7a590529109424a143ee62b0e29cb531f7a6891d7033",
+    "creator.finish_conversation_privacy_export_scope()": "a18d439512f89abe047fcfd2494cf48b366aa38ff5c4e5beaf153e98e9819bf8"
+  },
+  "comparison": {
+    "readerCatalogueChecksum": "ba9e4ccbcf4f9a62050529aeb06e2453e14181ba5766a74b18c920b2194ae4f4",
+    "privacy": {
+      "definitionSha256": "5b39ca6d3af5cd279117e614e955ca88c4eaef50c5735ad4ac42531942f1cbab",
+      "catalogueChecksum": "40834588e524d52852bd6875e055922098c3cf50192377e85607ac9dc00ef059"
+    },
+    "artifactsCatalogueChecksum": "3cb7096295761d9bd20b7929da8edece019cb476a6b908831c77ab56e37e233f"
+  },
+  "baselineWave": {
+    "path": "infra/migrations/waves/20261015-sign-in-and-money.json",
+    "sha256": "fdd7dfd27d8040f0830337b35e91b00b3dfce25483ce7c60fe8a6cbbe0df5dd2"
+  }
+}

@@ -1,6 +1,7 @@
 import review from "../../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
 import noticesReview from "../../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
 import signInAndMoneyReview from "../../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
+import workspaceLockReview from "../../../../infra/migrations/reviews/20261022-workspace-lock.json" with { type: "json" };
 import type { PoolClient } from "pg";
 import { invariant } from "../core/errors.js";
 import {
@@ -58,6 +59,26 @@ async function registeredSignInAndMoneyProfile(signal?: AbortSignal) {
   return signInAndMoney;
 }
 
+/** Fixed next wave; partial registrations never select a runtime profile. */
+async function registeredWorkspaceLockProfile(signal?: AbortSignal) {
+  signal?.throwIfAborted();
+  const active = await Promise.all(
+    workspaceLockReview.sources.map(registeredMigration),
+  );
+  signal?.throwIfAborted();
+  if (active.every((source) => !source)) return undefined;
+  invariant(
+    active.every(
+      (source, index) =>
+        source?.version === workspaceLockReview.sources[index]!.version &&
+        source.checksum === workspaceLockReview.sources[index]!.checksum,
+    ),
+    "comparison_unconfigured",
+    "The complete reviewed workspace-lock source graph is required.",
+  );
+  return freeze(workspaceLockReview);
+}
+
 /** Exact executable source selects independently reviewed metadata only.
  * Reservations and hand-installed ledger entries cannot activate this profile.
  * Original owners still check their actual source, purpose and transaction. */
@@ -77,6 +98,12 @@ export async function registeredComparisonProfile(signal?: AbortSignal) {
   );
   const head = await registeredNoticesProfile(signal);
   const next = await registeredSignInAndMoneyProfile(signal);
+  const workspace = await registeredWorkspaceLockProfile(signal);
+  invariant(
+    next || !workspace,
+    "comparison_unconfigured",
+    "Workspace locking requires the complete sign-in and money predecessor.",
+  );
   invariant(
     head || !next,
     "comparison_unconfigured",
@@ -87,10 +114,12 @@ export async function registeredComparisonProfile(signal?: AbortSignal) {
         ...profile,
         ...head,
         ...next,
+        ...workspace,
         sources: [
           ...profile.sources,
           ...head.sources,
           ...(next?.sources ?? []),
+          ...(workspace?.sources ?? []),
         ],
       })
     : profile;

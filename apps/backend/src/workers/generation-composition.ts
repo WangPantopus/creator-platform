@@ -16,6 +16,7 @@ import { CommerceGenerationAudience } from "../modules/commerce/generation-audie
 import { CommerceGenerationSafetyTerminalSettlement } from "../modules/commerce/generation-safety-terminal-settlement.js";
 import { PreparedContentGenerationOrigins } from "../modules/content/generation-origin.js";
 import { PreparedGenerationConversationContext } from "../modules/conversation/generation-context.js";
+import { PreparedGenerationConversationMemory } from "../modules/conversation/generation-memory.js";
 import { PreparedGenerationConversationOutput } from "../modules/conversation/generation-output.js";
 import { PreparedGenerationConversationTerminal } from "../modules/conversation/generation-terminal.js";
 import { GenerationIdentityAuthority } from "../modules/identity/generation-scope.js";
@@ -101,6 +102,11 @@ export type GenerationWorkerCustody = Readonly<{
   >;
   settlement: Omit<
     Parameters<typeof CommerceGenerationSafetyTerminalSettlement.prepare>[0],
+    BoundOwners
+  >;
+  /** Absent until the integrator registers the B5 memory proposal writer. */
+  memory?: Omit<
+    Parameters<typeof PreparedGenerationConversationMemory.prepare>[0],
     BoundOwners
   >;
 }>;
@@ -198,6 +204,14 @@ export async function prepareGenerationWorker(input: {
     inputs,
     context,
   });
+  // B5: memory proposals stay off until their reviewed receipt is registered.
+  const memory = input.custody.memory
+    ? await PreparedGenerationConversationMemory.prepare({
+        ...input.custody.memory,
+        identity,
+        workerPool: input.workerPool,
+      })
+    : undefined;
   input.signal?.throwIfAborted();
   const pipeline = PreparedGenerationPipeline.prepare({
     ...shared,
@@ -208,6 +222,7 @@ export async function prepareGenerationWorker(input: {
     accounting,
     retrieval,
     guardrail,
+    memory,
   });
   input.signal?.throwIfAborted();
   const output = await PreparedGenerationConversationOutput.prepare({

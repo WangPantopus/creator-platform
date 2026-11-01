@@ -4,6 +4,7 @@ import {
   DraftConfig,
   AgentAudience,
   type Passage,
+  type Usage,
 } from "../../../../../packages/api/src/agent/contracts.js";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError, invariant } from "../../core/errors.js";
@@ -17,6 +18,17 @@ import {
   type GenerationConversationContext,
 } from "../conversation/generation-context.js";
 import { PreparedGenerationConversationOutput } from "../conversation/generation-output.js";
+import {
+  PreparedGenerationConversationMemory,
+  type MemoryProposalItem,
+} from "../conversation/generation-memory.js";
+import {
+  MEMORY_EXTRACTION_INSTRUCTIONS,
+  MEMORY_SENSITIVITY_INSTRUCTIONS,
+  MemoryExtraction,
+  MemorySensitivity,
+  SENSITIVE_MEMORY_TEXT,
+} from "./memory-proposals.js";
 import { CommerceGenerationAudience } from "../commerce/generation-audience.js";
 import {
   PreparedGenerationAgentInputs,
@@ -29,7 +41,9 @@ import {
 import {
   PreparedGenerationProviderAccounting,
   type GenerationProviderAttempt,
+  type GenerationProviderAdmission,
   type GenerationProviderCall,
+  type GenerationAdmissionBookend,
 } from "./generation-provider-usage.js";
 import {
   PreparedGenerationRuntimeContext,
@@ -88,6 +102,10 @@ type Run = {
   retrieval?: GenerationRuntimeContext;
   classifierCall?: GenerationProviderCall;
   replyCall?: GenerationProviderCall;
+  /** The classifier call admitted inside the preflight (A4), until used. */
+  preadmitted?: GenerationProviderAdmission;
+  /** The reply call admitted inside the retrieval read (A4), until used. */
+  preadmittedReply?: GenerationProviderAdmission;
   nextSequence: number;
   live: boolean;
 };
@@ -142,6 +160,9 @@ function retrievalInput(context: GenerationRuntimeContext) {
   return contentHash({ ...context, audience: audienceInput(context.audience) });
 }
 
+/** For the worker: the last sentence cursor whose W1 COMMIT resolved. */
+export type GenerationProgress = { committed: number };
+
 /** Actual shared engine adapter, distinct from interactive Actor/ThreadScope.
  * It never writes W3 output/epoch or W4 money. W3's original prepared writer
  * calls assertApprovedInTransaction around its append; W1 alone commits.
@@ -162,6 +183,7 @@ export class PreparedGenerationPipeline {
     private readonly accounting: PreparedGenerationProviderAccounting,
     private readonly retrieval: PreparedGenerationRuntimeContext,
     private readonly guardrail: PreparedGenerationGuardrail,
+    private readonly memory?: PreparedGenerationConversationMemory,
   ) {}
 
   static prepare(input: {
@@ -174,6 +196,8 @@ export class PreparedGenerationPipeline {
     accounting: PreparedGenerationProviderAccounting;
     retrieval: PreparedGenerationRuntimeContext;
     guardrail: PreparedGenerationGuardrail;
+    /** Inactive until its reviewed receipt is registered (B5). */
+    memory?: PreparedGenerationConversationMemory;
   }): PreparedGenerationPipeline {
     invariant(
       input.identity instanceof GenerationIdentityAuthority &&
@@ -185,6 +209,8 @@ export class PreparedGenerationPipeline {
         input.accounting instanceof PreparedGenerationProviderAccounting &&
         input.retrieval instanceof PreparedGenerationRuntimeContext &&
         input.guardrail instanceof PreparedGenerationGuardrail &&
+        (input.memory === undefined ||
+          input.memory instanceof PreparedGenerationConversationMemory) &&
         input.service.pipeline.model?.pricingConfigured,
       "generation_pipeline_unconfigured",
       "All original prepared current-input, accounting, context and audit producers are required.",
@@ -208,6 +234,7 @@ export class PreparedGenerationPipeline {
       input.accounting,
       input.retrieval,
       input.guardrail,
+      input.memory,
     );
   }
 
@@ -326,6 +353,82 @@ export class PreparedGenerationPipeline {
     );
   }
 
+  /** B5: one extraction and an independent sensitivity call per item (at most
+   * five), each billed to this attempt under its memory category, then W3's
+   * proposal writer on a fresh held transaction. The answer is already
+   * delivered: a provider or write failure leaves it as it is and writes no
+   * memory. */
+  private async remember(
+    task: GenerationTask,
+    run: Run,
+    sentences: readonly { text: string }[],
+    signal: AbortSignal,
+    bookend: GenerationAdmissionBookend,
+  ): Promise<void> {
+    const model = this.service.pipeline.model!;
+    const billed = <T extends { usage: Usage }>(call: () => Promise<T>) =>
+      this.accounting.withUsage(
+        task,
+        run.attempt,
+        "memory",
+        signal,
+        call,
+        bookend,
+      );
+    try {
+      const exchange = [
+        `fan: ${run.conversation.acceptedText}`,
+        `ai: ${sentences.map((s) => s.text).join(" ")}`,
+      ];
+      const extracted = await billed(() =>
+        model.structured(
+          MEMORY_EXTRACTION_INSTRUCTIONS,
+          [JSON.stringify(exchange)],
+          MemoryExtraction,
+          "small",
+          signal,
+        ),
+      );
+      const items: MemoryProposalItem[] = [];
+      for (const item of extracted.value.items) {
+        const key = item.semanticKey.normalize("NFKC").toLowerCase().trim();
+        if (!key || run.conversation.snapshot.excludedKeys.includes(key))
+          continue;
+        const sensitive = await billed(() =>
+          model.structured(
+            MEMORY_SENSITIVITY_INSTRUCTIONS,
+            [JSON.stringify({ text: item.text })],
+            MemorySensitivity,
+            "small",
+            signal,
+          ),
+        );
+        items.push({
+          kind: item.kind,
+          text: item.text,
+          semanticKey: key,
+          sensitiveCategory:
+            item.sensitiveCategory ??
+            sensitive.value.category ??
+            (SENSITIVE_MEMORY_TEXT.test(item.text) || sensitive.value.uncertain
+              ? "sensitive_unspecified"
+              : null),
+        });
+      }
+      if (!items.length) return;
+      await this.identity.withGeneration(
+        task,
+        async (client, scope) => {
+          await bookend(client, scope);
+          await this.memory!.proposeInTransaction(client, scope, items);
+        },
+        signal,
+      );
+    } catch (cause) {
+      if (signal.aborted) throw cause;
+    }
+  }
+
   private issue(
     run: Run,
     raw: { text: string; citations: readonly string[] },
@@ -403,6 +506,8 @@ export class PreparedGenerationPipeline {
     /** The original prepared W3 writer finishes its W1-held append, both
      * private approval bookends and sole W1 COMMIT before delivery resolves. */
     output: PreparedGenerationConversationOutput,
+    /** Observation only: W1 still accepts a terminal at the exact durable cursor. */
+    progress?: GenerationProgress,
   ): Promise<PipelineResult> {
     const started = performance.now();
     let firstApprovedMs: number | null = null;
@@ -459,6 +564,15 @@ export class PreparedGenerationPipeline {
             scope,
             facts,
           );
+          // The engine's first call is always the input classifier: admit it
+          // here, on this same fresh read, instead of in a transaction of its own.
+          const preadmitted = await this.accounting.admitInTransaction(
+            client,
+            scope,
+            attempt,
+            "guardrail",
+            facts,
+          );
           await this.metadata.assertCurrentInTransaction(
             client,
             scope,
@@ -476,6 +590,7 @@ export class PreparedGenerationPipeline {
             facts,
             metadata,
             attempt,
+            preadmitted,
             nextSequence: 0,
             live: true,
           };
@@ -501,21 +616,15 @@ export class PreparedGenerationPipeline {
           proof,
           current.replyCall,
         );
-        await output.deliver(task, approved, signal);
-        await this.identity.withGeneration(
-          task,
-          async (client, scope) => {
-            invariant(
-              scope.lastSequence === approved.sequence,
-              "generation_output_not_committed",
-              "The actual original writer must commit this exact ordered cursor.",
-            );
-            // deliver() already validates approval before/after append and
-            // resolves only after the original W1 COMMIT. This read confirms
-            // that committed cursor; it does not repeat the whole input read.
-          },
-          signal,
+        // deliver() validates approval before and after the append and
+        // resolves only after the original W1 COMMIT, with the cursor that
+        // same transaction committed; no second W1 transaction re-reads it.
+        invariant(
+          (await output.deliver(task, approved, signal)) === approved.sequence,
+          "generation_output_not_committed",
+          "The actual original writer must commit this exact ordered cursor.",
         );
+        if (progress) progress.committed = approved.sequence;
         firstApprovedMs ??= Math.round(performance.now() - started);
         emitted++;
       };
@@ -548,8 +657,23 @@ export class PreparedGenerationPipeline {
             onSentence: emit,
           },
           {
-            withUsage: (call, stage) =>
-              this.accounting.withUsage(
+            withUsage: (call, stage) => {
+              const preadmitted =
+                stage === "classifier" ? current.preadmitted : undefined;
+              if (preadmitted) {
+                current.preadmitted = undefined;
+                return this.accounting.withAdmittedUsage(
+                  task,
+                  current.attempt,
+                  preadmitted,
+                  signal,
+                  call,
+                  (admitted) => {
+                    current.classifierCall = admitted;
+                  },
+                );
+              }
+              return this.accounting.withUsage(
                 task,
                 current.attempt,
                 "guardrail",
@@ -559,18 +683,33 @@ export class PreparedGenerationPipeline {
                 (admitted) => {
                   if (stage === "classifier") current.classifierCall = admitted;
                 },
-              ),
-            withStreamUsage: (call) =>
-              this.accounting.withStreamUsage(
-                task,
-                current.attempt,
-                signal,
-                call,
-                bookend,
-                (admitted) => {
-                  current.replyCall = admitted;
-                },
-              ),
+              );
+            },
+            withStreamUsage: (call) => {
+              const preadmitted = current.preadmittedReply;
+              current.preadmittedReply = undefined;
+              return preadmitted
+                ? this.accounting.withAdmittedStreamUsage(
+                    task,
+                    current.attempt,
+                    preadmitted,
+                    signal,
+                    call,
+                    (admitted) => {
+                      current.replyCall = admitted;
+                    },
+                  )
+                : this.accounting.withStreamUsage(
+                    task,
+                    current.attempt,
+                    signal,
+                    call,
+                    bookend,
+                    (admitted) => {
+                      current.replyCall = admitted;
+                    },
+                  );
+            },
             retrieve: async () => {
               const embedding = await this.retrieval.embedAcceptedMessage(
                 task,
@@ -578,22 +717,36 @@ export class PreparedGenerationPipeline {
                 signal,
                 bookend,
               );
-              const retrieved = await this.identity.withGeneration(
-                task,
-                async (client, scope) => {
-                  const facts = await this.current(client, scope, current);
-                  const value = await this.retrieval.currentInTransaction(
-                    client,
-                    scope,
-                    embedding,
-                    facts,
-                  );
-                  // The fresh reader already completes its own authority and
-                  // input bookends before returning this immutable value.
-                  return value;
-                },
-                signal,
-              );
+              const { value: retrieved, reply } =
+                await this.identity.withGeneration(
+                  task,
+                  async (client, scope) => {
+                    const facts = await this.current(client, scope, current);
+                    const value = await this.retrieval.currentInTransaction(
+                      client,
+                      scope,
+                      embedding,
+                      facts,
+                    );
+                    // The engine's next call is always the reply: admit it on
+                    // this same fresh read instead of in its own transaction.
+                    // The fresh reader already completes its own authority and
+                    // input bookends before returning this immutable value.
+                    return {
+                      value,
+                      reply: await this.accounting.admitInTransaction(
+                        client,
+                        scope,
+                        current.attempt,
+                        "reply",
+                        facts,
+                      ),
+                    };
+                  },
+                  signal,
+                );
+              // Only a committed admission is held for the reply.
+              current.preadmittedReply = reply;
               current.embedding = embedding;
               current.retrieval = retrieved;
               return {
@@ -655,20 +808,12 @@ export class PreparedGenerationPipeline {
           },
           current.classifierCall,
         );
-        await output.deliver(task, approved, signal);
-        await this.identity.withGeneration(
-          task,
-          async (client, scope) => {
-            invariant(
-              scope.lastSequence === approved.sequence,
-              "generation_output_not_committed",
-              "The original safety output must commit its exact ordered cursor.",
-            );
-            // The original writer already checked approval at both append
-            // bookends and committed before this current cursor observation.
-          },
-          signal,
+        invariant(
+          (await output.deliver(task, approved, signal)) === approved.sequence,
+          "generation_output_not_committed",
+          "The original safety output must commit its exact ordered cursor.",
         );
+        if (progress) progress.committed = approved.sequence;
         firstApprovedMs ??= Math.round(performance.now() - started);
         emitted++;
       }
@@ -677,6 +822,16 @@ export class PreparedGenerationPipeline {
         "generation_output_missing",
         "Every approved sentence requires its actual ordered durable writer.",
       );
+      // B5: memory proposals after the answer is delivered and before the
+      // terminal, for an ordinary answer only (no crisis, refusal or withheld
+      // sentence). Off the record writes nothing (Q13).
+      if (
+        this.memory &&
+        !result.blocked &&
+        result.category === null &&
+        !current.conversation.snapshot.offTheRecord
+      )
+        await this.remember(task, current, result.sentences, signal, bookend);
       // The shared engine also serves previews. This worker measures from its
       // original preflight through the durable append and current-cursor
       // readback, including classifier safety/fallback delivery. Terminal
@@ -700,7 +855,15 @@ export class PreparedGenerationPipeline {
       throw cause;
     } finally {
       if (run) run.live = false;
-      this.running.delete(key);
+      try {
+        // An admitted call the engine never made sent no request.
+        const unused = [run?.preadmitted, run?.preadmittedReply];
+        if (run) run.preadmitted = run.preadmittedReply = undefined;
+        for (const admitted of unused)
+          if (admitted) await this.accounting.releaseUnused(admitted);
+      } finally {
+        this.running.delete(key);
+      }
     }
   }
 }

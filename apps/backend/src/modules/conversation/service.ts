@@ -47,6 +47,7 @@ import {
 } from "../commerce/fulfillment-plans.js";
 import { ConversationSystemLinkSchema } from "../../../../../packages/api/src/conversation/system-link.js";
 import { PreparedGenerationAcceptance } from "./generation-acceptance.js";
+import { generationQueuedChannel } from "../../workers/generation-wake.js";
 
 type ThreadRow = {
   control: ThreadControl;
@@ -982,6 +983,11 @@ export class ConversationService {
               client,
               generationId,
             );
+            // PostgreSQL delivers this only if the acceptance commits. It
+            // carries nothing: the worker still discovers and claims the work.
+            await client.query("SELECT pg_notify($1,'')", [
+              generationQueuedChannel,
+            ]);
             return { message: fan, generationId };
           },
         ),

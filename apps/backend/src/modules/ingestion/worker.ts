@@ -131,6 +131,28 @@ export class IngestionWorker {
             [job.source_id, scope.creatorId, job.source_revision],
           );
           if (!current.rowCount) return;
+          // A rebuild of the same revision (a retry, a new embedding model)
+          // keeps each unchanged chunk's id, so delivered citations still open.
+          const existing = (
+            await client.query<{
+              id: string;
+              ordinal: number;
+              start_offset: number;
+              end_offset: number;
+              passage: string;
+            }>(
+              "SELECT id,ordinal,start_offset,end_offset,passage FROM creator.ai_chunk WHERE source_id=$1 AND creator_id=$2 AND source_revision=$3",
+              [job.source_id, scope.creatorId, job.source_revision],
+            )
+          ).rows;
+          const idOf = (chunk: (typeof chunks)[number]) =>
+            existing.find(
+              (row) =>
+                row.ordinal === chunk.ordinal &&
+                row.start_offset === chunk.start &&
+                row.end_offset === chunk.end &&
+                row.passage === chunk.text,
+            )?.id ?? chunk.id;
           await client.query(
             "DELETE FROM creator.ai_chunk WHERE source_id=$1 AND creator_id=$2",
             [job.source_id, scope.creatorId],
@@ -139,7 +161,7 @@ export class IngestionWorker {
             await client.query(
               "INSERT INTO creator.ai_chunk(id,creator_id,source_id,source_revision,ordinal,passage,start_offset,end_offset,embedding,embedding_model) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9::vector,$10)",
               [
-                chunk.id,
+                idOf(chunk),
                 scope.creatorId,
                 job.source_id,
                 job.source_revision,

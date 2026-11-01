@@ -344,7 +344,9 @@ it("persists the exact cohort fingerprint when both engines and all samples rema
   );
 });
 
-it("publication rejects an engine-only pass or a pass whose sample has expired", async () => {
+// B2: replacing a live version needs the creator's FAQ cases in the passing
+// evaluation; shadow replay of fan samples no longer authorizes it.
+it("publication without the creator's FAQ evidence is refused, whatever the shadow replay holds", async () => {
   const f = fixture();
   vi.spyOn(f.model, "pricingConfigured", "get").mockReturnValue(true);
   vi.spyOn(f.service, "currentLicense").mockResolvedValue({} as License);
@@ -356,11 +358,11 @@ it("publication rejects an engine-only pass or a pass whose sample has expired",
       changes: "Test revision",
     });
   await expect(publish()).rejects.toMatchObject({
-    code: "shadow_evaluation_required",
+    code: "faq_required",
   });
   f.setSamples([]);
   await expect(publish()).rejects.toMatchObject({
-    code: "shadow_evaluation_required",
+    code: "faq_required",
   });
   expect(
     f.query.mock.calls.some(([sql]) => /^(INSERT|UPDATE|DELETE)/u.test(sql)),

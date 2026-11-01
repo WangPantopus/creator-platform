@@ -8,6 +8,7 @@ import recoveryReview from "../../../infra/migrations/reviews/20261007-generatio
 import comparisonReview from "../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
 import noticesReview from "../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
 import signInAndMoneyReview from "../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
+import workspaceLockReview from "../../../infra/migrations/reviews/20261022-workspace-lock.json" with { type: "json" };
 import { comparisonReaderCatalogue } from "../src/modules/conversation/comparison-feed.js";
 import { comparisonPrivacyCatalogue } from "../src/modules/conversation/comparison-privacy.js";
 import { comparisonArtifactCatalogue } from "../src/modules/trust/comparison-artifacts.js";
@@ -172,7 +173,8 @@ export async function assertGenerationWaveRoleSafety(
     | "partial-generation-recovery"
     | "comparison"
     | "notices"
-    | "sign-in-and-money",
+    | "sign-in-and-money"
+    | "workspace-lock",
 ) {
   if (
     purposeReview.schemaVersion !== 1 ||
@@ -184,16 +186,19 @@ export async function assertGenerationWaveRoleSafety(
     throw new WaveRoleSafetyError(
       "Generation-purpose wave review is unavailable.",
     );
-  const signInAndMoney = extension === "sign-in-and-money";
+  const workspaceLock = extension === "workspace-lock";
+  const signInAndMoney = workspaceLock || extension === "sign-in-and-money";
   const notices = signInAndMoney || extension === "notices";
   const comparison = notices || extension === "comparison";
   // Every pinned catalogue lists every relation, so the newest installed
   // wave's review holds the current pins.
-  const head = signInAndMoney
-    ? signInAndMoneyReview
-    : notices
-      ? noticesReview
-      : comparisonReview;
+  const head = workspaceLock
+    ? workspaceLockReview
+    : signInAndMoney
+      ? signInAndMoneyReview
+      : notices
+        ? noticesReview
+        : comparisonReview;
   const recovery =
     comparison ||
     extension === "generation-recovery" ||
@@ -349,6 +354,21 @@ export async function assertGenerationWaveRoleSafety(
           )
             throw new WaveRoleSafetyError(
               "Exact complete sign-in and money source graph is required.",
+            );
+      if (workspaceLock)
+        for (const source of workspaceLockReview.sources)
+          if (
+            sha256(await readFile(new URL(source.path, repositoryRoot))) !==
+              source.checksum ||
+            !(
+              await client.query(
+                "SELECT 1 FROM creator.schema_migration WHERE version=$1 AND checksum=$2",
+                [source.version, source.checksum],
+              )
+            ).rowCount
+          )
+            throw new WaveRoleSafetyError(
+              "Exact complete workspace-lock source graph is required.",
             );
       if (
         contentHash(await comparisonReaderCatalogue(client)) !==

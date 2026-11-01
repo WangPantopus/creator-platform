@@ -261,7 +261,10 @@ function unknownUsage(model: AgentModel): Usage {
 }
 
 /** Records completed usage even when the later draft write fails. A provider
- * request without final usage remains uncertain rather than becoming free. */
+ * request without final usage remains uncertain rather than becoming free,
+ * unless the caller supplies that call's own upper bound: a call outside any
+ * generation hold then records the bound as an estimate (founder decision
+ * 2026-10-15), so an interrupted call cannot lock the creator's AI. */
 export async function withProviderUsage<T extends { usage: Usage }>(
   repository: AgentRepository,
   scope: CreatorScope,
@@ -272,6 +275,7 @@ export async function withProviderUsage<T extends { usage: Usage }>(
   call: () => Promise<T>,
   execution?: ProviderExecution,
   heldAdmission?: HeldProviderUsageAdmission,
+  unknownBoundMicros?: number | null,
 ): Promise<T> {
   const finish = await openProviderUsage(
     repository,
@@ -292,7 +296,23 @@ export async function withProviderUsage<T extends { usage: Usage }>(
     if (error instanceof ProviderResponseError) usage = error.usage;
     throw error;
   } finally {
-    await finish(usage);
+    const bounded =
+      usage.costMicros === null &&
+      !execution &&
+      !heldAdmission &&
+      Number.isSafeInteger(unknownBoundMicros) &&
+      unknownBoundMicros! > 0;
+    await finish(
+      bounded
+        ? {
+            provider: "estimate",
+            model: "interrupted-call",
+            inputTokens: 0,
+            outputTokens: 0,
+            costMicros: unknownBoundMicros!,
+          }
+        : usage,
+    );
   }
 }
 

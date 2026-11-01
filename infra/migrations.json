@@ -749,6 +749,13 @@
       "owner": "W2",
       "sourceSha256": "3bfbe8e7b7646729f5b2662115ec9198d1c4f0103bff63f9ca08fc765d590b69",
       "wave": "20261015-sign-in-and-money"
+    },
+    {
+      "version": "0252_w2_workspace_lock_wait",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_workspace_lock_wait.sql",
+      "owner": "W2",
+      "sourceSha256": "d95eeb56126bae8c64d3112b45072d773ae16b00bd5c7fcc572efdc3c4368e89",
+      "wave": "20261022-workspace-lock"
     }
   ],
   "reserved": [
@@ -1339,6 +1346,16 @@
       "state": "registered",
       "registeredVersion": "0251_w2_interrupted_cost_estimate",
       "reason": "Lane 3 proposal (pull request #433), registered by the integrator on 2026-10-15 at the founder's request after review of the exact source against a fresh and an independently restored database: the purpose-role reach it adds is the one the file grants. Apply only through the 20261015-sign-in-and-money wave; registration is not runtime activation."
+    },
+    {
+      "id": "0252",
+      "version": "0252_w2_workspace_lock_wait",
+      "owner": "W2",
+      "path": "apps/backend/src/modules/agent/migrations/pending_w2_workspace_lock_wait.sql",
+      "sourceSha256": "d95eeb56126bae8c64d3112b45072d773ae16b00bd5c7fcc572efdc3c4368e89",
+      "state": "registered",
+      "registeredVersion": "0252_w2_workspace_lock_wait",
+      "reason": "Registers the unchanged workspace-lock proposal for the app completion wave. Four existing workspace locks wait within the held transaction timeout; no ownership, grants, lock order or business data changes. Apply to populated databases only through the reviewed 20261022-workspace-lock operator wave."
     }
   ]
 }

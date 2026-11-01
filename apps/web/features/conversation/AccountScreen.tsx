@@ -11,7 +11,7 @@ import type {
 import { useConversationRequest, ConversationError } from "./api";
 import { useIdentityRequest } from "../identity/session-boundary";
 import "./conversation.css";
-import { ComparisonChoice } from "./ComparisonChoice";
+import { ComparisonChoice, useComparisonsAvailable } from "./ComparisonChoice";
 type Account = ConversationAccountPage;
 type AccountCommerce = {
   fan: { id: string } | null;
@@ -389,6 +389,8 @@ function ConversationPrivacy({
 }) {
   const request = useConversationRequest();
   const root = `${creatorId}/${fanId}`;
+  // Off on this server: no section and no "not available" line.
+  const comparisonsAvailable = useComparisonsAvailable(true);
   const [page, setPage] = useState<ConversationPage | null>(null);
   const [memory, setMemory] = useState<MemoryView | null>(null);
   const [audit, setAudit] = useState<Audit[] | null>(null);
@@ -758,10 +760,12 @@ function ConversationPrivacy({
           <span>Share my intro with this creator’s AI</span>
         </label>
       </section>
-      <section id="comparisons">
-        <h2>AI comparisons</h2>
-        <ComparisonChoice root={root} />
-      </section>
+      {comparisonsAvailable && (
+        <section id="comparisons">
+          <h2>AI comparisons</h2>
+          <ComparisonChoice root={root} />
+        </section>
+      )}
       <section>
         <h2>AI providers</h2>
         {policy?.verified === false && (
