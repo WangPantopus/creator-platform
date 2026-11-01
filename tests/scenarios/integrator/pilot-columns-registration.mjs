@@ -158,7 +158,7 @@ const grants = sql(
      UNION ALL SELECT 'relation '||c.oid::regclass,a.privilege_type,a.is_grantable FROM pg_class c,LATERAL aclexplode(c.relacl) a WHERE a.grantee=(SELECT oid FROM r)
      UNION ALL SELECT 'column '||c.oid::regclass||'.'||t.attname,a.privilege_type,a.is_grantable FROM pg_attribute t JOIN pg_class c ON c.oid=t.attrelid,LATERAL aclexplode(t.attacl) a WHERE a.grantee=(SELECT oid FROM r)
      UNION ALL SELECT 'function '||p.oid::regprocedure,a.privilege_type,a.is_grantable FROM pg_proc p,LATERAL aclexplode(p.proacl) a WHERE a.grantee=(SELECT oid FROM r)
-     UNION ALL SELECT 'default '||d.defaclobjtype,a.privilege_type,a.is_grantable FROM pg_default_acl d,LATERAL aclexplode(d.defaclacl) a WHERE a.grantee=(SELECT oid FROM r)
+     UNION ALL SELECT 'default '||d.defaclobjtype::text,a.privilege_type,a.is_grantable FROM pg_default_acl d,LATERAL aclexplode(d.defaclacl) a WHERE a.grantee=(SELECT oid FROM r)
    ) SELECT string_agg(object||' '||privilege_type||CASE WHEN is_grantable THEN '*' ELSE '' END,'; ' ORDER BY object,privilege_type) FROM acl`,
 );
 const inbox = "creator.commerce_provider_inbox";
@@ -186,8 +186,9 @@ step(
   `${grants.split("; ").length} privileges`,
 );
 
-/** Create a privacy job as one account and poll its tasks until they settle. */
-async function job(account, kind) {
+/** Create a privacy job as one account and poll its tasks until they settle.
+ * With waitRetries a task that is retrying has not settled yet. */
+async function job(account, kind, waitRetries = false) {
   const { token } = await signIn(BASE, account);
   const created = await call(BASE, "POST", "/v1/trust/privacy/jobs", {
     token,
@@ -220,7 +221,9 @@ async function job(account, kind) {
     !(
       Object.keys(tasks).length &&
       Object.values(tasks).every(
-        (s) => !/^(pending|running|queued|leased)\b/u.test(s),
+        (s) =>
+          !/^(pending|running|queued|leased)\b/u.test(s) &&
+          !(waitRetries && /^retry\b/u.test(s)),
       )
     ) &&
     Date.now() - began < 300_000
@@ -261,7 +264,7 @@ if (growth) {
         .json?.note === note,
     `${invite.status} ${invite.json?.error?.code ?? ""}`.trim(),
   );
-  const creator = await job(ACTORS.maya, "export");
+  const creator = await job(ACTORS.maya, "export", true);
   const ready = Object.values(creator.tasks ?? {}).every(
     (s) => s === "complete",
   );
