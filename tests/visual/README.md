@@ -46,3 +46,12 @@ over the conflicting artboard heading. Original `.dc.html` files remain intact.
 Paired Light/Night evidence is retained under `evidence/packet-heading/`; regenerate
 with `node scripts/visual-copy-evidence.mjs`. Run the affected packet state with
 `VISUAL_SCREENS=Packet,StepIn VISUAL_STEP=1 pnpm test:visual --grep Packet,StepIn`.
+
+A second explicit correction follows the founder's decision of 2026-10-15: Today
+replaces Notes as the first Studio tab, uses the home glyph at the same size as
+its neighbours, and stays the selected section on Notes. The reference server
+patches the original `StudioTabBar` and `Sidebar` in the served bundle and maps
+the Replies board's `active="Notes"` to Today; the catalog applies the same
+mapping. Queue cards render their actions only when real behavior is supplied,
+so the catalog passes inert handlers to show the designed actions. Request the
+uncorrected source with `?original=1`.

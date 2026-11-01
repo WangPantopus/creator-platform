@@ -746,7 +746,7 @@ public struct FanAppShell: View {
     private var shellNotices: some View {
         VStack(spacing: 0) {
             if !model.error.isEmpty {
-                Notice(tone: .error, title: "Account status", children: model.error, accessibilityIdentifier: model.session == nil && model.error == QelvoraCopy.text("pantopusUnavailable") ? "pantopus-unavailable" : "account-status").padding(16)
+                Notice(tone: .error, title: "Account status", children: model.error, accessibilityIdentifier: model.session == nil && model.error == QelvoraCopy.text("signInUnavailable") ? "sign-in-unavailable" : "account-status").padding(16)
             }
             if model.localPurgeFailed {
                 Button(QelvoraCopy.text("identityPrivateClearRetry"), variant: .secondary, block: true, disabled: model.busy || model.purgingPrivateState) { Task { await model.purge() } }.padding(.horizontal, 16)
