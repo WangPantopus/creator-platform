@@ -28,6 +28,10 @@ import { AgentPipeline } from "../src/modules/agent/pipeline.js";
 import { AgentService } from "../src/modules/agent/service.js";
 import { ShadowReplay } from "../src/modules/agent/shadow.js";
 import {
+  PASSKEY_RETIREMENT,
+  installRegisteredSource,
+} from "./support/registered-source.js";
+import {
   currentShadowSamples,
   type ShadowSample,
 } from "../src/modules/agent/shadow-samples.js";
@@ -103,6 +107,8 @@ describe.skipIf(!adminUrl)(
           timeout: 60000,
         },
       );
+      // Signing reads retired_at, which a registered wave adds (0256).
+      await installRegisteredSource(admin, PASSKEY_RETIREMENT);
       // Configure only a newly created fixture role; never rotate a retained
       // cluster's runtime credential when this suite is repeated.
       if (!existingRole.rowCount)
