@@ -8,6 +8,7 @@ import {
 } from "../../../../packages/api/src/commerce/approval";
 import { SignedActReview } from "../identity/signing";
 import { StudioFailure, studioRequest } from "./api";
+import { useLiveReload, useLiveState } from "./shell/live";
 
 // Validate the owner's current projection before showing approval or delivery.
 type SourcePage = {
@@ -102,7 +103,6 @@ export function ApprovedReply({
     editing = useRef(false),
     pending = useRef(false),
     refreshing = useRef(false),
-    lastCheck = useRef(0),
     generation = useRef(0),
     beforeSequence = useRef<number | null>(null),
     approvalRetry = useRef<{
@@ -140,7 +140,6 @@ export function ApprovedReply({
         editing.current = false;
         setDirty(false);
       }
-      lastCheck.current = Date.now();
       setCurrent(true);
       return saved;
     },
@@ -188,7 +187,6 @@ export function ApprovedReply({
         );
         if (mounted.current && revision === generation.current) {
           setSources(value);
-          lastCheck.current = Date.now();
           setCurrent(true);
         }
       }
@@ -208,22 +206,19 @@ export function ApprovedReply({
       pointer.current = null;
     }
     void refresh();
-    const polling = setInterval(() => void refresh(), 4000);
-    const expiry = setInterval(() => {
-      if (Date.now() - lastCheck.current >= 5000) {
-        setCurrent(false);
-        setReview(false);
-      }
-    }, 500);
-    window.addEventListener("focus", refresh);
     return () => {
       mounted.current = false;
       generation.current++;
-      clearInterval(polling);
-      clearInterval(expiry);
-      window.removeEventListener("focus", refresh);
     };
   }, [pointerKey, refresh]);
+  // The thread's live read (Studio's stream) says when the conversation changed
+  // or was refused; the draft is read again then, not on a timer.
+  const live = useLiveState(),
+    authorized = current && !live?.error;
+  useLiveReload(live ?? { key: "", revision: 0 }, refresh);
+  useEffect(() => {
+    if (live?.error) setReview(false);
+  }, [live?.error]);
   const run = async (work: () => Promise<void>) => {
     if (pending.current) return;
     generation.current++;
@@ -298,7 +293,7 @@ export function ApprovedReply({
           {error}
         </Notice>
       )}
-      {!current && (
+      {!authorized && (
         <p role="status">
           Checking current draft authority. Your input stays here during a
           connection interruption.
@@ -311,8 +306,8 @@ export function ApprovedReply({
       >
         Refresh current draft
       </button>
-      <div hidden={!current} inert={!current}>
-        {!draft && sources && current && (
+      <div hidden={!authorized} inert={!authorized}>
+        {!draft && sources && authorized && (
           <>
             {sources.items.length === 0 ? (
               <p>
@@ -353,7 +348,6 @@ export function ApprovedReply({
                     if (mounted.current) {
                       setSources(page);
                       setSelected("");
-                      lastCheck.current = Date.now();
                       setCurrent(true);
                     }
                   })
@@ -377,7 +371,7 @@ export function ApprovedReply({
             )}
             <button
               className="qv-btn qv-btn--secondary"
-              disabled={!selected || busy || !current}
+              disabled={!selected || busy || !authorized}
               onClick={() =>
                 void run(async () => {
                   const source = sources.items.find(
@@ -413,7 +407,7 @@ export function ApprovedReply({
                 value={text}
                 disabled={
                   busy ||
-                  !current ||
+                  !authorized ||
                   !!approvalRetry.current ||
                   !!deliveryRetry.current
                 }
@@ -433,7 +427,7 @@ export function ApprovedReply({
                 className="qv-btn qv-btn--secondary"
                 disabled={
                   busy ||
-                  !current ||
+                  !authorized ||
                   !dirty ||
                   !text.trim() ||
                   !!approvalRetry.current ||
@@ -459,7 +453,7 @@ export function ApprovedReply({
                 className="qv-btn qv-btn--quiet"
                 disabled={
                   busy ||
-                  !current ||
+                  !authorized ||
                   !dirty ||
                   !!approvalRetry.current ||
                   !!deliveryRetry.current
@@ -478,7 +472,7 @@ export function ApprovedReply({
                 disabled={
                   !creator.owned ||
                   busy ||
-                  !current ||
+                  !authorized ||
                   dirty ||
                   !text.trim() ||
                   !!draft.approval?.deliveredMessageId ||
@@ -513,7 +507,7 @@ export function ApprovedReply({
                   disabled={
                     !creator.owned ||
                     busy ||
-                    !current ||
+                    !authorized ||
                     dirty ||
                     !deliveryAllowed ||
                     !draft.approval ||
@@ -537,7 +531,7 @@ export function ApprovedReply({
                 Retry this signed approval
               </button>
             )}
-            {review && current && !dirty && (
+            {review && authorized && !dirty && (
               <SignedActReview
                 creatorId={creator.id}
                 fanId={fanId}

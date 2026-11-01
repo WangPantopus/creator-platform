@@ -41,10 +41,20 @@ const maya = (await signIn(API, ACTORS.maya, "/studio/ai")).token;
 const replies = async () =>
   (await call(MODEL, "GET", "/__stats")).json?.counts?.reply ?? 0;
 const dbNow = async () => (await sql("SELECT clock_timestamp() AS t"))[0].t;
+// An unknown cost outside an answer (an acknowledgment's check) refuses every
+// later reply for the creator. Inside an answer it counts as that answer's
+// whole cost hold instead (A6b, 0251), so the creator keeps answering.
 const uncertain = async () =>
   (
     await sql(
-      "SELECT count(*)::int AS n FROM creator.ai_usage WHERE creator_id=$1 AND cost_micros IS NULL",
+      "SELECT count(*)::int AS n FROM creator.ai_usage WHERE creator_id=$1 AND cost_micros IS NULL AND generation_id IS NULL",
+      [MAYA_CREATOR_ID],
+    )
+  )[0].n;
+const heldUnknown = async () =>
+  (
+    await sql(
+      "SELECT count(*)::int AS n FROM creator.ai_usage WHERE creator_id=$1 AND cost_micros IS NULL AND generation_id IS NOT NULL",
       [MAYA_CREATOR_ID],
     )
   )[0].n;
@@ -261,7 +271,7 @@ for (const name of cases) {
         (control
           ? `, control frame after ${Math.round(control.at - started)} ms`
           : "") +
-        (leftUncertain ? ", LEFT AN UNCERTAIN PROVIDER COST" : ""),
+        (leftUncertain ? ", LEFT AN UNKNOWN COST OUTSIDE AN ANSWER" : ""),
     );
     if (change.undo) {
       const undone = await change.undo(fan);
@@ -278,6 +288,10 @@ for (const name of cases) {
 }
 regular?.watch.close();
 const left = await uncertain();
-step("no uncertain provider cost left behind", left === 0, `${left} row(s)`);
+step(
+  "no unknown provider cost outside an answer (none locks the creator)",
+  left === 0,
+  `${left} row(s) outside an answer; ${await heldUnknown()} interrupted answer call(s) counted at their whole hold`,
+);
 await closeDb();
 finish();
