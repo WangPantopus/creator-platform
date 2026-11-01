@@ -1,6 +1,6 @@
 "use client";
 import { copy as growthCopy, formatCopy as growthFormat } from "@qelvora/copy";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useGrowthSession } from "./session";
 interface LaunchState {
   publicPage: { path: string; name: string } | null;
@@ -12,6 +12,8 @@ export function LaunchKit() {
   const [loadError, setLoadError] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState("");
+  const attempt = useRef<{ id: string; note: string } | null>(null);
   const load = useCallback(async () => {
     try {
       const value = await request<LaunchState>("launch");
@@ -103,6 +105,21 @@ export function LaunchKit() {
       ) : current ? (
         <a href="/studio/ai">{growthCopy.growthPublishYourAiToStart}</a>
       ) : null}
+      <label htmlFor="growth-invitation-note">
+        {growthCopy.growthInvitationNoteLabel}
+      </label>
+      <textarea
+        id="growth-invitation-note"
+        aria-describedby="growth-invitation-note-hint"
+        value={note}
+        maxLength={600}
+        rows={4}
+        disabled={busy}
+        onChange={(event) => setNote(event.target.value)}
+      />
+      <p className="growth-help" id="growth-invitation-note-hint">
+        {growthCopy.growthInvitationNoteHint}
+      </p>
       <button
         className="qv-btn qv-btn--secondary"
         disabled={busy || !current?.canInvite}
@@ -111,13 +128,19 @@ export function LaunchKit() {
           setBusy(true);
           setMessage("");
           try {
+            if (!attempt.current || attempt.current.note !== note)
+              attempt.current = { id: crypto.randomUUID(), note };
             const result = await request<{ id: string; expires_at: string }>(
               "invites",
-              { method: "POST", body: JSON.stringify({ contextId: null }) },
+              {
+                method: "POST",
+                body: JSON.stringify({ ...attempt.current, contextId: null }),
+              },
             );
             const link = `${window.location.origin}/invite/${result.id}`;
             await navigator.clipboard.writeText(link);
             signal.throwIfAborted();
+            attempt.current = null;
             setMessage(
               growthFormat("growthInvitationCopiedExpires", {
                 value1: new Date(result.expires_at).toLocaleDateString(),
