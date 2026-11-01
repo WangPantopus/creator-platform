@@ -1,3 +1,4 @@
+import studioReplyAuthorityReview from "../../../../../infra/migrations/reviews/20261023-studio-reply-authority.json" with { type: "json" };
 import type { PoolClient } from "pg";
 import { DomainError } from "../../core/errors.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
@@ -151,6 +152,19 @@ export async function assertDomainPrivacyTaskCatalogForReplyReview(
     client,
     domain,
     async () => replyReview.comparison.artifactsCatalogueChecksum,
+  );
+}
+
+/** Fixed122 predecessor metadata; no runtime task authority. */
+export async function assertDomainPrivacyTaskCatalogForStudioReplyAuthority(
+  client: PoolClient,
+  domain: "trust" | "growth",
+) {
+  return assertDomainPrivacyTask(
+    client,
+    domain,
+    async () =>
+      studioReplyAuthorityReview.comparison.artifactsCatalogueChecksum,
   );
 }
 

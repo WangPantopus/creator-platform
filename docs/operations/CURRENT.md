@@ -1,5 +1,17 @@
 # Current state
 
+The founder requested a commit/push/handoff on October27. Start with the
+[latest handoff](session-handoff-2026-10-27.md). Additive0255 now has
+four measured fresh/restored profiles, two30-check restored source probes with
+25 drift refusals each, and a successful closed122→123 upgrade on56780 with
+49/49 catalogue groups and56 digests. See the
+[follower qualification report](core-follow-qualification-2026-10-27.md).
+Fresh123 on56760 has **not** been created; genuine follower runtime/privacy,
+natural expiry and real followers pagination remain unrun. The prepared scenario
+is not acceptance; its durable same-stack resume remains unfinished. Existing122
+results below remain distinct;157 tests were not
+rerun after0255. The upgraded target stays traffic-closed/releaseReady:false.
+
 Continuation resumed October 27, 2026 in the same worktree and draft #517.
 The [runtime continuation report](creator-fan-denial-runtime-2026-10-27.md)
 records current remote heads, owned resources and operated results. All 65
@@ -21,8 +33,17 @@ is preserved. The current-account export completed all eight domains, and all
 four streamed artifacts matched their original byte counts and hashes. The
 subsequent deletion remains blocked by existing owner/retention gates. Its job
 and clocks are preserved;56710 actor6 must not be reused/reset. The separate
-157-test regression is running on an isolated56720 cluster; whole erasure
-remains unclaimed. #516 now preserves its operated native checks at`26915e9f2`.
+backend regression passed157/157 across nine files in158.15 seconds on an
+isolated56720 cluster; whole erasure remains unclaimed. #516 preserves its
+operated native checks at`26915e9f2`. Exact #514`47188ddba` and #516`26915e9f2`
+are now integrated into #517, preserving their web/native readers and evidence
+guard. The combined evidence check passes16 files/678,029 bytes. Fresh122 on
+56730–56733 passed real52-Note member pagination plus lifecycle9/9 and the
+separate seven-cursor UI fixture4/4. Its Growth catalogue retains the known
+46/47 family-pin diagnostic; all52 unpublished Notes/signatures are preserved.
+The concrete Conversation provenance metadata-display mismatch is repaired and
+verified against the unchanged reviewed pin, including a true-grant drift
+refusal. This does not claim completion of the preserved blocked deletion job.
 The following October25 checkpoint remains historical.
 
 Updated October 25, 2026 for the founder-requested handoff. Start with the

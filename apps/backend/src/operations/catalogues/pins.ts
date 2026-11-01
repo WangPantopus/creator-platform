@@ -1,3 +1,4 @@
+import { coreFollowPurposeCatalogue } from "../../modules/growth/core-follow-catalogue.js";
 import type { PoolClient } from "pg";
 import { contentHash } from "../../core/canonical.js";
 import { generationConsumerCatalogue } from "../../core/purpose-catalogue.js";
@@ -64,6 +65,7 @@ const hex = (value: unknown): value is string =>
 const IMMUTABLE: readonly RegExp[] = [
   /^sources\.\d+\.checksum$/u,
   /^denialFunction\.sha256$/u,
+  /^coreFollowDefinitionSha256$/u,
   /^conversationCursorDefinitions\..+$/u,
   /^comparison\.privacy\.definitionSha256$/u,
   /^baselineWave\.sha256$/u,
@@ -158,6 +160,38 @@ export function pinGroups(review: Review, outputShapeTables: string[]) {
           : []),
       ],
       read: (client) => creatorFanDenialPurposeCatalogue(client),
+      select: (facts) =>
+        facts.growthApi ? "with growth_api" : "without growth_api",
+    });
+
+  const follow = review.coreFollowCatalogueChecksum;
+  const followIncoming = review.coreFollowIncomingCatalogueChecksum;
+  if (hex(follow) || hex(followIncoming))
+    groups.push({
+      id: "coreFollowCatalogueChecksum",
+      covers:
+        "exact core Follow metadata: source, isolated purpose, session columns, Follow policies and effective reach",
+      members: [
+        ...(hex(follow)
+          ? [
+              {
+                label: "without growth_api",
+                path: ["coreFollowCatalogueChecksum"],
+                pinned: follow,
+              },
+            ]
+          : []),
+        ...(hex(followIncoming)
+          ? [
+              {
+                label: "with growth_api",
+                path: ["coreFollowIncomingCatalogueChecksum"],
+                pinned: followIncoming,
+              },
+            ]
+          : []),
+      ],
+      read: (client) => coreFollowPurposeCatalogue(client),
       select: (facts) =>
         facts.growthApi ? "with growth_api" : "without growth_api",
     });

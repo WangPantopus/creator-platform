@@ -52,7 +52,7 @@ export async function configureGrowthForBackend(
     weeklyImpactSource?: Parameters<
       typeof createGrowthRuntime
     >[0]["weeklyImpactSource"];
-    /** Actual W8 receipt for the unregistered core Follow proposal; absent stays unavailable. */
+    /** Actual executable/review receipt for the core Follow source; absent stays unavailable. */
     coreFollowMigration?: CoreFollowMigration;
     spendingNotices?: SpendingNotificationReader;
     weeklyImpactNotices?: WeeklyImpactNoticeReader;

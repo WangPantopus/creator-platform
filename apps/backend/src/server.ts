@@ -6,6 +6,7 @@ import { createConfiguredBackend } from "./integration.js";
 import { DevelopmentIdentityAdapter } from "./modules/identity/development.js";
 import { commerceSignedSubjects } from "./modules/commerce/registration.js";
 import { configureGrowthForBackend } from "./modules/growth/configured.js";
+import { registeredCoreFollowMigration } from "./modules/growth/core-follow-catalogue.js";
 import { composeConversationHost } from "./modules/conversation/host.js";
 import { registeredConversationPrivacyReview } from "./modules/conversation/privacy-configuration.js";
 import { accountingRetentionPolicy } from "./modules/trust/accounting-retention-policy.js";
@@ -284,9 +285,11 @@ try {
             const notices: {
               content?: GrowthOwners["notificationState"];
             } = {};
+            const coreFollowMigration = await registeredCoreFollowMigration();
             features.growth = await configureGrowthForBackend({
               ...runtime,
               pool: growthAPIPool ?? runtime.pool,
+              ...(coreFollowMigration ? { coreFollowMigration } : {}),
               ...(host.publicCreatorAI
                 ? { publicCreatorAI: host.publicCreatorAI }
                 : {}),

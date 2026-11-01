@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "scope": "Exact additive held0185 core Follow metadata authority; four independent fresh/restored profiles and runtime qualification required.",
+  "sources": [
+    {
+      "version": "0255_w7_core_follow_metadata",
+      "path": "apps/backend/src/modules/growth/migrations/pending_w7_core_follow_metadata.sql",
+      "checksum": "29c0261cdfce50be434d8b8b49c21e23df6057613d521c8e40a13c3928d63796",
+      "owner": "W7",
+      "name": "w7_core_follow_metadata"
+    }
+  ],
+  "purposeProfiles": [
+    {
+      "review": "original",
+      "sha256": "c4b21eeb4173d1bb9c52ffcd00ae792931772cdca2ef03d174f2e56cf53eee61"
+    },
+    {
+      "review": "original-incoming",
+      "sha256": "097cb1c848f3831930628b4d3eba8ba738d40fc5c687169624fd7df78735f16f"
+    },
+    {
+      "review": "populated-original",
+      "sha256": "c4b21eeb4173d1bb9c52ffcd00ae792931772cdca2ef03d174f2e56cf53eee61"
+    },
+    {
+      "review": "populated-original-incoming",
+      "sha256": "097cb1c848f3831930628b4d3eba8ba738d40fc5c687169624fd7df78735f16f"
+    }
+  ],
+  "runtimeCatalogues": {
+    "output": "bdbe967cf45878f31d4b31c6f5bcdc6cc5b6b04456dae3cf24ec2df7cac25d63",
+    "terminal": "247dcb72e94987132dd10a5c5fa61e9eac216b290a9e51dd7cf409423e9d0a99",
+    "financial": "3f44ac9a7d9856f7b9eaf52c96e184eb926db34d326f6d16f4b8294924baa824",
+    "expiry": "16402dba23b60e3706c6c5654ba9dce74202a1dd78ac1ce1b16f70884b608955",
+    "detached": "6d0c48dc1eba67b520f17128b99f4cb80d2a22bc825adb76b4485a2fa04260e7",
+    "boundary": "04ee076c54f91c8ba840383ddcc07d198f64967febdf8082b85744b78c2cd133",
+    "family": "c86af6193d88a706f6ddb1915b47842875a6f05fc04398d362bacea69cd246e9"
+  },
+  "originalFamilyProfiles": [
+    {
+      "review": "original",
+      "sha256": "c86af6193d88a706f6ddb1915b47842875a6f05fc04398d362bacea69cd246e9"
+    },
+    {
+      "review": "original-incoming",
+      "sha256": "67fe47f511ce34d87bfbd224b608d4578c40236599d4d92b4519fea66c160146"
+    }
+  ],
+  "outputCatalogueChecksum": "26e23e55f217273a99b36616dacfb887b7876d75d2e93fb9b25d8455505a5660",
+  "publicCatalogueChecksum": "2ae90848437cca074bea3144e683c7cbffe22d191541601a0552bcc5a68d784d",
+  "agentExportCatalogueChecksum": "607c2e06f1819aca05673fd61b07bbc0c0a7ac5f075ceff6c8ca6c13183f2a18",
+  "conversationCursorCatalogueChecksum": "556978c8999d94fcc545a828b50aebd73f30cf0b8c7be2bc7425fc317b406134",
+  "provenancePurgeCatalogueChecksum": "56729022392c698ecdfaefa3f7d3a89a122977b00ba7590320250c0c9b1c2c0c",
+  "provenancePurgeIncomingCatalogueChecksum": "04dceb0496d68927461c196b9a589083b9635ead2ea6f1ea86697ee9e377f728",
+  "workerCatalogues": {
+    "creator_commerce_public_read": "fa11d8a8c90d3ae4d2549cdb04c0015e9385bcf3f47ecac51a52ba9bfa9f4fbf",
+    "creator_generation_authority": "69af7e9a7771da39e11dc70a5431afc975fa1d4a191ad430f07671978cf6c369",
+    "creator_generation_conversation_context": "2914ed89ac4d604684bf89f19d1e985259bb65f14a1b6ec0b156039139ece665",
+    "creator_generation_cursor_authority": "0adffff198f815a4de094024aa9c813b92d9ff9b6a2d5f2d607d5090f185d8d2",
+    "creator_generation_terminal_authority": "ae1908a601069f4e715275c51b54d862bf499fa87127c100052be4c5ee28d617",
+    "creator_generation_terminal_discovery": "197dc8e49f94222a1b60e393ab3459f40a95af8e6edd97eef9300fb1d80cff97",
+    "creator_generation_worker": "89a85ea718a07e6f68e3ea798443f78314ed9c2d2d5244e3ca43265b906565ba",
+    "creator_privacy_accounting_boundary": "420c44f16c957e071bc18e534be1086d946113dcfd9016b4302041efc6b68a50",
+    "creator_privacy_family": "31f0b7b73e6703b77c9f5f9a1788a990d4d5ec924146dd259c0d75c9461d259c",
+    "creator_privacy_ownership_metadata": "89a85ea718a07e6f68e3ea798443f78314ed9c2d2d5244e3ca43265b906565ba",
+    "creator_signature_read_authority": "5b07191a1d16a376a6cd2c4a946eb553fd5e150e3624c462e5525c7601739d85",
+    "creator_usage_detachment": "ee51854fd365c4f43c5aeea44b4e781d844ae3190d3c248fbc37f9632c11a0ed",
+    "creator_usage_expiry": "0db0dc0521ed7bd0772b44609deb6e71d1ab667cdddb1b8ef73b341cccf409b4",
+    "creator_w2_generation_guardrail": "89dec0626b7a5d7fe74fb002719b158d050cd50a3f74bd945399afbf6ae40900",
+    "creator_w2_generation_input": "6da154de343ea9384afd5ed93c1d0e35b9a899b349c7745e8b822c1d261f7568",
+    "creator_w2_generation_journal": "45c26cd1f55182415dc674170794539e34bbb97c0b947e9e8707bc67a3360dd9",
+    "creator_w2_generation_metadata": "aa2c3a220ff38ea7be9f8cecfa030d9210c5b679b307386e5a08a5b79f0337ac",
+    "creator_w2_generation_retrieval": "97dab425bd1389bd10f0cc9949fc8d0097669d98130ae16466577c0b0990b410",
+    "creator_w2_generation_terminal_journal": "0340e9ff88eefcd0be5bfe517c320e274c29c372818e41ce540de7c1c709a62d",
+    "creator_w2_privacy_export": "607c2e06f1819aca05673fd61b07bbc0c0a7ac5f075ceff6c8ca6c13183f2a18",
+    "creator_w3_generation_output": "d82a14f21f8137a96f6b1c6fad5fe0da43875a30bb1235f0a1a0bed417a511a0",
+    "creator_w3_generation_privacy": "a43f2aa1723ff687a94f94a24a311c513ce074b0a201d75555dfaaf7a1c66885",
+    "creator_w3_privacy_export": "3bf6046a6d9e79e2eec8f8b274398df8d9d02e7f9da51ebcc265f8b183a50540",
+    "creator_w3_terminal_output": "e8288183de13a3441163fcb3b7201cc5c8932efaacd3e3276d5b172834ffe401",
+    "creator_w4_generation_audience": "ea0bf1aaa12a396b7f77759c507d2beb87c2c92594969f32783030351524aa42",
+    "creator_w4_generation_safety_terminal": "6123779f1ed7a76441aad8dc6941f84c364adca902555c556ec47ff104694fe1",
+    "creator_w4_generation_terminal": "5b464541cafb6c1a8dad53615eee6077705fbcd478d5331754c1c41b3f25e0a3",
+    "creator_w5_generation_origin": "29625fc005f50d419e74af32b1f632f6abb3106f1a36211202864126b4c51f10",
+    "creator_growth_follow_metadata": "4e45051abaa8b57d3fbbe5478fbf5ebbf347d91269c8fd310ac8c06622cc0270"
+  },
+  "conversationCursorDefinitions": {
+    "creator.conversation_privacy_export_rows(uuid,uuid)": "53656e429461ca73c2fb2a4d9b9ffd0a234b4b9cf3e6c2793ac78da9205965fd",
+    "creator.fence_conversation_privacy_export(uuid,uuid,text,uuid,uuid,uuid)": "c20292458ff54df47f4a7a590529109424a143ee62b0e29cb531f7a6891d7033",
+    "creator.finish_conversation_privacy_export_scope()": "a18d439512f89abe047fcfd2494cf48b366aa38ff5c4e5beaf153e98e9819bf8"
+  },
+  "comparison": {
+    "readerCatalogueChecksum": "20ccf95171c78716feebe99309552e9b889e2a04421461d5bc9fda18bc746982",
+    "privacy": {
+      "definitionSha256": "5b39ca6d3af5cd279117e614e955ca88c4eaef50c5735ad4ac42531942f1cbab",
+      "catalogueChecksum": "d3605d77a2a38a9cac9166049e336d815b4beb87f318b77f3cf0527d2cb97ed5"
+    },
+    "artifactsCatalogueChecksum": "0c8133ec8ac138e5d0ab7d4049aa32eafb67cdf7d7bce1f29c2e493982ec1164"
+  },
+  "baselineWave": {
+    "path": "infra/migrations/waves/20261023-studio-reply-authority.json",
+    "sha256": "b4d2c0e5a6aaa206865a62fa63e8f6d46a9176eaa4f4472b30ad9bf82b2072ab"
+  },
+  "replyReviewCatalogueChecksum": "811af86624d081a6b5a24c9f2ebd9372957462b7c4031c5b57098af8c1280ac5",
+  "denialFunction": {
+    "name": "creator_trust.creator_fan_denial(uuid, uuid)",
+    "owner": "creator_trust_denial",
+    "sha256": "56617e812fddf0f407afe208213289de2a84c34daf7074828b90a06409d7bcf1",
+    "grants": [
+      "creator_runtime=X/creator_trust_denial",
+      "creator_trust_denial=X/creator_trust_denial"
+    ]
+  },
+  "creatorFanDenialCatalogueChecksum": "990b5367d7cd0b201ea0438fa1b87b1a6f8aa84310583f34fe7a9a3d5f778141",
+  "creatorFanDenialIncomingCatalogueChecksum": "c574936c917375a1ef95b82144f0248553e43dee851e09cb1c6f27a283433017",
+  "coreFollowDefinitionSha256": "1b09d91fe20b712f5452ca5d79fa352f94482283edeaaac4543558975c761a78",
+  "coreFollowCatalogueChecksum": "48020ae2ec5c0a723418afef80e9170ba451eaf87de857582b78da6302377d89",
+  "coreFollowIncomingCatalogueChecksum": "65c1ad724664ca274c1cbd81c87d7275c0997089365bb7135117ecdc071655db"
+}

@@ -238,3 +238,80 @@ not evidence that the accepted signed reaction failed.
 The157-test backend rerun uses a separate owned PostgreSQL cluster on56720,
 `qelvora-regress122-1027-postgres`, so its disposable regression databases and
 test-role setup cannot mutate any application or restored cluster.
+
+That rerun passed **157/157 in nine files,158.15 seconds**, with no skipped
+files/tests. It included the existing10,000-pair PostgreSQL scope check, money,
+shadow, historical pipeline and worker-lifetime coverage. No unit tests were
+added. Private output is `backend-157.log`; the tested backend subtree is exactly
+the accepted122 source before the subsequent catalogue-display repair.
+
+## Reused app branches
+
+After the operated122 results, exact #514`47188ddba` and #516`26915e9f2` were
+merged into this existing #517 branch. The sole textual conflict was historical
+CURRENT prose; current acceptance results and #514's historical details were
+both retained. No backend, SQL, registry, API-contract or dependency bytes changed
+in those merges. Exact Git-object comparisons confirm #514's final web reader,
+evidence checker and CI job, plus #516's full iOS/Android/lane7 trees, are retained.
+No PR was merged to main and no existing branch history was rewritten.
+
+The real committed-tree evidence guard against #515 passed **16 changed files,
+678,029/1,000,000 bytes**, with the300,000-byte per-file cap and duplicate checks
+intact. New session screenshots and private receipts remain outside Git.
+The unchanged native blobs retain their operated same-reaction evidence;
+combined web pagination/lifecycle verification uses separate fresh actors.
+
+## Conversation catalogue rendering repair
+
+The actual Conversation deletion refusal exposed an existing metadata-display
+defect. With the default runtime search path, `pg_get_functiondef` rendered the
+extension types as `halfvec`/`vector`; the independently reviewed catalogue used
+`public.halfvec`/`public.vector`. The exact0217 source/function and original
+privacy-family guard already matched. This was not a missing migration.
+
+The existing provenance catalogue reader now uses the Conversation cursor's
+bounded, same-client savepoint pattern: read under `pg_catalog`, then restore the
+caller's original search path on success. A failed or uncertain read escapes to
+the original connection custodian without helper cleanup queries. No SQL,
+registry entry, review pin, retention policy or authority check changed.
+
+Six metadata qualification groups passed on56710: actual prepared-owner
+construction, three caller search paths with unchanged client/outer transaction,
+a real extra column grant refused in an administrator-owned rollback transaction,
+and acceptance restored after rollback. All three legitimate paths match the
+existing incoming pin
+`d228755d492e8e4f86b9a68df280eb93a33b9cedec5a66d63f1a071b9d8e217c`.
+Backend typecheck, focused lint/format and whitespace checks passed. Private
+evidence is `/tmp/qelvora-provenance-1027-dzP1aO/metadata-qualification.json`.
+
+This is metadata-preparation acceptance, not completion of the original deletion
+job. No fresh actor6 session, retry, erasure receipt or job-clock change was
+created to claim completion. The fresh combined-web stack on56730–56733 started
+with this source repair;56710's original job remains preserved and blocked.
+
+## Combined web rerun
+
+The separate `studio-web-1027` stack runs fresh122 with Growth on
+DB56730/API56731/web56732/model56733. Its stock `tsx` host executes source; no
+backend dist bundle existed or was used. The startup receipt records
+`8d4e09000` plus the then-uncommitted provenance repair. That repair is now
+committed in`2268d8d99`; all captured backend source bytes stayed unchanged
+through these checks.
+
+The existing real `members` pagination workflow, with its existing lifecycle
+checks invoked before scoped cleanup, passed **9/9, exit0**. It published52
+actual signed Notes, checked two audience-filtered windows, older-page loading,
+empty-window cursor continuation, retraction and duplicate exclusion, plus
+offline/pagehide/failure/five-second expiry behavior. All52 Notes were then
+unpublished through the existing cleanup; their records and52 signatures remain.
+No privacy job was created. The small `--pagination-lifecycle` scenario option
+reuses those same four checks while a real Note remains authorized.
+
+The separate seven-cursor browser fixture passed **4/4, exit0**, covering five
+retained cursors/concurrent reads, head-first deduplication, atomic sibling-failure
+concealment and shared expiry with late-response refusal. This establishes UI
+mechanics only; actual reaction acceptance is the earlier preserved fixture.
+Screenshots were inspected. Live Growth catalogue remains **46/47,53 digests,
+zero unknown groups**, solely the same family-pin diagnostic; both provenance
+and incoming profiles pass. Private receipts/logs/source hashes are under
+`/tmp/qelvora-studio-reply-1027/combined-web/`.
