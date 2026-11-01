@@ -135,7 +135,7 @@ export function contentFeature(service: ContentService): FeatureRegistration {
           async (client) =>
             (
               await client.query<{ wait: number | null }>(
-                "SELECT extract(epoch FROM (min(next_at)-now()))::float AS wait FROM creator.content_effect WHERE creator_id=$1 AND state<>'done' AND type IN('published','reaction')",
+                "SELECT extract(epoch FROM (min(next_at)-now()))::float AS wait FROM creator.content_effect WHERE creator_id=$1 AND state<>'done' AND type IN('published','withdrawn','reaction')",
                 [creatorId],
               )
             ).rows[0]?.wait ?? null,
@@ -202,15 +202,13 @@ export function contentFeature(service: ContentService): FeatureRegistration {
           ),
         ),
       );
-      router.post("/:creatorId/drafts", async (req, res) =>
-        res.json(
-          await service.save(
-            await actorFor(req),
-            z.uuid().parse(req.params.creatorId),
-            req.body,
-          ),
-        ),
-      );
+      router.post("/:creatorId/drafts", async (req, res) => {
+        const actor = await actorFor(req),
+          creatorId = z.uuid().parse(req.params.creatorId);
+        res.json(await service.save(actor, creatorId, req.body));
+        // Editing a published post withdraws its public version until re-signed.
+        await deliver(actor, creatorId);
+      });
       router.get("/:creatorId/replies", async (req, res) =>
         res.json(
           await service.replies(
@@ -378,28 +376,32 @@ export function contentFeature(service: ContentService): FeatureRegistration {
         );
       });
       router.post("/:creatorId/:id/unpublish", async (req, res) => {
-        const p = ids(req);
+        const p = ids(req),
+          actor = await actorFor(req);
         res.json(
           await service.lifecycle(
-            await actorFor(req),
+            actor,
             p.creatorId,
             p.id,
             "unpublish",
             req.body,
           ),
         );
+        await deliver(actor, p.creatorId);
       });
       router.post("/:creatorId/:id/archive", async (req, res) => {
-        const p = ids(req);
+        const p = ids(req),
+          actor = await actorFor(req);
         res.json(
           await service.lifecycle(
-            await actorFor(req),
+            actor,
             p.creatorId,
             p.id,
             "archive",
             req.body,
           ),
         );
+        await deliver(actor, p.creatorId);
       });
       router.post("/:creatorId/:id/replies", async (req, res) => {
         const p = ids(req);

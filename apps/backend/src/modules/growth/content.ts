@@ -293,7 +293,12 @@ export function contentPublicProjection(
       await growth.withdrawContent(
         current.creatorId,
         current.id,
-        current.version,
+        // Saving an edit creates the next draft revision. Withdraw the former
+        // publication without tombstoning that never-published draft: it can
+        // still be signed and published at its own version later.
+        current.state === "draft"
+          ? Math.max(1, current.version - 1)
+          : current.version,
       );
     return {
       reference: `growth-public:${current.id}:${current.version}:${publicState ? "published" : "withdrawn"}`,

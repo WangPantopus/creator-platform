@@ -1042,6 +1042,8 @@ export class ContentService {
                 existing.version,
               );
             await this.withdrawSignature(client, actor, existing);
+            if (existing.state === "published")
+              await this.effect(client, existing, "withdrawn");
             await this.effect(client, existing, "source_revoke");
             await client.query(
               "UPDATE creator.content_index SET version=$3,state='draft',audience=$4,kind=$5,scheduled_at=$6,published_at=NULL,withdrawn_at=now(),quote_reply_id=$7,quote_consent_version=$8,packet_id=$9 WHERE id=$1 AND creator_id=$2",
