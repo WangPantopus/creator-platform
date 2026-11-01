@@ -72,7 +72,19 @@ const server = http.createServer((req, res) => {
       .replace(
         "h(Button, { variant: 'secondary', block: true }, 'Join Kiln Club · $5 a month')));",
         "h(Button, { variant: 'secondary', block: true }, 'Join Kiln Club · $5 a month')), h(StepIn, { name: name }));",
-      );
+      )
+      // Founder decision 2026-10-15: Today replaces Notes as the first Studio
+      // tab, with the home glyph at the same size as its neighbours.
+      .replace(
+        "var tabs = [['Notes', G.broadcast], ['Requests', G.inbox]",
+        "var tabs = [['Today', G.home], ['Requests', G.inbox]",
+      )
+      .replace("t[1](t[0] === 'Notes' ? 17 : 22)", "t[1](22)")
+      .replace(
+        "var main = [['Notes', G.broadcast], ['Requests', G.inbox]",
+        "var main = [['Today', G.home], ['Requests', G.inbox]",
+      )
+      .replace("t[1](t[0] === 'Notes' ? 15 : 20)", "t[1](20)");
     type = "text/javascript";
   } else if (url.pathname.startsWith("/fonts/")) {
     const name = path.basename(url.pathname);
@@ -110,6 +122,13 @@ const server = http.createServer((req, res) => {
           url.searchParams.get("original") === "1"
             ? "What Maya will see"
             : "Included in your request",
+        )
+        // Today stays the selected Studio section on Notes (2026-10-15).
+        .replaceAll(
+          'StudioTabBar" active="Notes"',
+          url.searchParams.get("original") === "1"
+            ? 'StudioTabBar" active="Notes"'
+            : 'StudioTabBar" active="Today"',
         );
   }
   if (data === undefined) {

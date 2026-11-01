@@ -1,0 +1,483 @@
+{
+  "run": "eaf38f",
+  "web": "http://localhost:56662",
+  "api": "http://127.0.0.1:56661",
+  "creatorId": "20000000-0000-4000-8000-000000000001",
+  "fanId": "bfce1fcb-b0b1-451a-9a96-7d19a5fa8880",
+  "fixtureKind": "members",
+  "membership": {
+    "membership": "5afe50f6-545b-470f-a7c3-5be91593b2ca",
+    "grant": "7a1120fd-cf5c-46db-b93f-8f3037a64627"
+  },
+  "excludedTier": "b535a1b4-6a2c-484f-8dbf-6440fcde4308",
+  "notes": [
+    {
+      "id": "28833fe3-bb4b-4f44-9659-94a018c977b4",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "9aadecae-ec53-43bd-aa13-e88802029f29",
+      "text": "Pagination eaf38f 0: eligible Note",
+      "visible": true,
+      "retracted": true
+    },
+    {
+      "id": "263de111-fddb-4968-95cb-0e902ad89644",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "ffee5708-60c9-49ac-b1a0-b84edc64a097",
+      "text": "Pagination eaf38f 1: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "c01d563e-97eb-471a-9ca6-5d853d744534",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "adbb8178-677b-4ea8-acd5-dec9f32dfe4f",
+      "text": "Pagination eaf38f 2: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "4a108417-8958-4948-a506-312901b68097",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "f006b75c-8fed-4670-b023-57ede10dadbc",
+      "text": "Pagination eaf38f 3: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "2f8989c0-05fd-41ca-91da-5dfb9edce4e6",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "8121e926-d301-48d2-b764-011470562e16",
+      "text": "Pagination eaf38f 4: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "71bd7acf-c5ea-4ddb-a346-efb05eb2c4b9",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "0b29caa6-ebad-4c19-a737-0fae4eb398ae",
+      "text": "Pagination eaf38f 5: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "ef891902-7ebf-4407-a0e3-43d9c327a9a4",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "d2480682-8dc3-4d71-a0b0-6b9567e7b4d5",
+      "text": "Pagination eaf38f 6: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "084197ca-b91a-4124-ab4b-8c4d4d9db987",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "e2f599c8-15de-4846-a400-624125144ed1",
+      "text": "Pagination eaf38f 7: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "ed1ceb9b-3e9d-48e2-b836-71b3f074f217",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "4e07662a-6756-4d83-bb4c-7bf77d6be063",
+      "text": "Pagination eaf38f 8: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "7a6a28f1-00bf-416f-961c-0094729d8026",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "609ac440-cc7e-4b2f-a0fa-5ea537f3dd7d",
+      "text": "Pagination eaf38f 9: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "938fce87-c662-4c1d-95c8-2a3a908c0661",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "d5b21c41-434e-469a-9e0a-3833ef8d84c2",
+      "text": "Pagination eaf38f 10: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "3cce2e84-e711-48de-a231-0141c5db6a67",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "8bcf6246-ea6c-498c-8a6e-c9118ff84374",
+      "text": "Pagination eaf38f 11: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "354b1de9-42ec-4ddf-aa64-514c629db870",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "71a43a9f-83ef-4fa2-8a13-209369f7fbfe",
+      "text": "Pagination eaf38f 12: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "3f46a6a8-eabb-4039-b23c-e84fa9f94a4b",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "d8b51d60-3745-45f2-a595-a9aaa8fbf955",
+      "text": "Pagination eaf38f 13: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "e10e97e9-3bed-4a5d-8cd5-802195991ee8",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "987420d2-2b74-44aa-836a-0495d5fefa6d",
+      "text": "Pagination eaf38f 14: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "8473661a-96c3-4c0e-9e6d-f884801a3836",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "fd9a7ba4-06c8-4cb2-8bf8-4230224e027f",
+      "text": "Pagination eaf38f 15: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "99c4d0ce-baea-4a47-a761-528b4aa521da",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "d22fd1bc-5da4-488d-96b0-421b8276dc7e",
+      "text": "Pagination eaf38f 16: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "8317f802-4ea1-4666-a55b-9da63768fa1a",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "9390a589-d335-405d-b1b0-2ca4e29f1fd2",
+      "text": "Pagination eaf38f 17: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "e3d78a43-2c31-4d2d-868c-6f2710df63dd",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "5c202e82-2dd6-4183-958e-8f61758ce81e",
+      "text": "Pagination eaf38f 18: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "bc5e5d8d-8906-421f-a260-ad3eb25854e2",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "53301ea5-d7a9-4dc2-8257-f55d5590c2ce",
+      "text": "Pagination eaf38f 19: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "5bc70021-b1b5-4346-8966-467afcf5cb91",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "4ad09cfa-63a3-487f-ba8b-c2b82a769ca7",
+      "text": "Pagination eaf38f 20: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "a365ace5-bb52-47d6-8ffb-f015091a72ec",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "48c04f8b-00fa-4c56-8479-850d724bd4e1",
+      "text": "Pagination eaf38f 21: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "c3a716b6-f6fe-410b-933c-9df5a811f19c",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "90c195ef-44e4-48f0-8a3e-7109a037bdbe",
+      "text": "Pagination eaf38f 22: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "95faa578-8544-4fc9-b980-e2dc2aa7e107",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "9e41fd5c-0584-41cb-a3fe-064e3a6b5657",
+      "text": "Pagination eaf38f 23: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "bc658097-cf95-4581-a9d5-90bdeed8368f",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "8532a5cb-2920-42d7-a30d-15b03761abae",
+      "text": "Pagination eaf38f 24: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "941547af-b079-4d93-84f8-294bd8abe3d3",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "4ef44223-b143-45f1-b7a2-f01384326e0e",
+      "text": "Pagination eaf38f 25: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "5bbdfbd3-e131-4701-85cc-9d52585d8dc9",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "d33af74b-90fd-4ab8-a17e-367dc7a8f7b9",
+      "text": "Pagination eaf38f 26: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "ea541152-5cd1-4d5b-b391-9ad5c5eb6bde",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "43de8416-391d-4e25-9b65-e478efd2e2da",
+      "text": "Pagination eaf38f 27: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "14fb51e4-df10-4180-8d1e-0a75adc62454",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "d57db570-814f-4bfd-b39b-553d6ba3db58",
+      "text": "Pagination eaf38f 28: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "61865d4d-3d7a-4fe2-92c9-fb77814656a9",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "f5b0c22c-6113-4fac-83e3-d8aed49093bc",
+      "text": "Pagination eaf38f 29: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "899c11ca-5a78-49ba-93af-98e1cf962012",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "ffe97a0a-e870-44ed-a72b-d1f580c8a64e",
+      "text": "Pagination eaf38f 30: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "f987939b-a83c-4ab3-b94d-731040547bdb",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "fd869810-3499-4c3c-9525-799177adde89",
+      "text": "Pagination eaf38f 31: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "9272eb73-6f3a-46d2-aacc-3ada9eabd73c",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "86a253d4-9daa-4560-96d8-4ea1d3ce2ce8",
+      "text": "Pagination eaf38f 32: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "5c3fc7f7-2a6d-4b78-aad3-231c860765e3",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "87fced79-2033-4ae5-8dbd-fe97ea15acf4",
+      "text": "Pagination eaf38f 33: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "fcc48fb9-aa6c-4789-99e6-0bb9270280bc",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "a6a3a36d-72cc-4498-ac12-dca960bbe78d",
+      "text": "Pagination eaf38f 34: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "2ca172f3-f14e-4267-ae96-1d5d68cf904d",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "5e4fcd44-960f-428e-9887-4f54fd0b28f5",
+      "text": "Pagination eaf38f 35: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "b37f86a0-b9b8-478c-9631-6cb78da57083",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "e44c144b-e98d-44f2-a9f2-a5fc678fba9d",
+      "text": "Pagination eaf38f 36: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "17362ca8-fa31-42e0-bf79-c72d1b2aa026",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "5ce9cfae-99a3-452b-8f46-a41e0e8f2e16",
+      "text": "Pagination eaf38f 37: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "9c5f76d4-8f62-4232-812a-1f610ff93141",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "d46f358b-4794-4801-ba39-a8478b0f8a75",
+      "text": "Pagination eaf38f 38: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "e4df60be-57de-48a5-8de4-730f9fcabbe0",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "3d2297a5-9088-46ed-945a-b719d3f28227",
+      "text": "Pagination eaf38f 39: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "26d8cebc-73bb-498b-a9e3-4db38219196f",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "0f19bccc-ab1f-4da6-93dd-222f2acfbb4d",
+      "text": "Pagination eaf38f 40: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "907103fd-4ea0-467e-a46a-f486608e7aad",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "0210338d-3897-4f2c-8abe-d4b4057e185f",
+      "text": "Pagination eaf38f 41: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "ab46862c-d931-4699-af4e-8743658d3743",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "3a5e4751-d207-4e6c-9305-132d378c7b89",
+      "text": "Pagination eaf38f 42: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "8d0e3960-9659-49a7-a47c-5088d9e8ce6a",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "b386b192-e5e1-41dd-ade0-5ff28bb86bd5",
+      "text": "Pagination eaf38f 43: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "d5905b34-9f97-4eb6-b81f-92fd6122e787",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "c69d1bd2-dafd-45cd-b0dd-26e9542ce6a2",
+      "text": "Pagination eaf38f 44: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "ed1d6b71-05d0-41b5-928f-761aa91abc3c",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "db6cfb71-439f-4d55-9874-7e89c800b30f",
+      "text": "Pagination eaf38f 45: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "687abe26-b270-443a-87a1-5c76953b2d0a",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "1cc219b9-e6dc-4637-be7b-771f03ed66ae",
+      "text": "Pagination eaf38f 46: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "88891628-394b-46cc-b208-baa48357075d",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "d1363168-ac89-4a0b-97a9-b489113c9023",
+      "text": "Pagination eaf38f 47: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "d5914ad4-50f9-4931-9ab7-507ac02ef9ec",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "3b792af5-e99c-47e2-ad21-377b10081464",
+      "text": "Pagination eaf38f 48: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "3e6c3072-88ed-4487-8f61-5201c8672746",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "1ccb99e7-c548-4735-97ca-eea2db8054de",
+      "text": "Pagination eaf38f 49: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "7f715235-3596-4d1b-adb1-79c4405e6460",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "fd4ae516-3714-4ec3-a378-0596d1988b97",
+      "text": "Pagination eaf38f 50: outside audience Note",
+      "visible": false,
+      "retracted": true
+    },
+    {
+      "id": "1d94d669-d9f1-425a-a6a8-d45906ec0e57",
+      "version": 3,
+      "state": "published",
+      "signed_act_id": "a1e24fa7-2815-41de-acdf-75068e959b50",
+      "text": "Pagination eaf38f 51: eligible Note",
+      "visible": true,
+      "retracted": true
+    }
+  ]
+}

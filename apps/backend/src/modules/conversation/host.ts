@@ -41,6 +41,7 @@ import {
   type IntroOfferRetention,
 } from "../identity/intro-offers.js";
 import { ConversationRecordings } from "./recordings.js";
+import { PreparedConversationRecordingAssociations } from "./recording-associations.js";
 import type { PreparedConversationPrivacyCursor } from "./privacy-export-cursor.js";
 import type {
   ConversationPrivacyOwnerPorts,
@@ -411,6 +412,17 @@ export async function composeConversationHost(
           correctionMigrationVersion: migrations.correction,
         })
       : undefined;
+  // Privacy must read existing associations even when interactive media is off.
+  const recordingAssociations =
+    recordings?.associations ??
+    (lineage
+      ? await PreparedConversationRecordingAssociations.prepare({
+          database: runtime.database,
+          access: runtime.access,
+          migrationVersion: migrations.recording,
+          correctionMigrationVersion: migrations.correction,
+        })
+      : undefined);
   let accountingPreparation: GenerationAccountingPreparation | undefined;
   if (producers.privacyAccounting) {
     invariant(
@@ -418,7 +430,7 @@ export async function composeConversationHost(
         usageRetention &&
         commerce?.allowance &&
         lineage &&
-        recordings &&
+        recordingAssociations &&
         producers.privacyCursor,
       "conversation_accounting_unavailable",
       "Accounting privacy requires the host's original journal, expiry, financial and complete export owners.",
@@ -637,7 +649,7 @@ export async function composeConversationHost(
         : {}),
       ...(accountingPreparation ? { accountingPreparation } : {}),
       ...(lineage ? { lineage } : {}),
-      ...(recordings ? { recordings } : {}),
+      ...(recordingAssociations ? { recordings: recordingAssociations } : {}),
       ...(journal && producers.privacyCursor
         ? {
             cursorPreparation: {
@@ -656,10 +668,14 @@ export async function composeConversationHost(
     close(): Promise<void> {
       closing ??= (async () => {
         comparisonHost?.close();
-        // Stop admissions synchronously, then retain the actual ingestion
-        // promise until its final job/accounting work has settled.
+        // Stop admissions synchronously, then retain every owned promise
+        // until its final provider, job, and accounting work has settled.
+        const evaluating = agent.service.close();
+        const shadowing = agent.shadow?.close();
         const draining = ingesting.close();
         const outcomes = await Promise.allSettled([
+          evaluating,
+          shadowing,
           draining,
           Promise.resolve().then(() => conversation.close()),
         ]);

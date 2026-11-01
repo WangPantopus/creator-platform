@@ -24,6 +24,17 @@ const notes = () =>
 async function sign(text, { double = false } = {}) {
   await page.goto(`${WEB}/studio/${MAYA}/today`);
   await page.getByRole("link", { name: "New Note" }).click();
+  expect(
+    (await page.locator(".w5-tabs [aria-current='page']").innerText()) ===
+      "Today",
+    "the composer does not keep Today selected",
+  );
+  expect(
+    (await page.locator(".w5-editor .qv-author").innerText()).includes(
+      "Maya · to all members",
+    ),
+    "the preview differs from the published audience label",
+  );
   await page.locator("#note-text").fill(text);
   const review = page.getByRole("button", { name: "Review and sign" });
   await (double ? review.dblclick() : review.click());
@@ -36,17 +47,28 @@ async function sign(text, { double = false } = {}) {
 await step("E6.2-1", "Studio opens on Today", async () => {
   await page.goto(`${WEB}/studio/${MAYA}`);
   await today().waitFor();
+  const firstTab = page.locator(".w5-tabs a").first();
+  expect(
+    (await firstTab.innerText()) === "Today" &&
+      (await firstTab.getAttribute("aria-current")) === "page" &&
+      (await firstTab.getAttribute("href")) === `/studio/${MAYA}/today`,
+    "Today is not the first, selected Studio tab",
+  );
+  await page.goto(`${WEB}/studio/${MAYA}/notes`);
+  await page.getByRole("heading", { name: "Notes", level: 1 }).waitFor();
+  await page.locator(".w5-tabs [aria-current='page']").click();
+  await today().waitFor();
   await page.goto(`${WEB}/studio/workspace`);
   const href = await page
     .getByRole("link", { name: /Maya/ })
     .first()
     .getAttribute("href");
   expect(href === `/studio/${MAYA}/today`, `workspace links to ${href}`);
-  return `/studio/{id} and the workspace both open Today`;
+  return `/studio/{id} and the workspace open Today; Notes keeps Today selected and its tab returns there`;
 });
 const before = (await notes()).length;
 const words =
-  "Opened the kiln this morning. The celadon came out the color of shallow water.";
+  "Opened the kiln this morning.\n\nThe celadon came out the color of shallow water.";
 await step("E6.2-2", "one tap starts a Note; sign; back on Today", async () => {
   await sign(words);
   await page.getByText(words).waitFor();
@@ -62,6 +84,13 @@ await step("E6.2-2", "one tap starts a Note; sign; back on Today", async () => {
       );
     });
   expect(left < 4, `English Note starts ${left} px from the left`);
+  const body = page.locator(".qv-note__body > p").first();
+  expect(
+    (await body.innerText()) === words,
+    "the Note lost its paragraph breaks",
+  );
+  const whitespace = await body.evaluate((e) => getComputedStyle(e).whiteSpace);
+  expect(whitespace === "pre-wrap", `paragraph white-space: ${whitespace}`);
   const all = await notes();
   const last = all.at(-1);
   expect(
@@ -194,8 +223,8 @@ await step(
       (i) => i.text === mixed,
     );
     expect(seen, "member does not see the exact text");
-    // The shared Note component collapses line breaks (ticket to the integrator);
-    // here the words must be exact and the first, Arabic, character at the right.
+    // Published Notes preserve paragraph breaks and take direction from each
+    // paragraph; the first, Arabic, character starts at the right.
     const p = page.locator(".qv-note__body > p").first();
     const shown = await p.evaluate((e) => {
       const range = document.createRange();
@@ -205,7 +234,7 @@ await step(
       return [e.innerText, box.right - range.getBoundingClientRect().right];
     });
     expect(
-      shown[0] === mixed.replace("\n", " ") && shown[1] < 4,
+      shown[0] === mixed && shown[1] < 4,
       `${shown[1]} px from the right: ${shown[0]}`,
     );
     await page.screenshot({

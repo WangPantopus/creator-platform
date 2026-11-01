@@ -8,6 +8,21 @@ concurrency:
   group: foundation-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  evidence-budget:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+      - name: Check committed review evidence
+        env:
+          QELVORA_EVIDENCE_BASE: ${{ github.event.pull_request.base.sha }}
+          QELVORA_EVIDENCE_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: node scripts/check-evidence-budget.mjs --base "$QELVORA_EVIDENCE_BASE" --head "$QELVORA_EVIDENCE_HEAD"
   web-and-backend:
     runs-on: ubuntu-latest
     services:

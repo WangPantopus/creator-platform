@@ -24,6 +24,8 @@ public struct Welcome: View {
     public var onContinue: (() -> Void)?
     public var contextSource: String?
     public var contextTitle: String?
+    public var continueLabel: String?
+    public var accountNote: String?
     public var bodyCopy: String?
     public var onRemoveContext: (() -> Void)?
     @State private var hasContext = true
@@ -31,9 +33,10 @@ public struct Welcome: View {
     @State private var signInUnavailable = false
     @Environment(\.colorScheme) private var scheme
 
-    public init(returnTo: String = "/creators/maya", signIn: any PantopusSignInProvider = UnavailablePantopusSignIn(), showContext: Bool = true, contextSource: String? = nil, contextTitle: String? = nil, bodyCopy: String? = nil, onRemoveContext: (() -> Void)? = nil, onContinue: (() -> Void)? = nil, onAuthenticated: @escaping (PantopusIdentity, String) -> Void = { _, _ in }) {
+    public init(returnTo: String = "/creators/maya", signIn: any PantopusSignInProvider = UnavailablePantopusSignIn(), showContext: Bool = true, contextSource: String? = nil, contextTitle: String? = nil, continueLabel: String? = nil, accountNote: String? = nil, bodyCopy: String? = nil, onRemoveContext: (() -> Void)? = nil, onContinue: (() -> Void)? = nil, onAuthenticated: @escaping (PantopusIdentity, String) -> Void = { _, _ in }) {
         self.returnTo = returnTo; self.signIn = signIn; self.onAuthenticated = onAuthenticated
         self.onContinue = onContinue; _hasContext = State(initialValue: showContext)
+        self.continueLabel = continueLabel; self.accountNote = accountNote
         self.contextSource = contextSource; self.contextTitle = contextTitle; self.bodyCopy = bodyCopy; self.onRemoveContext = onRemoveContext
     }
 
@@ -55,9 +58,9 @@ public struct Welcome: View {
                     .padding(.vertical, QelvoraTokens.token("space-6"))
                     VStack(spacing: QelvoraTokens.token("message-padding")) {
                         if hasContext { ContextCard(source: contextSource ?? QelvoraCopy.text("welcomeSource"), title: contextTitle ?? QelvoraCopy.text("welcomeContext"), onRemove: { hasContext = false; onRemoveContext?() }) }
-                        Button(QelvoraCopy.text("continueWithPantopus"), variant: .secondary, size: .lg, block: true, disabled: connecting, action: continueWithPantopus)
+                        Button(continueLabel ?? QelvoraCopy.text("continueWithPantopus"), variant: .secondary, size: .lg, block: true, disabled: connecting, action: continueWithPantopus)
                             .accessibilityIdentifier("continue-with-pantopus")
-                        Text(QelvoraCopy.text("pantopusAccount")).qText("caption").foregroundStyle(qColor("ink-muted", scheme)).multilineTextAlignment(.center)
+                        if accountNote != "" { Text(accountNote ?? QelvoraCopy.text("pantopusAccount")).qText("caption").foregroundStyle(qColor("ink-muted", scheme)).multilineTextAlignment(.center) }
                         if signInUnavailable { Text(QelvoraCopy.text("pantopusUnavailable")).qText("caption").foregroundStyle(qColor("alert", scheme)).accessibilityIdentifier("pantopus-unavailable") }
                     }
                 }

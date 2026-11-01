@@ -151,8 +151,17 @@ step(
   minorPage.url(),
 );
 step(
-  "with no session and no links into the product",
+  "with no session and only the under-18 policy link",
   !(await cookie(minor, SESSION)) &&
+    (await minorPage.locator("main a").count()) === 1 &&
+    (await minorPage.locator("main a").getAttribute("href")) ===
+      "/auth/under-18",
+);
+await minorPage.locator('main a[href="/auth/under-18"]').click();
+step(
+  "the under-18 policy opens without a session or product links",
+  new URL(minorPage.url()).pathname === "/auth/under-18" &&
+    !(await cookie(minor, SESSION)) &&
     (await minorPage.locator("main a").count()) === 0,
 );
 await signIn(minorPage, "google", minorSub);

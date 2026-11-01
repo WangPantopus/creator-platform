@@ -250,6 +250,10 @@ export function Compose({
     }
   };
   const plannedAnswer = !!document.planRef;
+  const audienceLabel =
+    document.audience.kind === "members"
+      ? "all members"
+      : document.audience.kind;
   // Anyone in the chosen audience right now (the creator's own view only). A
   // Note to nobody still publishes: members who join later can read it.
   const tierReach = (ids: string[]) =>
@@ -437,11 +441,8 @@ export function Compose({
         <p className="qv-help">
           {creator.owned ? (
             <>
-              It's labeled “{creator.display_name} · to{" "}
-              {document.audience.kind === "members"
-                ? "all members"
-                : document.audience.kind}
-              ” everywhere.
+              It's labeled “{creator.display_name} · to {audienceLabel}”
+              everywhere.
             </>
           ) : document.kind === "post" ? (
             `A team publication stays labeled “${creator.display_name}'s team · ${creator.memberHandle}”.`
@@ -533,7 +534,7 @@ export function Compose({
               : "team"
           }
           name={creator.display_name}
-          audience={document.audience.kind}
+          audience={audienceLabel}
           member={creator.memberHandle ?? "Team draft"}
           onMaya={creator.owned}
         />

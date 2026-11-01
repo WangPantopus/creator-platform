@@ -19,5 +19,5 @@
     "kind": "verification",
     "from": "today"
   },
-  "fanHandleExemptPathPattern": "^/(?:identity/account|status|ops(?:/.*)?|studio/(?:workspace|[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/team))$"
+  "fanHandleExemptPathPattern": "^/(?:identity/account|status|ops(?:/.*)?|studio/(?:workspace|setup|[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/team))$"
 }

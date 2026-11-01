@@ -131,9 +131,10 @@ never sells any rung (INV-21).
 segments **Chat**, **Posts**, **Requests**, **Access**. Primary action:
 "Message Maya's AI" (AI colored).
 
-**Creator studio** (organized around the queue): **Notes** (first tab on phone),
-**Requests**, **Threads**, **My AI**, **Offers**, **Publish**, **Insights**,
-**Earnings and team** (including License and sponsorships).
+**Creator studio** opens on **Today** (first tab on phone), with **Notes** one
+tap from Today. The remaining phone tabs are **Requests**, **Threads**, **My AI**
+and **More**. More holds **Offers**, **Publish**, **Insights**, and **Earnings and
+team** (including License and sponsorships).
 
 The two screens where everything meets, and which get the most design attention:
 the **fan thread** (S-F5) and the **creator packet detail** (S-C4).
@@ -184,7 +185,7 @@ slice is designed, the pilot's screens first.
 | S-C9 | Earnings | 1 minimal, 4 pool | Money explained by cause |
 | S-C10 | Team and settings | 1 | Roles as checklists; creator-only list shown, not editable |
 | S-C11 | Call, creator side | 2 | Pre-call brief from the packet only |
-| S-C12 | Notes and the Replies feed | 1 | First tab on phone; Face ID signs each Note and reaction |
+| S-C12 | Notes and the Replies feed | 1 | One tap from Today; Face ID signs each Note and reaction |
 | S-C13 | License and sponsorships | 1 | "Pause everything" |
 | S-C14 | The creator interview | 1 | 20 minutes, voice or text; weekly 60-second check-in |
 | — | Passkey signing sheet | 1 | Shows the exact content being signed (ADR-9) |
@@ -303,6 +304,7 @@ D-H, D-01 to D-27) are in the Domain Model.
 | 2026-10-08 | Phone apps first: the native iOS and Android apps are the primary surface for fans; the web carries the first answer from a link and the configuration screens. Creators' Notes and reactions were to be native at launch; the 2026-10-09 row below replaces that for the pilot. |
 | 2026-10-09 | Option A: the pilot's native app is the fan app, with no new creator features. Creators use the Studio in the phone browser (installable, passkey signing). A separate native "Qelvora Studio" app follows after the pilot, Notes and reactions first. App ids `com.pantopus.qelvora` and, reserved, `com.pantopus.qelvora.studio`. One account across both. |
 | 2026-10-09 | The work is split into seven lanes plus an integrator: identity and trust; platform and hosting; AI engine; money; presence and reach; creator Studio (web); phone apps. See [docs/lanes](lanes/README.md). |
+| 2026-10-15 | Today replaces Notes as the first Studio tab; Notes stays one tap away from Today. Today remains the selected section for Notes and the Note composer. See the recorded approval in [lane 6 status](lanes/status/lane-6.md). |
 | 2026-10-09 | How the seven lanes work: seven sessions started by hand, each working alone with no subagents. No new unit tests: every lane proves its work with end-to-end scenarios that include edge cases, run on a real database, browser or device, with the deepest sets for money, sign-in, signing, deletion and the guard. The existing suites, including the 100 money tests, stay as regression gates. This replaces the 2026-10-08 rule that tests are required for money and sign-in. See the [working agreement](lanes/01-working-agreement.md) section 3. |
 | 2026-10-08 | The share card is in the pilot: a signed written reply with its verification page, as an image and a link. The fan chooses how their handle appears and either side can revoke it (D-15). |
 | 2026-10-08 | Model provider: the Anthropic API is the intended production provider, switched before the first real creator publishes, as one engine revision with the embedding provider chosen first. Development stays on the synthetic OpenAI configuration, which is not a production approval. |

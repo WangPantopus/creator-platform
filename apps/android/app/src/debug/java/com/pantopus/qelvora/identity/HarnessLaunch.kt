@@ -2,6 +2,11 @@ package com.pantopus.qelvora.identity
 
 import android.app.Activity
 import android.content.Context
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URI
 
 /**
  * Operated verification (lane 7). Debug builds only: the release source set
@@ -28,6 +33,35 @@ object HarnessLaunch {
     /** After the first session check: nothing happens if someone is signed in. */
     suspend fun signInIfRequested(context: Context, model: FanSession) {
         val intent = (context as? Activity)?.intent ?: return
+        val nativeSubject = intent.getStringExtra("harness_native_sub")
+        if (nativeSubject != null) {
+            intent.removeExtra("harness_native_sub")
+            val rawOrigin = intent.getStringExtra("harness_provider_url") ?: return
+            intent.removeExtra("harness_provider_url")
+            val origin = runCatching { URI(rawOrigin) }.getOrNull() ?: return
+            if (model.session != null || model.hasSavedCredential || origin.scheme != "http" ||
+                origin.host !in listOf("127.0.0.1", "localhost") || origin.userInfo != null ||
+                origin.query != null || origin.fragment != null || origin.path !in listOf("", "/")) return
+            model.beginSignIn()
+            model.signIn(NativeIdentityProvider.GOOGLE) { nonce ->
+                // Fake only the external sheet. The app exchanges its own real
+                // backend nonce and renders the real backend's age decision.
+                withContext(Dispatchers.IO) {
+                    val connection = origin.resolve("/__mint").toURL().openConnection() as HttpURLConnection
+                    try {
+                        connection.requestMethod = "POST"; connection.doOutput = true
+                        connection.connectTimeout = 5_000; connection.readTimeout = 5_000
+                        connection.setRequestProperty("Content-Type", "application/json")
+                        connection.outputStream.use { it.write(JSONObject().put("provider", "google")
+                            .put("aud", com.pantopus.qelvora.BuildConfig.CREATOR_GOOGLE_SERVER_CLIENT_ID)
+                            .put("sub", nativeSubject).put("nonce", nonce).toString().toByteArray()) }
+                        if (connection.responseCode != 200) throw NativeIdentityUnavailable()
+                        NativeIdentityCredential(JSONObject(connection.inputStream.bufferedReader().use { it.readText() }).getString("idToken"))
+                    } finally { connection.disconnect() }
+                }
+            }
+            return
+        }
         val wanted = intent.getStringExtra("harness_actor") ?: return
         intent.removeExtra("harness_actor")
         if (model.session != null || model.hasSavedCredential) return

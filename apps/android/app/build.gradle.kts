@@ -18,6 +18,9 @@ android {
         versionName = "0.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "CREATOR_API_URL", "\"${providers.gradleProperty("creatorApiUrl").getOrElse("").replace("\\", "\\\\").replace("\"", "\\\"")}\"")
+        val googleServerClientId = providers.gradleProperty("creatorGoogleServerClientId").getOrElse("")
+        require(!googleServerClientId.contains('\n') && !googleServerClientId.contains('\r')) { "Google client ID must be a single-line value" }
+        buildConfigField("String", "CREATOR_GOOGLE_SERVER_CLIENT_ID", "\"${googleServerClientId.replace("\\", "\\\\").replace("\"", "\\\"")}\"")
         buildConfigField("boolean", "CREATOR_PUSH_ENABLED", if (providers.gradleProperty("creatorPushEnabled").orNull == "true") "true" else "false")
         listOf("creatorFirebaseApplicationId" to "CREATOR_FIREBASE_APPLICATION_ID", "creatorFirebaseProjectId" to "CREATOR_FIREBASE_PROJECT_ID", "creatorFirebaseSenderId" to "CREATOR_FIREBASE_SENDER_ID", "creatorFirebaseApiKey" to "CREATOR_FIREBASE_API_KEY").forEach { (property, field) ->
             val value = providers.gradleProperty(property).getOrElse("")
@@ -48,6 +51,8 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("androidx.credentials:credentials:1.6.0")
     implementation("androidx.credentials:credentials-play-services-auth:1.6.0")
+    // Already a runtime dependency of credentials-play-services-auth; expose its typed sign-in API.
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
     implementation("com.android.billingclient:billing:9.1.0")
     implementation("com.google.firebase:firebase-messaging:25.1.0")
     implementation("androidx.work:work-runtime-ktx:2.10.5")

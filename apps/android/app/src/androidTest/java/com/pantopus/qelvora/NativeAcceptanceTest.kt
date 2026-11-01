@@ -16,8 +16,8 @@ class NativeAcceptanceTest {
 
     @Test fun unavailableSignInNeverPretendsToAuthenticate() {
         compose.onNodeWithText("Her AI answers you now. She answers in person when you ask.").assertIsDisplayed()
-        compose.onNodeWithText("Continue with Pantopus").performClick()
-        compose.onNodeWithText("Pantopus sign-in is not connected in this local build.").assertIsDisplayed()
+        compose.onNodeWithText("Sign in to continue").performClick()
+        compose.onNodeWithText("Sign-in is unavailable right now. Try again in a moment.").assertIsDisplayed()
     }
 
     @Test fun arrivalContextCanBeRemoved() {

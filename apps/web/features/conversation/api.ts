@@ -18,18 +18,22 @@ export async function conversationRequest<T>(
   signal?: AbortSignal,
   expectedAccountId?: string,
   expectedSessionId?: string,
+  domain: "conversations" | "content" = "conversations",
 ): Promise<T> {
   signal?.throwIfAborted();
   const timeout =
     body !== undefined && path.endsWith("/comparison") ? 65_000 : 10_000;
-  const response = await fetch(`/api/conversations/${path}`, {
+  const response = await fetch(`/api/${domain}/${path}`, {
     method: body === undefined ? "GET" : "POST",
     cache: "no-store",
     headers: {
       Accept: "application/json",
       "X-Correlation-Id": crypto.randomUUID(),
       ...(expectedAccountId
-        ? { "X-Expected-Account-Id": expectedAccountId }
+        ? {
+            "X-Expected-Account-Id": expectedAccountId,
+            "x-qelvora-expected-account": expectedAccountId,
+          }
         : {}),
       ...(expectedSessionId
         ? { "X-Expected-Session-Id": expectedSessionId }
@@ -52,7 +56,9 @@ export async function conversationRequest<T>(
 
 /** W1 owns identity and invalidation. The account header is only a mismatch
  * precondition; the BFF and backend authorize using the current session. */
-export function useConversationRequest() {
+export function useConversationRequest(
+  domain: "conversations" | "content" = "conversations",
+) {
   const {
     signal,
     session,
@@ -78,6 +84,7 @@ export function useConversationRequest() {
           ]),
           accountId,
           sessionId,
+          domain,
         );
         if (signal.aborted)
           throw new DOMException("Session ended", "AbortError");
@@ -108,6 +115,6 @@ export function useConversationRequest() {
         throw error;
       }
     },
-    [accountId, sessionId, signal, end, identityRequest],
+    [accountId, sessionId, signal, end, identityRequest, domain],
   );
 }

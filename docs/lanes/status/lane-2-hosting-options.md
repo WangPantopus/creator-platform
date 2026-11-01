@@ -1,5 +1,41 @@
 # Lane 2: where to host the pilot (WP 2.3), options and monthly cost
 
+## Current recommendation, 2026-10-22
+
+The founder asked for hosting options during the app-completion work. No provider,
+budget, account or domain has been selected, and nothing has been provisioned.
+The founder explicitly chose to keep hosting undecided on 2026-10-22; continue
+local implementation without choosing or purchasing infrastructure.
+
+Prefer **Fly.io for web/API/workers and Crunchy Bridge for PostgreSQL**. A small
+pilot should budget approximately **$150–250/month**, or **$250–400/month** with
+a standby database. These are planning estimates, not quotes or capacity proof;
+AI usage, payment fees, domains and store accounts are additional. Recheck the
+chosen region and measured load before provisioning.
+
+Current official pricing and compatibility evidence:
+
+- [Crunchy production plans](https://docs.crunchybridge.com/concepts/plans-pricing):
+  the AWS US East examples list Standard-4 at $70/month and Standard-8 at $140/month,
+  plus $0.10/GB storage. High availability doubles the cluster price. Hobby plans
+  are explicitly not intended for production.
+- [Crunchy role documentation](https://docs.crunchybridge.com/api/postgres-role)
+  describes a true `postgres` superuser. This fits the migration operator's current
+  requirement; verify the actual provisioned role and run the migration/recovery
+  qualification before placing product data there. Runtime logins remain restricted.
+- [Fly pricing](https://fly.io/pricing/) is usage-based. App machines, workers,
+  storage and network use must be sized alongside the database, not omitted from
+  the estimate. Use direct database connections for LISTEN/NOTIFY.
+- [DigitalOcean Droplets](https://www.digitalocean.com/pricing/droplets) offer
+  4 GB/2-vCPU and 8 GB/4-vCPU basic machines at $24 and $48/month. A small
+  self-managed deployment is approximately $80–140/month with backup/storage
+  allowance, but database maintenance and tested recovery become our responsibility.
+- [AWS RDS roles](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.PostgreSQL.CommonDBATasks.Roles.rds_superuser.html)
+  explicitly lack PostgreSQL superuser access. RDS needs the separately qualified
+  migration-tool changes described below; it is not a drop-in database today.
+
+## Earlier sizing and implementation analysis
+
 Updated: 2026-10-09, by the lane 2 session
 Status: **options only. Nothing is built or bought.** Staging starts after the founder chooses a provider, a region,
 a domain and a budget (questions at the end).

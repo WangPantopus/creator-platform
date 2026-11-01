@@ -76,6 +76,7 @@ function stopFake() {
 }
 
 const settings = [
+  "COMMERCE_RECOVERY_ENABLED=false",
   "STRIPE_SECRET_KEY=sk_test_lane4_fake_edge",
   "STRIPE_PUBLISHABLE_KEY=pk_test_lane4_fake_edge",
   `STRIPE_API_VERSION=${API_VERSION}`,

@@ -10,7 +10,7 @@ import { requestAuthority } from "../identity/request-authority.js";
 import { assertRegisteredMigration } from "../../db/reviewed-migration.js";
 import type { PrivacyHook } from "../trust/contracts.js";
 import { ConversationLineage } from "./lineage.js";
-import { ConversationRecordings } from "./recordings.js";
+import { PreparedConversationRecordingAssociations } from "./recording-associations.js";
 import {
   comparisonPrivacyInstalled,
   PreparedComparisonPrivacy,
@@ -104,7 +104,7 @@ export class PreparedConversationPrivacyCursor {
     private readonly journal: PreparedGenerationJournal,
     private readonly usageRetention: PreparedUsageRetention,
     private readonly lineage: ConversationLineage,
-    private readonly recordings: ConversationRecordings,
+    private readonly recordings: PreparedConversationRecordingAssociations,
     private readonly reviewed: Readonly<{
       definitions: Readonly<Record<(typeof Signatures)[number], string>>;
       catalogueChecksum: string;
@@ -139,7 +139,7 @@ export class PreparedConversationPrivacyCursor {
     pool: Pool;
     authority: ConversationPrivacyAuthority;
     lineage?: ConversationLineage;
-    recordings?: ConversationRecordings;
+    recordings?: PreparedConversationRecordingAssociations;
     comparisons?: PreparedComparisonPrivacy;
   }): void {
     this.assertPool(input.pool);
@@ -159,7 +159,7 @@ export class PreparedConversationPrivacyCursor {
     journal: PreparedGenerationJournal;
     usageRetention: PreparedUsageRetention;
     lineage: ConversationLineage;
-    recordings: ConversationRecordings;
+    recordings: PreparedConversationRecordingAssociations;
     comparisons?: PreparedComparisonPrivacy;
     custody: {
       migration: { version: string; checksum: string };
@@ -171,7 +171,7 @@ export class PreparedConversationPrivacyCursor {
       input.journal instanceof PreparedGenerationJournal &&
         input.usageRetention instanceof PreparedUsageRetention &&
         input.lineage instanceof ConversationLineage &&
-        input.recordings instanceof ConversationRecordings &&
+        input.recordings instanceof PreparedConversationRecordingAssociations &&
         input.custody.migration.version ===
           CONVERSATION_PRIVACY_CURSOR_MIGRATION &&
         input.custody.migration.checksum ===

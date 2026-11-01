@@ -190,16 +190,8 @@ await google.click();
 await page.getByLabel("Test person").fill(sub);
 await page.getByRole("button", { name: "Sign in" }).click();
 await page.waitForLoadState("networkidle");
-// The navigation config asks a person without a fan handle to pick one before
-// /studio/setup (it is not exempt); a person would do so here.
-if (new URL(page.url()).pathname === "/onboarding/handle") {
-  note(
-    "asked for a fan handle on the way back (navigation config, not this change)",
-  );
-  await page.locator("#handle").fill(`fan${Date.now() % 1e8}`);
-  await page.locator("button.handle-continue").click();
-  await page.waitForURL("**/studio/setup", { timeout: 20_000 }).catch(() => {});
-}
+// Creator setup is independent of enrolling as a fan, including after fresh
+// authentication for a passkey. Do not hide an onboarding regression here.
 step(
   "the fresh sign-in returns to the setup page",
   new URL(page.url()).pathname === "/studio/setup",

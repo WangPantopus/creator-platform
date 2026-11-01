@@ -200,6 +200,9 @@ export function createApp(
       mode:
         dependencies.identity?.mode ??
         (dependencies.identity ? "pantopus" : "unconfigured"),
+      providers: config.featureEnabled
+        ? (dependencies.platformIdentity?.sessions.qelvora?.enabled ?? [])
+        : [],
       ...(dependencies.identity?.mode === "development"
         ? { developmentActors: dependencies.identity.developmentActors }
         : {}),

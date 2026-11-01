@@ -430,6 +430,56 @@ export function createOpenApi() {
         },
       },
       "/v1/identity/session": { get: operation("identitySession", "Session") },
+      "/v1/identity/web/start": {
+        post: {
+          ...operation(
+            "startWebSignIn",
+            "IdentityRedirect",
+            "IdentityProviderContinue",
+          ),
+          security: [],
+        },
+      },
+      "/v1/identity/web/complete": {
+        post: {
+          ...operation(
+            "completeWebSignIn",
+            "IdentitySignInResult",
+            "CompleteIdentity",
+          ),
+          security: [],
+        },
+      },
+      "/v1/identity/native/nonce": {
+        post: {
+          ...operation(
+            "startNativeSignIn",
+            "NativeSignInNonce",
+            "NativeSignInStart",
+          ),
+          security: [],
+        },
+      },
+      "/v1/identity/native/complete": {
+        post: {
+          ...operation(
+            "completeNativeSignIn",
+            "IdentitySignInResult",
+            "NativeSignInComplete",
+          ),
+          security: [],
+        },
+      },
+      "/v1/identity/age": {
+        post: {
+          ...operation(
+            "confirmIdentityAge",
+            "IdentitySignInResult",
+            "AgeConfirmationInput",
+          ),
+          security: [],
+        },
+      },
       "/v1/identity/refresh": {
         post: operation("refreshSession", "SessionToken"),
       },
