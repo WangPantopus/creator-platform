@@ -45,7 +45,9 @@ export function screen() {
         .replaceAll("&amp;", "&")
         .replaceAll("&lt;", "<")
         .replaceAll("&gt;", ">")
-        .replaceAll("&#10;", "\n")
+        .replaceAll(/&#(?:x([0-9a-f]+)|(\d+));/giu, (_, hex, decimal) =>
+          String.fromCodePoint(Number.parseInt(hex ?? decimal, hex ? 16 : 10)),
+        )
         .replaceAll("&apos;", "'");
     nodes.push({
       text: unescape(attr("text")),
