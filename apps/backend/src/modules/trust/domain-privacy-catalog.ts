@@ -1,4 +1,5 @@
 import studioReplyAuthorityReview from "../../../../../infra/migrations/reviews/20261023-studio-reply-authority.json" with { type: "json" };
+import coreFollowReview from "../../../../../infra/migrations/reviews/20261027-core-follow.json" with { type: "json" };
 import type { PoolClient } from "pg";
 import { DomainError } from "../../core/errors.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
@@ -165,6 +166,18 @@ export async function assertDomainPrivacyTaskCatalogForStudioReplyAuthority(
     domain,
     async () =>
       studioReplyAuthorityReview.comparison.artifactsCatalogueChecksum,
+  );
+}
+
+/** Fixed123 predecessor metadata; no runtime task authority. */
+export async function assertDomainPrivacyTaskCatalogForCoreFollow(
+  client: PoolClient,
+  domain: "trust" | "growth",
+) {
+  return assertDomainPrivacyTask(
+    client,
+    domain,
+    async () => coreFollowReview.comparison.artifactsCatalogueChecksum,
   );
 }
 

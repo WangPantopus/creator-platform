@@ -1,4 +1,5 @@
 import coreFollowReview from "../../../infra/migrations/reviews/20261027-core-follow.json" with { type: "json" };
+import pilotColumnsReview from "../../../infra/migrations/reviews/20261101-pilot-columns.json" with { type: "json" };
 import { assertCoreFollowPurposeCatalog } from "../src/modules/growth/core-follow-catalogue.js";
 import type { PoolClient, QueryConfig, QueryResultRow } from "pg";
 import { readFile } from "node:fs/promises";
@@ -183,7 +184,8 @@ export async function assertGenerationWaveRoleSafety(
     | "workspace-lock"
     | "reply-review"
     | "studio-reply-authority"
-    | "core-follow",
+    | "core-follow"
+    | "pilot-columns",
 ) {
   if (
     purposeReview.schemaVersion !== 1 ||
@@ -195,7 +197,8 @@ export async function assertGenerationWaveRoleSafety(
     throw new WaveRoleSafetyError(
       "Generation-purpose wave review is unavailable.",
     );
-  const follow = extension === "core-follow";
+  const pilot = extension === "pilot-columns";
+  const follow = pilot || extension === "core-follow";
   const studio = follow || extension === "studio-reply-authority";
   const reply = studio || extension === "reply-review";
   const workspaceLock = reply || extension === "workspace-lock";
@@ -204,19 +207,21 @@ export async function assertGenerationWaveRoleSafety(
   const comparison = notices || extension === "comparison";
   // Every pinned catalogue lists every relation, so the newest installed
   // wave's review holds the current pins.
-  const head = follow
-    ? coreFollowReview
-    : studio
-      ? studioReplyAuthorityReview
-      : reply
-        ? replyReview
-        : workspaceLock
-          ? workspaceLockReview
-          : signInAndMoney
-            ? signInAndMoneyReview
-            : notices
-              ? noticesReview
-              : comparisonReview;
+  const head = pilot
+    ? pilotColumnsReview
+    : follow
+      ? coreFollowReview
+      : studio
+        ? studioReplyAuthorityReview
+        : reply
+          ? replyReview
+          : workspaceLock
+            ? workspaceLockReview
+            : signInAndMoney
+              ? signInAndMoneyReview
+              : notices
+                ? noticesReview
+                : comparisonReview;
   const recovery =
     comparison ||
     extension === "generation-recovery" ||
@@ -446,6 +451,21 @@ export async function assertGenerationWaveRoleSafety(
         );
     await assertCoreFollowPurposeCatalog(client);
   }
+  if (pilot)
+    for (const source of pilotColumnsReview.sources)
+      if (
+        sha256(await readFile(new URL(source.path, repositoryRoot))) !==
+          source.checksum ||
+        !(
+          await client.query(
+            "SELECT 1 FROM creator.schema_migration WHERE version=$1 AND checksum=$2",
+            [source.version, source.checksum],
+          )
+        ).rowCount
+      )
+        throw new WaveRoleSafetyError(
+          "Exact complete pilot-columns source graph is required.",
+        );
   return {
     original,
     purposeRoles:

@@ -43,6 +43,7 @@ export const FRESH_WAVES = [
   "20261023-reply-review",
   "20261023-studio-reply-authority",
   "20261027-core-follow",
+  "20261101-pilot-columns",
 ] as const;
 
 type Source = { version: string; path: string; checksum: string };
@@ -237,7 +238,7 @@ export async function installFullHost(input: FreshInstallInput) {
     }
     // The same final assertions scripts/migrate-trust.ts runs on any database
     // that holds the wave graph, plus the original business-row check.
-    await assertGenerationWaveRoleSafety(client, "core-follow");
+    await assertGenerationWaveRoleSafety(client, "pilot-columns");
     await assertPrivacyWaveRoleSafety(client, {
       privacy: true,
       domain: true,

@@ -1,4 +1,5 @@
 import studioReplyAuthorityReview from "../../../../../infra/migrations/reviews/20261023-studio-reply-authority.json" with { type: "json" };
+import coreFollowReview from "../../../../../infra/migrations/reviews/20261027-core-follow.json" with { type: "json" };
 import type { PoolClient } from "pg";
 import { DomainError } from "../../core/errors.js";
 import {
@@ -12,6 +13,7 @@ import {
   assertOriginalPrivacyFamilyWorkspaceLockCatalogForReview,
   assertOriginalPrivacyFamilyReplyReviewCatalogForReview,
   assertOriginalPrivacyFamilyStudioReplyAuthorityCatalogForReview,
+  assertOriginalPrivacyFamilyCoreFollowCatalogForReview,
   originalPrivacyBindingSignature,
   originalPrivacyBindingDefinition,
 } from "./privacy-family-catalog.js";
@@ -202,6 +204,14 @@ export async function assertStudioReplyAuthorityPrivacyTaskCatalogForReview(
   );
 }
 
+/** Fixed123 predecessor metadata before pilot-columns activation. */
+export async function assertCoreFollowPrivacyTaskCatalogForReview(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  return assertPrivacyExtensionForReview(client, "core-follow", signal);
+}
+
 async function assertPrivacyExtensionForReview(
   client: PoolClient,
   profile:
@@ -214,7 +224,8 @@ async function assertPrivacyExtensionForReview(
     | "sign-in-and-money"
     | "workspace-lock"
     | "reply-review"
-    | "studio-reply-authority",
+    | "studio-reply-authority"
+    | "core-follow",
   signal?: AbortSignal,
 ) {
   for (const source of generationReview.sources)
@@ -230,7 +241,8 @@ async function assertPrivacyExtensionForReview(
       profile === "sign-in-and-money" ||
       profile === "workspace-lock" ||
       profile === "reply-review" ||
-      profile === "studio-reply-authority"
+      profile === "studio-reply-authority" ||
+      profile === "core-follow"
     ) {
       for (const source of publicAIReview.sources)
         await assertRegisteredMigration(client, source, signal);
@@ -239,7 +251,8 @@ async function assertPrivacyExtensionForReview(
         profile === "sign-in-and-money" ||
         profile === "workspace-lock" ||
         profile === "reply-review" ||
-        profile === "studio-reply-authority"
+        profile === "studio-reply-authority" ||
+        profile === "core-follow"
       ) {
         for (const source of [
           ...comparisonReview.sources,
@@ -247,25 +260,37 @@ async function assertPrivacyExtensionForReview(
           ...(profile === "sign-in-and-money" ||
           profile === "workspace-lock" ||
           profile === "reply-review" ||
-          profile === "studio-reply-authority"
+          profile === "studio-reply-authority" ||
+          profile === "core-follow"
             ? signInAndMoneyReview.sources
             : []),
           ...([
             "workspace-lock",
             "reply-review",
             "studio-reply-authority",
+            "core-follow",
           ].includes(profile)
             ? workspaceLockReview.sources
             : []),
-          ...(profile === "reply-review" || profile === "studio-reply-authority"
+          ...([
+            "reply-review",
+            "studio-reply-authority",
+            "core-follow",
+          ].includes(profile)
             ? replyReview.sources
             : []),
-          ...(profile === "studio-reply-authority"
+          ...(profile === "studio-reply-authority" || profile === "core-follow"
             ? studioReplyAuthorityReview.sources
             : []),
+          ...(profile === "core-follow" ? coreFollowReview.sources : []),
         ])
           await assertRegisteredMigration(client, source, signal);
-        if (profile === "studio-reply-authority")
+        if (profile === "core-follow")
+          await assertOriginalPrivacyFamilyCoreFollowCatalogForReview(
+            client,
+            signal,
+          );
+        else if (profile === "studio-reply-authority")
           await assertOriginalPrivacyFamilyStudioReplyAuthorityCatalogForReview(
             client,
             signal,
@@ -303,45 +328,49 @@ async function assertPrivacyExtensionForReview(
   } else await assertOriginalPrivacyFamilyGenerationCatalog(client, signal);
   if (
     contentHash(await accountDetachedUsageCatalogue(client, signal)) !==
-      (profile === "studio-reply-authority"
-        ? studioReplyAuthorityReview.runtimeCatalogues.detached
-        : profile === "reply-review"
-          ? replyReview.runtimeCatalogues.detached
-          : profile === "workspace-lock"
-            ? workspaceLockReview.runtimeCatalogues.detached
-            : profile === "sign-in-and-money"
-              ? signInAndMoneyReview.runtimeCatalogues.detached
-              : profile === "notices"
-                ? noticesReview.runtimeCatalogues.detached
-                : profile === "comparison"
-                  ? comparisonReview.runtimeCatalogues.detached
-                  : profile === "public"
-                    ? publicAIReview.runtimeCatalogues.detached
-                    : profile === "output"
-                      ? outputReview.runtimeCatalogues.detached
-                      : profile === "content"
-                        ? contentReview.runtimeCatalogues.detached
-                        : accountDetachedUsageExpectedCatalogue) ||
+      (profile === "core-follow"
+        ? coreFollowReview.runtimeCatalogues.detached
+        : profile === "studio-reply-authority"
+          ? studioReplyAuthorityReview.runtimeCatalogues.detached
+          : profile === "reply-review"
+            ? replyReview.runtimeCatalogues.detached
+            : profile === "workspace-lock"
+              ? workspaceLockReview.runtimeCatalogues.detached
+              : profile === "sign-in-and-money"
+                ? signInAndMoneyReview.runtimeCatalogues.detached
+                : profile === "notices"
+                  ? noticesReview.runtimeCatalogues.detached
+                  : profile === "comparison"
+                    ? comparisonReview.runtimeCatalogues.detached
+                    : profile === "public"
+                      ? publicAIReview.runtimeCatalogues.detached
+                      : profile === "output"
+                        ? outputReview.runtimeCatalogues.detached
+                        : profile === "content"
+                          ? contentReview.runtimeCatalogues.detached
+                          : accountDetachedUsageExpectedCatalogue) ||
     contentHash(await accountingBoundaryCatalogue(client, signal)) !==
-      (profile === "studio-reply-authority"
-        ? studioReplyAuthorityReview.runtimeCatalogues.boundary
-        : profile === "reply-review"
-          ? replyReview.runtimeCatalogues.boundary
-          : profile === "workspace-lock"
-            ? workspaceLockReview.runtimeCatalogues.boundary
-            : profile === "sign-in-and-money"
-              ? signInAndMoneyReview.runtimeCatalogues.boundary
-              : profile === "notices"
-                ? noticesReview.runtimeCatalogues.boundary
-                : profile === "comparison"
-                  ? comparisonReview.runtimeCatalogues.boundary
-                  : profile === "public"
-                    ? publicAIReview.runtimeCatalogues.boundary
-                    : profile === "output"
-                      ? outputReview.runtimeCatalogues.boundary
-                      : profile === "content"
-                        ? contentReview.runtimeCatalogues.boundary
-                        : accountingBoundaryExpectedCatalogue)
+      (profile === "core-follow"
+        ? coreFollowReview.runtimeCatalogues.boundary
+        : profile === "studio-reply-authority"
+          ? studioReplyAuthorityReview.runtimeCatalogues.boundary
+          : profile === "reply-review"
+            ? replyReview.runtimeCatalogues.boundary
+            : profile === "workspace-lock"
+              ? workspaceLockReview.runtimeCatalogues.boundary
+              : profile === "sign-in-and-money"
+                ? signInAndMoneyReview.runtimeCatalogues.boundary
+                : profile === "notices"
+                  ? noticesReview.runtimeCatalogues.boundary
+                  : profile === "comparison"
+                    ? comparisonReview.runtimeCatalogues.boundary
+                    : profile === "public"
+                      ? publicAIReview.runtimeCatalogues.boundary
+                      : profile === "output"
+                        ? outputReview.runtimeCatalogues.boundary
+                        : profile === "content"
+                          ? contentReview.runtimeCatalogues.boundary
+                          : accountingBoundaryExpectedCatalogue)
   )
     throw new DomainError(
       "privacy_commit_fence_unavailable",

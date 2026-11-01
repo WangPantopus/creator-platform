@@ -1,4 +1,5 @@
 import coreFollowReview from "../../../../infra/migrations/reviews/20261027-core-follow.json" with { type: "json" };
+import pilotColumnsReview from "../../../../infra/migrations/reviews/20261101-pilot-columns.json" with { type: "json" };
 import review from "../../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
 import noticesReview from "../../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
 import signInAndMoneyReview from "../../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
@@ -143,6 +144,26 @@ async function registeredCoreFollowProfile(signal?: AbortSignal) {
   return freeze(coreFollowReview);
 }
 
+/** The three pilot columns register together; a partial set selects nothing. */
+async function registeredPilotColumnsProfile(signal?: AbortSignal) {
+  signal?.throwIfAborted();
+  const active = await Promise.all(
+    pilotColumnsReview.sources.map(registeredMigration),
+  );
+  signal?.throwIfAborted();
+  if (active.every((source) => !source)) return undefined;
+  invariant(
+    active.every(
+      (source, index) =>
+        source?.version === pilotColumnsReview.sources[index]!.version &&
+        source.checksum === pilotColumnsReview.sources[index]!.checksum,
+    ),
+    "comparison_unconfigured",
+    "The complete reviewed pilot-columns source graph is required.",
+  );
+  return freeze(pilotColumnsReview);
+}
+
 /** Exact executable source selects independently reviewed metadata only.
  * Reservations and hand-installed ledger entries cannot activate this profile.
  * Original owners still check their actual source, purpose and transaction. */
@@ -166,6 +187,12 @@ export async function registeredComparisonProfile(signal?: AbortSignal) {
   const reply = await registeredReplyReviewProfile(signal);
   const studio = await registeredStudioReplyAuthorityProfile(signal);
   const follow = await registeredCoreFollowProfile(signal);
+  const pilot = await registeredPilotColumnsProfile(signal);
+  invariant(
+    follow || !pilot,
+    "comparison_unconfigured",
+    "The pilot columns require the complete core Follow predecessor.",
+  );
   invariant(
     studio || !follow,
     "comparison_unconfigured",
@@ -200,6 +227,7 @@ export async function registeredComparisonProfile(signal?: AbortSignal) {
         ...reply,
         ...studio,
         ...follow,
+        ...pilot,
         sources: [
           ...profile.sources,
           ...head.sources,
@@ -208,6 +236,7 @@ export async function registeredComparisonProfile(signal?: AbortSignal) {
           ...(reply?.sources ?? []),
           ...(studio?.sources ?? []),
           ...(follow?.sources ?? []),
+          ...(pilot?.sources ?? []),
         ],
       })
     : profile;
