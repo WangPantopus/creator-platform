@@ -101,7 +101,9 @@ jobs:
           )
           phones = [d for runtime in runtimes for d in devices[runtime] if d["name"].startswith("iPhone")]
           if not phones: raise SystemExit("No available iOS iPhone simulator on the reference runner")
-          phone = phones[0]
+          # Prefer the reference phone on the newest runtime that has it. A newer runtime can offer only a
+          # phone that xcodebuild cannot run once booted (iOS 27.1 offers only the iPhone Duo).
+          phone = next((d for d in phones if d["name"] == "iPhone 18 Pro"), phones[0])
           with open(os.environ["GITHUB_OUTPUT"], "a") as output: output.write("id=" + phone["udid"] + "\n")
           '
       - name: Wait for the selected simulator to finish booting
