@@ -64,6 +64,19 @@ export function CreatorSetup({ initial }: { initial: Session }) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
+  // Working passkeys (neither revoked nor retired), for the second-key prompt.
+  const [activeKeys, setActiveKeys] = useState<number | null>(null);
+  const loadKeys = useCallback(async () => {
+    const list = await action("passkeys");
+    setActiveKeys(
+      (list.credentials as { revoked: boolean; retired: boolean }[]).filter(
+        (key) => !key.revoked && !key.retired,
+      ).length,
+    );
+  }, [action]);
+  useEffect(() => {
+    if (creator?.verification === "verified") void loadKeys().catch(() => {});
+  }, [creator?.verification, loadKeys]);
   // Changing passkeys needs a sign-in from the last five minutes.
   const [freshSignIn, setFreshSignIn] = useState(false);
   const [proofRead, setProofRead] = useState<{
@@ -540,6 +553,7 @@ export function CreatorSetup({ initial }: { initial: Session }) {
                       setNotice(
                         "Passkey registered. Each named act still needs a fresh exact-content assertion.",
                       );
+                      await loadKeys().catch(() => {});
                     } catch (error) {
                       await action(
                         `passkeys/${begin.challengeId}/cancel`,
@@ -552,29 +566,52 @@ export function CreatorSetup({ initial }: { initial: Session }) {
               >
                 Register a signing passkey
               </button>
+              {activeKeys === 1 && (
+                <p className="qv-help">{copy.passkeySecondPrompt}</p>
+              )}
               <details>
                 <summary>Lost your signing device?</summary>
                 <Notice title="Recovery stops named acts">
-                  All existing signing keys are revoked. Continue with Pantopus
-                  again and submit fresh external creator proof before
-                  registering a replacement.
+                  {copy.passkeyRecoveryBody}
                 </Notice>
-                <button
-                  disabled={busy}
-                  className="qv-btn qv-btn--secondary"
-                  onClick={() =>
-                    perform(async () => {
-                      await action("passkeys/recovery", {});
-                      const updated = await action("session");
-                      setCreator(updated.creator);
-                      setNotice(
-                        "Recovery started. Sign in again, then submit fresh creator proof.",
-                      );
-                    })
-                  }
-                >
-                  Start signing-key recovery
-                </button>
+                {(
+                  [
+                    [
+                      "lost",
+                      copy.passkeyRecoveryLost,
+                      copy.passkeyRecoveryLostHelp,
+                    ],
+                    [
+                      "compromised",
+                      copy.passkeyRecoveryCompromised,
+                      copy.passkeyRecoveryCompromisedHelp,
+                    ],
+                  ] as const
+                ).map(([loss, label, help]) => (
+                  <div key={loss}>
+                    <button
+                      disabled={busy}
+                      className="qv-btn qv-btn--secondary"
+                      aria-describedby={`recovery-${loss}`}
+                      onClick={() =>
+                        perform(async () => {
+                          await action("passkeys/recovery", { loss });
+                          const updated = await action("session");
+                          setCreator(updated.creator);
+                          await loadKeys().catch(() => {});
+                          setNotice(
+                            "Recovery started. Sign in again, then submit fresh creator proof.",
+                          );
+                        })
+                      }
+                    >
+                      {label}
+                    </button>
+                    <p className="qv-help" id={`recovery-${loss}`}>
+                      {help}
+                    </p>
+                  </div>
+                ))}
               </details>
             </div>
             <a href="/studio/ai" className="qv-btn qv-btn--quiet">

@@ -10,6 +10,7 @@ import {
   NativeSignInNonceSchema,
   NativeSignInStartSchema,
   SessionSchema,
+  PasskeyRecoverySchema,
   PasskeyRevocationSchema,
 } from "@qelvora/api";
 import type { SignInStep } from "./qelvora-sign-in.js";
@@ -249,15 +250,22 @@ export function createIdentityRouter(
     ),
   );
   router.post("/passkeys/revoke", async (req, res) => {
+    const body = PasskeyRevocationSchema.parse(req.body);
     res.json(
       await runtime.passkeys.revoke(
         await actor(req),
-        PasskeyRevocationSchema.parse(req.body).credentialId,
+        body.credentialId,
+        body.loss,
       ),
     );
   });
   router.post("/passkeys/recovery", async (req, res) =>
-    res.json(await runtime.passkeys.recover(await actor(req))),
+    res.json(
+      await runtime.passkeys.recover(
+        await actor(req),
+        PasskeyRecoverySchema.parse(req.body ?? {}).loss,
+      ),
+    ),
   );
   router.post("/:creatorId/team/invite", async (req, res) =>
     res.json(
