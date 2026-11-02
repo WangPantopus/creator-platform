@@ -186,7 +186,7 @@ export async function consumeCreatorSignedAct(
   await assertCurrentSession(client, actor.accountId);
   const hash = contentHash(command);
   const result = await client.query(
-    `SELECT sa.id FROM creator.signed_act sa JOIN creator.passkey_credential pc ON pc.id=sa.credential_id AND pc.account_id=sa.account_id JOIN creator.creator_profile cp ON cp.id=sa.creator_id AND cp.account_id=sa.account_id WHERE sa.id=$1 AND sa.account_id=$2 AND sa.creator_id=$3 AND sa.act_type=$4 AND sa.subject_id=$5 AND sa.content_hash=$6 AND sa.verified_at>now()-interval '5 minutes' AND pc.revoked_at IS NULL AND cp.verification='verified' AND NOT cp.recovery_required FOR SHARE OF pc,cp`,
+    `SELECT sa.id FROM creator.signed_act sa JOIN creator.passkey_credential pc ON pc.id=sa.credential_id AND pc.account_id=sa.account_id JOIN creator.creator_profile cp ON cp.id=sa.creator_id AND cp.account_id=sa.account_id WHERE sa.id=$1 AND sa.account_id=$2 AND sa.creator_id=$3 AND sa.act_type=$4 AND sa.subject_id=$5 AND sa.content_hash=$6 AND sa.verified_at>now()-interval '5 minutes' AND pc.revoked_at IS NULL AND pc.retired_at IS NULL AND cp.verification='verified' AND NOT cp.recovery_required FOR SHARE OF pc,cp`,
     [
       signedActId,
       actor.accountId,

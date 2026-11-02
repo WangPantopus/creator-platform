@@ -1,4 +1,5 @@
 import coreFollowReview from "../../../infra/migrations/reviews/20261027-core-follow.json" with { type: "json" };
+import pilotColumnsReview from "../../../infra/migrations/reviews/20261101-pilot-columns.json" with { type: "json" };
 import { readFile, stat } from "node:fs/promises";
 import { resolve, sep } from "node:path";
 import pg from "pg";
@@ -84,15 +85,18 @@ async function activate() {
       "20261023-reply-review",
       "20261023-studio-reply-authority",
       "20261027-core-follow",
+      "20261101-pilot-columns",
     ].includes(process.env.W8_MIGRATION_WAVE ?? ""),
-    "Select a reviewed W8_MIGRATION_WAVE (20261002, 20261002-privacy, 20261007-generation, 20261007-content 20261007-generation-output 20261007-public-ai 20261007-generation-recovery 20261007-partial-generation-recovery 20261008-comparison 20261015-notices 20261015-sign-in-and-money 20261022-workspace-lock 20261023-reply-review 20261023-studio-reply-authority or 20261027-core-follow).",
+    "Select a reviewed W8_MIGRATION_WAVE (20261002, 20261002-privacy, 20261007-generation, 20261007-content 20261007-generation-output 20261007-public-ai 20261007-generation-recovery 20261007-partial-generation-recovery 20261008-comparison 20261015-notices 20261015-sign-in-and-money 20261022-workspace-lock 20261023-reply-review 20261023-studio-reply-authority 20261027-core-follow or 20261101-pilot-columns).",
   );
   const connection = process.env.DATABASE_MIGRATION_URL;
   check(
     connection,
     "Provide a separate DATABASE_MIGRATION_URL; never a runtime credential.",
   );
-  const follow = process.env.W8_MIGRATION_WAVE === "20261027-core-follow";
+  const pilot = process.env.W8_MIGRATION_WAVE === "20261101-pilot-columns";
+  const follow =
+    pilot || process.env.W8_MIGRATION_WAVE === "20261027-core-follow";
   const studio =
     follow ||
     process.env.W8_MIGRATION_WAVE === "20261023-studio-reply-authority";
@@ -142,6 +146,7 @@ async function activate() {
     "20261023-reply-review",
     "20261023-studio-reply-authority",
     "20261027-core-follow",
+    "20261101-pilot-columns",
   ];
   const packets = await Promise.all(
     ids.map(
@@ -170,7 +175,9 @@ async function activate() {
     replyReviewPacket,
     studioReplyAuthorityPacket,
     coreFollowPacket,
+    pilotColumnsPacket,
   ] = packets as [
+    Packet,
     Packet,
     Packet,
     Packet,
@@ -195,10 +202,10 @@ async function activate() {
         entry.baseline.length ===
           [
             40, 57, 61, 100, 101, 102, 104, 105, 106, 114, 116, 119, 120, 121,
-            122,
+            122, 123,
           ][index] &&
         entry.wave.length ===
-          [17, 4, 39, 1, 1, 2, 1, 1, 8, 2, 3, 1, 1, 1, 1][index],
+          [17, 4, 39, 1, 1, 2, 1, 1, 8, 2, 3, 1, 1, 1, 1, 3][index],
     ) &&
       canonical(prior.baseline) ===
         canonical([...initial.baseline, ...initial.wave]) &&
@@ -438,8 +445,25 @@ async function activate() {
         await readFile(
           new URL(coreFollowReview.baselineWave.path, repositoryRoot),
         ),
-      ) === coreFollowReview.baselineWave.sha256,
-    "The exact reviewed 40/57/61/100/101/102/104/105/106/114/116/119/120/121/122/123-source migration chain is required.",
+      ) === coreFollowReview.baselineWave.sha256 &&
+      canonical(pilotColumnsPacket.baseline) ===
+        canonical([...coreFollowPacket.baseline, ...coreFollowPacket.wave]) &&
+      canonical(pilotColumnsPacket.wave) ===
+        canonical(
+          pilotColumnsReview.sources.map(({ version, path, checksum }) => ({
+            version,
+            path,
+            checksum,
+          })),
+        ) &&
+      canonical(pilotColumnsPacket.outOfOrderException) ===
+        canonical(coreFollowPacket.outOfOrderException) &&
+      sha256(
+        await readFile(
+          new URL(pilotColumnsReview.baselineWave.path, repositoryRoot),
+        ),
+      ) === pilotColumnsReview.baselineWave.sha256,
+    "The exact reviewed 40/57/61/100/101/102/104/105/106/114/116/119/120/121/122/123/126-source migration chain is required.",
   );
   check(
     await generationPrivacySourcesRegistered(),
@@ -463,7 +487,7 @@ async function activate() {
   );
   check(
     await registeredComparisonProfile(),
-    "The complete comparison, notices, sign-in and money, workspace-lock, reply-review, creator/fan denial and core Follow source registrations are required.",
+    "The complete comparison, notices, sign-in and money, workspace-lock, reply-review, creator/fan denial, core Follow and pilot-columns source registrations are required.",
   );
   const packet = packets.find(
     (entry) => entry.id === process.env.W8_MIGRATION_WAVE,
@@ -473,8 +497,8 @@ async function activate() {
   ) as { migrations: { version: string; path: string }[] };
   const sources = [...packet.baseline, ...packet.wave];
   const registeredSources = [
-    ...coreFollowPacket.baseline,
-    ...coreFollowPacket.wave,
+    ...pilotColumnsPacket.baseline,
+    ...pilotColumnsPacket.wave,
   ];
   check(
     new Set(registeredSources.map((s) => s.version.slice(0, 4))).size ===
@@ -784,34 +808,53 @@ async function activate() {
           studioReplyAuthorityPacket.wave.length,
       "Core Follow cannot precede creator/fan denial.",
     );
+    const installedPilotColumns = before.filter((row) =>
+      pilotColumnsPacket.wave.some((source) => source.version === row.version),
+    ).length;
+    check(
+      installedPilotColumns === 0 ||
+        installedPilotColumns === pilotColumnsPacket.wave.length,
+      "Partial pilot-columns wave is not an accepted baseline.",
+    );
+    check(
+      !pilot || installedCoreFollow === coreFollowPacket.wave.length,
+      "Pilot-columns activation requires the complete reviewed123 predecessor.",
+    );
+    check(
+      !installedPilotColumns ||
+        installedCoreFollow === coreFollowPacket.wave.length,
+      "Pilot columns cannot precede core Follow.",
+    );
     if (generationInstalled)
       await assertGenerationWaveRoleSafety(
         client,
-        installedCoreFollow
-          ? "core-follow"
-          : installedStudioReplyAuthority
-            ? "studio-reply-authority"
-            : installedReplyReview
-              ? "reply-review"
-              : installedWorkspaceLock
-                ? "workspace-lock"
-                : installedSignInAndMoney
-                  ? "sign-in-and-money"
-                  : installedNotices
-                    ? "notices"
-                    : installedComparison
-                      ? "comparison"
-                      : installedPartialRecovery
-                        ? "partial-generation-recovery"
-                        : installedRecovery
-                          ? "generation-recovery"
-                          : installedPublic
-                            ? "public-ai"
-                            : outputInstalled
-                              ? "generation-output"
-                              : contentInstalled
-                                ? "content-privacy"
-                                : undefined,
+        installedPilotColumns
+          ? "pilot-columns"
+          : installedCoreFollow
+            ? "core-follow"
+            : installedStudioReplyAuthority
+              ? "studio-reply-authority"
+              : installedReplyReview
+                ? "reply-review"
+                : installedWorkspaceLock
+                  ? "workspace-lock"
+                  : installedSignInAndMoney
+                    ? "sign-in-and-money"
+                    : installedNotices
+                      ? "notices"
+                      : installedComparison
+                        ? "comparison"
+                        : installedPartialRecovery
+                          ? "partial-generation-recovery"
+                          : installedRecovery
+                            ? "generation-recovery"
+                            : installedPublic
+                              ? "public-ai"
+                              : outputInstalled
+                                ? "generation-output"
+                                : contentInstalled
+                                  ? "content-privacy"
+                                  : undefined,
       );
     else
       await assertWaveRoleSafety(client, {
@@ -843,6 +886,9 @@ async function activate() {
         ),
         comparisonBeforeNotices: Boolean(
           installedComparison && !installedNotices,
+        ),
+        coreFollowBeforePilotColumns: Boolean(
+          installedCoreFollow && !installedPilotColumns,
         ),
         studioReplyAuthorityBeforeCoreFollow: Boolean(
           installedStudioReplyAuthority && !installedCoreFollow,
@@ -950,31 +996,33 @@ async function activate() {
     const roleSafety = generation
       ? await assertGenerationWaveRoleSafety(
           client,
-          follow
-            ? "core-follow"
-            : studio
-              ? "studio-reply-authority"
-              : reply
-                ? "reply-review"
-                : workspaceLock
-                  ? "workspace-lock"
-                  : signInAndMoney
-                    ? "sign-in-and-money"
-                    : notices
-                      ? "notices"
-                      : comparison
-                        ? "comparison"
-                        : partialRecovery
-                          ? "partial-generation-recovery"
-                          : recovery
-                            ? "generation-recovery"
-                            : publicAI
-                              ? "public-ai"
-                              : output
-                                ? "generation-output"
-                                : content
-                                  ? "content-privacy"
-                                  : undefined,
+          pilot
+            ? "pilot-columns"
+            : follow
+              ? "core-follow"
+              : studio
+                ? "studio-reply-authority"
+                : reply
+                  ? "reply-review"
+                  : workspaceLock
+                    ? "workspace-lock"
+                    : signInAndMoney
+                      ? "sign-in-and-money"
+                      : notices
+                        ? "notices"
+                        : comparison
+                          ? "comparison"
+                          : partialRecovery
+                            ? "partial-generation-recovery"
+                            : recovery
+                              ? "generation-recovery"
+                              : publicAI
+                                ? "public-ai"
+                                : output
+                                  ? "generation-output"
+                                  : content
+                                    ? "content-privacy"
+                                    : undefined,
         )
       : await assertWaveRoleSafety(client, {
           trust: true,
@@ -997,6 +1045,7 @@ async function activate() {
           workspaceLockBeforeReplyReview: workspaceLock && !reply,
           replyReviewBeforeStudioReplyAuthority: reply && !studio,
           studioReplyAuthorityBeforeCoreFollow: studio && !follow,
+          coreFollowBeforePilotColumns: follow && !pilot,
         })
       : undefined;
     check(
@@ -1012,15 +1061,26 @@ async function activate() {
       const added = afterRoles.filter(
         (row) => !beforeRoles.some((old) => old.role === row.role),
       );
+      const expected = [
+        ...(pending.some(
+          (source) => source.version === "0255_w7_core_follow_metadata",
+        )
+          ? ["creator_growth_follow_metadata"]
+          : []),
+        ...(pending.some(
+          (source) => source.version === "0258_w4_provider_inbox_worker",
+        )
+          ? ["creator_commerce_inbox"]
+          : []),
+      ];
+      // The inbox login's attributes, memberships and settings were checked
+      // above by the generation role safety (assertCommerceInboxLogin).
       check(
-        added.length ===
-          (pending.some(
-            (source) => source.version === "0255_w7_core_follow_metadata",
-          )
-            ? 1
-            : 0) &&
-          added.every((row) => row.role === "creator_growth_follow_metadata"),
-        "Core Follow may add only its isolated metadata role.",
+        canonical(added.map((row) => row.role).sort()) ===
+          canonical(expected.sort()),
+        pilot
+          ? "The pilot-columns wave must add exactly the commerce inbox login; a login that already exists is refused."
+          : "Core Follow may add only its isolated metadata role.",
       );
     }
     check(

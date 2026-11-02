@@ -1,4 +1,5 @@
 import coreFollowReview from "../../../infra/migrations/reviews/20261027-core-follow.json" with { type: "json" };
+import pilotColumnsReview from "../../../infra/migrations/reviews/20261101-pilot-columns.json" with { type: "json" };
 import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import pg from "pg";
@@ -206,6 +207,16 @@ try {
     throw new Error(
       "Core Follow registry requires its exact source and complete creator/fan denial predecessor.",
     );
+  const pilotColumnsVersions = new Set(
+    pilotColumnsReview.sources.map((source) => source.version),
+  );
+  const pilotColumns = registry.migrations.some((source) =>
+    pilotColumnsVersions.has(source.version),
+  );
+  if (pilotColumns && (!coreFollow || !(await registeredComparisonProfile())))
+    throw new Error(
+      "Pilot-columns registry requires all three reviewed sources and the complete core Follow predecessor.",
+    );
   const registeredFiles = registry.migrations
     .filter(
       (file) =>
@@ -369,6 +380,18 @@ try {
     throw new Error(
       "Incomplete or unregistered core Follow wave; no per-file repair was attempted.",
     );
+  const installedPilotColumns = applied.filter((source) =>
+    pilotColumnsVersions.has(source.version),
+  ).length;
+  if (
+    installedPilotColumns &&
+    (!pilotColumns ||
+      installedCoreFollow !== coreFollowVersions.size ||
+      installedPilotColumns !== pilotColumnsVersions.size)
+  )
+    throw new Error(
+      "Incomplete or unregistered pilot-columns wave; no per-file repair was attempted.",
+    );
   // Fresh databases still bootstrap the exact canonical61. The complete new
   // wave is only installed atomically by activate-wave after private backup,
   // separate restore and closed-admission checks. Registered code alone cannot
@@ -391,7 +414,8 @@ try {
       (installedReplyReview || !replyReviewVersions.has(source.version)) &&
       (installedStudioReplyAuthority ||
         !studioReplyAuthorityVersions.has(source.version)) &&
-      (installedCoreFollow || !coreFollowVersions.has(source.version)),
+      (installedCoreFollow || !coreFollowVersions.has(source.version)) &&
+      (installedPilotColumns || !pilotColumnsVersions.has(source.version)),
   );
   const historical = localLegacy
     ? new Set<string>()
@@ -418,6 +442,9 @@ try {
     outputBeforePublic: installedOutput && !installedPublic,
     publicBeforeComparison: Boolean(installedPublic && !installedComparison),
     comparisonBeforeNotices: Boolean(installedComparison && !installedNotices),
+    coreFollowBeforePilotColumns: Boolean(
+      installedCoreFollow && !installedPilotColumns,
+    ),
     studioReplyAuthorityBeforeCoreFollow: Boolean(
       installedStudioReplyAuthority && !installedCoreFollow,
     ),
@@ -455,31 +482,33 @@ try {
       if (installedGeneration)
         await assertGenerationWaveRoleSafety(
           client,
-          installedCoreFollow
-            ? "core-follow"
-            : installedStudioReplyAuthority
-              ? "studio-reply-authority"
-              : installedReplyReview
-                ? "reply-review"
-                : installedWorkspaceLock
-                  ? "workspace-lock"
-                  : installedSignInAndMoney
-                    ? "sign-in-and-money"
-                    : installedNotices
-                      ? "notices"
-                      : installedComparison
-                        ? "comparison"
-                        : installedPartialRecovery
-                          ? "partial-generation-recovery"
-                          : installedRecovery
-                            ? "generation-recovery"
-                            : installedPublic
-                              ? "public-ai"
-                              : installedOutput
-                                ? "generation-output"
-                                : installedContent
-                                  ? "content-privacy"
-                                  : undefined,
+          installedPilotColumns
+            ? "pilot-columns"
+            : installedCoreFollow
+              ? "core-follow"
+              : installedStudioReplyAuthority
+                ? "studio-reply-authority"
+                : installedReplyReview
+                  ? "reply-review"
+                  : installedWorkspaceLock
+                    ? "workspace-lock"
+                    : installedSignInAndMoney
+                      ? "sign-in-and-money"
+                      : installedNotices
+                        ? "notices"
+                        : installedComparison
+                          ? "comparison"
+                          : installedPartialRecovery
+                            ? "partial-generation-recovery"
+                            : installedRecovery
+                              ? "generation-recovery"
+                              : installedPublic
+                                ? "public-ai"
+                                : installedOutput
+                                  ? "generation-output"
+                                  : installedContent
+                                    ? "content-privacy"
+                                    : undefined,
         );
       else await assertWaveRoleSafety(client, installedRoles(applied));
       if (continuation)
@@ -569,31 +598,33 @@ try {
       if (installedGeneration)
         await assertGenerationWaveRoleSafety(
           client,
-          installedCoreFollow
-            ? "core-follow"
-            : installedStudioReplyAuthority
-              ? "studio-reply-authority"
-              : installedReplyReview
-                ? "reply-review"
-                : installedWorkspaceLock
-                  ? "workspace-lock"
-                  : installedSignInAndMoney
-                    ? "sign-in-and-money"
-                    : installedNotices
-                      ? "notices"
-                      : installedComparison
-                        ? "comparison"
-                        : installedPartialRecovery
-                          ? "partial-generation-recovery"
-                          : installedRecovery
-                            ? "generation-recovery"
-                            : installedPublic
-                              ? "public-ai"
-                              : installedOutput
-                                ? "generation-output"
-                                : installedContent
-                                  ? "content-privacy"
-                                  : undefined,
+          installedPilotColumns
+            ? "pilot-columns"
+            : installedCoreFollow
+              ? "core-follow"
+              : installedStudioReplyAuthority
+                ? "studio-reply-authority"
+                : installedReplyReview
+                  ? "reply-review"
+                  : installedWorkspaceLock
+                    ? "workspace-lock"
+                    : installedSignInAndMoney
+                      ? "sign-in-and-money"
+                      : installedNotices
+                        ? "notices"
+                        : installedComparison
+                          ? "comparison"
+                          : installedPartialRecovery
+                            ? "partial-generation-recovery"
+                            : installedRecovery
+                              ? "generation-recovery"
+                              : installedPublic
+                                ? "public-ai"
+                                : installedOutput
+                                  ? "generation-output"
+                                  : installedContent
+                                    ? "content-privacy"
+                                    : undefined,
         );
       else await assertWaveRoleSafety(client, installedRoles(files));
       if (continuation)
@@ -623,6 +654,10 @@ try {
   if (notices && !installedNotices)
     process.stdout.write(
       "Notices sources remain unapplied. After comparison114, use W8_MIGRATION_WAVE=20261015-notices with verified private backup/restore and closed admission.\n",
+    );
+  if (pilotColumns && !installedPilotColumns)
+    process.stdout.write(
+      "Pilot-columns sources remain unapplied. After core Follow123, use W8_MIGRATION_WAVE=20261101-pilot-columns with verified private backup/restore and closed admission.\n",
     );
   if (coreFollow && !installedCoreFollow)
     process.stdout.write(

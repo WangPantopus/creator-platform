@@ -3418,8 +3418,26 @@ data class APIPasskeyRegistration(
 
 @Serializable
 data class APIPasskeyRevocation(
-  val `credentialId`: String
+  val `credentialId`: String,
+  val `loss`: APIPasskeyRevocationLoss? = null
 )
+
+@Serializable
+enum class APIPasskeyRevocationLoss {
+  @SerialName("lost") LOST,
+  @SerialName("compromised") COMPROMISED
+}
+
+@Serializable
+data class APIPasskeyRecovery(
+  val `loss`: APIPasskeyRecoveryLoss? = null
+)
+
+@Serializable
+enum class APIPasskeyRecoveryLoss {
+  @SerialName("lost") LOST,
+  @SerialName("compromised") COMPROMISED
+}
 
 @Serializable
 data class APIPasskeys(
@@ -3431,7 +3449,8 @@ data class APIPasskeys(
 data class APIPasskeysCredentialsItem(
   val `id`: String,
   val `createdAt`: String,
-  val `revoked`: Boolean
+  val `revoked`: Boolean,
+  val `retired`: Boolean
 )
 
 @Serializable

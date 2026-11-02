@@ -11,6 +11,7 @@ import {
   assertWorkspaceLockPrivacyTaskCatalogForReview,
   assertReplyReviewPrivacyTaskCatalogForReview,
   assertStudioReplyAuthorityPrivacyTaskCatalogForReview,
+  assertCoreFollowPrivacyTaskCatalogForReview,
   assertContentPrivacyTaskCatalogForReview,
   assertPrivacyTaskCatalog,
 } from "../src/modules/trust/privacy-catalog.js";
@@ -22,6 +23,7 @@ import {
   assertDomainPrivacyTaskCatalogForWorkspaceLockReview,
   assertDomainPrivacyTaskCatalogForReplyReview,
   assertDomainPrivacyTaskCatalogForStudioReplyAuthority,
+  assertDomainPrivacyTaskCatalogForCoreFollow,
 } from "../src/modules/trust/domain-privacy-catalog.js";
 import { repositoryRoot, sha256 } from "./migration-custody.js";
 import { WaveRoleSafetyError } from "./migration-wave-roles.js";
@@ -64,6 +66,7 @@ export async function assertPrivacyWaveRoleSafety(
     workspaceLockBeforeReplyReview?: boolean;
     replyReviewBeforeStudioReplyAuthority?: boolean;
     studioReplyAuthorityBeforeCoreFollow?: boolean;
+    coreFollowBeforePilotColumns?: boolean;
   },
 ) {
   const fail = (purpose: string): never => {
@@ -162,6 +165,8 @@ export async function assertPrivacyWaveRoleSafety(
         await assertReplyReviewPrivacyTaskCatalogForReview(client);
       else if (installed.studioReplyAuthorityBeforeCoreFollow)
         await assertStudioReplyAuthorityPrivacyTaskCatalogForReview(client);
+      else if (installed.coreFollowBeforePilotColumns)
+        await assertCoreFollowPrivacyTaskCatalogForReview(client);
       else await assertPrivacyTaskCatalog(client);
       await client.query("RESET SESSION AUTHORIZATION");
     }
@@ -178,7 +183,9 @@ export async function assertPrivacyWaveRoleSafety(
                 ? assertDomainPrivacyTaskCatalogForReplyReview
                 : installed.studioReplyAuthorityBeforeCoreFollow
                   ? assertDomainPrivacyTaskCatalogForStudioReplyAuthority
-                  : assertDomainPrivacyTaskCatalog;
+                  : installed.coreFollowBeforePilotColumns
+                    ? assertDomainPrivacyTaskCatalogForCoreFollow
+                    : assertDomainPrivacyTaskCatalog;
       await client.query("SET SESSION AUTHORIZATION creator_trust_worker");
       await domainCatalog(client, "trust");
       await client.query("RESET SESSION AUTHORIZATION");

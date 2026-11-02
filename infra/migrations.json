@@ -777,6 +777,27 @@
       "path": "apps/backend/src/modules/growth/migrations/pending_w7_core_follow_metadata.sql",
       "sourceSha256": "29c0261cdfce50be434d8b8b49c21e23df6057613d521c8e40a13c3928d63796",
       "wave": "20261027-core-follow"
+    },
+    {
+      "version": "0256_w1_passkey_retirement",
+      "path": "apps/backend/src/modules/identity/pending-passkey-retirement.sql",
+      "owner": "W1",
+      "sourceSha256": "e38db23a85fbd9f2db2332a47dd5bbe734c0d16049c12f6ac6c5c3d941770565",
+      "wave": "20261101-pilot-columns"
+    },
+    {
+      "version": "0257_w7_invite_note",
+      "path": "apps/backend/src/modules/growth/migrations/pending_w7_invite_note.sql",
+      "owner": "W7",
+      "sourceSha256": "fcec29c57efd51975aa5c26827a4d39d6648e92b315563626b1e1079ede02868",
+      "wave": "20261101-pilot-columns"
+    },
+    {
+      "version": "0258_w4_provider_inbox_worker",
+      "path": "apps/backend/src/modules/commerce/schema-provider-inbox-worker.sql",
+      "owner": "W4",
+      "sourceSha256": "7c280dd05620b6574a6bc9bb34e2509caa6bb2a31a1a12a23a10425c9fa5c810",
+      "wave": "20261101-pilot-columns"
     }
   ],
   "reserved": [

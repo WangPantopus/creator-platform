@@ -1,4 +1,5 @@
 import studioReplyAuthorityReview from "../../../../../infra/migrations/reviews/20261023-studio-reply-authority.json" with { type: "json" };
+import coreFollowReview from "../../../../../infra/migrations/reviews/20261027-core-follow.json" with { type: "json" };
 import type { PoolClient, QueryConfig, QueryResultRow } from "pg";
 import generationPrivacyReview from "../../../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
 import contentPrivacyReview from "../../../../../infra/migrations/reviews/20261007-content-privacy.json" with { type: "json" };
@@ -459,6 +460,19 @@ export async function assertOriginalPrivacyFamilyStudioReplyAuthorityCatalogForR
     studioReplyAuthorityReview.originalFamilyProfiles.map(
       (profile) => profile.sha256,
     ),
+    signal,
+  );
+}
+
+/** Fixed123 predecessor metadata; no runtime task authority. */
+export async function assertOriginalPrivacyFamilyCoreFollowCatalogForReview(
+  client: PoolClient,
+  signal?: AbortSignal,
+) {
+  await assertOriginalPrivacyFamilyCaller(client, signal);
+  await assertPurposeCatalogue(
+    client,
+    coreFollowReview.originalFamilyProfiles.map((profile) => profile.sha256),
     signal,
   );
 }

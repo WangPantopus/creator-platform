@@ -1,8 +1,9 @@
 # Lane 1 · WP 1.5 · Signing fixes
 
 Written 2026-10-15 by lane 1. Three items from the lane brief (launch review, section 7, rows 8
-and 9, and the Android passkey limit). One is fixed here, one needs a lane 6 change (a verified
-patch is below) and two need the founder's decision.
+and 9, and the Android passkey limit). The signing panel is fixed in lane 1's code; the stuck Note
+needs a lane 6 change (a verified patch is below); the founder decided the other two on
+2026-10-15, and the recovery split is built.
 
 ## 1. A pending publication stays stuck after the five-minute window (row 8)
 
@@ -64,36 +65,53 @@ pull request does not add copy.
 
 ## 2. Passkey recovery marks every past signature revoked (row 9)
 
-**What the code does.** Starting recovery revokes every passkey and sets `key_revoked` and
-`creator_revoked` on every past signature of the creator
-(`apps/backend/src/modules/identity/passkeys.ts:200-220`, the update at line 216). Revoking one
-passkey sets `key_revoked` on every signature made with it (line 194). The public verification
-page then shows "Creator verification revoked" or "Signing key revoked" on every Note, reply and
-share card the creator ever signed (`apps/web/app/verify/[id]/page.tsx:49-50`), though nothing
-shows that any of them was forged. A creator who loses a phone looks, to fans, like a creator whose
-signatures were never trustworthy.
+**What the code did.** Starting recovery revoked every passkey and set `key_revoked` and
+`creator_revoked` on every past signature of the creator (`passkeys.ts`, `recover`). Revoking one
+passkey set `key_revoked` on every signature made with it (`revoke`). The public verification page
+then showed "Signing key revoked" (the key flag takes precedence) on every Note, reply and share card
+the creator ever signed (`apps/web/app/verify/[id]/page.tsx:49-50`), though nothing showed that any
+of them was forged.
 
-**Why it is a decision.** What a fan is told about a past signature is the trust posture (INV-22,
-D-18). Two honest answers exist:
+**Decision (founder, 2026-10-15).** Split a lost device from a compromised one. A lost device
+retires the key and past signatures stay valid; a compromised device keeps today's revocation.
 
-| Option      | Lost device                                                                                                                            | Compromised device                                            |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| A, today    | Every past signature shows revoked                                                                                                     | Same                                                          |
-| B, proposed | The lost keys are retired. Past signatures stay valid ("signed with a key since retired"); new acts need re-verification and a new key | The creator says the device was compromised: today's behavior |
+**What was built** (pull request stacked on this file's first one):
 
-**Proposed default, until you decide:** keep A in code, and do the cheap thing the launch review
-asked for:
+- A passkey can be **retired** (`passkey_credential.retired_at`, one pending migration). A retired
+  key can never sign again: signing checks `revoked_at` and `retired_at` (`signed-acts.ts`,
+  `subjects.ts`). Every reader of past acts (the public page, commerce, content, media, the
+  signature-read fences) checks only `revoked_at` and the signature flags, so past acts stay valid
+  with no other lane's code touched.
+- Until the integrator registers `pending-passkey-retirement.sql`, the three signing reads and the
+  key list read the column as `to_jsonb(pc)->>'retired_at'`, which is null while the column does
+  not exist. Signing therefore works on a database with registered migrations only (CI's backend
+  suite: 157 of 157), and retirement is enforced once the column exists (the key-loss scenario
+  below). Before registration the two lost-device updates fail inside their transaction and
+  change nothing (read from the code, not run). Once it is registered, lane 1 replaces the four
+  reads with the plain column.
+- **Lost** (`recover(actor, "lost")`, `revoke(actor, id, "lost")`): every working key is retired,
+  open challenges are cancelled, and `recovery_started_at` is set. That alone requires a fresh
+  sign-in and fresh, ops-approved proof before the next key. The creator stays verified and
+  `recovery_required` stays false, because several readers hide past acts while it is true.
+- **Compromised** (the default when no choice is sent): unchanged.
+- The setup page asks which happened. With exactly one working key, it asks for a second one in
+  the approved wording: "Add a second passkey on another device, so losing one does not stop you
+  signing."
 
-- **Guidance.** After the first passkey, the setup page asks the creator to add a second one on
-  another device, so losing one device does not stop them signing. Proposed wording (needs your
-  approval): "Add a second passkey on another device, so losing one does not stop you signing."
-  Not added in this pull request.
-- **Ops guidance.** Before an ops reviewer approves fresh proof after a recovery, they ask whether
-  the device was lost or compromised and record it in the case.
+**Wording, approved by the founder on 2026-10-15** (in `config/copy.json`, used on the setup page):
 
-**If you pick B:** `passkeys.ts` gains a "lost" path, the public status gains `key_retired`
-(`packages/api/src/identity.ts:191`), and lane 5's verification page gets one new line of copy.
-That touches a contract and copy, so it waits for your yes.
+| Key                              | Proposed                                                                                                         |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `passkeyRecoveryBody`            | Choose what happened. Either way, sign in again and submit fresh creator proof before registering a new passkey. |
+| `passkeyRecoveryLost`            | It's lost or broken                                                                                              |
+| `passkeyRecoveryLostHelp`        | Your past signatures stay valid. That passkey can't sign again.                                                  |
+| `passkeyRecoveryCompromised`     | Someone else may have it                                                                                         |
+| `passkeyRecoveryCompromisedHelp` | Every past signature will show as revoked, because no one can tell which were yours.                             |
+
+**Known gap.** The publication authority's applied SQL (`schema-publication-scope.sql:194`)
+checks only `revoked_at` when it publishes a scheduled or media Note. An act signed in the five
+minutes before its key was retired could still be published by that worker, which is not running in
+the pilot. Fixing it needs a new migration replacing that function.
 
 ## 3. The Android 8 and 9 passkey limit (minSdk)
 
@@ -104,7 +122,7 @@ passkey ceremony already refuses below that
 17, and passkeys exist from iOS 16. Under option A (2026-10-09), the native app is the fan app and
 creators sign in the Studio in a browser; fans never need a passkey.
 
-**Proposed decision:**
+**Decision (founder, 2026-10-15):**
 
 - Keep the fan app at Android 8: no fan feature needs a passkey.
 - A creator signs on a device with passkeys: Android 9 or later, iOS 16 or later, or a computer
@@ -128,6 +146,13 @@ on the real clock (no clock edits).
 | Thread reply, today's `signing.tsx` (swapped in locally)       | The passkey is revoked while the signed reply's request is in flight; the backend refuses with `signed_act_required`; the panel freezes on a disabled "Check publication status"                   | the defect, reproduced |
 | Thread reply, with the fix                                     | The same; the panel says "Signing could not complete. No publication was started." and signing is enabled again; nothing reached the fan                                                           | fixed                  |
 | Thread reply, lost answer, with the fix                        | The request is cut; the panel stays "unknown" (the reply may have been sent)                                                                                                                       | unchanged, as intended |
+
+Losing a passkey (`tests/scenarios/lane-1/e1-5-key-loss.mjs`, two virtual devices): a Note signed
+on device 1; "It's lost or broken" retires every key, the Note stays valid in the database and on
+the public page, Maya stays verified, and nothing can be signed; device 2 needs fresh proof, then
+registers a key and sees the second-passkey prompt; device 1, with its client altered to offer the
+retired key, is refused (`creator_passkey_required`); "Someone else may have it" revokes every key
+and every past signature ("Signing key revoked").
 
 Scripts: `tests/scenarios/lane-1/e1-5-pending-publication.mjs` (`--expect-recovery` with lane 6's
 patch) and `tests/scenarios/lane-1/e1-5-refused-publish.mjs` (`--expect-freeze` against today's

@@ -1607,6 +1607,72 @@
         }
       }
     },
+    "Add a second passkey on another device, so losing one does not stop you signing.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add a second passkey on another device, so losing one does not stop you signing."
+          }
+        }
+      }
+    },
+    "Choose what happened. Either way, sign in again and submit fresh creator proof before registering a new passkey.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose what happened. Either way, sign in again and submit fresh creator proof before registering a new passkey."
+          }
+        }
+      }
+    },
+    "It's lost or broken": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It's lost or broken"
+          }
+        }
+      }
+    },
+    "Your past signatures stay valid. That passkey can't sign again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your past signatures stay valid. That passkey can't sign again."
+          }
+        }
+      }
+    },
+    "Someone else may have it": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Someone else may have it"
+          }
+        }
+      }
+    },
+    "Every past signature will show as revoked, because no one can tell which were yours.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every past signature will show as revoked, because no one can tell which were yours."
+          }
+        }
+      }
+    },
     "Home": {
       "extractionState": "manual",
       "localizations": {
@@ -4056,6 +4122,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Your launch kit"
+          }
+        }
+      }
+    },
+    "Your invitation note (optional)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your invitation note (optional)"
+          }
+        }
+      }
+    },
+    "This note is public to anyone with the link. Up to 600 characters.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This note is public to anyone with the link. Up to 600 characters."
           }
         }
       }

@@ -91,12 +91,17 @@ const credential = sql(
 );
 step("Maya registers a passkey on this device", Boolean(credential));
 
+// Studio's shell keeps one live stream open (WP 6.9), so the network never
+// goes idle there; the stream's first answer means the page is up.
+const live = page.waitForResponse(
+  (response) => new URL(response.url()).pathname === "/api/studio/live",
+);
 await page.goto(`${WEB}/studio/${MAYA}/threads/${fanId}`);
-await page.waitForLoadState("networkidle");
+await live;
 const takeover = page.getByRole("button", { name: "Take over" });
 if (await takeover.isEnabled().catch(() => false)) {
   await takeover.click();
-  await page.waitForLoadState("networkidle");
+  await page.getByLabel("Your words").waitFor();
 }
 const reply = `A personal note from the kiln ${Date.now()}`;
 await page.getByLabel("Your words").fill(reply);
@@ -161,6 +166,16 @@ if (lost) {
     panel.replaceAll("\n", " | ").slice(-220),
   );
 }
+// Leave the conversation as it was: hand it back to the AI.
+await fetch(new URL(`/v1/studio/${MAYA}/threads/${fanId}/handback`, API), {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+    "X-Expected-Account-Id": MAYA_ACCOUNT,
+  },
+  body: JSON.stringify({ idempotencyKey: `handback-${Date.now()}` }),
+});
 await browser.close();
 console.log(failures ? `${failures} failed` : "all steps passed");
 process.exit(failures ? 1 : 0);
