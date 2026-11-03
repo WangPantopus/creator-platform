@@ -116,13 +116,17 @@ in the Wave 6 queue.
      `stack up` and `activate-wave` refuse the rest. So the rule to register no new wave until
      `migrate-trust` read the chain is lifted
      ([registering a file](engineering/migrations.md#registering-a-file-today)).
-   - **Next: three pull requests** ([the plan](engineering/migrations.md#wave-6-the-plan)): the
-     head profile, one loop over the reviews from `20261008-comparison` on; the wave lists and the
-     chain checks in `activate-wave`; and the role checks and the trust catalogue modules, which
-     select the head review and the fixed predecessor by wave id instead of a ternary per wave, and
-     give the installer's final checks the chain's head. Each keeps every existing refusal and its
-     message. The pilot's ops-console and memory waves still wait on them. After that, files are
-     registered only as features need them.
+   - **The head profile walks the table of reviewed waves** (#544). It selects the product's pins
+     with one walk over the waves from `20261008-comparison` on, in the chain's order, instead of a
+     function per wave, and keeps every refusal and its message. The table moved to
+     `apps/backend/src/db/reviewed-waves.ts`, so the runtime and the scripts share one list of
+     waves. A registration adds its wave's row there, with the head profile's two refusals for it.
+   - **Next: two pull requests** ([the plan](engineering/migrations.md#wave-6-the-plan)): the wave
+     lists and the chain checks in `activate-wave`; and the role checks and the trust catalogue
+     modules, which select the head review and the fixed predecessor by wave id instead of a
+     ternary per wave, and give the installer's final checks the chain's head. Each keeps every
+     existing refusal and its message. The pilot's ops-console and memory waves still wait on them.
+     After that, files are registered only as features need them.
 2. **Pilot phase 1, a real host** (about 3 weeks, blocked mostly on the founder's decisions): a
    production composition root with real adapters; staging, the domain and app links; Apple and
    Google credentials; the Anthropic switch; observability, backups and a restore drill. Its exit:
