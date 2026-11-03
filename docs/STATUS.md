@@ -76,7 +76,8 @@ in the Wave 6 queue.
   - **Done on 2026-11-03: `main` is protected,** with the founder's yes. Every change goes through a
     pull request, and the six CI jobs are required checks
     ([engineering/ci.md](engineering/ci.md#branch-protection)).
-  - Still waiting on the founder: tag the tree, then remove `artifacts/` from it.
+  - **Remove `artifacts/`: tagged; the removal PR is next.** The founder approved it on 2026-11-03.
+    The tag `archive/artifacts-2026-11-03` holds all 5,648 files at `37a47bd84`.
 
 ## Next
 
@@ -110,8 +111,8 @@ and "Sign-in is unavailable right now. Try again in a moment."), the home glyph 
 installs, "three now, rest later" for Wave 4, and one coordinating session plus one work session
 per task. Approved on 2026-11-03: the required checks, and tests that are end-to-end only. No unit
 tests from now on: every change is proven by end-to-end tests that launch the real apps against a
-real stack. That declines the plan's proposal to allow unit tests for pure logic, and confirms the
-2026-10-09 rule. Still open:
+real stack. That declines the plan's proposal to allow unit tests for pure logic and bug
+regressions, and confirms the 2026-10-09 rule. Still open:
 
 - **How we work:** the working rules in [plan section 6](CONSOLIDATION_PLAN.md#6-how-we-work-from-now-on)
   (scenarios in CI, parallel sessions); whether the existing suites keep running in CI as regression
