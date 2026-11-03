@@ -343,3 +343,18 @@ export const reviewedWaves: readonly Readonly<{
     operator,
   })),
 ];
+
+// The role checks take each name for one wave. Until they learn a new wave's
+// names, a row for it compiles only by reusing another wave's, and the role
+// checks would then check the wrong wave. No table with a shared name loads.
+for (const field of ["extension", "privacy"] as const)
+  for (const [index, row] of reviewedWaves.entries()) {
+    const name = row.operator[field];
+    const first = reviewedWaves.findIndex(
+      (other) => other.operator[field] === name,
+    );
+    if (name !== undefined && first !== index)
+      throw new Error(
+        `Reviewed waves ${reviewedWaves[first]!.id} and ${row.id} share the role-check name ${name}; each wave needs its own (step 6 in docs/engineering/migrations.md).`,
+      );
+  }
