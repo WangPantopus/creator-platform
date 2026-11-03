@@ -336,6 +336,8 @@ D-H, D-01 to D-27) are in the Domain Model.
 
 | 2026-11-02 (Pacific time) | The founder selected **Hotpot** as the product name under **Pantopus**, and requested the latest main iOS build on TestFlight for a real iPhone before public App Store and Google Play release. Supersedes the Qelvora-placeholder naming instruction; the coordinated source rename remains pending. Apple registered `com.pantopus.hotpot` under Pantopus, Inc.; the exact store listing name Hotpot was rejected as already in use, so a listing alternative awaits the founder. Evidence: the founder’s request in this setup chat and the Apple Developer/App Store Connect responses. See [naming](NAMING.md). |
 
+| 2026-11-02 (Pacific time), TestFlight follow-up | The founder approved an installation-only TestFlight build with no backend, accepted the Apple agreement, and signed in to Xcode. Sign-in and conversations are intentionally unavailable in this first install check. After the store name conflicts, the founder asked to keep exploring names; no replacement for Hotpot has been approved. This narrows the preceding TestFlight request, without changing pilot release gates. Evidence: the founder’s replies in the setup chat. |
+
 ## 15. Open questions and known inconsistencies
 
 Resolve these during the design pass (proposals in the [design plan](DESIGN_PLAN.md)):

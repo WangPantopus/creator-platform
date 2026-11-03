@@ -14,19 +14,21 @@ see [NAMING](NAMING.md). The source-wide rename is still pending.
   were open when checked. Work branch: `codex/hotpot-testflight-setup`.
 - Apple Developer team: **Pantopus, Inc.**, `6UYZBA546R`. Registered App ID:
   **Hotpot**, `com.pantopus.hotpot`, with Sign in with Apple enabled.
-- App Store Connect rejected **Hotpot** as an already-used listing name. No app
-  record exists yet; the founder has been asked for a listing alternative.
-- Apple shows an updated Developer Program License Agreement requiring the
-  Account Holder’s acceptance. Xcode has no Apple account or valid signing
-  identity on this Mac. The founder has been asked to complete these steps.
+- App Store Connect rejected **Hotpot**; the form also showed unavailable-name
+  errors for **Hotpots** and **Hot Pot**. The founder requested more name ideas;
+  no alternative is approved and no app record exists yet.
+- The founder accepted the updated Apple agreement, and its pending banner
+  disappeared. Xcode is signed in to the Pantopus team. Existing development and
+  distribution certificates show **Not in Keychain**; no valid local signing
+  identity exists yet. Certificate creation controls were disabled when checked.
 - A Release archive preflight **succeeded**, using main source with build overrides for the
   Hotpot display name and bundle ID. It is unsigned and cannot be installed
   through TestFlight. Build evidence stays under ignored `artifacts/`.
 - The archive lacks version/build metadata and an app icon; both need release
   configuration before Apple validation. Main has no configured HTTPS backend
-  or Google client IDs. A server
-  URL (or an explicit installation-only scope) is still needed. There is no
-  successful upload, TestFlight invitation or real-iPhone acceptance yet.
+  or Google client IDs. The founder explicitly approved an **installation-only**
+  build without a backend: sign-in and conversations will remain unavailable.
+  There is no successful upload, TestFlight invitation or real-iPhone acceptance yet.
 
 ## What we are building
 

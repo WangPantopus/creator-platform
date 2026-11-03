@@ -11,8 +11,8 @@ account). The G0 to G5 that the trust workflow names are the integration gates o
 [launch plan](../LAUNCH_PLAN.md#8-the-road-to-the-pilot) has replaced that plan.
 
 Nothing is released today. TestFlight setup has begun in the existing Pantopus, Inc. Apple
-Developer account; Hotpot has the registered bundle ID `com.pantopus.hotpot`. App Store naming,
-the updated Apple agreement and local signing setup are unresolved. No staging or production
+Developer account; Hotpot has the registered bundle ID `com.pantopus.hotpot`. App Store naming and local signing setup remain unresolved; the founder has
+accepted the updated Apple agreement and signed in to Xcode. No staging or production
 environment, final domain or production credential is configured in this repository
 ([STATUS](../STATUS.md)).
 
@@ -25,17 +25,17 @@ Hotpot as the home-screen display name.
 
 Before uploading:
 
-1. The Account Holder reviews and accepts Apple's outstanding Developer Program
-   License Agreement. Sign in to that team's account in Xcode Settings → Apple Accounts.
+1. Apple agreement acceptance and Xcode sign-in are complete. Set up a usable
+   signing identity on this Mac; the existing certificates show Not in Keychain.
 2. Create the App Store Connect iOS record with an available name, English (U.S.),
    bundle ID `com.pantopus.hotpot`, and SKU `pantopus-hotpot-ios`. These were the
    attempted form values; the name rejection means the record was **not** created.
 3. Supply an app icon and explicit `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION`.
    The unsigned main archive compiled successfully, but its processed Info.plist
    had neither version key nor app icons, so it is not ready for upload.
-4. Set the release HTTPS API origin and public OAuth client configuration, or get
-   an explicit installation-only scope. An empty API origin leaves sign-in and
-   conversations unavailable; TestFlight does not host the backend.
+4. The founder approved installation-only scope with no backend. Keep the API
+   origin empty and explicitly disclose that sign-in and conversations are
+   unavailable. A later functional beta needs the HTTPS API and OAuth setup.
 5. Archive with the Hotpot bundle/display-name overrides and Pantopus team, sign
    using Apple distribution, then validate and upload using Xcode. Review export
    compliance against the actual archive; do not invent declarations.
