@@ -8,9 +8,10 @@ import { fileURLToPath } from "node:url";
 // source of the waves before it, in order, and every checksum is the SHA-256 of
 // the SQL bytes. A registered wave never changes, so an existing packet that
 // would come out different stops the run instead of being rewritten. Each
-// packet must list exactly the sources its review names, and every other
-// reviewed record under infra/migrations must keep the checksum that
-// infra/migrations/reviewed.json pins. See docs/engineering/migrations.md.
+// packet must list exactly the sources its review names, each review after the
+// first pins the packet before its own and belongs to a wave in the chain, and
+// every other reviewed record under infra/migrations must keep the checksum
+// that infra/migrations/reviewed.json pins. See docs/engineering/migrations.md.
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const check = process.argv.includes("--check");
@@ -39,6 +40,19 @@ const fail = (message) => {
   console.error(message);
   process.exit(1);
 };
+// A missing or malformed input stops the run with one line, not a stack trace.
+const load = (name) => {
+  if (!exists(name)) fail(`${name} is missing.`);
+  let value;
+  try {
+    value = JSON.parse(read(name));
+  } catch (error) {
+    fail(`${name} is not valid JSON: ${error.message}`);
+  }
+  if (typeof value !== "object" || value === null || Array.isArray(value))
+    fail(`${name}: unknown format.`);
+  return value;
+};
 
 // Reviewed packets the registry cannot reproduce. reviewed.json pins their
 // bytes; the generator checks their place in the chain and never writes them.
@@ -53,6 +67,11 @@ const frozen = new Set([
   // Its 2 sources, 0235 and 0236, carry no wave in the registry.
   "20261007-public-ai",
 ]);
+// The first wave the local installer applies after the canonical bootstrap
+// that migrate-trust runs file by file. From it on, every wave has a review
+// that names its sources. It is fixed, so a wave tag added to a canonical
+// entry cannot move it.
+const firstFresh = "20261007-generation";
 // The reviews of three October waves have other names.
 const reviewPath = (id) =>
   `infra/migrations/reviews/${
@@ -63,7 +82,7 @@ const reviewPath = (id) =>
     }[id] ?? id
   }.json`;
 
-const pinned = JSON.parse(read(pins));
+const pinned = load(pins);
 if (
   pinned.schemaVersion !== 1 ||
   typeof pinned.sha256 !== "object" ||
@@ -71,7 +90,7 @@ if (
   !Object.values(pinned.sha256).every((digest) => /^[a-f0-9]{64}$/.test(digest))
 )
   fail(`${pins}: unknown format.`);
-const registry = JSON.parse(read("infra/migrations.json"));
+const registry = load("infra/migrations.json");
 if (registry.schemaVersion !== 1 || !Array.isArray(registry.migrations))
   fail("infra/migrations.json: unknown registry format.");
 const packets = new Map();
@@ -82,7 +101,7 @@ for (const id of frozen) {
     fail(`${name} is missing. It is a frozen reviewed packet.`);
   if (sha256(read(name)) !== pinned.sha256[name])
     fail(`${name} changed. It is a frozen reviewed packet, pinned in ${pins}.`);
-  const packet = JSON.parse(read(name));
+  const packet = load(name);
   packets.set(id, packet);
   for (const source of packet.wave) frozenWave.set(source.version, id);
 }
@@ -91,12 +110,12 @@ for (const id of frozen) {
 // their first source appears in the registry.
 const initial = [];
 const waves = new Map();
-const tagged = new Set();
 const seen = new Set();
-for (const entry of registry.migrations) {
-  const { version, path: file } = entry;
+for (const [at, entry] of registry.migrations.entries()) {
+  const { version, path: file } = entry ?? {};
+  if (typeof version !== "string")
+    fail(`Invalid registry entry at position ${at + 1}.`);
   if (
-    typeof version !== "string" ||
     !/^\d{4}_[a-z0-9_]+$/.test(version) ||
     typeof file !== "string" ||
     !/^(apps\/backend|infra\/migrations\/history)\/[a-zA-Z0-9_./-]+\.sql$/.test(
@@ -133,7 +152,6 @@ for (const entry of registry.migrations) {
     fail(`Invalid wave name for ${version}.`);
   if (entry.sourceSha256 === undefined)
     fail(`${version} is in a wave, so it needs its sourceSha256.`);
-  if (entry.wave !== undefined) tagged.add(wave);
   if (!waves.has(wave)) waves.set(wave, []);
   waves.get(wave).push(source);
 }
@@ -191,9 +209,9 @@ for (const [id, wave] of waves) {
       );
     else outputs.set(packetPath(id), content);
   }
-  // From the first wave the registry names on, every wave has a review that
-  // names its sources exactly: that is what anchors the newest packet.
-  fresh ||= tagged.has(id);
+  // From the first fresh wave on, every wave has a review that names its
+  // sources exactly: that is what anchors the newest packet.
+  fresh ||= id === firstFresh;
   if (fresh) {
     const name = reviewPath(id);
     reviews.add(name);
@@ -202,20 +220,35 @@ for (const [id, wave] of waves) {
         `${name} does not exist yet: measure the wave's pins with apps/backend/scripts/wave-pins.ts.`,
       );
     else {
-      const review = JSON.parse(read(name));
+      const review = load(name);
       const named = review.source ? [review.source] : review.sources;
       if (
         !Array.isArray(named) ||
         text(
-          named.map(({ version, path, checksum }) => ({
-            version,
-            path,
-            checksum,
+          named.map((source) => ({
+            version: source?.version,
+            path: source?.path,
+            checksum: source?.checksum,
           })),
         ) !== text(wave)
       )
         problems.push(
           `${packetPath(id)} does not list exactly the sources ${name} names.`,
+        );
+      // Each review after the first pins the packet of the wave before its
+      // own, so no packet before the newest changes unseen.
+      const pin = review.baselineWave;
+      const before = chain.at(-1);
+      const expected = packetPath(before?.id);
+      if (pin === undefined && id !== firstFresh)
+        problems.push(`${name} has no baselineWave; it must pin ${expected}.`);
+      else if (pin !== undefined && pin?.path !== expected)
+        problems.push(
+          `${name} pins ${pin?.path}, not ${expected}, the packet of the wave before its own.`,
+        );
+      else if (pin !== undefined && pin.sha256 !== before?.sha256)
+        problems.push(
+          `${name} pins ${pin.path}, which no longer has that checksum.`,
         );
     }
   }
@@ -230,23 +263,22 @@ for (const [id, wave] of waves) {
   previous = packet;
 }
 
-// A review pins the bytes of the packet it follows; keep that pin true.
+// A review that pins a packet is the review of a wave in the chain, so a
+// reviewed wave, the newest included, never leaves the registry unseen.
 for (const name of walk("infra/migrations/reviews"))
-  if (name.endsWith(".json")) {
-    const pin = JSON.parse(read(name)).baselineWave;
-    const bytes =
-      pin && (outputs.get(pin.path) ?? (exists(pin.path) && read(pin.path)));
-    if (pin && (!bytes || sha256(bytes) !== pin.sha256))
-      problems.push(
-        `${name} pins ${pin.path}, which no longer has that checksum.`,
-      );
-  }
+  if (
+    name.endsWith(".json") &&
+    !reviews.has(name) &&
+    load(name).baselineWave !== undefined
+  )
+    problems.push(
+      `${name} is the review of no wave in the chain. A reviewed wave is never dropped: put its registry entries and its packet back.`,
+    );
 
-// The local installer applies every wave after the canonical bootstrap that
-// migrate-trust runs file by file: the waves from the first one the registry
-// names.
-const first = chain.findIndex((wave) => tagged.has(wave.id));
-if (first < 0) fail("The registry names no wave.");
+// The local installer applies every wave from the first fresh one on, after
+// the canonical bootstrap that migrate-trust runs file by file.
+const first = chain.findIndex((wave) => wave.id === firstFresh);
+if (first < 0) fail(`The registry has no ${firstFresh} wave.`);
 outputs.set(
   "infra/migrations/chain.json",
   text({
@@ -262,15 +294,19 @@ outputs.set(
   }),
 );
 
-// Every other file here is a registered source or a pinned reviewed record.
+// Every other file here is a registered source or a pinned reviewed record,
+// and every pin is compared: a pin this walk never reaches stops the run
+// instead of being counted.
 const registered = new Set(registry.migrations.map((entry) => entry.path));
 const generated = new Set([
   "infra/migrations/chain.json",
   ...[...waves.keys()].filter((id) => !frozen.has(id)).map(packetPath),
 ]);
+const compared = new Set();
 for (const name of walk("infra/migrations")) {
   if (name === pins || registered.has(name) || generated.has(name)) continue;
   const digest = sha256(read(name));
+  if (pinned.sha256[name] !== undefined) compared.add(name);
   if (pinned.sha256[name] === digest) continue;
   if (pinned.sha256[name] !== undefined)
     problems.push(
@@ -284,7 +320,16 @@ for (const name of walk("infra/migrations")) {
     problems.push(`${name} is not generated, registered or pinned in ${pins}.`);
 }
 for (const name of Object.keys(pinned.sha256))
-  if (!exists(name)) problems.push(`${name} is pinned in ${pins} but missing.`);
+  if (!compared.has(name))
+    problems.push(
+      !exists(name)
+        ? `${name} is pinned in ${pins} but missing.`
+        : generated.has(name)
+          ? `${name} is pinned in ${pins}, but the generator writes it. Pin only reviewed records it doesn't write.`
+          : registered.has(name)
+            ? `${name} is pinned in ${pins}, but it is a registered source, whose checksum the packets hold.`
+            : `${name} is pinned in ${pins}, but it is not a reviewed record under infra/migrations.`,
+    );
 
 const stale = [...outputs].filter(
   ([name, content]) => !exists(name) || read(name).toString() !== content,
@@ -300,5 +345,5 @@ for (const [name, content] of stale) {
 }
 for (const note of pending) console.log(note);
 console.log(
-  `${check ? "Verified" : "Generated"} ${chain.length} migration waves (${frozen.size} frozen), their chain and ${Object.keys(pinned.sha256).length} pinned records.`,
+  `${check ? "Verified" : "Generated"} ${chain.length} migration waves (${frozen.size} frozen), their chain and ${compared.size} pinned records.`,
 );
