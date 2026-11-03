@@ -40,12 +40,14 @@ Four places still fail on every real database, three of them in the ops console 
 3. **Lifting a pause** (phase 3). `POST /v1/trust/cases/:id/lift-pause`
    (`trust/service.ts:797-820`) answers 503 `pause_lift_unavailable` until
    `trust/pending-lift-pause.sql` is registered. This one is guarded by design.
-4. **Team triage of a fan thread** (S-C10 Team, if basic Team includes triage). A Team member with
-   the triage role who opens a fan thread or sends a Team reply (`conversation/feature.ts:847`,
-   `:1191`) goes through `trust/scope-restriction.ts:141`, which calls
-   `creator_trust.team_thread_denial`. Only `migrations/0084_w8_team_thread_denial.sql` creates it,
-   and the only guard turns the missing function into 503 `scope_denial_unconfigured` (lines
-   103-122).
+4. **Team triage of a fan thread** (S-C10 Team). A Team member with the triage role who opens a fan
+   thread or sends a Team reply (`conversation/feature.ts:847`, `:1191`) goes through
+   `trust/scope-restriction.ts:141`, which calls `creator_trust.team_thread_denial`. Only
+   `migrations/0084_w8_team_thread_denial.sql` creates it, and the only guard turns the missing
+   function into 503 `scope_denial_unconfigured` (lines 103-122). The founder decided on 2026-11-02
+   that triage waits until after the pilot. Until then the Studio must not offer the Triage role:
+   it is a fixed entry in `apps/web/features/studio/team/Team.tsx:14` and in the native Studio
+   team screens, with no switch, so hiding it is a small code change.
 
 Moment 2 also doesn't work without its two queue files, though nothing fails: the memory writer is
 never built (no review lists its consumer), and one deleted memory or "don't remember this" makes
@@ -64,8 +66,8 @@ to run under a new number.
 | Class | Files |
 | --- | --- |
 | Needed for the pilot | 5 |
-| Unclear: the founder decides | 3 |
-| Needed later | 26 |
+| Unclear: the founder decides | 2 |
+| Needed later | 27 |
 | Obsolete | 16 |
 | Not a migration | 11 |
 | **All unregistered `.sql` files** | **61** |
@@ -92,9 +94,9 @@ reserved number. Rows are in the order of the [proposed waves](#proposed-waves).
 | `trust/pending-lift-pause.sql` | — | #478 (2026-10-16) | Effect state `cancelled`; policies `effect_cancel_pause`, `restriction_lift`; the runtime may set `restriction.revoked_at` | 0008, 0010, 0023 | `POST /v1/trust/cases/:id/lift-pause` and the ops case page; guarded (503) | Pilot: phase 3 | A supervisor can't lift a pause. Latent failure 3 |
 | `conversation/migrations/pending_w3_generation_memory_proposals.sql` | — | #518 (2026-10-16) | Role `creator_w3_generation_memory`; `generation_memory_proposals()`, a definer function only the generation worker may call, which inserts `memory` rows in state `proposed`; policies | 0001, 0041, 0159 | `conversation/generation-memory.ts:151`, built in `workers/generation-composition.ts:208` only when a review lists `custody.memory`, which none does; scenarios `lane-3/e3b5-memory*.mjs` | Pilot: moment 2 | Memory extraction and "Want me to remember this? Only if you say yes." can't run without it. Its wave also needs the worker receipt and new pins, or every fan turn answers 503 |
 | `conversation/migrations/pending_w3_generation_context_exclusions.sql` | — | #518 (2026-10-16) | Replaces `generation_conversation_context()` (0179) and the 0221 policy; nothing new | 0179, 0221; after the memory file | `conversation/generation-context.ts:426`, on every fan turn | Pilot: moment 2 | Without it an exclusion drops all of a thread's history and memory from the AI's context, silently. Needs a `generationDefinitions` entry and new pins |
-| `migrations/0084_w8_team_thread_denial.sql` | 0169 | #89 (2026-10-02) | `creator_trust.team_thread_denial()`, a definer function for the runtime | 0001, 0002, 0053, 0074, 0082 | `trust/scope-restriction.ts:141` for every non-participant | Unclear: founder | Needed if basic Team (S-C10) includes triage. Latent failure 4 |
 | `commerce/schema-paid-coverage.sql` | 0155 | #82 (2026-10-01) | Tables `commerce_paid_coverage`, `commerce_paid_coverage_denial`; roles `creator_commerce_count`, `creator_commerce_tenure`; two definer functions; policies | 0001, 0002, 0004, 0008, 0010, 0021, 0027 | `commerce/paid-coverage.ts`, `paid-audience-count.ts` (not built); the export skips it when absent (`financial-export.ts:281`); `commerce/runtime.ts:224-228` refuses to start when store verification is configured without it | Unclear: founder | Paid periods and refunds for app-store memberships. Needed for the pilot if memberships are sold through the App Store and Google Play (D-14) |
 | `migrations/0207_w8_development_feedback_lifecycle.sql` | 0207 | #132 (2026-10-07) | Role; `identity_event.policy_version` and `.expires_at`; three indexes; policies; three definer functions; a delete trigger | 0056, 0057 (checksums match) | `trust/development-feedback.ts:68`, only with `NODE_ENV=development` and two development switches (lines 47-53). It gates Helpful / Not helpful and the fan intro offer | Unclear: founder | Development-only by design, and its fixed window (2026-10-02 to 11-01) has ended. If the pilot wants reply feedback and the intro, it needs a production successor |
+| `migrations/0084_w8_team_thread_denial.sql` | 0169 | #89 (2026-10-02) | `creator_trust.team_thread_denial()`, a definer function for the runtime | 0001, 0002, 0053, 0074, 0082 | `trust/scope-restriction.ts:141` for every non-participant | Later: Team triage | The founder deferred Team triage to after the pilot (2026-11-02). Latent failure 4 |
 | `session/livekit-schema.sql` | 0176 | #67 (2026-10-02) | A login and a role for call callbacks; tables `call_provider_room`, `call_provider_identity`, `call_provider_callback`, `call_callback_scope`; callback functions and triggers | 0001, 0006 | `session/livekit-journal.ts`, which nothing imports | Later: calls | One-to-one calls wait for a call provider (Q06). Its header is the 0092 proposal held as 0176 |
 | `migrations/0150_w6_account_call_metadata.sql` | 0197 | #166 (2026-10-02) | Role `creator_call_metadata`; `account_call_metadata()`; five read policies | 0001, 0002, 0006 | `server.ts:169`, guarded: `GET /v1/w6/calls/:sessionId/route` answers 503 | Later: calls | Call route recovery |
 | `identity/schema-publication-scope.sql` | 0158 | #67 (2026-10-01) | Login `creator_publication_worker` and role `creator_publication_authority`; table `publication_worker_scope`; six definer task functions; narrows every public policy on four content tables to `creator_runtime` | 0001, 0002, 0008, 0035 | `identity/publication-scope.ts:203`, built only by the separate publication worker, which nothing starts; guarded (503) | Later: publication worker | Text posts and Notes publish without the worker. Revise before registering: narrowing `content_index`'s public read hides it from registered 0253's `review_note_reply`, so every Note reply review would answer "Reply author required" (read from the SQL, not run) |
@@ -169,8 +171,8 @@ and its reviewed checksum. No code reads the list except one 0045 check in `migr
 | Reserved | File | Keep or release | Why |
 | --- | --- | --- | --- |
 | 0005, 0009 | none | Keep, as history | They record that the W5 and W3 producers' 0005 and 0009 became 0035 and 0041. They hold nothing |
-| 0151, 0152, 0153, 0154, 0158, 0160, 0161, 0162, 0166, 0199, 0200, 0201, 0202, 0204, 0205, 0208, 0213, 0219, 0220, 0225 | the file named in the entry | Keep | Needed later |
-| 0155, 0169, 0207 | the file named in the entry | Keep | Unclear until the founder decides |
+| 0151, 0152, 0153, 0154, 0158, 0160, 0161, 0162, 0166, 0169, 0199, 0200, 0201, 0202, 0204, 0205, 0208, 0213, 0219, 0220, 0225 | the file named in the entry | Keep | Needed later |
+| 0155, 0207 | the file named in the entry | Keep | Unclear until the founder decides |
 | 0168, 0172, 0176, 0178, 0197 | `conversation/migrations/0083_w3_translation_worker_scope.sql`, `content/schema-note-reply-tenure.sql`, `session/livekit-schema.sql`, `commerce/schema-fulfillment-plans.sql`, `migrations/0150_w6_account_call_metadata.sql` | Keep, and add the path | Needed later. The entries have no path; the file's header or the held version history names it |
 | 0156, 0173 | `migrations/0069_w8_reply_review.sql`, `migrations/0089_w8_creator_fan_denial.sql` | Release | Registered as 0253 and 0254 (#520). The entries still say `reserved_unapplied` |
 | 0170, 0171 | `identity/schema-public-ai-scope.sql`, `migrations/0086_w8_public_creator_denial.sql` | Release | Registered as 0235 and 0236 |
@@ -201,14 +203,13 @@ here.
    `generationDefinitions` entry for the replaced context function, and new pins (lane 3 counted 13
    changed groups for the memory role). The steps are in lane 3's integrator table
    ([lane-3.md](../archive/lanes/status/lane-3.md)). The founder confirms the INV-15 default first.
-3. **Team triage**, if the founder says basic Team includes it:
-   `migrations/0084_w8_team_thread_denial.sql` alone. A triage member can then read a fan thread
-   and send a Team reply.
-4. **Store memberships**, if pilot memberships are sold through the App Store and Google Play:
+3. **Store memberships**, if pilot memberships are sold through the App Store and Google Play:
    `commerce/schema-paid-coverage.sql`, before store verification is configured.
 
 **Later, each with its feature**
 
+- **Team triage:** `migrations/0084_w8_team_thread_denial.sql` alone, when helpers may read and
+  answer fan threads. Test Team replies on both phones in the same wave.
 - **Calls:** `session/livekit-schema.sql` (0176), then
   `migrations/0150_w6_account_call_metadata.sql` (0197).
 - **The publication worker:** 0158 (revised first) → 0160 → 0161 and 0162, then 0201 once 0176 is
