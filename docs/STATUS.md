@@ -111,9 +111,9 @@ in the Wave 6 queue.
      `chain.json`, not `FRESH_WAVES`, through the reader and the table of reviewed waves it shares
      with `migrate-trust`. Before any SQL runs, it refuses a chain wave it has no matching review
      for, with `migrate-trust`'s message, and a chain whose head isn't the wave its final checks
-     name. `activate-wave` doesn't read the chain yet, so a registration still teaches it the wave
-     by hand. An incomplete registration fails closed: CI catches a missing row in the table, and
-     `stack up` and `activate-wave` refuse the rest. So the rule to register no new wave until
+     name. An incomplete registration fails closed everywhere, `activate-wave` included: CI
+     catches a missing row in the table and a row whose role-check names aren't the wave's own
+     (#545), and `stack up` refuses the rest. So the rule to register no new wave until
      `migrate-trust` read the chain is lifted
      ([registering a file](engineering/migrations.md#registering-a-file-today)).
    - **The head profile walks the table of reviewed waves** (#544). It selects the product's pins
@@ -121,12 +121,19 @@ in the Wave 6 queue.
      function per wave, and keeps every refusal and its message. The table moved to
      `apps/backend/src/db/reviewed-waves.ts`, so the runtime and the scripts share one list of
      waves. A registration adds its wave's row there, with the head profile's two refusals for it.
-   - **Next: two pull requests** ([the plan](engineering/migrations.md#wave-6-the-plan)): the wave
-     lists and the chain checks in `activate-wave`; and the role checks and the trust catalogue
-     modules, which select the head review and the fixed predecessor by wave id instead of a
-     ternary per wave, and give the installer's final checks the chain's head. Each keeps every
-     existing refusal and its message. The pilot's ops-console and memory waves still wait on them.
-     After that, files are registered only as features need them.
+   - **`activate-wave` reads the chain** (#545). The waves it accepts, and their order, come from
+     `chain.json`, the October waves included, through the shared reader: "a wave requires every
+     wave before it" is that order. It loops over the reviews instead of naming each wave in its
+     own lists and booleans, and keeps every refusal, its message, the order they fire in and every
+     ceremony. Each wave's refusals, and the names the role checks know it by, moved to its row in
+     the table of reviewed waves, so a registration no longer edits the operator. Before anything
+     connects, it refuses a chain wave with no row, with `migrate-trust`'s message. A row whose
+     role-check name is another wave's stops the table from loading, for every importer.
+   - **Next: one pull request** ([the plan](engineering/migrations.md#wave-6-the-plan)): the role
+     checks and the trust catalogue modules, which select the head review and the fixed
+     predecessor by wave id instead of a ternary per wave, and give the installer's final checks
+     the chain's head. It keeps every existing refusal and its message. The pilot's ops-console and
+     memory waves still wait on it. After that, files are registered only as features need them.
 2. **Pilot phase 1, a real host** (about 3 weeks, blocked mostly on the founder's decisions): a
    production composition root with real adapters; staging, the domain and app links; Apple and
    Google credentials; the Anthropic switch; observability, backups and a restore drill. Its exit:

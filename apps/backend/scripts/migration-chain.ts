@@ -2,10 +2,11 @@ import { readFile } from "node:fs/promises";
 import { reviewedWaves as table } from "../src/db/reviewed-waves.js";
 import { repositoryRoot, sha256 } from "./migration-custody.js";
 
-// The one reader of infra/migrations/chain.json for scripts/migrate-trust.ts
-// and the local installer (src/operations/local/fresh-install.ts). Both check
-// the chain against the table of reviewed waves, which src/db/reviewed-waves.ts
-// shares with the runtime's head profile.
+// The one reader of infra/migrations/chain.json for scripts/migrate-trust.ts,
+// the local installer (src/operations/local/fresh-install.ts) and
+// scripts/activate-wave.ts. Each checks the chain against the table of
+// reviewed waves, which src/db/reviewed-waves.ts shares with the runtime's
+// head profile.
 
 export type ChainSource = { version: string; path: string; checksum: string };
 const chainSources = (value: unknown): value is ChainSource[] =>
@@ -38,51 +39,103 @@ export const reviewedWaves: ReadonlyMap<string, ReadonlySet<string>> = new Map(
   table.map(({ id, sources }) => [id, sourceVersions(sources)] as const),
 );
 
-/** A wave of the chain's fresh list. Its packet is parsed from the bytes
- * whose checksum the chain holds; only its baseline and wave are checked. */
+/** A wave of the chain. Its packet is parsed from the bytes whose checksum
+ * the chain holds; only its baseline and wave are checked. */
 export type ChainWave = { id: string; sources: ChainSource[]; packet: unknown };
+
+/** infra/migrations/chain.json, with the checks every reader makes. */
+async function chainIndex(root: URL) {
+  const chain = JSON.parse(
+    await readFile(new URL("infra/migrations/chain.json", root), "utf8"),
+  ) as {
+    waves: { id: string; sha256: string }[];
+    fresh: { canonical: number; waves: string[] };
+  };
+  if (
+    !Array.isArray(chain.waves) ||
+    !Array.isArray(chain.fresh.waves) ||
+    chain.fresh.waves[0] !== firstFresh ||
+    chain.fresh.canonical !== canonicalSize
+  )
+    throw new Error();
+  return chain;
+}
+
+/** A wave's packet, if its bytes have the checksum the chain holds for it. */
+async function chainPacket(
+  root: URL,
+  id: unknown,
+  checksum: () => string | undefined,
+) {
+  if (typeof id !== "string" || !/^\d{8}(-[a-z0-9]+)*$/u.test(id))
+    throw new Error();
+  const bytes = await readFile(
+    new URL(`infra/migrations/waves/${id}.json`, root),
+  );
+  const packet = JSON.parse(bytes.toString("utf8")) as {
+    baseline: unknown;
+    wave: unknown;
+  };
+  if (
+    sha256(bytes) !== checksum() ||
+    !chainSources(packet.baseline) ||
+    !chainSources(packet.wave)
+  )
+    throw new Error();
+  return { id, baseline: packet.baseline, sources: packet.wave, packet };
+}
 
 /** The canonical bootstrap and the waves the local installer applies after
  * it, from infra/migrations/chain.json and the packets whose checksums it
  * holds (scripts/generate-migrations.mjs writes both). */
 export async function freshChain(root: URL) {
   try {
-    const chain = JSON.parse(
-      await readFile(new URL("infra/migrations/chain.json", root), "utf8"),
-    ) as {
-      waves: { id: string; sha256: string }[];
-      fresh: { canonical: number; waves: string[] };
-    };
-    if (
-      !Array.isArray(chain.waves) ||
-      !Array.isArray(chain.fresh.waves) ||
-      chain.fresh.waves[0] !== firstFresh ||
-      chain.fresh.canonical !== canonicalSize
-    )
-      throw new Error();
+    const chain = await chainIndex(root);
     let canonical: ChainSource[] | undefined;
     const waves: ChainWave[] = [];
     for (const id of chain.fresh.waves) {
-      if (typeof id !== "string" || !/^\d{8}(-[a-z0-9]+)*$/u.test(id))
-        throw new Error();
-      const bytes = await readFile(
-        new URL(`infra/migrations/waves/${id}.json`, root),
+      const { baseline, sources, packet } = await chainPacket(
+        root,
+        id,
+        () => chain.waves.find((wave) => wave.id === id)?.sha256,
       );
-      const packet = JSON.parse(bytes.toString("utf8")) as {
-        baseline: unknown;
-        wave: unknown;
-      };
-      if (
-        sha256(bytes) !== chain.waves.find((wave) => wave.id === id)?.sha256 ||
-        !chainSources(packet.baseline) ||
-        !chainSources(packet.wave)
-      )
-        throw new Error();
-      canonical ??= packet.baseline;
-      waves.push({ id, sources: packet.wave, packet });
+      canonical ??= baseline;
+      waves.push({ id, sources, packet });
     }
     if (canonical?.length !== canonicalSize) throw new Error();
     return { canonical, waves };
+  } catch {
+    throw new Error(chainRefusal);
+  }
+}
+
+/** Every wave of the chain, in its order, for scripts/activate-wave.ts: the
+ * canonical bootstrap's October waves, then the fresh list, which must be the
+ * rest of the chain (`fresh` is where it starts). Each packet is checked as
+ * freshChain checks the fresh ones, and no id appears twice. */
+export async function operatorChain(root: URL = repositoryRoot) {
+  try {
+    const chain = await chainIndex(root);
+    const waves: ChainWave[] = [];
+    let canonical: ChainSource[] | undefined;
+    const fresh = chain.waves.length - chain.fresh.waves.length;
+    for (const [index, wave] of chain.waves.entries()) {
+      const { id, baseline, sources, packet } = await chainPacket(
+        root,
+        wave.id,
+        () => wave.sha256,
+      );
+      if (index === fresh) canonical = baseline;
+      waves.push({ id, sources, packet });
+    }
+    if (
+      fresh < 0 ||
+      chain.fresh.waves.some((id, index) => id !== waves[fresh + index]?.id) ||
+      new Set(waves.map((wave) => wave.id)).size !== waves.length ||
+      canonical?.length !== canonicalSize
+    )
+      throw new Error();
+    return { waves, fresh };
   } catch {
     throw new Error(chainRefusal);
   }
