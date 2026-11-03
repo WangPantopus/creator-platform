@@ -111,9 +111,11 @@ in the Wave 6 queue.
      `chain.json`, not `FRESH_WAVES`, through the reader and the table of reviewed waves it shares
      with `migrate-trust`. Before any SQL runs, it refuses a chain wave it has no matching review
      for, with `migrate-trust`'s message, and a chain whose head isn't the wave its final checks
-     name. An incomplete registration fails closed: CI catches a missing row in the table, and
-     `stack up` refuses the rest. So the rule to register no new wave until `migrate-trust` read
-     the chain is lifted ([registering a file](engineering/migrations.md#registering-a-file-today)).
+     name. An incomplete registration fails closed everywhere, `activate-wave` included: CI
+     catches a missing row in the table and a row whose role-check names aren't the wave's own
+     (#545), and `stack up` refuses the rest. So the rule to register no new wave until
+     `migrate-trust` read the chain is lifted
+     ([registering a file](engineering/migrations.md#registering-a-file-today)).
    - **The head profile walks the table of reviewed waves** (#544). It selects the product's pins
      with one walk over the waves from `20261008-comparison` on, in the chain's order, instead of a
      function per wave, and keeps every refusal and its message. The table moved to
@@ -125,7 +127,8 @@ in the Wave 6 queue.
      own lists and booleans, and keeps every refusal, its message, the order they fire in and every
      ceremony. Each wave's refusals, and the names the role checks know it by, moved to its row in
      the table of reviewed waves, so a registration no longer edits the operator. Before anything
-     connects, it refuses a chain wave with no row, with `migrate-trust`'s message.
+     connects, it refuses a chain wave with no row, with `migrate-trust`'s message. A row whose
+     role-check name is another wave's stops the table from loading, for every importer.
    - **Next: one pull request** ([the plan](engineering/migrations.md#wave-6-the-plan)): the role
      checks and the trust catalogue modules, which select the head review and the fixed
      predecessor by wave id instead of a ternary per wave, and give the installer's final checks

@@ -27,8 +27,9 @@ database is never reset.
   canonical bootstrap that has a review, in the chain's order, with the sources its review names.
   The runtime and the scripts share it. `migrate-trust`, the local installer and `activate-wave`
   check each chain wave against it. A row also holds `activate-wave`'s refusals for the wave, word
-  for word, and the names the role checks know it by. From `20261008-comparison` on, it holds the
-  wave's review and the head profile's two refusals for it too.
+  for word, and the names the role checks know it by; no two rows may share a name, or the table
+  refuses to load. From `20261008-comparison` on, a row holds the wave's review and the head
+  profile's two refusals for it too.
 - **The head profile**, `apps/backend/src/db/comparison-profile.ts`: the pins the product checks at
   startup. It walks the table from `20261008-comparison` on and selects the newest wave whose
   sources are all registered, on top of the complete wave before it. It refuses a partial
@@ -146,21 +147,23 @@ all three refuse a chain wave without a row in the table of reviewed waves:
 `activate-wave` takes each wave's refusals from its row, so a registration adds them there
 (step 6) and leaves the operator's code alone.
 
-An incomplete registration fails closed, which is why the earlier rule, to register no new wave
-until `migrate-trust` read the chain, is lifted:
+An incomplete registration fails closed everywhere, `activate-wave` included, which is why the
+earlier rule, to register no new wave until `migrate-trust` read the chain, is lifted:
 
 - CI catches a registration that misses its row in the table of reviewed waves: CI's backend suite
-  bootstraps its fixture databases with `migrate-trust`. It also catches a row whose role-check
-  names the role checks don't take yet: the names are typed by the role checks' own parameters, so
-  the typecheck fails.
-- A registration that adds the row, with names the role checks take, but misses the rest of step 6
+  bootstraps its fixture databases with `migrate-trust`. `activate-wave` refuses the wave before
+  anything connects.
+- A row also needs the role checks' names for its wave, and CI catches a row whose names aren't the
+  wave's own. A new name the role checks don't take yet fails the typecheck: the names are typed by
+  the role checks' own parameters. A name another wave already has stops the table from loading,
+  so every importer refuses it, CI's suite and `activate-wave` included:
+  `Reviewed waves <id> and <id> share the role-check name <name>; each wave needs its own (step 6 in docs/engineering/migrations.md).`
+- A registration that teaches the role checks the wave's own names but misses the rest of step 6
   passes CI. `stack up` applies the canonical 61, then the local installer refuses it before it
   applies anything, because its final checks still name the previous head (`checkedHead` in
   `fresh-install.ts`):
   `Wave <id> heads the chain, but the local installer's final checks still name 20261101-pilot-columns; teach them the wave (step 6 in docs/engineering/migrations.md). No migration was applied.`
-  That is why step 7's fresh install on a new stack stays required. `activate-wave` reads the new
-  row like any other, so its checks after the wave are only as complete as the role checks' for the
-  new names; step 7's restored copy shows them.
+  That is why step 7's fresh install on a new stack stays required.
 
 A registration is one pull request: a registry edit, the generated packet and chain, a review file
 measured on scratch databases and pinned, the code that knows the wave, and the proof. Steps 2 to 5
@@ -220,7 +223,8 @@ are mechanical apart from the reach review in step 4; the table below says what 
        and `precedes`, when the ledger holds it without that wave. Also its short `name`, which the
        operator lists with the other head waves, and `addedRoles`: the role each of its sources
        adds, if any, so that the operator refuses any other;
-     - the names the role checks know it by: `extension` and `privacy`;
+     - the names the role checks know it by: `extension` and `privacy`, its own and no other
+       wave's. The table refuses to load if two rows share one;
    - `migrate-trust.ts`'s per-wave checks;
    - the generation and privacy role checks: the wave's `extension` and `privacy` stage, and what
      each checks for it;
