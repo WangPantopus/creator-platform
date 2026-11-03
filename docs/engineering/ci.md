@@ -1,24 +1,124 @@
 # CI
 
 What runs on a pull request, what each job proves, and where CI is going. The workflows are
-`.github/workflows/ci.yml` and `.github/workflows/trust-release.yml`.
+`.github/workflows/ci.yml` and `.github/workflows/trust-release.yml`. They are the source of truth,
+and their comments explain each choice; this page says what they do.
 
 ## Foundation checks (`ci.yml`)
 
-Runs on every pull request, and on every push to `main`. A newer push to the same branch cancels
-the older run.
+| Job                  | Runs          | Runner                                          | What it runs                                                                                                                                                            |
+| -------------------- | ------------- | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `changes`            | Always        | Ubuntu                                          | Lists the changed paths and decides which gated jobs the change needs ([below](#which-jobs-a-change-runs))                                                              |
+| `evidence-budget`    | Pull requests | Ubuntu                                          | `scripts/check-evidence-budget.mjs`: files added or changed under `artifacts/` stay at most 300 KB each and 1 MB in total, with no duplicate blobs                      |
+| `web-and-backend`    | Always        | Ubuntu, with a PostgreSQL 17 + pgvector service | `pnpm install --frozen-lockfile` and `pnpm check`: generate check, typecheck, lint, format check, the tests (including the backend suite on PostgreSQL) and every build |
+| `web-visual`         | Gated: visual | macOS (`xcode-27`)                              | `pnpm test:visual`: the Playwright comparison of the design boards and components with the web app, in Light and Night ([design verification](design-verification.md))  |
+| `ios-foundation`     | Gated: native | macOS (`xcode-27`)                              | `swift test` for the Swift package and its snapshots, then the app's UI tests on an iPhone simulator, the iPhone 18 Pro when the runner has one                         |
+| `android-foundation` | Gated: native | macOS (Intel)                                   | `assembleDebug`, the unit tests and the Paparazzi screenshot check                                                                                                      |
+| `android-runtime`    | Gated: native | Ubuntu, with an emulator                        | `connectedDebugAndroidTest` on API 34                                                                                                                                   |
 
-| Job | Runner | What it runs |
-| --- | --- | --- |
-| `evidence-budget` | Ubuntu | Pull requests only. `scripts/check-evidence-budget.mjs`: files added or changed under `artifacts/` stay at most 300 KB each and 1 MB in total, with no duplicate blobs |
-| `web-and-backend` | Ubuntu, with a PostgreSQL 17 + pgvector service | `pnpm install --frozen-lockfile` and `pnpm check`: generate check, typecheck, lint, format check, the tests (including the backend suite on PostgreSQL) and every build |
-| `web-visual` | macOS (`xcode-27`) | `pnpm test:visual`: the Playwright comparison of the design boards and components with the web app, in Light and Night ([design verification](design-verification.md)) |
-| `ios-foundation` | macOS (`xcode-27`) | `swift test` for the Swift package and its snapshots, then the app's UI tests on an iPhone simulator, the iPhone 18 Pro when the runner has one |
-| `android-foundation` | macOS (Intel) | `assembleDebug`, the unit tests and the Paparazzi screenshot check |
-| `android-runtime` | Ubuntu, with an emulator | `connectedDebugAndroidTest` on API 34 |
+`changes` and `web-and-backend` run every time, and `evidence-budget` runs on every pull request.
+The four gated jobs run when `changes` says the change needs them, and on every full run.
+`android-runtime` runs on Ubuntu, but it builds and tests the Android app, so it is gated with the
+native jobs. A job skipped by its `if:` reports success: a gated job that a change doesn't need
+still passes, and so does `evidence-budget` on runs that aren't pull requests.
 
-These six are the checks a pull request needs green today. Nothing enforces it yet: `main` has no
-branch protection (see [STATUS](../STATUS.md#wave-5-in-progress)).
+### When it runs
+
+- **Pull requests:** when one opens, and each time its branch changes. A pull request's branch runs
+  only as a pull request; pushes run only on `main`.
+- **Pushes to `main`:** every push, normally a merge.
+- **Every night at 12:17 UTC:** a full run of `main`. That is this repository's quietest CI hour, and
+  the odd minute avoids the rush of scheduled runs on the hour.
+- **On demand:** `workflow_dispatch` ("Run workflow" in the Actions tab) starts a full run.
+
+A newer run cancels an older one still running for the same pull request, or for the same branch and
+trigger. Push runs on `main` are the exception: each one is keyed by its commit, so they never cancel
+each other. A push run checks only what its own merge changed, so cancelling it would leave that
+merge unchecked until the nightly run.
+
+### Which jobs a change runs
+
+`changes` lists every changed path and checks it against two groups. A gated job skips only when
+every changed path is known not to affect it.
+
+| Group  | Gates                                                        | What it claims                                                                                                                                                                                                                                                                                                                                                                      |
+| ------ | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Native | `ios-foundation`, `android-foundation` and `android-runtime` | What the two apps build and test: `apps/ios/` and `apps/android/`. The generators that write into both apps, `scripts/generate-shared.mjs` and `scripts/generate-native-api.mjs`, and what they read: `config/`, `packages/api/generated/`, `design/handoff/tokens.json` and `design/design-system/project/components/bundle.js`                                                    |
+| Visual | `web-visual`                                                 | The web app and what its comparison reads: `apps/web/`, `packages/`, `tests/visual/`, `scripts/visual-*`, `playwright.config.ts`, `design/`, `assets/` and `config/`. The toolchain that installs and runs them: the root `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `turbo.json` and `tsconfig.base.json`, every `apps/*/package.json`, `.npmrc` and `.pnpmfile.cjs` |
+
+A path can be in both groups, such as anything under `config/`. A path that a group claims runs that
+group even inside a folder that otherwise skips: `apps/backend/package.json` runs `web-visual`,
+because `pnpm install` reads every workspace manifest.
+
+**These paths skip,** because no gated job reads them:
+
+- the folders `docs/`, `artifacts/`, `tests/scenarios/`, `infra/` and `apps/backend/`, with any
+  `.gitattributes` inside them;
+- the root files `AGENTS.md`, `CLAUDE.md`, `README.md`, `.gitignore`, `.prettierignore` and
+  `eslint.config.mjs`;
+- four scripts: `scripts/check-evidence-budget.mjs`, `scripts/shared.test.mjs`,
+  `scripts/rename-brand.mjs` and `scripts/with-heavy-build-lock.mjs`;
+- in `.github/`: `CODEOWNERS`, Markdown files, `ISSUE_TEMPLATE/`, the pull request templates,
+  `FUNDING.yml` and `dependabot.yml`.
+
+**These paths run everything:** anything under `.github/workflows/` or `.github/actions/`, and any
+`.gitattributes` outside the folders above, because they change how jobs run or how files are
+checked out. Any other path that no group claims and no list skips runs everything too.
+
+**What a run compares:**
+
+| Run                             | Compared with                                                                                                                                                                               |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Pull request                    | The merge base of its head and the default branch, not the pull request's own base. A stacked pull request then counts the changes below it, and a retargeted one can't keep a stale result |
+| Push to `main`                  | The commit before it. If a push run never finishes (cancelled, an outage or `[skip ci]`), the nightly run is the backstop                                                                   |
+| Nightly, or `workflow_dispatch` | Nothing: it checks everything                                                                                                                                                               |
+
+**When `changes` can't decide, everything runs.** If it can't compare the commits or list the
+changes, every gated job runs. The same happens when any of its steps fails or times out: the gated
+jobs run even when `changes` itself failed.
+
+Matching ignores case, because the macOS runners would check a path such as `Apps/ios/` out into
+`apps/ios/`.
+
+The step summary of `changes` says what was decided and why, in one line, such as
+`Native jobs run: false. Visual job runs: false. Basis: compared <base> with <head>.` The basis
+names the two commits compared, or why everything ran: a full run, a comparison that wasn't
+possible, or the first path that no group claims.
+
+### Adding a path
+
+- A new file or folder that a gated job reads goes into that job's group, in the same pull request.
+- A new folder that no gated job reads goes on the skip list.
+- Anything else runs everything. That is safe, but slow.
+
+A change to `ci.yml` runs everything, so a change to the groups is itself checked by the full matrix.
+
+### The nightly run
+
+The coordinator reads the nightly result, and starts a work session the same day for a real
+failure. A flaky check is fixed the day it appears.
+
+### Timing
+
+Measured on the pull request run of #530,
+[run 41566516221](https://github.com/WangPantopus/creator-platform/actions/runs/41566516221), which
+ran the full matrix on this workflow:
+
+| Job                  | Time        |
+| -------------------- | ----------- |
+| `changes`            | 9 s         |
+| `evidence-budget`    | 14 s        |
+| `web-and-backend`    | 3 min 22 s  |
+| `android-runtime`    | 5 min 54 s  |
+| `android-foundation` | 8 min 8 s   |
+| `web-visual`         | 9 min 15 s  |
+| `ios-foundation`     | 20 min 30 s |
+
+- From the first job's start to the last job's end the run took 20 min 42 s, set by
+  `ios-foundation`. Counted from when it was queued, it took 22 min 42 s: it first waited about 2
+  minutes for the older run it replaced to finish cancelling.
+- The gated jobs started 11 to 15 seconds after `changes` did, because they wait for its decision.
+- No job waited more than 6 seconds for a runner, so these are working times, not queue times.
 
 ## Trust release compilation (`trust-release.yml`)
 
@@ -27,28 +127,32 @@ support, trust and status web pages, `infra/` or the workflow itself. It runs `g
 backend and web typechecks and builds, and then states that compilation is not release readiness
 ([release](release.md)).
 
+## Required checks
+
+The checks to require are the six job names of `ci.yml`: `evidence-budget`, `web-and-backend`,
+`web-visual`, `ios-foundation`, `android-foundation` and `android-runtime`. All six can be required
+because a skipped job reports success.
+
+- **Never `changes`.** It only decides what runs, and when it fails, every gated job runs instead.
+- **Never `compile` from `trust-release.yml`.** That workflow has a workflow-level `paths:` filter,
+  so on other pull requests it reports nothing, and a required check that never reports blocks the
+  merge.
+
+`main` has no branch protection yet, so nothing enforces these checks. Protecting `main` waits for
+the founder's yes ([STATUS](../STATUS.md#wave-5-in-progress)). Until then, pull requests merge only
+after every check passes ([how work runs](../STATUS.md#how-work-runs)).
+
 ## Where CI is going
 
 From the [consolidation plan](../CONSOLIDATION_PLAN.md), sections 5 and 6. The founder approved the
 plan; which checks become required, and scenarios in CI, are among the section 6 working rules that
 are still open.
 
-- **A fast required gate in under 15 minutes:** generate, typecheck, lint, format, the backend tests
-  on PostgreSQL, the build, and a scenario smoke on a fresh stack.
-- **The macOS jobs run only when their paths change,** native, shared UI or visual, **plus a full
-  run every night.** Today a run waits mostly for macOS runners: 30 to 60 minutes, and the review
-  measured a median of 94 minutes in October.
-- **Scenarios run in CI** on a disposable stack. Today they run by hand. This is one of the working
-  rules the founder has not decided yet.
+- **Done in #530, merged on 2026-11-03:** the macOS jobs run only when their paths change, and the
+  full matrix runs every night.
+- **Still open: a required gate in under 15 minutes,** with a scenario smoke on a fresh stack.
+  `web-and-backend` already runs the rest of that gate (generate, typecheck, lint, format, the
+  backend tests on PostgreSQL and the build); it took 3 min 22 s in the [measured run](#timing).
+- **Still open: scenarios run in CI** on a disposable stack. Today they run by hand. This is one of
+  the working rules the founder has not decided yet.
 - A flaky check gets fixed the day it appears.
-
-The Wave 5 CI session is adding the path filters and the nightly run.
-
-### Path groups
-
-<!-- The Wave 5 CI pull request defines the exact path groups. Fill this in from that PR once it
-merges: which jobs are required on every pull request, which run only when their paths change, and
-the nightly schedule. -->
-
-Not merged yet. The exact path groups for the macOS jobs, and which jobs are required on every pull
-request, go here when the Wave 5 CI pull request lands.

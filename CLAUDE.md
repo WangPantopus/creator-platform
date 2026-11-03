@@ -11,7 +11,7 @@ personal attention.
 
 Start at [docs/README.md](docs/README.md), which says where to start and maps every
 living doc, and read [docs/STATUS.md](docs/STATUS.md) for the current state and what
-is next. STATUS replaces `docs/operations/CURRENT.md` and the dated handoffs, which
+is next. STATUS replaces the old `CURRENT.md` and the dated handoffs, which
 are history in [docs/archive/](docs/archive/). The [launch plan](docs/LAUNCH_PLAN.md)
 is the road to the pilot, and the [consolidation plan](docs/CONSOLIDATION_PLAN.md)
 stays the detailed reference until phase 0 closes. Refresh the Git/GitHub
@@ -34,7 +34,8 @@ area's scenarios.
 
 - **Naming:** the product is always `Qelvora` / `qelvora` / `QELVORA`, following
   [docs/NAMING.md](docs/NAMING.md) exactly (one unbroken word, no possessive, no
-  abbreviation). "Pantopus" is the parent company and the shared account; never
+  abbreviation). "Pantopus" is the parent company, and the account a Qelvora
+  account can later link to (the pilot signs in with Apple and Google); never
   rename it. Sample content (Maya, Kiln Club, @kilnfire, Devon, Priya, Glazeco) is
   not product naming.
 - **The identity system comes first.** Every design must make "who is speaking"

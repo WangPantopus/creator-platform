@@ -1,8 +1,8 @@
 # Qelvora status
 
-Updated 2026-11-03. This page replaces [operations/CURRENT.md](operations/CURRENT.md) and the dated
-handoffs, which are now in the [archive](archive/operations/). Update this page in place instead of
-adding a dated handoff. Refresh the Git and GitHub facts before acting on them.
+Updated 2026-11-03. This page replaces the old `CURRENT.md` and the dated handoffs, which are now in
+the [archive](archive/operations/). Update this page in place instead of adding a dated handoff.
+Refresh the Git and GitHub facts before acting on them.
 
 ## What we are building
 
@@ -18,6 +18,7 @@ Android apps, and the web gives the first answer from a link; creators use the w
 phones; sign-in is Qelvora sign-in with Apple and Google plus an 18+ date-of-birth step.
 
 **Done** means:
+
 - **for the pilot:** the five moments work end to end on a real host, every launch screen exists in
   every state, INV-01 to INV-25 hold, and the quality bars and store requirements are met, each
   checked by someone other than its author on a real iPhone and a real Android phone
@@ -40,17 +41,17 @@ All 66 pull requests that were open on 2026-11-01 are resolved: 59 merged and 7 
 The 59 merged through nine integration pull requests, each merged with a merge commit after every CI
 check passed.
 
-| PR | Wave | What landed |
-| --- | --- | --- |
-| #518 | 1 | The lane 3 AI-engine wave and migration 0252 (#511 and the 20 lane 3 PRs) |
-| #519 | 1 | App completion, native presence, CI fixes and the consolidation plan (#514, #516) |
-| #520 | 1 | Migrations 0253 and 0254 (#515) |
-| #521 | 1 | Migration 0255, followers-only Notes, with a direct follower check (#517) |
-| #522 | 3 | Studio live stream, public post withdrawal, Android push lifetime, lane 5 docs (#512, #488, #388, #395, #396, #394) |
-| #523 | 2 | The whole native stack: the 22 lane 7 PRs, #401 to #508 |
-| #524 | 3 | The My AI split (#513) |
-| #525 | 3 | The public creator page cache and the launch kit (#389, #393) |
-| #527 | 4 | Migrations 0256 to 0258: passkey retirement, invite notes and the processor-notification login (#439, #397, #425) |
+| PR   | Wave | What landed                                                                                                         |
+| ---- | ---- | ------------------------------------------------------------------------------------------------------------------- |
+| #518 | 1    | The lane 3 AI-engine wave and migration 0252 (#511 and the 20 lane 3 PRs)                                           |
+| #519 | 1    | App completion, native presence, CI fixes and the consolidation plan (#514, #516)                                   |
+| #520 | 1    | Migrations 0253 and 0254 (#515)                                                                                     |
+| #521 | 1    | Migration 0255, followers-only Notes, with a direct follower check (#517)                                           |
+| #522 | 3    | Studio live stream, public post withdrawal, Android push lifetime, lane 5 docs (#512, #488, #388, #395, #396, #394) |
+| #523 | 2    | The whole native stack: the 22 lane 7 PRs, #401 to #508                                                             |
+| #524 | 3    | The My AI split (#513)                                                                                              |
+| #525 | 3    | The public creator page cache and the launch kit (#389, #393)                                                       |
+| #527 | 4    | Migrations 0256 to 0258: passkey retirement, invite notes and the processor-notification login (#439, #397, #425)   |
 
 Also merged: #526 and #528, the two coordination handoffs (#526 also runs the iOS UI tests on the
 iPhone 18 Pro). #509, lane 1's status, was closed as out of date; its facts are in Git history and
@@ -58,11 +59,12 @@ in the Wave 6 queue.
 
 ## Wave 5: in progress
 
-- **Docs:** this page, [docs/README.md](README.md), [engineering/](engineering/) and
-  [archive/](archive/), and the corrected BRIEF, launch plan and design plan.
-- **CI**, in a separate session: run the macOS jobs only when native, shared-UI or visual paths
-  change, plus a nightly full run, so the required gate takes under 15 minutes
-  ([engineering/ci.md](engineering/ci.md)).
+- **Docs: done,** #529 (merged on 2026-11-03 as `8ce419f50`): this page,
+  [docs/README.md](README.md), [engineering/](engineering/) and [archive/](archive/), and the
+  corrected BRIEF, launch plan and design plan.
+- **CI: done,** #530 (merged on 2026-11-03 as `37a47bd84`). The macOS jobs run only when their paths
+  change, and the full matrix runs every night ([engineering/ci.md](engineering/ci.md)).
+- A work session is finishing the archive, moving the 16 files #529 kept in place.
 - **Repository steps** (the coordinator runs each one only with the founder's yes):
   - **Done on 2026-11-03: the branch cleanup.** 535 branches were tagged `archive/<branch-name>`
     at their last commit, then deleted from GitHub. 461 were fully contained in `main`. The other
@@ -70,8 +72,9 @@ in the Wave 6 queue.
     merged, 12 branches with no PR, and #509's branch. GitHub keeps `main`, the six parked branches
     and `cost` (the founder's spreadsheet, whose future is still open). To restore an archived
     branch, see [setup](engineering/setup.md#archived-branches).
-  - Still waiting on the founder, one at a time: turn on "delete branch on merge"; protect `main`
-    with required checks; tag the tree, then remove `artifacts/` from it.
+  - **Done on 2026-11-03: "delete branch on merge"** was turned on, with the founder's yes.
+  - Still waiting on the founder, one at a time: protect `main` with required checks; tag the
+    tree, then remove `artifacts/` from it.
 
 ## Next
 
@@ -90,13 +93,13 @@ in the Wave 6 queue.
 
 Closed with a note and their branches kept. Each returns with the feature that needs it.
 
-| PR | What | Returns with |
-| --- | --- | --- |
-| #400 | Reaction pushes recheck a withdrawn reply | Push (moment 3). Needs a registered-source guard |
+| PR            | What                                                             | Returns with                                                                |
+| ------------- | ---------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| #400          | Reaction pushes recheck a withdrawn reply                        | Push (moment 3). Needs a registered-source guard                            |
 | #459 and #392 | Share-card status, and share cards for signed human replies only | The share card. Needs a guard, wiring into `server.ts`, and a trust refusal |
-| #399 | Creator web push | Later. Needs web push (VAPID) keys and a Studio service worker |
-| #398 | Profile fields | Later. Needs the form and the copy decided |
-| #487 | "Usually decides in" | Later. It shows nothing until a creator has five outcomes |
+| #399          | Creator web push                                                 | Later. Needs web push (VAPID) keys and a Studio service worker              |
+| #398          | Profile fields                                                   | Later. Needs the form and the copy decided                                  |
+| #487          | "Usually decides in"                                             | Later. It shows nothing until a creator has five outcomes                   |
 
 ## Decisions the founder still owes
 
