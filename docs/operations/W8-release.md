@@ -1,5 +1,3 @@
-> **Archived on 2026-11-02, and summarized in [engineering/release.md](../engineering/release.md).** It stays at this path until `infra/environments.json` and `.github/workflows/trust-release.yml` stop linking here.
-
 # Release gates and trust preparation
 
 **PR7 merged/source checkpoint:** normal merge `705215955415332e601adf5c42a2169cd0d173a5` at2026-10-01T05:10:56Z; exact reviewed189db7c tree equals fetched main. [Actual merge receipt](../../artifacts/workstreams/W8/takeover/20260930/pr7-merged.json) records launched browser/iOS2/2/Android4/4 acceptance, preserved SQL/data and nonrequired CI queued/running. Full R1–R10 and release/private/provider/hardware gates remain open. No admin override, check removal, test weakening, live migration, reseed or paid call. The preserved W8 branch fast-forwarded to actual main before this evidence-only continuation.
@@ -12,7 +10,7 @@
 
 **2026-09-30 update:** [resumed evidence](../../artifacts/workstreams/W8/resume/20260930-local/README.md) records current browser/denial/build checks and two existing-suite incompatibilities. Canonical configured trust composition and digest-pinned minimal non-root image are now implemented; no deployment/signing/real-provider readiness is claimed. PR #7 remains draft until its review/merge gates are resolved. The OpenAI key location supplied by the user is server-only and was not read/used; model credentials alone do not establish identity, refunds, storage, calls, notices, WAL, staging or staffed safety.
 
-Continuation authority: [full W8 handoff](../archive/workstreams/handoffs/W8.md) and [next-agent prompt](../archive/workstreams/handoffs/W8-resume-prompt.md). Prepared 2026-09-29 PDT; original assignment and all remaining packages still apply. Historical run evidence is not current release acceptance.
+Continuation authority: [full W8 handoff](../workstreams/handoffs/W8.md) and [next-agent prompt](../workstreams/handoffs/W8-resume-prompt.md). Prepared 2026-09-29 PDT; original assignment and all remaining packages still apply. Historical run evidence is not current release acceptance.
 
 Qelvora remains a replaceable placeholder. No store account, final domain, billing price, legal approval or production credential is inferred. Nothing here authorizes publication or fees.
 
