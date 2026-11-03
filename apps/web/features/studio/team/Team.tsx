@@ -10,12 +10,15 @@ import { Feedback, useAction } from "../shared/action";
 import { time } from "../shared/format";
 import type { Creator } from "../shared/types";
 import { useLiveReload, useLiveView } from "../shell/live";
+// Team triage is off for the pilot, so it is never offered. A member who
+// already holds it still shows it, and saving that member's roles drops it.
 const teamRoleChoices = [
-  ["triage", "Triage", "Reads and routes the queue. Replies as team."],
   ["drafter", "Drafting", "Prepares drafts. Never approves as you."],
   ["publisher", "Publishing", "Publishes content under team identity."],
   ["scheduler", "Scheduling", "Offers times from your hours."],
 ] as const;
+const offeredTeamRoles = (roles: readonly string[]) =>
+  roles.filter((role) => teamRoleChoices.some(([choice]) => choice === role));
 const sameTeamRoles = (left: readonly string[], right: readonly string[]) =>
   [...left].sort().join("|") === [...right].sort().join("|");
 type TeamRoleEdit = {
@@ -391,7 +394,7 @@ export function Team({
                           accountId: m.account_id,
                           label: m.handle ? `@${m.handle}` : m.account_id,
                           expectedRoles: [...m.roles],
-                          roles: [...m.roles],
+                          roles: offeredTeamRoles(m.roles),
                           responseUnknown: false,
                         });
                       })

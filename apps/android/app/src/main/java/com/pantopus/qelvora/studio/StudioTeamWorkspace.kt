@@ -30,8 +30,10 @@ import java.util.UUID
 
 private fun teamCopy(key: String, values: Map<String, String> = emptyMap()) = QelvoraCopy.text("w5NativeTeam$key", values)
 private fun uuid(value: String): Boolean = runCatching { UUID.fromString(value).toString().equals(value, ignoreCase = true) }.getOrDefault(false)
+/** The roles the Studio offers. Team triage is off for the pilot: a member who
+ * already holds it still shows it, and saving that member's roles drops it. */
 private enum class TeamRole {
-    TRIAGE, DRAFTER, PUBLISHER, SCHEDULER;
+    DRAFTER, PUBLISHER, SCHEDULER;
     val key: String get() = name.lowercase()
     val title: String get() = teamCopy(key + "Title")
     val detail: String get() = teamCopy(key + "Detail")
@@ -203,7 +205,8 @@ private class NativeTeamState(
         val request = capture ?: return
         if (!mayManage || saving || edit != null || member.revoked_at != null || member.roles.isEmpty() || member.account_id == accountId || team?.members?.none { it.account_id == member.account_id && it.revoked_at == null } != false) return
         edit = TeamEdit(member.account_id, member.handle?.let { "@$it" } ?: member.account_id, request,
-            member.roles.map { it.name }.sorted(), member.roles.map { it.name }.sorted())
+            member.roles.map { it.name }.sorted(),
+            member.roles.map { it.name }.filter { role -> TeamRole.entries.any { it.name == role } }.sorted())
         error = ""
     }
     fun select(role: String, selected: Boolean) {
