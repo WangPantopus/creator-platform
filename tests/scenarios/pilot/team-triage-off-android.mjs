@@ -1,14 +1,20 @@
 // Team triage is off for the pilot: the Android Studio Team screen offers
 // Drafting, Publishing and Scheduling, never Triage, a member who already holds
-// Triage still displays with it, and saving that member's roles drops it. Run on
-// a fresh stack, with the debug app installed on an emulator:
+// Triage still displays with it, and saving that member's roles drops it. The
+// screen keeps the team, and the person's place in it, through its refreshes.
+// Run on a fresh stack, with the debug app installed on an emulator:
 //   node infra/local/stack.mjs up --lane N --base-port P
 //   adb -s <serial> install -r app-debug.apk
 //   LANE7_ANDROID=<serial> PILOT_BASE_PORT=P node tests/scenarios/pilot/team-triage-off-android.mjs [--shots DIR]
+// As a slow phone would see it: put lane 7's delay proxy in front of the API,
+// holding each Team read, and point the app at it with PILOT_APP_PORT=Q:
+//   node tests/scenarios/lane-7/delay-proxy.mjs --listen Q --target <P+1> \
+//     --hold "GET /v1/studio/20000000-0000-4000-8000-000000000001/team" --ms 2500
 // The real app on the emulator, the real backend and PostgreSQL, driven through
 // adb (lane 7's android-ui.mjs). Fakes: the development identity, signed in by
 // the debug launch hook, and a SQL row standing in for a membership made before
-// triage went off. --shots saves the editor in Light and Night to DIR.
+// triage went off. --shots saves to DIR the editor in Light and Night, and the
+// screen before and after its refreshes.
 import { execFileSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -37,7 +43,8 @@ const shots = process.argv.includes("--shots")
   : null;
 const SEEDED = account(4);
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-const port = new URL(API).port;
+// The port the app reaches: the API itself, or a delay proxy in front of it.
+const port = process.env.PILOT_APP_PORT ?? new URL(API).port;
 
 const two = await fan(2);
 await legacyMember(2, ["drafter", "triage"]);
@@ -99,51 +106,44 @@ function member(label) {
     : null;
   return { roles: below[0]?.text ?? "", edit, enabled: holder?.enabled };
 }
-// The screen re-reads the team every few seconds. While it reads, its controls
-// are disabled, and when a read runs late the team is hidden and redrawn at the
-// top. A screen dump takes about 2 seconds, so a tap can land after either: the
-// helpers below scroll back and tap again until the effect shows. A swallowed
-// tap sends nothing, so trying again never sends a command twice.
-/** Scrolls down until a line starting with `prefix` is on screen. */
-async function reveal(prefix) {
-  const seen = () => texts().some((t) => t.startsWith(prefix));
-  if (seen()) return true;
-  // From the top down, in steps shorter than the screen, so no line is skipped.
-  top();
-  for (let i = 0; i < 6; i++) {
-    await sleep(700);
-    if (seen()) return true;
+const line = (prefix, nodes = screen()) =>
+  nodes.find((n) => n.text.startsWith(prefix));
+/** Scrolls down to the line that starts with `prefix` and puts it near the top,
+ * so the editor below it fits on the screen. */
+async function bringUp(prefix) {
+  let found = line(prefix);
+  for (let i = 0; !found && i < 6; i++) {
+    // Steps shorter than the screen, so no line is skipped.
     swipe(540, 1700, 540, 1100);
+    await sleep(700);
+    found = line(prefix);
   }
-  return seen();
+  expect(found, `no "${prefix}" on screen`);
+  // Slowly, so the list doesn't fling past it.
+  if (found.y > 800) swipe(540, found.y, 540, 600, 1500);
+  await sleep(700);
 }
-const top = () => {
-  for (let i = 0; i < 4; i++) swipe(540, 700, 540, 1900);
-};
-/** Opens the role editor for a member and scrolls it into view. */
+/** Opens the role editor for a member and brings it on screen. */
 async function edit(label) {
-  for (let attempt = 0; attempt < 4; attempt++) {
-    top();
-    // A late tap may have opened it after the last look.
-    if (attempt > 0 && (await reveal(`Roles for ${label}`))) break;
-    top();
-    await until(
-      () => member(label)?.enabled,
-      30_000,
-      `enabled Edit roles for ${label}`,
-    );
-    const { edit } = member(label);
-    tapAt(edit.x, edit.y);
-    await sleep(1500);
-    if (await reveal(`Roles for ${label}`)) break;
-  }
-  expect(await reveal("Save roles"), `no editor for ${label}`);
+  let found;
+  await until(
+    () => (found = member(label))?.enabled,
+    30_000,
+    `enabled Edit roles for ${label}`,
+  );
+  tapAt(found.edit.x, found.edit.y);
+  await sleep(1000);
+  await bringUp(`Roles for ${label}`);
+  expect(texts().includes("Save roles"), `the editor for ${label} is cut off`);
 }
 /** Taps a control once it is enabled. */
 async function press(label) {
   const control = await waitEnabled(label, 30_000);
   tapAt(control.x, control.y);
 }
+const top = () => {
+  for (let i = 0; i < 4; i++) swipe(540, 700, 540, 1900);
+};
 // The PNG needs the raw bytes; android-ui.mjs's adb() decodes its output as text.
 const shot = (name) =>
   shots &&
@@ -200,29 +200,58 @@ await step(
 );
 await step(
   "A3",
+  "the screen keeps the team, and the person's place in it, through its refreshes",
+  async () => {
+    // Scrolled down to the editor. For 35 s, through about eleven team reads
+    // and the session's own re-check (every 30 s), every look must find the
+    // editor's lines where the first look did: never hidden, never moved.
+    const place = () => {
+      const nodes = screen();
+      return [`Roles for ${SEEDED}`, "Desired roles:", "Save roles"]
+        .map((prefix) => line(prefix, nodes)?.y ?? "gone")
+        .join(", ");
+    };
+    shot("android-hold-before.png");
+    const first = place();
+    expect(!first.includes("gone"), `the editor is not on screen: ${first}`);
+    let looks = 0;
+    for (const end = Date.now() + 35_000; Date.now() < end; looks++) {
+      const now = place();
+      if (now !== first) shot("android-hold-moved.png");
+      expect(now === first, `look ${looks + 1} found y ${now}, not ${first}`);
+    }
+    shot("android-hold-after.png");
+    return `${looks} looks in 35 s found the heading, "Desired roles:" and "Save roles" at y ${first}`;
+  },
+);
+await step(
+  "A4",
   "saving a member who holds Triage drops it, and the server accepts the change",
   async () => {
     const label = `@${two.handle}`;
     await open("light", false);
     await edit(label);
-    for (let attempt = 0; ; attempt++) {
-      await reveal("Desired roles:");
-      const desired = texts().find((t) => t.startsWith("Desired roles:"));
-      if (desired === "Desired roles: drafter, scheduler") break;
-      expect(
-        attempt < 5 && desired === "Desired roles: drafter",
-        `"${desired}"`,
-      );
-      await reveal("Scheduling");
-      await press("Scheduling");
-      await sleep(1500);
-    }
+    const desired = texts().find((t) => t.startsWith("Desired roles:"));
+    expect(desired === "Desired roles: drafter", `"${desired}"`);
+    await press("Scheduling");
+    await until(
+      () => texts().includes("Desired roles: drafter, scheduler"),
+      10_000,
+      "the new desired roles",
+    );
+    // Save needs a current lease and session. On a slow phone the lease can run
+    // out just before a read lands, and the session's own check pauses Save too,
+    // so a tap can land on it disabled and do nothing: tap again until the
+    // server has the change. A tap that did nothing sent nothing.
+    let taps = 0;
     for (let attempt = 0; (await roles(2)) !== "drafter,scheduler"; attempt++) {
-      expect(attempt < 5, "the save never reached the server");
-      await reveal("Save roles");
+      expect(attempt < 4, "the save never reached the server");
       const save = await waitEnabled("Save roles", 10_000).catch(() => null);
-      if (save) tapAt(save.x, save.y);
-      await sleep(4000);
+      if (save) {
+        tapAt(save.x, save.y);
+        taps++;
+      }
+      await sleep(3000);
     }
     // The confirmation is the screen's status notice, at the top.
     top();
@@ -231,7 +260,7 @@ await step(
       15_000,
       "the confirmation",
     );
-    return `"Desired roles: drafter, scheduler" before Save; saved drafter,scheduler; "The role change was confirmed."`;
+    return `"Desired roles: drafter, scheduler" before Save; saved drafter,scheduler after ${taps} tap${taps === 1 ? "" : "s"} on Save; "The role change was confirmed."`;
   },
 );
 if (shots) {

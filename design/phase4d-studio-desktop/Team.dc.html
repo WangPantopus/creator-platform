@@ -23,7 +23,7 @@
 <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px">
 <section style="background: var(--team-surface); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 12px">
 <x-import component-from-global-scope="Qelvora.AuthorLabel" kind="team" member="Priya"></x-import>
-<sc-for list="{{roles}}" as="r" hint-placeholder-count="4"><label style="display: flex; align-items: flex-start; gap: 10px; font-size: 14px"><input type="checkbox" checked="{{r.on}}" style="margin-top: 3px"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">{{r.t}}</span><span class="qv-help">{{r.d}}</span></span></label></sc-for>
+<sc-for list="{{roles}}" as="r" hint-placeholder-count="3"><label style="display: flex; align-items: flex-start; gap: 10px; font-size: 14px"><input type="checkbox" checked="{{r.on}}" style="margin-top: 3px"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">{{r.t}}</span><span class="qv-help">{{r.d}}</span></span></label></sc-for>
 </section>
 <section class="qv-on-maya" style="background: var(--maya-surface); color: var(--on-maya); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 10px">
 <span style="font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; color: var(--maya-accent)">ONLY YOU · CANNOT BE SHARED</span>
@@ -39,7 +39,6 @@
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
 class Component extends DCLogic {
 renderVals() { return { five: 5, roles: [
-{ t: 'Triage', d: 'Reads threads and packets. Every opening is logged and shown to the fan.', on: true },
 { t: 'Drafting', d: 'Prepares replies for you to review and sign. Can’t send them as you.', on: true },
 { t: 'Publishing', d: 'Posts content you’ve approved. Notes stay yours.', on: false },
 { t: 'Scheduling', d: 'Offers call times from your hours.', on: false }

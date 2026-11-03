@@ -76,19 +76,31 @@ private class NativeTeamState(
     private var active = false
     private var generation = 0
     private var checkedUntil = 0L
+    private var dueAt = 0L
+    private var readStarted = 0L
+    private var readToken = 0
     private var readJob: Job? = null
     private var writeJob: Job? = null
     val ready: Boolean get() = !session.checkingSession && !session.busy && session.error.isEmpty()
-    val mayManage: Boolean get() = ready && current && SystemClock.elapsedRealtime() < checkedUntil && creator?.owned == true && creator?.verification == "verified"
+    // The session's own re-check (every 30 s) is a refresh too: only actions wait for it.
+    private val rechecking: Boolean get() = session.checkingSession && !session.busy && session.error.isEmpty()
+    /** The team on screen. A refresh keeps it, and the person's place in it, until the refresh
+     * ends: a read for as long as it can still succeed (5 s from its start), a save or that
+     * re-check for up to 5 s past the lease. Every action still needs the lease and a ready
+     * session. */
+    val shown: Boolean get() = current && (ready || rechecking)
+    private val held: Boolean get() = SystemClock.elapsedRealtime().let { it < checkedUntil || (reading && it < readStarted + 5_000) || ((saving || rechecking) && it < checkedUntil + 5_000) }
+    val manages: Boolean get() = shown && creator?.owned == true && creator?.verification == "verified"
+    val mayManage: Boolean get() = manages && ready && SystemClock.elapsedRealtime() < checkedUntil
     private val mayAcceptDuringWrite: Boolean get() = ready && current && SystemClock.elapsedRealtime() < checkedUntil && creatorId == null
-    val mayAccept: Boolean get() = mayAcceptDuringWrite && !saving && !reading
+    val mayAccept: Boolean get() = mayAcceptDuringWrite && !saving
     val currentEditRoles: List<String>? get() = edit?.let { command -> team?.members?.firstOrNull { it.account_id == command.accountId && it.revoked_at == null }?.roles?.map { it.name }?.sorted() }
     val editIsStale: Boolean get() = edit?.let { command -> currentEditRoles?.let { it != command.expected.sorted() && it != command.desired.sorted() } ?: true } ?: false
-    val canSave: Boolean get() = mayManage && !saving && !reading && edit?.desired?.isNotEmpty() == true && edit?.confirmed == false && !editIsStale && currentEditRoles != null
+    val canSave: Boolean get() = mayManage && !saving && edit?.desired?.isNotEmpty() == true && edit?.confirmed == false && !editIsStale && currentEditRoles != null
 
     fun activate() { deactivate(); active = true; refresh() }
     fun deactivate() {
-        active = false; generation++
+        active = false; generation++; dueAt = 0
         readJob?.cancel(); writeJob?.cancel(); readJob = null; writeJob = null
         reading = false; saving = false; conceal(discardEdit = true)
     }
@@ -111,24 +123,28 @@ private class NativeTeamState(
         if (!active) return
         val snapshot = generation
         if (!matches(snapshot)) { deactivate(); return }
-        if (!ready) { conceal(); return }
+        if (!ready) { if (!rechecking || !held) conceal(); return }
         val request = capture
         if (request != null && !matches(snapshot, request)) {
-            if (matches(snapshot)) { conceal(discardEdit = ready); error = teamCopy(if (ready) "AccountChanged" else "Unavailable") }
+            if (matches(snapshot) && !rechecking) { conceal(discardEdit = ready); error = teamCopy(if (ready) "AccountChanged" else "Unavailable") }
             return
         }
-        if (SystemClock.elapsedRealtime() >= checkedUntil) conceal()
+        if (!held) conceal()
     }
+    /** Reads 3 s after the last read began, or as soon as a slower one ends, so a read is
+     * running whenever the lease runs out. */
+    fun refreshIfDue() { if (SystemClock.elapsedRealtime() >= dueAt) refresh() }
     fun refresh() {
         if (!active || reading || saving) return
-        if (!ready) { conceal(); return }
-        val snapshot = generation; val started = SystemClock.elapsedRealtime()
-        reading = true
+        if (!ready) { if (rechecking) dueAt = 0 else conceal(); return }
+        val snapshot = generation; val started = SystemClock.elapsedRealtime(); val token = ++readToken
+        reading = true; readStarted = started; dueAt = started + 3_000
         readJob = scope.launch {
+            var ended = false
             try {
                 val request = session.captureRequest(destination, maximumResponseBytes = 262_144, timeoutMs = 4_000)
                 if (request == null || !matches(snapshot, request)) {
-                    if (matches(snapshot)) { conceal(); error = teamCopy("Unavailable") }
+                    if (matches(snapshot) && !rechecking) { conceal(); error = teamCopy("Unavailable"); ended = true }
                     return@launch
                 }
                 val first = request.client.studioSession()
@@ -141,7 +157,7 @@ private class NativeTeamState(
                     if (!uuid(creatorId) || found.verification != "verified" || (!found.owned && found.roles.isEmpty())) throw TeamDenied()
                     members = request.client.studioTeam(creatorId)
                     if (members.members.size > 50 || members.invitations.size > 50 || members.members.map { it.account_id }.toSet().size != members.members.size || members.members.any { !uuid(it.account_id) }) throw TeamDenied()
-                    if (!matches(snapshot, request) || SystemClock.elapsedRealtime() >= started + 5_000) throw TeamExpired()
+                    if (!matches(snapshot, request) || SystemClock.elapsedRealtime() >= started + 5_000) { if (rechecking) return@launch else throw TeamExpired() }
                     val last = request.client.studioSession()
                     if (!matches(snapshot, request)) return@launch
                     validate(last, request)
@@ -153,21 +169,29 @@ private class NativeTeamState(
                     }
                     selected = final
                 }
-                if (!matches(snapshot, request) || SystemClock.elapsedRealtime() >= started + 5_000) throw TeamExpired()
+                if (!matches(snapshot, request) || SystemClock.elapsedRealtime() >= started + 5_000) { if (rechecking) return@launch else throw TeamExpired() }
                 directory = first; creator = selected; team = members; capture = request
-                checkedUntil = started + 5_000; current = true
+                checkedUntil = started + 5_000; current = true; ended = true
                 // A real desired set is visible after a fresh read. It does not
                 // manufacture acknowledgement of an interrupted role command.
                 if (edit?.unknown != true && edit?.confirmed != true && acceptance?.unknown != true && acceptance?.confirmed != true) error = ""
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (failure: Exception) {
+                ended = true
                 if (matches(snapshot)) {
                     val denied = failure is TeamDenied || (failure as? CreatorAPIError)?.status in listOf(401, 403, 404)
                     conceal(discardEdit = denied); error = teamCopy(if (denied) "Denied" else "Unavailable")
                 }
-            } finally { if (generation == snapshot) { reading = false; readJob = null } }
+            } finally {
+                // A read the session's re-check cut short ends quietly and runs again once
+                // that ends. A read a write stopped leaves the state to the write.
+                if (generation == snapshot && readToken == token) { reading = false; readJob = null; if (!ended) dueAt = 0 }
+            }
         }
     }
+    // A write stops a read in flight, so the two never overlap and a tap on Save or Accept is
+    // never lost to a background read; the write reads again when it ends.
+    private fun stopReading() { readToken++; readJob?.cancel(); readJob = null; reading = false }
     private fun validate(value: APIStudioSession, request: FanSessionRequestCapture) {
         if (value.creators.size > 50 || value.invitations.size > 50 || value.creators.map { it.id }.toSet().size != value.creators.size ||
             value.invitations.map { it.id }.toSet().size != value.invitations.size || value.invitations.any { !uuid(it.id) || !uuid(it.creatorId) || it.roles.isEmpty() } ||
@@ -183,6 +207,7 @@ private class NativeTeamState(
     fun retryAcceptance() {
         val command = acceptance ?: return
         if (!mayAccept || command.confirmed) return
+        stopReading()
         val snapshot = generation
         saving = true
         writeJob = scope.launch {
@@ -206,9 +231,11 @@ private class NativeTeamState(
             } finally { if (generation == snapshot) { saving = false; writeJob = null; refresh() } }
         }
     }
+    // Opening the editor, choosing roles and reviewing the current ones stay on this device,
+    // so a read in flight doesn't stop them.
     fun openEditor(member: APIStudioTeamMembersItem) {
         val request = capture ?: return
-        if (!mayManage || saving || edit != null || member.revoked_at != null || member.roles.isEmpty() || member.account_id == accountId || team?.members?.none { it.account_id == member.account_id && it.revoked_at == null } != false) return
+        if (!manages || saving || edit != null || member.revoked_at != null || member.roles.isEmpty() || member.account_id == accountId || team?.members?.none { it.account_id == member.account_id && it.revoked_at == null } != false) return
         edit = TeamEdit(member.account_id, member.handle?.let { "@$it" } ?: member.account_id, request,
             member.roles.map { it.name }.sorted(),
             member.roles.map { it.name }.filter { role -> TeamRole.entries.any { it.name == role } }.sorted())
@@ -216,18 +243,19 @@ private class NativeTeamState(
     }
     fun select(role: String, selected: Boolean) {
         val value = edit ?: return
-        if (!mayManage || saving || reading || editIsStale || value.unknown || value.confirmed) return
+        if (!manages || saving || editIsStale || value.unknown || value.confirmed) return
         edit = value.copy(desired = (if (selected) (value.desired + role).distinct() else value.desired.filter { it != role }).sorted())
     }
     fun reviewCurrent() {
         val roles = currentEditRoles ?: return; val value = edit ?: return
-        if (!mayManage || saving || reading) return
+        if (!manages || saving) return
         edit = value.copy(expected = roles, unknown = false, confirmed = false); error = ""
     }
     fun closeEditor() { if (!saving) { edit = null; error = "" } }
     fun save() {
         val command = edit ?: return; val id = creatorId ?: return
         if (!canSave) return
+        stopReading()
         val snapshot = generation
         val body = APITeamRolesUpdateInput(command.expected.map { APITeamRolesUpdateInputExpectedRolesItem.valueOf(it) }, command.desired.map { APITeamRolesUpdateInputRolesItem.valueOf(it) })
         saving = true
@@ -282,13 +310,11 @@ fun StudioTeamWorkspace(
     }
     LaunchedEffect(state, foreground) {
         if (!foreground) return@LaunchedEffect
-        state.activate(); var ticks = 0
-        while (true) {
-            delay(250); state.expire(); ticks++
-            if (ticks % 12 == 0) state.refresh()
-        }
+        state.activate()
+        // A due read starts before the lease is checked, so the lease never runs out between reads.
+        while (true) { delay(250); state.refreshIfDue(); state.expire() }
     }
-    val visible = foreground && state.ready && state.current && accountId == state.accountId && sessionId == state.sessionId && !session.purgingPrivateState && !session.localPurgeFailed
+    val visible = foreground && state.shown && accountId == state.accountId && sessionId == state.sessionId && !session.purgingPrivateState && !session.localPurgeFailed
     Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         TextLine(teamCopy(if (creatorId == null) "Workspace" else "Title"), "display-md", modifier = Modifier.semantics { heading() })
         if (state.error.isNotEmpty()) Notice(title = teamCopy("Status"), children = state.error)
@@ -327,25 +353,25 @@ fun StudioTeamWorkspace(
                         TextLine(member.handle?.let { "@$it" } ?: member.account_id, strong = true)
                         TextLine(member.roles.joinToString { it.name.lowercase() })
                         if (member.revoked_at != null) TextLine(teamCopy("Removed"), "label")
-                        else if (state.mayManage && member.account_id != state.accountId) Button(teamCopy("Edit"), ButtonVariant.SECONDARY, block = true, disabled = state.saving || state.edit != null || member.roles.isEmpty()) { state.openEditor(member) }
+                        else if (state.manages && member.account_id != state.accountId) Button(teamCopy("Edit"), ButtonVariant.SECONDARY, block = true, disabled = state.saving || state.edit != null || member.roles.isEmpty()) { state.openEditor(member) }
                     }
                 }
                 if (!creator.owned) TextLine(teamCopy("CreatorOnly"))
-                state.edit?.takeIf { state.mayManage }?.let { edit ->
+                state.edit?.takeIf { state.manages }?.let { edit ->
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         TextLine(teamCopy("EditFor", mapOf("member" to edit.label)), strong = true, modifier = Modifier.semantics { heading() })
                         TextLine(teamCopy("Reviewed", mapOf("roles" to edit.expected.joinToString { it.lowercase() })))
                         TextLine(teamCopy("Desired", mapOf("roles" to edit.desired.joinToString { it.lowercase() })))
                         state.currentEditRoles?.let { TextLine(teamCopy("Current", mapOf("roles" to it.joinToString { role -> role.lowercase() }))) }
                         TeamRole.entries.forEach { role ->
-                            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).toggleable(value = edit.desired.contains(role.name), enabled = !state.saving && !state.reading && !state.editIsStale && !edit.unknown && !edit.confirmed, role = Role.Checkbox, onValueChange = { state.select(role.name, it) }).padding(vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).toggleable(value = edit.desired.contains(role.name), enabled = !state.saving && !state.editIsStale && !edit.unknown && !edit.confirmed, role = Role.Checkbox, onValueChange = { state.select(role.name, it) }).padding(vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                                 // The shared checkbox: there is no "circle" glyph, so asking for one crashed the editor.
                                 val selected = edit.desired.contains(role.name)
                                 Box(Modifier.size(QelvoraTokens.checkboxSize).background(qColor(if (selected) "ink" else "surface"), RoundedCornerShape(QelvoraTokens.radiusTail)).border(QelvoraTokens.hairline, qColor("control-line"), RoundedCornerShape(QelvoraTokens.radiusTail)), contentAlignment = Alignment.Center) { if (selected) Glyph("check", QelvoraTokens.space4, qColor("surface")) }
                                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) { TextLine(role.title, strong = true); TextLine(role.detail, "caption") }
                             }
                         }
-                        if (state.editIsStale && state.currentEditRoles != null) Button(teamCopy("ReviewCurrent"), ButtonVariant.SECONDARY, block = true, disabled = state.saving || state.reading, onClick = state::reviewCurrent)
+                        if (state.editIsStale && state.currentEditRoles != null) Button(teamCopy("ReviewCurrent"), ButtonVariant.SECONDARY, block = true, disabled = state.saving, onClick = state::reviewCurrent)
                         Button(teamCopy(if (edit.unknown) "RetryExact" else "Save"), ButtonVariant.SECONDARY, block = true, disabled = !state.canSave, onClick = state::save)
                         Button(QelvoraCopy.text("close"), ButtonVariant.QUIET, block = true, disabled = state.saving, onClick = state::closeEditor)
                     }

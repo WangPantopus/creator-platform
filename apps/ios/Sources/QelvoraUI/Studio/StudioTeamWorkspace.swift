@@ -54,13 +54,25 @@ private struct NativeTeamAcceptance {
     private var active = false
     private var generation = 0
     private var checkedUntil: TimeInterval = 0
+    private var dueAt: TimeInterval = 0
+    private var readStarted: TimeInterval = 0
+    private var readToken = 0
     private var readTask: Task<Void, Never>?
     private var writeTask: Task<Void, Never>?
 
     private var now: TimeInterval { ProcessInfo.processInfo.systemUptime }
     var ready: Bool { session?.checkingSession == false && session?.busy == false && session?.error.isEmpty == true }
-    var mayManage: Bool { ready && current && now < checkedUntil && creator?.owned == true && creator?.verification == "verified" }
-    var mayAccept: Bool { ready && current && now < checkedUntil && creatorId == nil && !saving && !reading }
+    // The session's own re-check (every 30 s) is a refresh too: only actions wait for it.
+    private var rechecking: Bool { session?.checkingSession == true && session?.busy == false && session?.error.isEmpty == true }
+    /// The team on screen. A refresh keeps it, and the person's place in it, until the refresh
+    /// ends: a read for as long as it can still succeed (5 s from its start), a save or that
+    /// re-check for up to 5 s past the lease. Every action still needs the lease and a ready
+    /// session.
+    var shown: Bool { current && (ready || rechecking) }
+    private var held: Bool { now < checkedUntil || (reading && now < readStarted + 5) || ((saving || rechecking) && now < checkedUntil + 5) }
+    var manages: Bool { shown && creator?.owned == true && creator?.verification == "verified" }
+    var mayManage: Bool { manages && ready && now < checkedUntil }
+    var mayAccept: Bool { ready && current && now < checkedUntil && creatorId == nil && !saving }
     var currentEditRoles: [String]? {
         guard let edit, let member = team?.members.first(where: { $0.account_id == edit.accountId && $0.revoked_at == nil }) else { return nil }
         return member.roles.map(\.rawValue).sorted()
@@ -72,7 +84,7 @@ private struct NativeTeamAcceptance {
     }
     var canSave: Bool {
         guard let edit else { return false }
-        return mayManage && !saving && !reading && !edit.desired.isEmpty && !edit.confirmed && !editIsStale && currentEditRoles != nil
+        return mayManage && !saving && !edit.desired.isEmpty && !edit.confirmed && !editIsStale && currentEditRoles != nil
     }
 
     func activate(session: FanSession, creatorId: String?) {
@@ -82,7 +94,7 @@ private struct NativeTeamAcceptance {
         active = true; refresh()
     }
     func deactivate() {
-        active = false; generation &+= 1
+        active = false; generation &+= 1; dueAt = 0
         readTask?.cancel(); writeTask?.cancel(); readTask = nil; writeTask = nil
         reading = false; saving = false; conceal(discardEdit: true)
     }
@@ -104,24 +116,31 @@ private struct NativeTeamAcceptance {
         guard active else { return }
         let snapshot = generation
         if !matches(snapshot) { deactivate(); return }
-        if !ready { conceal(); return }
+        if !ready { if !rechecking || !held { conceal() }; return }
         if let capture, !(await matches(snapshot, request: capture)) {
-            guard matches(snapshot) else { return }
+            guard matches(snapshot), !rechecking else { return }
             conceal(discardEdit: ready); error = teamCopy(ready ? "AccountChanged" : "Unavailable"); return
         }
-        if now >= checkedUntil { conceal() }
+        if !held { conceal() }
     }
+    /// Reads 3 s after the last read began, or as soon as a slower one ends, so a read is
+    /// running whenever the lease runs out.
+    func refreshIfDue() { if now >= dueAt { refresh() } }
     func refresh() {
         guard active, !reading, !saving, let session else { return }
-        guard ready else { conceal(); return }
+        guard ready else { if rechecking { dueAt = 0 } else { conceal() }; return }
         let snapshot = generation, started = now
-        reading = true
+        readToken &+= 1; let token = readToken
+        reading = true; readStarted = started; dueAt = started + 3
         readTask = Task { [weak self] in
             guard let self else { return }
-            defer { if generation == snapshot { reading = false; readTask = nil } }
+            var ended = false
+            // A read the session's re-check cut short ends quietly and runs again once
+            // that ends. A read a write stopped leaves the state to the write.
+            defer { if generation == snapshot && readToken == token { reading = false; readTask = nil; if !ended { dueAt = 0 } } }
             do {
                 guard let request = await session.captureRequest(from: destination, maximumResponseBytes: 262_144, timeoutSeconds: 4), await matches(snapshot, request: request) else {
-                    if matches(snapshot) { conceal(); error = teamCopy("Unavailable") }
+                    if matches(snapshot), !rechecking { conceal(); error = teamCopy("Unavailable"); ended = true }
                     return
                 }
                 let first = try await request.client.studioSession()
@@ -138,7 +157,7 @@ private struct NativeTeamAcceptance {
                     guard let teamValue = members, teamValue.members.count <= 50, teamValue.invitations.count <= 50,
                           Set(teamValue.members.map(\.account_id)).count == teamValue.members.count,
                           teamValue.members.allSatisfy({ UUID(uuidString: $0.account_id) != nil }) else { throw NativeTeamDenied() }
-                    guard await matches(snapshot, request: request), now < started + 5 else { throw NativeTeamExpired() }
+                    guard await matches(snapshot, request: request), now < started + 5 else { if rechecking { return }; throw NativeTeamExpired() }
                     let last = try await request.client.studioSession()
                     guard await matches(snapshot, request: request) else { return }
                     try validate(last, request: request)
@@ -151,13 +170,14 @@ private struct NativeTeamAcceptance {
                               membership.roles.map(\.rawValue).sorted() == final.roles.map(\.rawValue).sorted() else { throw NativeTeamDenied() }
                     }
                 }
-                guard await matches(snapshot, request: request), now < started + 5 else { throw NativeTeamExpired() }
+                guard await matches(snapshot, request: request), now < started + 5 else { if rechecking { return }; throw NativeTeamExpired() }
                 directory = first; creator = selected; team = members; capture = request
-                checkedUntil = started + 5; current = true
+                checkedUntil = started + 5; current = true; ended = true
                 // An actual current read can display a committed desired set,
                 // but it never invents acknowledgement of an unknown command.
                 if edit?.unknown != true && edit?.confirmed != true && acceptance?.unknown != true && acceptance?.confirmed != true { error = "" }
             } catch {
+                ended = true
                 guard matches(snapshot) else { return }
                 let denied = error is NativeTeamDenied || (error as? CreatorAPIError).map { [401, 403, 404].contains($0.status) } == true
                 conceal(discardEdit: denied)
@@ -165,6 +185,9 @@ private struct NativeTeamAcceptance {
             }
         }
     }
+    // A write stops a read in flight, so the two never overlap and a tap on Save or Accept is
+    // never lost to a background read; the write reads again when it ends.
+    private func stopReading() { readToken &+= 1; readTask?.cancel(); readTask = nil; reading = false }
     private func validate(_ value: APIStudioSession, request: FanSessionRequestCapture) throws {
         guard value.creators.count <= 50, value.invitations.count <= 50,
               Set(value.creators.map(\.id)).count == value.creators.count,
@@ -182,6 +205,7 @@ private struct NativeTeamAcceptance {
     func closeAcceptance() { if !saving { acceptance = nil; error = "" } }
     func retryAcceptance() {
         guard mayAccept, let command = acceptance, !command.confirmed else { return }
+        stopReading()
         let snapshot = generation
         saving = true
         writeTask = Task { [weak self] in
@@ -209,8 +233,10 @@ private struct NativeTeamAcceptance {
         }
     }
     private var mayAcceptDuringWrite: Bool { ready && current && now < checkedUntil && creatorId == nil }
+    // Opening the editor, choosing roles and reviewing the current ones stay on this device,
+    // so a read in flight doesn't stop them.
     func openEditor(_ member: APIStudioTeamMembersItem) {
-        guard mayManage, !saving, edit == nil, member.revoked_at == nil, !member.roles.isEmpty, member.account_id != accountId,
+        guard manages, !saving, edit == nil, member.revoked_at == nil, !member.roles.isEmpty, member.account_id != accountId,
               let capture, team?.members.contains(where: { $0.account_id == member.account_id && $0.revoked_at == nil }) == true else { return }
         edit = NativeTeamEdit(accountId: member.account_id, label: member.handle.map { "@" + $0 } ?? member.account_id, capture: capture,
                               expected: member.roles.map(\.rawValue).sorted(),
@@ -218,12 +244,12 @@ private struct NativeTeamAcceptance {
         error = ""
     }
     func select(_ role: String, selected: Bool) {
-        guard mayManage, !saving, !reading, !editIsStale, var value = edit, !value.unknown, !value.confirmed else { return }
+        guard manages, !saving, !editIsStale, var value = edit, !value.unknown, !value.confirmed else { return }
         value.desired = (selected ? Array(Set(value.desired + [role])) : value.desired.filter { $0 != role }).sorted()
         edit = value
     }
     func reviewCurrent() {
-        guard mayManage, !saving, !reading, let roles = currentEditRoles, var value = edit else { return }
+        guard manages, !saving, let roles = currentEditRoles, var value = edit else { return }
         value.expected = roles; value.unknown = false; value.confirmed = false; edit = value; error = ""
     }
     func closeEditor() { if !saving { edit = nil; error = "" } }
@@ -234,6 +260,7 @@ private struct NativeTeamAcceptance {
         // interruption. No fresh actor, credential, or inferred signing receipt.
         let body = APITeamRolesUpdateInput(expectedRoles: command.expected.compactMap(APITeamRolesUpdateInputExpectedRolesItem.init(rawValue:)), roles: command.desired.compactMap(APITeamRolesUpdateInputRolesItem.init(rawValue:)))
         guard body.expectedRoles.count == command.expected.count, body.roles.count == command.desired.count else { return }
+        stopReading()
         saving = true
         writeTask = Task { [weak self] in
             guard let self else { return }
@@ -284,7 +311,7 @@ private struct NativeTeamExpired: Error {}
         self.session = session; self.creatorId = creatorId; self.onOpenTeam = onOpenTeam; self.onReturnToWorkspace = onReturnToWorkspace
     }
     private var lifetime: String { (session.session?.accountId ?? "") + ":" + (session.session?.sessionId ?? "") + ":" + session.destination + ":" + (creatorId ?? "") }
-    private var visible: Bool { scene == .active && state.ready && state.current && session.session?.accountId == state.accountId && session.session?.sessionId == state.sessionId && !session.purgingPrivateState && !session.localPurgeFailed }
+    private var visible: Bool { scene == .active && state.shown && session.session?.accountId == state.accountId && session.session?.sessionId == state.sessionId && !session.purgingPrivateState && !session.localPurgeFailed }
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
@@ -303,11 +330,10 @@ private struct NativeTeamExpired: Error {}
             .task(id: lifetime + String(describing: scene)) {
                 guard scene == .active else { state.deactivate(); return }
                 state.activate(session: session, creatorId: creatorId)
-                var ticks = 0
+                // A due read starts before the lease is checked, so the lease never runs out between reads.
                 while !Task.isCancelled {
                     do { try await Task.sleep(for: .milliseconds(250)) } catch { return }
-                    await state.expire(); ticks += 1
-                    if ticks % 12 == 0 { state.refresh() }
+                    state.refreshIfDue(); await state.expire()
                 }
             }.onDisappear { state.deactivate() }
             .onChange(of: state.edit?.accountId) { _, value in editorFocus = value != nil }
@@ -350,13 +376,13 @@ private struct NativeTeamExpired: Error {}
                 Text(member.handle.map { "@" + $0 } ?? member.account_id).qText("body-strong")
                 Text(member.roles.map(\.rawValue).joined(separator: ", ")).qText("body")
                 if member.revoked_at != nil { Text(teamCopy("Removed")).qText("label") }
-                else if state.mayManage && member.account_id != state.accountId {
+                else if state.manages && member.account_id != state.accountId {
                     Button(teamCopy("Edit"), variant: .secondary, block: true, disabled: state.saving || state.edit != nil || member.roles.isEmpty) { state.openEditor(member) }
                 }
             }
         }
         if !creator.owned { Text(teamCopy("CreatorOnly")).qText("body") }
-        if let edit = state.edit, state.mayManage {
+        if let edit = state.edit, state.manages {
             VStack(alignment: .leading, spacing: 12) {
                 Text(teamCopy("EditFor", ["member": edit.label])).qText("body-strong").accessibilityAddTraits(.isHeader).accessibilityFocused($editorFocus)
                 Text(teamCopy("Reviewed", ["roles": edit.expected.joined(separator: ", ")])).qText("body")
@@ -365,10 +391,10 @@ private struct NativeTeamExpired: Error {}
                 ForEach(NativeTeamRole.allCases) { role in
                     Toggle(isOn: Binding(get: { edit.desired.contains(role.rawValue) }, set: { state.select(role.rawValue, selected: $0) })) {
                         VStack(alignment: .leading, spacing: 4) { Text(role.title).qText("body-strong"); Text(role.detail).qText("caption") }
-                    }.frame(minHeight: 48).disabled(state.saving || state.reading || state.editIsStale || edit.unknown || edit.confirmed)
+                    }.frame(minHeight: 48).disabled(state.saving || state.editIsStale || edit.unknown || edit.confirmed)
                 }
                 if state.editIsStale && state.currentEditRoles != nil {
-                    Button(teamCopy("ReviewCurrent"), variant: .secondary, block: true, disabled: state.saving || state.reading) { state.reviewCurrent() }
+                    Button(teamCopy("ReviewCurrent"), variant: .secondary, block: true, disabled: state.saving) { state.reviewCurrent() }
                 }
                 Button(teamCopy(edit.unknown ? "RetryExact" : "Save"), variant: .secondary, block: true, disabled: !state.canSave) { state.save() }
                 Button(QelvoraCopy.text("close"), variant: .quiet, block: true, disabled: state.saving) { state.closeEditor() }

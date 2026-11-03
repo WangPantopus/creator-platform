@@ -106,7 +106,15 @@ git push origin refs/tags/archive/<name>:refs/heads/<name>
   - Permanent fix: quit Docker, eject the installer image, and start Docker from Applications.
 - **iOS:** use an iPhone 18 Pro on iOS 27.0. iOS 27.1 offers only the iPhone Duo, which sometimes
   can't be found once it has booted (CI picks the iPhone 18 Pro for the same reason).
-- **Android:** there is no Android SDK here, so CI builds Android.
+- **Android:** this Mac can run the app on an emulator but can't build it, so CI builds Android.
+  - Android Studio's SDK is at `~/Library/Android/sdk`: `adb`, the emulator, the API 37 arm64
+    system image and one emulator, `Medium_Phone_API_37.0`. None of them is on `PATH`, and there is
+    no `sdkmanager` or `avdmanager`.
+  - There is no Java 21 and no Gradle cache. Android Studio's own Java is 25, which Gradle 8.9
+    can't run.
+  - For an `adb` scenario, make your own emulator from that image (a copy of the existing one's
+    `config.ini` in a new `.avd` folder) and install the debug APK from CI's `android-review`
+    artifact.
 - **Tools rewrite tracked files.** `swift test` and `xcodebuild` rewrite `apps/ios/Package.resolved`,
   and `next dev` rewrites `apps/web/next-env.d.ts`. Restore both before committing. The local stack
   hides `next-env.d.ts` from Git while the web app runs and restores it on `stop` and `down`.
