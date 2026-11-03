@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { copy } from "@qelvora/copy";
+import { copy, formatCopy } from "@qelvora/copy";
 import { Notice } from "@qelvora/ui-web";
 import { DoneSchema, TeamRolesUpdateInputSchema } from "@qelvora/api";
 import { StudioFailure, studioRequest } from "../api";
@@ -10,12 +10,16 @@ import { Feedback, useAction } from "../shared/action";
 import { time } from "../shared/format";
 import type { Creator } from "../shared/types";
 import { useLiveReload, useLiveView } from "../shell/live";
+// Team triage is off for the pilot, so it is never offered; the server's
+// switch is `teamRolesOffForPilot` in the backend's identity profiles. A member
+// who already holds it still shows it, and saving that member's roles drops it.
 const teamRoleChoices = [
-  ["triage", "Triage", "Reads and routes the queue. Replies as team."],
   ["drafter", "Drafting", "Prepares drafts. Never approves as you."],
   ["publisher", "Publishing", "Publishes content under team identity."],
   ["scheduler", "Scheduling", "Offers times from your hours."],
 ] as const;
+const offeredTeamRoles = (roles: readonly string[]) =>
+  roles.filter((role) => teamRoleChoices.some(([choice]) => choice === role));
 const sameTeamRoles = (left: readonly string[], right: readonly string[]) =>
   [...left].sort().join("|") === [...right].sort().join("|");
 type TeamRoleEdit = {
@@ -391,7 +395,7 @@ export function Team({
                           accountId: m.account_id,
                           label: m.handle ? `@${m.handle}` : m.account_id,
                           expectedRoles: [...m.roles],
-                          roles: [...m.roles],
+                          roles: offeredTeamRoles(m.roles),
                           responseUnknown: false,
                         });
                       })
@@ -426,6 +430,11 @@ export function Team({
                 member's pending invitations.
               </p>
               <p>Reviewed roles: {roleEdit.expectedRoles.join(" · ")}</p>
+              <p>
+                {formatCopy("w5NativeTeamDesired", {
+                  roles: roleEdit.roles.join(" · "),
+                })}
+              </p>
               {!memberActive && (
                 <Notice title="Member access changed">
                   This member no longer has active access. Refresh the team

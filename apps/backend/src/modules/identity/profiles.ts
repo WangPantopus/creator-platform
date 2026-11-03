@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
 import type { Pool, PoolClient } from "pg";
+import { copy } from "@qelvora/copy";
 import {
   CreatorProfileInputSchema,
   FanProfileInputSchema,
@@ -21,6 +22,19 @@ import {
 } from "./request-authority.js";
 
 const handle = (value: string) => value.replace(/^@/u, "").toLowerCase();
+/** Roles no invitation, acceptance or role change may grant. Team triage is off
+ * for the pilot (founder decision, 2026-11-03): its thread access needs the
+ * unregistered migration 0084. Existing memberships still read it and may drop
+ * it. To turn it back on, empty this list and offer the role again in the web,
+ * iOS and Android Team screens; the native apps need new store builds. */
+const teamRolesOffForPilot: readonly string[] = ["triage"];
+const refuseTeamRolesOffForPilot = (
+  roles: readonly string[],
+  message: string,
+) => {
+  if (roles.some((role) => teamRolesOffForPilot.includes(role)))
+    throw new DomainError("team_role_unavailable", message, 403);
+};
 export interface VerificationDecision {
   proofId: string;
   accountId: string;
@@ -296,6 +310,7 @@ export class IdentityProfiles {
   }
   async invite(actor: Actor, creatorId: string, input: unknown) {
     const body = TeamInviteSchema.parse(input);
+    refuseTeamRolesOffForPilot(body.roles, copy.growthErrorPromptUnavailable);
     const assertAllowed = this.team?.assertCreatorAllowed;
     if (typeof assertAllowed !== "function")
       throw new DomainError(
@@ -499,6 +514,8 @@ export class IdentityProfiles {
         "team_member_exists",
         "You already belong to this team. Reopen it to review your current roles.",
       );
+      // An invitation created before a role went off still cannot grant it.
+      refuseTeamRolesOffForPilot(roles, copy.growthErrorEntryUnavailable2);
       await client.query(
         "INSERT INTO creator.team_membership(creator_id,account_id,roles) VALUES($1,$2,$3) ON CONFLICT(creator_id,account_id) DO UPDATE SET roles=excluded.roles,revoked_at=NULL",
         [family.creator_id, actor.accountId, [...roles].sort()],
@@ -581,6 +598,8 @@ export class IdentityProfiles {
     input: unknown,
   ) {
     const body = TeamRolesUpdateInputSchema.parse(input);
+    // The reviewed expectedRoles may still hold it; the new set may not.
+    refuseTeamRolesOffForPilot(body.roles, copy.growthErrorPromptUnavailable);
     const assertAllowed = this.team?.assertCreatorAllowed;
     if (typeof assertAllowed !== "function")
       throw new DomainError(

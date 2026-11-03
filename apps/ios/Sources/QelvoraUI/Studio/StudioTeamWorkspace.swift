@@ -5,8 +5,12 @@ private func teamCopy(_ key: String, _ values: [String: String] = [:]) -> String
     QelvoraCopy.text("w5NativeTeam" + key, values: values)
 }
 
+/// The roles the Studio offers. Team triage is off for the pilot; the server's
+/// switch is `teamRolesOffForPilot` in the backend's identity profiles, and
+/// offering the role here again needs a new store build. A member who already
+/// holds it still shows it, and saving that member's roles drops it.
 private enum NativeTeamRole: String, CaseIterable, Identifiable {
-    case triage, drafter, publisher, scheduler
+    case drafter, publisher, scheduler
     var id: String { rawValue }
     var title: String { teamCopy(rawValue + "Title") }
     var detail: String { teamCopy(rawValue + "Detail") }
@@ -209,7 +213,8 @@ private struct NativeTeamAcceptance {
         guard mayManage, !saving, edit == nil, member.revoked_at == nil, !member.roles.isEmpty, member.account_id != accountId,
               let capture, team?.members.contains(where: { $0.account_id == member.account_id && $0.revoked_at == nil }) == true else { return }
         edit = NativeTeamEdit(accountId: member.account_id, label: member.handle.map { "@" + $0 } ?? member.account_id, capture: capture,
-                              expected: member.roles.map(\.rawValue).sorted(), desired: member.roles.map(\.rawValue).sorted())
+                              expected: member.roles.map(\.rawValue).sorted(),
+                              desired: member.roles.map(\.rawValue).filter { NativeTeamRole(rawValue: $0) != nil }.sorted())
         error = ""
     }
     func select(_ role: String, selected: Bool) {

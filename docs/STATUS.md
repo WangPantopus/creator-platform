@@ -93,9 +93,9 @@ in the Wave 6 queue.
      evidence copies under `artifacts/`, so 56 are left in the tree.
    - **Four places fail on every real database:** three in the ops console (naming a reviewer,
      supervisor audits and lifting a pause) and one in Team triage. The founder left Team triage
-     out of the pilot ([decision log](BRIEF.md#14-decision-log), 2026-11-03), so during the pilot the
-     Studio must not offer the Triage role and the server must refuse to grant it; a separate
-     follow-up does both.
+     out of the pilot ([decision log](BRIEF.md#14-decision-log), 2026-11-03). The Studio no longer
+     offers the Triage role, and the server refuses to grant it with 403 `team_role_unavailable`
+     (#537).
    - **The proposed pilot waves:** the ops console, then memory, then store memberships if the
      founder says so.
    - **Next: the registration generator.** It makes registration data-driven: it generates the wave

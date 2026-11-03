@@ -57,6 +57,7 @@ eval "$(node infra/local/stack.mjs env --lane N | sed 's/^/export /')"
 (cd apps/backend && pnpm exec vitest run tests/commerce-money-limits.test.ts)
 ```
 
-The end-to-end scenarios live under `tests/scenarios/`, one folder per lane plus `integrator/`.
+The end-to-end scenarios live under `tests/scenarios/`: one folder per lane, plus `integrator/`
+and `pilot/`.
 Each says at its top which stack options it needs. They run by hand today, not in CI
 ([ci.md](ci.md)).
