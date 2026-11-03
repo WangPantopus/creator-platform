@@ -9,9 +9,17 @@
 // adb (lane 7's android-ui.mjs). Fakes: the development identity, signed in by
 // the debug launch hook, and a SQL row standing in for a membership made before
 // triage went off. --shots saves the editor in Light and Night to DIR.
+import { execFileSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { adb, screen, swipe, tapAt, texts } from "../lane-7/android-ui.mjs";
+import {
+  adb,
+  screen,
+  swipe,
+  tapAt,
+  texts,
+  waitEnabled,
+} from "../lane-7/android-ui.mjs";
 import {
   API,
   MAYA,
@@ -91,31 +99,67 @@ function member(label) {
     : null;
   return { roles: below[0]?.text ?? "", edit, enabled: holder?.enabled };
 }
+// The screen re-reads the team every few seconds. While it reads, its controls
+// are disabled, and when a read runs late the team is hidden and redrawn at the
+// top. A screen dump takes about 2 seconds, so a tap can land after either: the
+// helpers below scroll back and tap again until the effect shows. A swallowed
+// tap sends nothing, so trying again never sends a command twice.
+/** Scrolls down until a line starting with `prefix` is on screen. */
+async function reveal(prefix) {
+  const seen = () => texts().some((t) => t.startsWith(prefix));
+  if (seen()) return true;
+  // From the top down, in steps shorter than the screen, so no line is skipped.
+  top();
+  for (let i = 0; i < 6; i++) {
+    await sleep(700);
+    if (seen()) return true;
+    swipe(540, 1700, 540, 1100);
+  }
+  return seen();
+}
+const top = () => {
+  for (let i = 0; i < 4; i++) swipe(540, 700, 540, 1900);
+};
 /** Opens the role editor for a member and scrolls it into view. */
 async function edit(label) {
-  await until(
-    () => member(label)?.enabled,
-    30_000,
-    `enabled Edit roles for ${label}`,
-  );
-  const { edit } = member(label);
-  tapAt(edit.x, edit.y);
-  await until(
-    () => texts().includes(`Roles for ${label}`),
-    15_000,
-    "the editor",
-  );
-  for (let i = 0; i < 4 && !texts().includes("Save roles"); i++) {
-    swipe(540, 1800, 540, 900);
-    await sleep(700);
+  for (let attempt = 0; attempt < 4; attempt++) {
+    top();
+    // A late tap may have opened it after the last look.
+    if (attempt > 0 && (await reveal(`Roles for ${label}`))) break;
+    top();
+    await until(
+      () => member(label)?.enabled,
+      30_000,
+      `enabled Edit roles for ${label}`,
+    );
+    const { edit } = member(label);
+    tapAt(edit.x, edit.y);
+    await sleep(1500);
+    if (await reveal(`Roles for ${label}`)) break;
   }
+  expect(await reveal("Save roles"), `no editor for ${label}`);
 }
+/** Taps a control once it is enabled. */
+async function press(label) {
+  const control = await waitEnabled(label, 30_000);
+  tapAt(control.x, control.y);
+}
+// The PNG needs the raw bytes; android-ui.mjs's adb() decodes its output as text.
 const shot = (name) =>
   shots &&
   writeFileSync(
     join(shots, name),
-    adb("exec-out", "screencap", "-p").toString("latin1"),
-    "latin1",
+    execFileSync(
+      "adb",
+      [
+        "-s",
+        process.env.LANE7_ANDROID ?? "emulator-5574",
+        "exec-out",
+        "screencap",
+        "-p",
+      ],
+      { maxBuffer: 64 << 20 },
+    ),
   );
 
 await open("light", true);
@@ -161,23 +205,33 @@ await step(
     const label = `@${two.handle}`;
     await open("light", false);
     await edit(label);
-    const scheduling = screen().find((n) => n.text === "Scheduling");
-    tapAt(scheduling.x, scheduling.y);
-    await until(
-      () => texts().includes("Desired roles: drafter, scheduler"),
-      10_000,
-      "the new desired roles",
-    );
-    const save = screen().find((n) => n.text === "Save roles");
-    tapAt(save.x, save.y);
+    for (let attempt = 0; ; attempt++) {
+      await reveal("Desired roles:");
+      const desired = texts().find((t) => t.startsWith("Desired roles:"));
+      if (desired === "Desired roles: drafter, scheduler") break;
+      expect(
+        attempt < 5 && desired === "Desired roles: drafter",
+        `"${desired}"`,
+      );
+      await reveal("Scheduling");
+      await press("Scheduling");
+      await sleep(1500);
+    }
+    for (let attempt = 0; (await roles(2)) !== "drafter,scheduler"; attempt++) {
+      expect(attempt < 5, "the save never reached the server");
+      await reveal("Save roles");
+      const save = await waitEnabled("Save roles", 10_000).catch(() => null);
+      if (save) tapAt(save.x, save.y);
+      await sleep(4000);
+    }
+    // The confirmation is the screen's status notice, at the top.
+    top();
     await until(
       () => texts().includes("The role change was confirmed."),
-      30_000,
+      15_000,
       "the confirmation",
     );
-    const now = await roles(2);
-    expect(now === "drafter,scheduler", `roles became ${now}`);
-    return `"Desired roles: drafter, scheduler" before Save; confirmed; saved ${now}`;
+    return `"Desired roles: drafter, scheduler" before Save; saved drafter,scheduler; "The role change was confirmed."`;
   },
 );
 if (shots) {
