@@ -187,7 +187,7 @@ async function main() {
     // script here by mistake would be handed the way past the guard.
     check(
       target.scratch,
-      `${target.name} is not marked as a scratch database. Only a database the local stack creates carries the marker: create one with node infra/local/stack.mjs up --lane N --base-port P --no-web (docs/engineering/migrations.md, step 1).`,
+      `${target.name} is not marked as a scratch database. The local stack marks the database it creates (node infra/local/stack.mjs up --lane N --base-port P --no-web), and a restored copy is marked as step 1 of docs/engineering/migrations.md says.`,
     );
     const ledger = await readLedger(client);
     if (command === "apply") {

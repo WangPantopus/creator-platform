@@ -102,6 +102,11 @@ for (const id of frozen) {
   if (sha256(read(name)) !== pinned.sha256[name])
     fail(`${name} changed. It is a frozen reviewed packet, pinned in ${pins}.`);
   const packet = load(name);
+  if (
+    !Array.isArray(packet.wave) ||
+    !packet.wave.every((source) => typeof source?.version === "string")
+  )
+    fail(`${name}: unknown format.`);
   packets.set(id, packet);
   for (const source of packet.wave) frozenWave.set(source.version, id);
 }
