@@ -13,7 +13,7 @@ the older run.
 | `evidence-budget` | Ubuntu | Pull requests only. `scripts/check-evidence-budget.mjs`: files added or changed under `artifacts/` stay at most 300 KB each and 1 MB in total, with no duplicate blobs |
 | `web-and-backend` | Ubuntu, with a PostgreSQL 17 + pgvector service | `pnpm install --frozen-lockfile` and `pnpm check`: generate check, typecheck, lint, format check, the tests (including the backend suite on PostgreSQL) and every build |
 | `web-visual` | macOS (`xcode-27`) | `pnpm test:visual`: the Playwright comparison of the design boards and components with the web app, in Light and Night ([design verification](design-verification.md)) |
-| `ios-foundation` | macOS (`xcode-27`) | `swift test` for the Swift package and its snapshots, then the app's UI tests on an iPhone 18 Pro simulator |
+| `ios-foundation` | macOS (`xcode-27`) | `swift test` for the Swift package and its snapshots, then the app's UI tests on an iPhone simulator, the iPhone 18 Pro when the runner has one |
 | `android-foundation` | macOS (Intel) | `assembleDebug`, the unit tests and the Paparazzi screenshot check |
 | `android-runtime` | Ubuntu, with an emulator | `connectedDebugAndroidTest` on API 34 |
 

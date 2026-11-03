@@ -19,8 +19,9 @@ Each creator has an authorized, clearly labeled AI that talks one-on-one with
 every fan and remembers them. The real creator stays present through short
 **Notes** and **reactions**, and fans can pay for the creator's personal
 attention in defined units (a written reply, a voice note, a call), charged only
-if the creator accepts. The pilot sells the written reply; voice notes, calls and
-public answers are planned for later ([launch plan](LAUNCH_PLAN.md), section 4). The business is making a real person reachable; the AI is
+if the creator accepts. In the pilot the paid unit is the written reply; voice
+notes, calls and public answers are planned for later ([launch plan](LAUNCH_PLAN.md),
+section 4). The business is making a real person reachable; the AI is
 the bridge between human moments and is never presented as the person. The label
 is the product: this is the honest version of an industry (paid DMs, outsourced
 "chatters") that runs on deception today.
