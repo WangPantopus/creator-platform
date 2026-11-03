@@ -1,2 +1,0 @@
-  2 failed
-  11 passed (11.5m)

@@ -25,8 +25,15 @@
 | [source/](source/) | The four source documents: Product Design, the Domain Model and Behavioral Contract, the System Architecture and the Second Review | Never: they are kept as written, and the BRIEF records any later decision |
 | [research/](research/UX_RESEARCH.md) | The phase 1 UX research | |
 | [audit/](audit/AUDIT.md) | The phase 6 design audit | |
-| [engineering/](engineering/README.md) | Setup, the local stack, the Claude provider, migrations and the catalogue pins, CI, release and the store privacy answers, the backend and the production host, the native apps and their harness, and design verification | Updating the page whose subject changed |
-| [archive/](archive/) | History: the lanes, the workstreams, implementation notes, dated operations reports, the first build prompt and log, and every handoff | Never: it is read-only, and its links are kept as they were. 101 of them are broken: 33 were broken before Wave 5, and 68 broke when the last kept docs moved at its end |
+| [engineering/](engineering/README.md) | Setup, the local stack, the Claude provider, migrations, the [migration queue](engineering/migration-queue.md) of unregistered SQL files and the catalogue pins, CI, release and the store privacy answers, the backend and the production host, the native apps and their harness, and design verification | Updating the page whose subject changed |
+| [archive/](archive/) | History: the lanes, the workstreams, implementation notes, dated operations reports, the first build prompt and log, and every handoff | Never: it is read-only, and its links are kept as they were. 1,582 of them are broken: 33 were broken before Wave 5, 68 broke when the last kept docs moved at its end, and 1,481 point into the removed `artifacts/` ([below](#archived-evidence)) |
+
+## Archived evidence
+
+The evidence that archived docs mention under `artifacts/` left the tree on 2026-11-03. It is kept
+at the tag `archive/artifacts-2026-11-03`: browse it
+[on GitHub](https://github.com/WangPantopus/creator-platform/tree/archive/artifacts-2026-11-03/artifacts),
+or read a file with `git show archive/artifacts-2026-11-03:artifacts/<path>`.
 
 ## The one file left in operations/
 
