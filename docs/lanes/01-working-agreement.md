@@ -1,3 +1,5 @@
+> **Archived on 2026-11-02 with the other lane docs in [docs/archive/lanes](../archive/lanes/README.md).** It stays at this path until `tests/scenarios/lane-5/setup.sh` and `cycle.sh` stop linking here. How work runs now is in [STATUS](../STATUS.md#how-work-runs).
+
 # Working agreement for every lane
 
 This applies to all seven lanes. It supersedes the older workstream standards where they

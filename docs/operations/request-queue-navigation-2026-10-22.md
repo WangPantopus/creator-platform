@@ -1,3 +1,5 @@
+> **Archived on 2026-11-02.** It stays at this path until `tests/scenarios/lane-6/e6-requests-navigation.mjs` stops linking here. The current state is in [STATUS](../STATUS.md).
+
 # Request queue navigation and narrow layout
 
 Verified locally on 2026-10-22 against the preserved `integrated-1022` stack:

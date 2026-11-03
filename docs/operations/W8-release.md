@@ -1,3 +1,5 @@
+> **Archived on 2026-11-02, and summarized in [engineering/release.md](../engineering/release.md).** It stays at this path until `infra/environments.json` and `.github/workflows/trust-release.yml` stop linking here.
+
 # Release gates and trust preparation
 
 **PR7 merged/source checkpoint:** normal merge `705215955415332e601adf5c42a2169cd0d173a5` at2026-10-01T05:10:56Z; exact reviewed189db7c tree equals fetched main. [Actual merge receipt](../../artifacts/workstreams/W8/takeover/20260930/pr7-merged.json) records launched browser/iOS2/2/Android4/4 acceptance, preserved SQL/data and nonrequired CI queued/running. Full R1–R10 and release/private/provider/hardware gates remain open. No admin override, check removal, test weakening, live migration, reseed or paid call. The preserved W8 branch fast-forwarded to actual main before this evidence-only continuation.

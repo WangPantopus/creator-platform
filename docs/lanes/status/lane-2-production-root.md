@@ -1,3 +1,5 @@
+> **Archived on 2026-11-02 with the other lane docs in [docs/archive/lanes](../../archive/lanes/status/README.md).** It stays at this path until `apps/backend/src/operations/production.ts` stops linking here.
+
 # Lane 2: the production host (WP 2.2) and proposed contract C2
 
 Updated: 2026-10-08, by the lane 2 session

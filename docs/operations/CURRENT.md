@@ -1,3 +1,5 @@
+> **Archived on 2026-11-02: the current state is in [docs/STATUS.md](../STATUS.md).** It stays at this path until `tests/scenarios/integrator/operator-walk.mts` stops linking here.
+
 # Current state
 
 The founder requested a commit/push/handoff on October27. Start with the

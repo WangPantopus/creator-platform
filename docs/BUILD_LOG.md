@@ -1,3 +1,5 @@
+> **Archived on 2026-11-02.** It stays at this path until `packages/ui-web/src/components.ts` stops linking here. The current state is in [STATUS](STATUS.md).
+
 # Build log
 
 ## 2026-09-29 — Foundation slice started

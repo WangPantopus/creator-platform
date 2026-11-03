@@ -1,3 +1,5 @@
+> **Archived on 2026-11-02.** It stays at this path until `packages/ui-web/README.md` and `tests/visual/README.md` stop naming it here. The current state is in [STATUS](STATUS.md).
+
 # Build prompt for the development agent
 
 > Current execution instructions (2026-09-29): read

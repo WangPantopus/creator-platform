@@ -1,3 +1,5 @@
+> **A procedure still in use, listed in [docs/engineering](../../engineering/migrations.md).** It stays at this path until `apps/backend/src/operations/catalogues/catalogue-pins.ts`, `infra/local/README.md` and `infra/local/stack.mjs` stop linking here.
+
 # Lane 2: the pinned catalogues (WP 2.9)
 
 Updated: 2026-10-09, by the lane 2 session

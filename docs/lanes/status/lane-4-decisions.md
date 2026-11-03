@@ -1,3 +1,5 @@
+> **Archived on 2026-11-02 with the other lane docs in [docs/archive/lanes](../../archive/lanes/status/README.md).** It stays at this path until `tests/scenarios/lane-4/e4-8-refund-room.mjs`, `e4-9-refund-slot.mjs` and `e4-10-ending-no-hold.mjs` stop naming it.
+
 # Lane 4: decisions for the founder
 
 On 2026-10-16 the founder told lane 4 to stop waiting on yes/no decisions and to take the proposed

@@ -1,3 +1,5 @@
+> **An engineering how-to, listed in [docs/engineering](../engineering/README.md).** It stays at this path until `infra/local/model-gateway.mjs` and `infra/local/stack.mjs` stop linking here.
+
 # Anthropic (Claude) as the generation provider
 
 The model port (`AgentModel`) now has a second adapter, `AnthropicMessagesModel`

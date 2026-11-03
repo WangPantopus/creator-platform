@@ -1,3 +1,5 @@
+> **Archived on 2026-11-02 with the other lane docs in [docs/archive/lanes](../../archive/lanes/status/README.md).** It stays at this path until `tests/scenarios/lane-6/e6-1-pr-body.mjs` stops linking here.
+
 # E6.1 runbook: proving a Studio split changes nothing
 
 Lane 6, written 2026-10-08. The integrator moves this to its permanent place.

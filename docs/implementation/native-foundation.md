@@ -1,3 +1,5 @@
+> **An engineering reference, listed in [docs/engineering](../engineering/README.md).** It stays at this path until `apps/ios/README.md` and `apps/android/README.md` stop linking here. Its other implementation notes are in [docs/archive/implementation](../archive/implementation/).
+
 # Native foundation and verification limits
 
 The iOS client is native SwiftUI and the Android client is native Kotlin/Compose. `Qelvora` is the replaceable product placeholder; Pantopus remains the identity provider name. Canonical local identity/session services and real feature registrations are integrated. Genuine Pantopus native authorization, approved external identities and production/provider acceptance remain open.

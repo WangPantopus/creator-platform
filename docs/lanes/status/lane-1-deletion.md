@@ -1,3 +1,5 @@
+> **Archived on 2026-11-02 with the other lane docs in [docs/archive/lanes](../../archive/lanes/status/README.md).** It stays at this path until `tests/scenarios/lane-1/e1-8-sign-in-delete.mjs` stops linking here.
+
 # Lane 1 · WP 1.7 · Why account deletion does not finish, and what fixes it
 
 Written 2026-10-15 by lane 1, from runs on lane 1's own one-command stack (`--growth`, the fake
