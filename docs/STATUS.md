@@ -92,9 +92,10 @@ in the Wave 6 queue.
      decide, 27 needed later, 16 obsolete and 11 that aren't migrations. Five of those 11 were
      evidence copies under `artifacts/`, so 56 are left in the tree.
    - **Four places fail on every real database:** three in the ops console (naming a reviewer,
-     supervisor audits and lifting a pause) and one in Team triage. Team triage waits until after
-     the pilot (#535): until then the Studio must not offer the Triage role, and the server must
-     refuse to grant it.
+     supervisor audits and lifting a pause) and one in Team triage. The founder left Team triage
+     out of the pilot ([decision log](BRIEF.md#14-decision-log), 2026-11-03), so during the pilot the
+     Studio must not offer the Triage role and the server must refuse to grant it; a separate
+     follow-up does both.
    - **The proposed pilot waves:** the ops console, then memory, then store memberships if the
      founder says so.
    - **Next: the registration generator.** It makes registration data-driven: it generates the wave
@@ -123,7 +124,7 @@ Closed with a note and their branches kept. Each returns with the feature that n
 Approved on 2026-11-01: the consolidation plan, the native sign-in wording ("Sign in to continue"
 and "Sign-in is unavailable right now. Try again in a moment."), the home glyph for Today, the local
 installs, "three now, rest later" for Wave 4, and one coordinating session plus one work session
-per task. Approved on 2026-11-03: the required checks, Team triage after the pilot, and tests that
+per task. Approved on 2026-11-03: the required checks, no Team triage in the pilot, and tests that
 are end-to-end only. No unit tests from now on: every change is proven by end-to-end tests that
 launch the real apps against a real stack. That declines the plan's proposal to allow unit tests for
 pure logic and bug regressions, and confirms the 2026-10-09 rule. Still open:
