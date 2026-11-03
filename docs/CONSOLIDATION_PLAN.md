@@ -7,10 +7,13 @@ from Git, GitHub or a local run on 2026-11-01 unless marked otherwise.
 **Status (2026-11-02):** the founder approved the plan on 2026-11-01, with the recommended defaults
 for the native sign-in wording ("Sign in to continue" and "Sign-in is unavailable right now. Try again
 in a moment."), the home glyph for Today, and the local installs. Waves 1 to 4 are merged (#518 to
-#527), and all 66 original pull requests are merged or closed with a note. Wave 5 is next.
-The current state and queue are in the
-[coordination handoff](archive/operations/handoff-2026-11-02.md). The section 6 working rules and the other
-section 8 decisions are still open. The tables below record the state on the review day.
+#527), and all 66 original pull requests are merged or closed with a note. Wave 5 is in progress:
+the docs cleanup (one-page [STATUS](STATUS.md), the [docs index](README.md),
+[engineering/](engineering/README.md) and [archive/](archive/)), the CI path filters, and the
+repository steps that wait on the founder. The current state and queue are in [STATUS](STATUS.md),
+which replaces the [coordination handoffs](archive/operations/handoff-2026-11-02.md). The section 6
+working rules and the other section 8 decisions are still open. The tables below record the state on
+the review day; links to moved files point at their new paths.
 
 ## 1. Bottom line
 
