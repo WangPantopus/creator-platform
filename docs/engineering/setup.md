@@ -1,79 +1,104 @@
-# Foundation development
+# Setup
 
-This is the first implementation slice of the full build, in `creator-platform`
-before Pantopus integration. Node.js/Express, Next.js, SwiftUI and Kotlin/Compose
-are the chosen stack. Existing product and source designs remain authoritative.
+How to get a working checkout, run the checks, and avoid this Mac's known traps. The stack is
+Node.js and Express for the backend, Next.js for the web, SwiftUI for iOS and Kotlin/Compose for
+Android, in one pnpm workspace. The product and source documents stay authoritative; this page is
+only how to build it.
 
-Install Node 22 or newer and the pnpm version pinned in package.json, then run:
+## What you need
+
+| Tool | Version | Notes |
+| --- | --- | --- |
+| Node.js | 24 (CI); 22 or newer works | `package.json` `engines` |
+| pnpm | 12.5.1 | `packageManager` in `package.json`. See "This Mac" if it is not installed |
+| Docker | Desktop, running | For the local stack and the backend's PostgreSQL tests |
+| PostgreSQL image | `pgvector/pgvector:pg17` | Pulling it is a download that needs the founder's yes |
+| Xcode | 27.1, with the iOS 27.0 and 27.1 runtimes | iOS only. Also `xcodegen` |
+| JDK and Android SDK | CI uses Java 21 and compile SDK 35 | Android only. [apps/android/README.md](../../apps/android/README.md) has the commands |
+| `gh` | any recent | For pull requests |
+
+## First run
 
 ```sh
-pnpm install
+pnpm install --frozen-lockfile
 pnpm generate
 pnpm dev
 ```
 
-`pnpm check` verifies generated resources, strict types, lint, tests and builds.
-`pnpm test:visual` checks all exported artboards and component compositions in
-Light and Night, plus the foundation and auth boundaries. The design
-gallery is reference content, not completed feature functionality.
+`pnpm dev` starts the web and backend hosts. For a complete stack with a database, the workers and
+the development creator Maya, use the [local stack](local-stack.md) instead. The design review
+catalog is at `/design`.
 
-The application has no independent account system. Pantopus identity integration
-is deferred by the user, so sign-in fails closed until its adapter is configured.
-The backend must never connect using an owner, superuser or Supabase service role.
-Provider names, billing amounts and licensing terms remain their documented open
-decisions; no real payment or provider is enabled by a sample screen.
+## Checks
+
+- `pnpm check` runs what CI's `web-and-backend` job runs: `generate:check`, every typecheck, lint,
+  `format:check`, the tests and every build.
+- The backend's PostgreSQL tests need `CREATOR_TEST_DATABASE_URL` pointing at a disposable
+  PostgreSQL 17 with pgvector. They create fixtures there, so never point it at a database you need.
+  Without the URL they are skipped locally; in CI a missing URL fails the suite. `node
+  infra/local/stack.mjs env` prints a URL for a running local stack.
+- `pnpm test:visual` runs the Playwright visual suite ([design verification](design-verification.md)).
+- Native: `swift test --package-path apps/ios` for the Swift package, and the Gradle tasks in
+  [apps/android/README.md](../../apps/android/README.md). The limits of the native checks are in
+  [native verification limits](../implementation/native-foundation.md).
+- What CI runs, and when, is in [ci.md](ci.md).
 
 ## Shared sources
 
-- `config/brand.json`: the temporary product identity.
-- `config/copy.json`: fixed copy and interpolated sentences.
-- `design/handoff/tokens.json`: colors, dimensions and typography, including the
-  instructed Night corrections and named measurements from reference layouts.
-- `packages/api`: API schemas and their generated OpenAPI contract.
+Generated files are committed and checked for drift in CI. Run `pnpm generate` after changing any of
+these:
+- `config/brand.json`: the placeholder product identity ([naming rules](../NAMING.md));
+- `config/copy.json`: the fixed copy and interpolated sentences;
+- `design/handoff/tokens.json`: colors, dimensions and typography;
+- `packages/api`: the API schemas and the generated OpenAPI contract.
 
-Run `pnpm generate` after changing these resources. Generated Swift/Kotlin and
-web token/copy files are checked into Git and checked for drift in CI.
+To preview a rename of the placeholder name, run `pnpm brand:rename NewName --dry-run`, then
+follow the checklist in [NAMING.md](../NAMING.md).
 
-## Product rename
+## Sign-in
 
-The final name is intentionally undecided. Preview a future rename with
-`pnpm brand:rename NewName --dry-run`; run the same command without `--dry-run`
-to replace the three placeholder spellings across tracked and non-ignored text
-files and their filenames in one operation. Pantopus is retained.
-Then install dependencies and regenerate. External domains, store identities,
-provider dashboards and existing passkeys need the checklist in `docs/NAMING.md`.
+The local stack signs in with the synthetic development identity. Qelvora sign-in with Apple and
+Google plus the 18+ step (option D) is built and switched on with `QELVORA_SIGN_IN`; the lane 1
+scenarios run it against a fake Apple and Google (`tests/scenarios/lane-1/fake-provider.mjs`). Real
+Apple and Google credentials don't exist yet. The backend never connects as an owner, a superuser
+or an RLS-bypassing role.
 
-## Native hosts and tests
+## Native hosts
 
-Use `swift test --package-path apps/ios` for protocol, identity, generated
-contracts and 110 macOS snapshot assertions. Generate the iOS host with
-`xcodegen generate --spec apps/ios/project.yml`; its `QelvoraApp` scheme includes
-simulator UI tests. DEBUG arguments `--catalog-component Message` and
-`--appearance night` open deterministic component/theme previews.
+- **iOS:** generate the project with `xcodegen generate --spec apps/ios/project.yml`; the
+  `QelvoraApp` scheme includes the simulator UI tests. DEBUG launch arguments open the component
+  catalog and force an appearance ([apps/ios/README.md](../../apps/ios/README.md)).
+- **Android:** `apps/android/gradlew -p apps/android :app:assembleDebug :app:verifyPaparazziDebug`
+  with an Android SDK installed; `:app:connectedDebugAndroidTest` needs an emulator.
+- Both apps can run signed in against the lane 7 fake API through a DEBUG-only harness
+  ([harness runbook](../lanes/status/lane-7-harness.md)).
 
-With an Android SDK installed, run:
+## Definition of done for a screen
 
-```sh
-apps/android/gradlew -p apps/android :app:assembleDebug :app:verifyPaparazziDebug
-```
+A screen needs a reviewed visual diff against its board in both themes, working module-backed
+behavior, accessibility checks and the flows that apply to it. A preview or a screenshot baseline
+alone does not establish completion. Device calls, store billing, provider behavior and pilot
+performance stay unverified until they run on their real boundaries.
 
-An attached emulator can run
-`:app:connectedDebugAndroidTest`. The Android host also opens catalogs with
-DEBUG intent extras. See native READMEs for complete commands.
+## This Mac
 
-Local Postgres checks require `CREATOR_TEST_DATABASE_URL` pointing to the
-dedicated fixture database. They create migration/test fixtures there and must
-never target a production database. Without that explicit URL, local integration
-tests report skips; CI requires it and fails otherwise. The full check command
-passes it through Turbo and runs integration tests without caching.
-
-The current behavior, screenshots and outstanding acceptance work are recorded
-in [BUILD_LOG](../BUILD_LOG.md) and the implementation verification documents.
-
-## Definition of done
-
-A screen requires a reviewed visual diff against its supplied artboard in both
-themes, working module-backed behavior, accessibility checks and applicable
-flow tests. A preview or a screenshot baseline alone does not establish completion.
-Native device calls, store billing, provider behavior and pilot performance remain
-unverified until those slices run on their real boundaries.
+- **`gh`** is at `/opt/homebrew/bin/gh`, which is not on the default shell `PATH`.
+- **pnpm 12.5.1** is not installed globally. Install it into a scratch folder
+  (`npm install --prefix <dir> pnpm@12.5.1`), or once globally.
+- **Docker:** its CLI plugins are symlinked into the mounted Docker installer image, which makes
+  `docker info` hang.
+  - Workaround: point `DOCKER_CONFIG` at a folder whose `config.json` is `{"auths":{}}`, and set
+    `DOCKER_HOST=unix://$HOME/.docker/run/docker.sock`.
+  - Permanent fix: quit Docker, eject the installer image, and start Docker from Applications.
+- **iOS:** use an iPhone 18 Pro on iOS 27.0. iOS 27.1 offers only the iPhone Duo, which sometimes
+  can't be found once it has booted (CI picks the iPhone 18 Pro for the same reason).
+- **Android:** there is no Android SDK here, so CI builds Android.
+- **Tools rewrite tracked files.** `swift test` and `xcodebuild` rewrite `apps/ios/Package.resolved`,
+  and `next dev` rewrites `apps/web/next-env.d.ts`. Restore both before committing. The local stack
+  hides `next-env.d.ts` from Git while the web app runs and restores it on `stop` and `down`.
+- **zsh:**
+  - write `${ref}:path`, not `$ref:path` (`:a` and `:h` are modifiers);
+  - unquoted variables don't split into words;
+  - there is no `timeout` command.
+- **CI** waits mostly on the macOS runner queue: a full run takes 30 to 60 minutes. The app's PR
+  monitor watches it; don't poll.

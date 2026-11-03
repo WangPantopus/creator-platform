@@ -1,5 +1,11 @@
 # Backend foundation
 
+Written for the foundation slice on 2026-09-29 and moved here in Wave 5. The rules for authority,
+the database and durable delivery below still describe how the backend is built; later modules add
+to them, so check the code before relying on a detail. Two parts are history: sign-in is now option D,
+Apple and Google plus an 18+ step behind the same adapter seam ([setup](setup.md#sign-in)), and the
+suite is now 157 backend tests in nine files, not 18.
+
 The backend is a strict TypeScript Express modular foundation in `apps/backend`.
 It builds here first; the Pantopus checkout has not been modified. The shared
 `@qelvora/api` package owns Zod request/response schemas, a typed web client,

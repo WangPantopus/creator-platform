@@ -1,5 +1,10 @@
 # Design verification evidence
 
+Written on 2026-09-29 and moved here in Wave 5. The method below is how `pnpm test:visual` and the
+native snapshot checks still work; the counts and runs are from then. The current suite is described
+in [tests/visual/README.md](../../tests/visual/README.md), and CI runs it in the `web-visual` job
+([ci.md](ci.md)).
+
 This record separates reference fidelity from implementation coverage and from
 working product behavior. The web gallery renders all supplied artboards and
 component previews. A gallery entry is a design fixture, not a completed
