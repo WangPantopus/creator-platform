@@ -21,7 +21,7 @@
     "credentials": "staging_secret_manager",
     "providerProjects": "dedicated_sandboxes",
     "publicTraffic": false,
-    "releaseGate": "docs/operations/W8-release.md"
+    "releaseGate": "docs/engineering/release.md"
   },
   "production": {
     "identity": "Pantopus_verified_opaque_account_and_eligibility",
@@ -29,7 +29,7 @@
     "credentials": "production_secret_manager",
     "providerProjects": "dedicated_production",
     "publicTraffic": "human_release_approval_required",
-    "releaseGate": "docs/operations/W8-release.md"
+    "releaseGate": "docs/engineering/release.md"
   },
   "requiredIsolation": [
     "database",

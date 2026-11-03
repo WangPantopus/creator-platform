@@ -1,6 +1,11 @@
-> **Archived on 2026-11-02 with the other lane docs in [docs/archive/lanes](../../archive/lanes/status/README.md).** It stays at this path until `apps/backend/src/operations/production.ts` stops linking here.
-
 # Lane 2: the production host (WP 2.2) and proposed contract C2
+
+Moved here in Wave 5, because pilot phase 1 builds the real adapters for this host
+([launch plan](../LAUNCH_PLAN.md#8-the-road-to-the-pilot)); contract C2 below is still a draft. The
+host and its rules are on `main`; check `apps/backend/src/operations/production*.ts` before relying
+on a detail. The pull request, the merge order, the decisions and the tickets are from 2026-10-08,
+and the slot owners are the lanes of that time. Sign-in is now option D, which the production
+settings still refuse (`IDENTITY_ADAPTER` may only be `pantopus`); phase 1 changes that.
 
 Updated: 2026-10-08, by the lane 2 session
 Pull request: `lane-2/production-root`, stacked on `lane-2/stack-from-scratch` (merge that one first)
@@ -188,5 +193,5 @@ PostgreSQL 17 with pgvector and the real migrated schema.
 | Lane 1                         | Its adapter and Trust configuration                                 | Provide `identity` (`mode: "pantopus"`), `trust` (with `environment`, `release` equal to the host's, and the probes `identity`, `calls`, `voice`)                                                                                  | Without them the host stays closed or red                                                                       |
 | Lanes 3, 4, 5                  | Their provider modules                                              | Export `providers.model`, `providers.payments`, `providers.push` (each with a `probe`)                                                                                                                                             | Their health becomes a required readiness row                                                                   |
 | Lane 6                         | `apps/web` (where it handles API errors)                            | Treat a 503 `host_closed` like `restoration_pending`: a plain "try again" state                                                                                                                                                    | A closed host answers every page's data request with it                                                         |
-| Integrator                     | `docs/lanes/02-contracts.md` (C2 row), root `package.json`          | Mark C2 as proposed in this note; add a script that runs `production-server.ts` and, later, the build                                                                                                                              | They are the integrator's files                                                                                 |
+| Integrator                     | `docs/archive/lanes/02-contracts.md` (C2 row), root `package.json`  | Mark C2 as proposed in this note; add a script that runs `production-server.ts` and, later, the build                                                                                                                              | They are the integrator's files                                                                                 |
 | Lane 2 (WP 2.4 and 2.7), later | `infra/containers/*`, a bundle step                                 | A bundle of `production-server.ts` with `__QELVORA_BUILD_REVISION__` defined, a container that runs it with `integrations/` beside it                                                                                              | Needed before the build-revision check can run                                                                  |

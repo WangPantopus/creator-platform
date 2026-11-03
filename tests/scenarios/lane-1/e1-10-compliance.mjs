@@ -2,8 +2,8 @@
 // E1.10: compliance content. Crisis resources by region (the pilot list in
 // modules/trust/crisis-resources.ts) through the API and on the crisis page;
 // the consent screen naming the processors before a first message; and three
-// fields of the data-safety source document (docs/lanes/status/
-// lane-1-data-safety.md) checked against the database. The under-18 policy
+// fields of the data-safety source document (docs/engineering/data-safety.md)
+// checked against the database. The under-18 policy
 // page is checked by e1-2-under-18-data.mjs (#481). Fakes: Apple
 // (fake-provider.mjs), the development identity, the model.
 // Needs the lane stack with sign-in on, the web app, growth (`--growth`: the

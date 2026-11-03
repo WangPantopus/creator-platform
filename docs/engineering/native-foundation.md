@@ -1,6 +1,12 @@
-> **An engineering reference, listed in [docs/engineering](../engineering/README.md).** It stays at this path until `apps/ios/README.md` and `apps/android/README.md` stop linking here. Its other implementation notes are in [docs/archive/implementation](../archive/implementation/).
-
 # Native foundation and verification limits
+
+Written for the foundation slice on 2026-09-29, updated by workstream 1 to 2026-10-01, and moved
+here in Wave 5. The component foundation, the runtime boundaries and the verification limits below
+still describe the native apps; check the code before relying on a detail. The October 1 source
+state, the receipts and the Commands section are history: the cleanup restriction has ended, and the
+apps are built, run and checked as [setup](setup.md#native-hosts) and [ci.md](ci.md) describe. How
+the native snapshots are compared is in
+[design verification](design-verification.md#native-evidence-and-remaining-acceptance).
 
 The iOS client is native SwiftUI and the Android client is native Kotlin/Compose. `Qelvora` is the replaceable product placeholder; Pantopus remains the identity provider name. Canonical local identity/session services and real feature registrations are integrated. Genuine Pantopus native authorization, approved external identities and production/provider acceptance remain open.
 
@@ -20,7 +26,7 @@ The component families are:
 
 The catalog covers seven author labels; all five renderable message kinds; pending, failed, accepted, streaming and interrupted delivery; split, gradient and stacked approved drafts; AI/human/team/paused/updating identity strips; six composer states; accessible/unavailable citations; saved/consent-question memory; selectable/disabled request modes; packet inclusion and summary editing; request steps; source approval states; recording states; reserved disabled labels; version and boundary-test states; and light/Night themes. Some multi-state fixtures exceed one screen. Separate Android thread-state captures cover the delivery, draft, composer, Note and sponsor variants individually.
 
-The packet summary uses sans typography as required by BUILD_PROMPT §9, which intentionally supersedes the older reference bundle's serif summary style. The native Android signing action uses biometrics terminology. Source SVG geometry is generated from the original reference bundle rather than substituted system icons. Geist, Geist Mono and Newsreader are bundled with their OFL licenses. Newsreader's optical-size axis follows text size, and its platform PostScript names are resolved locally while generated tokens retain canonical family names.
+The packet summary uses sans typography as required by [BUILD_PROMPT §9](../archive/BUILD_PROMPT.md#9-known-design-fixes-to-apply-while-building), which intentionally supersedes the older reference bundle's serif summary style. The native Android signing action uses biometrics terminology. Source SVG geometry is generated from the original reference bundle rather than substituted system icons. Geist, Geist Mono and Newsreader are bundled with their OFL licenses. Newsreader's optical-size axis follows text size, and its platform PostScript names are resolved locally while generated tokens retain canonical family names.
 
 ## Runtime boundaries
 

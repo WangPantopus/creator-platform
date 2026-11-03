@@ -1,7 +1,7 @@
 #!/bin/sh
 # Lane 5: build the disposable database the scenarios run on. Safe to re-run.
 # Run from the repository root with node and pnpm on PATH (the toolchain block
-# in docs/lanes/01-working-agreement.md section 3.7). Port 56450, container
+# in docs/archive/lanes/01-working-agreement.md section 3.7). Port 56450, container
 # qelvora-lane5-db, test-only credentials. It migrates once into a template
 # (creator_foundation_lane5_base) and clones the working database from it, so
 # reset.sh can return to a clean state in seconds.

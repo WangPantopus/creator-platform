@@ -94,7 +94,7 @@ ${cfg.why}
 
 ## Scenarios run
 
-Compared ${cfg.before_label} with this branch, each from a cold start, with \`docs/lanes/status/lane-6-e6-1-runbook.md\`.
+Compared ${cfg.before_label} with this branch, each from a cold start, with \`docs/archive/lanes/status/lane-6-e6-1-runbook.md\`.
 
 ${table}
 

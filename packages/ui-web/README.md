@@ -7,7 +7,7 @@ from that bundle's `index.d.ts`, preserved in `src/contracts.ts`.
 The port removes the browser global and adds strict React types to each prop,
 helper, glyph and nav tuple. It preserves reference `qv-*` classes, element order,
 SVG paths and composition. CSS is the original bundle with its remote font
-import removed and the explicit BUILD_PROMPT section 9 corrections applied.
+import removed and the explicit [BUILD_PROMPT section 9](../../docs/archive/BUILD_PROMPT.md#9-known-design-fixes-to-apply-while-building) corrections applied.
 Fonts are bundled locally. Creator/AI authorship copy reads `@qelvora/copy`;
 product names read `@qelvora/brand`.
 

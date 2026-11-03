@@ -1,4 +1,4 @@
-// E4.10 and the founder's decision 4 (lane-4-decisions.md, taken as the
+// E4.10 and the founder's decision 4 (docs/archive/lanes/status/lane-4-decisions.md, taken as the
 // proposed default on 2026-10-16): a request that is already ending never gets
 // a new hold. When every try to place its hold was lost before the processor
 // acted, and the request then times out or the fan withdraws it, the retry

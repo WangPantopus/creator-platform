@@ -25,14 +25,14 @@ Newsreader font files and generated theme tokens. No fallback or network font
 was accepted. Chromium, device scale 1, reduced motion and the artboard's own
 viewport dimensions are held constant.
 
-The explicit corrections in BUILD_PROMPT section 9 apply to both renders:
+The explicit corrections in [BUILD_PROMPT section 9](../archive/BUILD_PROMPT.md#9-known-design-fixes-to-apply-while-building) apply to both renders:
 Night's warm creator plate and its ink/accent pair, contextual seal colors,
 neutral setting selections, sans-serif packet summaries, unwrapped metadata,
 quiet controls on creator plates, the ended conversation's retained StepIn
 action, standalone request status, and dialog scrims. Original screen exports
 remain intact. These are instructed repairs, not inferred redesigns.
 
-An additional behavioral conflict is resolved by BUILD_PROMPT's stated source
+An additional behavioral conflict is resolved by [BUILD_PROMPT](../archive/BUILD_PROMPT.md#1-read-before-you-write-any-code)'s stated source
 precedence. [Product Design S-F7](../source/Product_Design_Flows_Screens_and_Copy.md)
 at line 247 explicitly requires **Included in your request** and forbids
 **What Maya will see**: request selection controls what is sent for attention;

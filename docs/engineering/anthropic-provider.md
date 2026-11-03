@@ -1,6 +1,10 @@
-> **An engineering how-to, listed in [docs/engineering](../engineering/README.md).** It stays at this path until `infra/local/model-gateway.mjs` and `infra/local/stack.mjs` stop linking here.
-
 # Anthropic (Claude) as the generation provider
+
+Written by the integrator from 2026-10-09 to 2026-10-15 and moved here in Wave 5. The key, the
+gateway, the host settings and the checks still apply; the switch itself is pilot phase 1 (the
+[provider switch notes](../LAUNCH_PLAN.md#provider-switch-notes-to-verify-at-migration-time)). The
+follow-ups below were lane 3's queue on 2026-10-15, and lane 3's work has merged since, so check the
+code before relying on one.
 
 The model port (`AgentModel`) now has a second adapter, `AnthropicMessagesModel`
 (`apps/backend/src/modules/agent/anthropic-model.ts`). OpenAI stays the default; Claude is
@@ -42,7 +46,7 @@ The key lives in one place and one process. Nobody else, including every lane se
    The stack sets every other setting itself (Sonnet 5.5 for every call, prices, the consent policy
    naming Anthropic and OpenAI), so the key is the only thing you provide.
 
-Lanes follow the rule in the working agreement (section 3.6): the fake by default, the gateway only
+Lanes follow the rule in the [working agreement](../archive/lanes/01-working-agreement.md#36-real-providers) (section 3.6): the fake by default, the gateway only
 for what needs real model behavior, small requests, no loops, spend reported.
 
 ## Turn it on elsewhere (a real host, not the local stack)

@@ -40,7 +40,7 @@ catalog is at `/design`.
 - `pnpm test:visual` runs the Playwright visual suite ([design verification](design-verification.md)).
 - Native: `swift test --package-path apps/ios` for the Swift package, and the Gradle tasks in
   [apps/android/README.md](../../apps/android/README.md). The limits of the native checks are in
-  [native verification limits](../implementation/native-foundation.md).
+  [native verification limits](native-foundation.md).
 - What CI runs, and when, is in [ci.md](ci.md).
 
 ## Shared sources
@@ -71,7 +71,7 @@ or an RLS-bypassing role.
 - **Android:** `apps/android/gradlew -p apps/android :app:assembleDebug :app:verifyPaparazziDebug`
   with an Android SDK installed; `:app:connectedDebugAndroidTest` needs an emulator.
 - Both apps can run signed in against the lane 7 fake API through a DEBUG-only harness
-  ([harness runbook](../lanes/status/lane-7-harness.md)).
+  ([harness runbook](native-harness.md)).
 
 ## Definition of done for a screen
 

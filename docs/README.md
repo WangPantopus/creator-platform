@@ -16,7 +16,7 @@
 
 | Doc | What it holds | Keep it current by |
 | --- | --- | --- |
-| [STATUS.md](STATUS.md) | The current state on one page. It replaces `operations/CURRENT.md` and the dated handoffs | Updating it in place, in plain words, instead of writing a dated handoff |
+| [STATUS.md](STATUS.md) | The current state on one page. It replaces [operations/CURRENT.md](archive/operations/CURRENT.md), now archived, and the dated handoffs | Updating it in place, in plain words, instead of writing a dated handoff |
 | [BRIEF.md](BRIEF.md) | The product summary, the identity system, the screen inventory, the copy system, the decision log and the open questions | Adding a decision-log row when a decision is made. The log is append-only, newest last; a new row names the row it supersedes |
 | [LAUNCH_PLAN.md](LAUNCH_PLAN.md) | The five moments, the launch scope, the phases to the pilot with their exits, the pilot gates, and what is planned for later | Changing it when the scope or the order changes |
 | [NAMING.md](NAMING.md) | The placeholder name, its three spellings and the rename checklist | Logging anything a text replacement cannot rename |
@@ -25,21 +25,13 @@
 | [source/](source/) | The four source documents: Product Design, the Domain Model and Behavioral Contract, the System Architecture and the Second Review | Never: they are kept as written, and the BRIEF records any later decision |
 | [research/](research/UX_RESEARCH.md) | The phase 1 UX research | |
 | [audit/](audit/AUDIT.md) | The phase 6 design audit | |
-| [engineering/](engineering/README.md) | Setup, the local stack, migrations, CI, release, the backend and design verification | Updating the page whose subject changed |
-| [archive/](archive/) | History: the lanes, the workstreams, implementation notes, dated operations reports and every handoff | Never: it is read-only. Its links are kept as they were, and 33 of them were already broken before Wave 5 |
+| [engineering/](engineering/README.md) | Setup, the local stack, the Claude provider, migrations and the catalogue pins, CI, release and the store privacy answers, the backend and the production host, the native apps and their harness, and design verification | Updating the page whose subject changed |
+| [archive/](archive/) | History: the lanes, the workstreams, implementation notes, dated operations reports, the first build prompt and log, and every handoff | Never: it is read-only, and its links are kept as they were. 101 of them are broken: 33 were broken before Wave 5, and 68 broke when the last kept docs moved at its end |
 
-## Files at their old paths
+## The one file left in operations/
 
-Some docs are linked or named from code, tests or config outside `docs/`, so they stay where they
-are until those references move. Each starts with a banner that says what still points at it.
-
-- Still in use: [operations/anthropic-provider.md](operations/anthropic-provider.md),
-  [lanes/status/lane-2-catalogue-pins.md](lanes/status/lane-2-catalogue-pins.md),
-  [lanes/status/lane-7-harness.md](lanes/status/lane-7-harness.md) and
-  [implementation/native-foundation.md](implementation/native-foundation.md).
-- Archived: [operations/CURRENT.md](operations/CURRENT.md),
-  [operations/W8-release.md](operations/W8-release.md),
-  [operations/request-queue-navigation-2026-10-22.md](operations/request-queue-navigation-2026-10-22.md),
-  [lanes/01-working-agreement.md](lanes/01-working-agreement.md), five more in
-  [lanes/status/](lanes/status/), [BUILD_LOG.md](BUILD_LOG.md) and [BUILD_PROMPT.md](BUILD_PROMPT.md).
-- `operations/W8-approved-retention-20261002.json` is imported by the trust code at build time.
+[operations/W8-approved-retention-20261002.json](operations/W8-approved-retention-20261002.json) is
+the approved retention record that the trust code imports
+(`apps/backend/src/modules/trust/accounting-retention-policy.ts`). Moving it would change trust code
+for no gain, so it stays at its path, byte for byte. Every other operations doc is in the
+[archive](archive/operations/).

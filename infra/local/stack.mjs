@@ -681,7 +681,7 @@ async function providerFor(plan, options) {
   if (stats?.status !== 200 || stats.json?.budgetMicros === undefined)
     throw new StackError(
       `No model gateway answers at ${gateway.origin}.`,
-      "The founder starts it with the key from the Keychain: see docs/operations/anthropic-provider.md.",
+      "The founder starts it with the key from the Keychain: see docs/engineering/anthropic-provider.md.",
     );
   if (stats.json.paused)
     throw new StackError(
@@ -1410,7 +1410,7 @@ const help = `Usage: node infra/local/stack.mjs <up|status|smoke|env|logs|stop|d
   down options    --keep-data
   logs            logs backend|web|model [-n 80]
   catalogues      check | snapshot --out F | diff --base F | write [--base F] [--dry-run] [--variant L]
-                  the reviewed catalogue pins against this stack's database (docs/lanes/status/lane-2-catalogue-pins.md)`;
+                  the reviewed catalogue pins against this stack's database (docs/engineering/catalogue-pins.md)`;
 
 // ---------------------------------------------------- the reviewed catalogue pins
 /** Everything but --lane and --base-port belongs to the tool; its exit code is ours. */

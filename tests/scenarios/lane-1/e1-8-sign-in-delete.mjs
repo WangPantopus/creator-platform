@@ -15,13 +15,13 @@
 //   R  a sign-in during erasure stores a new token: that attempt waits and
 //      the next one revokes it.
 // Deletion jobs cannot finish on main yet: lanes 2 to 5's domains block or
-// retry (docs/lanes/status/lane-1-deletion.md). Identity erases last, so after
+// retry (docs/archive/lanes/status/lane-1-deletion.md). Identity erases last, so after
 // checking that it waits, this script marks the other domains' tasks of its
 // own jobs complete in the database: a stand-in that changes task state only
 // and erases none of their data. Fakes: Apple and Google (fake-provider.mjs)
 // and the development privacy proof.
 // Needs the lane stack with sign-in on and the fake provider (README in
-// docs/lanes/status/lane-1-deletion.md):
+// docs/archive/lanes/status/lane-1-deletion.md):
 //   node tests/scenarios/lane-1/e1-8-sign-in-delete.mjs
 // The unconfigured-host case (Apple turned off with an Apple token still
 // held) runs in two steps around a backend restart with QELVORA_SIGN_IN=google:

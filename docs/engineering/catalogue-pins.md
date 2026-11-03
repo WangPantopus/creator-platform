@@ -1,6 +1,11 @@
-> **A procedure still in use, listed in [docs/engineering](../../engineering/migrations.md).** It stays at this path until `apps/backend/src/operations/catalogues/catalogue-pins.ts`, `infra/local/README.md` and `infra/local/stack.mjs` stop linking here.
-
 # Lane 2: the pinned catalogues (WP 2.9)
+
+Moved here in Wave 5. The procedure and the commands still apply, for whoever registers a migration
+([migrations](migrations.md#registering-a-file-today)); the measurements, the counts, the scenario
+results and the tickets are from 2026-10-09. Two details have changed since: the tool reads the
+newest review file, which on 2026-11-02 is `20261101-pilot-columns.json`, not
+`20261008-comparison.json`, and CI does not run `check` yet
+([what CI checks](migrations.md#what-ci-checks)).
 
 Updated: 2026-10-09, by the lane 2 session
 Pull request: `lane-2/catalogue-pins`, stacked on `lane-2/production-root` (which is stacked on `lane-2/stack-from-scratch`)
@@ -155,7 +160,7 @@ so it is a ticket for the integrator and the founder, not something I did.
 | ------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
 | Integrator, founder | `apps/backend/src/core/purpose-catalogue.ts`                                   | Decide whether to drop rows a role cannot reach from the catalogue it hashes (see the recommendation), then regenerate once with this tool | One unrelated table stops export and replies and keeps the backend from starting     |
 | Integrator          | `.github/workflows` (CI)                                                       | Run `catalogue-pins check` against a database built from the branch                                                                        | A forgotten regeneration then fails the pull request                                 |
-| Integrator          | `docs/lanes/01-working-agreement.md` section 5                                 | Point the migration procedure at this note                                                                                                 | Step 3 there says the integrator regenerates and reviews the catalogues; this is how |
+| Integrator          | `docs/archive/lanes/01-working-agreement.md` section 5                         | Point the migration procedure at this note                                                                                                 | Step 3 there says the integrator regenerates and reviews the catalogues; this is how |
 | Lane 1, integrator  | `trust/*-privacy-hook.ts`, `content/privacy.ts`, `commerce/privacy-purpose.ts` | Decide and build the retention policies erasure waits for                                                                                  | Delete cannot complete; a requested delete locks the fan out                         |
 | Lane 3              | `modules/trust/usage-accounting-host.ts`                                       | Let the `failed` and `invalidated` latches clear when the catalogue is whole again, or document that a restart is required                 | A transient mismatch makes the host refuse every fan message until it is restarted   |
 | Integrator          | `apps/backend/src/server.ts`                                                   | Compose the recording-association adapter so conversation export can complete on the development stack                                     | `conversation_recordings_unavailable` blocks it, and the agent export waits for it   |

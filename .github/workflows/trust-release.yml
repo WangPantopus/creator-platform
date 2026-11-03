@@ -35,4 +35,4 @@ jobs:
       - run: pnpm --filter @qelvora/backend build
       - run: pnpm --filter @qelvora/web build
       - name: Runtime evidence remains a release gate
-        run: echo 'Compilation does not establish G0-G5, provider, physical-device, privacy, store or reliability readiness. See docs/operations/W8-release.md.'
+        run: echo 'Compilation does not establish G0-G5, provider, physical-device, privacy, store or reliability readiness. See docs/engineering/release.md.'

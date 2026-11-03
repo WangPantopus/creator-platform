@@ -29,7 +29,7 @@ import { lifecycleFailure } from "./telemetry.js";
  * A development setting, a development identity or an unsafe database login
  * makes it refuse to start at all. Genuine adapters come from a reviewed bundled
  * module (PRODUCTION_ADAPTER_MODULE) exporting `configure(env)`, as the Trust
- * deployment does. Contract C2 (draft): docs/lanes/status/lane-2-production-root.md */
+ * deployment does. Contract C2 (draft): docs/engineering/production-host.md */
 
 type BackendInput = Parameters<typeof createConfiguredBackend>[0];
 export type ProductionTrust = Exclude<

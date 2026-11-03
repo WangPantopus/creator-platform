@@ -1,4 +1,4 @@
-// E4.8 and the founder's decision 1 (lane-4-decisions.md, taken as the
+// E4.8 and the founder's decision 1 (docs/archive/lanes/status/lane-4-decisions.md, taken as the
 // proposed default on 2026-10-16): a refunded payment gives its room under the
 // fan's monthly limit back. A fan with $60 of room pays $50 and Maya misses her
 // deadline. While the refund is in flight the $50 still counts, so a $20

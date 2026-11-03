@@ -1,7 +1,7 @@
 // Operate the real Requests page against an owned local stack and existing
 // submitted/accepted commerce fixtures. Creates no offers, decisions or payments.
 // Development identity and the loopback fake Stripe processor are outer edges.
-// See docs/operations/request-queue-navigation-2026-10-22.md for setup boundaries.
+// See docs/archive/operations/request-queue-navigation-2026-10-22.md for setup boundaries.
 import assert from "node:assert/strict";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
