@@ -10,7 +10,7 @@ wave of the feature that needs it) or deleted (with the founder's yes), and a pu
 an unregistered SQL file adds its row here. The founder decides from this page which files to
 register, keep or delete. Nothing here registers or deletes anything.
 
-Triaged on 2026-11-02 at `37a47bd84` (registered head `0258_w4_provider_inbox_worker`) by reading
+Triaged on 2026-11-03 at `37a47bd84` (registered head `0258_w4_provider_inbox_worker`) by reading
 every file and every place in `apps/`, `packages/`, `infra/`, `scripts/` and `tests/` that names its
 objects. No file was applied to a database. To list the queue again:
 
@@ -44,10 +44,13 @@ Four places still fail on every real database, three of them in the ops console 
    thread or sends a Team reply (`conversation/feature.ts:847`, `:1191`) goes through
    `trust/scope-restriction.ts:141`, which calls `creator_trust.team_thread_denial`. Only
    `migrations/0084_w8_team_thread_denial.sql` creates it, and the only guard turns the missing
-   function into 503 `scope_denial_unconfigured` (lines 103-122). The founder decided on 2026-11-02
+   function into 503 `scope_denial_unconfigured` (lines 103-122). The founder decided on 2026-11-03
    that triage waits until after the pilot. Until then the Studio must not offer the Triage role:
    it is a fixed entry in `apps/web/features/studio/team/Team.tsx:14` and in the native Studio
-   team screens, with no switch, so hiding it is a small code change.
+   team screens, with no switch, so hiding it is a small code change. The API still accepts the
+   role (`TeamRoleSchema` in `packages/api/src/identity.ts`, used by the invite and role-change
+   routes), so the server must refuse to grant it too, not only the apps. A separate work session
+   does both.
 
 Moment 2 also doesn't work without its two queue files, though nothing fails: the memory writer is
 never built (no review lists its consumer), and one deleted memory or "don't remember this" makes
@@ -96,7 +99,7 @@ reserved number. Rows are in the order of the [proposed waves](#proposed-waves).
 | `conversation/migrations/pending_w3_generation_context_exclusions.sql` | — | #518 (2026-10-16) | Replaces `generation_conversation_context()` (0179) and the 0221 policy; nothing new | 0179, 0221; after the memory file | `conversation/generation-context.ts:426`, on every fan turn | Pilot: moment 2 | Without it an exclusion drops all of a thread's history and memory from the AI's context, silently. Needs a `generationDefinitions` entry and new pins |
 | `commerce/schema-paid-coverage.sql` | 0155 | #82 (2026-10-01) | Tables `commerce_paid_coverage`, `commerce_paid_coverage_denial`; roles `creator_commerce_count`, `creator_commerce_tenure`; two definer functions; policies | 0001, 0002, 0004, 0008, 0010, 0021, 0027 | `commerce/paid-coverage.ts`, `paid-audience-count.ts` (not built); the export skips it when absent (`financial-export.ts:281`); `commerce/runtime.ts:224-228` refuses to start when store verification is configured without it | Unclear: founder | Paid periods and refunds for app-store memberships. Needed for the pilot if memberships are sold through the App Store and Google Play (D-14) |
 | `migrations/0207_w8_development_feedback_lifecycle.sql` | 0207 | #132 (2026-10-07) | Role; `identity_event.policy_version` and `.expires_at`; three indexes; policies; three definer functions; a delete trigger | 0056, 0057 (checksums match) | `trust/development-feedback.ts:68`, only with `NODE_ENV=development` and two development switches (lines 47-53). It gates Helpful / Not helpful and the fan intro offer | Unclear: founder | Development-only by design, and its fixed window (2026-10-02 to 11-01) has ended. If the pilot wants reply feedback and the intro, it needs a production successor |
-| `migrations/0084_w8_team_thread_denial.sql` | 0169 | #89 (2026-10-02) | `creator_trust.team_thread_denial()`, a definer function for the runtime | 0001, 0002, 0053, 0074, 0082 | `trust/scope-restriction.ts:141` for every non-participant | Later: Team triage | The founder deferred Team triage to after the pilot (2026-11-02). Latent failure 4 |
+| `migrations/0084_w8_team_thread_denial.sql` | 0169 | #89 (2026-10-02) | `creator_trust.team_thread_denial()`, a definer function for the runtime | 0001, 0002, 0053, 0074, 0082 | `trust/scope-restriction.ts:141` for every non-participant | Later: Team triage | The founder deferred Team triage to after the pilot (2026-11-03). Latent failure 4 |
 | `session/livekit-schema.sql` | 0176 | #67 (2026-10-02) | A login and a role for call callbacks; tables `call_provider_room`, `call_provider_identity`, `call_provider_callback`, `call_callback_scope`; callback functions and triggers | 0001, 0006 | `session/livekit-journal.ts`, which nothing imports | Later: calls | One-to-one calls wait for a call provider (Q06). Its header is the 0092 proposal held as 0176 |
 | `migrations/0150_w6_account_call_metadata.sql` | 0197 | #166 (2026-10-02) | Role `creator_call_metadata`; `account_call_metadata()`; five read policies | 0001, 0002, 0006 | `server.ts:169`, guarded: `GET /v1/w6/calls/:sessionId/route` answers 503 | Later: calls | Call route recovery |
 | `identity/schema-publication-scope.sql` | 0158 | #67 (2026-10-01) | Login `creator_publication_worker` and role `creator_publication_authority`; table `publication_worker_scope`; six definer task functions; narrows every public policy on four content tables to `creator_runtime` | 0001, 0002, 0008, 0035 | `identity/publication-scope.ts:203`, built only by the separate publication worker, which nothing starts; guarded (503) | Later: publication worker | Text posts and Notes publish without the worker. Revise before registering: narrowing `content_index`'s public read hides it from registered 0253's `review_note_reply`, so every Note reply review would answer "Reply author required" (read from the SQL, not run) |
