@@ -18,8 +18,8 @@ concurrency:
   cancel-in-progress: true
 jobs:
   changes:
-    # Decides which slow jobs a change needs. They skip only when a diff between two known commits
-    # shows they can; anything this job can't classify runs them.
+    # Decides which slow jobs a change needs. A gated job skips only when every changed path is known
+    # not to affect it; an unknown path, or any failure here, runs it.
     runs-on: ubuntu-latest
     outputs:
       native: ${{ steps.classify.outputs.native }}
@@ -41,7 +41,7 @@ jobs:
         shell: bash
         env:
           QELVORA_EVENT: ${{ github.event_name }}
-          QELVORA_PR_BASE: ${{ github.event.pull_request.base.sha }}
+          QELVORA_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           QELVORA_PR_HEAD: ${{ github.event.pull_request.head.sha }}
           QELVORA_PUSH_BEFORE: ${{ github.event.before }}
           QELVORA_PUSH_AFTER: ${{ github.sha }}
@@ -49,50 +49,86 @@ jobs:
           native=true
           visual=true
           reason="a $QELVORA_EVENT run checks everything"
-          case "$QELVORA_EVENT" in
-            pull_request) base=$QELVORA_PR_BASE head=$QELVORA_PR_HEAD range="$QELVORA_PR_BASE...$QELVORA_PR_HEAD" ;;
-            push) base=$QELVORA_PUSH_BEFORE head=$QELVORA_PUSH_AFTER range="$QELVORA_PUSH_BEFORE..$QELVORA_PUSH_AFTER" ;;
-            *) range= ;;
-          esac
           commit='^[0-9a-f]{40}$'
           zeros='^0+$'
-          if [ -z "$range" ]; then
+          base=
+          case "$QELVORA_EVENT" in
+            pull_request)
+              # Compared with the default branch, not the PR's base: a stacked PR then counts the
+              # changes below it, and retargeting a PR can't leave a stale result behind.
+              if [[ $QELVORA_PR_HEAD =~ $commit ]] &&
+                default=$(git rev-parse --verify --quiet "refs/remotes/origin/$QELVORA_DEFAULT_BRANCH^{commit}") &&
+                base=$(git merge-base "$default" "$QELVORA_PR_HEAD"); then
+                head=$QELVORA_PR_HEAD
+              else
+                base=
+                reason="the head could not be compared with the default branch"
+              fi
+              ;;
+            push)
+              # Compared only with the commit before it. If a push's run never finishes (cancelled,
+              # an outage, [skip ci]), the nightly full run is the backstop.
+              if [[ $QELVORA_PUSH_BEFORE =~ $commit && ! $QELVORA_PUSH_BEFORE =~ $zeros && $QELVORA_PUSH_AFTER =~ $commit ]]; then
+                base=$QELVORA_PUSH_BEFORE
+                head=$QELVORA_PUSH_AFTER
+              else
+                reason="there is no previous commit to compare with"
+              fi
+              ;;
+          esac
+          if [ -z "$base" ]; then
             :
-          elif ! [[ $base =~ $commit && $head =~ $commit ]] || [[ $base =~ $zeros ]]; then
-            reason="there is no base commit to compare with"
           # --no-renames lists both sides of a move, and -z keeps unusual names unquoted.
-          elif ! git diff --name-only --no-renames -z "$range" > "$RUNNER_TEMP/changed-paths"; then
-            reason="the changes in $range could not be listed"
+          elif ! git diff --name-only --no-renames -z "$base" "$head" > "$RUNNER_TEMP/changed-paths"; then
+            reason="the changes from $base to $head could not be listed"
           else
             native=false
             visual=false
-            reason="compared $range"
+            reason="compared $base with $head"
+            unclassified=
+            # macOS checks Apps/ios out into apps/ios, so paths match without regard to case.
+            shopt -s nocasematch
             while IFS= read -r -d '' path; do
-              case "$path" in
-                # A change to the workflows, to local actions or to how Git checks files out runs the
-                # full matrix, so the change itself is tested.
-                .github/workflows/* | .github/actions/* | .gitattributes) native=true visual=true ;;
-              esac
+              claimed=false
               case "$path" in
                 # What the iOS and Android jobs build and test.
-                apps/ios/* | apps/android/*) native=true ;;
+                apps/ios/* | apps/android/*) native=true claimed=true ;;
                 # The generators that write into both apps, and everything they read.
-                scripts/generate-shared.mjs | scripts/generate-native-api.mjs) native=true ;;
-                config/* | packages/api/generated/* | design/handoff/tokens.json) native=true ;;
-                design/design-system/project/components/bundle.js) native=true ;;
+                scripts/generate-shared.mjs | scripts/generate-native-api.mjs) native=true claimed=true ;;
+                config/* | packages/api/generated/* | design/handoff/tokens.json) native=true claimed=true ;;
+                design/design-system/project/components/bundle.js) native=true claimed=true ;;
               esac
               case "$path" in
                 # The web app, its packages, the Playwright tests and the reference server.
-                apps/web/* | packages/* | tests/visual/* | scripts/visual-* | playwright.config.ts) visual=true ;;
+                apps/web/* | packages/* | tests/visual/* | scripts/visual-* | playwright.config.ts) visual=true claimed=true ;;
                 # The design references and fonts the reference server reads, and the copy and brand
                 # sources behind the generated packages.
-                design/* | assets/* | config/*) visual=true ;;
+                design/* | assets/* | config/*) visual=true claimed=true ;;
                 # The toolchain that installs and runs them. `pnpm install` reads every workspace
                 # manifest and runs its install scripts.
-                package.json | pnpm-lock.yaml | pnpm-workspace.yaml | turbo.json | tsconfig.base.json) visual=true ;;
-                apps/*/package.json | .npmrc | .pnpmfile.cjs) visual=true ;;
+                package.json | pnpm-lock.yaml | pnpm-workspace.yaml | turbo.json | tsconfig.base.json) visual=true claimed=true ;;
+                apps/*/package.json | .npmrc | .pnpmfile.cjs) visual=true claimed=true ;;
+              esac
+              case "$path" in
+                # Folders no gated job reads, including any .gitattributes inside them.
+                docs/* | artifacts/* | tests/scenarios/* | infra/* | apps/backend/*) ;;
+                # The workflows, local actions and every other .gitattributes change how jobs run or
+                # how files are checked out, so they run the full matrix.
+                .github/workflows/* | .github/actions/* | .gitattributes | */.gitattributes) native=true visual=true ;;
+                # Files no gated job reads.
+                .github/* | AGENTS.md | CLAUDE.md | README.md | .gitignore | .prettierignore | eslint.config.mjs) ;;
+                scripts/check-evidence-budget.mjs | scripts/shared.test.mjs | scripts/rename-brand.mjs) ;;
+                scripts/with-heavy-build-lock.mjs) ;;
+                # Any other path that no group claimed might matter, so it runs everything.
+                *) [ "$claimed" = true ] || unclassified=${unclassified:-$path} ;;
               esac
             done < "$RUNNER_TEMP/changed-paths"
+            shopt -u nocasematch
+            if [ -n "$unclassified" ]; then
+              native=true
+              visual=true
+              reason="$reason; $(printf %q "$unclassified") is in no group"
+            fi
           fi
           echo "Native jobs run: $native. Visual job runs: $visual. Basis: $reason." | tee -a "$GITHUB_STEP_SUMMARY"
           # Written last, so a step that fails anywhere sets no outputs and every gated job runs.
