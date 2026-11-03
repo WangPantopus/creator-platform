@@ -127,42 +127,62 @@ every text pair holds 4.5:1 or more in both themes.
 - [x] 3.5 Studio components: queue cards (commitment, packet, rule match),
       capacity header, "Instead" menu, label preview, passkey signing sheet,
       source rows with scope chips, test-console transcript, version list, audit banner;
-      the 72-hour digest item.
+      the 72-hour digest item. *Stale:* the signing sheet's action says "Sign with Face ID",
+      but under option A creators sign with a passkey in the web Studio.
 - [x] 3.6 Shared: navigation (fan tabs, studio tabs plus More, desktop sidebar),
       sheets, dialogs, toasts, empty, loading and error patterns, offline banner,
       notification rows, email templates, share card. The email layout is one
       component; each email's wording is designed with its screen in Phase 4.
+      *Stale:* the studio tab bar shows Notes first; Today replaced it on 2026-10-15, with the
+      home glyph (2026-11-01). The visual reference applies Today as a correction
+      (`scripts/visual-reference.mjs`); the board itself is unchanged.
 - [x] 3.7 Content guidelines: the copy system (fixed sentences, never-words,
       the AI's voice) as usage rules on the components.
 
 ## Phase 4: screens (every state, light and dark, phone and desktop where relevant)
 
-- [x] 4A **Fan core, pilot** ([canvas](https://claude.ai/artifact/CVDK7KgFQ5rL3rMekhJBcF); first pass: 10 screens, see `design/phase4a-fan-core/`): public creator home (plus post, invite and
+Corrected on 2026-11-02 against the boards in `design/`: an item is ticked only when every
+board it lists exists. The launch surfaces that were never designed are listed under
+[Missing launch surfaces](#missing-launch-surfaces), and boards that no longer match a decision
+under [Stale boards](#stale-boards).
+
+- [~] 4A **Fan core, pilot** ([canvas](https://claude.ai/artifact/CVDK7KgFQ5rL3rMekhJBcF); 16 boards, see `design/phase4a-fan-core/`): public creator home (plus post, invite and
       Instagram entrances), onboarding, processor consent, thread (every state),
       memory card, packet, spend-limit step and checkout sheet, request status and
-      receipt, a Note in the thread, notifications.
+      receipt, a Note in the thread, notifications. *Missing:* the Instagram entrance, the
+      S-F6 memory card, and 12 of the 21 launch honest states. Onboarding is drawn as
+      "Continue with Pantopus" (stale).
 - [x] 4B **Fan account and discovery, pilot** ([canvas](https://claude.ai/artifact/VZNMhK2CdYKHF9pECEojQE), `design/phase4b-fan-account/`): Home, Discover, creator profile
       (Access segment), post view, You, Me and privacy, spending and time,
       verification page.
-- [x] 4C **Studio on phone, pilot** ([canvas](https://claude.ai/artifact/HgnU1RHdqJTS9aYN6Gpmdc), `design/phase4c-studio-phone/`): Notes and the Replies feed, Requests queue,
+- [~] 4C **Studio on phone, pilot** ([canvas](https://claude.ai/artifact/HgnU1RHdqJTS9aYN6Gpmdc), `design/phase4c-studio-phone/`): Notes and the Replies feed, Requests queue,
       packet detail and reply composer, Threads with takeover and handback,
-      passkey signing sheet, weekly impact digest.
-- [x] 4D **Studio on desktop, pilot** ([canvas](https://claude.ai/artifact/K465Z5XjExNgXWLgM3Ln3u), `design/phase4d-studio-desktop/`): verification and onboarding (external
+      passkey signing sheet, weekly impact digest. *Missing:* the creator's hand back and the
+      Today screen. The signing sheet is drawn as "Sign with Face ID", and "Review and sign"
+      draws accept and send as one signed act, which is the founder's open INV-22 call.
+- [~] 4D **Studio on desktop, pilot** ([canvas](https://claude.ai/artifact/K465Z5XjExNgXWLgM3Ln3u), `design/phase4d-studio-desktop/`): verification and onboarding (external
       proof, passkey, license, interview), My AI (mode, sources, style, rules,
       approval, test console, versions, export, 72-hour digest), Offers, Publish
-      (basic), Earnings (minimal), Team and settings, License and sponsorships.
-- [x] 4E **Slice 2, calls and native** (4E to 4I share one [canvas](https://claude.ai/artifact/SuT31u7iaBNPVaHqAMbBFT), `design/phase4e-4i/`): call screens for fan and creator
+      (basic), Earnings (minimal), Team and settings, License and sponsorships. *Missing:*
+      passkey registration, the S-C14 interview and S-C7 Publish. Creator setup is drawn only
+      at desktop width, but under option A creators set up in the web Studio on a phone.
+- [~] 4E **Slice 2, calls and native** (4E to 4I share one [canvas](https://claude.ai/artifact/SuT31u7iaBNPVaHqAMbBFT), `design/phase4e-4i/`): call screens for fan and creator
       (pre-call, waiting, connected, reconnecting, every outcome), offering
-      times, native app (push, incoming call, in-app purchase sheets, offline).
-- [x] 4F **Slice 3, producer and sharing**: share cards and their verification
+      times, native app (push, incoming call, in-app purchase sheets, offline). *Drawn:*
+      before the call, connected (Night), after the call, the creator offering times, the lock
+      screen and native membership purchase.
+- [~] 4F **Slice 3, producer and sharing**: share cards and their verification
       pages, public answers with credits, Publish (full), Insights and producer,
-      AI voice notes.
-- [x] 4G **Slice 4, the pass**: pass inside You, Discover markers, slot
-      replacement, pool earnings.
-- [x] 4H **Ops console** (proposed; not in the source docs): verification review,
-      safety cases, disputes, pauses and license suspension.
-- [x] 4I **Notifications and email**: every row of Product Design section 9 as
-      push, email and in-app designs.
+      AI voice notes. *Missing:* Publish (full), and the share card's handle choice and
+      revocation.
+- [~] 4G **Slice 4, the pass**: pass inside You, Discover markers, slot
+      replacement, pool earnings. *Missing:* slot replacement.
+- [~] 4H **Ops console** (proposed; not in the source docs): verification review,
+      safety cases, disputes, pauses and license suspension. *Drawn:* the safety queue and a
+      dispute.
+- [~] 4I **Notifications and email**: every row of Product Design section 9 as
+      push, email and in-app designs. *Drawn:* every notification type with its sender label,
+      preview and never-rule, a push board, and two emails.
 
 ## Phase 5: prototypes
 
@@ -177,6 +197,9 @@ Canvas: [Qelvora · Prototypes](https://claude.ai/artifact/BCbknq2yt777Du9u8c4Ye
 - [x] 5.4 Creator: onboarding to a published AI and its first handled conversation.
 - [x] 5.5 The comprehension-test prototype for T-21.
 
+*Stale:* the prototypes still show "Continue with Pantopus" and the forbidden "What Maya will see"
+heading (see [Stale boards](#stale-boards)).
+
 ## Phase 6: audit and handoff
 
 Audit: [`docs/audit/AUDIT.md`](audit/AUDIT.md) (14 findings, 13 fixed, 1 open proposal; canvases not visually verified). Handoff: [`design/handoff/`](../design/handoff/).
@@ -188,6 +211,40 @@ Audit: [`docs/audit/AUDIT.md`](audit/AUDIT.md) (14 findings, 13 fixed, 1 open pr
 - [x] 6.3 Developer handoff: tokens as code, component specs and states, and the
       screen-to-endpoint map from the System Architecture.
 
+## Missing launch surfaces
+
+Launch surfaces with no design, from the consolidation review (plan section 3.2). Phase 2 of the
+[launch plan](LAUNCH_PLAN.md#8-the-road-to-the-pilot) designs them first.
+
+- **Sign-in and onboarding:** option D sign-in (Apple and Google, date of birth, the under-18
+  refusal, sign-in failure, handle taken).
+- **The thread:** the S-F6 memory card, the open-loop follow-up and the intro-card offer; 12 of
+  the 21 launch honest states; the creator's hand back.
+- **Money:** web membership checkout, 3-D Secure, the app-to-web request hand-off and Play
+  Billing.
+- **Studio:** S-C7 Publish and the S-C14 interview; passkey registration, pending review and lost
+  device; signing sheets for each act type; FAQ-set authoring; license switches and Pause
+  everything; the Today screen.
+- **Sharing:** the share card's handle choice and revocation.
+- **Safety, account and ops:** report, block and crisis UI; delete account and notification
+  settings; the ops reviews and pauses.
+- **Measurement:** the pilot aggregate view and the full T-21 study kit.
+
+## Stale boards
+
+Boards that a later decision overtook (plan section 3.2). Fix them when the screen is next
+designed; the code follows the decision, not the board.
+
+| What is stale | Where it is drawn | The decision it contradicts |
+| --- | --- | --- |
+| "Continue with Pantopus" | Nine boards in the review's count, among them 4A Welcome, the 4D canvas, the prototypes canvas and the Button component | Option D sign-in and the native wording "Sign in to continue" (BRIEF decision log, 2026-11-02 rows) |
+| "Sign with Face ID" | The SigningSheet component and 4C "Review and sign" | Option A: creators sign with a passkey in the web Studio |
+| Creator setup only at desktop width | 4D "Get verified and set up" | Option A: creators work in the web Studio on their phones |
+| Deferred voice, call and public modes | Among others, 4A Packet, 4B Access and Requests, and 4D Offers and Earnings | The launch scope is written replies (launch plan, section 4) |
+| One signature for accept and send | 4C "Review and sign" ("Accept and send") | INV-22 is an open founder call |
+| Notes as the first Studio tab | The StudioTabBar and Sidebar components | Today is the first tab (2026-10-15), with the home glyph (2026-11-01) |
+| "What Maya will see" | 4A Packet and the 5.2 step-in prototype | Product Design S-F7 requires "Included in your request" |
+
 ## Answers to the open questions
 
 From Brief section 15. Approved on 2026-09-25 unless marked otherwise; approved
@@ -198,7 +255,7 @@ rows are also in the Brief's decision log.
 | 1 | Stale trial wording | Follow D-26 and D-23: the state is "Your free conversation has ended", shown at the next natural pause, explaining the membership with the four access lines | Approved |
 | 2 | Auto-reply after 20 drafts | Follow D-12: the AI replies instantly once live; the approval policy covers only `approved_draft` | Approved |
 | 3 | Fan tabs | Four tabs (Home, Discover, Requests, You) with notifications behind a bell on Home; the pass lives in You and becomes a fifth tab only if testing fails | Approved |
-| 4 | Studio navigation on a phone | Notes · Requests · Threads · My AI · More (Offers, Publish, Insights, Earnings and team) | Approved |
+| 4 | Studio navigation on a phone | Notes · Requests · Threads · My AI · More (Offers, Publish, Insights, Earnings and team) | Approved; Today replaced Notes as the first tab on 2026-10-15 (BRIEF decision log) |
 | 5 | Approved-draft treatment | Explore all three in phase 2; choose by the comprehension test, not by taste | Decided in Phase 2 |
 | 6 | "Studio" naming | The creator app is "Qelvora Studio"; the sample tier is "Kiln Club"; Devon is the second sample creator | Approved |
 | 7 | Theme default | Follow the system setting; both themes first-class | Approved |
