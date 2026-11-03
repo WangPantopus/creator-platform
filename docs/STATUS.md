@@ -4,6 +4,30 @@ Updated 2026-11-03. This page replaces the old `CURRENT.md` and the dated handof
 the [archive](archive/operations/). Update this page in place instead of adding a dated handoff.
 Refresh the Git and GitHub facts before acting on them.
 
+## Hotpot TestFlight setup — in progress
+
+The founder selected **Hotpot** under **Pantopus** and requested TestFlight first
+(2026-11-02 Pacific time). This supersedes the old placeholder-only naming rule;
+see [NAMING](NAMING.md). The source-wide rename is still pending.
+
+- Setup started from refreshed `origin/main` at `78c890e8c` (#536); #537 and #538
+  were open when checked. Work branch: `codex/hotpot-testflight-setup`.
+- Apple Developer team: **Pantopus, Inc.**, `6UYZBA546R`. Registered App ID:
+  **Hotpot**, `com.pantopus.hotpot`, with Sign in with Apple enabled.
+- App Store Connect rejected **Hotpot** as an already-used listing name. No app
+  record exists yet; the founder has been asked for a listing alternative.
+- Apple shows an updated Developer Program License Agreement requiring the
+  Account Holder’s acceptance. Xcode has no Apple account or valid signing
+  identity on this Mac. The founder has been asked to complete these steps.
+- A Release archive preflight **succeeded**, using main source with build overrides for the
+  Hotpot display name and bundle ID. It is unsigned and cannot be installed
+  through TestFlight. Build evidence stays under ignored `artifacts/`.
+- The archive lacks version/build metadata and an app icon; both need release
+  configuration before Apple validation. Main has no configured HTTPS backend
+  or Google client IDs. A server
+  URL (or an explicit installation-only scope) is still needed. There is no
+  successful upload, TestFlight invitation or real-iPhone acceptance yet.
+
 ## What we are building
 
 - Each creator has an authorized, clearly labeled AI that talks one-on-one with every fan, remembers
@@ -175,5 +199,4 @@ pure logic and bug regressions, and confirms the 2026-10-09 rule. Still open:
   an independent review first. The app's PR monitor watches CI, and nobody polls it.
 - **Rules that never bend:** never reset a used database or device; never rewrite applied SQL or
   publication fingerprints; never invent consent; never advance clocks; never settle an unknown cost
-  without a receipt; INV-01 to INV-25 and the fixed copy are not negotiable; the product name is
-  always Qelvora.
+  without a receipt; INV-01 to INV-25 and the fixed copy are not negotiable; the product name follows the current decision in [NAMING](NAMING.md).

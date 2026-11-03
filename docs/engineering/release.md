@@ -10,8 +10,49 @@ account). The G0 to G5 that the trust workflow names are the integration gates o
 [workstream plan](../archive/workstreams/README.md); the
 [launch plan](../LAUNCH_PLAN.md#8-the-road-to-the-pilot) has replaced that plan.
 
-Nothing is released today. No staging or production environment, store account, final domain or
-production credential exists ([STATUS](../STATUS.md)).
+Nothing is released today. TestFlight setup has begun in the existing Pantopus, Inc. Apple
+Developer account; Hotpot has the registered bundle ID `com.pantopus.hotpot`. App Store naming,
+the updated Apple agreement and local signing setup are unresolved. No staging or production
+environment, final domain or production credential is configured in this repository
+([STATUS](../STATUS.md)).
+
+## First Hotpot TestFlight build
+
+Setup state and outstanding founder inputs are in [STATUS](../STATUS.md#hotpot-testflight-setup--in-progress).
+Apple team `6UYZBA546R` owns `com.pantopus.hotpot` with Sign in with Apple enabled.
+The exact listing name Hotpot is unavailable; a different listing name can retain
+Hotpot as the home-screen display name.
+
+Before uploading:
+
+1. The Account Holder reviews and accepts Apple's outstanding Developer Program
+   License Agreement. Sign in to that team's account in Xcode Settings → Apple Accounts.
+2. Create the App Store Connect iOS record with an available name, English (U.S.),
+   bundle ID `com.pantopus.hotpot`, and SKU `pantopus-hotpot-ios`. These were the
+   attempted form values; the name rejection means the record was **not** created.
+3. Supply an app icon and explicit `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION`.
+   The unsigned main archive compiled successfully, but its processed Info.plist
+   had neither version key nor app icons, so it is not ready for upload.
+4. Set the release HTTPS API origin and public OAuth client configuration, or get
+   an explicit installation-only scope. An empty API origin leaves sign-in and
+   conversations unavailable; TestFlight does not host the backend.
+5. Archive with the Hotpot bundle/display-name overrides and Pantopus team, sign
+   using Apple distribution, then validate and upload using Xcode. Review export
+   compliance against the actual archive; do not invent declarations.
+6. After Apple processes the build, add it to an internal TestFlight group and
+   add the founder's existing App Store Connect user. Verify installation and
+   the agreed test scope on the real iPhone before reporting completion.
+
+The initial archive was built from `78c890e8cc6c8bbf19bb32e8355edc9affe5f757`
+with Xcode 27.1, Release, generic iOS device, signing disabled, and build overrides
+`PRODUCT_BUNDLE_IDENTIFIER=com.pantopus.hotpot` and
+`INFOPLIST_KEY_CFBundleDisplayName=Hotpot`. It is a compile preflight, not an
+end-to-end test, signed delivery artifact or successful TestFlight upload. The
+source-wide rename remains pending. Logs and archive stay outside Git in ignored
+`artifacts/testflight-hotpot/`.
+
+Apple references: [upload builds](https://developer.apple.com/help/app-store-connect/manage-builds/upload-builds)
+and [TestFlight overview](https://developer.apple.com/help/app-store-connect/test-a-beta-version/testflight-overview/).
 
 ## The gates
 

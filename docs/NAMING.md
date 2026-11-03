@@ -1,8 +1,15 @@
-# Naming: the placeholder product name
+# Naming: Hotpot transition
 
-The product has no final name yet. Everywhere in this repository (docs, designs,
-code, config) it is called **Qelvora**, a made-up word chosen so that it can be
-replaced mechanically once the real name is decided.
+The founder selected **Hotpot** under **Pantopus** on 2026-11-02 (Pacific time).
+This supersedes the placeholder-only naming rule. Apple has registered
+`com.pantopus.hotpot` under Pantopus, Inc. (team `6UYZBA546R`), with Sign in with
+Apple enabled. App Store Connect rejected the exact listing name **Hotpot** as
+already in use; an alternative listing name awaits the founder. No app record or
+TestFlight upload has been completed.
+
+The existing source, package names and historical docs still use **Qelvora**.
+The repository-wide rename below is pending; the first build preflight uses build
+settings for the Hotpot display name and bundle ID without changing app behavior.
 
 `Qelvora` is not an English word, not a product term used in the source
 documents, and not a substring of any other word, so a case-sensitive
@@ -26,8 +33,8 @@ folders whose names contain `qelvora`.
 New implementation uses `config/brand.json` as its runtime brand source. Run
 `pnpm brand:rename NewName --dry-run` to preview a repository-wide rename, and
 `pnpm brand:rename NewName` to apply it in one command, including text filenames.
-Run `pnpm install && pnpm generate && pnpm check` afterward. The final product
-name is still undecided; Qelvora remains a temporary token.
+Run `pnpm install && pnpm generate && pnpm check` afterward. The chosen product
+name is Hotpot; the coordinated source rename and its checks remain pending.
 
 1. **One unbroken word.** It may be joined to other words (`QelvoraStudio`,
    `qelvora-api`, `qelvoraClient`), but the token itself is never split, spaced
@@ -56,8 +63,8 @@ Log each of these here when it is created, so the rename checklist is complete.
 | Item                                                                    | Why it needs manual work                                                                                                                                                                | Status                    |
 | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
 | Logo, wordmark, app icon                                                | A drawn asset; the name's length and letterforms change the design                                                                                                                      | Not created yet           |
-| iOS bundle ID and Android application ID                                | Cannot be changed after the first store submission. Local hosts use `com.pantopus.qelvora`; the rename command updates source IDs before submission                                     | Local only; not submitted |
-| App Store / Play Store listing names                                    | Changed in the store consoles                                                                                                                                                           | Not created yet           |
+| iOS bundle ID and Android application ID                                | Cannot be changed after the first store submission. Local hosts use `com.pantopus.qelvora`; the rename command updates source IDs before submission                                     | Hotpot iOS ID registered; not uploaded. Android unchanged |
+| App Store / Play Store listing names                                    | Changed in the store consoles                                                                                                                                                           | Exact Hotpot listing name unavailable; record not created |
 | Domain names and email sender domains                                   | Must be registered; old ones should redirect                                                                                                                                            | Not created yet           |
 | Stripe products, prices and statement descriptors                       | Changed in the Stripe dashboard                                                                                                                                                         | Not created yet           |
 | OAuth / passkey relying-party IDs                                       | A WebAuthn relying-party ID is tied to a domain; passkeys registered under the old domain stop working after a domain change. Decide the final domain before creators register passkeys | Not created yet           |
