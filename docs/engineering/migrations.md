@@ -30,7 +30,8 @@ database is never reset.
   for word. From `20261008-comparison` on, a row holds the wave's review, the head profile's two
   refusals for it and `migrate-trust`'s too. The role checks and the trust catalogue modules find
   a wave's row by its id, and the wave before it in the row before it, so the table refuses to
-  load with two rows for one wave or with rows out of the chain's order.
+  load with two rows for one wave, with rows out of the chain's order, or with a row from
+  `20261008-comparison` on that isn't a head wave.
 - **The head profile**, `apps/backend/src/db/comparison-profile.ts`: the pins the product checks at
   startup. It walks the table from `20261008-comparison` on and selects the newest wave whose
   sources are all registered, on top of the complete wave before it. It refuses a partial
@@ -163,13 +164,17 @@ earlier rule, to register no new wave until `migrate-trust` read the chain, stay
 - **No row:** CI's backend suite bootstraps its fixture databases with `migrate-trust`, which
   refuses the wave, and so does `stack up` at its first migration step. `activate-wave` refuses it
   before anything connects.
-- **A row with a field missing:** the typecheck fails.
+- **A head row with a field missing:** the typecheck fails. A row added outside the head waves,
+  where no field is required, stops every importer from loading:
+  `Reviewed wave <id> has no head row; the rows from 20261008-comparison on are the head waves, in their order (step 6 in docs/engineering/migrations.md).`
 - **A row that stands in for another wave.** The role checks find a wave's row only by its id, so
   the table refuses to load with two rows for one wave, and every importer stops, CI's suite,
   `stack up` and `activate-wave` included:
   `Reviewed wave <id> has two rows; each wave needs exactly one (step 6 in docs/engineering/migrations.md).`
   A row has to carry its own wave's review:
-  - a review whose sources aren't the wave's packet gets the refusal for a missing row;
+  - a review whose sources aren't the wave's packet gets the refusal for a missing row from
+    `migrate-trust` and the local installer, and `activate-wave`'s own
+    `The exact reviewed …-source migration chain is required.`;
   - a row that is out of the chain's order stops every importer from loading, the head profile's
     `The reviewed head waves are out of the chain's order.` from notices on, or the table's
     `Reviewed wave <id> is out of the chain's order; …` before that.
