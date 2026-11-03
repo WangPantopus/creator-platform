@@ -29,8 +29,9 @@ Four places still fail on every real database, three of them in the ops console 
    [`trust/ops-members.ts`](../../apps/backend/src/modules/trust/ops-members.ts) has no guard. `list
    --changes` (line 159) fails with "relation `creator_trust.ops_member_change` does not exist",
    `add` (line 104) is refused by row security, and `remove` finds nobody. So on a real database
-   only a superuser can name a reviewer. Needs `trust/pending-ops-member-admin.sql`. The local stack hides
-   this: its seed inserts the reviewers as an administrator (`infra/local/seed-stack.sql:20-24`).
+   only a superuser can name a reviewer. Needs `trust/pending-ops-member-admin.sql`. The local
+   stack hides this: its seed inserts the reviewers as an administrator
+   (`infra/local/seed-stack.sql:20-24`).
 2. **Supervisor audits** (phase 3). `GET /v1/trust/operations/audits`
    (`trust/service.ts:1396-1418`) relies on a row-security policy that only
    `trust/pending-supervisor-audits.sql` adds. Without it a supervisor sees only their own records
@@ -194,21 +195,22 @@ here.
    real database, shows supervisors every reviewer's audit records, and lets a supervisor lift a
    pause. The lane 1 scenarios `tests/scenarios/lane-1/e1-6-*.mjs` prove it.
 2. **Memory** (phase 2, moment 2): the memory proposals file, then the context exclusions file, as
-   lane 3 asked. This turns on memory extraction after the answer, "Want me to remember this? Only if
-   you say yes.", and an exclusion that removes only what it names. The wave also adds the
+   lane 3 asked. This turns on memory extraction after the answer, "Want me to remember this? Only
+   if you say yes.", and an exclusion that removes only what it names. The wave also adds the
    `custody.memory` receipt to the generation worker review and W1's consumers, a
    `generationDefinitions` entry for the replaced context function, and new pins (lane 3 counted 13
    changed groups for the memory role). The steps are in lane 3's integrator table
    ([lane-3.md](../archive/lanes/status/lane-3.md)). The founder confirms the INV-15 default first.
-3. **Team triage**, if the founder says basic Team includes it: `migrations/0084_w8_team_thread_denial.sql`
-   alone. A triage member can then read a fan thread and send a Team reply.
+3. **Team triage**, if the founder says basic Team includes it:
+   `migrations/0084_w8_team_thread_denial.sql` alone. A triage member can then read a fan thread
+   and send a Team reply.
 4. **Store memberships**, if pilot memberships are sold through the App Store and Google Play:
    `commerce/schema-paid-coverage.sql`, before store verification is configured.
 
 **Later, each with its feature**
 
-- **Calls:** `session/livekit-schema.sql` (0176), then `migrations/0150_w6_account_call_metadata.sql`
-  (0197).
+- **Calls:** `session/livekit-schema.sql` (0176), then
+  `migrations/0150_w6_account_call_metadata.sql` (0197).
 - **The publication worker:** 0158 (revised first) → 0160 → 0161 and 0162, then 0201 once 0176 is
   in. The worker also needs code changes: its start check (`workers/start.ts:35`) requires the
   public-answer chain and has no pin, and it checks only `revoked_at`, not `retired_at`.
@@ -216,14 +218,15 @@ here.
   0219 → 0220, as renumbered copies.
 - **Home and growth at scale:** 0151 (revised first), 0153, 0166, 0152, 0154, and
   `growth/migrations/pending_w7_account_notifications.sql` for spending reminders.
-- **The rest:** 0172 (longer Note replies), 0225 (content signature reads), 0083 (translation).
+- **The rest:** 0172 (longer Note replies), 0225 (content signature reads), 0168 (translation).
 
 ## Not on `main` yet
 
 Five parked pull requests carry SQL that will join the queue when they return
 ([STATUS](../STATUS.md#parked-pull-requests)). Two are pilot features:
 
-- #400, reaction pushes after a withdrawn reply (moment 3): `content/migrations/pending_w5_reaction_available.sql`;
+- #400, reaction pushes after a withdrawn reply (moment 3):
+  `content/migrations/pending_w5_reaction_available.sql`;
 - #459 with #392, the share card: `commerce/schema-share-status.sql`;
 - #399, creator web push: `growth/migrations/pending_w7_web_push.sql`;
 - #398, profile fields: `growth/migrations/pending_w7_creator_profile_fields.sql`;
