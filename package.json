@@ -7,8 +7,8 @@
     "node": ">=22"
   },
   "scripts": {
-    "generate": "pnpm --filter @qelvora/api generate && node scripts/generate-shared.mjs && node scripts/generate-native-api.mjs",
-    "generate:check": "pnpm --filter @qelvora/api generate --check && node scripts/generate-shared.mjs --check && node scripts/generate-native-api.mjs --check",
+    "generate": "pnpm --filter @qelvora/api generate && node scripts/generate-shared.mjs && node scripts/generate-native-api.mjs && node scripts/generate-migrations.mjs",
+    "generate:check": "pnpm --filter @qelvora/api generate --check && node scripts/generate-shared.mjs --check && node scripts/generate-native-api.mjs --check && node scripts/generate-migrations.mjs --check",
     "brand:rename": "node scripts/rename-brand.mjs",
     "dev": "turbo run dev",
     "stack": "node infra/local/stack.mjs",

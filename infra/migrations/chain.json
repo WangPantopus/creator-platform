@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "generatedFrom": "infra/migrations.json, by scripts/generate-migrations.mjs. Do not edit.",
+  "waves": [
+    {
+      "id": "20261002",
+      "sha256": "9e21499af1c10ad488dbb6e7f6477c675f2c2511bfde5c7635f3adfef56919b9",
+      "baseline": 40,
+      "sources": 17,
+      "frozen": true
+    },
+    {
+      "id": "20261002-privacy",
+      "sha256": "2d72120d1be136081acb5d324f19dae44660d6e423e932cc962664596ab4c3e2",
+      "baseline": 57,
+      "sources": 4,
+      "frozen": true
+    },
+    {
+      "id": "20261007-generation",
+      "sha256": "8418840a9b15bd71ca3e155ce8742deab90048991f1324c6096003a4e7e1e908",
+      "baseline": 61,
+      "sources": 39
+    },
+    {
+      "id": "20261007-content",
+      "sha256": "0511a93b6df6fb2eb70527898fea04b59844b38bdb63c69bc6b85640765ff972",
+      "baseline": 100,
+      "sources": 1,
+      "frozen": true
+    },
+    {
+      "id": "20261007-generation-output",
+      "sha256": "3879ae6f4a30a19661ad4d970fec8c5a2e4de03d281cfd9d7078aa7fd5236ece",
+      "baseline": 101,
+      "sources": 1
+    },
+    {
+      "id": "20261007-public-ai",
+      "sha256": "0568f611eafe32329ca4ca8305ca33130f72a615d7a209010a9adbe65baac1e8",
+      "baseline": 102,
+      "sources": 2,
+      "frozen": true
+    },
+    {
+      "id": "20261007-generation-recovery",
+      "sha256": "09f82e55b54b07caf47cea6c4bf336f2f8e745e076041644692dd87774b79796",
+      "baseline": 104,
+      "sources": 1
+    },
+    {
+      "id": "20261007-partial-generation-recovery",
+      "sha256": "33253ff139f0bb44521327b18e16f47b5aa5611883ad54fce44b3a375a5d2341",
+      "baseline": 105,
+      "sources": 1
+    },
+    {
+      "id": "20261008-comparison",
+      "sha256": "6942da8257686009ecd7798d75d5459df02a9788a664961fd43c75dbdb3e03cd",
+      "baseline": 106,
+      "sources": 8
+    },
+    {
+      "id": "20261015-notices",
+      "sha256": "ac5677f2e346224209c3c65be2414519d46edf9d2085e8f42b76d6161cbb30ab",
+      "baseline": 114,
+      "sources": 2
+    },
+    {
+      "id": "20261015-sign-in-and-money",
+      "sha256": "fdd7dfd27d8040f0830337b35e91b00b3dfce25483ce7c60fe8a6cbbe0df5dd2",
+      "baseline": 116,
+      "sources": 3
+    },
+    {
+      "id": "20261022-workspace-lock",
+      "sha256": "7414a806f92bd12cf6149cfcc813a77df4d605793217df3684ef30c7abbc7da7",
+      "baseline": 119,
+      "sources": 1
+    },
+    {
+      "id": "20261023-reply-review",
+      "sha256": "09e09244e943f77311beb51f2b908b8bc7b2f01d0d5ec5ee5a8b7f943034e041",
+      "baseline": 120,
+      "sources": 1
+    },
+    {
+      "id": "20261023-studio-reply-authority",
+      "sha256": "b4d2c0e5a6aaa206865a62fa63e8f6d46a9176eaa4f4472b30ad9bf82b2072ab",
+      "baseline": 121,
+      "sources": 1
+    },
+    {
+      "id": "20261027-core-follow",
+      "sha256": "574507ae3a004806a8c04c82482a9af8865b300d37f8e0633f03c88064e0bf79",
+      "baseline": 122,
+      "sources": 1
+    },
+    {
+      "id": "20261101-pilot-columns",
+      "sha256": "c9dfd075d3b3764b0d50bf662bbc64243ffa96af210786b81ca51e2d083f6d41",
+      "baseline": 123,
+      "sources": 3
+    }
+  ],
+  "fresh": {
+    "canonical": 61,
+    "waves": [
+      "20261007-generation",
+      "20261007-content",
+      "20261007-generation-output",
+      "20261007-public-ai",
+      "20261007-generation-recovery",
+      "20261007-partial-generation-recovery",
+      "20261008-comparison",
+      "20261015-notices",
+      "20261015-sign-in-and-money",
+      "20261022-workspace-lock",
+      "20261023-reply-review",
+      "20261023-studio-reply-authority",
+      "20261027-core-follow",
+      "20261101-pilot-columns"
+    ]
+  },
+  "head": {
+    "wave": "20261101-pilot-columns",
+    "sources": 126
+  }
+}
