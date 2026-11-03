@@ -6,6 +6,7 @@
 //   PILOT_BASE_PORT=P node tests/scenarios/pilot/team-triage-off.mjs
 // Real backend and PostgreSQL. Fakes: the development identity, and SQL rows
 // standing in for a membership and an invitation made before triage went off.
+import { readFileSync } from "node:fs";
 import { ACTORS, call, signIn } from "../lane-2/lib.mjs";
 import {
   API,
@@ -20,14 +21,28 @@ import {
   step,
 } from "./lib.mjs";
 
+const copy = JSON.parse(
+  readFileSync(new URL("../../../config/copy.json", import.meta.url), "utf8"),
+);
 const maya = await signIn(API, ACTORS.maya, "/studio");
 const one = await fan(1),
   two = await fan(2);
 const as = (token, method, path, body, headers) =>
   call(API, method, path, { token, body, headers });
-const refused = (r) => {
+/** The pilot refusal, with its existing copy sentence. */
+const refused = (r, message = copy.growthErrorPromptUnavailable) => {
   expect(
-    r.status === 403 && r.json?.error?.code === "team_role_unavailable",
+    r.status === 403 &&
+      r.json?.error?.code === "team_role_unavailable" &&
+      r.json.error.message === message,
+    `${r.status} ${r.text}`,
+  );
+  return `${r.status} ${r.json.error.code} "${message}"`;
+};
+/** A body the API contract itself refuses. */
+const invalid = (r) => {
+  expect(
+    r.status === 400 && r.json?.error?.code === "invalid_request",
     `${r.status} ${r.text}`,
   );
   return `${r.status} ${r.json.error.code}`;
@@ -93,6 +108,20 @@ await step(
 );
 await step(
   "T3",
+  "an invitation with Triage repeated or in another case is refused too",
+  async () => {
+    const repeated = refused(
+      await studioInvite(one.handle, ["triage", "triage"]),
+    );
+    refused(await identityInvite(one.account, ["triage", "triage"]));
+    const cased = invalid(await studioInvite(one.handle, ["Triage"]));
+    invalid(await identityInvite(one.account, ["drafter", "Triage"]));
+    expect((await pending(1)) === 0, "an invitation was written");
+    return `repeated: ${repeated} on both routes; "Triage": ${cased} on both; nothing written`;
+  },
+);
+await step(
+  "T4",
   "an invitation for Drafting, Publishing and Scheduling is made and accepted",
   async () => {
     const made = ok(
@@ -112,23 +141,20 @@ await step(
   },
 );
 await step(
-  "T4",
-  "a role change that adds Triage to a member is refused",
+  "T5",
+  "a role change that adds Triage to a member is refused, however it is written",
   async () => {
-    const observed = refused(
-      await change(
-        1,
-        ["drafter", "publisher", "scheduler"],
-        ["drafter", "publisher", "scheduler", "triage"],
-      ),
-    );
+    const current = ["drafter", "publisher", "scheduler"];
+    const observed = refused(await change(1, current, [...current, "triage"]));
+    const repeated = invalid(await change(1, current, ["triage", "triage"]));
+    const cased = invalid(await change(1, current, [...current, "Triage"]));
     const now = await roles(1);
     expect(now === "drafter,publisher,scheduler", `roles became ${now}`);
-    return `${observed}, roles stay ${now}`;
+    return `${observed}; repeated: ${repeated}; "Triage": ${cased}; roles stay ${now}`;
   },
 );
 await step(
-  "T5",
+  "T6",
   "role changes among Drafting, Publishing and Scheduling still save",
   async () => {
     ok(await change(1, ["drafter", "publisher", "scheduler"], ["drafter"]));
@@ -141,7 +167,7 @@ await step(
   },
 );
 await step(
-  "T6",
+  "T7",
   "an invitation made before triage went off reads but cannot be accepted",
   async () => {
     // Stand-in: a pending invitation written before the pilot turned triage off.
@@ -156,6 +182,7 @@ await step(
       ),
       "the invitation does not read",
     );
+    const gone = copy.growthErrorEntryUnavailable2;
     const studio = refused(
       await as(
         two.token,
@@ -163,9 +190,11 @@ await step(
         `/v1/studio/invitations/${old.id}/accept`,
         {},
       ),
+      gone,
     );
     refused(
       await as(two.token, "POST", `/v1/identity/team/${old.id}/accept`, {}),
+      gone,
     );
     expect((await roles(2)) === "none", "a membership was written");
     ok(await remove(2));
@@ -173,7 +202,7 @@ await step(
   },
 );
 await step(
-  "T7",
+  "T8",
   "a member who already holds Triage reads, cannot keep it through a change, and can drop it",
   async () => {
     await legacyMember(2, ["drafter", "triage"]);
@@ -194,7 +223,7 @@ await step(
   },
 );
 await step(
-  "T8",
+  "T9",
   "the seeded member who holds Triage still reads, for Maya and for themself",
   async () => {
     const team = ok(await as(maya.token, "GET", `/v1/studio/${MAYA}/team`));

@@ -102,7 +102,7 @@ if (shots)
   });
 await step(
   "W3",
-  "editing that member offers no Triage and starts from the roles it can keep",
+  "editing that member offers no Triage and shows, before Save, the roles it keeps",
   async () => {
     await page
       .getByRole("button", { name: `Edit roles for ${SEEDED}` })
@@ -127,10 +127,12 @@ await step(
     expect(checked.join("|") === "Drafting|Publishing", `checked ${checked}`);
     const reviewed = await editor.getByText("Reviewed roles:").textContent();
     expect(reviewed.includes("triage"), `"${reviewed}"`);
+    const desired = await editor.getByText("Desired roles:").textContent();
+    expect(desired === "Desired roles: drafter · publisher", `"${desired}"`);
     if (shots)
       await editor.screenshot({ path: join(shots, "web-editor-light.png") });
     await editor.getByRole("button", { name: "Close role editor" }).click();
-    return `offered ${offered.join(", ")}; checked ${checked.join(", ")}; "${reviewed}"`;
+    return `offered ${offered.join(", ")}; checked ${checked.join(", ")}; "${reviewed}"; "${desired}"`;
   },
 );
 await step(
@@ -152,6 +154,9 @@ await step(
     await page
       .getByRole("checkbox", { name: `Scheduling role for ${label}` })
       .check();
+    await page
+      .getByText("Desired roles: drafter · scheduler", { exact: true })
+      .waitFor();
     await page.getByRole("button", { name: "Save roles" }).click();
     await page
       .getByText("Role change saved. Current access is being checked.")
@@ -160,7 +165,7 @@ await step(
     expect(now === "drafter,scheduler", `roles became ${now}`);
     const row = page.locator(".w5-team-member", { hasText: label });
     await row.getByText("drafter · scheduler").waitFor({ timeout: 30_000 });
-    return `saved ${now}`;
+    return `"Desired roles: drafter · scheduler" before Save; saved ${now}`;
   },
 );
 if (shots) {

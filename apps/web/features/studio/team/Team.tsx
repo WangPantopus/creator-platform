@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { copy } from "@qelvora/copy";
+import { copy, formatCopy } from "@qelvora/copy";
 import { Notice } from "@qelvora/ui-web";
 import { DoneSchema, TeamRolesUpdateInputSchema } from "@qelvora/api";
 import { StudioFailure, studioRequest } from "../api";
@@ -10,8 +10,9 @@ import { Feedback, useAction } from "../shared/action";
 import { time } from "../shared/format";
 import type { Creator } from "../shared/types";
 import { useLiveReload, useLiveView } from "../shell/live";
-// Team triage is off for the pilot, so it is never offered. A member who
-// already holds it still shows it, and saving that member's roles drops it.
+// Team triage is off for the pilot, so it is never offered; the server's
+// switch is `teamRolesOffForPilot` in the backend's identity profiles. A member
+// who already holds it still shows it, and saving that member's roles drops it.
 const teamRoleChoices = [
   ["drafter", "Drafting", "Prepares drafts. Never approves as you."],
   ["publisher", "Publishing", "Publishes content under team identity."],
@@ -429,6 +430,11 @@ export function Team({
                 member's pending invitations.
               </p>
               <p>Reviewed roles: {roleEdit.expectedRoles.join(" · ")}</p>
+              <p>
+                {formatCopy("w5NativeTeamDesired", {
+                  roles: roleEdit.roles.join(" · "),
+                })}
+              </p>
               {!memberActive && (
                 <Notice title="Member access changed">
                   This member no longer has active access. Refresh the team

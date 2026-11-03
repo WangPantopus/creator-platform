@@ -5,8 +5,10 @@ private func teamCopy(_ key: String, _ values: [String: String] = [:]) -> String
     QelvoraCopy.text("w5NativeTeam" + key, values: values)
 }
 
-/// The roles the Studio offers. Team triage is off for the pilot: a member who
-/// already holds it still shows it, and saving that member's roles drops it.
+/// The roles the Studio offers. Team triage is off for the pilot; the server's
+/// switch is `teamRolesOffForPilot` in the backend's identity profiles, and
+/// offering the role here again needs a new store build. A member who already
+/// holds it still shows it, and saving that member's roles drops it.
 private enum NativeTeamRole: String, CaseIterable, Identifiable {
     case drafter, publisher, scheduler
     var id: String { rawValue }

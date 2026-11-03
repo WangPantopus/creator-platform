@@ -26,7 +26,7 @@ const handle = (value: string) => value.replace(/^@/u, "").toLowerCase();
  * for the pilot (founder decision, 2026-11-03): its thread access needs the
  * unregistered migration 0084. Existing memberships still read it and may drop
  * it. To turn it back on, empty this list and offer the role again in the web,
- * iOS and Android Team screens. */
+ * iOS and Android Team screens; the native apps need new store builds. */
 const teamRolesOffForPilot: readonly string[] = ["triage"];
 const refuseTeamRolesOffForPilot = (
   roles: readonly string[],
