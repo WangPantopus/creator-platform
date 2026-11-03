@@ -21,8 +21,8 @@ database is never reset.
   `20261002-privacy-held.json`) are October's role and held-mapping reviews, not packets.
 - **The chain**, `infra/migrations/chain.json`, generated with the packets: the wave order with each
   packet's checksum and size, the waves the local installer applies after the canonical bootstrap,
-  and the head. The pin script reads it; the operator and the runtime don't yet
-  ([the plan](#wave-6-the-plan)).
+  and the head. The pin script and `migrate-trust.ts` read it; `activate-wave.ts`, the local
+  installer and the runtime don't yet ([the plan](#wave-6-the-plan)).
 - **Reviews**, `infra/migrations/reviews/<id>.json`: the reviewed head for each wave, mainly the
   catalogue pins (who can reach which tables, columns and functions) that the product checks at
   startup and that the operator checks before it applies anything.
@@ -32,8 +32,15 @@ database is never reset.
   copy. A registration adds its review to it; nothing writes it for you.
 - **The operator**, in `apps/backend/scripts/`: `activate-wave.ts` applies one reviewed wave to a
   database that holds data (with a private backup and a closed restore), and `migrate-trust.ts`
-  verifies a database and bootstraps the base schema. The role checks (`migration-*-roles.ts`) are
-  beside them.
+  verifies a database and bootstraps the base schema. Of the two, only `migrate-trust` reads the
+  chain. It applies file by file only the canonical bootstrap: the 61 sources before
+  `20261007-generation`, a line fixed in its code rather than read from the chain. Every source of
+  a wave in the chain's `fresh` list is activation-only: it is verified once its wave is installed,
+  and never applied on its own. Before it applies anything, `migrate-trust` refuses a chain that
+  doesn't match its packets or that line, a registry the chain doesn't match, a registered wave
+  that has no matching review in its table of reviewed waves, and a canonical file whose bytes
+  differ from the checksum its packet holds. The role checks (`migration-*-roles.ts`) are beside
+  them.
 - **The local installer**, `apps/backend/src/operations/local/fresh-install.ts`: for a new, empty
   database only. It applies every wave in `FRESH_WAVES` order, in one transaction, checks every
   pinned checksum and the final role-safety and privacy-catalogue assertions, and refuses any
@@ -55,21 +62,35 @@ database is never reset.
 - `outOfOrderException`, the W5 adoption record (0045 applied before 0044), carries over unchanged
   from the wave before, since every later baseline holds that history.
 
+The chain's `fresh` list starts at `20261007-generation`, fixed in the generator: the canonical
+bootstrap is the 61 sources before it, whichever registry entries carry an explicit `wave`.
+
 Each packet from `20261007-generation` on must list exactly the sources its review names (the
 review's `source`, or else its `sources`; the reviews of the generation, content and output waves
-have other names). Each review is pinned in `reviewed.json`, and each packet but the newest is also
-pinned by the next review's `baselineWave`, so no packet can change unseen, the newest included.
+have other names). Each review is pinned in `reviewed.json`, and each review after the first must
+pin the packet of the wave before its own as its `baselineWave`, so every packet but the newest is
+pinned by a reviewed record. The newest is anchored by its review's sources instead. A review
+that pins a packet must be the review of a wave in the chain, so a reviewed wave can't leave the
+registry while its review stays: dropping one also means deleting its review and its line in
+`reviewed.json` by hand, where a reviewer sees it.
 
 It stops, and writes nothing, when:
 
+- the registry, `reviewed.json` or a frozen packet is missing or malformed, or a review isn't valid
+  JSON (one line, no stack trace);
 - a registered file's bytes changed, or a source in a wave has no `sourceSha256`;
 - an existing packet would come out different, or a packet doesn't list its review's sources;
 - a new wave's versions don't rise above the ones before it;
 - an entry without a wave follows the first wave, or two entries share a version, a number or a
   path;
-- a review's `baselineWave` no longer has the checksum of the packet it pins;
+- a review after the first has no `baselineWave`, or pins anything but the packet of the wave
+  before its own with that packet's checksum;
+- a review that pins a packet is the review of no wave in the chain;
 - a pinned record's bytes changed or it is missing, or a file here is neither generated, registered
-  nor pinned. Dotfiles, such as a Finder `.DS_Store`, are ignored.
+  nor pinned. Dotfiles, such as a Finder `.DS_Store`, are ignored;
+- `reviewed.json` pins anything the generator doesn't compare: a file it writes, a registered
+  source, or a path that isn't a reviewed record under `infra/migrations`. The count it prints is
+  the number of pins it compared.
 
 `--check` also refuses a wave without a review, and a review that isn't pinned yet; `pnpm generate`
 only prints those, so a registration can write its packet before its review exists.
@@ -90,11 +111,23 @@ change the registry, so they stay frozen.
 
 ## Registering a file today
 
-**Register no new wave until the operator reads the chain**, the first step of
-[the plan](#wave-6-the-plan). Until then, when `migrate-trust` bootstraps a fresh database it
-applies the files of a registered wave it doesn't know one by one, out of order and without their
-baseline, and exits 0. A registry edit with its generated packet and its review would look complete
-and pass CI.
+**`migrate-trust` reads the chain**, the first step of [the plan](#wave-6-the-plan). It never
+applies a registered wave's files one by one, which it used to do on a fresh database for a wave
+it didn't know. On any database it refuses such a wave before it applies anything:
+`Registered wave <id> has no matching review in this revision; no migration was applied.`
+`activate-wave` and the local installer don't read the chain yet, so a registration still teaches
+them the wave by hand (step 6).
+
+An incomplete registration now fails closed, which is why the earlier rule, to register no new
+wave until `migrate-trust` read the chain, is lifted:
+
+- CI catches only a registration that misses `migrate-trust`'s table row: CI's backend suite
+  bootstraps its fixture databases with `migrate-trust`.
+- A registration that adds the row but misses the rest of step 6 passes CI. `stack up` then
+  refuses it with
+  `The complete reviewed full-host wave chain and executable migration registry must match.`,
+  and `activate-wave` with `Active registry differs from the reviewed packet.` That is why step
+  7's fresh install on a new stack stays required.
 
 A registration is one pull request: a registry edit, the generated packet and chain, a review file
 measured on scratch databases and pinned, the code that knows the wave, and the proof. Steps 2 to 5
@@ -122,9 +155,10 @@ are mechanical apart from the reach review in step 4; the table below says what 
    ```
 
    `<dir>` is a private folder outside Git. The script refuses a URL with a query string or a
-   host other than loopback, a database without the scratch marker, a database that doesn't hold
-   exactly the wave's baseline, and a wave whose versions don't rise above it. It takes a catalogue
-   snapshot against the previous head's review, applies the wave's sources in one transaction as
+   host other than `localhost` or `127.0.0.1`, a database without the scratch marker (its refusal
+   doesn't print the statement that sets it), a database that doesn't hold exactly the wave's
+   baseline, and a wave whose versions don't rise above it. It takes a catalogue snapshot
+   against the previous head's review, applies the wave's sources in one transaction as
    `activate-wave` does, and prints the catalogue diff. **A person reviews every changed reach
    against the SQL** ([catalogue pins](catalogue-pins.md)). Then:
 
@@ -143,9 +177,10 @@ are mechanical apart from the reach review in step 4; the table below says what 
 5. **Pin the review** once its pins are reviewed: add its line to `infra/migrations/reviewed.json`.
    `pnpm generate:check` prints the line, with the checksum.
 6. **Teach the operator and the runtime the wave**, by hand until they read the chain: `activate-wave.ts`,
-   `migrate-trust.ts`, the generation and privacy role checks, the head profile
-   (`src/db/comparison-profile.ts`), the three trust catalogue modules (a database at the previous
-   head is checked against that head's fixed pins) and `FRESH_WAVES`.
+   `migrate-trust.ts` (its table of reviewed waves and its per-wave checks), the generation and
+   privacy role checks, the head profile (`src/db/comparison-profile.ts`), the three trust
+   catalogue modules (a database at the previous head is checked against that head's fixed pins)
+   and `FRESH_WAVES`.
 7. **Prove it:** a fresh install on a new stack, then
    `node infra/local/stack.mjs catalogues check --lane N`, which must match every group without
    Growth and every group but `runtimeCatalogues.family` with it; the scenarios that use the new
@@ -174,10 +209,11 @@ CI's `web-and-backend` job runs `pnpm check`. Its `generate:check` fails when a 
 chain differs from what the registry gives, when a registered file's bytes changed, when a packet
 doesn't list its review's sources, when a wave has no pinned review, or when any reviewed record
 differs from its checksum in `reviewed.json`. The job runs the backend suite on a fresh PostgreSQL 17 with
-pgvector: each fixture database is bootstrapped by `migrate-trust.ts`, and tests that need a wave's
-schema install its registered bytes. The full install of every wave and the catalogue check run on
-the local stack and in the integrator scenarios, not in CI today. Restore and update drills are
-deferred until a production database exists.
+pgvector: each fixture database is bootstrapped by `migrate-trust.ts`, which refuses a registered
+wave it has no matching review for, and tests that need a wave's schema install its registered
+bytes. The full install of every wave and the catalogue check run on the local stack and in the
+integrator scenarios, not in CI today. Restore and update drills are deferred until a production
+database exists.
 
 ## Wave 6: the plan
 
@@ -185,9 +221,10 @@ From [STATUS](../STATUS.md#next) and the [consolidation plan](../CONSOLIDATION_P
 
 1. **Triage the unregistered SQL files.** Done in the [migration queue](migration-queue.md) (#533).
 2. **Make registration data-driven.** The generator and the pin script are in; four packets are
-   frozen. Left: the operator and the runtime still name each wave (step 5 above). The plan:
-   - `migrate-trust` first: treat every source of a chain wave after the canonical bootstrap as
-     activation-only, so a registry edit can never bootstrap a wave's files one by one;
+   frozen. Left: the operator and the runtime still name each wave (step 6 above). The plan:
+   - done: `migrate-trust` treats every source of a chain wave after the canonical bootstrap as
+     activation-only, so a registry edit can never bootstrap a wave's files one by one, and
+     refuses a registered wave it has no review for;
    - `FRESH_WAVES`, the wave lists and the chain checks in `activate-wave`, and the head profile:
      read the chain and loop over the reviews from `20261008-comparison` on, keeping each existing
      refusal and its message;

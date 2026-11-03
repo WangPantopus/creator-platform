@@ -102,13 +102,23 @@ in the Wave 6 queue.
      from `infra/migrations.json`, and `generate:check` verifies them and 36 pinned records in CI.
      `wave-pins` measures the catalogue pins on marked scratch databases
      ([engineering/migrations.md](engineering/migrations.md)).
-   - **Register no new wave until the operator reads the chain**
-     ([the rule](engineering/migrations.md#registering-a-file-today)). Until then, on a fresh
-     database `migrate-trust` would apply an unknown wave's files one by one, without their
-     baseline, and exit 0.
-   - **Next: the operator and the runtime read the chain,** in five pull requests, `migrate-trust`
-     first ([the plan](engineering/migrations.md#wave-6-the-plan)). The pilot's ops-console and
-     memory waves wait on them. After that, files are registered only as features need them.
+   - **`migrate-trust` reads the chain** (#541). Every source of a wave after the canonical
+     bootstrap is activation-only, so it never applies a wave's files one by one. Before it applies
+     anything, it refuses a registered wave it has no matching review for, a registry that
+     `chain.json` doesn't match, a chain that doesn't match its packets or the canonical line fixed
+     in its code, and a canonical file whose bytes changed. `activate-wave` and the local installer
+     don't read the chain yet, so a registration still teaches them the wave by hand. An incomplete
+     registration fails closed: CI catches a missing `migrate-trust` row, and `stack up` and
+     `activate-wave` refuse the rest. So the rule to register no new wave until `migrate-trust`
+     read the chain is lifted
+     ([registering a file](engineering/migrations.md#registering-a-file-today)).
+   - **Next: four pull requests** ([the plan](engineering/migrations.md#wave-6-the-plan)):
+     `FRESH_WAVES` from the chain; the head profile, one loop over the reviews from
+     `20261008-comparison` on; the wave lists and the chain checks in `activate-wave`; and the role
+     checks and the trust catalogue modules, which select the head review and the fixed predecessor
+     by wave id instead of a ternary per wave. Each keeps every existing refusal and its message.
+     The pilot's ops-console and memory waves still wait on them. After that, files are registered
+     only as features need them.
 2. **Pilot phase 1, a real host** (about 3 weeks, blocked mostly on the founder's decisions): a
    production composition root with real adapters; staging, the domain and app links; Apple and
    Google credentials; the Anthropic switch; observability, backups and a restore drill. Its exit:
