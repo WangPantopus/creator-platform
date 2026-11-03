@@ -77,6 +77,7 @@ private class NativeTeamState(
     private var generation = 0
     private var checkedUntil = 0L
     private var dueAt = 0L
+    private var readToken = 0
     private var readJob: Job? = null
     private var writeJob: Job? = null
     val ready: Boolean get() = !session.checkingSession && !session.busy && session.error.isEmpty()
@@ -90,10 +91,10 @@ private class NativeTeamState(
     val manages: Boolean get() = shown && creator?.owned == true && creator?.verification == "verified"
     val mayManage: Boolean get() = manages && ready && SystemClock.elapsedRealtime() < checkedUntil
     private val mayAcceptDuringWrite: Boolean get() = ready && current && SystemClock.elapsedRealtime() < checkedUntil && creatorId == null
-    val mayAccept: Boolean get() = mayAcceptDuringWrite && !saving && !reading
+    val mayAccept: Boolean get() = mayAcceptDuringWrite && !saving
     val currentEditRoles: List<String>? get() = edit?.let { command -> team?.members?.firstOrNull { it.account_id == command.accountId && it.revoked_at == null }?.roles?.map { it.name }?.sorted() }
     val editIsStale: Boolean get() = edit?.let { command -> currentEditRoles?.let { it != command.expected.sorted() && it != command.desired.sorted() } ?: true } ?: false
-    val canSave: Boolean get() = mayManage && !saving && !reading && edit?.desired?.isNotEmpty() == true && edit?.confirmed == false && !editIsStale && currentEditRoles != null
+    val canSave: Boolean get() = mayManage && !saving && edit?.desired?.isNotEmpty() == true && edit?.confirmed == false && !editIsStale && currentEditRoles != null
 
     fun activate() { deactivate(); active = true; refresh() }
     fun deactivate() {
@@ -134,7 +135,7 @@ private class NativeTeamState(
     fun refresh() {
         if (!active || reading || saving) return
         if (!ready) { if (rechecking) dueAt = 0 else conceal(); return }
-        val snapshot = generation; val started = SystemClock.elapsedRealtime()
+        val snapshot = generation; val started = SystemClock.elapsedRealtime(); val token = ++readToken
         reading = true; dueAt = started + 3_000
         readJob = scope.launch {
             var ended = false
@@ -154,7 +155,7 @@ private class NativeTeamState(
                     if (!uuid(creatorId) || found.verification != "verified" || (!found.owned && found.roles.isEmpty())) throw TeamDenied()
                     members = request.client.studioTeam(creatorId)
                     if (members.members.size > 50 || members.invitations.size > 50 || members.members.map { it.account_id }.toSet().size != members.members.size || members.members.any { !uuid(it.account_id) }) throw TeamDenied()
-                    if (!matches(snapshot, request) || SystemClock.elapsedRealtime() >= started + 5_000) throw TeamExpired()
+                    if (!matches(snapshot, request) || SystemClock.elapsedRealtime() >= started + 5_000) { if (rechecking) return@launch else throw TeamExpired() }
                     val last = request.client.studioSession()
                     if (!matches(snapshot, request)) return@launch
                     validate(last, request)
@@ -166,7 +167,7 @@ private class NativeTeamState(
                     }
                     selected = final
                 }
-                if (!matches(snapshot, request) || SystemClock.elapsedRealtime() >= started + 5_000) throw TeamExpired()
+                if (!matches(snapshot, request) || SystemClock.elapsedRealtime() >= started + 5_000) { if (rechecking) return@launch else throw TeamExpired() }
                 directory = first; creator = selected; team = members; capture = request
                 checkedUntil = started + 5_000; current = true; ended = true
                 // A real desired set is visible after a fresh read. It does not
@@ -180,11 +181,15 @@ private class NativeTeamState(
                     conceal(discardEdit = denied); error = teamCopy(if (denied) "Denied" else "Unavailable")
                 }
             } finally {
-                // A read cut short by the session's re-check runs again once that ends.
-                if (generation == snapshot) { reading = false; readJob = null; if (!ended) dueAt = 0 }
+                // A read the session's re-check cut short ends quietly and runs again once
+                // that ends. A read a write stopped leaves the state to the write.
+                if (generation == snapshot && readToken == token) { reading = false; readJob = null; if (!ended) dueAt = 0 }
             }
         }
     }
+    // A write stops a read in flight, so the two never overlap and a tap on Save or Accept is
+    // never lost to a background read; the write reads again when it ends.
+    private fun stopReading() { readToken++; readJob?.cancel(); readJob = null; reading = false }
     private fun validate(value: APIStudioSession, request: FanSessionRequestCapture) {
         if (value.creators.size > 50 || value.invitations.size > 50 || value.creators.map { it.id }.toSet().size != value.creators.size ||
             value.invitations.map { it.id }.toSet().size != value.invitations.size || value.invitations.any { !uuid(it.id) || !uuid(it.creatorId) || it.roles.isEmpty() } ||
@@ -200,6 +205,7 @@ private class NativeTeamState(
     fun retryAcceptance() {
         val command = acceptance ?: return
         if (!mayAccept || command.confirmed) return
+        stopReading()
         val snapshot = generation
         saving = true
         writeJob = scope.launch {
@@ -224,7 +230,7 @@ private class NativeTeamState(
         }
     }
     // Opening the editor, choosing roles and reviewing the current ones stay on this device,
-    // so a read in flight doesn't stop them; Save needs the lease and waits for the read.
+    // so a read in flight doesn't stop them.
     fun openEditor(member: APIStudioTeamMembersItem) {
         val request = capture ?: return
         if (!manages || saving || edit != null || member.revoked_at != null || member.roles.isEmpty() || member.account_id == accountId || team?.members?.none { it.account_id == member.account_id && it.revoked_at == null } != false) return
@@ -247,6 +253,7 @@ private class NativeTeamState(
     fun save() {
         val command = edit ?: return; val id = creatorId ?: return
         if (!canSave) return
+        stopReading()
         val snapshot = generation
         val body = APITeamRolesUpdateInput(command.expected.map { APITeamRolesUpdateInputExpectedRolesItem.valueOf(it) }, command.desired.map { APITeamRolesUpdateInputRolesItem.valueOf(it) })
         saving = true
@@ -302,7 +309,8 @@ fun StudioTeamWorkspace(
     LaunchedEffect(state, foreground) {
         if (!foreground) return@LaunchedEffect
         state.activate()
-        while (true) { delay(250); state.expire(); state.refreshIfDue() }
+        // A due read starts before the lease is checked, so the lease never runs out between reads.
+        while (true) { delay(250); state.refreshIfDue(); state.expire() }
     }
     val visible = foreground && state.shown && accountId == state.accountId && sessionId == state.sessionId && !session.purgingPrivateState && !session.localPurgeFailed
     Column(Modifier.fillMaxSize().background(qColor("ground")).verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {

@@ -55,6 +55,7 @@ private struct NativeTeamAcceptance {
     private var generation = 0
     private var checkedUntil: TimeInterval = 0
     private var dueAt: TimeInterval = 0
+    private var readToken = 0
     private var readTask: Task<Void, Never>?
     private var writeTask: Task<Void, Never>?
 
@@ -69,7 +70,7 @@ private struct NativeTeamAcceptance {
     private var held: Bool { now < checkedUntil || ((reading || saving || rechecking) && now < checkedUntil + 5) }
     var manages: Bool { shown && creator?.owned == true && creator?.verification == "verified" }
     var mayManage: Bool { manages && ready && now < checkedUntil }
-    var mayAccept: Bool { ready && current && now < checkedUntil && creatorId == nil && !saving && !reading }
+    var mayAccept: Bool { ready && current && now < checkedUntil && creatorId == nil && !saving }
     var currentEditRoles: [String]? {
         guard let edit, let member = team?.members.first(where: { $0.account_id == edit.accountId && $0.revoked_at == nil }) else { return nil }
         return member.roles.map(\.rawValue).sorted()
@@ -81,7 +82,7 @@ private struct NativeTeamAcceptance {
     }
     var canSave: Bool {
         guard let edit else { return false }
-        return mayManage && !saving && !reading && !edit.desired.isEmpty && !edit.confirmed && !editIsStale && currentEditRoles != nil
+        return mayManage && !saving && !edit.desired.isEmpty && !edit.confirmed && !editIsStale && currentEditRoles != nil
     }
 
     func activate(session: FanSession, creatorId: String?) {
@@ -127,12 +128,14 @@ private struct NativeTeamAcceptance {
         guard active, !reading, !saving, let session else { return }
         guard ready else { if rechecking { dueAt = 0 } else { conceal() }; return }
         let snapshot = generation, started = now
+        readToken &+= 1; let token = readToken
         reading = true; dueAt = started + 3
         readTask = Task { [weak self] in
             guard let self else { return }
             var ended = false
-            // A read cut short by the session's re-check runs again once that ends.
-            defer { if generation == snapshot { reading = false; readTask = nil; if !ended { dueAt = 0 } } }
+            // A read the session's re-check cut short ends quietly and runs again once
+            // that ends. A read a write stopped leaves the state to the write.
+            defer { if generation == snapshot && readToken == token { reading = false; readTask = nil; if !ended { dueAt = 0 } } }
             do {
                 guard let request = await session.captureRequest(from: destination, maximumResponseBytes: 262_144, timeoutSeconds: 4), await matches(snapshot, request: request) else {
                     if matches(snapshot), !rechecking { conceal(); error = teamCopy("Unavailable"); ended = true }
@@ -152,7 +155,7 @@ private struct NativeTeamAcceptance {
                     guard let teamValue = members, teamValue.members.count <= 50, teamValue.invitations.count <= 50,
                           Set(teamValue.members.map(\.account_id)).count == teamValue.members.count,
                           teamValue.members.allSatisfy({ UUID(uuidString: $0.account_id) != nil }) else { throw NativeTeamDenied() }
-                    guard await matches(snapshot, request: request), now < started + 5 else { throw NativeTeamExpired() }
+                    guard await matches(snapshot, request: request), now < started + 5 else { if rechecking { return }; throw NativeTeamExpired() }
                     let last = try await request.client.studioSession()
                     guard await matches(snapshot, request: request) else { return }
                     try validate(last, request: request)
@@ -165,7 +168,7 @@ private struct NativeTeamAcceptance {
                               membership.roles.map(\.rawValue).sorted() == final.roles.map(\.rawValue).sorted() else { throw NativeTeamDenied() }
                     }
                 }
-                guard await matches(snapshot, request: request), now < started + 5 else { throw NativeTeamExpired() }
+                guard await matches(snapshot, request: request), now < started + 5 else { if rechecking { return }; throw NativeTeamExpired() }
                 directory = first; creator = selected; team = members; capture = request
                 checkedUntil = started + 5; current = true; ended = true
                 // An actual current read can display a committed desired set,
@@ -180,6 +183,9 @@ private struct NativeTeamAcceptance {
             }
         }
     }
+    // A write stops a read in flight, so the two never overlap and a tap on Save or Accept is
+    // never lost to a background read; the write reads again when it ends.
+    private func stopReading() { readToken &+= 1; readTask?.cancel(); readTask = nil; reading = false }
     private func validate(_ value: APIStudioSession, request: FanSessionRequestCapture) throws {
         guard value.creators.count <= 50, value.invitations.count <= 50,
               Set(value.creators.map(\.id)).count == value.creators.count,
@@ -197,6 +203,7 @@ private struct NativeTeamAcceptance {
     func closeAcceptance() { if !saving { acceptance = nil; error = "" } }
     func retryAcceptance() {
         guard mayAccept, let command = acceptance, !command.confirmed else { return }
+        stopReading()
         let snapshot = generation
         saving = true
         writeTask = Task { [weak self] in
@@ -225,7 +232,7 @@ private struct NativeTeamAcceptance {
     }
     private var mayAcceptDuringWrite: Bool { ready && current && now < checkedUntil && creatorId == nil }
     // Opening the editor, choosing roles and reviewing the current ones stay on this device,
-    // so a read in flight doesn't stop them; Save needs the lease and waits for the read.
+    // so a read in flight doesn't stop them.
     func openEditor(_ member: APIStudioTeamMembersItem) {
         guard manages, !saving, edit == nil, member.revoked_at == nil, !member.roles.isEmpty, member.account_id != accountId,
               let capture, team?.members.contains(where: { $0.account_id == member.account_id && $0.revoked_at == nil }) == true else { return }
@@ -251,6 +258,7 @@ private struct NativeTeamAcceptance {
         // interruption. No fresh actor, credential, or inferred signing receipt.
         let body = APITeamRolesUpdateInput(expectedRoles: command.expected.compactMap(APITeamRolesUpdateInputExpectedRolesItem.init(rawValue:)), roles: command.desired.compactMap(APITeamRolesUpdateInputRolesItem.init(rawValue:)))
         guard body.expectedRoles.count == command.expected.count, body.roles.count == command.desired.count else { return }
+        stopReading()
         saving = true
         writeTask = Task { [weak self] in
             guard let self else { return }
@@ -320,9 +328,10 @@ private struct NativeTeamExpired: Error {}
             .task(id: lifetime + String(describing: scene)) {
                 guard scene == .active else { state.deactivate(); return }
                 state.activate(session: session, creatorId: creatorId)
+                // A due read starts before the lease is checked, so the lease never runs out between reads.
                 while !Task.isCancelled {
                     do { try await Task.sleep(for: .milliseconds(250)) } catch { return }
-                    await state.expire(); state.refreshIfDue()
+                    state.refreshIfDue(); await state.expire()
                 }
             }.onDisappear { state.deactivate() }
             .onChange(of: state.edit?.accountId) { _, value in editorFocus = value != nil }
