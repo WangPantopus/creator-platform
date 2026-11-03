@@ -6,8 +6,8 @@ back. This page is the release gate that `infra/environments.json` and
 wrote on 2026-09-30, now in the [archive](../archive/operations/W8-release.md), and keeps its
 commands, probes and notice wording; where the two differ, the later decisions recorded in the
 [BRIEF](../BRIEF.md) win (for example, sign-in is now option D, Apple and Google, not a Pantopus
-account). The G0 to G5 that the trust workflow names are workstream 8's integration gates, from the
-archived [workstream plan](../archive/workstreams/README.md); the
+account). The G0 to G5 that the trust workflow names are the integration gates of the archived
+[workstream plan](../archive/workstreams/README.md); the
 [launch plan](../LAUNCH_PLAN.md#8-the-road-to-the-pilot) has replaced that plan.
 
 Nothing is released today. No staging or production environment, store account, final domain or

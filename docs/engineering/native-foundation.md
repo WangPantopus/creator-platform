@@ -1,11 +1,12 @@
 # Native foundation and verification limits
 
-Written by workstream 1 from 2026-09-29 to 2026-10-01 and moved here in Wave 5. The component
-foundation, the runtime boundaries and the verification limits below still describe the native apps;
-check the code before relying on a detail. The October 1 source state, the receipts and the Commands
-section are history: the cleanup restriction has ended, and the apps are built, run and checked as
-[setup](setup.md#native-hosts) and [ci.md](ci.md) describe. How the native snapshots are compared is
-in [design verification](design-verification.md#native-evidence-and-remaining-acceptance).
+Written for the foundation slice on 2026-09-29, updated by workstream 1 to 2026-10-01, and moved
+here in Wave 5. The component foundation, the runtime boundaries and the verification limits below
+still describe the native apps; check the code before relying on a detail. The October 1 source
+state, the receipts and the Commands section are history: the cleanup restriction has ended, and the
+apps are built, run and checked as [setup](setup.md#native-hosts) and [ci.md](ci.md) describe. How
+the native snapshots are compared is in
+[design verification](design-verification.md#native-evidence-and-remaining-acceptance).
 
 The iOS client is native SwiftUI and the Android client is native Kotlin/Compose. `Qelvora` is the replaceable product placeholder; Pantopus remains the identity provider name. Canonical local identity/session services and real feature registrations are integrated. Genuine Pantopus native authorization, approved external identities and production/provider acceptance remain open.
 

@@ -1,11 +1,11 @@
 # Lane 2: the production host (WP 2.2) and proposed contract C2
 
-Moved here in Wave 5, because pilot phase 1 builds the real adapters for this host against contract
-C2 ([launch plan](../LAUNCH_PLAN.md#8-the-road-to-the-pilot)). The host and its rules are on `main`;
-check `apps/backend/src/operations/production*.ts` before relying on a detail. The pull request, the
-merge order, the decisions and the tickets are from 2026-10-08, and the slot owners are the lanes of
-that time. Sign-in is now option D, which the production settings still refuse (`IDENTITY_ADAPTER`
-may only be `pantopus`); phase 1 changes that.
+Moved here in Wave 5, because pilot phase 1 builds the real adapters for this host
+([launch plan](../LAUNCH_PLAN.md#8-the-road-to-the-pilot)); contract C2 below is still a draft. The
+host and its rules are on `main`; check `apps/backend/src/operations/production*.ts` before relying
+on a detail. The pull request, the merge order, the decisions and the tickets are from 2026-10-08,
+and the slot owners are the lanes of that time. Sign-in is now option D, which the production
+settings still refuse (`IDENTITY_ADAPTER` may only be `pantopus`); phase 1 changes that.
 
 Updated: 2026-10-08, by the lane 2 session
 Pull request: `lane-2/production-root`, stacked on `lane-2/stack-from-scratch` (merge that one first)

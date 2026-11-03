@@ -1,10 +1,11 @@
 # Lane 2: the pinned catalogues (WP 2.9)
 
-Moved here in Wave 5. The procedure, the commands and what the tool covers still apply, for whoever
-registers a migration ([migrations](migrations.md#registering-a-file-today)); the measurements, the
-scenario results and the tickets are from 2026-10-09. Two details have changed since: the tool reads
-the newest review file, which on 2026-11-02 is `20261101-pilot-columns.json`, not
-`20261008-comparison.json`, and CI does not run `check` yet ([what CI checks](migrations.md#what-ci-checks)).
+Moved here in Wave 5. The procedure and the commands still apply, for whoever registers a migration
+([migrations](migrations.md#registering-a-file-today)); the measurements, the counts, the scenario
+results and the tickets are from 2026-10-09. Two details have changed since: the tool reads the
+newest review file, which on 2026-11-02 is `20261101-pilot-columns.json`, not
+`20261008-comparison.json`, and CI does not run `check` yet
+([what CI checks](migrations.md#what-ci-checks)).
 
 Updated: 2026-10-09, by the lane 2 session
 Pull request: `lane-2/catalogue-pins`, stacked on `lane-2/production-root` (which is stacked on `lane-2/stack-from-scratch`)

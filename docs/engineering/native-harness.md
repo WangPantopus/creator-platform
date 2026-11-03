@@ -3,8 +3,8 @@
 Written by lane 7 (last updated 2026-10-15) and moved here in Wave 5. It says how to run each phone
 app signed in on a simulator and an emulator without the full stack, what the fake serves, and what
 it does not. The one-command stack it mentions is on `main` now ([local stack](local-stack.md)). The
-toolchain, simulator runtime and emulator below are from the Mac the lanes used; on this Mac, use the
-tools in [setup](setup.md#this-mac), which has no Android SDK.
+toolchain, simulator runtime and emulator below are from the Mac the lanes used; on this Mac, which
+has no Android SDK, use the tools in [setup](setup.md#this-mac).
 
 ## What it is, and what it is not
 
