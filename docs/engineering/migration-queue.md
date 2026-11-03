@@ -45,12 +45,13 @@ Four places still fail on every real database, three of them in the ops console 
    `trust/scope-restriction.ts:141`, which calls `creator_trust.team_thread_denial`. Only
    `migrations/0084_w8_team_thread_denial.sql` creates it, and the only guard turns the missing
    function into 503 `scope_denial_unconfigured` (lines 103-122). The founder decided on 2026-11-03
-   that triage waits until after the pilot. Until then the Studio must not offer the Triage role:
-   it is a fixed entry in `apps/web/features/studio/team/Team.tsx:14` and in the native Studio
-   team screens, with no switch, so hiding it is a small code change. The API still accepts the
-   role (`TeamRoleSchema` in `packages/api/src/identity.ts`, used by the invite and role-change
-   routes), so the server must refuse to grant it too, not only the apps. A separate work session
-   does both.
+   that triage waits until after the pilot, and #537 holds it there: the web, iOS and Android Team
+   screens no longer offer the Triage role, and the identity team service refuses any invitation,
+   invitation acceptance or role change that would grant it, with 403 `team_role_unavailable`.
+   `TeamRoleSchema` still lists `triage`, so a membership that already holds it still reads; only
+   the development seeds have one. To bring triage back once 0084 is registered, empty
+   `teamRolesOffForPilot` in `apps/backend/src/modules/identity/profiles.ts` and offer the role
+   again in the three Team screens; the native apps need new store builds.
 
 Moment 2 also doesn't work without its two queue files, though nothing fails: the memory writer is
 never built (no review lists its consumer), and one deleted memory or "don't remember this" makes

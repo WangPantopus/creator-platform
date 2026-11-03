@@ -93,14 +93,22 @@ in the Wave 6 queue.
      evidence copies under `artifacts/`, so 56 are left in the tree.
    - **Four places fail on every real database:** three in the ops console (naming a reviewer,
      supervisor audits and lifting a pause) and one in Team triage. The founder left Team triage
-     out of the pilot ([decision log](BRIEF.md#14-decision-log), 2026-11-03), so during the pilot the
-     Studio must not offer the Triage role and the server must refuse to grant it; a separate
-     follow-up does both.
+     out of the pilot ([decision log](BRIEF.md#14-decision-log), 2026-11-03). The Studio no longer
+     offers the Triage role, and the server refuses to grant it with 403 `team_role_unavailable`
+     (#537).
    - **The proposed pilot waves:** the ops console, then memory, then store memberships if the
      founder says so.
-   - **Next: the registration generator.** It makes registration data-driven: it generates the wave
-     and review files, so nobody hand-edits baseline arrays. Files are registered only as features
-     need them ([engineering/migrations.md](engineering/migrations.md)).
+   - **The generator is merged** (#538). `pnpm generate` builds the wave packets and `chain.json`
+     from `infra/migrations.json`, and `generate:check` verifies them and 36 pinned records in CI.
+     `wave-pins` measures the catalogue pins on marked scratch databases
+     ([engineering/migrations.md](engineering/migrations.md)).
+   - **Register no new wave until the operator reads the chain**
+     ([the rule](engineering/migrations.md#registering-a-file-today)). Until then, on a fresh
+     database `migrate-trust` would apply an unknown wave's files one by one, without their
+     baseline, and exit 0.
+   - **Next: the operator and the runtime read the chain,** in five pull requests, `migrate-trust`
+     first ([the plan](engineering/migrations.md#wave-6-the-plan)). The pilot's ops-console and
+     memory waves wait on them. After that, files are registered only as features need them.
 2. **Pilot phase 1, a real host** (about 3 weeks, blocked mostly on the founder's decisions): a
    production composition root with real adapters; staging, the domain and app links; Apple and
    Google credentials; the Anthropic switch; observability, backups and a restore drill. Its exit:

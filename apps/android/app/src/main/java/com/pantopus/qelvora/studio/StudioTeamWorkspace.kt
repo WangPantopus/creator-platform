@@ -2,11 +2,14 @@ package com.pantopus.qelvora.studio
 
 import android.os.SystemClock
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.Role
@@ -30,8 +33,12 @@ import java.util.UUID
 
 private fun teamCopy(key: String, values: Map<String, String> = emptyMap()) = QelvoraCopy.text("w5NativeTeam$key", values)
 private fun uuid(value: String): Boolean = runCatching { UUID.fromString(value).toString().equals(value, ignoreCase = true) }.getOrDefault(false)
+/** The roles the Studio offers. Team triage is off for the pilot; the server's
+ * switch is `teamRolesOffForPilot` in the backend's identity profiles, and
+ * offering the role here again needs a new store build. A member who already
+ * holds it still shows it, and saving that member's roles drops it. */
 private enum class TeamRole {
-    TRIAGE, DRAFTER, PUBLISHER, SCHEDULER;
+    DRAFTER, PUBLISHER, SCHEDULER;
     val key: String get() = name.lowercase()
     val title: String get() = teamCopy(key + "Title")
     val detail: String get() = teamCopy(key + "Detail")
@@ -203,7 +210,8 @@ private class NativeTeamState(
         val request = capture ?: return
         if (!mayManage || saving || edit != null || member.revoked_at != null || member.roles.isEmpty() || member.account_id == accountId || team?.members?.none { it.account_id == member.account_id && it.revoked_at == null } != false) return
         edit = TeamEdit(member.account_id, member.handle?.let { "@$it" } ?: member.account_id, request,
-            member.roles.map { it.name }.sorted(), member.roles.map { it.name }.sorted())
+            member.roles.map { it.name }.sorted(),
+            member.roles.map { it.name }.filter { role -> TeamRole.entries.any { it.name == role } }.sorted())
         error = ""
     }
     fun select(role: String, selected: Boolean) {
@@ -331,7 +339,9 @@ fun StudioTeamWorkspace(
                         state.currentEditRoles?.let { TextLine(teamCopy("Current", mapOf("roles" to it.joinToString { role -> role.lowercase() }))) }
                         TeamRole.entries.forEach { role ->
                             Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).toggleable(value = edit.desired.contains(role.name), enabled = !state.saving && !state.reading && !state.editIsStale && !edit.unknown && !edit.confirmed, role = Role.Checkbox, onValueChange = { state.select(role.name, it) }).padding(vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                                Glyph(if (edit.desired.contains(role.name)) "check" else "circle", 20.dp, qColor("ink"))
+                                // The shared checkbox: there is no "circle" glyph, so asking for one crashed the editor.
+                                val selected = edit.desired.contains(role.name)
+                                Box(Modifier.size(QelvoraTokens.checkboxSize).background(qColor(if (selected) "ink" else "surface"), RoundedCornerShape(QelvoraTokens.radiusTail)).border(QelvoraTokens.hairline, qColor("control-line"), RoundedCornerShape(QelvoraTokens.radiusTail)), contentAlignment = Alignment.Center) { if (selected) Glyph("check", QelvoraTokens.space4, qColor("surface")) }
                                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) { TextLine(role.title, strong = true); TextLine(role.detail, "caption") }
                             }
                         }

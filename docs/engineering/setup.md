@@ -7,15 +7,15 @@ only how to build it.
 
 ## What you need
 
-| Tool | Version | Notes |
-| --- | --- | --- |
-| Node.js | 24 (CI); 22 or newer works | `package.json` `engines` |
-| pnpm | 12.5.1 | `packageManager` in `package.json`. See "This Mac" if it is not installed |
-| Docker | Desktop, running | For the local stack and the backend's PostgreSQL tests |
-| PostgreSQL image | `pgvector/pgvector:pg17` | Pulling it is a download that needs the founder's yes |
-| Xcode | 27.1, with the iOS 27.0 and 27.1 runtimes | iOS only. Also `xcodegen` |
-| JDK and Android SDK | CI uses Java 21 and compile SDK 35 | Android only. [apps/android/README.md](../../apps/android/README.md) has the commands |
-| `gh` | any recent | For pull requests |
+| Tool                | Version                                   | Notes                                                                                 |
+| ------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------- |
+| Node.js             | 24 (CI); 22 or newer works                | `package.json` `engines`                                                              |
+| pnpm                | 12.5.1                                    | `packageManager` in `package.json`. See "This Mac" if it is not installed             |
+| Docker              | Desktop, running                          | For the local stack and the backend's PostgreSQL tests                                |
+| PostgreSQL image    | `pgvector/pgvector:pg17`                  | Pulling it is a download that needs the founder's yes                                 |
+| Xcode               | 27.1, with the iOS 27.0 and 27.1 runtimes | iOS only. Also `xcodegen`                                                             |
+| JDK and Android SDK | CI uses Java 21 and compile SDK 35        | Android only. [apps/android/README.md](../../apps/android/README.md) has the commands |
+| `gh`                | any recent                                | For pull requests                                                                     |
 
 ## First run
 
@@ -35,8 +35,8 @@ catalog is at `/design`.
   `format:check`, the tests and every build.
 - The backend's PostgreSQL tests need `CREATOR_TEST_DATABASE_URL` pointing at a disposable
   PostgreSQL 17 with pgvector. They create fixtures there, so never point it at a database you need.
-  Without the URL they are skipped locally; in CI a missing URL fails the suite. `node
-  infra/local/stack.mjs env` prints a URL for a running local stack.
+  Without the URL they are skipped locally; in CI a missing URL fails the suite.
+  `node infra/local/stack.mjs env` prints a URL for a running local stack.
 - `pnpm test:visual` runs the Playwright visual suite ([design verification](design-verification.md)).
 - Native: `swift test --package-path apps/ios` for the Swift package, and the Gradle tasks in
   [apps/android/README.md](../../apps/android/README.md). The limits of the native checks are in
@@ -45,12 +45,15 @@ catalog is at `/design`.
 
 ## Shared sources
 
-Generated files are committed and checked for drift in CI. Run `pnpm generate` after changing any of
-these:
+Generated files are committed, and `pnpm generate:check` checks them for drift in CI. Run
+`pnpm generate` after changing any of these:
+
 - `config/brand.json`: the placeholder product identity ([naming rules](../NAMING.md));
 - `config/copy.json`: the fixed copy and interpolated sentences;
 - `design/handoff/tokens.json`: colors, dimensions and typography;
-- `packages/api`: the API schemas and the generated OpenAPI contract.
+- `packages/api`: the API schemas and the generated OpenAPI contract;
+- `infra/migrations.json`: the migration registry, from which the wave packets and
+  `infra/migrations/chain.json` are generated ([registering a file](migrations.md#registering-a-file-today)).
 
 To preview a rename of the placeholder name, run `pnpm brand:rename NewName --dry-run`, then
 follow the checklist in [NAMING.md](../NAMING.md).
