@@ -27,9 +27,10 @@ database is never reset.
   canonical bootstrap that has a review, in the chain's order, with the sources its review names.
   The runtime and the scripts share it. `migrate-trust`, the local installer and `activate-wave`
   check each chain wave against it. A row also holds `activate-wave`'s refusals for the wave, word
-  for word, and the names the role checks know it by; no two rows may share a name, or the table
-  refuses to load. From `20261008-comparison` on, a row holds the wave's review and the head
-  profile's two refusals for it too.
+  for word. From `20261008-comparison` on, a row holds the wave's review, the head profile's two
+  refusals for it and `migrate-trust`'s too. The role checks and the trust catalogue modules find
+  a wave's row by its id, and the wave before it in the row before it, so the table refuses to
+  load with two rows for one wave or with rows out of the chain's order.
 - **The head profile**, `apps/backend/src/db/comparison-profile.ts`: the pins the product checks at
   startup. It walks the table from `20261008-comparison` on and selects the newest wave whose
   sources are all registered, on top of the complete wave before it. It refuses a partial
@@ -52,7 +53,9 @@ database is never reset.
     installed, and never applied on its own. Before it applies anything, `migrate-trust` refuses a
     chain that doesn't match its packets or that line, a registry the chain doesn't match, a
     registered wave that has no matching review in the table of reviewed waves, and a canonical
-    file whose bytes differ from the checksum its packet holds.
+    file whose bytes differ from the checksum its packet holds. Its registry and installed checks
+    for each head wave, and the line it prints while one is unapplied, come from the wave's row;
+    the October waves' stay in its code.
   - `activate-wave` takes the waves it accepts in `W8_MIGRATION_WAVE`, and their order, from the
     chain: the canonical bootstrap's two October waves, then every wave of the `fresh` list. "A
     wave requires every wave before it" is that order. The October waves have no review, so their
@@ -61,16 +64,24 @@ database is never reset.
     refuses a chain that doesn't match its packets, and a chain wave with no row in the table of
     reviewed waves (`migrate-trust`'s message). Each wave's refusals come from its row; every
     message, and the order they fire in, is as it was.
-  - The role checks (`migration-*-roles.ts`) are beside them. They still name each wave, so
-    `activate-wave` passes them the names on each wave's row.
+  - The role checks (`migration-*-roles.ts`) are beside them, with the three trust catalogue
+    modules (`src/modules/trust/privacy-catalog.ts`, `privacy-family-catalog.ts` and
+    `domain-privacy-catalog.ts`) behind the privacy one. They select by wave id:
+    - the generation role check takes the newest installed wave and checks its review as the
+      head, and everything each wave up to it added;
+    - the privacy role check takes the wave whose privacy stage holds (`before`), and checks the
+      fixed pins of the reviewed wave before it, or the head's live registered graph without
+      one. The two recovery waves change none of those pins, so they end no stage.
+
+    `migrate-trust`, the local installer and `activate-wave` pass them ids from the chain.
+
 - **The local installer**, `apps/backend/src/operations/local/fresh-install.ts`: for a new, empty
   database only. It applies the waves in the chain's `fresh` list, in that order and in one
   transaction, each from the packet whose bytes match the chain's checksum. Before any SQL runs, it
   refuses a chain wave that has no matching review in the table of reviewed waves, with
-  `migrate-trust`'s message, and a chain whose head isn't the wave its final checks are written
-  for (`checkedHead`, `20261101-pilot-columns` today). It checks every pinned checksum, then those
-  final role-safety and privacy-catalogue assertions. It refuses any database that holds a business
-  row. The [local stack](local-stack.md) uses it.
+  `migrate-trust`'s message; the chain's head is one of them. It checks every pinned checksum, then
+  the final role-safety and privacy-catalogue assertions, for the chain's head. It refuses any
+  database that holds a business row. The [local stack](local-stack.md) uses it.
 
 ## The generator
 
@@ -137,37 +148,43 @@ change the registry, so they stay frozen.
 
 ## Registering a file today
 
-**`migrate-trust`, the local installer and `activate-wave` read the chain, and the head profile
-walks the table of reviewed waves in its order**: the first four steps of
-[the plan](#wave-6-the-plan). `migrate-trust` never applies a registered wave's files one by one,
-which it used to do on a fresh database for a wave it didn't know. The installer and
-`activate-wave` take their waves from the chain, not from lists in their code. Before any SQL runs,
-all three refuse a chain wave without a row in the table of reviewed waves:
+**Registration is data-driven**: every step of [the plan](#wave-6-the-plan) is done.
+`migrate-trust`, the local installer and `activate-wave` take their waves from the chain, and
+`migrate-trust` never applies a registered wave's files one by one. The head profile walks the
+table of reviewed waves, and the role checks and the trust catalogue modules select from it by
+wave id. Before any SQL runs, all three scripts refuse a chain wave without a row in the table:
 `Registered wave <id> has no matching review in this revision; no migration was applied.`
-`activate-wave` takes each wave's refusals from its row, so a registration adds them there
-(step 6) and leaves the operator's code alone.
+A registration adds its wave's row (step 6) and leaves the code of every script and module alone,
+unless the wave needs a check of its own (the table below).
 
-An incomplete registration fails closed everywhere, `activate-wave` included, which is why the
-earlier rule, to register no new wave until `migrate-trust` read the chain, is lifted:
+An incomplete registration fails closed at `stack up` and at `activate-wave`, which is why the
+earlier rule, to register no new wave until `migrate-trust` read the chain, stays lifted:
 
-- CI catches a registration that misses its row in the table of reviewed waves: CI's backend suite
-  bootstraps its fixture databases with `migrate-trust`. `activate-wave` refuses the wave before
-  anything connects.
-- A row also needs the role checks' names for its wave, and CI catches a row whose names aren't the
-  wave's own. A new name the role checks don't take yet fails the typecheck: the names are typed by
-  the role checks' own parameters. A name another wave already has stops the table from loading,
-  so every importer refuses it, CI's suite and `activate-wave` included:
-  `Reviewed waves <id> and <id> share the role-check name <name>; each wave needs its own (step 6 in docs/engineering/migrations.md).`
-- A registration that teaches the role checks the wave's own names but misses the rest of step 6
-  passes CI. `stack up` applies the canonical 61, then the local installer refuses it before it
-  applies anything, because its final checks still name the previous head (`checkedHead` in
-  `fresh-install.ts`):
-  `Wave <id> heads the chain, but the local installer's final checks still name 20261101-pilot-columns; teach them the wave (step 6 in docs/engineering/migrations.md). No migration was applied.`
-  That is why step 7's fresh install on a new stack stays required.
+- **No row:** CI's backend suite bootstraps its fixture databases with `migrate-trust`, which
+  refuses the wave, and so does `stack up` at its first migration step. `activate-wave` refuses it
+  before anything connects.
+- **A row with a field missing:** the typecheck fails.
+- **A row that stands in for another wave.** The role checks find a wave's row only by its id, so
+  the table refuses to load with two rows for one wave, and every importer stops, CI's suite,
+  `stack up` and `activate-wave` included:
+  `Reviewed wave <id> has two rows; each wave needs exactly one (step 6 in docs/engineering/migrations.md).`
+  A row has to carry its own wave's review:
+  - a review whose sources aren't the wave's packet gets the refusal for a missing row;
+  - a row that is out of the chain's order stops every importer from loading, the head profile's
+    `The reviewed head waves are out of the chain's order.` from notices on, or the table's
+    `Reviewed wave <id> is out of the chain's order; …` before that.
+- **A row whose review wasn't measured** (written from the previous review and pinned) passes CI,
+  which doesn't install the waves. `stack up` refuses it at the local installer's final checks:
+  they compare the new install with that review's pins for the chain's head, and the database
+  stays at the canonical 61 (`Generation-purpose wave catalogue changed.` for a new table).
+  `activate-wave` applies the wave, refuses it at the same check, and rolls it back. Only a wave
+  whose changes the pins don't see passes both, and then the copied pins are right.
+
+That is why step 7's fresh install on a new stack stays required.
 
 A registration is one pull request: a registry edit, the generated packet and chain, a review file
-measured on scratch databases and pinned, the code that knows the wave, and the proof. Steps 2 to 5
-are mechanical apart from the reach review in step 4; the table below says what isn't.
+measured on scratch databases and pinned, the table row, and the proof. Steps 2 to 5 are mechanical
+apart from the reach review in step 4; the table below says what isn't.
 
 1. **Before any edit, build scratch databases at the current head:** two local stacks, one of them
    with `--growth` (`node infra/local/stack.mjs up --lane N --base-port P --no-web`). The stack
@@ -210,28 +227,30 @@ are mechanical apart from the reach review in step 4; the table below says what 
    `--variant populated-original-incoming` with Growth. `write` refuses a review that is already
    pinned in `reviewed.json` unless you pass `--replace`: re-measuring a reviewed wave is a review
    of its own, in its own pull request, and its new checksum goes into `reviewed.json` by hand.
+
 5. **Pin the review** once its pins are reviewed: add its line to `infra/migrations/reviewed.json`.
    `pnpm generate:check` prints the line, with the checksum.
-6. **Teach the operator and the runtime the wave**, by hand until they read the chain:
-   - a row at the end of the table of reviewed waves (`src/db/reviewed-waves.ts`).
-     `migrate-trust`, the local installer, the head profile and `activate-wave` read it; the head
-     profile's and `activate-wave`'s code doesn't change. The row holds:
-     - the wave's review, and the head profile's two refusals for it: `partial`, when only some of
-       its sources are registered, and `requires`, when the wave before it isn't;
-     - `activate-wave`'s refusals, word for word: `partial`, when the ledger holds only some of its
-       sources; `activation`, when it is selected and the ledger lacks the complete wave before it;
-       and `precedes`, when the ledger holds it without that wave. Also its short `name`, which the
-       operator lists with the other head waves, and `addedRoles`: the role each of its sources
-       adds, if any, so that the operator refuses any other;
-     - the names the role checks know it by: `extension` and `privacy`, its own and no other
-       wave's. The table refuses to load if two rows share one;
-   - `migrate-trust.ts`'s per-wave checks;
-   - the generation and privacy role checks: the wave's `extension` and `privacy` stage, and what
-     each checks for it;
-   - the head the local installer's final checks name (`checkedHead` in
-     `src/operations/local/fresh-install.ts`);
-   - the three trust catalogue modules (a database at the previous head is checked against that
-     head's fixed pins).
+6. **Teach the operator and the runtime the wave: a row at the end of the table of reviewed waves**
+   (`src/db/reviewed-waves.ts`). `migrate-trust`, the local installer, `activate-wave`, the head
+   profile, the role checks and the trust catalogue modules read it, and none of their code
+   changes for a new wave. The row holds, word for word:
+   - the wave's review, and the head profile's two refusals for it: `partial`, when only some of
+     its sources are registered, and `requires`, when the wave before it isn't;
+   - `migrate-trust`'s, under `trust`: `registry`, when the wave is registered without the wave
+     before it; `installed`, when the ledger holds part of the wave, or holds it unregistered or
+     without the complete wave before it; and `unapplied`, the line it prints while the wave is
+     registered but not installed;
+   - `activate-wave`'s, under `operator`: `partial`, when the ledger holds only some of its
+     sources; `activation`, when it is selected and the ledger lacks the complete wave before it;
+     and `precedes`, when the ledger holds it without that wave. Also its short `name`, which the
+     operator lists with the other head waves, and `addedRoles`: the role each of its sources
+     adds, if any, so that the operator refuses any other.
+
+   That is all of step 6. The role checks check the wave against its own review once it is
+   installed, and a database at the wave before it against that wave's fixed pins; the local
+   installer's final checks take the chain's head. A wave that needs more than its pins checked,
+   such as a new login, still needs that check written (the table below).
+
 7. **Prove it:** a fresh install on a new stack, then
    `node infra/local/stack.mjs catalogues check --lane N`, which must match every group without
    Growth and every group but `runtimeCatalogues.family` with it; the scenarios that use the new
@@ -247,7 +266,7 @@ What still needs a person, and why:
 | The reach review between `apply` and `write`, and the scope sentence | A changed reach is what the pins exist to show; only a person can say it was meant |
 | A pin for something new that the catalogue tool can't recompute, such as a new role's own catalogue (0254, 0255) | Its reader, its review key and its entry in `operations/catalogues/pins.ts` are new code |
 | A check for a new login or role, and the stack's setting for it (0258: `assertCommerceInboxLogin`, `COMMERCE_INBOX_DATABASE_URL`) | What a new role may do is a decision |
-| Step 6 | A row's refusals are sentences a person writes. `migrate-trust`'s per-wave checks, the role checks, the installer's final checks and the trust catalogue modules still name each wave in code |
+| Step 6 | A row's refusals and its unapplied line are sentences a person writes |
 | The populated copies | A restore, and the judgment that its grant change is the only difference |
 | Test support (`apps/backend/tests/support/registered-source.ts`) and the scenarios | Which tests need the new schema, and what the feature must do |
 
@@ -271,14 +290,16 @@ database exists.
 From [STATUS](../STATUS.md#next) and the [consolidation plan](../CONSOLIDATION_PLAN.md):
 
 1. **Triage the unregistered SQL files.** Done in the [migration queue](migration-queue.md) (#533).
-2. **Make registration data-driven.** The generator and the pin script are in; four packets are
-   frozen. Left: the operator and the runtime still name each wave (step 6 above). The plan:
+2. **Make registration data-driven.** Done: the generator and the pin script are in, four packets
+   are frozen, and a registration teaches the operator and the runtime its wave with one table row
+   (step 6 above). The plan:
    - done: `migrate-trust` treats every source of a chain wave after the canonical bootstrap as
      activation-only, so a registry edit can never bootstrap a wave's files one by one, and
      refuses a registered wave it has no review for;
    - done: the local installer takes its waves from the chain instead of `FRESH_WAVES`, through the
      reader and the table of reviewed waves it shares with `migrate-trust`. It refuses a chain wave
-     it has no review for, and a chain head its final checks don't name (`checkedHead`);
+     it has no review for, and, until the last step, a chain head its final checks didn't name
+     (`checkedHead`);
    - done: the head profile walks the table of reviewed waves from `20261008-comparison` on, in the
      chain's order, instead of naming each wave in its own function. It keeps each refusal, its
      message and the order they fire in. The table moved to `src/db/reviewed-waves.ts`, so the
@@ -288,11 +309,14 @@ From [STATUS](../STATUS.md#next) and the [consolidation plan](../CONSOLIDATION_P
      booleans. It keeps each refusal, its message and the order they fire in, and every ceremony.
      Each wave's refusals, and the names the role checks know it by, moved to its row in the table
      of reviewed waves;
-   - the role checks and the trust catalogue modules: select the head review and the fixed
+   - done: the role checks and the trust catalogue modules select the head review and the fixed
      predecessor by wave id instead of a ternary per wave, which retires the table's `extension`
-     and `privacy` names. The local installer's final checks and its guard then take the chain's
-     head instead of `checkedHead`;
-   - prove each step on a fresh stack and on a restored copy moved forward by `activate-wave`.
+     and `privacy` names and the guard that kept them apart. The table now refuses two rows for
+     one wave. The local installer's final checks take the chain's head instead of
+     `checkedHead`, whose guard went with it. `migrate-trust`'s per-wave checks and its unapplied
+     lines, which the plan had no step for, loop over the head waves' rows;
+   - done: each step proved on a fresh stack and on a restored copy moved forward by
+     `activate-wave`.
 3. **Register files only as features need them**, one wave per feature.
 4. Keep the fresh install and the catalogue check, and automate restore drills once a production
    database exists.
