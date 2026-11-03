@@ -45,7 +45,11 @@ real Android phone, in Light and Night:
 ## 3. Launch scope
 
 The launch is slice 1 of the [architecture build sequence](source/System_Architecture.md)
-(section 12) plus the share card. Everything else is in section 4.
+(section 12) with two things pulled forward and two held back. Pulled forward: the native fan
+apps (slice 2 in the architecture) and a minimal share card (slice 3). Held back: public answers,
+which slice 1 includes (D-19) but the 2026-10-08 launch scope defers, and paid voice notes, which
+slice 1 and D-25 include but this plan recommends deferring *(to confirm)*. Everything else is in
+section 4.
 
 - **Fans** use the native iOS and Android apps. The web stays supported: it gives the first answer
   from a creator's link with no install, and it carries the configuration screens.
@@ -77,7 +81,7 @@ The decisions behind this scope:
 
 | Decision | Detail |
 | --- | --- |
-| Pilot cut line (2026-10-08) | Slice 1 plus the share card. It orders the work; it removes nothing |
+| Pilot cut line (2026-10-08) | Slice 1 plus the share card, without public answers. It orders the work; it removes nothing |
 | Phone apps first (2026-10-08), option A (2026-10-09) | The pilot's native app is the fan app; creators use the web Studio in the phone browser; the native Studio app follows after the pilot. This replaced the 2026-10-08 plan to make Notes and reactions native at launch |
 | Sign-in, option D (2026-10-15, confirmed 2026-11-01) | Qelvora sign-in with Apple and Google and an 18+ date-of-birth step, built on `main`; native wording "Sign in to continue" |
 | Share card is in (2026-10-08) | A signed written reply with its public verification page, as an image and a link. The fan chooses how their handle appears, and either side can revoke it (D-15). Pulled forward from slice 3 |
@@ -95,7 +99,7 @@ The decisions behind this scope:
 | Paid voice notes | D-25, W6 media stack | After written replies have proven out; no way to offer a voice mode exists today *(recommended)* |
 | AI voice notes | D-25, slice 3 | After the pilot, with a license that lists AI voice, C2PA marking and a watermark |
 | Insights, producer, group answers | S-C8, F13, F14, slice 3 | Once fans generate enough questions (minimum group of five) |
-| Public answers and credits | D-19, D-27, slice 3 | After the pilot; economics undecided (Q08) |
+| Public answers and credits | D-19 (public answers, slice 1, deferred 2026-10-08), D-27 (credits, slice 3) | After the pilot; economics undecided (Q08) |
 | Full publishing: tier builder, library, live, community | S-C7 full, Q14, slice 3 | After the pilot |
 | Fan-derived comparison replay | Architecture section 6, A12 | After the pilot produces real fan data and a consent and privacy review |
 | Native configuration screens | O19 | After the pilot; web remains the home for configuration |
@@ -113,7 +117,8 @@ section 8 (proposed thresholds, to be agreed before the pilot):
 - At least 70% of creators post two or more Notes a week in week four.
 - At least 5% of monthly active fans buy a human mode within 30 days, and at least 60% of
   first-month members renew.
-- At least 90% correct on "who wrote this?", zero leaks between threads, zero unlabeled AI text.
+- At least 90% of fans in the comprehension test identify every message's author correctly ("who
+  wrote this?"), zero leaks between threads, zero unlabeled AI text.
 - Median creator time under two hours a week, and at least three in five creators ask to continue.
 
 Quality bars for the pilot, used as the definition of done in the consolidation plan (section 2)
@@ -258,6 +263,7 @@ The October finish plan's ten milestones are folded into these phases; the plan 
    acknowledgment), deletion D1 to D4 and Q16, and ops P1 to P5.
 8. The pilot size, the creators and a named reviewer for Note replies and safety cases.
 9. The quality bars in section 5, and voice notes after written replies (section 4).
+10. Formalizing Q13 and Q14, which the working documents already treat as decided.
 
 ## Provider switch notes (to verify at migration time)
 

@@ -19,7 +19,8 @@ Each creator has an authorized, clearly labeled AI that talks one-on-one with
 every fan and remembers them. The real creator stays present through short
 **Notes** and **reactions**, and fans can pay for the creator's personal
 attention in defined units (a written reply, a voice note, a call), charged only
-if the creator accepts. The business is making a real person reachable; the AI is
+if the creator accepts. The pilot sells the written reply; voice notes, calls and
+public answers are planned for later ([launch plan](LAUNCH_PLAN.md), section 4). The business is making a real person reachable; the AI is
 the bridge between human moments and is never presented as the person. The label
 is the product: this is the honest version of an industry (paid DMs, outsourced
 "chatters") that runs on deception today.
@@ -28,20 +29,26 @@ is the product: this is the honest version of an industry (paid DMs, outsourced
 
 - **Pantopus is the parent company.** Qelvora is one of several Pantopus apps.
   The existing neighborhood app currently called "Pantopus" will be renamed.
-- **One Pantopus account works across every Pantopus app.** Sign-in is always
-  "Continue with Pantopus"; there is no local Qelvora account.
-- Qelvora has **its own brand and design system**. Only the Pantopus sign-in
-  (and company-level legal and footer elements) is shared.
+- **Sign-in is Qelvora sign-in (option D, decision log 2026-10-15).** People sign
+  in with Apple or Google ("Continue with Apple", "Continue with Google"; the native
+  Welcome button reads "Sign in to continue"), and a new account gets one
+  date-of-birth step. Each person has a Qelvora-specific account id. A link to a
+  Pantopus account is the long-term path. This replaces the source documents'
+  "Continue with Pantopus" and one Pantopus account underneath (D-A) for the pilot.
+- Qelvora has **its own brand and design system**. Only company-level legal and
+  footer elements are shared.
 - Only `account_id` crosses the boundary (INV-14). Where the source documents
   say "Pantopus private data (address, household, neighborhood)", read it as the
   neighborhood app's data; none of it ever appears in Qelvora.
-- Fans must be 18+, enforced by the Pantopus account (D-11).
+- Fans must be 18+ (D-11). Under option D the date-of-birth step enforces it,
+  with the phone's age signal where one exists, and under 18 always wins; counsel
+  confirms the method before real fans join. D-11 had the Pantopus account enforce it.
 
 ## 3. People
 
 | Role | Needs | Where they live |
 | --- | --- | --- |
-| Fan, expert cohort | Real help from someone they trust (craft, fitness, finance, filmmaking); cited answers; a way to reach the person | Fan app: web first, then native (iOS, Android) |
+| Fan, expert cohort | Real help from someone they trust (craft, fitness, finance, filmmaking); cited answers; a way to reach the person | Fan app: the native iOS and Android apps first; the web answers from a creator's link and stays supported (2026-10-08) |
 | Fan, companion cohort | Closeness, to feel heard and remembered, recognition from the person | Same app; stricter guardrails and wellbeing features |
 | Creator | Relief from unanswerable DMs, income without more hours, control of their reputation and likeness, meaning ("this helped") | Creator studio: phone for Notes, Requests and Threads; desktop for My AI and Insights |
 | Creator's team member | Triage, draft, publish, schedule, **never act as the creator** | Studio with a reduced, clearly labeled role view |
@@ -80,8 +87,9 @@ notification previews.
 | Correction | "Maya's note on this AI reply" | Person color, attached under the AI bubble | None |
 | Reserved, disabled | `fan_agent` ("{handle}'s assistant"), `ai_call`, `ai_video` | Designed later, never shown until enabled | |
 
-Working color pair: **violet = AI, amber = the person** (the visual pass may
-change hues, never the rule that they differ).
+Color pair: **blue graphite = AI, ember = the person** (decided 2026-09-25 in the
+visual direction, replacing the source's working pair of violet for the AI and amber
+for the person). Hues may change; the rule that they differ never does.
 
 Rules the design must enforce:
 
@@ -104,11 +112,12 @@ Rules the design must enforce:
 | Call, audio or video, fixed length | 10–15 min + scheduling | Creator's price | `human_call` |
 
 The first two rungs are the daily habit; the top four are the revenue. The AI
-never sells any rung (INV-21).
+never sells any rung (INV-21). The pilot offers Notes, reactions and private written
+replies; public answers, voice notes and calls come later.
 
 ## 7. Money and access, as the fan sees it
 
-- **Membership leads** (D-23): per creator, about $5/month, includes the AI, Notes and the right to request. The **pass** (three creators' AIs a month) arrives in slice 4, once about 30 creators have active fans.
+- **Membership leads** (D-23): per creator, includes the AI, Notes and the right to request. The creator sets the price (Product Design, Offers); the Second Review's figures, around $4.99 a month, are illustrative, not decided prices. The **pass** (three creators' AIs a month) arrives in slice 4, once about 30 creators have active fans.
 - **Free first conversation** of about 24 hours per creator (D-26), ending at the next natural pause, never mid-disclosure.
 - **Charge on acceptance** (INV-16): card held at submit, captured only if the creator accepts; decline, expiry, withdrawal, missed deadline and creator no-show refund automatically. Decline is free and not penalized.
 - **One monthly charge** per fan covers all memberships.
@@ -131,8 +140,9 @@ never sells any rung (INV-21).
 segments **Chat**, **Posts**, **Requests**, **Access**. Primary action:
 "Message Maya's AI" (AI colored).
 
-**Creator studio** opens on **Today** (first tab on phone), with **Notes** one
-tap from Today. The remaining phone tabs are **Requests**, **Threads**, **My AI**
+**Creator studio** opens on **Today** (first tab on phone, with the home glyph),
+with **Notes** one tap from Today (decision log, 2026-10-15 and 2026-11-01;
+Product Design section 3 puts Notes first). The remaining phone tabs are **Requests**, **Threads**, **My AI**
 and **More**. More holds **Offers**, **Publish**, **Insights**, and **Earnings and
 team** (including License and sponsorships).
 
@@ -148,17 +158,17 @@ slice is designed, the pilot's screens first.
 
 | ID | Screen | Slice | Notes |
 | --- | --- | --- | --- |
-| — | Creator home, public (signed out) | 1 | Link-in-bio landing; post and Instagram "comment KILN" entrances carry a context card |
-| S-F1 | Onboarding | 1 | Pantopus sign-in → handle → access notice → back to exactly where the fan was; under two minutes to a first useful answer |
+| — | Creator home, public (signed out) | 1 | Link-in-bio landing; post and Instagram "comment KILN" entrances carry a context card. The Instagram entrance needs the comment automation (A13), which comes after the launch kit |
+| S-F1 | Onboarding | 1 | Sign in with Apple or Google → date of birth (a new account only) → handle → access notice → back to exactly where the fan was; under two minutes to a first useful answer |
 | — | Processor consent | 1 | Names the model providers before the first AI message (D-22) |
 | S-F2 | Home | 1 | Pass draft card in slice 4 |
 | S-F3 | Discover | 1 (pass markers slice 4) | |
 | S-F4 | Creator profile (the creator's home, signed in) | 1 | Four segments; Access holds the ladder and the four access lines |
 | S-F5 | Thread | 1 | Identity strip, bubbles per state, citation chips, memory chips, context card, trial, takeover, reminders |
 | S-F6 | Memory card | 1 | Facts, open loops, summary; provenance; "don't remember this" |
-| S-F7 | Packet (Ask Maya to step in) | 1 | Included in your request; mode rows; private or public; rule line; ETA |
+| S-F7 | Packet (Ask Maya to step in) | 1 | Included in your request; mode rows; private or public (private only in the pilot; public answers come later); rule line; ETA |
 | — | Spend-limit step and checkout sheet | 1 | Before the first paid action; card authentication step |
-| S-F8 | Request status and receipt | 1 | Stepper; outcomes; share card (slice 3) |
+| S-F8 | Request status and receipt | 1 | Stepper; outcomes; share card (in the pilot since 2026-10-08) |
 | S-F9 | Call (pre-call, waiting room, connected, post-call) | 2 | Three clocks, five outcomes |
 | S-F10 | Pass (inside You) | 4 | |
 | S-F11 | Notifications | 1 | Sender label per row, per-creator mute |
@@ -167,14 +177,14 @@ slice is designed, the pilot's screens first.
 | S-F14 | A Note in the thread | 1 | Reply box; "Sent to Maya's Notes"; reactions; quote-replies |
 | S-F15 | Spending and time | 1 | Limit, reminders, weekly usage, 90-minute companion signal |
 | S-F16 | Verification page (public) | 1 | Stable URL printed on every share card |
-| — | Share card (image for X, TikTok, Instagram) | 3 | Carries the authorship label and verification URL |
-| — | Native specifics | 2 | Push, CallKit/ConnectionService incoming call, IAP sheets, offline banner |
+| — | Share card (image for X, TikTok, Instagram) | 3; a minimal card is in the pilot (2026-10-08) | Carries the authorship label and verification URL. In the pilot: a signed written reply with its verification page, as an image and a link |
+| — | Native specifics | 2; the fan apps are in the pilot (2026-10-08) | Push, IAP sheets and the offline banner in the pilot; the CallKit/ConnectionService incoming call comes with calls |
 
 ### Creator studio
 
 | ID | Screen | Slice | Notes |
 | --- | --- | --- | --- |
-| S-C1 | Verification and onboarding | 1 | Pantopus identity → external proof → passkey → handle → replica license → interview → publish |
+| S-C1 | Verification and onboarding | 1 | Sign in (Apple or Google, 18+) → external proof → passkey → handle → replica license → interview → publish |
 | S-C2 | My AI | 1 | Mode, sources, style, rules, approval, voice (slice 3), test console, versions, export; 72-hour digest after publish |
 | S-C3 | Requests queue | 1 | Commitments first, then packets by SLA, then rule matches; capacity header |
 | S-C4 | Packet detail and reply composer | 1 | Fulfilling actions first, everything else behind "Instead"; preview of the fan's label |
@@ -185,7 +195,8 @@ slice is designed, the pilot's screens first.
 | S-C9 | Earnings | 1 minimal, 4 pool | Money explained by cause |
 | S-C10 | Team and settings | 1 | Roles as checklists; creator-only list shown, not editable |
 | S-C11 | Call, creator side | 2 | Pre-call brief from the packet only |
-| S-C12 | Notes and the Replies feed | 1 | One tap from Today; Face ID signs each Note and reaction |
+| — | Today | 1 | Where the Studio opens and its first phone tab (2026-10-15): requests waiting, this week's capacity, the AI's status and the latest Note, with Notes one tap away; the weekly digest once it has a producer |
+| S-C12 | Notes and the Replies feed | 1 | One tap from Today; each Note and reaction is signed with her passkey in the web Studio (option A) |
 | S-C13 | License and sponsorships | 1 | "Pause everything" |
 | S-C14 | The creator interview | 1 | 20 minutes, voice or text; weekly 60-second check-in |
 | — | Passkey signing sheet | 1 | Shows the exact content being signed (ADR-9) |
@@ -240,7 +251,7 @@ reply" · "VIP", "exclusive access", "get closer" · "from $", "per minute" ·
 replies.
 
 Preferred words: "Seen by Maya's queue", "Maya's AI remembers", "Maya usually
-decides within {n} h", "Ask", "request", "Passed on this one", "Maya's AI",
+decides in {range}" (the 2026-09-25 decision replaced the single-number form), "Ask", "request", "Passed on this one", "Maya's AI",
 "official AI".
 
 ## 12. Compliance that shows up in the UI
@@ -256,11 +267,11 @@ fan · export and delete everywhere.
 
 ## 13. Platform and accessibility requirements
 
-- Web is the full product; native fan apps follow the distribution matrix (D-14). The studio is web, mobile-first for Notes, Requests and Threads; desktop-first for My AI and Insights. Under option A (decision log, 2026-10-09) the pilot's native app is the fan app and creators use the web Studio on their phones; a separate native Qelvora Studio app follows after the pilot.
+- Web is the full product: every screen, and the only home for configuration. For fans the native apps are the primary launch surface (decision log, 2026-10-08), and purchases follow the distribution matrix (D-14). The studio is web, mobile-first for Notes, Requests and Threads; desktop-first for My AI and Insights. Under option A (decision log, 2026-10-09) the pilot's native app is the fan app and creators use the web Studio on their phones; a separate native Qelvora Studio app follows after the pilot.
 - WCAG AA contrast in both themes; authorship never by color alone; every core action reachable by keyboard; labels in the accessibility tree before message bodies; countdowns not read every second; no autoplaying voice; typing indicators respect reduced motion.
 - Translation label on translated human replies; call times shown in both parties' time zones.
 - Every object with a screen has a stable deep link. Offline: readable from cache with a stale banner; nothing sent or bought offline.
-- Latency the design should reflect: acknowledgment in 300 ms, first approved sentence in about 2.5 s, visible takeover in 500 ms.
+- Latency the design should reflect: acknowledgment in 300 ms, the first approved sentence at p95 2.5 s warm and 4 s cold (System Architecture), visible takeover in 500 ms. The pilot starts from a 4.5 s bar ([launch plan](LAUNCH_PLAN.md), section 5, to confirm).
 
 ## 14. Decision log
 
@@ -310,6 +321,7 @@ D-H, D-01 to D-27) are in the Domain Model.
 | 2026-10-08 | Model provider: the Anthropic API is the intended production provider, switched before the first real creator publishes, as one engine revision with the embedding provider chosen first. Development stays on the synthetic OpenAI configuration, which is not a production approval. |
 | 2026-10-08 | Comparison is frozen after the open stack merged (#351 to #353): installed and off. Done means withdraw-only mode with retry, one native withdrawal exercised, SQL-level checks on a disposable database, a runbook, an overdue-purge alert, and a creator-authored FAQ set that replaces the fan-sample publish gate. |
 | 2026-10-08 | Paid written replies inside the native apps (Q04): continue on the web during the TestFlight and closed-testing pilot; settle the public-release approach with counsel. |
+| 2026-10-09 | The launch order: a private web alpha first (about ten invited adults, web only, payments in Stripe test mode), then the TestFlight and Google Play closed-testing pilot, then public release after the pilot gates. It orders the 2026-10-08 phone-apps-first row; supersedes no row. Recorded 2026-11-02. Evidence: the [lanes charter](archive/lanes/00-charter.md), section 5, "Decisions already made". |
 | 2026-10-15 | Pilot sign-in is option D: Qelvora sign-in with Sign in with Apple and Google, behind the existing identity adapter seam. A new account gets one neutral date-of-birth step before any session; 18+ comes from that attestation plus the phone's age signal where one exists, and under 18 always wins (counsel confirms the method before real fans join). Each person gets a random Qelvora account id, never derived from an Apple, Google or Pantopus id. A Pantopus account link stays the long-term path. For the pilot this departs from Domain Model D-A (one Pantopus account underneath), D-11 (18+ through the Pantopus account) and Product Design's "Continue with Pantopus" onboarding step. Confirmed formally with the consolidation plan on 2026-11-01. Supersedes the sign-in part of the 2026-09-25 row "one Pantopus account signs in to every Pantopus app"; the company and brand parts of that row stand. Recorded 2026-11-02. Evidence: the [sign-in decision pack](archive/lanes/status/lane-1-signin-decision-pack.md), #431 and #432. |
 | 2026-10-15 | Passkey recovery splits a lost device from a compromised one. "It's lost or broken" retires that creator's working keys: a retired key can never sign again, and every past signature stays valid. "Someone else may have it" keeps the earlier behavior: every key and every past signature is revoked and shows as revoked. With one working key, the Studio asks for a second passkey on another device. The wording was approved the same day. Built in #439 and registered as migration 0256 by #527 (2026-11-02). Supersedes no earlier row. Recorded 2026-11-02. Evidence: [lane 1 signing](archive/lanes/status/lane-1-signing.md), section 2. |
 | 2026-10-15 | A reply's cost hold is a strict upper bound, computed from the calls the pipeline can make for the creator's configuration, each at its own model's rate, and the cap is never exceeded. A reply that fails on a provider error before any output releases the fan's allowance. A partly delivered answer that crashes keeps the fan's reservation held, like any unknown cost, until a receipt settles it. Built in lane 3's A6 work (#433, #434, #436, #438), merged through #518. Supersedes no earlier row. Recorded 2026-11-02. Evidence: [lane 3 status](archive/lanes/status/lane-3.md), founder decisions. |
@@ -317,21 +329,33 @@ D-H, D-01 to D-27) are in the Domain Model.
 | 2026-10-15 | The compact persistent author header: in constrained layouts (largest text, landscape, split screen), both apps keep the author word and glyph fixed at the top of the thread and put the full identity sentence in the message scroller. No wording changed. Built in #401 (merged through #523). It applies section 5's rule that the identity strip never scrolls away; supersedes no row. Recorded 2026-11-02. Evidence: [lane 7 keyboard and drafts](archive/lanes/status/lane-7-keyboard-drafts.md), "Founder decision". |
 | 2026-11-01 | The native sign-in wording: the Welcome button reads "Sign in to continue", and the unavailable message is "Sign-in is unavailable right now. Try again in a moment." They replace "Continue with Pantopus" and "Pantopus sign-in is not connected in this local build." The web keeps "Continue with Apple" and "Continue with Google" (approved 2026-10-15, #432). Approved with the consolidation plan's defaults. Supersedes "Continue with Pantopus" as the sign-in wording of the 2026-09-25 account row; some native error copy still says "Continue with Pantopus again" (a follow-up). Recorded 2026-11-02. Evidence: the [consolidation plan](CONSOLIDATION_PLAN.md), status and section 8, item 2. |
 | 2026-11-01 | The Today tab uses the home glyph. With the 2026-10-15 row (Today replaces Notes as the first Studio tab, Notes one tap away), the phone tabs are Today · Requests · Threads · My AI · More. Approved with the consolidation plan's defaults. Supersedes the 2026-09-25 row "Studio on a phone: Notes · Requests · Threads · My AI · More". Recorded 2026-11-02. Evidence: the [consolidation plan](CONSOLIDATION_PLAN.md), status and section 8, item 3; `StudioTabBar` in `packages/ui-web`. |
+| 2026-11-01 | How work runs: one coordinating session plus one work session per task. The coordinator keeps the plan, [STATUS](STATUS.md), the pull request queue and merges, and writes no feature code; a work session owns one task, one branch and one pull request, doesn't merge, and ends with a report. Supersedes the session model of the 2026-10-09 rows (seven lane sessions plus an integrator). The 2026-10-09 testing rule (end-to-end scenarios, no new unit tests) is unchanged: allowing unit tests for pure logic is one of the consolidation plan's open section 6 rules. Recorded 2026-11-02. Evidence: the [2026-11-02 handoff](archive/operations/handoff-2026-11-02.md), sections 3 and 4. |
 
 ## 15. Open questions and known inconsistencies
 
 Resolve these during the design pass (proposals in the [design plan](DESIGN_PLAN.md)):
 
-1. **Trial wording is stale in places.** The honest-states row "Trial exhausted · Five messages used · Add Maya to your pass or a tier", F2 ("N free messages per creator"), the fan-journey "try 5", and the architecture's trial-farming row still describe five lifetime messages and pass-first access. D-26 (free first conversation, about 24 hours) and D-23 (membership first) supersede them.
-2. **Auto-reply after 20 approved drafts** (creator-journey table, S-C2 flow) conflicts with D-12, which says the AI always replies instantly once live and there is no "auto-reply after N approvals" gate. Follow D-12.
-3. **Fan tabs:** the docs say five but list four (Home, Discover, Requests, You); the fifth is the pass fallback. Notifications (S-F11) also needs a home (for example a bell on Home).
-4. **Studio navigation:** eight sections on a phone need a primary-tabs-plus-More pattern.
+1. **Trial wording is stale in places.** The honest-states row "Trial exhausted · Five messages used · Add Maya to your pass or a tier", F2 ("N free messages per creator"), the fan-journey "try 5", and the architecture's trial-farming row still describe five lifetime messages and pass-first access. D-26 (free first conversation, about 24 hours) and D-23 (membership first) supersede them. *Answered 2026-09-25 (design plan, answer 1); the source text stays as written.*
+2. **Auto-reply after 20 approved drafts** (creator-journey table, S-C2 flow) conflicts with D-12, which says the AI always replies instantly once live and there is no "auto-reply after N approvals" gate. Follow D-12. *Answered 2026-09-25 (design plan, answer 2).*
+3. **Fan tabs:** the docs say five but list four (Home, Discover, Requests, You); the fifth is the pass fallback. Notifications (S-F11) also needs a home (for example a bell on Home). *Answered 2026-09-25: four tabs, with notifications behind a bell on Home (decision log).*
+4. **Studio navigation:** eight sections on a phone need a primary-tabs-plus-More pattern. *Answered 2026-09-25 with Notes first; since 2026-10-15 Today is the first tab, with the home glyph from 2026-11-01 (decision log).*
 5. **Approved-draft treatment:** the product design says split bubble; the glossary says gradient label. Explore both plus a stacked badge. *Proposal in the design system:* split is the default (it matches the product design); gradient and stacked stay in the system for the usability test. Not yet a founder decision.
-6. **"Studio" is both the sample tier name and the natural name for the creator app.** Proposal: the creator app is "Qelvora Studio"; mockups use a different sample tier name to avoid "Studio members" in the Studio.
+6. **"Studio" is both the sample tier name and the natural name for the creator app.** Proposal: the creator app is "Qelvora Studio"; mockups use a different sample tier name to avoid "Studio members" in the Studio. *Answered 2026-09-25: "Qelvora Studio", with the sample tier "Kiln Club" (decision log).*
 7. **The identity section says "seven states"** but there are nine fan-visible states plus the Signed marker and Correction.
 8. **Pass-era copy** appears in slice-1 screens (Home's "Next month's pass" card, Discover's "before spending a slot"). Design both the membership-era and pass-era variants.
-9. **Ops console** (verification review, safety cases, disputes, pauses) is required by the product but has no screens in the source docs.
-10. **Brand name, colors, approved-draft treatment, theme default, AI vs human voice player, Discover's lead, studio density:** the seven open questions in Product Design section 12.
+9. **Ops console** (verification review, safety cases, disputes, pauses) is required by the product but has no screens in the source docs. *Answered 2026-09-25: a minimal console is designed (decision log, phase 4H).*
+10. **Brand name, colors, approved-draft treatment, theme default, AI vs human voice player, Discover's lead, studio density:** the seven open questions in Product Design section 12. *Partly answered on 2026-09-25: the colors (visual direction), the theme default, Discover's lead and studio density (design plan, answers 7 to 9), and the voice player in phase 3 (answer 10). Still open: the brand name and the approved-draft treatment (item 5).*
+
+Added 2026-11-02 in Wave 5. These wait on the founder; the docs record them and decide nothing:
+
+11. **Pilot size and cohorts.** The Second Review (section 8, and Q2 in section 7) and the System Architecture's slice 1 say 5 to 10 creators split across both cohorts; the October launch plan asked for a first cohort of three to five.
+12. **INV-22, one signature for accept and deliver.** As written, INV-22 needs a passkey assertion for each named act, and accepting a request is one of them. The 4C "Review and sign" board draws one "Accept and send" act, and the October launch plan wrote "two taps and one signature" as if decided. Until the founder decides, accept and send are two signatures, as the code does today.
+13. **Paid voice notes in the pilot.** D-25 and the architecture's slice 1 ship the creator's real voice notes; the launch plan defers them until written replies have proven out, as a recommendation the founder has not confirmed.
+14. **The pilot's quality bars** ([launch plan](LAUNCH_PLAN.md), section 5): the first approved sentence at p95 at most 4.5 s at the start of the pilot, against the architecture's 2.5 s warm and 4 s cold, and the other bars there. To confirm.
+15. **Option D's open inputs:** counsel on the 18+ method, the age-step copy, and the Apple and Google client IDs.
+16. **The other open calls:** the INV-21 price rule, the A5 safety sign-off, deletion D1 to D4 and Q16, ops P1 to P5, hosting, the domain and passkey ID, and the credentials ([STATUS](STATUS.md#decisions-the-founder-still-owes)).
+17. **The ETA range in the pilot.** The public summary leaves "Maya usually decides in {range}" empty until a creator's decision record exists, and never invents a range. #487, which fills it, is parked: it shows nothing until a creator has five outcomes.
+18. **Known inconsistencies in the decision log,** which is append-only and so stays as written: the 2026-10-15 Today row sits above rows dated 2026-10-09 and 2026-10-08; two rows carry "October8" labels instead of dates; the 2026-10-02 row links a W3 checkpoint that is now archived. The 2026-09-25 rows on sign-in and the Studio tabs are superseded by the rows dated 2026-10-15 and 2026-11-01.
 
 ### October 8 — original export scope and legacy retention
 

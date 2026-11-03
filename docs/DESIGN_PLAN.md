@@ -237,7 +237,7 @@ designed; the code follows the decision, not the board.
 
 | What is stale | Where it is drawn | The decision it contradicts |
 | --- | --- | --- |
-| "Continue with Pantopus" | Nine boards in the review's count, among them 4A Welcome, the 4D canvas, the prototypes canvas and the Button component | Option D sign-in and the native wording "Sign in to continue" (BRIEF decision log, 2026-11-02 rows) |
+| "Continue with Pantopus" | Nine boards in the review's count, among them 4A Welcome, the 4D canvas, the prototypes canvas and the Button component | Option D sign-in and the native wording "Sign in to continue" (BRIEF decision log) |
 | "Sign with Face ID" | The SigningSheet component and 4C "Review and sign" | Option A: creators sign with a passkey in the web Studio |
 | Creator setup only at desktop width | 4D "Get verified and set up" | Option A: creators work in the web Studio on their phones |
 | Deferred voice, call and public modes | Among others, 4A Packet, 4B Access and Requests, and 4D Offers and Earnings | The launch scope is written replies (launch plan, section 4) |
