@@ -1,10 +1,11 @@
-# Launch plan: scope, decisions and what comes later
+# Launch plan: scope, the road to the pilot, and what comes later
 
-Decided with the founder on 2026-10-08 and checked against the code the same day (see the
-[launch review](archive/operations/launch-review-2026-10-08.md)). This file sets the **sequence** of
-the work. It removes nothing from the product: the documents in [source/](source/) still
-define behavior, and everything under "Planned for later" is planned, not dropped. Items
-marked *(to confirm)* are recommendations that still need a yes.
+Decided with the founder on 2026-10-08 and 2026-10-09, and re-baselined on 2026-11-02 to the
+phases in the [consolidation plan](CONSOLIDATION_PLAN.md) (section 7), which the founder approved on
+2026-11-01. This file sets the **sequence** of the work. It removes nothing from the product: the
+documents in [source/](source/) still define behavior, and everything under "Planned for later" is
+planned, not dropped. Items marked *(to confirm)* still need the founder's yes. The current state is
+in [STATUS](STATUS.md).
 
 ## 1. What the launch must get right: five moments
 
@@ -25,34 +26,64 @@ Distribution is the creators' own audiences: the link in bio and per-post "Ask a
 links, with a small launch kit. No paid advertising until the retention gates in section 5
 are met.
 
-## 2. Decisions recorded
+## 2. What "done" means
 
-| Decision | Detail |
-| --- | --- |
-| Pilot cut line | The launch is slice 1 of the [architecture build sequence](source/System_Architecture.md) (section 12) plus the share card below. Everything else is in section 4. All ten finish-plan milestones stay in scope; this only orders them (section 9). |
-| Phone apps first | The native iOS and Android apps are the primary launch surface for fans. Web stays supported: it must deliver the first answer from a creator's link with no install, and it carries the configuration screens (My AI, Offers, Earnings, Team, License). Creators' daily work was decided native on 2026-10-02 in [DECISIONS](archive/workstreams/DECISIONS.md), but the review found it unbuilt (L per platform). Decided 2026-10-09 (option A): the pilot's native app is the fan app; creators use the Studio in the phone browser (installable, passkey signing); a separate native Qelvora Studio app follows after the pilot, Notes and reactions first. This replaces the 2026-10-08 plan to make Notes and reactions native at launch (section 8, step 5). |
-| Share card is in | A minimal card: a signed written reply, with its public verification page, as an image and a link. The fan chooses how their handle appears, and either side can revoke it (D-15). Pulled forward from slice 3. |
-| Model provider | The Anthropic API is the intended production provider. Development continues on the existing synthetic OpenAI configuration, which is development-only and not a production approval. Decided 2026-10-08: switch before the first real creator publishes, as one engine revision, with the embedding provider chosen first (section 8, step 2, and the provider notes below). |
-| Comparison scope freeze | Comparison stays installed and off. Done means: merge #351, #352 and #353 in order; a withdraw-only mode with retry; one native withdrawal exercised; SQL-level checks on a disposable database; a runbook; an overdue-purge alert; and a creator-authored FAQ set that replaces the fan-sample publish gate. Parked: sanitizer corpus, production authority, object store, per-fan limits. The wave cannot be removed, because export and delete are composed from it. Confirmed 2026-10-08. |
+**For the pilot.** Each item is checked by someone other than its author, on a real iPhone and a
+real Android phone, in Light and Night:
+1. **The five moments work end to end on the real host.**
+2. **Every launch screen (section 3) exists in every state,** with the fixed copy word for word and
+   no forbidden words.
+3. **INV-01 to INV-25 hold,** and their acceptance tests (T-xx) pass. The isolation test T-11 runs
+   in CI.
+4. **The quality bars in section 5 are met.**
+5. **The release requirements are met:** an 18+ rating, in-app account deletion, Report on every AI
+   message, provider consent before the first AI message, and links that open the app or fall back
+   to the web.
+
+**For public release:** the pilot gates in section 5, then the founder's release decision.
 
 ## 3. Launch scope
 
+The launch is slice 1 of the [architecture build sequence](source/System_Architecture.md)
+(section 12) plus the share card. Everything else is in section 4.
+
+- **Fans** use the native iOS and Android apps. The web stays supported: it gives the first answer
+  from a creator's link with no install, and it carries the configuration screens.
+- **Creators** use the web Studio on their phones, with passkey signing (option A). A separate
+  native Qelvora Studio app follows after the pilot, Notes and reactions first.
+- **Sign-in** is option D: Qelvora sign-in with Apple and Google, plus an 18+ date-of-birth step.
+  A Pantopus account link stays the long-term path.
+- **Order:** a private web alpha (about ten invited adults, Stripe test mode), then TestFlight and
+  Google Play closed testing, then public release after the pilot gates.
+
 **Fan (phone apps; web supported):** creator home and entrances (link in bio, post, invite)
 that open the app when installed and otherwise answer on the web; S-F1 onboarding with
-processor consent; S-F2 Home, S-F3 Discover, S-F4 creator profile; S-F5 thread in every
-state; S-F6 memory; S-F7 packet, spend limit and checkout; S-F8 request status and receipt;
-S-F11 notifications with push; S-F12 me and privacy; S-F13 post view ("Ask about this");
+sign-in, the 18+ step and processor consent; S-F2 Home, S-F3 Discover, S-F4 creator profile; S-F5
+thread in every state; S-F6 memory; S-F7 packet, spend limit and checkout; S-F8 request status and
+receipt; S-F11 notifications with push; S-F12 me and privacy; S-F13 post view ("Ask about this");
 S-F14 Notes in the thread; S-F15 spending and time; S-F16 verification page; the share card.
 
-**Creator (daily work on the phone, responsive web for configuration):** S-C1 verification
-and onboarding with passkey, license and interview (S-C14); S-C2 My AI; S-C3 requests queue;
-S-C4 packet detail with signing; S-C5 threads (takeover, handback, audit, "I'd never say
-that"); S-C6 Offers; S-C7 Publish (basic); S-C9 Earnings (minimal); S-C10 Team (basic);
-S-C12 Notes and Replies; S-C13 license and sponsorships; the weekly impact digest.
+**Creator (the web Studio, phone first for daily work):** S-C1 verification and onboarding with
+passkey, license and interview (S-C14); S-C2 My AI, including the FAQ check; S-C3 requests queue;
+S-C4 packet detail with signing; S-C5 threads (takeover, handback, audit, "I'd never say that");
+S-C6 Offers; S-C7 Publish (basic); S-C9 Earnings (minimal); S-C10 Team (basic); Today, the first
+Studio tab; S-C12 Notes and Replies; S-C13 license and sponsorships; the weekly impact digest.
 
 **Platform:** safety (report, block, crisis protocol), a minimal ops console, export and
 delete, push notifications, instrumentation for the pilot gates, and the "who wrote this?"
 comprehension study (T-21).
+
+The decisions behind this scope:
+
+| Decision | Detail |
+| --- | --- |
+| Pilot cut line (2026-10-08) | Slice 1 plus the share card. It orders the work; it removes nothing |
+| Phone apps first (2026-10-08), option A (2026-10-09) | The pilot's native app is the fan app; creators use the web Studio in the phone browser; the native Studio app follows after the pilot. This replaced the 2026-10-08 plan to make Notes and reactions native at launch |
+| Sign-in, option D (2026-10-15, confirmed 2026-11-01) | Qelvora sign-in with Apple and Google and an 18+ date-of-birth step, built on `main`; native wording "Sign in to continue" |
+| Share card is in (2026-10-08) | A signed written reply with its public verification page, as an image and a link. The fan chooses how their handle appears, and either side can revoke it (D-15). Pulled forward from slice 3 |
+| Model provider (2026-10-08) | The Anthropic API is the intended production provider. Switch before the first real creator publishes, as one engine revision, with the embedding provider chosen first. Development stays on the synthetic OpenAI configuration, which is not a production approval |
+| Comparison freeze (2026-10-08) | Comparison stays installed and off. The creator's FAQ check replaced the fan-sample publish gate (#441). The wave cannot be removed, because export and delete are composed from it |
+| Paid replies in the apps, Q04 (2026-10-08) | Continue on the web during the TestFlight and closed-testing pilot; settle the public-release approach with counsel (section 6) |
 
 ## 4. Planned for later (not dropped)
 
@@ -68,6 +99,7 @@ comprehension study (T-21).
 | Full publishing: tier builder, library, live, community | S-C7 full, Q14, slice 3 | After the pilot |
 | Fan-derived comparison replay | Architecture section 6, A12 | After the pilot produces real fan data and a consent and privacy review |
 | Native configuration screens | O19 | After the pilot; web remains the home for configuration |
+| The native Qelvora Studio app | Option A (2026-10-09) | After the pilot proves the daily loop, Notes and reactions first; earlier if pilot creators miss Notes because of the web |
 | Instagram "comment" automation | A13 | After the launch kit; needs Meta approval |
 | Referral incentives, extra locales, tips, fan agent, real-time AI voice or video | O18, O20, D-H, D-G | Later; some are reserved by design |
 
@@ -84,210 +116,153 @@ section 8 (proposed thresholds, to be agreed before the pilot):
 - At least 90% correct on "who wrote this?", zero leaks between threads, zero unlabeled AI text.
 - Median creator time under two hours a week, and at least three in five creators ask to continue.
 
-Proposed launch-quality bars *(to confirm)*: acknowledgment p95 at most 300 ms; first
-approved visible sentence p95 at most 4.5 s at the start of the pilot, with 2.5 s warm as
-the target after the provider switch (the review measured 19 to 27 s today and judged 2.5 s
-a stretch even after the overhead is removed); a fallback rate on a creator's own FAQ set low
-enough that creators do not need to file corrections for it (threshold set with the first
-creators); each of the five moments exercised on a real iPhone and a real Android phone in
-Light and Night.
+Quality bars for the pilot, used as the definition of done in the consolidation plan (section 2)
+*(to confirm)*:
+- acknowledgment p95 at most 300 ms;
+- first approved visible sentence p95 at most 4.5 s at the start of the pilot, and 2.5 s warm as
+  the target after the provider switch (the October review measured 19 to 27 s; lane 3 brought the
+  first sentence's median to about 7 to 8 s on the fakes);
+- takeover visible within 500 ms;
+- 99.9% monthly API availability;
+- RPO 5 minutes and RTO 1 hour, proven by a restore drill;
+- zero leaks between threads and zero unlabeled AI text;
+- WCAG AA;
+- nightly money reconciliation with zero mismatches;
+- a fallback rate on a creator's own FAQ set low enough that creators don't need to file
+  corrections for it (the threshold is set with the first creators).
 
 ## 6. What choosing phone apps first adds
 
 - **Paid replies inside the app (Q04).** Memberships use in-app purchase (D-14) and calls
   are paid outside it, but asynchronous written replies bought in the app are still open with
   counsel. In-app purchase cannot hold and then capture, so "charged only when she accepts"
-  needs a decision. Both apps disable "Send request" today. Options: continue on the web
-  with a signed handoff, charge now with an automatic full refund on decline (breaks the
-  promise), or keep human modes on web. Decided 2026-10-08: continue on the web during the
-  TestFlight and closed-testing pilot; settle the public-release approach with counsel.
+  needs a decision. Both apps disable "Send request" today, and the hand-off to the web is not
+  built. Decided 2026-10-08: continue on the web during the TestFlight and closed-testing pilot;
+  settle the public-release approach with counsel.
 - **Distribution.** Run the pilot through TestFlight and Google Play closed testing, and
   release publicly after the pilot gates. Store accounts, an 18+ rating, in-app account
   deletion, a report control on every AI message and consent before data goes to a
   third-party AI are release requirements either way.
 - **Links.** A link from a social app must open the app when it is installed and otherwise
-  give the first answer on the web, then offer the app after the first useful answer.
-  Nothing supports this today: there are no universal or app links, no entitlements, and the
-  link host is empty. Push is the main retention channel for "the person shows up".
+  give the first answer on the web, then offer the app after the first useful answer. No
+  universal or app links exist yet: they need the domain. Push is the main retention channel for
+  "the person shows up".
 - **Share card.** It needs the system share sheet on both platforms and a verification page
   that works signed out.
 
 ## 7. Where the build stands
 
-The review found a strong engine with the connections missing. The detail, with evidence and
-sizes, is in the [launch review](archive/operations/launch-review-2026-10-08.md).
+Nearly every launch screen exists on web, iOS and Android, but only on a development host with
+fake identity, payment, model and push providers. None of it has been accepted on a real device or
+against a real provider. The moment-by-moment detail is in the
+[consolidation plan](CONSOLIDATION_PLAN.md) (section 3.1), and the current state is in
+[STATUS](STATUS.md).
 
-| Moment | Works today | Missing |
+| Moment | Works on the development host | Missing for the pilot |
 | --- | --- | --- |
-| 1 First answer | Cited, labelled answer end to end on the development host | 19 to 27 s to the first sentence; the guard blocks ordinary advice; a second version cannot be published without fan samples; entry links and creator page |
-| 2 Remembered | Memory view, edit and delete | Extraction and follow-up are not wired |
-| 3 The person shows up | Signed Note and heart on web | Fans cannot read Notes; nothing reaches the thread or phone; no push |
-| 4 Honest money | Packet, limit, hold, signed accept, capture, decline, receipt | Nothing drives expiry or refund; Stripe never run; apps cannot send a request |
-| 5 The creator's five minutes | Web queue, Notes, threads | 12 taps and 2 ceremonies to accept and deliver; native Studio absent |
-| Share card | All pieces | The join (creation call, words on the verify page, share sheet) |
-| Phone apps | Fan thread, custody, delivery gate, store billing seams | Release sign-in, links, push, store requirements |
+| 1 First answer | Public creator page and entrances, web sign-in and consent, the labeled thread with citations, takeover and handback, guard revision 16, the FAQ check | A real host, the Anthropic switch and real-model latency, universal and app links, native sign-in on devices |
+| 2 Remembered | View, edit and delete memory everywhere | Memory extraction and "Want me to remember this?" (its SQL is unregistered), follow-up on return, a native memory prompt |
+| 3 The person shows up | Signed Notes and reactions in the web and native threads, the Studio composer | Push end to end, follower Notes, withdrawn replies suppressing queued reactions (#400) |
+| 4 Honest money | Packet, spend limit, hold, capture, decline, receipt, the scheduler and signed webhooks | A Stripe test-mode run with 3-D Secure, the phone-to-web hand-off, live keys |
+| 5 The creator's five minutes | Today, Notes, the queue, threads and takeover, passkey signing on the web, one live stream instead of polling | Accept and deliver are two signing ceremonies (INV-22 is the founder's call), no digest producer, no installable Studio |
+| Share card | The share endpoint, pages and native share sheets | The owner that supplies a share's source (#459 and #392) |
+| Platform | Report, block, crisis, the ops console, an eight-domain export | The production host and its adapters, a real license verifier, pilot metrics, whole-account deletion (Q16), store readiness |
 
-Underneath all of it: **only the development host runs the product.** A non-development
-backend serves health and nothing else, and no Pantopus identity adapter exists (Q01).
+## 8. The road to the pilot
 
-## 8. Build order: vertical steps
+Build in vertical steps. Each ends with someone other than its author doing the moment on a real
+iPhone and a real Android phone, in Light and Night, instead of hardening one layer at a time. A
+weekly walk of the five moments on the two phones is the progress report. The durations assume the
+hosting, domain and credential decisions arrive early in phase 1, and each phase ends with something
+the founder can do on their own phones.
 
-Build in steps that each end with a person other than the author doing the moment on a real
-iPhone and a real Android phone, in Light and Night, instead of hardening one layer at a
-time. The result is written down in one page; evidence bundles stay out of git (review
-section 12). Steps 2 to 5 can run in parallel once step 1 has a host. A weekly walk of the
-five moments on the two phones is the progress report. Sizes: S up to 3 days, M about a week,
-L two weeks or more.
+| Phase | What | Exit |
+| --- | --- | --- |
+| 0. Consolidate (about 2 weeks) | Consolidation plan, section 5 | Zero open PRs, `main` green and protected, docs current |
+| 1. A real host (about 3 weeks) | Below | The founder signs in on both phones against staging, opens a creator link that launches the app, and receives a test push |
+| 2. The five moments (about 4 weeks, 2 to 3 streams) | Below | Each moment done by someone other than its author on two real phones, in Light and Night; latency measured against the bar |
+| 3. Pilot readiness (about 2 weeks; the web alpha can start midway) | Below | The private web alpha runs, then TestFlight and Play closed-testing builds go to the first creators |
+| 4. The pilot | Pilot creators, measured against the gates in section 5. The size is undecided (below) | The founder's release decision |
 
-**Step 0: clear the deck (days).**
-- Done 2026-10-08: #351, #352 and #353 merged in order (`f41f297d3`, `73360885c`,
-  `95abce43c`), plus a documents PR with this plan, the review, a short
-  [CURRENT](operations/CURRENT.md), the decision-log rows inside the table, and the older
-  handoffs marked as history.
-- Deferred: the two `CreatorAI.tsx` fixes (stale first paint on re-entry, clearing on every
-  focus) wait until someone can operate the panel with seeded data. They matter only when
-  comparison is switched on.
-- Comparison stays installed and off. Add withdraw-only mode with retry, an overdue-purge
-  alert and a short runbook, then stop comparison work.
-- Evidence policy: written into `CLAUDE.md` and CURRENT. A CI guard (fail a PR that adds
-  more than 1 MB under `artifacts/`, any file over 300 KB, or duplicate blobs) is still to
-  build.
-- *Exit:* main's run on the merged stack is green, a comparison-enabled export completes on
-  the first attempt (smoke test), and the documents agree.
+**Phase 0: consolidate.** Waves 1 to 4 are done: all 66 pull requests that were open on 2026-11-01
+are merged or closed with a note. Wave 5 (docs, CI path filters and the repository steps) is in
+progress, and Wave 6 makes migration registration data-driven ([STATUS](STATUS.md)).
 
-**Step 1: a real host on real phones (blocks everything real).**
-- Compose the production backend with an injected identity adapter, production configuration
-  and the workers: generation, publication, commerce recovery, growth. M. `server.ts` is the
-  development composition root; production hosts are meant to inject genuine identity, W8
-  denials and provider dependencies into the same `createConfiguredBackend` seam. So this is a
-  second composition root that needs those adapters, not a flag, and it waits on the
-  [identity contract](archive/operations/pantopus-identity-contract.md).
-- Real sign-in. Pantopus is not an OAuth provider and has no verified 18+ signal (research of
-  2026-10-08; see the [identity contract](archive/operations/pantopus-identity-contract.md)). The
-  recommendation *(to confirm)* is a Qelvora-owned sign-in as a second adapter for the pilot,
-  with its own 18+ approach, and a Pantopus connect flow later; then release sign-in on both
-  phones. L, then M each.
-- Domain and relying-party ID (Q09), then associated domains, app links and passkeys on
-  devices; push credentials.
-- Store requirements: iOS app icon, privacy manifest, entitlements and trimmed background
-  modes; Android target level, R8, signing, icon, Back handling, edge-to-edge, tolerant JSON
-  decode and the API-33 call.
-- TestFlight and Play closed-testing builds for a founder-only cohort.
-- *Exit:* the founder signs in on both phones against the real host, opens a creator link
-  that launches the app (or falls back to the web), and receives a test push.
+**Phase 1: a real host.**
+- A production composition root with real adapters: option D accepted by the production config, a
+  license verifier, the model, payments and push. `server.ts` is the development composition root;
+  production hosts inject their adapters into the same `createConfiguredBackend` seam.
+- Deploy images for the backend, web and workers, and a staging environment.
+- The domain, the passkey origin, universal and app links, and the app entitlements that links and
+  push need.
+- Apple and Google credentials.
+- The Anthropic switch as one engine revision, with the embedding provider chosen first (see the
+  provider notes below).
+- Logs, error tracking, alerts, backups and a restore drill.
 
-**Step 2: the first answer (moment 1).**
-- Latency: stop repeating verification inside a held transaction, wake the worker on accept,
-  paint from the frame, merge transactions, and (with safety sign-off) take the model safety
-  classifier off the path before acknowledgement.
-- Guard: word boundaries and subject anchors, offset-based verification, normalization,
-  failure sub-codes, a distress-safe fallback, and the price rule (founder call, INV-21).
-  These change engine behavior, and a published version binds the engine revision in its
-  fingerprint, so they ship as the next revision together with the provider switch, with
-  revisions 12 to 14 left as they are, not as an edit to revision 14.
-- Publishing: the FAQ-set check replaces the fan-sample gate.
-- Citations that survive re-ingestion.
-- Entry: creator page content, invite with the creator's note, share image, link to app else
-  web, first message in four screens, a cached public read path.
-- Reliability for a handful of simultaneous fans: lease renewal, lock collisions, hold
-  sizing, unknown-cost handling.
-- The provider switch as one engine revision, with the embedding provider decided first.
-- *Exit:* the bars in section 5 are measured on the phones.
+**Phase 2: the five moments.**
+- **Design first:** the launch screens and states that have no design
+  ([design plan](DESIGN_PLAN.md#missing-launch-surfaces)).
+- **Moment 1:** latency down to the bar; the guard and citations on the real model.
+- **Moment 2:** memory extraction as a job after the answer, "Want me to remember this? Only if you
+  say yes." in the thread, and follow-up on return.
+- **Moment 3:** push for Notes and reactions, follower Notes, and reaction withdrawal (#400).
+- **Moment 4:** a scripted Stripe test-mode run (hold, accept, decline, 3-D Secure, refund) and the
+  phone-to-web hand-off for paid requests (Q04).
+- **Moment 5:** accept and send in two taps; one signature for both only if the founder's INV-22
+  call allows it; the digest producer; an installable Studio. The founder, as Maya, completes a
+  day's five minutes on a phone in under five.
+- **The share card,** end to end (#459 and #392 return here).
 
-**Step 3: remembered, and the person shows up (moments 2 and 3).**
-- Memory: extraction as a job after the answer; "Want me to remember this? Only if you say
-  yes." in the thread; follow-up on return; an exclusion removes only what was excluded; the
-  guard can use memory.
-- Notes: wire tenure so members and tier see Notes; deliver Notes and reactions into the
-  thread and as push; show the audience label and glyph natively; allow clean replies
-  automatically and review flagged ones; the weekly digest producer.
-- *Exit:* a Note signed by the founder appears in a test fan's thread with a push, and the AI
-  follows up on an open loop on return.
+**Phase 3: pilot readiness.**
+- Metric emitters and an aggregate pilot view (the small-group rule hides most per-creator data at
+  pilot size).
+- Whole-account deletion, after Q16 is decided.
+- The ops console and a named reviewer for Note replies and safety cases.
+- Store requirements: app icons, the iOS privacy manifest and trimmed background modes, and the
+  Android target level, release build, signing and R8, Back handling and edge-to-edge.
+- An accessibility pass, the T-21 comprehension study, a security review, a load test at pilot size,
+  and runbooks.
 
-**Step 4: honest money (moment 4).**
-- Scheduler and webhooks (expiry, auto-refund, capacity release); decline after the deadline;
-  one scripted Stripe test-mode run (hold, accept, decline, 3DS, refund) and the money tests;
-  deliver automatically when the reply is sent; the eligibility field; a minimum price. The
-  scheduler needs a `CommerceWorkIndex` that the identity or operations adapter issues (the
-  recovery worker takes one and none is implemented), so it follows the adapter work in step 1.
-- Phone entry for paid requests per Q04 (section 6).
-- *Exit:* request, accept, signed reply and receipt, and a decline and an expiry that cost
-  nothing, run twice including 3DS.
+**Phase 4: the pilot.** The pilot size is undecided. The Second Review proposes 5 to 10 creators
+split across both cohorts for four to six weeks (section 8, and Q2 in section 7); the October launch
+plan asked for a first cohort of three to five. The founder decides the size, the creators and the named reviewer.
 
-**Step 5: the creator's five minutes (moment 5).**
-- Flow first, on every platform: accept and send in two taps and one signature; queue rule
-  cards and a draft-ready flag; Note and reaction without extra steps.
-- Creators use the web Studio on their phones during the pilot (option A). The native Qelvora
-  Studio app follows after the pilot proves the daily loop, with Notes and reactions first. If
-  pilot creators miss Notes because of the web friction, it moves earlier.
-- *Exit:* the founder, as Maya, completes a day's five minutes on a phone in under five.
+The October finish plan's ten milestones are folded into these phases; the plan itself is in the
+[archive](archive/operations/product-finish-plan-2026-10-08.md).
 
-**Step 6: share card, measurement and release readiness.**
-- Share card: the creation call, grant id, words on the verify page, system share sheet, image
-  and link on both platforms (8 to 12 days).
-- Measurement: emitters for the pilot gates, an arrival counter and `useful_answer`, and an
-  aggregate pilot view (the small-group rule hides most per-creator data at pilot size).
-- Operations: the minimal ops console, a named reviewer for Note replies and safety cases, the
-  T-21 study, and the production-readiness list in finish-plan milestone 10.
+## 9. Founder decisions
 
-## 9. The ten finish-plan milestones, ordered for launch
+**Made:**
+1. **Native creator Studio:** option A (2026-10-09).
+2. **Comparison done:** the definition in section 3 (2026-10-08).
+3. **Anthropic timing:** before the first real creator publishes, as one engine revision, with the
+   embedding provider chosen first (2026-10-08).
+4. **Paid replies in the apps (Q04):** continue on the web during the pilot; counsel before the
+   public release (2026-10-08).
+5. **Pilot sign-in:** option D, with 18+ by a date-of-birth attestation plus platform age signals
+   (counsel to confirm) and a Qelvora-specific account id (2026-10-15); the native wording (2026-11-01).
+6. **The consolidation plan** and its defaults (2026-11-01).
 
-| # | Milestone | Launch status | Step |
-| --- | --- | --- | --- |
-| 1 | Safe comparison evidence and its privacy producer | Installed and off. #351 to #353 merged; withdraw-only mode next, then stop. Export and delete cannot be separated from the wave | 0 |
-| 2 | Existing creator upgrade | Demonstrated once on the development creator; more later. A provider change after a creator publishes needs it, which is why the switch comes first | 2 |
-| 3 | Useful response latency and grounding | Launch, pulled forward | 2 |
-| 4 | Generation reliability and access | Launch (takeover, revocation, sensitive memory, idempotency, lease, lock collisions, hold sizing); shared-pass accounting later | 2, 3 |
-| 5 | Complete privacy and recovery | Launch for export, delete and retention; comparison parts ride with the wave | 0, 6 |
-| 6 | Human presence and creator or team work | Launch | 3, 5 |
-| 7 | Commerce and content publication | Launch for membership and packet money; the group publisher is later | 4 |
-| 8 | Recording and real calls | Voice notes cannot be offered today and move later; calls are later | n/a |
-| 9 | Growth and complete cross-platform experience | Entry links, push, share card, verification and phone parity launch; Insights and discovery extras are later | 1, 2, 3, 6 |
-| 10 | Production readiness and pilot | Launch | 1, 6 |
-
-## 10. Inputs and decisions needed from the founder
-
-Decided on 2026-10-08 (recommendations confirmed):
-
-1. **Native creator Studio (option A, 2026-10-09).** The pilot's native app is the fan app.
-   Creators use the web Studio on their phones; a separate native Qelvora Studio app follows
-   after the pilot. Fix the tap count and the two ceremonies either way.
-2. **Comparison done.** The definition in section 2.
-3. **Anthropic timing.** Before the first real creator publishes, as one engine revision, with
-   the embedding provider chosen first.
-4. **Paid replies in the apps (Q04).** Continue on the web during the pilot; counsel before the
-   public release.
-5. **Merging the open stack.** Done (section 8, step 0).
-
-Still to confirm:
-
-1. **Pilot sign-in and 18+.** The recommendation and seven questions in the
-   [identity contract](archive/operations/pantopus-identity-contract.md).
-2. **Voice notes.** Written replies first; voice later (section 4).
-3. **Launch-quality bars** in section 5.
-4. **Calls only the founder can make.** Whether an AI reply may state a price from the
-   creator's own materials (INV-21); taking the model safety check off the path before
-   acknowledgement; a single signed act for accept and deliver (INV-22); formalizing Q13 and
-   Q14, which the working documents already treat as decided.
-
-Inputs only the founder can supply:
-
-1. The Q01 decisions in the [identity contract](archive/operations/pantopus-identity-contract.md):
-   the sign-in option for the pilot, what defines 18+, and which account id Qelvora receives.
-2. The final domain and relying-party ID (Q09). Passkeys and universal links depend on it.
-3. Apple Developer and Google Play accounts, TestFlight and closed testing, and at least one
-   physical iPhone and one Android phone (Q10, Q11).
-4. Stripe test-mode keys and the account topology (Q03).
-5. A real passkey ceremony (Touch ID) for the development creator, plus the creator
-   verification approval. This unblocks signed Notes, replies, reactions and acceptances.
-6. Counsel on Q04.
-7. A first cohort of three to five creators, and a named reviewer for Note replies and safety
-   cases.
-8. The consent wording that names the model providers (`[AI PROVIDERS]`), once final.
+**Still open** (the full list is in [STATUS](STATUS.md#decisions-the-founder-still-owes)):
+1. Hosting, the domain and passkey relying-party ID (Q09), and the final app identifiers.
+2. Apple and Google sign-in client IDs, counsel on the 18+ method, and the age-step copy.
+3. The creator license terms and verifier.
+4. The embedding provider, the Anthropic production key and terms, and the consent wording that
+   names the providers (`[AI PROVIDERS]`).
+5. Stripe test keys and the account topology (Q03); counsel on Q04 before public release.
+6. Apple Developer and Google Play accounts, push credentials, one iPhone and one Android phone
+   (Q10, Q11).
+7. The invariant and policy calls: the INV-21 price rule, INV-22 one signature for accept and
+   deliver, the A5 safety sign-off (taking the model safety check off the path before the
+   acknowledgment), deletion D1 to D4 and Q16, and ops P1 to P5.
+8. The pilot size, the creators and a named reviewer for Note replies and safety cases.
+9. The quality bars in section 5, and voice notes after written replies (section 4).
 
 ## Provider switch notes (to verify at migration time)
 
 The full checklist is in the [launch review](archive/operations/launch-review-2026-10-08.md), section 13.
+The day-to-day setup is in [Claude as the generation provider](operations/anthropic-provider.md).
 
 - **Timing.** A model or provider change alters every published version's engine
   fingerprint, so it is an engine upgrade. Until a creator publishes, it is free. Afterwards

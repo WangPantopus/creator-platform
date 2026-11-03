@@ -22,7 +22,7 @@ phones; sign-in is Qelvora sign-in with Apple and Google plus an 18+ date-of-bir
   every state, INV-01 to INV-25 hold, and the quality bars and store requirements are met, each
   checked by someone other than its author on a real iPhone and a real Android phone
   ([launch plan, section 2](LAUNCH_PLAN.md#2-what-done-means));
-- **for public release:** the pilot gates ([launch plan, section 6](LAUNCH_PLAN.md#6-launch-criteria));
+- **for public release:** the pilot gates ([launch plan, section 5](LAUNCH_PLAN.md#5-launch-criteria));
 - **for the consolidation (phase 0):** zero open pull requests, `main` green and protected, and the docs
   reduced to a few current files.
 
@@ -80,7 +80,7 @@ in the Wave 6 queue.
    production composition root with real adapters; staging, the domain and app links; Apple and
    Google credentials; the Anthropic switch; observability, backups and a restore drill. Its exit:
    the founder signs in on both phones against staging, opens a creator link that launches the app,
-   and receives a test push. Phases 2 to 4 are in the [launch plan](LAUNCH_PLAN.md#4-the-road-to-the-pilot).
+   and receives a test push. Phases 2 to 4 are in the [launch plan](LAUNCH_PLAN.md#8-the-road-to-the-pilot).
 
 ## Parked pull requests
 
