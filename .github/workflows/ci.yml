@@ -4,10 +4,139 @@ on:
   push:
     branches: [main]
   pull_request:
+  # The full matrix runs every night and on demand. 12:17 UTC is this repository's quietest CI hour,
+  # and the odd minute avoids the rush of scheduled runs at the start of each hour.
+  schedule:
+    - cron: "17 12 * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
 concurrency:
-  group: foundation-${{ github.event_name }}-${{ github.ref }}
+  # A newer run replaces an older one, except on main: a push there checks only what its own merge
+  # changed, so a cancelled push run would leave that merge unchecked until the nightly run.
+  group: foundation-${{ github.event_name }}-${{ github.event_name == 'push' && github.sha || github.ref }}
   cancel-in-progress: true
 jobs:
+  changes:
+    # Decides which slow jobs a change needs. A gated job skips only when every changed path is known
+    # not to affect it; an unknown path, or any failure here, runs it.
+    runs-on: ubuntu-latest
+    outputs:
+      native: ${{ steps.classify.outputs.native }}
+      visual: ${{ steps.classify.outputs.visual }}
+    steps:
+      # Time limits sit on the steps: a step that times out fails `changes`, so every gated job runs.
+      # A job-level limit would cancel `changes` instead, which gated jobs might read as a cancelled run.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        timeout-minutes: 5
+        with:
+          # Every commit and tree, but file contents only for the root files and .github. Listing
+          # changed paths needs nothing more.
+          fetch-depth: 0
+          sparse-checkout: .github
+          persist-credentials: false
+      - name: Classify the changed paths
+        id: classify
+        timeout-minutes: 5
+        shell: bash
+        env:
+          QELVORA_EVENT: ${{ github.event_name }}
+          QELVORA_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          QELVORA_PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          QELVORA_PUSH_BEFORE: ${{ github.event.before }}
+          QELVORA_PUSH_AFTER: ${{ github.sha }}
+        run: |
+          native=true
+          visual=true
+          reason="a $QELVORA_EVENT run checks everything"
+          commit='^[0-9a-f]{40}$'
+          zeros='^0+$'
+          base=
+          case "$QELVORA_EVENT" in
+            pull_request)
+              # Compared with the default branch, not the PR's base: a stacked PR then counts the
+              # changes below it, and retargeting a PR can't leave a stale result behind.
+              if [[ $QELVORA_PR_HEAD =~ $commit ]] &&
+                default=$(git rev-parse --verify --quiet "refs/remotes/origin/$QELVORA_DEFAULT_BRANCH^{commit}") &&
+                base=$(git merge-base "$default" "$QELVORA_PR_HEAD"); then
+                head=$QELVORA_PR_HEAD
+              else
+                base=
+                reason="the head could not be compared with the default branch"
+              fi
+              ;;
+            push)
+              # Compared only with the commit before it. If a push's run never finishes (cancelled,
+              # an outage, [skip ci]), the nightly full run is the backstop.
+              if [[ $QELVORA_PUSH_BEFORE =~ $commit && ! $QELVORA_PUSH_BEFORE =~ $zeros && $QELVORA_PUSH_AFTER =~ $commit ]]; then
+                base=$QELVORA_PUSH_BEFORE
+                head=$QELVORA_PUSH_AFTER
+              else
+                reason="there is no previous commit to compare with"
+              fi
+              ;;
+          esac
+          if [ -z "$base" ]; then
+            :
+          # --no-renames lists both sides of a move, and -z keeps unusual names unquoted.
+          elif ! git diff --name-only --no-renames -z "$base" "$head" > "$RUNNER_TEMP/changed-paths"; then
+            reason="the changes from $base to $head could not be listed"
+          else
+            native=false
+            visual=false
+            reason="compared $base with $head"
+            unclassified=
+            # macOS checks Apps/ios out into apps/ios, so paths match without regard to case.
+            shopt -s nocasematch
+            while IFS= read -r -d '' path; do
+              claimed=false
+              case "$path" in
+                # What the iOS and Android jobs build and test.
+                apps/ios/* | apps/android/*) native=true claimed=true ;;
+                # The generators that write into both apps, and everything they read.
+                scripts/generate-shared.mjs | scripts/generate-native-api.mjs) native=true claimed=true ;;
+                config/* | packages/api/generated/* | design/handoff/tokens.json) native=true claimed=true ;;
+                design/design-system/project/components/bundle.js) native=true claimed=true ;;
+              esac
+              case "$path" in
+                # The web app, its packages, the Playwright tests and the reference server.
+                apps/web/* | packages/* | tests/visual/* | scripts/visual-* | playwright.config.ts) visual=true claimed=true ;;
+                # The design references and fonts the reference server reads, and the copy and brand
+                # sources behind the generated packages.
+                design/* | assets/* | config/*) visual=true claimed=true ;;
+                # The toolchain that installs and runs them. `pnpm install` reads every workspace
+                # manifest and runs its install scripts.
+                package.json | pnpm-lock.yaml | pnpm-workspace.yaml | turbo.json | tsconfig.base.json) visual=true claimed=true ;;
+                apps/*/package.json | .npmrc | .pnpmfile.cjs) visual=true claimed=true ;;
+              esac
+              case "$path" in
+                # Folders no gated job reads, including any .gitattributes inside them.
+                docs/* | artifacts/* | tests/scenarios/* | infra/* | apps/backend/*) ;;
+                # The workflows, local actions and every other .gitattributes change how jobs run or
+                # how files are checked out, so they run the full matrix.
+                .github/workflows/* | .github/actions/* | .gitattributes | */.gitattributes) native=true visual=true ;;
+                # Files no gated job reads. Any other .github/ path, such as a new local action, runs
+                # everything.
+                .github/CODEOWNERS | .github/*.md | .github/ISSUE_TEMPLATE/* | .github/PULL_REQUEST_TEMPLATE*) ;;
+                .github/FUNDING.yml | .github/dependabot.yml) ;;
+                AGENTS.md | CLAUDE.md | README.md | .gitignore | .prettierignore | eslint.config.mjs) ;;
+                scripts/check-evidence-budget.mjs | scripts/shared.test.mjs | scripts/rename-brand.mjs) ;;
+                scripts/with-heavy-build-lock.mjs) ;;
+                # Any other path that no group claimed might matter, so it runs everything.
+                *) [ "$claimed" = true ] || unclassified=${unclassified:-$path} ;;
+              esac
+            done < "$RUNNER_TEMP/changed-paths"
+            shopt -u nocasematch
+            if [ -n "$unclassified" ]; then
+              native=true
+              visual=true
+              # Only letters, digits and ._/- reach the log and the Markdown summary.
+              reason="$reason; ${unclassified//[^[:alnum:]._\/-]/?} is in no group"
+            fi
+          fi
+          echo "Native jobs run: $native. Visual job runs: $visual. Basis: $reason." | tee -a "$GITHUB_STEP_SUMMARY"
+          # Written last, so a step that fails anywhere sets no outputs and every gated job runs.
+          printf 'native=%s\nvisual=%s\n' "$native" "$visual" >> "$GITHUB_OUTPUT"
   evidence-budget:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
@@ -49,9 +178,13 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
+  # The four gated jobs below skip when `changes` says they can. A job skipped by its `if:` reports
+  # success to required checks. `!cancelled()` runs them even when `changes` itself fails.
   web-visual:
     # The preserved source baselines pass on macOS27/arm64; macOS26/Intel
     # now rasterizes two text-edge pixels differently. Keep exact comparisons.
+    needs: changes
+    if: ${{ !cancelled() && needs.changes.outputs.visual != 'false' }}
     runs-on: xcode-27
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -77,6 +210,8 @@ jobs:
             test-results
   ios-foundation:
     # Preserve the original Swift references and their reviewed comparison contract.
+    needs: changes
+    if: ${{ !cancelled() && needs.changes.outputs.native != 'false' }}
     runs-on: xcode-27
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -117,6 +252,8 @@ jobs:
             artifacts/ios
             ${{ runner.temp }}/creator-native-${{ github.run_id }}-${{ github.job }}/NativeSnapshotTests
   android-foundation:
+    needs: changes
+    if: ${{ !cancelled() && needs.changes.outputs.native != 'false' }}
     runs-on: macos-26-intel
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -139,6 +276,9 @@ jobs:
             apps/android/app/build/paparazzi/failures
             apps/android/app/build/outputs/apk/debug/*.apk
   android-runtime:
+    # Runs on Ubuntu, but builds and tests the Android app, so it is gated with the native jobs.
+    needs: changes
+    if: ${{ !cancelled() && needs.changes.outputs.native != 'false' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
