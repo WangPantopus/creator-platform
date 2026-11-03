@@ -13,7 +13,7 @@ import studioReplyAuthorityReview from "../../../infra/migrations/reviews/202610
 import coreFollowReview from "../../../infra/migrations/reviews/20261027-core-follow.json" with { type: "json" };
 import pilotColumnsReview from "../../../infra/migrations/reviews/20261101-pilot-columns.json" with { type: "json" };
 import { readFile } from "node:fs/promises";
-import { sha256 } from "./migration-custody.js";
+import { repositoryRoot, sha256 } from "./migration-custody.js";
 
 // The one reader of infra/migrations/chain.json for scripts/migrate-trust.ts
 // and the local installer (src/operations/local/fresh-install.ts), and the
@@ -117,6 +117,12 @@ export async function freshChain(root: URL) {
   } catch {
     throw new Error(chainRefusal);
   }
+}
+
+/** The waves after the canonical bootstrap, in the chain's order: what the
+ * local installer applies, and what the operator walk walks. */
+export async function freshWaves(root: URL = repositoryRoot) {
+  return (await freshChain(root)).waves.map((wave) => wave.id);
 }
 
 /** Whether this revision has the wave's review, and the wave lists exactly
