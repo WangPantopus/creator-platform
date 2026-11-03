@@ -102,7 +102,7 @@ manual financial settlement is part of WP 2.8. Use only ports 56420–56429 and 
 ## How to run it
 
 `node infra/local/stack.mjs up --lane N`, then `smoke`, `status`, `down`. Full guide:
-[infra/local/README.md](../../../infra/local/README.md). Scenario scripts are in
+[infra/local/README.md](../../../../infra/local/README.md). Scenario scripts are in
 `tests/scenarios/lane-2/`: `smoke.mjs`, `seed-maya.mjs`, `e2-1-cold-start.mjs`.
 
 ## Scenarios

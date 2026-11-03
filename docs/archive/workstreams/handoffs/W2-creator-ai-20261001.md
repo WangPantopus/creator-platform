@@ -35,13 +35,13 @@ Do not duplicate/reopen merged PRs. Preserve all branches and uncommitted work; 
 
 ## First concrete repair to finish
 
-Cleanup removed PostgreSQL while the backend had an idle `pg.Pool` connection. The API crashed on an unhandled pool error; raw client/error internals are excluded from evidence. PR40 adds five lines to `apps/backend/src/integration.ts`: an early `pool.on("error", ...)` listener emits only a fixed sanitized diagnostic. Existing active query rejection, readiness, authority, role verification and pool lifecycle remain intact. W1 was informed of the narrow shared edit. See [pool checkpoint](../../../artifacts/workstreams/W2/completion/20261001/pool-recovery-checkpoint.md).
+Cleanup removed PostgreSQL while the backend had an idle `pg.Pool` connection. The API crashed on an unhandled pool error; raw client/error internals are excluded from evidence. PR40 adds five lines to `apps/backend/src/integration.ts`: an early `pool.on("error", ...)` listener emits only a fixed sanitized diagnostic. Existing active query rejection, readiness, authority, role verification and pool lifecycle remain intact. W1 was informed of the narrow shared edit. See [pool checkpoint](../../../../artifacts/workstreams/W2/completion/20261001/pool-recovery-checkpoint.md).
 
 After safe recovery, launch the actual backend/web, establish an idle connection, **normally stop only the owned PostgreSQL container while retaining its volume**, observe API survival and truthful unavailable operations, restart PostgreSQL, then operate an authenticated persisted Studio read/preview and inspect known/unknown accounting. Verify no secret-bearing diagnostics or authority bypass. Back up before and after this milestone. Do not reproduce destructive cleanup by removing the volume. Fix any actual defects, finish relevant checks, mark PR40 ready and merge normally when ready; it is not a permanent draft.
 
 ### Fresh CI facts, observed 19:31 UTC
 
-[Current exact-head receipt](../../../artifacts/workstreams/W2/completion/20261001/handoff-pr40-ci.json) supersedes earlier queued-status observations for PR40 head `3a76192…`:
+[Current exact-head receipt](../../../../artifacts/workstreams/W2/completion/20261001/handoff-pr40-ci.json) supersedes earlier queued-status observations for PR40 head `3a76192…`:
 
 - Both web/backend, both Android foundation and both Android runtime jobs passed.
 - Both web visual jobs failed. PR run `36878309916`, job `110423341374`, reports `ReferenceError: visualWebURL is not defined` at `playwright.config.ts:14` before cases start.
@@ -88,7 +88,7 @@ Before loss, actual process SIGSTOP/SIGKILL and natural lease expiry yielded att
 
 Real desktop/phone Light/Night Studio source/style/test/license/My AI/onboarding, focus/rights/offline/reconnect/reduced motion and wrapping were operated. Actual iOS/Android builds/Welcome launches occurred in the October continuation; earlier September 30 iOS 2/2 and Android 4/4/Night sign-in are historical. **Fresh authenticated licensed native fan delivery, genuine 200% text, VoiceOver/TalkBack and complete fidelity remain unaccepted.** Doubled-display reflow is not 200% text. Two-tab actor proof did not establish separate session cookies. Latest preview UI JSON explicitly lacks captured HTTP response body. Do not upgrade these boundaries in the next report.
 
-Preserved sources/evidence: [October completion index](../../../artifacts/workstreams/W2/completion/20261001/README.md), [finish matrix](../../../artifacts/workstreams/W2/completion/20261001/finish-matrix.md), [decision/integration backlog](../../../artifacts/workstreams/W2/completion/20261001/release-backlog.md), [resource loss](../../../artifacts/workstreams/W2/completion/20261001/resource-loss-checkpoint.md), [process recovery](../../../artifacts/workstreams/W2/completion/20261001/source-process-recovery.md), citation and source-process manifests, provider/evaluation/preview/CI receipts. September 29/30 handoffs and artifacts remain historical context.
+Preserved sources/evidence: [October completion index](../../../../artifacts/workstreams/W2/completion/20261001/README.md), [finish matrix](../../../../artifacts/workstreams/W2/completion/20261001/finish-matrix.md), [decision/integration backlog](../../../../artifacts/workstreams/W2/completion/20261001/release-backlog.md), [resource loss](../../../../artifacts/workstreams/W2/completion/20261001/resource-loss-checkpoint.md), [process recovery](../../../../artifacts/workstreams/W2/completion/20261001/source-process-recovery.md), citation and source-process manifests, provider/evaluation/preview/CI receipts. September 29/30 handoffs and artifacts remain historical context.
 
 ## Canonical integrations and remaining acceptance
 

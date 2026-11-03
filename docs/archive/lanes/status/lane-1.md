@@ -61,7 +61,7 @@ Blocked on:
   migrations of #439, #472, #475 and #478.
 - Lane 4: P1, settling a paused creator's open paid requests, so a pause action can finish.
 - Lane 3: an `agent.resume` action handler, so a lifted pause brings the AI back (#478).
-- The founder's deletion decisions D1, D3 and D4 ([deletion findings, section 4](lane-1-deletion.md)):
+- The founder's deletion decisions D1, D3 and D4 ([deletion findings, section 4](../../../lanes/status/lane-1-deletion.md)):
   creator signature retention, how long the redacted fan record is kept, and Q16. D2 (sign-in
   after deletion) runs on its proposed default until the founder says otherwise.
 - Real Apple and Google tokens need the founder's Apple and Google client ids and the domain

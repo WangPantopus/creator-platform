@@ -2,7 +2,7 @@
 
 The iOS client is native SwiftUI and the Android client is native Kotlin/Compose. `Qelvora` is the replaceable product placeholder; Pantopus remains the identity provider name. Canonical local identity/session services and real feature registrations are integrated. Genuine Pantopus native authorization, approved external identities and production/provider acceptance remain open.
 
-Current October1 source includes main `c1c615e6`, public verification, native storage/lifecycle recovery and API-origin validation. The new native source is uncompiled/unoperated under the cleanup restriction. Current generation checks and bounded Swift syntax parsing are supporting source checks; they do not supersede historical app receipts. See [current W1 status](../workstreams/status/W1-resume.md), [storage/foreground source](../../artifacts/workstreams/W1/resume/2026-10-01-native-storage/run.md) and [identity authority](W1-identity-authority.md).
+Current October1 source includes main `c1c615e6`, public verification, native storage/lifecycle recovery and API-origin validation. The new native source is uncompiled/unoperated under the cleanup restriction. Current generation checks and bounded Swift syntax parsing are supporting source checks; they do not supersede historical app receipts. See [current W1 status](../archive/workstreams/status/W1-resume.md), [storage/foreground source](../../artifacts/workstreams/W1/resume/2026-10-01-native-storage/run.md) and [identity authority](../archive/implementation/W1-identity-authority.md).
 
 ## Implemented source
 

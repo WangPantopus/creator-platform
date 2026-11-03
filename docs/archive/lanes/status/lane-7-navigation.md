@@ -167,8 +167,8 @@ results are identified explicitly. All use the fake API, not the real backend.
 | N20 | Edit profile: Back through the account screen to You, then Home         | pass: you > account > handle form > in-screen Back: account > system Back: you > home                                                                                                                                          | pass: handle form > account > You > Home                                               |
 | N21 | Requests tab: money screens go Back to Requests, not to You             | pass: requests > spending > in-screen Back: requests, not you > access > system Back: requests > home                                                                                                                          | pass: Spending (prior manual); Creator access > Requests > Home (XCUITest)             |
 
-Logs: [Android](../../../artifacts/lane-7/7-2-android-run.txt) and
-[iOS](../../../artifacts/lane-7/7-2-ios-run.txt). The iOS runner asserts screen transitions,
+Logs: [Android](../../../../artifacts/lane-7/7-2-android-run.txt) and
+[iOS](../../../../artifacts/lane-7/7-2-ios-run.txt). The iOS runner asserts screen transitions,
 notification read state, consent creation, session revocation and account-scoped API requests.
 The resumed Android N13 check now matches `/conversations/` (the real API path); the old
 `/threads/` match was ineffective. Its existing screen assertion had caught the deliberate
@@ -241,7 +241,7 @@ pull-to-refresh. The thread takes a few seconds to load after a tap on a cold st
 | Harness contract check against current real schemas | pass: 51/51                                                                                             |
 | GitHub CI                                           | not run: app PR checks tool needs a GitHub connection; no polling                                       |
 
-Evidence: [local gate report](../../../artifacts/lane-7/7-2-gates.txt). The connected journey
+Evidence: [local gate report](../../../../artifacts/lane-7/7-2-gates.txt). The connected journey
 skips do not count as operated navigation passes. Release distribution signing and installation
 are WP 7.9 and are not run here.
 

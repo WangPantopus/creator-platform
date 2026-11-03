@@ -84,7 +84,7 @@ conveniences stay behind `BuildConfig.DEBUG` or `#if DEBUG`.
 
 ## Verification: end-to-end scenarios and exit demo
 
-No new unit or snapshot tests ([working agreement](01-working-agreement.md) section 3). Build
+No new unit or snapshot tests ([working agreement](../../lanes/01-working-agreement.md) section 3). Build
 with the local JDK and XcodeGen and run Lint and the existing unit and snapshot suites as a
 regression check. Then operate the app: **every scenario runs on iOS and on Android, and the pull
 request shows both results side by side. A difference between the platforms is a defect.** Run in

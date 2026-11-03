@@ -8,7 +8,7 @@ Read [BRIEF.md](BRIEF.md) before working on any phase.
 Status keys: `[ ]` not started · `[~]` in progress · `[x]` done. Record the
 link to each published artifact next to its item when it exists.
 
-W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan export](../artifacts/workstreams/W3/increment-66/20261002-privacy61-handoff/run.md). Personally operated web Light/Night390 with a genuine saved request and four explicit blocked domains; current native builds pass, current native UI and full A–I remain incomplete. [Successor handoff](workstreams/handoffs/W3-mac-studio-2026-10-02.md). The [final source-pin correction](../artifacts/workstreams/W3/increment-67/20261002-cursor-source-pin/run.md) matches the corrected held privacy SQL without activating it; [abort cleanup correction](../artifacts/workstreams/W3/increment-68/20261002-cursor-abort-cleanup/run.md) retains the client through cancellation and rollback, with real held-purpose qualification still open. No design/implementation completion checkbox is advanced from this partial acceptance.
+W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan export](../artifacts/workstreams/W3/increment-66/20261002-privacy61-handoff/run.md). Personally operated web Light/Night390 with a genuine saved request and four explicit blocked domains; current native builds pass, current native UI and full A–I remain incomplete. [Successor handoff](archive/workstreams/handoffs/W3-mac-studio-2026-10-02.md). The [final source-pin correction](../artifacts/workstreams/W3/increment-67/20261002-cursor-source-pin/run.md) matches the corrected held privacy SQL without activating it; [abort cleanup correction](../artifacts/workstreams/W3/increment-68/20261002-cursor-abort-cleanup/run.md) retains the client through cancellation and rollback, with real held-purpose qualification still open. No design/implementation completion checkbox is advanced from this partial acceptance.
 
 ## Where the work lives
 
@@ -27,14 +27,14 @@ W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan expor
   reference, creator upgrade evidence, view lifetime) are merged; comparison stays
   installed and off. The [launch plan](LAUNCH_PLAN.md) sets the order of work (five
   moments, phone apps first, the share card in, the rest planned for later) and the
-  [launch review](operations/launch-review-2026-10-08.md) records what the code does
+  [launch review](archive/operations/launch-review-2026-10-08.md) records what the code does
   today. Current state: [CURRENT](operations/CURRENT.md). No design or implementation
   completion checkbox is advanced.
 
 - [~] October 8, 2026: creator comparison results clear on offline or failed
   permission reads and recover after fresh reads. Launched web checks and production
   compilation pass; remaining lifetime/privacy operations are carried into the
-  [immediate requested handoff](operations/session-handoff-2026-10-08-immediate.md).
+  [immediate requested handoff](archive/operations/session-handoff-2026-10-08-immediate.md).
   [Evidence](../artifacts/pr-review/2026-10-08/comparison-view-lifetime/README.md).
 
 - [~] October 8, 2026: actual preserved creator revision13→14 comparison, fresh
@@ -135,7 +135,7 @@ W3 implementation checkpoint,2026-10-02: [preserved privacy61 and real fan expor
   [Connected native evidence and remaining acceptance](../artifacts/pr-review/2026-10-08/native-connected-journey/README.md).
   Full native feature/design acceptance remains open.
 
-**October 8 resumed plan:** [complete product finish plan and completion criteria](operations/product-finish-plan-2026-10-08.md).
+**October 8 resumed plan:** [complete product finish plan and completion criteria](archive/operations/product-finish-plan-2026-10-08.md).
 The first increment binds shadow comparison evidence to its exact current sample
 cohort. The real privacy producer and actual existing-version upgrade remain
 open; this does not advance full journey or design acceptance.
@@ -145,20 +145,20 @@ open; this does not advance full journey or design acceptance.
   Backend build and all 57 tests pass, including 11 PostgreSQL cases.
   [Bounded evidence and remaining producer work](../artifacts/pr-review/2026-10-08/shadow-evidence-lifetime/README.md).
 
-**October 8 handoff:** [#335 is merged; successor instructions, remaining acceptance and retained resources](operations/session-handoff-2026-10-08.md). All original PRs are resolved. Product latency, safe upgrades and the broader finish plan remain open.
+**October 8 handoff:** [#335 is merged; successor instructions, remaining acceptance and retained resources](archive/operations/session-handoff-2026-10-08.md). All original PRs are resolved. Product latency, safe upgrades and the broader finish plan remain open.
 
-- [x] October 7, 2026: inventory and continuation decisions for all 18 original draft PRs, with per-file preservation evidence and outstanding acceptance in the [reconciliation ledger](operations/pr-reconciliation-2026-10-07.md).
+- [x] October 7, 2026: inventory and continuation decisions for all 18 original draft PRs, with per-file preservation evidence and outstanding acceptance in the [reconciliation ledger](archive/operations/pr-reconciliation-2026-10-07.md).
 - [x] October 7, 2026: reused the missing #145 restoration protections in the #132 continuation; [source/built-runtime database fault evidence](../artifacts/pr-review/2026-10-07/restoration-reconciliation/README.md). This is a bounded runtime repair, not a completed generation journey.
 - [x] October 7, 2026: connect installed privacy consumers, original Agent accounting owners and the usage-expiry lifetime in #132; [source/standalone operation and failure evidence](../artifacts/pr-review/2026-10-07/usage-accounting-host/README.md). Complete privacy and generation journeys remain open.
 - [x] October 7, 2026: connect Conversation export and the original protected Commerce stream; source and standalone exports plus a source staging-closure check are recorded in [the bounded evidence](../artifacts/pr-review/2026-10-07/conversation-commerce/README.md). Preserve the original #262 publication signal checks and account for #262/#301/#302 in #132. Full privacy and publication acceptance remain open.
 - [x] October 7, 2026: preserve native Commerce, iOS recorder cleanup and Studio media sources from #284/#303/#305 with current integration repairs and [bounded validation](../artifacts/pr-review/2026-10-07/native-media-reconciliation/README.md); physical-device and complete journey acceptance remain open.
 - [x] October 7, 2026: reconcile #247 terminal cancellation and #192 finite feedback source, including actual sequence-catalogue correction and original Trust boundaries; [preservation evidence and retained gates](../artifacts/pr-review/2026-10-07/terminal-feedback-reconciliation/README.md). Generation and feedback activation remain closed.
 - [x] October 7, 2026: preserve #282 original call offers, signing and exact retries; [source and validation](../artifacts/pr-review/2026-10-07/call-source-reconciliation/README.md). Successful scheduling/provider/hardware journeys remain open.
-- [~] Reconcile and qualify the retained implementations in that ledger's journey order. Design deliverables marked complete below do not establish functional application acceptance. The [project checkpoint](operations/project-continuation-2026-10-07.md) preserves product, architecture and current engineering context.
+- [~] Reconcile and qualify the retained implementations in that ledger's journey order. Design deliverables marked complete below do not establish functional application acceptance. The [project checkpoint](archive/operations/project-continuation-2026-10-07.md) preserves product, architecture and current engineering context.
 - [x] October 7, 2026: strengthen output grounding with complete sentence spans and exact authorized quotes; operate six boundary cases and two real fan replies with original accounting. [Evidence and preserved failures](../artifacts/pr-review/2026-10-07/generation-performance-grounding/README.md).
 - [x] October 7–8, 2026: fix the 2,500-token context budget being counted as UTF-8 bytes; retain the source in the actual longer conversation, reduce repeated current-authority reads, and complete revision 14 first publication and three settled fan replies. [Reproduction, live operation and custody](../artifacts/pr-review/2026-10-07/generation-context-latency/README.md).
 - [x] October 8, 2026: preserve published revision 12/13 engine behavior and immutable fingerprints while new drafts use revision 14; bind shadow evidence to both engines and invalidate old comparisons. All 14 historical differential cases pass; the current compiled host serves an existing revision 13 publication without republishing. Equivalent catalogue prefilters retain all checked privilege/policy drift. [Compatibility, live operation and custody](../artifacts/pr-review/2026-10-08/generation-published-compatibility/README.md).
-- [~] Generation latency: latest compiled useful answer is fully visible at 26.992s with a 3.767s HTTP acknowledgement; server acceptance-to-completion is 23.820s. Earlier revision 14 observations (22.512s visible / 1.101s acknowledgement) remain preserved; these are not controlled comparisons or percentile qualification. Retain the 300ms acknowledgement, 2.5s warm/4s cold first useful sentence and 8s completion targets. Existing-version upgrades still require the unconnected privacy-safe shadow feed; historical engine support preserves original limitations until an evaluated upgrade. The [launch review](operations/launch-review-2026-10-08.md) supersedes these figures for planning: the latest measured first stored sentence is 19.1 s, most of the wait (roughly 15 s or more) is platform overhead, and the launch plan's bar is 4.5 s at the start of the pilot.
+- [~] Generation latency: latest compiled useful answer is fully visible at 26.992s with a 3.767s HTTP acknowledgement; server acceptance-to-completion is 23.820s. Earlier revision 14 observations (22.512s visible / 1.101s acknowledgement) remain preserved; these are not controlled comparisons or percentile qualification. Retain the 300ms acknowledgement, 2.5s warm/4s cold first useful sentence and 8s completion targets. Existing-version upgrades still require the unconnected privacy-safe shadow feed; historical engine support preserves original limitations until an evaluated upgrade. The [launch review](archive/operations/launch-review-2026-10-08.md) supersedes these figures for planning: the latest measured first stored sentence is 19.1 s, most of the wait (roughly 15 s or more) is platform overhead, and the launch plan's bar is 4.5 s at the start of the pilot.
 
 ## Sample content used in every design
 

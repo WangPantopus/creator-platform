@@ -44,12 +44,12 @@ Surface codes: **F** = fan web/iOS/Android; **SP** = phone Studio web; **SD** = 
 
 The following artboards have you as primary implementation/visual owner. Also deliver every contributing state, domain requirement and missing-design resolution assigned to you by `COVERAGE.md` and the full design inventory. Prototype cards are workflow requirements; exercise all states instead of shipping prototype navigation as the product.
 
-- **4A-02 — 02 · Continue with Pantopus**: [Welcome.dc.html](../../../design/phase4a-fan-core/Welcome.dc.html); reference 390×844; surface F.
-- **4A-13 — 13 · Onboarding: your handle**: [Handle.dc.html](../../../design/phase4a-fan-core/Handle.dc.html); reference 390×844; surface F.
-- **4B-08 — 08 · Verification page (web)**: [Verify.dc.html](../../../design/phase4b-fan-account/Verify.dc.html); reference 390×1000; surface Public web + SHARE.
-- **4C-03 — 03 · Review and sign**: [Sign.dc.html](../../../design/phase4c-studio-phone/Sign.dc.html); reference 390×844; surface SP.
-- **4D-01 — 01 · Get verified and set up**: [Main.dc.html](../../../design/phase4d-studio-desktop/Main.dc.html); reference 1280×900; surface SD.
-- **5.5 — 5.5 · Who wrote this? (comprehension test)**: [Comprehension.dc.html](../../../design/phase5-prototypes/Comprehension.dc.html); reference 390×844; surface REF.
+- **4A-02 — 02 · Continue with Pantopus**: [Welcome.dc.html](../../../../design/phase4a-fan-core/Welcome.dc.html); reference 390×844; surface F.
+- **4A-13 — 13 · Onboarding: your handle**: [Handle.dc.html](../../../../design/phase4a-fan-core/Handle.dc.html); reference 390×844; surface F.
+- **4B-08 — 08 · Verification page (web)**: [Verify.dc.html](../../../../design/phase4b-fan-account/Verify.dc.html); reference 390×1000; surface Public web + SHARE.
+- **4C-03 — 03 · Review and sign**: [Sign.dc.html](../../../../design/phase4c-studio-phone/Sign.dc.html); reference 390×844; surface SP.
+- **4D-01 — 01 · Get verified and set up**: [Main.dc.html](../../../../design/phase4d-studio-desktop/Main.dc.html); reference 1280×900; surface SD.
+- **5.5 — 5.5 · Who wrote this? (comprehension test)**: [Comprehension.dc.html](../../../../design/phase5-prototypes/Comprehension.dc.html); reference 390×844; surface REF.
 
 You also own the 53-component shared foundation and generated design resources. Semantic feature owners contribute requirements; you personally perform your shared-file integration and fidelity work.
 

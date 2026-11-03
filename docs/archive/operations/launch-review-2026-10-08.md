@@ -1,8 +1,8 @@
 # Launch review: what the code does today
 
 Point-in-time record, 2026-10-08, main at `4bdf3e1cd` with PRs #351 to #353 still open.
-The decisions and the sequence built on it are in [LAUNCH_PLAN](../LAUNCH_PLAN.md).
-Nothing here changes what [source/](../source/) requires.
+The decisions and the sequence built on it are in [LAUNCH_PLAN](../../LAUNCH_PLAN.md).
+Nothing here changes what [source/](../../source/) requires.
 
 **Method.** Seven read-only reviews (Android, iOS, comparison, growth and entry, the AI
 pipeline, presence and money, the three open PRs), then spot checks of the

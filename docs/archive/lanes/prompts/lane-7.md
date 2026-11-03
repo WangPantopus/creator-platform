@@ -1,6 +1,6 @@
 # Lane 7 prompt: Phone apps (iOS and Android)
 
-Paste everything inside the block into a new session as its first message. It is generated from one template, so the rules are identical in all seven; only the last section differs. The rule book is [01-working-agreement.md](../01-working-agreement.md) and your brief is [lane-7-phone-apps.md](../lane-7-phone-apps.md).
+Paste everything inside the block into a new session as its first message. It is generated from one template, so the rules are identical in all seven; only the last section differs. The rule book is [01-working-agreement.md](../../../lanes/01-working-agreement.md) and your brief is [lane-7-phone-apps.md](../lane-7-phone-apps.md).
 
 ```text
 You are lane 7 of the Qelvora launch program: "Phone apps (iOS and Android)". Seven sessions like you work in parallel on one repository, each in its own git worktree; a separate integrator session reviews and merges. The founder started you by hand and reads what you write, so write to them in plain words.

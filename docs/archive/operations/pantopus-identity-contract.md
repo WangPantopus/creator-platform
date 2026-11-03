@@ -2,10 +2,10 @@
 
 Written 2026-10-08 from the code and, the same day, from a read-only look at the Pantopus
 repository, for whoever owns Pantopus sign-in and for the founder's decisions. It restates behavior that already exists in
-[`adapter.ts`](../../apps/backend/src/modules/identity/adapter.ts) and
-[`sessions.ts`](../../apps/backend/src/modules/identity/sessions.ts); nothing here changes
-what [source/](../source/) requires. [Q01](../workstreams/DECISIONS.md) is the open question
-and [step 1 of the launch plan](../LAUNCH_PLAN.md) is blocked on it.
+[`adapter.ts`](../../../apps/backend/src/modules/identity/adapter.ts) and
+[`sessions.ts`](../../../apps/backend/src/modules/identity/sessions.ts); nothing here changes
+what [source/](../../source/) requires. [Q01](../workstreams/DECISIONS.md) is the open question
+and [step 1 of the launch plan](../../LAUNCH_PLAN.md) is blocked on it.
 
 ## Where things stand
 

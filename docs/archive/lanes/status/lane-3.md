@@ -13,7 +13,7 @@ Partial FAQ drafts survive recovery and stale memory responses cannot restore a
 dismissed prompt. The unchanged workspace-lock proposal is now registered as
 0252 with exact runtime receipts, fresh/restored qualification and a guarded
 fresh installer. See [migration evidence](../../operations/workspace-lock-qualification-2026-10-22.md)
-and the [current status](../../operations/CURRENT.md).
+and the [current status](../../../operations/CURRENT.md).
 
 The memory and context-exclusion proposals remain unregistered and inactive.
 Real-model checks and embeddings require the actual gateway/provider decision.

@@ -35,7 +35,7 @@ Public-page drafts are prepared but are not part of this branch. No new unit tes
 For the next lane 5 session. Read this after [docs/lanes/README.md](../README.md) and before
 touching anything. It is written so you can resume without redoing work, without guessing, and
 without leaving gaps. The standing rules are in [the lane 5 prompt](../prompts/lane-5.md) and
-[the working agreement](../01-working-agreement.md); this file records only what changed and
+[the working agreement](../../../lanes/01-working-agreement.md); this file records only what changed and
 where things stand. The shorter, always-current summary is [lane-5.md](lane-5.md).
 
 ## 1. Original handoff state (superseded by the resume update above)

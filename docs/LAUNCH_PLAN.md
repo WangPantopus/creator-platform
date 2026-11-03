@@ -1,7 +1,7 @@
 # Launch plan: scope, decisions and what comes later
 
 Decided with the founder on 2026-10-08 and checked against the code the same day (see the
-[launch review](operations/launch-review-2026-10-08.md)). This file sets the **sequence** of
+[launch review](archive/operations/launch-review-2026-10-08.md)). This file sets the **sequence** of
 the work. It removes nothing from the product: the documents in [source/](source/) still
 define behavior, and everything under "Planned for later" is planned, not dropped. Items
 marked *(to confirm)* are recommendations that still need a yes.
@@ -30,7 +30,7 @@ are met.
 | Decision | Detail |
 | --- | --- |
 | Pilot cut line | The launch is slice 1 of the [architecture build sequence](source/System_Architecture.md) (section 12) plus the share card below. Everything else is in section 4. All ten finish-plan milestones stay in scope; this only orders them (section 9). |
-| Phone apps first | The native iOS and Android apps are the primary launch surface for fans. Web stays supported: it must deliver the first answer from a creator's link with no install, and it carries the configuration screens (My AI, Offers, Earnings, Team, License). Creators' daily work was decided native on 2026-10-02 in [DECISIONS](workstreams/DECISIONS.md), but the review found it unbuilt (L per platform). Decided 2026-10-09 (option A): the pilot's native app is the fan app; creators use the Studio in the phone browser (installable, passkey signing); a separate native Qelvora Studio app follows after the pilot, Notes and reactions first. This replaces the 2026-10-08 plan to make Notes and reactions native at launch (section 8, step 5). |
+| Phone apps first | The native iOS and Android apps are the primary launch surface for fans. Web stays supported: it must deliver the first answer from a creator's link with no install, and it carries the configuration screens (My AI, Offers, Earnings, Team, License). Creators' daily work was decided native on 2026-10-02 in [DECISIONS](archive/workstreams/DECISIONS.md), but the review found it unbuilt (L per platform). Decided 2026-10-09 (option A): the pilot's native app is the fan app; creators use the Studio in the phone browser (installable, passkey signing); a separate native Qelvora Studio app follows after the pilot, Notes and reactions first. This replaces the 2026-10-08 plan to make Notes and reactions native at launch (section 8, step 5). |
 | Share card is in | A minimal card: a signed written reply, with its public verification page, as an image and a link. The fan chooses how their handle appears, and either side can revoke it (D-15). Pulled forward from slice 3. |
 | Model provider | The Anthropic API is the intended production provider. Development continues on the existing synthetic OpenAI configuration, which is development-only and not a production approval. Decided 2026-10-08: switch before the first real creator publishes, as one engine revision, with the embedding provider chosen first (section 8, step 2, and the provider notes below). |
 | Comparison scope freeze | Comparison stays installed and off. Done means: merge #351, #352 and #353 in order; a withdraw-only mode with retry; one native withdrawal exercised; SQL-level checks on a disposable database; a runbook; an overdue-purge alert; and a creator-authored FAQ set that replaces the fan-sample publish gate. Parked: sanitizer corpus, production authority, object store, per-fan limits. The wave cannot be removed, because export and delete are composed from it. Confirmed 2026-10-08. |
@@ -115,7 +115,7 @@ Light and Night.
 ## 7. Where the build stands
 
 The review found a strong engine with the connections missing. The detail, with evidence and
-sizes, is in the [launch review](operations/launch-review-2026-10-08.md).
+sizes, is in the [launch review](archive/operations/launch-review-2026-10-08.md).
 
 | Moment | Works today | Missing |
 | --- | --- | --- |
@@ -161,9 +161,9 @@ L two weeks or more.
   development composition root; production hosts are meant to inject genuine identity, W8
   denials and provider dependencies into the same `createConfiguredBackend` seam. So this is a
   second composition root that needs those adapters, not a flag, and it waits on the
-  [identity contract](operations/pantopus-identity-contract.md).
+  [identity contract](archive/operations/pantopus-identity-contract.md).
 - Real sign-in. Pantopus is not an OAuth provider and has no verified 18+ signal (research of
-  2026-10-08; see the [identity contract](operations/pantopus-identity-contract.md)). The
+  2026-10-08; see the [identity contract](archive/operations/pantopus-identity-contract.md)). The
   recommendation *(to confirm)* is a Qelvora-owned sign-in as a second adapter for the pilot,
   with its own 18+ approach, and a Pantopus connect flow later; then release sign-in on both
   phones. L, then M each.
@@ -262,7 +262,7 @@ Decided on 2026-10-08 (recommendations confirmed):
 Still to confirm:
 
 1. **Pilot sign-in and 18+.** The recommendation and seven questions in the
-   [identity contract](operations/pantopus-identity-contract.md).
+   [identity contract](archive/operations/pantopus-identity-contract.md).
 2. **Voice notes.** Written replies first; voice later (section 4).
 3. **Launch-quality bars** in section 5.
 4. **Calls only the founder can make.** Whether an AI reply may state a price from the
@@ -272,7 +272,7 @@ Still to confirm:
 
 Inputs only the founder can supply:
 
-1. The Q01 decisions in the [identity contract](operations/pantopus-identity-contract.md):
+1. The Q01 decisions in the [identity contract](archive/operations/pantopus-identity-contract.md):
    the sign-in option for the pilot, what defines 18+, and which account id Qelvora receives.
 2. The final domain and relying-party ID (Q09). Passkeys and universal links depend on it.
 3. Apple Developer and Google Play accounts, TestFlight and closed testing, and at least one
@@ -287,7 +287,7 @@ Inputs only the founder can supply:
 
 ## Provider switch notes (to verify at migration time)
 
-The full checklist is in the [launch review](operations/launch-review-2026-10-08.md), section 13.
+The full checklist is in the [launch review](archive/operations/launch-review-2026-10-08.md), section 13.
 
 - **Timing.** A model or provider change alters every published version's engine
   fingerprint, so it is an engine upgrade. Until a creator publishes, it is free. Afterwards

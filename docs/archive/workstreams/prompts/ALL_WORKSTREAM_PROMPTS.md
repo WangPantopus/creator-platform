@@ -59,12 +59,12 @@ Surface codes: **F** = fan web/iOS/Android; **SP** = phone Studio web; **SD** = 
 
 The following artboards have you as primary implementation/visual owner. Also deliver every contributing state, domain requirement and missing-design resolution assigned to you by `COVERAGE.md` and the full design inventory. Prototype cards are workflow requirements; exercise all states instead of shipping prototype navigation as the product.
 
-- **4A-02 — 02 · Continue with Pantopus**: [Welcome.dc.html](../../../design/phase4a-fan-core/Welcome.dc.html); reference 390×844; surface F.
-- **4A-13 — 13 · Onboarding: your handle**: [Handle.dc.html](../../../design/phase4a-fan-core/Handle.dc.html); reference 390×844; surface F.
-- **4B-08 — 08 · Verification page (web)**: [Verify.dc.html](../../../design/phase4b-fan-account/Verify.dc.html); reference 390×1000; surface Public web + SHARE.
-- **4C-03 — 03 · Review and sign**: [Sign.dc.html](../../../design/phase4c-studio-phone/Sign.dc.html); reference 390×844; surface SP.
-- **4D-01 — 01 · Get verified and set up**: [Main.dc.html](../../../design/phase4d-studio-desktop/Main.dc.html); reference 1280×900; surface SD.
-- **5.5 — 5.5 · Who wrote this? (comprehension test)**: [Comprehension.dc.html](../../../design/phase5-prototypes/Comprehension.dc.html); reference 390×844; surface REF.
+- **4A-02 — 02 · Continue with Pantopus**: [Welcome.dc.html](../../../../design/phase4a-fan-core/Welcome.dc.html); reference 390×844; surface F.
+- **4A-13 — 13 · Onboarding: your handle**: [Handle.dc.html](../../../../design/phase4a-fan-core/Handle.dc.html); reference 390×844; surface F.
+- **4B-08 — 08 · Verification page (web)**: [Verify.dc.html](../../../../design/phase4b-fan-account/Verify.dc.html); reference 390×1000; surface Public web + SHARE.
+- **4C-03 — 03 · Review and sign**: [Sign.dc.html](../../../../design/phase4c-studio-phone/Sign.dc.html); reference 390×844; surface SP.
+- **4D-01 — 01 · Get verified and set up**: [Main.dc.html](../../../../design/phase4d-studio-desktop/Main.dc.html); reference 1280×900; surface SD.
+- **5.5 — 5.5 · Who wrote this? (comprehension test)**: [Comprehension.dc.html](../../../../design/phase5-prototypes/Comprehension.dc.html); reference 390×844; surface REF.
 
 You also own the 53-component shared foundation and generated design resources. Semantic feature owners contribute requirements; you personally perform your shared-file integration and fidelity work.
 
@@ -180,12 +180,12 @@ Surface codes: **F** = fan web/iOS/Android; **SP** = phone Studio web; **SD** = 
 
 The following artboards have you as primary implementation/visual owner. Also deliver every contributing state, domain requirement and missing-design resolution assigned to you by `COVERAGE.md` and the full design inventory. Prototype cards are workflow requirements; exercise all states instead of shipping prototype navigation as the product.
 
-- **4C-07 — 07 · My AI: live version and 72-hour digest**: [MyAI.dc.html](../../../design/phase4c-studio-phone/MyAI.dc.html); reference 390×1300; surface SP.
-- **4D-02 — 02 · My AI · Sources**: [Sources.dc.html](../../../design/phase4d-studio-desktop/Sources.dc.html); reference 1280×900; surface SD.
-- **4D-03 — 03 · My AI · Mode, style and rules**: [Style.dc.html](../../../design/phase4d-studio-desktop/Style.dc.html); reference 1280×900; surface SD.
-- **4D-04 — 04 · My AI · Test, publish, versions**: [Test.dc.html](../../../design/phase4d-studio-desktop/Test.dc.html); reference 1280×900; surface SD.
-- **4D-08 — 08 · License and sponsorships**: [License.dc.html](../../../design/phase4d-studio-desktop/License.dc.html); reference 1280×900; surface SD.
-- **5.4 — 5.4 · Onboarding to a published AI**: [Onboard.dc.html](../../../design/phase5-prototypes/Onboard.dc.html); reference 1280×800; surface REF → SD.
+- **4C-07 — 07 · My AI: live version and 72-hour digest**: [MyAI.dc.html](../../../../design/phase4c-studio-phone/MyAI.dc.html); reference 390×1300; surface SP.
+- **4D-02 — 02 · My AI · Sources**: [Sources.dc.html](../../../../design/phase4d-studio-desktop/Sources.dc.html); reference 1280×900; surface SD.
+- **4D-03 — 03 · My AI · Mode, style and rules**: [Style.dc.html](../../../../design/phase4d-studio-desktop/Style.dc.html); reference 1280×900; surface SD.
+- **4D-04 — 04 · My AI · Test, publish, versions**: [Test.dc.html](../../../../design/phase4d-studio-desktop/Test.dc.html); reference 1280×900; surface SD.
+- **4D-08 — 08 · License and sponsorships**: [License.dc.html](../../../../design/phase4d-studio-desktop/License.dc.html); reference 1280×900; surface SD.
+- **5.4 — 5.4 · Onboarding to a published AI**: [Onboard.dc.html](../../../../design/phase5-prototypes/Onboard.dc.html); reference 1280×800; surface REF → SD.
 
 ## Work packages
 
@@ -298,15 +298,15 @@ Surface codes: **F** = fan web/iOS/Android; **SP** = phone Studio web; **SD** = 
 
 The following artboards have you as primary implementation/visual owner. Also deliver every contributing state, domain requirement and missing-design resolution assigned to you by `COVERAGE.md` and the full design inventory. Prototype cards are workflow requirements; exercise all states instead of shipping prototype navigation as the product.
 
-- **4A-03 — 03 · Before your first message**: [Consent.dc.html](../../../design/phase4a-fan-core/Consent.dc.html); reference 390×844; surface F.
-- **4A-04 — 04 · Thread · Maya's AI**: [Thread.dc.html](../../../design/phase4a-fan-core/Thread.dc.html); reference 390×1240; surface F.
-- **4A-05 — 05 · Thread · Maya is here (Night)**: [ThreadLive.dc.html](../../../design/phase4a-fan-core/ThreadLive.dc.html); reference 390×1180; surface F.
-- **4A-10 — 10 · Free conversation ended**: [Ended.dc.html](../../../design/phase4a-fan-core/Ended.dc.html); reference 390×1000; surface F.
-- **4A-14 — 14 · A Note arrives, with the thread**: [NoteThread.dc.html](../../../design/phase4a-fan-core/NoteThread.dc.html); reference 390×1100; surface F.
-- **4A-15 — 15 · Thread states: booked, paused, offline, not sent**: [States.dc.html](../../../design/phase4a-fan-core/States.dc.html); reference 390×1500; surface F / REF states.
-- **4B-05 — 05 · You**: [You.dc.html](../../../design/phase4b-fan-account/You.dc.html); reference 390×1100; surface F.
-- **4B-06 — 06 · Me and privacy**: [Privacy.dc.html](../../../design/phase4b-fan-account/Privacy.dc.html); reference 390×1400; surface F.
-- **5.1 — 5.1 · Link in bio to a first cited answer**: [Main.dc.html](../../../design/phase5-prototypes/Main.dc.html); reference 390×844; surface REF → F.
+- **4A-03 — 03 · Before your first message**: [Consent.dc.html](../../../../design/phase4a-fan-core/Consent.dc.html); reference 390×844; surface F.
+- **4A-04 — 04 · Thread · Maya's AI**: [Thread.dc.html](../../../../design/phase4a-fan-core/Thread.dc.html); reference 390×1240; surface F.
+- **4A-05 — 05 · Thread · Maya is here (Night)**: [ThreadLive.dc.html](../../../../design/phase4a-fan-core/ThreadLive.dc.html); reference 390×1180; surface F.
+- **4A-10 — 10 · Free conversation ended**: [Ended.dc.html](../../../../design/phase4a-fan-core/Ended.dc.html); reference 390×1000; surface F.
+- **4A-14 — 14 · A Note arrives, with the thread**: [NoteThread.dc.html](../../../../design/phase4a-fan-core/NoteThread.dc.html); reference 390×1100; surface F.
+- **4A-15 — 15 · Thread states: booked, paused, offline, not sent**: [States.dc.html](../../../../design/phase4a-fan-core/States.dc.html); reference 390×1500; surface F / REF states.
+- **4B-05 — 05 · You**: [You.dc.html](../../../../design/phase4b-fan-account/You.dc.html); reference 390×1100; surface F.
+- **4B-06 — 06 · Me and privacy**: [Privacy.dc.html](../../../../design/phase4b-fan-account/Privacy.dc.html); reference 390×1400; surface F.
+- **5.1 — 5.1 · Link in bio to a first cited answer**: [Main.dc.html](../../../../design/phase5-prototypes/Main.dc.html); reference 390×844; surface REF → F.
 
 ## Work packages
 
@@ -419,19 +419,19 @@ Surface codes: **F** = fan web/iOS/Android; **SP** = phone Studio web; **SD** = 
 
 The following artboards have you as primary implementation/visual owner. Also deliver every contributing state, domain requirement and missing-design resolution assigned to you by `COVERAGE.md` and the full design inventory. Prototype cards are workflow requirements; exercise all states instead of shipping prototype navigation as the product.
 
-- **4A-06 — 06 · Ask Maya to step in**: [Packet.dc.html](../../../design/phase4a-fan-core/Packet.dc.html); reference 390×1700; surface F.
-- **4A-07 — 07 · First paid action · spend limit**: [Limit.dc.html](../../../design/phase4a-fan-core/Limit.dc.html); reference 390×844; surface F.
-- **4A-08 — 08 · Request status and receipt**: [Status.dc.html](../../../design/phase4a-fan-core/Status.dc.html); reference 390×1300; surface F + SHARE.
-- **4A-16 — 16 · Add a card (hold, not a charge)**: [Checkout.dc.html](../../../design/phase4a-fan-core/Checkout.dc.html); reference 390×844; surface F (native policy gated).
-- **4B-03 — 03 · Creator profile · Access**: [Access.dc.html](../../../design/phase4b-fan-account/Access.dc.html); reference 390×1100; surface F.
-- **4B-04 — 04 · Requests tab**: [Requests.dc.html](../../../design/phase4b-fan-account/Requests.dc.html); reference 390×1100; surface F.
-- **4B-07 — 07 · Spending and time**: [Spending.dc.html](../../../design/phase4b-fan-account/Spending.dc.html); reference 390×1000; surface F.
-- **4D-05 — 05 · Offers**: [Offers.dc.html](../../../design/phase4d-studio-desktop/Offers.dc.html); reference 1280×900; surface SD.
-- **4D-06 — 06 · Earnings**: [Earnings.dc.html](../../../design/phase4d-studio-desktop/Earnings.dc.html); reference 1280×900; surface SD.
-- **4E-06 — E6 · Native membership purchase**: [IAP.dc.html](../../../design/phase4e-4i/IAP.dc.html); reference 390×844; surface iOS + Android / OS.
-- **4G-01 — G1 · Your pass**: [PassYou.dc.html](../../../design/phase4e-4i/PassYou.dc.html); reference 390×1100; surface F.
-- **4G-03 — G3 · Pool earnings**: [Pool.dc.html](../../../design/phase4e-4i/Pool.dc.html); reference 1280×900; surface SD.
-- **5.2 — 5.2 · Step in to a signed reply**: [StepIn.dc.html](../../../design/phase5-prototypes/StepIn.dc.html); reference 390×844; surface REF → F.
+- **4A-06 — 06 · Ask Maya to step in**: [Packet.dc.html](../../../../design/phase4a-fan-core/Packet.dc.html); reference 390×1700; surface F.
+- **4A-07 — 07 · First paid action · spend limit**: [Limit.dc.html](../../../../design/phase4a-fan-core/Limit.dc.html); reference 390×844; surface F.
+- **4A-08 — 08 · Request status and receipt**: [Status.dc.html](../../../../design/phase4a-fan-core/Status.dc.html); reference 390×1300; surface F + SHARE.
+- **4A-16 — 16 · Add a card (hold, not a charge)**: [Checkout.dc.html](../../../../design/phase4a-fan-core/Checkout.dc.html); reference 390×844; surface F (native policy gated).
+- **4B-03 — 03 · Creator profile · Access**: [Access.dc.html](../../../../design/phase4b-fan-account/Access.dc.html); reference 390×1100; surface F.
+- **4B-04 — 04 · Requests tab**: [Requests.dc.html](../../../../design/phase4b-fan-account/Requests.dc.html); reference 390×1100; surface F.
+- **4B-07 — 07 · Spending and time**: [Spending.dc.html](../../../../design/phase4b-fan-account/Spending.dc.html); reference 390×1000; surface F.
+- **4D-05 — 05 · Offers**: [Offers.dc.html](../../../../design/phase4d-studio-desktop/Offers.dc.html); reference 1280×900; surface SD.
+- **4D-06 — 06 · Earnings**: [Earnings.dc.html](../../../../design/phase4d-studio-desktop/Earnings.dc.html); reference 1280×900; surface SD.
+- **4E-06 — E6 · Native membership purchase**: [IAP.dc.html](../../../../design/phase4e-4i/IAP.dc.html); reference 390×844; surface iOS + Android / OS.
+- **4G-01 — G1 · Your pass**: [PassYou.dc.html](../../../../design/phase4e-4i/PassYou.dc.html); reference 390×1100; surface F.
+- **4G-03 — G3 · Pool earnings**: [Pool.dc.html](../../../../design/phase4e-4i/Pool.dc.html); reference 1280×900; surface SD.
+- **5.2 — 5.2 · Step in to a signed reply**: [StepIn.dc.html](../../../../design/phase5-prototypes/StepIn.dc.html); reference 390×844; surface REF → F.
 
 ## Work packages
 
@@ -546,16 +546,16 @@ Surface codes: **F** = fan web/iOS/Android; **SP** = phone Studio web; **SD** = 
 
 The following artboards have you as primary implementation/visual owner. Also deliver every contributing state, domain requirement and missing-design resolution assigned to you by `COVERAGE.md` and the full design inventory. Prototype cards are workflow requirements; exercise all states instead of shipping prototype navigation as the product.
 
-- **4C-01 — 01 · Requests queue**: [Main.dc.html](../../../design/phase4c-studio-phone/Main.dc.html); reference 390×1400; surface SP.
-- **4C-02 — 02 · A request: reply or Instead**: [PacketDetail.dc.html](../../../design/phase4c-studio-phone/PacketDetail.dc.html); reference 390×1700; surface SP.
-- **4C-04 — 04 · Threads**: [Threads.dc.html](../../../design/phase4c-studio-phone/Threads.dc.html); reference 390×1000; surface SP.
-- **4C-05 — 05 · A fan's thread: audit, take over**: [ThreadView.dc.html](../../../design/phase4c-studio-phone/ThreadView.dc.html); reference 390×1300; surface SP.
-- **4C-06 — 06 · Write a Note**: [NoteCompose.dc.html](../../../design/phase4c-studio-phone/NoteCompose.dc.html); reference 390×1100; surface SP.
-- **4C-08 — 08 · More**: [More.dc.html](../../../design/phase4c-studio-phone/More.dc.html); reference 390×900; surface SP.
-- **4C-09 — 09 · Notes: replies feed**: [Replies.dc.html](../../../design/phase4c-studio-phone/Replies.dc.html); reference 390×1200; surface SP.
-- **4D-07 — 07 · Team and roles**: [Team.dc.html](../../../design/phase4d-studio-desktop/Team.dc.html); reference 1280×900; surface SD.
-- **4F-01 — F1 · A public answer**: [PublicAnswer.dc.html](../../../design/phase4e-4i/PublicAnswer.dc.html); reference 390×1200; surface F.
-- **5.3 — 5.3 · The creator's daily five minutes**: [Daily.dc.html](../../../design/phase5-prototypes/Daily.dc.html); reference 390×844; surface REF → SP.
+- **4C-01 — 01 · Requests queue**: [Main.dc.html](../../../../design/phase4c-studio-phone/Main.dc.html); reference 390×1400; surface SP.
+- **4C-02 — 02 · A request: reply or Instead**: [PacketDetail.dc.html](../../../../design/phase4c-studio-phone/PacketDetail.dc.html); reference 390×1700; surface SP.
+- **4C-04 — 04 · Threads**: [Threads.dc.html](../../../../design/phase4c-studio-phone/Threads.dc.html); reference 390×1000; surface SP.
+- **4C-05 — 05 · A fan's thread: audit, take over**: [ThreadView.dc.html](../../../../design/phase4c-studio-phone/ThreadView.dc.html); reference 390×1300; surface SP.
+- **4C-06 — 06 · Write a Note**: [NoteCompose.dc.html](../../../../design/phase4c-studio-phone/NoteCompose.dc.html); reference 390×1100; surface SP.
+- **4C-08 — 08 · More**: [More.dc.html](../../../../design/phase4c-studio-phone/More.dc.html); reference 390×900; surface SP.
+- **4C-09 — 09 · Notes: replies feed**: [Replies.dc.html](../../../../design/phase4c-studio-phone/Replies.dc.html); reference 390×1200; surface SP.
+- **4D-07 — 07 · Team and roles**: [Team.dc.html](../../../../design/phase4d-studio-desktop/Team.dc.html); reference 1280×900; surface SD.
+- **4F-01 — F1 · A public answer**: [PublicAnswer.dc.html](../../../../design/phase4e-4i/PublicAnswer.dc.html); reference 390×1200; surface F.
+- **5.3 — 5.3 · The creator's daily five minutes**: [Daily.dc.html](../../../../design/phase5-prototypes/Daily.dc.html); reference 390×844; surface REF → SP.
 
 ## Work packages
 
@@ -668,11 +668,11 @@ Surface codes: **F** = fan web/iOS/Android; **SP** = phone Studio web; **SD** = 
 
 The following artboards have you as primary implementation/visual owner. Also deliver every contributing state, domain requirement and missing-design resolution assigned to you by `COVERAGE.md` and the full design inventory. Prototype cards are workflow requirements; exercise all states instead of shipping prototype navigation as the product.
 
-- **4E-01 — E1 · Before the call**: [Main.dc.html](../../../design/phase4e-4i/Main.dc.html); reference 390×844; surface F + SP.
-- **4E-02 — E2 · Connected (Night)**: [CallLive.dc.html](../../../design/phase4e-4i/CallLive.dc.html); reference 390×844; surface F + SP.
-- **4E-03 — E3 · After the call**: [CallAfter.dc.html](../../../design/phase4e-4i/CallAfter.dc.html); reference 390×900; surface F + SP.
-- **4E-04 — E4 · Creator offers times**: [OfferTimes.dc.html](../../../design/phase4e-4i/OfferTimes.dc.html); reference 390×900; surface SP.
-- **4F-03 — F3 · AI voice notes**: [AIVoice.dc.html](../../../design/phase4e-4i/AIVoice.dc.html); reference 390×1000; surface F.
+- **4E-01 — E1 · Before the call**: [Main.dc.html](../../../../design/phase4e-4i/Main.dc.html); reference 390×844; surface F + SP.
+- **4E-02 — E2 · Connected (Night)**: [CallLive.dc.html](../../../../design/phase4e-4i/CallLive.dc.html); reference 390×844; surface F + SP.
+- **4E-03 — E3 · After the call**: [CallAfter.dc.html](../../../../design/phase4e-4i/CallAfter.dc.html); reference 390×900; surface F + SP.
+- **4E-04 — E4 · Creator offers times**: [OfferTimes.dc.html](../../../../design/phase4e-4i/OfferTimes.dc.html); reference 390×900; surface SP.
+- **4F-03 — F3 · AI voice notes**: [AIVoice.dc.html](../../../../design/phase4e-4i/AIVoice.dc.html); reference 390×1000; surface F.
 
 ## Work packages
 
@@ -784,19 +784,19 @@ Surface codes: **F** = fan web/iOS/Android; **SP** = phone Studio web; **SD** = 
 
 The following artboards have you as primary implementation/visual owner. Also deliver every contributing state, domain requirement and missing-design resolution assigned to you by `COVERAGE.md` and the full design inventory. Prototype cards are workflow requirements; exercise all states instead of shipping prototype navigation as the product.
 
-- **4A-01 — 01 · Maya's home (public)**: [Main.dc.html](../../../design/phase4a-fan-core/Main.dc.html); reference 390×1560; surface F.
-- **4A-09 — 09 · Notifications**: [Notifications.dc.html](../../../design/phase4a-fan-core/Notifications.dc.html); reference 390×980; surface F.
-- **4A-11 — 11 · Entrance: a post, Ask Maya's AI about this**: [Post.dc.html](../../../design/phase4a-fan-core/Post.dc.html); reference 390×1300; surface F.
-- **4A-12 — 12 · Entrance: Maya's invite link**: [Invite.dc.html](../../../design/phase4a-fan-core/Invite.dc.html); reference 390×844; surface F.
-- **4B-01 — 01 · Home**: [Main.dc.html](../../../design/phase4b-fan-account/Main.dc.html); reference 390×1300; surface F.
-- **4B-02 — 02 · Discover**: [Discover.dc.html](../../../design/phase4b-fan-account/Discover.dc.html); reference 390×1400; surface F.
-- **4C-10 — 10 · Weekly impact digest**: [Impact.dc.html](../../../design/phase4c-studio-phone/Impact.dc.html); reference 390×1000; surface SP.
-- **4E-05 — E5 · Lock screen: push and incoming call**: [Push.dc.html](../../../design/phase4e-4i/Push.dc.html); reference 390×844; surface OS.
-- **4F-02 — F2 · Share Maya's reply**: [ShareSheet.dc.html](../../../design/phase4e-4i/ShareSheet.dc.html); reference 390×900; surface F + SHARE.
-- **4F-04 — F4 · Insights and producer**: [Insights.dc.html](../../../design/phase4e-4i/Insights.dc.html); reference 1280×900; surface SD.
-- **4G-02 — G2 · Discover with the pass**: [DiscoverPass.dc.html](../../../design/phase4e-4i/DiscoverPass.dc.html); reference 390×1000; surface F.
-- **4I-01 — I1 · Every notification, three channels**: [NotifMatrix.dc.html](../../../design/phase4e-4i/NotifMatrix.dc.html); reference 1280×1300; surface REF → F / OS / EMAIL.
-- **4I-02 — I2 · Emails**: [Email.dc.html](../../../design/phase4e-4i/Email.dc.html); reference 1280×1000; surface EMAIL.
+- **4A-01 — 01 · Maya's home (public)**: [Main.dc.html](../../../../design/phase4a-fan-core/Main.dc.html); reference 390×1560; surface F.
+- **4A-09 — 09 · Notifications**: [Notifications.dc.html](../../../../design/phase4a-fan-core/Notifications.dc.html); reference 390×980; surface F.
+- **4A-11 — 11 · Entrance: a post, Ask Maya's AI about this**: [Post.dc.html](../../../../design/phase4a-fan-core/Post.dc.html); reference 390×1300; surface F.
+- **4A-12 — 12 · Entrance: Maya's invite link**: [Invite.dc.html](../../../../design/phase4a-fan-core/Invite.dc.html); reference 390×844; surface F.
+- **4B-01 — 01 · Home**: [Main.dc.html](../../../../design/phase4b-fan-account/Main.dc.html); reference 390×1300; surface F.
+- **4B-02 — 02 · Discover**: [Discover.dc.html](../../../../design/phase4b-fan-account/Discover.dc.html); reference 390×1400; surface F.
+- **4C-10 — 10 · Weekly impact digest**: [Impact.dc.html](../../../../design/phase4c-studio-phone/Impact.dc.html); reference 390×1000; surface SP.
+- **4E-05 — E5 · Lock screen: push and incoming call**: [Push.dc.html](../../../../design/phase4e-4i/Push.dc.html); reference 390×844; surface OS.
+- **4F-02 — F2 · Share Maya's reply**: [ShareSheet.dc.html](../../../../design/phase4e-4i/ShareSheet.dc.html); reference 390×900; surface F + SHARE.
+- **4F-04 — F4 · Insights and producer**: [Insights.dc.html](../../../../design/phase4e-4i/Insights.dc.html); reference 1280×900; surface SD.
+- **4G-02 — G2 · Discover with the pass**: [DiscoverPass.dc.html](../../../../design/phase4e-4i/DiscoverPass.dc.html); reference 390×1000; surface F.
+- **4I-01 — I1 · Every notification, three channels**: [NotifMatrix.dc.html](../../../../design/phase4e-4i/NotifMatrix.dc.html); reference 1280×1300; surface REF → F / OS / EMAIL.
+- **4I-02 — I2 · Emails**: [Email.dc.html](../../../../design/phase4e-4i/Email.dc.html); reference 1280×1000; surface EMAIL.
 
 ## Work packages
 
@@ -907,8 +907,8 @@ Surface codes: **F** = fan web/iOS/Android; **SP** = phone Studio web; **SD** = 
 
 The following artboards have you as primary implementation/visual owner. Also deliver every contributing state, domain requirement and missing-design resolution assigned to you by `COVERAGE.md` and the full design inventory. Prototype cards are workflow requirements; exercise all states instead of shipping prototype navigation as the product.
 
-- **4H-01 — H1 · Ops queue**: [OpsQueue.dc.html](../../../design/phase4e-4i/OpsQueue.dc.html); reference 1280×900; surface OW.
-- **4H-02 — H2 · A dispute**: [OpsCase.dc.html](../../../design/phase4e-4i/OpsCase.dc.html); reference 1280×900; surface OW.
+- **4H-01 — H1 · Ops queue**: [OpsQueue.dc.html](../../../../design/phase4e-4i/OpsQueue.dc.html); reference 1280×900; surface OW.
+- **4H-02 — H2 · A dispute**: [OpsCase.dc.html](../../../../design/phase4e-4i/OpsCase.dc.html); reference 1280×900; surface OW.
 
 Your two primary Ops artboards are only the UI portion of this stream. Personally implement the operations, privacy, infrastructure, observability and release work below, and personally run integrated demonstrations. Do not turn this assignment into supervision alone or delegate its implementation to the seven peer owners.
 

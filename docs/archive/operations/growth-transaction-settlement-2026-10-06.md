@@ -15,7 +15,7 @@ The preserved review database is `creator_pr_review_full` in container `creator-
 - Exhausting a real one-client pool returned 503 in 501ms with no queued acquisition left. Cancelling a queued acquisition, then releasing the occupied client after 80ms, discarded the acquired client before returning at 85ms. A following real transaction succeeded with no account context carried over.
 - Through the actual canonical development sign-in and web notification settings, an exclusive lock on the feedback table produced 503 in 2025ms. The form kept rating four and its retry intent. After releasing the lock, the unchanged retry returned 201 in 25ms and persisted exactly one new row. Existing eight rows and their `xmin` values stayed unchanged. The actual success screenshot is included below.
 
-Backend types, scoped ESLint/Prettier and backend production build passed. No test code or suites were added. [Raw observations, persistence and captures](../../artifacts/pr-review/2026-10-06/growth-transaction-settlement/).
+Backend types, scoped ESLint/Prettier and backend production build passed. No test code or suites were added. [Raw observations, persistence and captures](../../../artifacts/pr-review/2026-10-06/growth-transaction-settlement/).
 
 ## Deliberate boundary and remaining work
 
@@ -23,4 +23,4 @@ This does **not** introduce a whole-callback timer race. Growth callbacks includ
 
 Further work requires a concrete provider cancellation/settlement contract before bounding sends; nested authority/erasure transactions need descendant settlement and commit-order qualification. In particular, `workerActor()` currently commits its inner runtime session transaction before its outer worker write commits. That independently identified ordering needs a focused fix and real session-revocation race operation. No provider success, caller cancellation capability or approved purpose is invented here. The frontend composition is unchanged; missing DI16 design and native operation remain separate holds.
 
-![Actual feedback retry succeeded](../../artifacts/pr-review/2026-10-06/growth-transaction-settlement/retried-feedback-saved.jpg)
+![Actual feedback retry succeeded](../../../artifacts/pr-review/2026-10-06/growth-transaction-settlement/retried-feedback-saved.jpg)

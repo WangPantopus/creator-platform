@@ -1,13 +1,13 @@
 # Session handoff — October 8, 2026
 
-**History. For the order of work read [LAUNCH_PLAN](../LAUNCH_PLAN.md); for the current state, [CURRENT](CURRENT.md).**
+**History. For the order of work read [LAUNCH_PLAN](../../LAUNCH_PLAN.md); for the current state, [CURRENT](../../operations/CURRENT.md).**
 The entries below, including the "Continue on" instructions, the open-PR lists and "Start here", are preserved evidence from before the launch review, not current instructions or runtime state.
 
 
 ## Active continuation — actual creator upgrade and native verification
 
 Continue in637b on `codex/comparison-creator-upgrade-20261008`. The
-[actual increment](../../artifacts/pr-review/2026-10-08/comparison-creator-upgrade/README.md)
+[actual increment](../../../artifacts/pr-review/2026-10-08/comparison-creator-upgrade/README.md)
 publishes v2 through original comparison and fresh boundary evaluation; actual
 fan reply2d6eac2f binds66af0eba and cites the approved source. Normal backend
 restart, v1 rollback and v2 restoration preserve both publication identities,
@@ -36,7 +36,7 @@ by349; do not count it as a pass.
 ## Active continuation — original export recovery and withdrawal
 
 Continue on `codex/comparison-export-reference-20261008` in637b. The
-[actual increment](../../artifacts/pr-review/2026-10-08/comparison-export-reference/README.md)
+[actual increment](../../../artifacts/pr-review/2026-10-08/comparison-export-reference/README.md)
 fixes Agent's original snapshot reference and sequences comparison maintenance after
 claimed operations settle. Original jobc09931ea completes all8 domains on attempt9;
 all4 real browser downloads match saved hashes. Earlier reference/55P03 failures
@@ -60,7 +60,7 @@ Carry every full-plan milestone and all immutable evidence/clock/holds forward.
 ## Active continuation — real comparison choice and question
 
 Continue on `codex/comparison-choice-ui-20261008` in637b. The
-[three-app increment](../../artifacts/pr-review/2026-10-08/comparison-choice-ui/README.md)
+[three-app increment](../../../artifacts/pr-review/2026-10-08/comparison-choice-ui/README.md)
 has actual web/iOS/Android Light evidence. Explicit fictional fan choice and one
 selected question produced one scrubbed sample, two real completed provider calls,
 921 microdollars and two settled holds; native repetitions reused the same sample.
@@ -83,7 +83,7 @@ Refresh remaining PR checks and separate main workflows before merging.
 ## Active continuation — original populated comparison wave
 
 Continue on `codex/comparison-closed-wave-20261008` in637b. The
-[closed original wave](../../artifacts/pr-review/2026-10-08/comparison-closed-wave/README.md)
+[closed original wave](../../../artifacts/pr-review/2026-10-08/comparison-closed-wave/README.md)
 is applied: executable registry and actual copy43 now both have114 sources.
 Original1472 rows/history/roles/sequences are preserved. Rollback review, original
 backup/restores01–04, actual clone wave, idempotent rerun and original43 wave pass.
@@ -107,7 +107,7 @@ separate main37819217990 has been rerun and was queued. Refresh before merging.
 ## Active continuation — scoped export recovery and legacy expiry
 
 Continue on `codex/comparison-legacy-custody-20261008` in637b. The
-[scope/legacy increment](../../artifacts/pr-review/2026-10-08/comparison-legacy-custody/README.md)
+[scope/legacy increment](../../../artifacts/pr-review/2026-10-08/comparison-legacy-custody/README.md)
 reserves0246, skips only unrelated known captures under the original held deletion,
 and physically removes exact original legacy artifacts only after their own saved
 expiry. Six isolated SQL/filesystem cases pass on pending graph21 and restored
@@ -132,7 +132,7 @@ with state intact. No original data, clock, file or publication was changed.
 ## Active continuation — comparison runtime integration
 
 Continue on `codex/comparison-runtime-integration-20261008` in637b. The
-[combined source milestone](../../artifacts/pr-review/2026-10-08/comparison-runtime-integration/README.md)
+[combined source milestone](../../../artifacts/pr-review/2026-10-08/comparison-runtime-integration/README.md)
 reserves0239–0245 and provides gated original host/Trust/store/worker composition.
 The executable registry remains106 sources. Isolated graph19 and full restore20
 match every reviewed metadata value; original purpose permissions on existing
@@ -160,7 +160,7 @@ No comparison source was activated. Both native devices remain stopped.
 ## Active continuation — original held comparison feed
 
 Continue on `codex/comparison-held-feed-20261008` in 637b. The
-[original reader/consumer increment](../../artifacts/pr-review/2026-10-08/comparison-held-feed/README.md)
+[original reader/consumer increment](../../../artifacts/pr-review/2026-10-08/comparison-held-feed/README.md)
 adds a finite private SQL read scope, original creator/fan/denial checks and
 same-transaction collection, provider admission, replay, display and publication.
 Fresh isolated graph15 passes eight SQL and four actual consumer-class operations
@@ -185,7 +185,7 @@ and all original evidence remain as before. Carry every full-plan milestone.
 ## Active continuation — comparison provider admission and writer
 
 Continue on `codex/comparison-purpose-admission-20261008` in637b. The
-[provider/writer source increment](../../artifacts/pr-review/2026-10-08/comparison-purpose-admission/README.md)
+[provider/writer source increment](../../../artifacts/pr-review/2026-10-08/comparison-purpose-admission/README.md)
 adds original fan admission, distinct provider costs, source-bound two-call
 receipts, finite development notice, caller cancellation and additive sample
 write/commit checks. Final isolated graph12 passes nine SQL cases with synthetic
@@ -209,7 +209,7 @@ the remaining full-product journeys.
 ## Active continuation — original Trust artifact privacy
 
 Continue on `codex/comparison-artifact-privacy-20261008` in637b. The
-[source/privacy increment](../../artifacts/pr-review/2026-10-08/comparison-artifact-privacy/README.md)
+[source/privacy increment](../../../artifacts/pr-review/2026-10-08/comparison-artifact-privacy/README.md)
 adds private held-source mapping, own-only Trust projection, complete file inventory,
 physical removal and original 0103 deletion clearing. Fresh isolated graph09 passes
 six SQL/filesystem cases; dependency receipts are synthetic. All pending sources
@@ -231,7 +231,7 @@ upgrade and every remaining criterion in the complete product finish plan.
 
 Continue on `codex/privacy-export-attempt-recovery-20261008` in 637b.
 Source `5bd6b6215f172344528d2735e61705a4e079fc69` now has
-[actual crash/source and real browser export evidence](../../artifacts/pr-review/2026-10-08/privacy-export-attempt-recovery/README.md).
+[actual crash/source and real browser export evidence](../../../artifacts/pr-review/2026-10-08/privacy-export-attempt-recovery/README.md).
 Pending original-task recovery remains unregistered. The private store's durable
 attempt marker is exercised by the actual app. New fan export f6a7410b completes
 all eight domains; every downloaded stream matches its saved hash. Agent's
@@ -260,7 +260,7 @@ Continue on `codex/comparison-artifact-lifecycle-20261008` in the same637b
 checkout. PR[#340](https://github.com/WangPantopus/creator-platform/pull/340)
 and stacked PR[#341](https://github.com/WangPantopus/creator-platform/pull/341)
 are open; refresh exact-head checks before merge, and retarget341 to main after340.
-The [saved-artifact increment](../../artifacts/pr-review/2026-10-08/comparison-artifact-lifecycle/README.md)
+The [saved-artifact increment](../../../artifacts/pr-review/2026-10-08/comparison-artifact-lifecycle/README.md)
 has pending source plus actual isolated SQL/filesystem evidence for source-bound
 capture, withdrawal denial, COMMIT refusal and physical removal. Original EOF
 and task authority remain required. Failed review attempts are preserved.
@@ -280,7 +280,7 @@ both owned native devices remain stopped with their state preserved.
 Comparison/privacy milestone PR [#340](https://github.com/WangPantopus/creator-platform/pull/340)
 is open at `acaaeb332157214c66d21987ff7de23c922e8c6e`; refresh all checks before
 merging. Continue on `codex/privacy-export-download-recovery-20261008`.
-The [download recovery increment](../../artifacts/pr-review/2026-10-08/privacy-download-recovery/README.md)
+The [download recovery increment](../../../artifacts/pr-review/2026-10-08/privacy-download-recovery/README.md)
 at `3cbac7be7` has actual expired-verification → same-origin notice → same-account
 sign-in → identical original download evidence. API clients retain401 JSON.
 The initial loopback-alias redirect failure is preserved. Production web build,
@@ -303,7 +303,7 @@ passed at `ea61835150a093184302f56a2c61bc22e0071764`. Its post-merge workflow is
 all five post-merge jobs passed. All five #338 post-merge jobs also passed.
 
 Continue on `codex/comparison-consent-lifecycle-20261008`. The
-[source milestone](../../artifacts/pr-review/2026-10-08/comparison-consent-lifecycle/README.md)
+[source milestone](../../../artifacts/pr-review/2026-10-08/comparison-consent-lifecycle/README.md)
 adds pending consent/sample storage, source invalidation, physical expiry SQL,
 and complete export/deletion extension. It is unregistered and unapplied to
 original archives and journey copies. Separate PostgreSQL source review is
@@ -349,7 +349,7 @@ physical expiry, exports and consumer read/publication guards are complete.
 Ordinary reply feedback does not authorize this use. The complete ten-milestone
 [finish plan](product-finish-plan-2026-10-08.md) remains active.
 
-The [disconnected-feed guard](../../artifacts/pr-review/2026-10-08/comparison-feed-guard/README.md)
+The [disconnected-feed guard](../../../artifacts/pr-review/2026-10-08/comparison-feed-guard/README.md)
 now blocks upgrade publication and hides comparison text without the original
 feed. It was operated in the actual preserved creator Studio with exact
 before/after custody. The current compiled backend is
@@ -374,7 +374,7 @@ now contains 18 operations: 17 delivered and one failed iOS operation with no
 provider call, recovered by the original worker at zero settled units. The
 original eight generations, publication and usage records remain preserved;
 new receipts record every additional operation and failure. See
-[native message evidence](../../artifacts/pr-review/2026-10-08/native-message-reliability/README.md).
+[native message evidence](../../../artifacts/pr-review/2026-10-08/native-message-reliability/README.md).
 
 The compiled backend is currently launched by `native-e2e/launch43-backend-realtime.mjs`
 on port 57304; web uses `native-e2e/launch43-web-trust.mjs` on port 3119, both in
@@ -387,7 +387,7 @@ existing-version upgrade and every unqualified acceptance item remain open.
 jobs passing. Work continues in the same checkout on
 `codex/native-connected-journey-20261008`; copy 43 and its owned backend/web are
 running for real native acceptance. See the
-[native operation evidence](../../artifacts/pr-review/2026-10-08/native-connected-journey/README.md)
+[native operation evidence](../../../artifacts/pr-review/2026-10-08/native-connected-journey/README.md)
 and [complete finish plan](product-finish-plan-2026-10-08.md). The stopped-resource
 inventory below is the original handoff observation, not the current live state.
 The user now authorizes commits, pushes, milestone PRs and merges after checks,
@@ -396,7 +396,7 @@ with actual web/iOS/Android operation and no new unit tests.
 Successor resumed in the same `637b` checkout on
 `codex/shadow-evidence-lifetime-20261008`. See the
 [full finish plan](product-finish-plan-2026-10-08.md) and
-[bounded comparison-evidence increment](../../artifacts/pr-review/2026-10-08/shadow-evidence-lifetime/README.md).
+[bounded comparison-evidence increment](../../../artifacts/pr-review/2026-10-08/shadow-evidence-lifetime/README.md).
 The post-merge main workflow below has since completed successfully. The original
 handoff observations and all evidence remain preserved below.
 
@@ -405,7 +405,7 @@ This is the starting point for the next session. The user requested a coherent h
 ## Start here
 
 1. Read this file and [the project continuation checkpoint](project-continuation-2026-10-07.md). They supersede older status summaries, while retaining their evidence and unfinished acceptance.
-2. Read repository `AGENTS.md`, `CLAUDE.md`, [BRIEF](../BRIEF.md), [DESIGN_PLAN](../DESIGN_PLAN.md), and applicable directory instructions before changing files. For Turbo configuration/commands, read the installed package's `docs/README.md` and relevant bundled docs first; the repository has no general `docs/README.md`.
+2. Read repository `AGENTS.md`, `CLAUDE.md`, [BRIEF](../../BRIEF.md), [DESIGN_PLAN](../../DESIGN_PLAN.md), and applicable directory instructions before changing files. For Turbo configuration/commands, read the installed package's `docs/README.md` and relevant bundled docs first; the repository has no general `docs/README.md`.
 3. Refresh Git/GitHub state. Reuse this clean checkout if suitable; the primary checkout was deliberately left untouched. Read the evidence linked below before repeating an operation.
 4. Continue from the merged implementation. The immediate recommendation is a bounded existing-version upgrade milestone, with privacy-safe shadow replay, followed by controlled end-to-end latency work. Both remain open. The upgrade path enables existing creators to receive the newer fixes while preserving their published identity until evaluation succeeds. The broader finish plan is below.
 
@@ -438,7 +438,7 @@ git log -5 --oneline
 
 Qelvora is a Pantopus app combining a clearly disclosed creator-authorized AI with genuine human presence: Notes, reactions, private replies and calls. Membership leads; the initial conversation is free for roughly 24 hours and ends at a natural pause. The human request action remains available. The pass follows a meaningful creator roster, approximately 30 active creators as a working threshold. Sample creators, tier names, prices and commercial assumptions are examples, not finalized decisions.
 
-Read the four authoritative documents in [docs/source](../source): [domain contract](../source/Domain_Model_and_Behavioral_Contract.md), [product flows/screens/copy](../source/Product_Design_Flows_Screens_and_Copy.md), [architecture](../source/System_Architecture.md), and [second review](../source/Second_Review_Strategy_Behavior_and_Additions.md). Apply accepted BUILD_PROMPT section 9 corrections and later [decisions](../workstreams/DECISIONS.md) where they amend older material. Exact screen designs are in the repository's [design directory](../../design), also available at `/Users/yingpengwang/creator-platform/design`. Use the corresponding screen/state, theme and size, not a generic approximation.
+Read the four authoritative documents in [docs/source](../../source): [domain contract](../../source/Domain_Model_and_Behavioral_Contract.md), [product flows/screens/copy](../../source/Product_Design_Flows_Screens_and_Copy.md), [architecture](../../source/System_Architecture.md), and [second review](../../source/Second_Review_Strategy_Behavior_and_Additions.md). Apply accepted BUILD_PROMPT section 9 corrections and later [decisions](../workstreams/DECISIONS.md) where they amend older material. Exact screen designs are in the repository's [design directory](../../../design), also available at `/Users/yingpengwang/creator-platform/design`. Use the corresponding screen/state, theme and size, not a generic approximation.
 
 Critical product constraints:
 
@@ -459,7 +459,7 @@ The implemented stack is a modular Node/Express TypeScript backend, PostgreSQL/p
 - Active-provider SIGTERM and restart recover the exact interrupted conversation after its original lease, without provider replay. Unknown-cost calls retain full reserved holds with null settlement amount/reference/clock. Those earlier failure cases remain preserved.
 - Development fan export/download spans all eight domains. Immediate account deletion denies the old download and session. Full physical deletion still blocks on unconfigured retention/purge adapters; populated financial export and other missing scenarios remain unqualified.
 
-Start with [canonical journey evidence](../../artifacts/pr-review/2026-10-07/canonical-generation-journey/README.md), [output repair](../../artifacts/pr-review/2026-10-07/generation-output-repair/README.md), and [privacy completion evidence](../../artifacts/pr-review/2026-10-07/growth-privacy-completion/README.md). The project checkpoint links the preceding integration and all original PR sources.
+Start with [canonical journey evidence](../../../artifacts/pr-review/2026-10-07/canonical-generation-journey/README.md), [output repair](../../../artifacts/pr-review/2026-10-07/generation-output-repair/README.md), and [privacy completion evidence](../../../artifacts/pr-review/2026-10-07/growth-privacy-completion/README.md). The project checkpoint links the preceding integration and all original PR sources.
 
 ### Context, grounding, performance and compatibility (#335)
 
@@ -486,9 +486,9 @@ Key code map:
 
 Read these in reverse chronological order:
 
-1. [Published compatibility and final operation](../../artifacts/pr-review/2026-10-08/generation-published-compatibility/README.md).
-2. [Context-budget reproduction and revision 14 first publication](../../artifacts/pr-review/2026-10-07/generation-context-latency/README.md).
-3. [Grounding changes, boundary evaluation and preserved failures](../../artifacts/pr-review/2026-10-07/generation-performance-grounding/README.md).
+1. [Published compatibility and final operation](../../../artifacts/pr-review/2026-10-08/generation-published-compatibility/README.md).
+2. [Context-budget reproduction and revision 14 first publication](../../../artifacts/pr-review/2026-10-07/generation-context-latency/README.md).
+3. [Grounding changes, boundary evaluation and preserved failures](../../../artifacts/pr-review/2026-10-07/generation-performance-grounding/README.md).
 
 Latest compiled backend + Next development frontend, revision 14 on copy 45:
 
@@ -577,7 +577,7 @@ Reusable files in `conversation-commerce-completion/`:
 - `private/journey45-current-grounding-diagnostic.jsonl`: actual scoped diagnostic outputs; private, not a substitute for public sanitized evidence.
 - `private/handoff-20261008/`: retained `qualify-purpose-prefilters.mts`, `qualify-financial-prefilters.mts`, and backend/iOS CI logs moved out of `/tmp`. Scripts may contain absolute paths and baseline assumptions; inspect before reusing. Their temporary originals and the redundant temporary PR-body file were removed.
 
-The final [public custody receipt](../../artifacts/pr-review/2026-10-08/generation-published-compatibility/final-custody.json) is the last completed DB audit, performed before the container stopped. No database was reopened just to prepare this handoff. The local `pr335-final-ci-52d86e1eb.json` records the exact reviewed-head checks. A stopped container is intentionally reusable; do not run `docker rm`, volume pruning or database reset to tidy this evidence.
+The final [public custody receipt](../../../artifacts/pr-review/2026-10-08/generation-published-compatibility/final-custody.json) is the last completed DB audit, performed before the container stopped. No database was reopened just to prepare this handoff. The local `pr335-final-ci-52d86e1eb.json` records the exact reviewed-head checks. A stopped container is intentionally reusable; do not run `docker rm`, volume pruning or database reset to tidy this evidence.
 
 ## Practical restart and validation
 

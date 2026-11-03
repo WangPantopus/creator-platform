@@ -86,7 +86,7 @@ reveals more than the label allows. Fans' private text does not leave the thread
 
 ## Verification: end-to-end scenarios and exit demo
 
-No unit tests ([working agreement](01-working-agreement.md) section 3). The question that
+No unit tests ([working agreement](../../lanes/01-working-agreement.md) section 3). The question that
 matters most is who gets what: **a fan outside the audience gets nothing**, and a push never says
 more than the label allows. Use a fake push gateway until the credentials arrive and say so.
 

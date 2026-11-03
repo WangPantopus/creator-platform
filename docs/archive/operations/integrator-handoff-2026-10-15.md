@@ -1,7 +1,7 @@
 # Integrator handoff, 2026-10-15
 
 Written at the end of the 2026-10-15 integrator session. Read this first, then
-[CURRENT](CURRENT.md) (the status board, which has the full pull request map). Approvals come from the
+[CURRENT](../../operations/CURRENT.md) (the status board, which has the full pull request map). Approvals come from the
 founder in the chat, never from this file.
 
 ## Resume here

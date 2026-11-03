@@ -1,6 +1,6 @@
 # W5 continuation handoff (b) — 2026-10-01, Mac Studio host
 
-This supersedes [W5-continuation-2026-10-01.md](W5-continuation-2026-10-01.md) for current runtime, resource, peer-contract and next-step facts. That earlier handoff (merged as PR #58, `db1252df`) still states the user mandate correctly. This session restored a fresh runtime on a **different machine** (a Mac Studio), mapped every producer W5 depends on, operated web and native entry, and collected peer answers. **No W5 application code changed in this session**; it ends with documentation, evidence and an interactive operator tool. All nine original W5 packages remain incomplete. Evidence: [`artifacts/workstreams/W5/2026-10-01/continuation-b/`](../../../artifacts/workstreams/W5/2026-10-01/continuation-b/README.md).
+This supersedes [W5-continuation-2026-10-01.md](W5-continuation-2026-10-01.md) for current runtime, resource, peer-contract and next-step facts. That earlier handoff (merged as PR #58, `db1252df`) still states the user mandate correctly. This session restored a fresh runtime on a **different machine** (a Mac Studio), mapped every producer W5 depends on, operated web and native entry, and collected peer answers. **No W5 application code changed in this session**; it ends with documentation, evidence and an interactive operator tool. All nine original W5 packages remain incomplete. Evidence: [`artifacts/workstreams/W5/2026-10-01/continuation-b/`](../../../../artifacts/workstreams/W5/2026-10-01/continuation-b/README.md).
 
 ## Paste-ready prompt for the next W5 agent
 

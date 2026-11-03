@@ -18,18 +18,18 @@ lane needs to see the whole picture, do its part well, and not collide with the 
 - **Seven sessions, started by hand by the founder,** each in its own git worktree and each
   working alone: no subagents. The prompt to paste into each is in [prompts/](prompts/).
 - **The integrator** is a separate session. It reviews pull requests, merges in batches, owns the
-  shared files and the migration queue, keeps [CURRENT](../operations/CURRENT.md) and tells the
+  shared files and the migration queue, keeps [CURRENT](../../operations/CURRENT.md) and tells the
   founder what is running and what is next.
 - **Sessions cannot see each other.** Messages travel through the founder, pull request comments
   and each lane's status file.
 - **Nothing is proven by unit tests.** Every lane proves its work with end-to-end scenarios that
-  include edge cases ([working agreement](01-working-agreement.md) section 3); each lane brief
+  include edge cases ([working agreement](../../lanes/01-working-agreement.md) section 3); each lane brief
   lists its scenarios.
 
 ## Reading order for every lane
 
 1. [00-charter.md](00-charter.md): the picture, what can never bend, what is decided, who owns what.
-2. [01-working-agreement.md](01-working-agreement.md): how we work, verify, report and ask.
+2. [01-working-agreement.md](../../lanes/01-working-agreement.md): how we work, verify, report and ask.
 3. [02-contracts.md](02-contracts.md): the seams between lanes.
 4. Your lane brief, then only the files it lists.
 5. [03-coverage.md](03-coverage.md) when you want to know where a finding went.
@@ -75,5 +75,5 @@ Each pair states the behavior spec in its pull requests, and the integrator chec
 ## Status
 
 Each lane keeps `status/lane-N.md` current in its pull requests (working on, done, next, blocked
-on, scenarios, tickets). The integrator aggregates them into [CURRENT](../operations/CURRENT.md)
+on, scenarios, tickets). The integrator aggregates them into [CURRENT](../../operations/CURRENT.md)
 and tells the founder, in the chat, what is running and what is next every time work stops.

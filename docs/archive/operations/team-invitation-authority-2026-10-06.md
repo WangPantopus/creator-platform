@@ -21,4 +21,4 @@ All commands used genuine API-issued local development sessions and the existing
 - Removal and its exact retry return200; accepting afterward returns403. A new invitation after removal succeeds; expiry then prevents acceptance, and removal revokes it.
 - Final database: creator pending/version9, zero active Team memberships, zero unrevoked invitations. Historical revoked invitations remain as review evidence. Browser account intro was restored blank during the prerequisite foundation operation.
 
-Backend types, scoped ESLint/Prettier/diff and production build pass. [Exact source/overlap inventory and before/after receipts](../../artifacts/pr-review/2026-10-06/team-invitation-authority/). No test suites were added. No web/native/design inputs changed. Production identity and full native Team acceptance remain separate work.
+Backend types, scoped ESLint/Prettier/diff and production build pass. [Exact source/overlap inventory and before/after receipts](../../../artifacts/pr-review/2026-10-06/team-invitation-authority/). No test suites were added. No web/native/design inputs changed. Production identity and full native Team acceptance remain separate work.

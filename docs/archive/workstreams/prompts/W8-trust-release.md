@@ -44,8 +44,8 @@ Surface codes: **F** = fan web/iOS/Android; **SP** = phone Studio web; **SD** = 
 
 The following artboards have you as primary implementation/visual owner. Also deliver every contributing state, domain requirement and missing-design resolution assigned to you by `COVERAGE.md` and the full design inventory. Prototype cards are workflow requirements; exercise all states instead of shipping prototype navigation as the product.
 
-- **4H-01 — H1 · Ops queue**: [OpsQueue.dc.html](../../../design/phase4e-4i/OpsQueue.dc.html); reference 1280×900; surface OW.
-- **4H-02 — H2 · A dispute**: [OpsCase.dc.html](../../../design/phase4e-4i/OpsCase.dc.html); reference 1280×900; surface OW.
+- **4H-01 — H1 · Ops queue**: [OpsQueue.dc.html](../../../../design/phase4e-4i/OpsQueue.dc.html); reference 1280×900; surface OW.
+- **4H-02 — H2 · A dispute**: [OpsCase.dc.html](../../../../design/phase4e-4i/OpsCase.dc.html); reference 1280×900; surface OW.
 
 Your two primary Ops artboards are only the UI portion of this stream. Personally implement the operations, privacy, infrastructure, observability and release work below, and personally run integrated demonstrations. Do not turn this assignment into supervision alone or delegate its implementation to the seven peer owners.
 

@@ -1,6 +1,6 @@
 # W5 continuation handoff — 2026-10-01
 
-This supersedes the 2026-09-29 starting-state assertions in [W5.md](W5.md). It is a transfer checkpoint, not a claim that the nine-package W5 workstream is complete. Read the [original W5 scope](../W5-studio-content.md), [execution prompt](../prompts/W5-studio-content.md), [status](../status/W5.md), [coordination record](../coordination/W5.md), and the [PR #9 operated acceptance](../../../artifacts/workstreams/W5/2026-10-01/main-reconciliation/README.md). The historical files contain useful contracts and evidence, but many runtime and PR statements in them predate this handoff.
+This supersedes the 2026-09-29 starting-state assertions in [W5.md](W5.md). It is a transfer checkpoint, not a claim that the nine-package W5 workstream is complete. Read the [original W5 scope](../W5-studio-content.md), [execution prompt](../prompts/W5-studio-content.md), [status](../status/W5.md), [coordination record](../coordination/W5.md), and the [PR #9 operated acceptance](../../../../artifacts/workstreams/W5/2026-10-01/main-reconciliation/README.md). The historical files contain useful contracts and evidence, but many runtime and PR statements in them predate this handoff.
 
 ## Current Git and application checkpoint
 

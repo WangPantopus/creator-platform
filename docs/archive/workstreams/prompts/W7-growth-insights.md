@@ -44,19 +44,19 @@ Surface codes: **F** = fan web/iOS/Android; **SP** = phone Studio web; **SD** = 
 
 The following artboards have you as primary implementation/visual owner. Also deliver every contributing state, domain requirement and missing-design resolution assigned to you by `COVERAGE.md` and the full design inventory. Prototype cards are workflow requirements; exercise all states instead of shipping prototype navigation as the product.
 
-- **4A-01 — 01 · Maya's home (public)**: [Main.dc.html](../../../design/phase4a-fan-core/Main.dc.html); reference 390×1560; surface F.
-- **4A-09 — 09 · Notifications**: [Notifications.dc.html](../../../design/phase4a-fan-core/Notifications.dc.html); reference 390×980; surface F.
-- **4A-11 — 11 · Entrance: a post, Ask Maya's AI about this**: [Post.dc.html](../../../design/phase4a-fan-core/Post.dc.html); reference 390×1300; surface F.
-- **4A-12 — 12 · Entrance: Maya's invite link**: [Invite.dc.html](../../../design/phase4a-fan-core/Invite.dc.html); reference 390×844; surface F.
-- **4B-01 — 01 · Home**: [Main.dc.html](../../../design/phase4b-fan-account/Main.dc.html); reference 390×1300; surface F.
-- **4B-02 — 02 · Discover**: [Discover.dc.html](../../../design/phase4b-fan-account/Discover.dc.html); reference 390×1400; surface F.
-- **4C-10 — 10 · Weekly impact digest**: [Impact.dc.html](../../../design/phase4c-studio-phone/Impact.dc.html); reference 390×1000; surface SP.
-- **4E-05 — E5 · Lock screen: push and incoming call**: [Push.dc.html](../../../design/phase4e-4i/Push.dc.html); reference 390×844; surface OS.
-- **4F-02 — F2 · Share Maya's reply**: [ShareSheet.dc.html](../../../design/phase4e-4i/ShareSheet.dc.html); reference 390×900; surface F + SHARE.
-- **4F-04 — F4 · Insights and producer**: [Insights.dc.html](../../../design/phase4e-4i/Insights.dc.html); reference 1280×900; surface SD.
-- **4G-02 — G2 · Discover with the pass**: [DiscoverPass.dc.html](../../../design/phase4e-4i/DiscoverPass.dc.html); reference 390×1000; surface F.
-- **4I-01 — I1 · Every notification, three channels**: [NotifMatrix.dc.html](../../../design/phase4e-4i/NotifMatrix.dc.html); reference 1280×1300; surface REF → F / OS / EMAIL.
-- **4I-02 — I2 · Emails**: [Email.dc.html](../../../design/phase4e-4i/Email.dc.html); reference 1280×1000; surface EMAIL.
+- **4A-01 — 01 · Maya's home (public)**: [Main.dc.html](../../../../design/phase4a-fan-core/Main.dc.html); reference 390×1560; surface F.
+- **4A-09 — 09 · Notifications**: [Notifications.dc.html](../../../../design/phase4a-fan-core/Notifications.dc.html); reference 390×980; surface F.
+- **4A-11 — 11 · Entrance: a post, Ask Maya's AI about this**: [Post.dc.html](../../../../design/phase4a-fan-core/Post.dc.html); reference 390×1300; surface F.
+- **4A-12 — 12 · Entrance: Maya's invite link**: [Invite.dc.html](../../../../design/phase4a-fan-core/Invite.dc.html); reference 390×844; surface F.
+- **4B-01 — 01 · Home**: [Main.dc.html](../../../../design/phase4b-fan-account/Main.dc.html); reference 390×1300; surface F.
+- **4B-02 — 02 · Discover**: [Discover.dc.html](../../../../design/phase4b-fan-account/Discover.dc.html); reference 390×1400; surface F.
+- **4C-10 — 10 · Weekly impact digest**: [Impact.dc.html](../../../../design/phase4c-studio-phone/Impact.dc.html); reference 390×1000; surface SP.
+- **4E-05 — E5 · Lock screen: push and incoming call**: [Push.dc.html](../../../../design/phase4e-4i/Push.dc.html); reference 390×844; surface OS.
+- **4F-02 — F2 · Share Maya's reply**: [ShareSheet.dc.html](../../../../design/phase4e-4i/ShareSheet.dc.html); reference 390×900; surface F + SHARE.
+- **4F-04 — F4 · Insights and producer**: [Insights.dc.html](../../../../design/phase4e-4i/Insights.dc.html); reference 1280×900; surface SD.
+- **4G-02 — G2 · Discover with the pass**: [DiscoverPass.dc.html](../../../../design/phase4e-4i/DiscoverPass.dc.html); reference 390×1000; surface F.
+- **4I-01 — I1 · Every notification, three channels**: [NotifMatrix.dc.html](../../../../design/phase4e-4i/NotifMatrix.dc.html); reference 1280×1300; surface REF → F / OS / EMAIL.
+- **4I-02 — I2 · Emails**: [Email.dc.html](../../../../design/phase4e-4i/Email.dc.html); reference 1280×1000; surface EMAIL.
 
 ## Work packages
 

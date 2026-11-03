@@ -2,7 +2,7 @@
 
 Updated: 2026-10-16 (Pacific time, afternoon), by the lane 4 session
 
-Working on: nothing in flight. On the afternoon of 2026-10-16 the founder asked lane 4 to merge its pull requests when ready. Twelve were merged as one rehearsed batch (#476, #448, #449, #450, #467, #469, #470, #474, #484, #485, #486, #463), and #453 follows once its CI is green: main merged into its branch, with its conflict with #463 resolved. The decisions are recorded in [`lane-4-decisions.md`](lane-4-decisions.md). What is left waits on migration registration (#425, #459, #487), Stripe test keys, Q16 (a legal retention period) or other lanes. A new session starts at [`lane-4-handoff.md`](lane-4-handoff.md).
+Working on: nothing in flight. On the afternoon of 2026-10-16 the founder asked lane 4 to merge its pull requests when ready. Twelve were merged as one rehearsed batch (#476, #448, #449, #450, #467, #469, #470, #474, #484, #485, #486, #463), and #453 follows once its CI is green: main merged into its branch, with its conflict with #463 resolved. The decisions are recorded in [`lane-4-decisions.md`](../../../lanes/status/lane-4-decisions.md). What is left waits on migration registration (#425, #459, #487), Stripe test keys, Q16 (a legal retention period) or other lanes. A new session starts at [`lane-4-handoff.md`](lane-4-handoff.md).
 
 Open pull requests:
 

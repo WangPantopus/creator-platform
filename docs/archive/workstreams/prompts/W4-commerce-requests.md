@@ -44,19 +44,19 @@ Surface codes: **F** = fan web/iOS/Android; **SP** = phone Studio web; **SD** = 
 
 The following artboards have you as primary implementation/visual owner. Also deliver every contributing state, domain requirement and missing-design resolution assigned to you by `COVERAGE.md` and the full design inventory. Prototype cards are workflow requirements; exercise all states instead of shipping prototype navigation as the product.
 
-- **4A-06 — 06 · Ask Maya to step in**: [Packet.dc.html](../../../design/phase4a-fan-core/Packet.dc.html); reference 390×1700; surface F.
-- **4A-07 — 07 · First paid action · spend limit**: [Limit.dc.html](../../../design/phase4a-fan-core/Limit.dc.html); reference 390×844; surface F.
-- **4A-08 — 08 · Request status and receipt**: [Status.dc.html](../../../design/phase4a-fan-core/Status.dc.html); reference 390×1300; surface F + SHARE.
-- **4A-16 — 16 · Add a card (hold, not a charge)**: [Checkout.dc.html](../../../design/phase4a-fan-core/Checkout.dc.html); reference 390×844; surface F (native policy gated).
-- **4B-03 — 03 · Creator profile · Access**: [Access.dc.html](../../../design/phase4b-fan-account/Access.dc.html); reference 390×1100; surface F.
-- **4B-04 — 04 · Requests tab**: [Requests.dc.html](../../../design/phase4b-fan-account/Requests.dc.html); reference 390×1100; surface F.
-- **4B-07 — 07 · Spending and time**: [Spending.dc.html](../../../design/phase4b-fan-account/Spending.dc.html); reference 390×1000; surface F.
-- **4D-05 — 05 · Offers**: [Offers.dc.html](../../../design/phase4d-studio-desktop/Offers.dc.html); reference 1280×900; surface SD.
-- **4D-06 — 06 · Earnings**: [Earnings.dc.html](../../../design/phase4d-studio-desktop/Earnings.dc.html); reference 1280×900; surface SD.
-- **4E-06 — E6 · Native membership purchase**: [IAP.dc.html](../../../design/phase4e-4i/IAP.dc.html); reference 390×844; surface iOS + Android / OS.
-- **4G-01 — G1 · Your pass**: [PassYou.dc.html](../../../design/phase4e-4i/PassYou.dc.html); reference 390×1100; surface F.
-- **4G-03 — G3 · Pool earnings**: [Pool.dc.html](../../../design/phase4e-4i/Pool.dc.html); reference 1280×900; surface SD.
-- **5.2 — 5.2 · Step in to a signed reply**: [StepIn.dc.html](../../../design/phase5-prototypes/StepIn.dc.html); reference 390×844; surface REF → F.
+- **4A-06 — 06 · Ask Maya to step in**: [Packet.dc.html](../../../../design/phase4a-fan-core/Packet.dc.html); reference 390×1700; surface F.
+- **4A-07 — 07 · First paid action · spend limit**: [Limit.dc.html](../../../../design/phase4a-fan-core/Limit.dc.html); reference 390×844; surface F.
+- **4A-08 — 08 · Request status and receipt**: [Status.dc.html](../../../../design/phase4a-fan-core/Status.dc.html); reference 390×1300; surface F + SHARE.
+- **4A-16 — 16 · Add a card (hold, not a charge)**: [Checkout.dc.html](../../../../design/phase4a-fan-core/Checkout.dc.html); reference 390×844; surface F (native policy gated).
+- **4B-03 — 03 · Creator profile · Access**: [Access.dc.html](../../../../design/phase4b-fan-account/Access.dc.html); reference 390×1100; surface F.
+- **4B-04 — 04 · Requests tab**: [Requests.dc.html](../../../../design/phase4b-fan-account/Requests.dc.html); reference 390×1100; surface F.
+- **4B-07 — 07 · Spending and time**: [Spending.dc.html](../../../../design/phase4b-fan-account/Spending.dc.html); reference 390×1000; surface F.
+- **4D-05 — 05 · Offers**: [Offers.dc.html](../../../../design/phase4d-studio-desktop/Offers.dc.html); reference 1280×900; surface SD.
+- **4D-06 — 06 · Earnings**: [Earnings.dc.html](../../../../design/phase4d-studio-desktop/Earnings.dc.html); reference 1280×900; surface SD.
+- **4E-06 — E6 · Native membership purchase**: [IAP.dc.html](../../../../design/phase4e-4i/IAP.dc.html); reference 390×844; surface iOS + Android / OS.
+- **4G-01 — G1 · Your pass**: [PassYou.dc.html](../../../../design/phase4e-4i/PassYou.dc.html); reference 390×1100; surface F.
+- **4G-03 — G3 · Pool earnings**: [Pool.dc.html](../../../../design/phase4e-4i/Pool.dc.html); reference 1280×900; surface SD.
+- **5.2 — 5.2 · Step in to a signed reply**: [StepIn.dc.html](../../../../design/phase5-prototypes/StepIn.dc.html); reference 390×844; surface REF → F.
 
 ## Work packages
 

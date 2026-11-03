@@ -87,7 +87,7 @@ Apple if other social sign-in is offered; account deletion must be possible insi
 
 ## Verification: end-to-end scenarios and exit demo
 
-No unit tests ([working agreement](01-working-agreement.md) section 3). Operate everything on
+No unit tests ([working agreement](../../lanes/01-working-agreement.md) section 3). Operate everything on
 the stack from lane 2; until it is on `main`, boot the backend with the development adapter and a
 fake Apple or Google ID-token issuer on your own disposable database. Negative cases come first:
 for sign-in and signing the refusal is the product. Sign-in, the 18+ gate, signing and deletion

@@ -8,7 +8,7 @@ The active `f402/creator-platform` checkout remains as the successor's documente
 
 **Before using the existing launch commands, run `pnpm install --frozen-lockfile` from the checkout. Regenerate Xcode with `xcodegen generate --spec apps/ios/project.yml`, then normally build/sign/install; rebuild Android/Next/backend outputs as required.** Private build output paths in historical receipts are intentionally gone. Shared pnpm/Gradle/Xcode/SDK/toolchain installations were not purged; native simulator/AVD data is retained for the real return journeys. No new runtime verification is inferred from cleanup.
 
-The stopped canonical61 Docker container/volume, stable private API/web configuration, original/current database backups, proof evidence, operational helper scripts and committed screenshots are preserved. Current backup SHA remains `c1d7203d176b694431a2aae74e1bbd585385bf4b6d117dedd8d7d5a5e324e201`. The current cleanup branch supersedes the prior handoff branch for the resource addendum; inspect its containing commit/PR. See [sanitized deletion and preservation receipt](../../../artifacts/workstreams/W4/runtime/2026-10-02/resource-cleanup/receipt.json). No peers' resources were touched.
+The stopped canonical61 Docker container/volume, stable private API/web configuration, original/current database backups, proof evidence, operational helper scripts and committed screenshots are preserved. Current backup SHA remains `c1d7203d176b694431a2aae74e1bbd585385bf4b6d117dedd8d7d5a5e324e201`. The current cleanup branch supersedes the prior handoff branch for the resource addendum; inspect its containing commit/PR. See [sanitized deletion and preservation receipt](../../../../artifacts/workstreams/W4/runtime/2026-10-02/resource-cleanup/receipt.json). No peers' resources were touched.
 
 This is the successor checkpoint requested by the founder. The original **nine packages and R01–R15 remain assigned and incomplete**. This checkpoint preserves implemented source and personally operated development acceptance; it does not mark the workstream complete or release-ready. Read this document before older handoffs: their forty/fifty-seven migration counts, pending synthetic review and old PR tables are historical.
 
@@ -120,10 +120,10 @@ Active executable pin omission initially crashed API startup at InteractiveCallC
 
 Safe tracked evidence:
 
-- [Final synthetic workflow/screens and limits](../../../artifacts/workstreams/W4/runtime/2026-10-02/synthetic-proof-ops/README.md), metadata receipt and private-backup hash receipt.
-- [Live61 qualification/recovery/refusal](../../../artifacts/workstreams/W4/runtime/2026-10-02/privacy-live-activation/README.md), including initial failed restore and actual closed Support screenshot.
-- [0204 SQL qualification](../../../artifacts/workstreams/W4/runtime/2026-10-02/fulfillment-publication-metadata/README.md), exact missing205 diagnostic and full rollback.
-- [200% real Android](../../../artifacts/workstreams/W4/runtime/2026-10-02/android-accessibility/receipt.json), preceding decimal-input/cold-return and original57 receipts.
+- [Final synthetic workflow/screens and limits](../../../../artifacts/workstreams/W4/runtime/2026-10-02/synthetic-proof-ops/README.md), metadata receipt and private-backup hash receipt.
+- [Live61 qualification/recovery/refusal](../../../../artifacts/workstreams/W4/runtime/2026-10-02/privacy-live-activation/README.md), including initial failed restore and actual closed Support screenshot.
+- [0204 SQL qualification](../../../../artifacts/workstreams/W4/runtime/2026-10-02/fulfillment-publication-metadata/README.md), exact missing205 diagnostic and full rollback.
+- [200% real Android](../../../../artifacts/workstreams/W4/runtime/2026-10-02/android-accessibility/receipt.json), preceding decimal-input/cold-return and original57 receipts.
 - Fulfillment draft/read/retry/view/input-hash receipts under the same2026-10-02 runtime tree. Older receipts retain their actual historical source/counts; never rewrite them as latest acceptance.
 
 ## Peer ownership and successor order

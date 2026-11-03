@@ -10,7 +10,7 @@ Ran the real Next browser route against the canonical development issuer and sep
 
 A paused database disabled actions and hid case results while preserving the unsent draft. Freezing the real API process produced three observed browser session aborts at 3008, 3005 and 3005 ms. Resuming it restored the original session and unchanged draft. Fresh sign-in to the same account cleared the original view's draft; another-account sign-in removed its case and draft in the first observed old-tab frame after the completion correction. Actual HTTP calls through both the backend and Next BFF returned 409 for stale-session reads, mutations and sign-out; BFF refusal emitted no cookie mutation and the replacement session remained valid. Confirmed sign-out cleared private views across tabs.
 
-[Evidence manifest](../../artifacts/pr-review/2026-10-06/support-session/manifest.json) links the scope and limitations; adjacent captures show the functional routes in Light/Night at 390 pixels, without horizontal overflow. Backend/web types, scoped ESLint, backend build and production web build passed. No new test code was written.
+[Evidence manifest](../../../artifacts/pr-review/2026-10-06/support-session/manifest.json) links the scope and limitations; adjacent captures show the functional routes in Light/Night at 390 pixels, without horizontal overflow. Backend/web types, scoped ESLint, backend build and production web build passed. No new test code was written.
 
 ## Design and remaining scope
 

@@ -26,7 +26,7 @@ W8 must compose `createCreatorMediaPrivacyHook` with the existing thread/call li
 
 The web `uploadCreatorMedia` helper uses real creator/object IDs with the existing bounded resumable digest/offset/ticket recovery. `AvailabilityEditor` uses the creator-only route when no fan is supplied. These are integration ports, not an observed complete creator journey. C07 terminal evidence additionally waits for recording off and an empty participant set; closed history alone cannot finish settlement while provider effects are still draining.
 
-All current media/call/AI-audio capabilities remainfalse. Typechecks/library builds and existing Foundation checks are not evidence of a genuine human pipeline, provider guarantee, deletion/archive or hardware acceptance. See [takeover evidence](../../artifacts/workstreams/W6/takeover/2026-09-30/README.md) and [provider evaluation](W6-livekit-evaluation.md).
+All current media/call/AI-audio capabilities remainfalse. Typechecks/library builds and existing Foundation checks are not evidence of a genuine human pipeline, provider guarantee, deletion/archive or hardware acceptance. See [takeover evidence](../../../artifacts/workstreams/W6/takeover/2026-09-30/README.md) and [provider evaluation](W6-livekit-evaluation.md).
 
 ## Web host composition
 

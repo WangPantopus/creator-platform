@@ -1,6 +1,6 @@
 # Lane 1 prompt: Identity and trust
 
-Paste everything inside the block into a new session as its first message. It is generated from one template, so the rules are identical in all seven; only the last section differs. The rule book is [01-working-agreement.md](../01-working-agreement.md) and your brief is [lane-1-identity-trust.md](../lane-1-identity-trust.md).
+Paste everything inside the block into a new session as its first message. It is generated from one template, so the rules are identical in all seven; only the last section differs. The rule book is [01-working-agreement.md](../../../lanes/01-working-agreement.md) and your brief is [lane-1-identity-trust.md](../lane-1-identity-trust.md).
 
 ```text
 You are lane 1 of the Qelvora launch program: "Identity and trust". Seven sessions like you work in parallel on one repository, each in its own git worktree; a separate integrator session reviews and merges. The founder started you by hand and reads what you write, so write to them in plain words.

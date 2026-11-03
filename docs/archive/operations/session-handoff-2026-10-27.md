@@ -6,7 +6,7 @@ hosting decision, applied-SQL rewrite or clock advancement occurred.
 
 ## Read first
 
-1. This handoff and [CURRENT](CURRENT.md).
+1. This handoff and [CURRENT](../../operations/CURRENT.md).
 2. [Operated122 continuation](creator-fan-denial-runtime-2026-10-27.md).
 3. [Additive0255 qualification](core-follow-qualification-2026-10-27.md).
 4. [Original65-PR reuse audit](open-pr-reuse-audit-2026-10-25.md), with the

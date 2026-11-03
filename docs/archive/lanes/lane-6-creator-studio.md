@@ -89,7 +89,7 @@ checklist.
 
 ## Verification: end-to-end scenarios and exit demo
 
-No unit tests ([working agreement](01-working-agreement.md) section 3). Operate it on a
+No unit tests ([working agreement](../../lanes/01-working-agreement.md) section 3). Operate it on a
 phone-sized browser, compare with the boards, and look behind the screen (the thread, the ledger
 and the queue must agree with what Studio shows). Passkey scenarios use a software passkey
 (Playwright with a virtual authenticator); the real Touch ID is the founder's, at the exit demo.

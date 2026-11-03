@@ -44,12 +44,12 @@ Surface codes: **F** = fan web/iOS/Android; **SP** = phone Studio web; **SD** = 
 
 The following artboards have you as primary implementation/visual owner. Also deliver every contributing state, domain requirement and missing-design resolution assigned to you by `COVERAGE.md` and the full design inventory. Prototype cards are workflow requirements; exercise all states instead of shipping prototype navigation as the product.
 
-- **4C-07 — 07 · My AI: live version and 72-hour digest**: [MyAI.dc.html](../../../design/phase4c-studio-phone/MyAI.dc.html); reference 390×1300; surface SP.
-- **4D-02 — 02 · My AI · Sources**: [Sources.dc.html](../../../design/phase4d-studio-desktop/Sources.dc.html); reference 1280×900; surface SD.
-- **4D-03 — 03 · My AI · Mode, style and rules**: [Style.dc.html](../../../design/phase4d-studio-desktop/Style.dc.html); reference 1280×900; surface SD.
-- **4D-04 — 04 · My AI · Test, publish, versions**: [Test.dc.html](../../../design/phase4d-studio-desktop/Test.dc.html); reference 1280×900; surface SD.
-- **4D-08 — 08 · License and sponsorships**: [License.dc.html](../../../design/phase4d-studio-desktop/License.dc.html); reference 1280×900; surface SD.
-- **5.4 — 5.4 · Onboarding to a published AI**: [Onboard.dc.html](../../../design/phase5-prototypes/Onboard.dc.html); reference 1280×800; surface REF → SD.
+- **4C-07 — 07 · My AI: live version and 72-hour digest**: [MyAI.dc.html](../../../../design/phase4c-studio-phone/MyAI.dc.html); reference 390×1300; surface SP.
+- **4D-02 — 02 · My AI · Sources**: [Sources.dc.html](../../../../design/phase4d-studio-desktop/Sources.dc.html); reference 1280×900; surface SD.
+- **4D-03 — 03 · My AI · Mode, style and rules**: [Style.dc.html](../../../../design/phase4d-studio-desktop/Style.dc.html); reference 1280×900; surface SD.
+- **4D-04 — 04 · My AI · Test, publish, versions**: [Test.dc.html](../../../../design/phase4d-studio-desktop/Test.dc.html); reference 1280×900; surface SD.
+- **4D-08 — 08 · License and sponsorships**: [License.dc.html](../../../../design/phase4d-studio-desktop/License.dc.html); reference 1280×900; surface SD.
+- **5.4 — 5.4 · Onboarding to a published AI**: [Onboard.dc.html](../../../../design/phase5-prototypes/Onboard.dc.html); reference 1280×800; surface REF → SD.
 
 ## Work packages
 

@@ -37,11 +37,11 @@ For a creator Studio page containing several original plans, call `prepareDraftR
 
 After all W5 document/media/creator/audience positives, call `prepareDraftReadBatchPositive` to hold current original packet/mode/capture/consent fences and exact plan hashes. Complete the actual page response, then call `finalizeDraftReadBatch` last. Saved draft and published states, complete documents, original fingerprints, existing immutable neutral deliveries and consumed current personal publication commands/media are checked. The final account signer fence and EOF metadata/current session/catalogue checks acquire no new row lock and change no identity setting. Only COMMIT follows. A retained, serialized, different-request/client/transaction or finalized batch cannot be reused. All interactive owner preparations now consume W1's genuine current middleware session and exact Actor/adult proof before domain work. Original0178/0199/0202 SQL is unchanged.
 
-[Current draft-reader SQL evidence](../../artifacts/workstreams/W4/runtime/2026-10-02/fulfillment-draft-read/receipt.json) records28 actual non-owner SELECT plans and unchanged canonical57/zero business rows. It is source/SQL qualification, not positive saved draft, captured group or Studio page acceptance; W5 must consume these actual ports.
+[Current draft-reader SQL evidence](../../../artifacts/workstreams/W4/runtime/2026-10-02/fulfillment-draft-read/receipt.json) records28 actual non-owner SELECT plans and unchanged canonical57/zero business rows. It is source/SQL qualification, not positive saved draft, captured group or Studio page acceptance; W5 must consume these actual ports.
 
 For an actual committed publish retry, use `preparePublicationRetry`, all W5 current positive/media checks, and `preparePublicationPositive` (returns an empty frozen recipient list), then `finalizePublicationRetry(client, actor, actualSignedActId)` last. Each original delivered member/version, capture, consent, immutable association and current consumed personal signature is checked. Genuine recipient RLS scopes retain each actual neutral message before the last signer; the final metadata read changes no RLS and waits for no message lock. No act is consumed again and no recipient/message/frame/delivery is emitted. SQL contention returns retryable503. Only COMMIT follows any finalizer.
 
-[Sanitized current stage query plans](../../artifacts/workstreams/W4/runtime/2026-10-02/fulfillment-plan-stages/README.md) establish non-owner planning and unchanged empty review data, not positive creator acceptance.
+[Sanitized current stage query plans](../../../artifacts/workstreams/W4/runtime/2026-10-02/fulfillment-plan-stages/README.md) establish non-owner planning and unchanged empty review data, not positive creator acceptance.
 
 ## Personally signed guaranteed review
 
@@ -53,7 +53,7 @@ A committed retry reads the real idempotency response and immutable attestation 
 
 The financial export includes all four installed tables with bounded original fan/packet keyset scope and excludes the internal transaction marker. Partial table installation refuses export completion. W8 still owns the restricted retained-purpose composition and Q16 retention/erasure decision. The immutable message/thread foreign keys block populated physical erasure until the real finite financial detachment is composed, so positive group activation remains closed. No raw worker/Team/private-source grants are added.
 
-[Sanitized compiler/catalogue/readiness evidence](../../artifacts/workstreams/W4/runtime/2026-10-02/fulfillment-plan-custody/README.md) records actual checks and original zero-row/57-ledger counts. No creator identity, signature, capture, refund, provider receipt, consent or successful fulfillment was fabricated. Actual positive creator/group/review, concurrent revocation/refund, export-purpose and native acceptance remain open.
+[Sanitized compiler/catalogue/readiness evidence](../../../artifacts/workstreams/W4/runtime/2026-10-02/fulfillment-plan-custody/README.md) records actual checks and original zero-row/57-ledger counts. No creator identity, signature, capture, refund, provider receipt, consent or successful fulfillment was fabricated. Actual positive creator/group/review, concurrent revocation/refund, export-purpose and native acceptance remain open.
 
 ## Separate early publication-worker metadata source
 

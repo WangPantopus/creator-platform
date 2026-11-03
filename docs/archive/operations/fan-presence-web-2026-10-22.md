@@ -55,8 +55,8 @@ The full available workflow passed **10/10** checks. After adding the existing
 five-second freshness behavior, the affected lifecycle/failure/expiry subset
 passed **4/4**. Web typecheck, targeted ESLint and Prettier checks passed.
 
-Screenshots: [Light](../../artifacts/lane-5/fan-presence-2026-10-22/light.png),
-[Night](../../artifacts/lane-5/fan-presence-2026-10-22/night.png).
+Screenshots: [Light](../../../artifacts/lane-5/fan-presence-2026-10-22/light.png),
+[Night](../../../artifacts/lane-5/fan-presence-2026-10-22/night.png).
 
 ## Refusals and harness corrections
 
@@ -149,13 +149,13 @@ Typecheck, scoped ESLint, syntax and formatting checks passed. This checkpoint p
 below preserves its result separately from deeper fixture-only checks.
 
 Preserved evidence:
-[follower refusal](../../artifacts/lane-5/fan-presence-2026-10-22/pagination/followers-refusal.txt),
-[member starvation](../../artifacts/lane-5/fan-presence-2026-10-22/pagination/member-starvation.txt),
-[harness failure](../../artifacts/lane-5/fan-presence-2026-10-22/pagination/harness-route-failure.txt),
-[5/5 result](../../artifacts/lane-5/fan-presence-2026-10-22/pagination/member-passed.txt),
-[fixture IDs and signed versions](../../artifacts/lane-5/fan-presence-2026-10-22/pagination/member-fixture.json),
-[older page](../../artifacts/lane-5/fan-presence-2026-10-22/pagination/older.png),
-[empty then older](../../artifacts/lane-5/fan-presence-2026-10-22/pagination/empty-then-older.png).
+[follower refusal](../../../artifacts/lane-5/fan-presence-2026-10-22/pagination/followers-refusal.txt),
+[member starvation](../../../artifacts/lane-5/fan-presence-2026-10-22/pagination/member-starvation.txt),
+[harness failure](../../../artifacts/lane-5/fan-presence-2026-10-22/pagination/harness-route-failure.txt),
+[5/5 result](../../../artifacts/lane-5/fan-presence-2026-10-22/pagination/member-passed.txt),
+[fixture IDs and signed versions](../../../artifacts/lane-5/fan-presence-2026-10-22/pagination/member-fixture.json),
+[older page](../../../artifacts/lane-5/fan-presence-2026-10-22/pagination/older.png),
+[empty then older](../../../artifacts/lane-5/fan-presence-2026-10-22/pagination/empty-then-older.png).
 The harness trace's workspace prefix is normalized; the original temporary log is
 retained. Both screenshots were inspected at 390×844.
 
@@ -210,13 +210,13 @@ was stopped with its database volume kept; the integrated native stack was left
 running. No migration, authority registration or hosting decision changed.
 
 Preserved final-source evidence:
-[real 5/5](../../artifacts/lane-5/fan-presence-2026-10-22/rolling-window/member-passed.txt),
-[version 4 fixture identifiers](../../artifacts/lane-5/fan-presence-2026-10-22/rolling-window/member-fixture.json),
-[older Notes](../../artifacts/lane-5/fan-presence-2026-10-22/rolling-window/older.png),
-[empty then older](../../artifacts/lane-5/fan-presence-2026-10-22/rolling-window/empty-then-older.png),
-[lifecycle 4/4](../../artifacts/lane-5/fan-presence-2026-10-22/rolling-window/lifecycle.txt),
-[deep UI fixture 4/4](../../artifacts/lane-5/fan-presence-2026-10-22/rolling-window/deep-fixture.txt),
-[deep UI fixture screenshot](../../artifacts/lane-5/fan-presence-2026-10-22/rolling-window/deep-fixture.png).
+[real 5/5](../../../artifacts/lane-5/fan-presence-2026-10-22/rolling-window/member-passed.txt),
+[version 4 fixture identifiers](../../../artifacts/lane-5/fan-presence-2026-10-22/rolling-window/member-fixture.json),
+[older Notes](../../../artifacts/lane-5/fan-presence-2026-10-22/rolling-window/older.png),
+[empty then older](../../../artifacts/lane-5/fan-presence-2026-10-22/rolling-window/empty-then-older.png),
+[lifecycle 4/4](../../../artifacts/lane-5/fan-presence-2026-10-22/rolling-window/lifecycle.txt),
+[deep UI fixture 4/4](../../../artifacts/lane-5/fan-presence-2026-10-22/rolling-window/deep-fixture.txt),
+[deep UI fixture screenshot](../../../artifacts/lane-5/fan-presence-2026-10-22/rolling-window/deep-fixture.png).
 
 To repeat the fixture-only mechanics on an existing owned pagination stack, use
 its `LANE6_WEB`, `LANE6_API`, `LANE6_DB` and fan actor variables with

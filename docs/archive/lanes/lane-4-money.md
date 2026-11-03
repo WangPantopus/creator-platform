@@ -80,7 +80,7 @@ lapses stays. Hold and release are exact; the ledger is append-only.
 
 ## Verification: end-to-end scenarios and exit demo
 
-No new unit tests ([working agreement](01-working-agreement.md) section 3). Money is where a
+No new unit tests ([working agreement](../../lanes/01-working-agreement.md) section 3). Money is where a
 missed edge case costs the most, so **every row below is ★** (required for any pull request that
 can affect it) and this lane has the deepest set in the program. Before anything else, build two small things once and use them for every scenario:
 

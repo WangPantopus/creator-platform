@@ -99,7 +99,7 @@ thread-local (INV-11). Never edit applied SQL; migrations go through the queue.
 
 ## Verification: end-to-end scenarios and exit demo
 
-No unit tests ([working agreement](01-working-agreement.md) section 3). Measure before and
+No unit tests ([working agreement](../../lanes/01-working-agreement.md) section 3). Measure before and
 after and show the numbers. The fixture database with a fake model (with a realistic delay) is
 your first stack; move to lane 2's stack when it lands. Safety-adjacent changes also get the
 integrator's review. Every Track A change must pass E3A.2: the same conversation gives the same

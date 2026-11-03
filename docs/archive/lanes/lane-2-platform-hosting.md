@@ -78,7 +78,7 @@ Never run a command against `creator-w2-original-archive-20261007` or other pres
 
 ## Verification: end-to-end scenarios and exit demo
 
-No unit tests ([working agreement](01-working-agreement.md) section 3). Everything you build is
+No unit tests ([working agreement](../../lanes/01-working-agreement.md) section 3). Everything you build is
 operated for real, and **your smoke script is the seed of every other lane's checks**, so make it
 small and reliable. Use your own port range and containers only; never touch the preserved
 databases.

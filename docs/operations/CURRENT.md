@@ -1,11 +1,11 @@
 # Current state
 
 The founder requested a commit/push/handoff on October27. Start with the
-[latest handoff](session-handoff-2026-10-27.md). Additive0255 now has
+[latest handoff](../archive/operations/session-handoff-2026-10-27.md). Additive0255 now has
 four measured fresh/restored profiles, two30-check restored source probes with
 25 drift refusals each, and a successful closed122→123 upgrade on56780 with
 49/49 catalogue groups and56 digests. See the
-[follower qualification report](core-follow-qualification-2026-10-27.md).
+[follower qualification report](../archive/operations/core-follow-qualification-2026-10-27.md).
 Fresh123 on56760 has **not** been created; genuine follower runtime/privacy,
 natural expiry and real followers pagination remain unrun. The prepared scenario
 is not acceptance; its durable same-stack resume remains unfinished. Existing122
@@ -13,7 +13,7 @@ results below remain distinct;157 tests were not
 rerun after0255. The upgraded target stays traffic-closed/releaseReady:false.
 
 Continuation resumed October 27, 2026 in the same worktree and draft #517.
-The [runtime continuation report](creator-fan-denial-runtime-2026-10-27.md)
+The [runtime continuation report](../archive/operations/creator-fan-denial-runtime-2026-10-27.md)
 records current remote heads, owned resources and operated results. All 65
 previously audited remote heads are unchanged; GitHub now lists those PRs plus
 #517. Original fresh122 remains healthy on56700–56703. All15 runtime groups
@@ -47,9 +47,9 @@ refusal. This does not claim completion of the preserved blocked deletion job.
 The following October25 checkpoint remains historical.
 
 Updated October 25, 2026 for the founder-requested handoff. Start with the
-[latest handoff](session-handoff-2026-10-25.md),
-[65-PR reuse audit](open-pr-reuse-audit-2026-10-25.md) and
-[0254 qualification report](creator-fan-denial-qualification-2026-10-25.md).
+[latest handoff](../archive/operations/session-handoff-2026-10-25.md),
+[65-PR reuse audit](../archive/operations/open-pr-reuse-audit-2026-10-25.md) and
+[0254 qualification report](../archive/operations/creator-fan-denial-qualification-2026-10-25.md).
 
 The active continuation is `codex/studio-reply-authority-2026-10-25` in
 `/Users/yingpengwang/.codex/worktrees/studio-reply-authority/creator-platform`,
@@ -100,7 +100,7 @@ local implementation checkpoint, not launch acceptance. Earlier lane notes and
 pull request maps are historical unless reverified here. Decisions come from the
 founder in chat, not from this file.
 
-Continue from the [October 23 handoff](session-handoff-2026-10-23.md), which names
+Continue from the [October 23 handoff](../archive/operations/session-handoff-2026-10-23.md), which names
 the exact branches, evidence, owned resources and next unstarted migration wave.
 
 ## Current integration
@@ -116,7 +116,7 @@ Three isolated tasks handled commerce, native sign-in and Studio/AI verification
 No production deployment, provider purchase or merge to main has occurred.
 
 **Hosting stays undecided**, as the founder explicitly requested. The
-[hosting options](../lanes/status/lane-2-hosting-options.md) contain current
+[hosting options](../archive/lanes/status/lane-2-hosting-options.md) contain current
 planning estimates, not an infrastructure choice.
 
 ## Implemented and operated
@@ -127,7 +127,7 @@ planning estimates, not an infrastructure choice.
 - iOS Apple and Android Google sign-in run through backend nonce validation,
   age confirmation and secure session restoration. Birth dates and provider
   continuations stay in memory. Late or mismatched returned sessions receive
-  bounded cleanup. See [native sign-in evidence](native-sign-in-2026-10-22.md).
+  bounded cleanup. See [native sign-in evidence](../archive/operations/native-sign-in-2026-10-22.md).
 - The approved GoogleSignIn 10.0.0 dependency and iOS Google credential adapter
   are committed. Both simulator architectures compile, and the expanded Google
   fake-provider journey passes with cancellation, age refusal, adult admission,
@@ -136,7 +136,7 @@ planning estimates, not an infrastructure choice.
   service and identity adapter, plus signed raw Stripe notification ingress.
   Expired requests release holds; overdue accepted commitments refund. Optional
   inbox credentials are restricted to the reviewed separate role.
-  See [commerce evidence](commerce-host-completion-2026-10-22.md).
+  See [commerce evidence](../archive/operations/commerce-host-completion-2026-10-22.md).
 - Studio opens on Today. Note composition preserves paragraphs and direction,
   names the member audience, and retains Today navigation while composing.
 - Web fan conversations now merge the authorized Content Notes and reaction
@@ -148,7 +148,7 @@ planning estimates, not an infrastructure choice.
   starvation during automatic refresh. The final bounded concurrent reader also
   passes that real 5/5 workflow, lifecycle 4/4 and separate seven-cursor fixture
   4/4. Follower access still refuses at its held metadata reader.
-  See [web presence evidence](fan-presence-web-2026-10-22.md).
+  See [web presence evidence](../archive/operations/fan-presence-web-2026-10-22.md).
 - The separate [native feed PR #516](https://github.com/WangPantopus/creator-platform/pull/516)
   adds authorized Notes/reactions to both phone timelines. Both apps build and
   have operated actual signed Notes. The latest iOS journey passes again on the
@@ -168,17 +168,17 @@ planning estimates, not an infrastructure choice.
 - Migration 0252 registers the unchanged workspace-lock proposal. Four bounded
   locks wait instead of immediately failing during concurrent workspace reads.
   Exact owner/source/definition checks remain in place. Fresh and restored
-  qualification is in [workspace-lock evidence](workspace-lock-qualification-2026-10-22.md).
+  qualification is in [workspace-lock evidence](../archive/operations/workspace-lock-qualification-2026-10-22.md).
 - Conversation privacy now prepares its concrete recording-association metadata
   reader independently of interactive media. A populated text-account export
   completes all eight domains, with actual artifact contents and access controls
-  verified. See [export evidence](conversation-export-completion-2026-10-22.md).
+  verified. See [export evidence](../archive/operations/conversation-export-completion-2026-10-22.md).
 - FAQ evaluations and comparison replay stop new admissions during shutdown and
   drain admitted provider work and final database writes before releasing their
   pool. Actual active-provider and database-lock-wait shutdown cases passed.
 - Pull requests now check committed evidence size and duplicate blobs against
   their actual base/head. Eleven real Git workflows passed; historical artifacts
-  remain untouched. See [evidence-budget checks](evidence-budget-2026-10-22.md).
+  remain untouched. See [evidence-budget checks](../archive/operations/evidence-budget-2026-10-22.md).
 
 ## Verification observed this session
 
@@ -240,7 +240,7 @@ original scope in the linked reports.
   all four streamed artifact checks passed after a stock-runtime restart. That
   actor had no conversation families; neither this export nor the completed
   owner outputs establish whole-account deletion.
-  [Follower metadata](core-follow-custody-audit-2026-10-22.md) needs a subsequent
+  [Follower metadata](../archive/operations/core-follow-custody-audit-2026-10-22.md) needs a subsequent
   separate wave; no missing denial or audience guard is bypassed.
 - **Production:** the production host still fails closed where its real adapters
   are absent. Hosting, region, account, domain and budget remain undecided;
@@ -276,9 +276,9 @@ Foundation checks pending and Trust release compilation in progress at commit
 used. Native Content-feed and reply-review qualification work continue in
 separate managed worktrees and branches for stacked pull requests.
 
-The [October 15 handoff](integrator-handoff-2026-10-15.md),
-[launch plan](../LAUNCH_PLAN.md), [finish plan](product-finish-plan-2026-10-08.md)
-and [lane status notes](../lanes/status/) preserve scope and earlier evidence.
+The [October 15 handoff](../archive/operations/integrator-handoff-2026-10-15.md),
+[launch plan](../LAUNCH_PLAN.md), [finish plan](../archive/operations/product-finish-plan-2026-10-08.md)
+and [lane status notes](../archive/lanes/status/) preserve scope and earlier evidence.
 The original deletion maturity remains 2026-10-30 08:48:22.966 UTC. Development
 comparison authority and reply-feedback policy expire on 2026-11-01; renewing
 those policies requires their actual authority, not a clock change.

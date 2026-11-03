@@ -9,7 +9,7 @@ for the native sign-in wording ("Sign in to continue" and "Sign-in is unavailabl
 in a moment."), the home glyph for Today, and the local installs. Waves 1 to 4 are merged (#518 to
 #527), and all 66 original pull requests are merged or closed with a note. Wave 5 is next.
 The current state and queue are in the
-[coordination handoff](operations/handoff-2026-11-02.md). The section 6 working rules and the other
+[coordination handoff](archive/operations/handoff-2026-11-02.md). The section 6 working rules and the other
 section 8 decisions are still open. The tables below record the state on the review day.
 
 ## 1. Bottom line

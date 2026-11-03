@@ -44,11 +44,11 @@ Surface codes: **F** = fan web/iOS/Android; **SP** = phone Studio web; **SD** = 
 
 The following artboards have you as primary implementation/visual owner. Also deliver every contributing state, domain requirement and missing-design resolution assigned to you by `COVERAGE.md` and the full design inventory. Prototype cards are workflow requirements; exercise all states instead of shipping prototype navigation as the product.
 
-- **4E-01 — E1 · Before the call**: [Main.dc.html](../../../design/phase4e-4i/Main.dc.html); reference 390×844; surface F + SP.
-- **4E-02 — E2 · Connected (Night)**: [CallLive.dc.html](../../../design/phase4e-4i/CallLive.dc.html); reference 390×844; surface F + SP.
-- **4E-03 — E3 · After the call**: [CallAfter.dc.html](../../../design/phase4e-4i/CallAfter.dc.html); reference 390×900; surface F + SP.
-- **4E-04 — E4 · Creator offers times**: [OfferTimes.dc.html](../../../design/phase4e-4i/OfferTimes.dc.html); reference 390×900; surface SP.
-- **4F-03 — F3 · AI voice notes**: [AIVoice.dc.html](../../../design/phase4e-4i/AIVoice.dc.html); reference 390×1000; surface F.
+- **4E-01 — E1 · Before the call**: [Main.dc.html](../../../../design/phase4e-4i/Main.dc.html); reference 390×844; surface F + SP.
+- **4E-02 — E2 · Connected (Night)**: [CallLive.dc.html](../../../../design/phase4e-4i/CallLive.dc.html); reference 390×844; surface F + SP.
+- **4E-03 — E3 · After the call**: [CallAfter.dc.html](../../../../design/phase4e-4i/CallAfter.dc.html); reference 390×900; surface F + SP.
+- **4E-04 — E4 · Creator offers times**: [OfferTimes.dc.html](../../../../design/phase4e-4i/OfferTimes.dc.html); reference 390×900; surface SP.
+- **4F-03 — F3 · AI voice notes**: [AIVoice.dc.html](../../../../design/phase4e-4i/AIVoice.dc.html); reference 390×1000; surface F.
 
 ## Work packages
 

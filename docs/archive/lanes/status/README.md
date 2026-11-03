@@ -1,7 +1,7 @@
 # Lane status files
 
 Each lane keeps `lane-N.md` here, updated in every pull request. The integrator aggregates them
-into [CURRENT](../../operations/CURRENT.md).
+into [CURRENT](../../../operations/CURRENT.md).
 
 ```
 # Lane N: <name> status

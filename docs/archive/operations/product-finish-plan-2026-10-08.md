@@ -1,15 +1,15 @@
 # Product finish plan — October 8, 2026
 
-> **Order and scope now live in [LAUNCH_PLAN](../LAUNCH_PLAN.md)**, decided later the same day;
+> **Order and scope now live in [LAUNCH_PLAN](../../LAUNCH_PLAN.md)**, decided later the same day;
 > the ten milestones below stay in scope and the launch plan only orders them (its section 9).
 > The "Present position" column predates the [launch review](launch-review-2026-10-08.md):
 > a comparison sanitizer and privacy producer now exist (row 1), and the latest measured
 > first stored sentence is 19.1 s, most of it platform overhead (row 3). Current state:
-> [CURRENT](CURRENT.md).
+> [CURRENT](../../operations/CURRENT.md).
 
 ## Immediate requested handoff
 
-Implementation paused at the [comparison-view privacy repair](../../artifacts/pr-review/2026-10-08/comparison-view-lifetime/README.md).
+Implementation paused at the [comparison-view privacy repair](../../../artifacts/pr-review/2026-10-08/comparison-view-lifetime/README.md).
 Offline/failed-read concealment and fresh-read recovery pass in the real web app;
 visibility/identity/cancellation and populated creator export withdrawal remain.
 The [immediate handoff](session-handoff-2026-10-08-immediate.md) is history.
@@ -18,7 +18,7 @@ All ten milestones and every historical evidence/clock/hold remain in scope.
 
 ## Current execution — preserved creator upgrade
 
-The [actual upgrade increment](../../artifacts/pr-review/2026-10-08/comparison-creator-upgrade/README.md)
+The [actual upgrade increment](../../../artifacts/pr-review/2026-10-08/comparison-creator-upgrade/README.md)
 operates original engine13→14 comparison, fresh six-case evaluation, legitimate v2
 publication, cited fan reply, restart and permissible rollback/restoration. Native
 Light/Night journeys verify the preserved reply and citation. Original publication
@@ -33,7 +33,7 @@ criteria, production policy and original mature deletion clock remain in scope.
 
 ## Current execution — actual comparison export and withdrawal
 
-The [original export recovery increment](../../artifacts/pr-review/2026-10-08/comparison-export-reference/README.md)
+The [original export recovery increment](../../../artifacts/pr-review/2026-10-08/comparison-export-reference/README.md)
 now completes the same fan export across8domains and verifies all4actual browser
 file downloads. Explicit web withdrawal removes the sample/consent and physically
 purges its affected file; fresh verified download refuses access. Other11files and
@@ -44,7 +44,7 @@ revision13upgrade remain next. All ten completion criteria stay open.
 
 ## Current execution — real comparison controls
 
-The [web/iOS/Android comparison increment](../../artifacts/pr-review/2026-10-08/comparison-choice-ui/README.md)
+The [web/iOS/Android comparison increment](../../../artifacts/pr-review/2026-10-08/comparison-choice-ui/README.md)
 now has explicit fictional choice, one real privacy-reviewed question, two settled
 provider calls costing921 microdollars, and native cache reuse with unchanged
 original generation/publication custody. The next actual export exposed mismatched
@@ -62,7 +62,7 @@ The product is substantially implemented and remains incomplete.
 
 ## Continuing execution
 
-The [original populated comparison wave](../../artifacts/pr-review/2026-10-08/comparison-closed-wave/README.md)
+The [original populated comparison wave](../../../artifacts/pr-review/2026-10-08/comparison-closed-wave/README.md)
 now activates all eight exact sources through the closed runner, with independent
 backups/restores and original1472 rows/history preserved. The actual compiled
 comparison host runs on copy43 and the original browser conversation works;
@@ -70,7 +70,7 @@ all18 generations/69 usage rows/publication are unchanged. Actual fan choice,
 sanitizer/provider, native controls and preserved-version upgrade are next.
 All ten completion criteria remain open.
 
-[Scoped artifact recovery and legacy expiry](../../artifacts/pr-review/2026-10-08/comparison-legacy-custody/README.md)
+[Scoped artifact recovery and legacy expiry](../../../artifacts/pr-review/2026-10-08/comparison-legacy-custody/README.md)
 now distinguish unrelated mapped live exports and permit exact expired legacy
 cleanup under the original task. Six real isolated SQL/filesystem cases pass on
 a complete restored graph. The eight reserved sources still need the closed
@@ -78,7 +78,7 @@ populated upgrade; actual owner ACL and incoming-role representation require
 independent review. Unexpired unknown mapping remains pending. Actual comparison
 controls/provider/upgrade and every ten-milestone finish criterion remain open.
 
-[Comparison runtime integration](../../artifacts/pr-review/2026-10-08/comparison-runtime-integration/README.md)
+[Comparison runtime integration](../../../artifacts/pr-review/2026-10-08/comparison-runtime-integration/README.md)
 now has seven reserved numbered sources, complete combined catalogue/restore
 review and gated original host, export/store, withdrawal and expiry composition.
 The executable graph remains106; actual comparison UI/provider acceptance is
@@ -90,7 +90,7 @@ same-account sign-in and both original source export downloads pass with unchang
 generation/accounting/publication custody. Comparison activation remains off.
 All ten finish criteria below remain unchanged.
 
-The [original held comparison feed increment](../../artifacts/pr-review/2026-10-08/comparison-held-feed/README.md)
+The [original held comparison feed increment](../../../artifacts/pr-review/2026-10-08/comparison-held-feed/README.md)
 adds a finite SQL read/COMMIT scope and same-transaction source checks for
 collection, each provider admission, replay, display and publication. Eight
 isolated SQL and four actual consumer-class operations pass with synthetic
@@ -100,7 +100,7 @@ Actual consent, sanitization and cross-platform upgrade acceptance remain open.
 PR344's separate main workflow passed. PR345 merged at `60f415b65` after all
 eleven exact-head checks passed; refresh its separate main run.
 
-The [comparison provider/writer increment](../../artifacts/pr-review/2026-10-08/comparison-purpose-admission/README.md)
+The [comparison provider/writer increment](../../../artifacts/pr-review/2026-10-08/comparison-purpose-admission/README.md)
 adds original fan admission, purpose/source-bound accounting receipts, finite
 development notice and original write/COMMIT checks. Nine isolated SQL cases
 pass with synthetic sessions/provider receipts; genuine consent, sanitizer
@@ -119,7 +119,7 @@ Copy 43 is reopened through its original custody helper and used by the compiled
 backend, actual web sessions and dedicated native simulators. The initial eight
 generation/33 usage record receipt remains unchanged after native reads.
 
-The [connected native milestone](../../artifacts/pr-review/2026-10-08/native-connected-journey/README.md)
+The [connected native milestone](../../../artifacts/pr-review/2026-10-08/native-connected-journey/README.md)
 repairs initial reply visibility, Android saved navigation and empty-composer
 presentation, and the welcome action during sign-out cleanup. Its evidence is
 backed by passing iOS Night and Android Light/Night connected UI journeys.
@@ -127,7 +127,7 @@ It is limited to the operated flows; new native sends, interruption/keyboard/lar
 text, physical devices and the rest of the finish criteria remain outstanding.
 
 PR #337 merged at `715cc0728d417f40e97d41eec64cab6e4121cd6f`; all ten head
-checks and all five post-merge checks passed. The [native send increment](../../artifacts/pr-review/2026-10-08/native-message-reliability/README.md)
+checks and all five post-merge checks passed. The [native send increment](../../../artifacts/pr-review/2026-10-08/native-message-reliability/README.md)
 now passes actual sends, retained drafts and keyboard/reconnection checks on
 both native apps, including Android account reconfirmation. All eighteen actual
 operations and failures remain preserved. Copy 43 has seventeen delivered and
@@ -145,7 +145,7 @@ original trusted feed is disconnected. All ten milestones below remain open.
 
 PR #339 merged at `2c1bc9f5605381469d585998a61a4de97ecc4dd5` with all eleven
 reviewed-head checks passing; both #338 and #339 have all five post-merge jobs passing.
-The [comparison lifecycle source increment](../../artifacts/pr-review/2026-10-08/comparison-consent-lifecycle/README.md)
+The [comparison lifecycle source increment](../../../artifacts/pr-review/2026-10-08/comparison-consent-lifecycle/README.md)
 now has isolated PostgreSQL withdrawal/expiry/export evidence. Its new storage
 and privacy adapter remain unregistered. Consent, actual sanitization, original
 provider admission, saved-export invalidation and complete consumer fences remain
@@ -157,18 +157,18 @@ Conversation pages within the original45s deadline. The original account request
 now completes all eight domains, and all four streamed UI downloads match their
 saved checksums. Publication and all18 generation/69 usage records remain exact.
 This is bounded creator-account evidence, not populated media or mature deletion.
-The [download recovery follow-up](../../artifacts/pr-review/2026-10-08/privacy-download-recovery/README.md)
+The [download recovery follow-up](../../../artifacts/pr-review/2026-10-08/privacy-download-recovery/README.md)
 now passes the real expired-verification → sign-in → identical artifact journey.
 Original provider/read authority and saved-comparison artifact invalidation remain next.
 
 
-The [saved comparison artifact source](../../artifacts/pr-review/2026-10-08/comparison-artifact-lifecycle/README.md)
+The [saved comparison artifact source](../../../artifacts/pr-review/2026-10-08/comparison-artifact-lifecycle/README.md)
 now has isolated original-scope capture, withdrawal/expiry, deferred completion
 and physical removal evidence. It remains unregistered/uncomposed. Durable
 unfinished-attempt and sealed-orphan recovery, full graph review and actual
 producer/consumer operation remain prerequisites. No milestone is closed.
 
-The [durable attempt recovery increment](../../artifacts/pr-review/2026-10-08/privacy-export-attempt-recovery/README.md)
+The [durable attempt recovery increment](../../../artifacts/pr-review/2026-10-08/privacy-export-attempt-recovery/README.md)
 now has actual isolated process-crash/source-lock evidence and a real copy43 fan
 export with all eight domains complete and all four downloaded stream hashes
 verified. Pending recovery remains unregistered. Preserve new provenance in
@@ -176,7 +176,7 @@ complete Trust export/deletion and explicitly review legacy exports before
 activation; full source/provider admission and actual producer operation remain.
 PRs340 and341 merged with eleven checks passing each;342 now targets main.
 
-The [Trust artifact privacy increment](../../artifacts/pr-review/2026-10-08/comparison-artifact-privacy/README.md)
+The [Trust artifact privacy increment](../../../artifacts/pr-review/2026-10-08/comparison-artifact-privacy/README.md)
 now has source-derived private mapping, own-only export, complete file inventory,
 physical removal and original 0103-authorized clearing. Six isolated operations
 pass; synthetic source-task receipts are not mature deletion acceptance. All
@@ -236,7 +236,7 @@ sample cohort; and a stored pass can survive the samples' seven-day eligibility.
 This continuation binds comparison identity to the exact cohort, replaces cached
 candidates from a bounded complete feed response, and checks current eligible
 samples at replay stages, result persistence and publication. Empty cohorts
-cannot pass. See [increment evidence](../../artifacts/pr-review/2026-10-08/shadow-evidence-lifetime/README.md).
+cannot pass. See [increment evidence](../../../artifacts/pr-review/2026-10-08/shadow-evidence-lifetime/README.md).
 
 That repair does **not** issue privacy authority or finish the producer. Next:
 

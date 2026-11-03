@@ -12,7 +12,7 @@ replace it.
 
 ## Development
 
-Start parallel product work from the [eight-workstream delivery plan](docs/workstreams/README.md).
+Start parallel product work from the [eight-workstream delivery plan](docs/archive/workstreams/README.md).
 It contains agent assignments, full-scope coverage, ownership/contracts, runtime
 verification standards, and current founder decisions that supersede older build instructions.
 
@@ -21,8 +21,8 @@ Run `pnpm install && pnpm dev` for the local web/backend hosts. The design revie
 catalog is at `/design`; authentication and providers remain unconfigured until
 their adapters are connected.
 
-See [foundation setup](docs/implementation/FOUNDATION.md),
-[build status](docs/BUILD_LOG.md), and [visual evidence](docs/implementation/design-verification.md)
+See [foundation setup](docs/engineering/setup.md),
+[build status](docs/BUILD_LOG.md), and [visual evidence](docs/engineering/design-verification.md)
 for what is implemented, what was tested and the remaining product stages.
 
 ## Repository

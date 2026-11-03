@@ -66,9 +66,9 @@ disabled until their adapters and workflows exist.
 | Swift     | 18 test methods pass, including 110 macOS snapshot assertions. iPhone 17/iOS 27 XCUITests exercise unavailable sign-in in Light/Night and labeled AI/creator messages.                                                                      | macOS rendering is regression evidence, not accepted native screen fidelity. Physical-device and full-flow acceptance remain pending.                   |
 | Android   | Debug APK, 19 unit/snapshot test methods and 144 Paparazzi assertions pass. Four Android 14 emulator tests cover unavailable sign-in, context removal, mode selection and real dialog actions.                                              | Pixel acceptance against independent design renders and all native states remain pending.                                                               |
 
-See [design evidence](implementation/design-verification.md),
+See [design evidence](engineering/design-verification.md),
 [native verification](implementation/native-foundation.md), and
-[T-01–T-40 coverage](implementation/backend-foundation.md) for exact scope.
+[T-01–T-40 coverage](engineering/backend.md) for exact scope.
 
 ### Repairs and decisions during implementation
 

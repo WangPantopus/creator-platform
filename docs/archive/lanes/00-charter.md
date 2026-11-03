@@ -6,7 +6,7 @@ lane brief and this charter disagree, stop and ask the integrator.
 
 ## 1. What we are building
 
-Qelvora (a placeholder name, always written exactly as in [NAMING](../NAMING.md)) is a
+Qelvora (a placeholder name, always written exactly as in [NAMING](../../NAMING.md)) is a
 Pantopus app. Each creator has an authorized, clearly labeled AI that talks one-on-one with
 every fan. It is useful, it cites the creator's own work, and it remembers the fan. The real
 creator stays present through signed Notes and reactions and can step in. A fan can pay for
@@ -72,13 +72,13 @@ link) is also in scope for the pilot.
 Every message has exactly one authorship state, set by the server: `ai`, `approved_draft`,
 `human_creator`, `human_call`, `human_broadcast` (a Note), `human_reaction`, `team`, `fan`,
 `system`. Each has a **word**, a **glyph** and a **color**, rendered into the content itself,
-never color alone. Full table: [BRIEF section 5](../BRIEF.md). The identity strip at the top of
+never color alone. Full table: [BRIEF section 5](../../BRIEF.md). The identity strip at the top of
 a thread never scrolls away. The primary button in a thread is always the AI; the only
 person-colored button is "Ask Maya to step in", and it opens the packet, never a payment sheet.
 
 ### 4.3 The invariants (INV-01 to INV-25)
 
-The text of record is in the [Domain Model](../source/Domain_Model_and_Behavioral_Contract.md).
+The text of record is in the [Domain Model](../../source/Domain_Model_and_Behavioral_Contract.md).
 If your work needs one to bend, **stop and ask the founder through the integrator**. Do not
 design around it.
 
@@ -95,7 +95,7 @@ design around it.
 ### 4.4 Copy is part of the contract
 
 Use the fixed sentences verbatim and never use the forbidden words
-([BRIEF section 11](../BRIEF.md)). The product is `Qelvora` / `qelvora` / `QELVORA`: one
+([BRIEF section 11](../../BRIEF.md)). The product is `Qelvora` / `qelvora` / `QELVORA`: one
 unbroken word, no possessive, no abbreviation. User-facing text lives in `config/copy.json`
 and goes through the copy review checklist in the working agreement.
 
@@ -134,8 +134,8 @@ your work would touch one, say so in your report.
 
 ## 7. Where things stand
 
-Read [CURRENT](../operations/CURRENT.md) (state and plan), the
-[launch plan](../LAUNCH_PLAN.md) (scope and order) and the
+Read [CURRENT](../../operations/CURRENT.md) (state and plan), the
+[launch plan](../../LAUNCH_PLAN.md) (scope and order) and the
 [launch review](../operations/launch-review-2026-10-08.md) (what the code does, with file
 references). In one paragraph: the engine is strong (identity labels, signing, money rules,
 delivery, safety) and passes its checks, but only the development host runs the product. The
@@ -169,11 +169,11 @@ Frozen (planned for later, owner is the integrator, do not extend): `modules/med
 
 ## 9. Where to look, and what wins
 
-1. [`docs/source/`](../source/) is authoritative for behavior. When the brief and a source
+1. [`docs/source/`](../../source/) is authoritative for behavior. When the brief and a source
    disagree, the source wins and the brief is corrected.
-2. [`docs/BRIEF.md`](../BRIEF.md) is the condensed product, identity system, screen inventory,
+2. [`docs/BRIEF.md`](../../BRIEF.md) is the condensed product, identity system, screen inventory,
    copy system and decision log.
-3. [`design/`](../../design/) is authoritative for appearance. The corrected tokens are
+3. [`design/`](../../../design/) is authoritative for appearance. The corrected tokens are
    `design/handoff/tokens.json` plus the corrections in `docs/BUILD_PROMPT.md` section 9
    (neutral selected states, warm-paper Night creator plate, fan words in sans, no-wrap pills,
    dialogs over a scrim). The `.dc.html` boards do not render standalone; use

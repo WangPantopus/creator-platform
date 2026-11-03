@@ -44,16 +44,16 @@ Surface codes: **F** = fan web/iOS/Android; **SP** = phone Studio web; **SD** = 
 
 The following artboards have you as primary implementation/visual owner. Also deliver every contributing state, domain requirement and missing-design resolution assigned to you by `COVERAGE.md` and the full design inventory. Prototype cards are workflow requirements; exercise all states instead of shipping prototype navigation as the product.
 
-- **4C-01 — 01 · Requests queue**: [Main.dc.html](../../../design/phase4c-studio-phone/Main.dc.html); reference 390×1400; surface SP.
-- **4C-02 — 02 · A request: reply or Instead**: [PacketDetail.dc.html](../../../design/phase4c-studio-phone/PacketDetail.dc.html); reference 390×1700; surface SP.
-- **4C-04 — 04 · Threads**: [Threads.dc.html](../../../design/phase4c-studio-phone/Threads.dc.html); reference 390×1000; surface SP.
-- **4C-05 — 05 · A fan's thread: audit, take over**: [ThreadView.dc.html](../../../design/phase4c-studio-phone/ThreadView.dc.html); reference 390×1300; surface SP.
-- **4C-06 — 06 · Write a Note**: [NoteCompose.dc.html](../../../design/phase4c-studio-phone/NoteCompose.dc.html); reference 390×1100; surface SP.
-- **4C-08 — 08 · More**: [More.dc.html](../../../design/phase4c-studio-phone/More.dc.html); reference 390×900; surface SP.
-- **4C-09 — 09 · Notes: replies feed**: [Replies.dc.html](../../../design/phase4c-studio-phone/Replies.dc.html); reference 390×1200; surface SP.
-- **4D-07 — 07 · Team and roles**: [Team.dc.html](../../../design/phase4d-studio-desktop/Team.dc.html); reference 1280×900; surface SD.
-- **4F-01 — F1 · A public answer**: [PublicAnswer.dc.html](../../../design/phase4e-4i/PublicAnswer.dc.html); reference 390×1200; surface F.
-- **5.3 — 5.3 · The creator's daily five minutes**: [Daily.dc.html](../../../design/phase5-prototypes/Daily.dc.html); reference 390×844; surface REF → SP.
+- **4C-01 — 01 · Requests queue**: [Main.dc.html](../../../../design/phase4c-studio-phone/Main.dc.html); reference 390×1400; surface SP.
+- **4C-02 — 02 · A request: reply or Instead**: [PacketDetail.dc.html](../../../../design/phase4c-studio-phone/PacketDetail.dc.html); reference 390×1700; surface SP.
+- **4C-04 — 04 · Threads**: [Threads.dc.html](../../../../design/phase4c-studio-phone/Threads.dc.html); reference 390×1000; surface SP.
+- **4C-05 — 05 · A fan's thread: audit, take over**: [ThreadView.dc.html](../../../../design/phase4c-studio-phone/ThreadView.dc.html); reference 390×1300; surface SP.
+- **4C-06 — 06 · Write a Note**: [NoteCompose.dc.html](../../../../design/phase4c-studio-phone/NoteCompose.dc.html); reference 390×1100; surface SP.
+- **4C-08 — 08 · More**: [More.dc.html](../../../../design/phase4c-studio-phone/More.dc.html); reference 390×900; surface SP.
+- **4C-09 — 09 · Notes: replies feed**: [Replies.dc.html](../../../../design/phase4c-studio-phone/Replies.dc.html); reference 390×1200; surface SP.
+- **4D-07 — 07 · Team and roles**: [Team.dc.html](../../../../design/phase4d-studio-desktop/Team.dc.html); reference 1280×900; surface SD.
+- **4F-01 — F1 · A public answer**: [PublicAnswer.dc.html](../../../../design/phase4e-4i/PublicAnswer.dc.html); reference 390×1200; surface F.
+- **5.3 — 5.3 · The creator's daily five minutes**: [Daily.dc.html](../../../../design/phase5-prototypes/Daily.dc.html); reference 390×844; surface REF → SP.
 
 ## Work packages
 

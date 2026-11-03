@@ -1,8 +1,8 @@
 # Immediate handoff — October 8, 2026
 
 > **History, not instructions.** This was written when the previous session was paused.
-> The order of work is now in [LAUNCH_PLAN](../LAUNCH_PLAN.md) and the state in
-> [CURRENT](CURRENT.md). PRs 351 to 353 listed below have merged. A committed file is not
+> The order of work is now in [LAUNCH_PLAN](../../LAUNCH_PLAN.md) and the state in
+> [CURRENT](../../operations/CURRENT.md). PRs 351 to 353 listed below have merged. A committed file is not
 > an authorization; approvals come from the founder in the chat. The statements about what
 > the user authorized in that session, and local paths to private environment files, were
 > removed from this copy.
@@ -115,17 +115,17 @@ just to examine that populated result.
 
 ## Completed evidence and immediate next work
 
-1. [Export reference/recovery](../../artifacts/pr-review/2026-10-08/comparison-export-reference/README.md):
+1. [Export reference/recovery](../../../artifacts/pr-review/2026-10-08/comparison-export-reference/README.md):
    original fanc09931ea export completes8domains on attempt9. Four real downloads
    verified; withdrawal physically removes its Conversation artifact in1.161s,
    fresh download403, other11saved files exact. Earlier refusals remain evidence.
-2. [Creator upgrade](../../artifacts/pr-review/2026-10-08/comparison-creator-upgrade/README.md):
+2. [Creator upgrade](../../../artifacts/pr-review/2026-10-08/comparison-creator-upgrade/README.md):
    actual comparison/evaluation/publication, useful fan reply, restart, rollback,
    native Light/Night. iOS48.712sLight/49.025sNight pass. Android final27.943sNight
    and24.634s coldLight pass. Existing harness fixes: iOS label predicate avoids
    XCTest128-character limit; Android real-time wait advances Compose, screenshot
    capture waits for compositor. All original failures retained. No new unit tests.
-3. [Current view repair](../../artifacts/pr-review/2026-10-08/comparison-view-lifetime/README.md):
+3. [Current view repair](../../../artifacts/pr-review/2026-10-08/comparison-view-lifetime/README.md):
    source-derived comparison text now clears on offline/failed reads and reappears
    after fresh reads. Actual dev-browser evidence, scoped lint/format/typecheck and
    production compilation pass. Visibility/identity/late-response cancellation is

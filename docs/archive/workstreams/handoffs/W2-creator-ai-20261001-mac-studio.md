@@ -19,7 +19,7 @@ This is the newest W2 continuation entry point. It supersedes the host, runtime 
 
 | Item | State |
 | --- | --- |
-| [PR40](https://github.com/WangPantopus/creator-platform/pull/40) idle-pool listener | **Merged** as `19a3d297d3fb7e050452b5ea1d97e813af8cfd84` (head `a791b4e4`, normal merge, main unprotected / rulesets `[]` rechecked). Real before/after outage receipt: [pool-recovery-acceptance.md](../../../artifacts/workstreams/W2/completion/20261001-mac-studio/pool-recovery-acceptance.md). Exact-head `web-and-backend` ×2 and `android-runtime` ×2 passed. The three macOS jobs were still queued at merge; `web-visual` and `ios-foundation` also fail on main itself (see §5). |
+| [PR40](https://github.com/WangPantopus/creator-platform/pull/40) idle-pool listener | **Merged** as `19a3d297d3fb7e050452b5ea1d97e813af8cfd84` (head `a791b4e4`, normal merge, main unprotected / rulesets `[]` rechecked). Real before/after outage receipt: [pool-recovery-acceptance.md](../../../../artifacts/workstreams/W2/completion/20261001-mac-studio/pool-recovery-acceptance.md). Exact-head `web-and-backend` ×2 and `android-runtime` ×2 passed. The three macOS jobs were still queued at merge; `web-visual` and `ios-foundation` also fail on main itself (see §5). |
 | Development synthetic licensing + Studio action-error focus | Branch `claude/w2-development-licensing` from `19a3d297`, PR listed in §7. See §3. |
 | Peer coordination | §6. |
 | Fresh canonical runtime + validated backup | §4. |
@@ -157,6 +157,6 @@ Unset `W2_PG_SUPERUSER_PASSWORD` before launching. Add the provider env only aft
    - artboards 4C-07/4D-02/03/04/08/5.4 at equal content;
    - actual 200% text, VoiceOver/TalkBack, reduced motion, offline;
    - success messages are still top-only `role=status`, so consider a Toast for actions lower on the page (the design system allows Toast for confirmations only).
-6. R07 export/purge/family jobs, R10 shadow/digest feed (W3/W7) and R11 connectors/voice, as listed in [the finish matrix](../../../artifacts/workstreams/W2/completion/20261001/finish-matrix.md) and [backlog](../../../artifacts/workstreams/W2/completion/20261001/release-backlog.md). These are unchanged by this session.
+6. R07 export/purge/family jobs, R10 shadow/digest feed (W3/W7) and R11 connectors/voice, as listed in [the finish matrix](../../../../artifacts/workstreams/W2/completion/20261001/finish-matrix.md) and [backlog](../../../../artifacts/workstreams/W2/completion/20261001/release-backlog.md). These are unchanged by this session.
 
 Deferred human decisions remain prerequisites only for their production paths: Q05 reviewed license, processor/retention (Q02) and Q16 retention.

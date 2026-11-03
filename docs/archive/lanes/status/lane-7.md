@@ -235,7 +235,7 @@ Next: the five steps in the night handoff. WP 7.5/7.6/7.7/7.9 wait on C1, domain
 2. Resume the authorized warm worktree; the newest branch is `lane-7/status-7-4` (the tip of the WP 7.4 stack). Earlier: resume on `lane-7/keyboard-drafts`. Fetch, verify clean status and inspect PR metadata/reviews. PR 369 is merged; PR 379 remains ready/open with no review comments at the handoff check. Main through `21b3d4836` is merged. Never rebase or merge a PR.
 3. WP 7.1/7.2 are done. WP 7.3 proves E7.2's draft restoration. Do not repeat completed matrices without a relevant change or failure. If the compact header is rejected, change only the presentation on both apps and rerun D1/D3 and Android D3I/D3S; storage/recovery need no blanket rerun.
 4. Approved draft policy: device only, encrypted, account/thread bound; cleared on accepted send, sign-out, accepted deletion or conversation removal; unsent input never uploaded. Pending sends keep their existing idempotency key; restart checks acceptance and never automatically sends again.
-5. Final generic gates build with an empty API origin and Android instrumentation uninstalls the app. Before the next operated flow, rebuild/install debug for the fake (or explicit debug override). Use the [harness runbook](lane-7-harness.md), own devices and serial heavy-build lock. The machine-specific cache pointer is in the handoff memory.
+5. Final generic gates build with an empty API origin and Android instrumentation uninstalls the app. Before the next operated flow, rebuild/install debug for the fake (or explicit debug override). Use the [harness runbook](../../../lanes/status/lane-7-harness.md), own devices and serial heavy-build lock. The machine-specific cache pointer is in the handoff memory.
 
 ## Traps that cost time (so you do not pay twice)
 
@@ -254,7 +254,7 @@ Next: the five steps in the night handoff. WP 7.5/7.6/7.7/7.9 wait on C1, domain
 - **iOS taps while typing are asynchronous**: wait, take a screenshot, then tap Send (the layout shifts while the keyboard animates).
 - **iOS simulator tool tips** (the edge swipe needs `touch_path`, `simctl openurl` asks "Open in Qelvora?", tap coordinates, waiting for a thread to load) are in [lane-7-navigation.md](lane-7-navigation.md).
 - **Do not use bare `git stash`** (shared across worktrees), `git worktree remove`, `git clean -fdx`, `git reset --hard`.
-- **Devices and ports** are in [lane-7-harness.md](lane-7-harness.md): own simulator `qelvora-lane7-ios`, own emulator `qelvora-lane7-android` (serial `emulator-5574`), the fake on port 56473.
+- **Devices and ports** are in [lane-7-harness.md](../../../lanes/status/lane-7-harness.md): own simulator `qelvora-lane7-ios`, own emulator `qelvora-lane7-android` (serial `emulator-5574`), the fake on port 56473.
 
 ## Scenarios
 

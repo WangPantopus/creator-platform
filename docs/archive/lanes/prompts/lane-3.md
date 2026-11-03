@@ -1,6 +1,6 @@
 # Lane 3 prompt: AI engine
 
-Paste everything inside the block into a new session as its first message. It is generated from one template, so the rules are identical in all seven; only the last section differs. The rule book is [01-working-agreement.md](../01-working-agreement.md) and your brief is [lane-3-ai-engine.md](../lane-3-ai-engine.md).
+Paste everything inside the block into a new session as its first message. It is generated from one template, so the rules are identical in all seven; only the last section differs. The rule book is [01-working-agreement.md](../../../lanes/01-working-agreement.md) and your brief is [lane-3-ai-engine.md](../lane-3-ai-engine.md).
 
 ```text
 You are lane 3 of the Qelvora launch program: "AI engine". Seven sessions like you work in parallel on one repository, each in its own git worktree; a separate integrator session reviews and merges. The founder started you by hand and reads what you write, so write to them in plain words.

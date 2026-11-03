@@ -44,15 +44,15 @@ Surface codes: **F** = fan web/iOS/Android; **SP** = phone Studio web; **SD** = 
 
 The following artboards have you as primary implementation/visual owner. Also deliver every contributing state, domain requirement and missing-design resolution assigned to you by `COVERAGE.md` and the full design inventory. Prototype cards are workflow requirements; exercise all states instead of shipping prototype navigation as the product.
 
-- **4A-03 — 03 · Before your first message**: [Consent.dc.html](../../../design/phase4a-fan-core/Consent.dc.html); reference 390×844; surface F.
-- **4A-04 — 04 · Thread · Maya's AI**: [Thread.dc.html](../../../design/phase4a-fan-core/Thread.dc.html); reference 390×1240; surface F.
-- **4A-05 — 05 · Thread · Maya is here (Night)**: [ThreadLive.dc.html](../../../design/phase4a-fan-core/ThreadLive.dc.html); reference 390×1180; surface F.
-- **4A-10 — 10 · Free conversation ended**: [Ended.dc.html](../../../design/phase4a-fan-core/Ended.dc.html); reference 390×1000; surface F.
-- **4A-14 — 14 · A Note arrives, with the thread**: [NoteThread.dc.html](../../../design/phase4a-fan-core/NoteThread.dc.html); reference 390×1100; surface F.
-- **4A-15 — 15 · Thread states: booked, paused, offline, not sent**: [States.dc.html](../../../design/phase4a-fan-core/States.dc.html); reference 390×1500; surface F / REF states.
-- **4B-05 — 05 · You**: [You.dc.html](../../../design/phase4b-fan-account/You.dc.html); reference 390×1100; surface F.
-- **4B-06 — 06 · Me and privacy**: [Privacy.dc.html](../../../design/phase4b-fan-account/Privacy.dc.html); reference 390×1400; surface F.
-- **5.1 — 5.1 · Link in bio to a first cited answer**: [Main.dc.html](../../../design/phase5-prototypes/Main.dc.html); reference 390×844; surface REF → F.
+- **4A-03 — 03 · Before your first message**: [Consent.dc.html](../../../../design/phase4a-fan-core/Consent.dc.html); reference 390×844; surface F.
+- **4A-04 — 04 · Thread · Maya's AI**: [Thread.dc.html](../../../../design/phase4a-fan-core/Thread.dc.html); reference 390×1240; surface F.
+- **4A-05 — 05 · Thread · Maya is here (Night)**: [ThreadLive.dc.html](../../../../design/phase4a-fan-core/ThreadLive.dc.html); reference 390×1180; surface F.
+- **4A-10 — 10 · Free conversation ended**: [Ended.dc.html](../../../../design/phase4a-fan-core/Ended.dc.html); reference 390×1000; surface F.
+- **4A-14 — 14 · A Note arrives, with the thread**: [NoteThread.dc.html](../../../../design/phase4a-fan-core/NoteThread.dc.html); reference 390×1100; surface F.
+- **4A-15 — 15 · Thread states: booked, paused, offline, not sent**: [States.dc.html](../../../../design/phase4a-fan-core/States.dc.html); reference 390×1500; surface F / REF states.
+- **4B-05 — 05 · You**: [You.dc.html](../../../../design/phase4b-fan-account/You.dc.html); reference 390×1100; surface F.
+- **4B-06 — 06 · Me and privacy**: [Privacy.dc.html](../../../../design/phase4b-fan-account/Privacy.dc.html); reference 390×1400; surface F.
+- **5.1 — 5.1 · Link in bio to a first cited answer**: [Main.dc.html](../../../../design/phase5-prototypes/Main.dc.html); reference 390×844; surface REF → F.
 
 ## Work packages
 

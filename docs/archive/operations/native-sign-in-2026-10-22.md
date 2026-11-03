@@ -53,8 +53,8 @@ Temporary evidence is outside git:
 - `/tmp/qelvora-native-signin-android-{adult-final,teen-policy}.png`
 - `/tmp/qelvora-native-signin-{ios-build,ios-test,android-final-build,android-contract-test}.log`
 
-The opt-in debug hooks and configuration are documented in the [iOS README](../../apps/ios/README.md)
-and [Android README](../../apps/android/README.md). Hooks are absent from release
+The opt-in debug hooks and configuration are documented in the [iOS README](../../../apps/ios/README.md)
+and [Android README](../../../apps/android/README.md). Hooks are absent from release
 builds. The operated scenarios created no real provider identities or credentials.
 
 ## Combined app follow-up
