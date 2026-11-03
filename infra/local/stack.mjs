@@ -47,6 +47,8 @@ const TEST_PASSWORD = "foundation-test-only";
  * nothing else), so a stack that uses it matches them and passes the migration
  * checks with --growth. */
 const GROWTH_API_LOGIN = "creator_review_growth_api";
+/** The comment on the stack's own database that marks it as scratch. */
+const SCRATCH = "creator-platform:local-scratch";
 const SYNTHETIC_REFERENCE =
   "synthetic-review-only-unapproved-processor-20261001";
 const MAYA = "20000000-0000-4000-8000-000000000001";
@@ -500,8 +502,13 @@ async function bootstrapDatabase(plan, secrets, options) {
         plan,
         `select 1 from pg_database where datname='${database}'`,
       ))
-    )
+    ) {
       await psql(plan, `create database ${database}`);
+      // The positive marker apps/backend/scripts/wave-pins.ts requires before
+      // it applies a wave: this database is the stack's own and disposable.
+      if (database === plan.database)
+        await psql(plan, `comment on database ${database} is '${SCRATCH}'`);
+    }
   const backendDir = join(root, "apps/backend");
   const url = adminUrl(plan);
   const node = (script, extraEnv = {}, args = []) =>

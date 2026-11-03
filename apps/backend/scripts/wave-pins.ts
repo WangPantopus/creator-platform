@@ -31,26 +31,22 @@ import {
 //   write  write the new review from the previous one if it does not exist,
 //          put the live digests in, and check them.
 // Run both on a database without the Growth API login and on one with it, and
-// on a restored populated copy with --variant for the populated profiles. It
-// never edits the registry, a wave packet or SQL.
+// on a restored populated copy with --variant for the populated profiles. The
+// database must carry the local stack's scratch marker. A review pinned in
+// infra/migrations/reviewed.json is reviewed: write changes it only with
+// --replace. It never edits the registry, reviewed.json, a wave packet or SQL.
 //   (cd apps/backend && node --import tsx scripts/wave-pins.ts apply|write \
-//     --wave ID --database-url URL --out DIR [--scope TEXT] [--variant LABEL])
+//     --wave ID --database-url URL --out DIR [--scope TEXT] [--variant LABEL]
+//     [--replace])
 
 type Source = { version: string; path: string; checksum: string };
 class Stop extends Error {}
 function check(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Stop(message);
 }
-const [command, ...rest] = process.argv.slice(2);
-const flags = new Map<string, string>();
-for (let at = 0; at < rest.length; at += 2) {
-  check(
-    /^--(wave|database-url|out|scope|variant)$/u.test(rest[at] ?? "") &&
-      rest[at + 1] !== undefined,
-    "Usage: wave-pins.ts apply|write --wave ID --database-url URL --out DIR [--scope TEXT] [--variant LABEL]",
-  );
-  flags.set(rest[at]!.slice(2), rest[at + 1]!);
-}
+/** The comment the local stack puts on the database it creates
+ * (infra/local/stack.mjs). Put it on a restored copy by hand. */
+const SCRATCH = "creator-platform:local-scratch";
 const file = (path: string) => new URL(path, repositoryRoot);
 const json = async (path: string) =>
   JSON.parse(await readFile(file(path), "utf8"));
@@ -58,6 +54,20 @@ const abs = (path: string) => fileURLToPath(file(path));
 const backend = abs("apps/backend/");
 
 async function main() {
+  const [command, ...rest] = process.argv.slice(2);
+  const flags = new Map<string, string>();
+  for (let at = 0; at < rest.length; at += 1) {
+    const flag = rest[at] ?? "";
+    if (flag === "--replace") flags.set("replace", "");
+    else {
+      check(
+        /^--(wave|database-url|out|scope|variant)$/u.test(flag) &&
+          rest[at + 1] !== undefined,
+        "Usage: wave-pins.ts apply|write --wave ID --database-url URL --out DIR [--scope TEXT] [--variant LABEL] [--replace]",
+      );
+      flags.set(flag.slice(2), rest[(at += 1)]!);
+    }
+  }
   check(command === "apply" || command === "write", "Give apply or write.");
   const chain = (await json("infra/migrations/chain.json")) as {
     waves: { id: string; sha256: string }[];
@@ -85,10 +95,29 @@ async function main() {
     baseline: Source[];
     wave: Source[];
   };
-  const url = new URL(flags.get("database-url") ?? "");
+  // As the operator: a wave's versions rise, above every version before it.
+  const last = packet.baseline.reduce(
+    (high, source) => (source.version > high ? source.version : high),
+    "",
+  );
   check(
-    ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname),
-    "Use a loopback scratch database.",
+    packet.wave.every(
+      (source, at) =>
+        source.version > (at ? packet.wave[at - 1]!.version : last),
+    ),
+    `${wave.id}'s versions must rise, above every version before the wave (${last}).`,
+  );
+  // pg reads host, port and socket settings from the query string too, so a
+  // URL is taken only without one.
+  const given = flags.get("database-url") ?? "";
+  check(URL.canParse(given), "Give --database-url.");
+  const url = new URL(given);
+  check(
+    ["postgres:", "postgresql:"].includes(url.protocol) &&
+      ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname) &&
+      !url.search &&
+      !url.hash,
+    "Use a plain loopback URL to a scratch database: no query string or fragment.",
   );
   const out = resolve(flags.get("out") ?? "");
   const root = resolve(fileURLToPath(repositoryRoot));
@@ -135,16 +164,27 @@ async function main() {
   const client = await pool.connect();
   try {
     const target = (
-      await client.query<{ safe: boolean; major: number; closed: boolean }>(
+      await client.query<{
+        safe: boolean;
+        major: number;
+        scratch: boolean;
+        name: string;
+      }>(
         `SELECT current_user=session_user AND r.rolsuper AS safe,
            current_setting('server_version_num')::int/10000 AS major,
-           coalesce(shobj_description(d.oid,'pg_database')='creator-platform:restored-traffic-closed',false) AS closed
+           coalesce(shobj_description(d.oid,'pg_database')=$1,false) AS scratch,
+           current_database() AS name
          FROM pg_roles r, pg_database d WHERE r.rolname=session_user AND d.datname=current_database()`,
+        [SCRATCH],
       )
     ).rows[0];
     check(
-      target?.safe && target.major === 17 && !target.closed,
-      "Use a scratch PostgreSQL 17 database as its administrator; a traffic-closed restore belongs to the operator.",
+      target?.safe && target.major === 17,
+      "Use a PostgreSQL 17 database as its administrator.",
+    );
+    check(
+      target.scratch,
+      `${target.name} is not marked as a scratch database. The local stack marks the database it creates; mark a restored copy with COMMENT ON DATABASE ${target.name} IS '${SCRATCH}'.`,
     );
     const ledger = await readLedger(client);
     if (command === "apply") {
@@ -236,6 +276,14 @@ async function main() {
       path: `infra/migrations/waves/${prior.id}.json`,
       sha256: prior.sha256,
     };
+    // Re-measuring a reviewed wave is a review of its own.
+    const reviewed = (await json("infra/migrations/reviewed.json")) as {
+      sha256: Record<string, string>;
+    };
+    check(
+      !(reviewPath in reviewed.sha256) || flags.has("replace"),
+      `${reviewPath} is reviewed (pinned in infra/migrations/reviewed.json). Re-measure it only with --replace, and review the change.`,
+    );
     if (!existsSync(file(reviewPath))) {
       // Everything the wave does not change carries over from the previous
       // head; the catalogue tool rewrites what it does change.
@@ -343,11 +391,21 @@ async function main() {
   }
 }
 
+/** A refused connection has no message of its own, only a code or the
+ * errors of each address it tried. */
+const reason = (error: unknown): string =>
+  error instanceof AggregateError && !error.message
+    ? error.errors.map(reason).join("; ")
+    : error instanceof Error
+      ? error.message ||
+        String((error as { code?: unknown }).code ?? error.name)
+      : "unknown error";
+
 main().catch((error) => {
   process.stderr.write(
     error instanceof Stop
       ? error.message + "\n"
-      : `wave-pins failed (${error instanceof Error ? error.message : "unknown error"}).\n`,
+      : `wave-pins failed (${reason(error)}).\n`,
   );
   process.exitCode = 1;
 });
