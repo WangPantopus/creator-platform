@@ -52,10 +52,11 @@ area's scenarios.
   emulator or phone) against a real stack. Don't write unit tests
   ([decision log](docs/BRIEF.md#14-decision-log), 2026-11-03).
 - **Keep the docs current.** After each milestone, tick it off in
-  `docs/DESIGN_PLAN.md`, add artifact links, and add decisions to the brief's
-  decision log. Update `docs/STATUS.md` in place instead of writing a dated
-  handoff.
-- **Keep evidence small.** At most 1 MB per pull request and 300 KB per file under
-  `artifacts/`: a README, a manifest with checksums, and only the screenshots that
-  carry a decision. Raw logs and bundles stay outside git
-  ([the evidence-budget check](docs/engineering/ci.md)).
+  `docs/DESIGN_PLAN.md` with its claude.ai link, link the evidence in the PR
+  description, and add decisions to the brief's decision log. Update
+  `docs/STATUS.md` in place instead of writing a dated handoff.
+- **Evidence stays out of Git.** Screenshots and logs go in the PR description or
+  CI artifacts, never in the repository. `artifacts/` is ignored, and the
+  [evidence-budget check](docs/engineering/ci.md) refuses any new file under it.
+  This follows the [consolidation plan](docs/CONSOLIDATION_PLAN.md#6-how-we-work-from-now-on),
+  section 6 item 7.

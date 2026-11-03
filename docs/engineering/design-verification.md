@@ -123,9 +123,10 @@ fixtures. `NativeSnapshotTests.swift` uses a macOS `NSHostingView` at logical
 SwiftUI captures**, not iOS simulator/device pixel acceptance. Separately, two
 XCUITests passed on an iPhone 17/iOS 27 simulator: labeled AI/creator messages
 and unavailable sign-in in explicitly selected Light and Night appearances.
-Five retained device screenshots and their manifest are under
-`artifacts/native/ios/device-final/`. CI uses the documented `xcode-27` runner
-for the same OS family; remote CI has not been run.
+Five retained device screenshots and their manifest are archived under
+[`artifacts/native/ios/device-final/`](https://github.com/WangPantopus/creator-platform/tree/archive/artifacts-2026-11-03/artifacts/native/ios/device-final).
+CI uses the documented `xcode-27` runner for the same OS family; remote CI has
+not been run.
 
 The independent review checked all 106 component captures on each platform,
 with additional attention to identity, signing, status and overlays, against
