@@ -446,7 +446,7 @@ export async function assertGenerationWaveRoleSafety(
         throw new WaveRoleSafetyError(
           "Exact core Follow metadata source is required.",
         );
-    await assertCoreFollowPurposeCatalog(client);
+    await assertCoreFollowPurposeCatalog(client, wave);
   }
   if (pilot) {
     for (const source of pilotColumnsReview.sources)

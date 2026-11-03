@@ -9,6 +9,7 @@ import {
   assertRegisteredMigration,
   registeredMigration,
 } from "../../db/reviewed-migration.js";
+import { headWaves } from "../../db/reviewed-waves.js";
 
 export const coreFollowSource = Object.freeze({
   name: "w7_core_follow_metadata",
@@ -170,13 +171,21 @@ export async function coreFollowPurposeCatalogue(client: PoolClient) {
   };
 }
 
-/** Fixed independently measured wave review, for closed source/operator checks. */
-export async function assertCoreFollowPurposeCatalog(client: PoolClient) {
+/** Fixed independently measured wave review, for closed source/operator
+ * checks: core Follow's own, or a later head wave's, selected by its id. */
+export async function assertCoreFollowPurposeCatalog(
+  client: PoolClient,
+  wave = "20261027-core-follow",
+) {
   try {
+    const pinned = headWaves.find(({ id }) => id === wave)?.review;
     if (
+      !pinned ||
+      !("coreFollowCatalogueChecksum" in pinned) ||
+      !("coreFollowIncomingCatalogueChecksum" in pinned) ||
       ![
-        review.coreFollowCatalogueChecksum,
-        review.coreFollowIncomingCatalogueChecksum,
+        pinned.coreFollowCatalogueChecksum,
+        pinned.coreFollowIncomingCatalogueChecksum,
       ].includes(contentHash(await coreFollowPurposeCatalogue(client)))
     )
       unavailable();
