@@ -108,16 +108,17 @@ async function main() {
     `${wave.id}'s versions must rise, above every version before the wave (${last}).`,
   );
   // pg reads host, port and socket settings from the query string too, so a
-  // URL is taken only without one.
+  // URL is taken only without one. pg would look up a bracketed IPv6 host
+  // such as [::1] as a name, so only the two names the stack uses are taken.
   const given = flags.get("database-url") ?? "";
   check(URL.canParse(given), "Give --database-url.");
   const url = new URL(given);
   check(
     ["postgres:", "postgresql:"].includes(url.protocol) &&
-      ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname) &&
+      ["localhost", "127.0.0.1"].includes(url.hostname) &&
       !url.search &&
       !url.hash,
-    "Use a plain loopback URL to a scratch database: no query string or fragment.",
+    "Use a plain loopback URL to a scratch database: host localhost or 127.0.0.1, no query string or fragment.",
   );
   const out = resolve(flags.get("out") ?? "");
   const root = resolve(fileURLToPath(repositoryRoot));
@@ -182,9 +183,11 @@ async function main() {
       target?.safe && target.major === 17,
       "Use a PostgreSQL 17 database as its administrator.",
     );
+    // Never print the statement that marks this database: whoever pointed the
+    // script here by mistake would be handed the way past the guard.
     check(
       target.scratch,
-      `${target.name} is not marked as a scratch database. The local stack marks the database it creates; mark a restored copy with COMMENT ON DATABASE ${target.name} IS '${SCRATCH}'.`,
+      `${target.name} is not marked as a scratch database. Only a database the local stack creates carries the marker: create one with node infra/local/stack.mjs up --lane N --base-port P --no-web (docs/engineering/migrations.md, step 1).`,
     );
     const ledger = await readLedger(client);
     if (command === "apply") {
