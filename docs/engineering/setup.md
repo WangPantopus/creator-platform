@@ -80,6 +80,17 @@ behavior, accessibility checks and the flows that apply to it. A preview or a sc
 alone does not establish completion. Device calls, store billing, provider behavior and pilot
 performance stay unverified until they run on their real boundaries.
 
+## Archived branches
+
+On 2026-11-03 the merged and orphan branches were tagged `archive/<branch-name>` at their last
+commit and deleted from GitHub. Only `main`, the six parked branches and `cost` remain
+([STATUS](../STATUS.md#wave-5-in-progress)). To list the archived branches, and to restore one:
+
+```sh
+git ls-remote --tags origin 'refs/tags/archive/*'
+git push origin refs/tags/archive/<name>:refs/heads/<name>
+```
+
 ## This Mac
 
 - **`gh`** is at `/opt/homebrew/bin/gh`, which is not on the default shell `PATH`.

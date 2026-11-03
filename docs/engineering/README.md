@@ -4,7 +4,7 @@ How to build, run, check and ship Qelvora. For what to build, start at the [docs
 
 | Page | What it covers |
 | --- | --- |
-| [setup.md](setup.md) | Tools, first run, the checks, native hosts, and this Mac's known traps |
+| [setup.md](setup.md) | Tools, first run, the checks, native hosts, archived branches, and this Mac's known traps |
 | [local-stack.md](local-stack.md) | The one-command local stack (`infra/local/stack.mjs`) |
 | [migrations.md](migrations.md) | How a migration is registered today, and the Wave 6 plan |
 | [ci.md](ci.md) | The CI jobs, what each proves, and where CI is going |

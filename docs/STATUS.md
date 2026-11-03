@@ -1,6 +1,6 @@
 # Qelvora status
 
-Updated 2026-11-02. This page replaces [operations/CURRENT.md](operations/CURRENT.md) and the dated
+Updated 2026-11-03. This page replaces [operations/CURRENT.md](operations/CURRENT.md) and the dated
 handoffs, which are now in the [archive](archive/operations/). Update this page in place instead of
 adding a dated handoff. Refresh the Git and GitHub facts before acting on them.
 
@@ -63,11 +63,15 @@ in the Wave 6 queue.
 - **CI**, in a separate session: run the macOS jobs only when native, shared-UI or visual paths
   change, plus a nightly full run, so the required gate takes under 15 minutes
   ([engineering/ci.md](engineering/ci.md)).
-- **Repository steps, each waiting on the founder's yes** (the coordinator runs them):
-  - tag, then delete, the merged and orphan branches, keeping the six parked ones;
-  - turn on "delete branch on merge";
-  - protect `main` with required checks;
-  - tag the tree, then remove `artifacts/` from it.
+- **Repository steps** (the coordinator runs each one only with the founder's yes):
+  - **Done on 2026-11-03: the branch cleanup.** 535 branches were tagged `archive/<branch-name>`
+    at their last commit, then deleted from GitHub. 461 were fully contained in `main`. The other
+    74 were 36 closed-PR branches from early October, 25 branches with commits added after their PR
+    merged, 12 branches with no PR, and #509's branch. GitHub keeps `main`, the six parked branches
+    and `cost` (the founder's spreadsheet, whose future is still open). To restore an archived
+    branch, see [setup](engineering/setup.md#archived-branches).
+  - Still waiting on the founder, one at a time: turn on "delete branch on merge"; protect `main`
+    with required checks; tag the tree, then remove `artifacts/` from it.
 
 ## Next
 
