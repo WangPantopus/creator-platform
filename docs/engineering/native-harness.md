@@ -1,10 +1,10 @@
-> **A runbook still in use, listed in [docs/engineering](../../engineering/setup.md#native-hosts).** It stays at this path until `apps/ios/README.md` and `apps/android/README.md` stop linking here.
-
 # Lane 7: the fake API harness (WP 7.1) runbook
 
-Written by lane 7. The integrator moves this to its permanent place. It says how to run each phone
+Written by lane 7 (last updated 2026-10-15) and moved here in Wave 5. It says how to run each phone
 app signed in on a simulator and an emulator without the full stack, what the fake serves, and what
-it does not.
+it does not. The one-command stack it mentions is on `main` now ([local stack](local-stack.md)). The
+toolchain, simulator runtime and emulator below are from the Mac the lanes used; on this Mac, use the
+tools in [setup](setup.md#this-mac), which has no Android SDK.
 
 ## What it is, and what it is not
 
@@ -22,7 +22,7 @@ agreement allows only because WP 7.1 asks for it. So:
 
 ## Run it
 
-Toolchain, once per shell (see the working agreement, section 3.7):
+Toolchain, once per shell (see the [working agreement](../archive/lanes/01-working-agreement.md#37-environment), section 3.7):
 
 ```
 NB="$HOME/.cache/codex-runtimes/codex-primary-runtime/dependencies"
@@ -157,7 +157,7 @@ node tests/scenarios/lane-7/e7-1-signin.mjs [ios|android]            # H1 to H12
 node tests/scenarios/lane-7/e7-1-states.mjs [ios|android]            # S1 to S8, E1, L1 to L5
 node tests/scenarios/lane-7/e7-1-first-conversation.mjs [ios|android] # F1 to F2 (Android by script; iOS by hand through the simulator tool)
 node tests/scenarios/lane-7/baseline-requests.mjs [ios|android] 60   # requests a minute with a thread open (WP 7.8 baseline)
-node tests/scenarios/lane-7/e7-2-navigation.mjs [N1 N7 ...]          # N1 to N21, Back and restore, Android (iOS by hand: see lane-7-navigation.md)
+node tests/scenarios/lane-7/e7-2-navigation.mjs [N1 N7 ...]          # N1 to N21, Back and restore, Android (iOS by hand: see docs/archive/lanes/status/lane-7-navigation.md)
 ```
 
 Each step looks behind the screen (the harness log and state) **and** at the screen: Android reads the

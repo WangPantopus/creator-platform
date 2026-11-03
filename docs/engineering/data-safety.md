@@ -1,11 +1,13 @@
-> **Archived on 2026-11-02 with the other lane docs in [docs/archive/lanes](../../archive/lanes/status/README.md).** It stays at this path until `tests/scenarios/lane-1/e1-10-compliance.mjs` stops linking here.
-
 # Lane 1 · WP 1.9 · Data-safety source document
 
 Written 2026-10-16 by lane 1 from the database schema on main (`dea51a4ff`), for the App Store
 privacy label and Google Play's data-safety form. It lists what the code stores, where, and why.
 Counsel to confirm before submission. Media (voice, video, calls) is frozen for the pilot and not
 listed; add it when it ships.
+
+Moved here in Wave 5 as the starting point for the store privacy answers. Before a submission,
+recheck it against the schema of the build being submitted, and add what the audit of the signed
+apps and their SDKs finds ([release](release.md#store-submission)).
 
 ## Collected
 
