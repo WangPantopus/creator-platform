@@ -32,12 +32,15 @@ database is never reset.
   copy. A registration adds its review to it; nothing writes it for you.
 - **The operator**, in `apps/backend/scripts/`: `activate-wave.ts` applies one reviewed wave to a
   database that holds data (with a private backup and a closed restore), and `migrate-trust.ts`
-  verifies a database and bootstraps the base schema. `migrate-trust` applies file by file only
-  the canonical bootstrap that the chain names. Every source of a wave in the chain's `fresh` list
-  is activation-only: it is verified once its wave is installed, and never applied on its own.
-  Before any SQL runs, `migrate-trust` refuses a registered wave that has no matching review in
-  its table of reviewed waves, and a registry the chain doesn't match. The role checks
-  (`migration-*-roles.ts`) are beside them.
+  verifies a database and bootstraps the base schema. Of the two, only `migrate-trust` reads the
+  chain. It applies file by file only the canonical bootstrap: the 61 sources before
+  `20261007-generation`, a line fixed in its code rather than read from the chain. Every source of
+  a wave in the chain's `fresh` list is activation-only: it is verified once its wave is installed,
+  and never applied on its own. Before it applies anything, `migrate-trust` refuses a chain that
+  doesn't match its packets or that line, a registry the chain doesn't match, a registered wave
+  that has no matching review in its table of reviewed waves, and a canonical file whose bytes
+  differ from the checksum its packet holds. The role checks (`migration-*-roles.ts`) are beside
+  them.
 - **The local installer**, `apps/backend/src/operations/local/fresh-install.ts`: for a new, empty
   database only. It applies every wave in `FRESH_WAVES` order, in one transaction, checks every
   pinned checksum and the final role-safety and privacy-catalogue assertions, and refuses any
@@ -73,8 +76,8 @@ registry while its review stays: dropping one also means deleting its review and
 
 It stops, and writes nothing, when:
 
-- the registry, `reviewed.json`, a frozen packet or a review is missing or isn't valid JSON (one
-  line, no stack trace);
+- the registry, `reviewed.json` or a frozen packet is missing or malformed, or a review isn't valid
+  JSON (one line, no stack trace);
 - a registered file's bytes changed, or a source in a wave has no `sourceSha256`;
 - an existing packet would come out different, or a packet doesn't list its review's sources;
 - a new wave's versions don't rise above the ones before it;
@@ -108,13 +111,23 @@ change the registry, so they stay frozen.
 
 ## Registering a file today
 
-**`migrate-trust` reads the chain**, the first step of [the plan](#wave-6-the-plan), so the
-earlier rule to register no new wave until it did no longer holds. It never applies a registered
-wave's files one by one, which it used to do on a fresh database for a wave it didn't know. On any
-database it now refuses such a wave before any SQL runs: `Registered wave <id> has no matching
-review in this revision; no migration was applied.` CI's backend suite bootstraps its fixture
-databases with `migrate-trust`, so a registration without the code that knows its wave (step 6)
-fails CI instead of passing it.
+**`migrate-trust` reads the chain**, the first step of [the plan](#wave-6-the-plan). It never
+applies a registered wave's files one by one, which it used to do on a fresh database for a wave
+it didn't know. On any database it refuses such a wave before it applies anything:
+`Registered wave <id> has no matching review in this revision; no migration was applied.`
+`activate-wave` and the local installer don't read the chain yet, so a registration still teaches
+them the wave by hand (step 6).
+
+An incomplete registration now fails closed, which is why the earlier rule, to register no new
+wave until `migrate-trust` read the chain, is lifted:
+
+- CI catches only a registration that misses `migrate-trust`'s table row: CI's backend suite
+  bootstraps its fixture databases with `migrate-trust`.
+- A registration that adds the row but misses the rest of step 6 passes CI. `stack up` then
+  refuses it with
+  `The complete reviewed full-host wave chain and executable migration registry must match.`,
+  and `activate-wave` with `Active registry differs from the reviewed packet.` That is why step
+  7's fresh install on a new stack stays required.
 
 A registration is one pull request: a registry edit, the generated packet and chain, a review file
 measured on scratch databases and pinned, the code that knows the wave, and the proof. Steps 2 to 5

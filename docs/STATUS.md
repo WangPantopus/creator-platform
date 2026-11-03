@@ -103,10 +103,14 @@ in the Wave 6 queue.
      `wave-pins` measures the catalogue pins on marked scratch databases
      ([engineering/migrations.md](engineering/migrations.md)).
    - **`migrate-trust` reads the chain** (#541). Every source of a wave after the canonical
-     bootstrap is activation-only, so it never applies a wave's files one by one. Before any SQL
-     runs, it refuses a registered wave it has no matching review for, a registry that `chain.json`
-     doesn't match, and a chain whose packets don't match it. The rule to register no new wave
-     until the operator reads the chain is lifted
+     bootstrap is activation-only, so it never applies a wave's files one by one. Before it applies
+     anything, it refuses a registered wave it has no matching review for, a registry that
+     `chain.json` doesn't match, a chain that doesn't match its packets or the canonical line fixed
+     in its code, and a canonical file whose bytes changed. `activate-wave` and the local installer
+     don't read the chain yet, so a registration still teaches them the wave by hand. An incomplete
+     registration fails closed: CI catches a missing `migrate-trust` row, and `stack up` and
+     `activate-wave` refuse the rest. So the rule to register no new wave until `migrate-trust`
+     read the chain is lifted
      ([registering a file](engineering/migrations.md#registering-a-file-today)).
    - **Next: four pull requests** ([the plan](engineering/migrations.md#wave-6-the-plan)):
      `FRESH_WAVES` from the chain; the head profile, one loop over the reviews from
