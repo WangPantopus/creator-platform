@@ -30,13 +30,25 @@ import studioReplyAuthorityReview from "../../../infra/migrations/reviews/202610
 import workspaceLockReview from "../../../infra/migrations/reviews/20261022-workspace-lock.json" with { type: "json" };
 import generationReview from "../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
 
-type ChainSource = { version: string; path: string };
+type ChainSource = { version: string; path: string; checksum: string };
 const chainSources = (value: unknown): value is ChainSource[] =>
   Array.isArray(value) &&
   value.every(
     (source) =>
-      typeof source?.version === "string" && typeof source?.path === "string",
+      /^\d{4}_[a-z0-9_]+$/u.test(source?.version) &&
+      /^(apps\/backend|infra\/migrations\/history)\/[a-zA-Z0-9_./-]+\.sql$/u.test(
+        source.path,
+      ) &&
+      !source.path.includes("..") &&
+      /^[a-f0-9]{64}$/u.test(source.checksum),
   );
+/** Where the canonical bootstrap ends is fixed here, not read from the chain:
+ * the first wave after it (firstFresh in scripts/generate-migrations.mjs) and
+ * its size, the canonical61. */
+const firstFresh = "20261007-generation";
+const canonicalSize = 61;
+const chainRefusal =
+  "infra/migrations/chain.json does not match its packets or the reviewed chain; run pnpm generate. No migration was applied.";
 /** The canonical bootstrap and the waves the local installer applies after
  * it, from infra/migrations/chain.json and the packets whose checksums it
  * holds (scripts/generate-migrations.mjs writes both). */
@@ -48,10 +60,18 @@ async function freshChain(root: URL) {
       waves: { id: string; sha256: string }[];
       fresh: { canonical: number; waves: string[] };
     };
+    if (
+      !Array.isArray(chain.waves) ||
+      !Array.isArray(chain.fresh.waves) ||
+      chain.fresh.waves[0] !== firstFresh ||
+      chain.fresh.canonical !== canonicalSize
+    )
+      throw new Error();
     let canonical: ChainSource[] | undefined;
     const waves: { id: string; sources: ChainSource[] }[] = [];
     for (const id of chain.fresh.waves) {
-      if (!/^\d{8}(-[a-z0-9]+)*$/u.test(id)) throw new Error();
+      if (typeof id !== "string" || !/^\d{8}(-[a-z0-9]+)*$/u.test(id))
+        throw new Error();
       const bytes = await readFile(
         new URL(`infra/migrations/waves/${id}.json`, root),
       );
@@ -68,12 +88,10 @@ async function freshChain(root: URL) {
       canonical ??= packet.baseline;
       waves.push({ id, sources: packet.wave });
     }
-    if (canonical?.length !== chain.fresh.canonical) throw new Error();
+    if (canonical?.length !== canonicalSize) throw new Error();
     return { canonical, waves };
   } catch {
-    throw new Error(
-      "infra/migrations/chain.json does not match its wave packets; run pnpm generate. No migration was applied.",
-    );
+    throw new Error(chainRefusal);
   }
 }
 
@@ -291,19 +309,6 @@ try {
     ["20261101-pilot-columns", pilotColumnsVersions],
   ]);
   const fresh = await freshChain(root);
-  const activationOnly = new Map<string, string>();
-  for (const { id, sources } of fresh.waves) {
-    const versions = reviewedWaves.get(id);
-    if (
-      !versions ||
-      sources.length !== versions.size ||
-      sources.some((source) => !versions.has(source.version))
-    )
-      throw new Error(
-        `Registered wave ${id} has no matching review in this revision; no migration was applied.`,
-      );
-    for (const source of sources) activationOnly.set(source.version, id);
-  }
   // Whatever the chain does not name as activation-only is the canonical
   // bootstrap, so a registry edit the chain has not seen is refused too.
   const chained = new Map(
@@ -320,6 +325,30 @@ try {
     throw new Error(
       "The registry and infra/migrations/chain.json differ; run pnpm generate. No migration was applied.",
     );
+  // A reviewed wave the registry names is activation-only whatever the chain
+  // says, and every wave the chain names has its review here.
+  const registeredVersions = new Set(
+    registry.migrations.map((entry) => entry.version),
+  );
+  for (const [id, versions] of reviewedWaves)
+    if (
+      [...versions].some((version) => registeredVersions.has(version)) &&
+      !fresh.waves.some((wave) => wave.id === id)
+    )
+      throw new Error(chainRefusal);
+  const activationOnly = new Map<string, string>();
+  for (const { id, sources } of fresh.waves) {
+    const versions = reviewedWaves.get(id);
+    if (
+      !versions ||
+      sources.length !== versions.size ||
+      sources.some((source) => !versions.has(source.version))
+    )
+      throw new Error(
+        `Registered wave ${id} has no matching review in this revision; no migration was applied.`,
+      );
+    for (const source of sources) activationOnly.set(source.version, id);
+  }
   const registeredFiles = registry.migrations
     .filter(
       (file) =>
@@ -616,6 +645,18 @@ try {
       throw new Error(
         `Applied migration ${row.version} is absent from this revision.`,
       );
+  // A file is applied here only with the bytes the canonical packet pins, as
+  // the local installer checks; every one is compared before the first runs.
+  const pinned = new Map(
+    fresh.canonical.map((source) => [source.version, source.checksum]),
+  );
+  for (const file of files)
+    if (
+      !applied.some((row) => row.version === file.version) &&
+      sha256(await readFile(new URL(file.path, root))) !==
+        pinned.get(file.version)
+    )
+      throw new Error(`Pinned source changed: ${file.version}.`);
   for (const file of files) {
     if (
       !/^\d{4}_[a-z0-9_]+$/.test(file.version) ||
