@@ -26,6 +26,10 @@ database is never reset.
 - **Reviews**, `infra/migrations/reviews/<id>.json`: the reviewed head for each wave, mainly the
   catalogue pins (who can reach which tables, columns and functions) that the product checks at
   startup and that the operator checks before it applies anything.
+- **The pinned records**, `infra/migrations/reviewed.json`, edited by hand: the SHA-256 of every
+  reviewed record here that the generator doesn't write. That is the four frozen packets, the four
+  other October files in `waves/`, every review, the adoption, the recoveries and the 0045 history
+  copy. A registration adds its review to it; nothing writes it for you.
 - **The operator**, in `apps/backend/scripts/`: `activate-wave.ts` applies one reviewed wave to a
   database that holds data (with a private backup and a closed restore), and `migrate-trust.ts`
   verifies a database and bootstraps the base schema. The role checks (`migration-*-roles.ts`) are
@@ -44,17 +48,35 @@ database is never reset.
   the order their first source appears;
 - its `baseline` is every source of the waves before it, in that order, after the entries that come
   before the first wave (0001 to 0043);
-- every checksum is the SHA-256 of the file's bytes, and must equal the entry's `sourceSha256`;
+- every checksum is the SHA-256 of the file's bytes; every source in a wave must have a
+  `sourceSha256` (all 86 from 0044 on do), and it must match;
+- a new wave's versions rise in registry order, above every version before the wave, because the
+  operator refuses to apply a version below one already applied;
 - `outOfOrderException`, the W5 adoption record (0045 applied before 0044), carries over unchanged
   from the wave before, since every later baseline holds that history.
 
-It stops, and writes nothing, when a registered file's bytes changed, when an existing packet would
-come out different, when an entry without a wave follows the first wave, when two entries share a
-version, a number or a path, when a packet exists for a wave the registry doesn't have, or when a
-review's `baselineWave` no longer has the checksum of the packet it pins.
+Each packet from `20261007-generation` on must list exactly the sources its review names (the
+review's `source`, or else its `sources`; the reviews of the generation, content and output waves
+have other names). Each review is pinned in `reviewed.json`, and each packet but the newest is also
+pinned by the next review's `baselineWave`, so no packet can change unseen, the newest included.
 
-**Frozen packets.** Four reviewed packets can't be reproduced from the registry. The generator checks
-their SHA-256 and their place in the chain (their baseline and their sources) and never writes them:
+It stops, and writes nothing, when:
+
+- a registered file's bytes changed, or a source in a wave has no `sourceSha256`;
+- an existing packet would come out different, or a packet doesn't list its review's sources;
+- a new wave's versions don't rise above the ones before it;
+- an entry without a wave follows the first wave, or two entries share a version, a number or a
+  path;
+- a review's `baselineWave` no longer has the checksum of the packet it pins;
+- a pinned record's bytes changed or it is missing, or a file here is neither generated, registered
+  nor pinned. Dotfiles, such as a Finder `.DS_Store`, are ignored.
+
+`--check` also refuses a wave without a review, and a review that isn't pinned yet; `pnpm generate`
+only prints those, so a registration can write its packet before its review exists.
+
+**Frozen packets.** Four reviewed packets can't be reproduced from the registry. `reviewed.json` pins
+their bytes; the generator checks their place in the chain (their baseline and their sources) and
+never writes them:
 
 | Packet | Why |
 | --- | --- |
@@ -68,19 +90,26 @@ change the registry, so they stay frozen.
 
 ## Registering a file today
 
+**Register no new wave until the operator reads the chain**, the first step of
+[the plan](#wave-6-the-plan). Until then, when `migrate-trust` bootstraps a fresh database it
+applies the files of a registered wave it doesn't know one by one, out of order and without their
+baseline, and exits 0. A registry edit with its generated packet and its review would look complete
+and pass CI.
+
 A registration is one pull request: a registry edit, the generated packet and chain, a review file
-measured on scratch databases, the code that knows the wave, and the proof. Steps 2 to 4 are
-mechanical; the table below says what isn't.
+measured on scratch databases and pinned, the code that knows the wave, and the proof. Steps 2 to 5
+are mechanical apart from the reach review in step 4; the table below says what isn't.
 
 1. **Before any edit, build scratch databases at the current head:** two local stacks, one of them
-   with `--growth` (`node infra/local/stack.mjs up --lane N --base-port P --no-web`). For the
-   populated alternatives, also restore a copy of each stack's database (`pg_dump -Fc`, then
-   `pg_restore` into a new database in the same container). A restore turns the explicit owner-only
-   grant on the isolated-owner tables (seven at 0258) into the implicit default; after proving that
-   is the only difference, replay each owner's grant on its own table, as the archived
+   with `--growth` (`node infra/local/stack.mjs up --lane N --base-port P --no-web`). The stack
+   marks the database it creates as scratch, with the comment `creator-platform:local-scratch`.
+   For the populated alternatives, also restore a copy of each stack's database (`pg_dump -Fc`,
+   then `pg_restore` into a new database in the same container), and mark it by hand:
+   `COMMENT ON DATABASE <copy> IS 'creator-platform:local-scratch'`. A restore turns the explicit
+   owner-only grant on the isolated-owner tables (seven at 0258) into the implicit default; after
+   proving that is the only difference, replay each owner's grant on its own table, as the archived
    [runbook](../archive/operations/W8-runbook.md) says, until `catalogue-pins check` on the copy
-   matches its original. Build them first: until the operator reads the chain, `migrate-trust`
-   applies the files of a wave it doesn't know one by one when it bootstraps a fresh database.
+   matches its original. Build them first, with the registry as it is.
 2. **Edit the registry.** Append one entry per file: `version` (the next free number; no reservation
    can be used as a version, see [reserved numbers](migration-queue.md#reserved-numbers)), `path`
    (the file as it is), `owner`, `sourceSha256` and a new `wave` id, `YYYYMMDD-name`.
@@ -92,11 +121,12 @@ mechanical; the table below says what isn't.
    node --import tsx scripts/wave-pins.ts apply --wave <wave> --database-url <url> --out <dir>
    ```
 
-   `<dir>` is a private folder outside Git. The script refuses anything but a loopback database that
-   holds exactly the wave's baseline. It takes a catalogue snapshot against the previous head's
-   review, applies the wave's sources in one transaction as `activate-wave` does, and prints the
-   catalogue diff. **A person reviews every changed reach against the SQL**
-   ([catalogue pins](catalogue-pins.md)). Then:
+   `<dir>` is a private folder outside Git. The script refuses a URL with a query string or a
+   host other than loopback, a database without the scratch marker, a database that doesn't hold
+   exactly the wave's baseline, and a wave whose versions don't rise above it. It takes a catalogue
+   snapshot against the previous head's review, applies the wave's sources in one transaction as
+   `activate-wave` does, and prints the catalogue diff. **A person reviews every changed reach
+   against the SQL** ([catalogue pins](catalogue-pins.md)). Then:
 
    ```sh
    node --import tsx scripts/wave-pins.ts write --wave <wave> --database-url <url> --out <dir> --scope "<sentence>"
@@ -107,12 +137,16 @@ mechanical; the table below says what isn't.
    puts in the digests that changed; every other pin carries over. A pin that didn't match the
    database before the wave is left as it was: with Growth that is `runtimeCatalogues.family`, which
    stays the no-Growth diagnostic. On a restored copy add `--variant populated-original`, or
-   `--variant populated-original-incoming` with Growth.
-5. **Teach the operator and the runtime the wave**, by hand until they read the chain: `activate-wave.ts`,
+   `--variant populated-original-incoming` with Growth. `write` refuses a review that is already
+   pinned in `reviewed.json` unless you pass `--replace`: re-measuring a reviewed wave is a review
+   of its own, in its own pull request, and its new checksum goes into `reviewed.json` by hand.
+5. **Pin the review** once its pins are reviewed: add its line to `infra/migrations/reviewed.json`.
+   `pnpm generate:check` prints the line, with the checksum.
+6. **Teach the operator and the runtime the wave**, by hand until they read the chain: `activate-wave.ts`,
    `migrate-trust.ts`, the generation and privacy role checks, the head profile
    (`src/db/comparison-profile.ts`), the three trust catalogue modules (a database at the previous
    head is checked against that head's fixed pins) and `FRESH_WAVES`.
-6. **Prove it:** a fresh install on a new stack, then
+7. **Prove it:** a fresh install on a new stack, then
    `node infra/local/stack.mjs catalogues check --lane N`, which must match every group without
    Growth and every group but `runtimeCatalogues.family` with it; the scenarios that use the new
    schema; and a restored populated copy of the previous head moved forward by `activate-wave`, as
@@ -127,7 +161,7 @@ What still needs a person, and why:
 | The reach review between `apply` and `write`, and the scope sentence | A changed reach is what the pins exist to show; only a person can say it was meant |
 | A pin for something new that the catalogue tool can't recompute, such as a new role's own catalogue (0254, 0255) | Its reader, its review key and its entry in `operations/catalogues/pins.ts` are new code |
 | A check for a new login or role, and the stack's setting for it (0258: `assertCommerceInboxLogin`, `COMMERCE_INBOX_DATABASE_URL`) | What a new role may do is a decision |
-| Step 5 | The operator and the runtime still name each wave in code |
+| Step 6 | The operator and the runtime still name each wave in code |
 | The populated copies | A restore, and the judgment that its grant change is the only difference |
 | Test support (`apps/backend/tests/support/registered-source.ts`) and the scenarios | Which tests need the new schema, and what the feature must do |
 
@@ -137,8 +171,9 @@ must not ship before it is registered, or it fails on every real database.
 ## What CI checks
 
 CI's `web-and-backend` job runs `pnpm check`. Its `generate:check` fails when a wave packet or the
-chain differs from what the registry gives, when a registered file's bytes changed, or when a review
-no longer pins its packet's checksum. The job runs the backend suite on a fresh PostgreSQL 17 with
+chain differs from what the registry gives, when a registered file's bytes changed, when a packet
+doesn't list its review's sources, when a wave has no pinned review, or when any reviewed record
+differs from its checksum in `reviewed.json`. The job runs the backend suite on a fresh PostgreSQL 17 with
 pgvector: each fixture database is bootstrapped by `migrate-trust.ts`, and tests that need a wave's
 schema install its registered bytes. The full install of every wave and the catalogue check run on
 the local stack and in the integrator scenarios, not in CI today. Restore and update drills are
