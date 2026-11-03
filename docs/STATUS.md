@@ -110,18 +110,19 @@ in the Wave 6 queue.
    - **The local installer reads the chain** (#543). Its waves and their order come from
      `chain.json`, not `FRESH_WAVES`, through the reader and the table of reviewed waves it shares
      with `migrate-trust`. Before any SQL runs, it refuses a chain wave it has no matching review
-     for, with `migrate-trust`'s message. `activate-wave` doesn't read the chain yet, so a
-     registration still teaches it the wave by hand. An incomplete registration fails closed: CI
-     catches a missing row in the table, `activate-wave` refuses the rest, and on `stack up` the
-     installer's role checks refuse a wave that changes what the head's pins cover. So the rule to
-     register no new wave until `migrate-trust` read the chain is lifted
+     for, with `migrate-trust`'s message, and a chain whose head isn't the wave its final checks
+     name. `activate-wave` doesn't read the chain yet, so a registration still teaches it the wave
+     by hand. An incomplete registration fails closed: CI catches a missing row in the table, and
+     `stack up` and `activate-wave` refuse the rest. So the rule to register no new wave until
+     `migrate-trust` read the chain is lifted
      ([registering a file](engineering/migrations.md#registering-a-file-today)).
    - **Next: three pull requests** ([the plan](engineering/migrations.md#wave-6-the-plan)): the
      head profile, one loop over the reviews from `20261008-comparison` on; the wave lists and the
      chain checks in `activate-wave`; and the role checks and the trust catalogue modules, which
-     select the head review and the fixed predecessor by wave id instead of a ternary per wave. Each
-     keeps every existing refusal and its message. The pilot's ops-console and memory waves still
-     wait on them. After that, files are registered only as features need them.
+     select the head review and the fixed predecessor by wave id instead of a ternary per wave, and
+     give the installer's final checks the chain's head. Each keeps every existing refusal and its
+     message. The pilot's ops-console and memory waves still wait on them. After that, files are
+     registered only as features need them.
 2. **Pilot phase 1, a real host** (about 3 weeks, blocked mostly on the founder's decisions): a
    production composition root with real adapters; staging, the domain and app links; Apple and
    Google credentials; the Anthropic switch; observability, backups and a restore drill. Its exit:
