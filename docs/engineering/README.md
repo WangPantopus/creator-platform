@@ -8,6 +8,7 @@ How to build, run, check and ship Qelvora. For what to build, start at the [docs
 | [local-stack.md](local-stack.md) | The one-command local stack (`infra/local/stack.mjs`) |
 | [anthropic-provider.md](anthropic-provider.md) | Claude as the generation provider: the key, the capped gateway and the switch |
 | [migrations.md](migrations.md) | How a migration is registered today, and the Wave 6 plan |
+| [migration-queue.md](migration-queue.md) | The Wave 6 triage of every unregistered SQL file: what each creates and needs, and whether the pilot needs it, later work needs it, or it is obsolete |
 | [catalogue-pins.md](catalogue-pins.md) | Regenerating and reviewing the catalogue pins when a migration changes them |
 | [ci.md](ci.md) | The CI jobs, what each proves, and where CI is going |
 | [release.md](release.md) | Release gates, store submission, rollout and rollback, the trust image |

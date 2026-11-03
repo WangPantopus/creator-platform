@@ -57,35 +57,47 @@ Also merged: #526 and #528, the two coordination handoffs (#526 also runs the iO
 iPhone 18 Pro). #509, lane 1's status, was closed as out of date; its facts are in Git history and
 in the Wave 6 queue.
 
-## Wave 5: in progress
+## Wave 5: done
 
 - **Docs: done,** #529 (merged on 2026-11-03 as `8ce419f50`): this page,
   [docs/README.md](README.md), [engineering/](engineering/) and [archive/](archive/), and the
   corrected BRIEF, launch plan and design plan.
 - **CI: done,** #530 (merged on 2026-11-03 as `37a47bd84`). The macOS jobs run only when their paths
-  change, and the full matrix runs every night ([engineering/ci.md](engineering/ci.md)).
-- A work session is finishing the archive, moving the 16 files #529 kept in place.
-- **Repository steps** (the coordinator runs each one only with the founder's yes):
-  - **Done on 2026-11-03: the branch cleanup.** 535 branches were tagged `archive/<branch-name>`
-    at their last commit, then deleted from GitHub. 461 were fully contained in `main`. The other
-    74 were 36 closed-PR branches from early October, 25 branches with commits added after their PR
-    merged, 12 branches with no PR, and #509's branch. GitHub keeps `main`, the six parked branches
-    and `cost` (the founder's spreadsheet, whose future is still open). To restore an archived
-    branch, see [setup](engineering/setup.md#archived-branches).
-  - **Done on 2026-11-03: "delete branch on merge"** was turned on, with the founder's yes.
-  - **Done on 2026-11-03: `main` is protected,** with the founder's yes. Every change goes through a
-    pull request, and the six CI jobs are required checks
-    ([engineering/ci.md](engineering/ci.md#branch-protection)).
-  - **Remove `artifacts/`: tagged; the removal PR is next.** The founder approved it on 2026-11-03.
-    The tag `archive/artifacts-2026-11-03` holds all 5,648 files at `37a47bd84`.
+  change, and the full matrix runs every night ([engineering/ci.md](engineering/ci.md)). #531
+  (merged as `befa9da77`) described the merged CI and updated the agent rules.
+- **Archive: done,** #532 (merged on 2026-11-03 as `471978957`): the 16 docs #529 kept in place
+  moved into [engineering/](engineering/) or [archive/](archive/).
+- **Repository steps,** each run by the coordinator with the founder's yes, all done on 2026-11-03:
+  - **The branch cleanup.** 535 branches were tagged `archive/<branch-name>` at their last commit,
+    then deleted from GitHub. 461 were fully contained in `main`. The other 74 were 36 closed-PR
+    branches from early October, 25 branches with commits added after their PR merged, 12 branches
+    with no PR, and #509's branch. GitHub keeps `main`, the six parked branches and `cost` (the
+    founder's spreadsheet, whose future is still open). To restore an archived branch, see
+    [setup](engineering/setup.md#archived-branches).
+  - **"Delete branch on merge"** was turned on.
+  - **`main` is protected.** Every change goes through a pull request, and the six CI jobs are
+    required checks ([engineering/ci.md](engineering/ci.md#branch-protection)).
+  - **`artifacts/` is removed** ("tag the tree, then remove `artifacts/`"). The tag
+    `archive/artifacts-2026-11-03` (`37a47bd84`) holds all 5,648 files, 324 MB. Read one with
+    `git show archive/artifacts-2026-11-03:artifacts/<path>`, or browse them
+    [on GitHub](https://github.com/WangPantopus/creator-platform/tree/archive/artifacts-2026-11-03/artifacts).
+    `artifacts/` is now ignored, and the evidence check refuses any new file under it: evidence goes
+    in the pull request description or the CI artifacts.
 
 ## Next
 
-1. **Wave 6, migration registration.** 42 SQL files are still unregistered, 18 of them with
-   reserved numbers, among them lane 1's #472, #475 and #478 (the list is in #527's description).
-   First triage which are still needed and which are obsolete. Then make registration data-driven:
-   generate the wave and review files, and stop hand-editing baseline arrays. Register files only as
-   features need them ([engineering/migrations.md](engineering/migrations.md)).
+1. **Wave 6, migration registration.**
+   - **The triage is merged** (#533). The [migration queue](engineering/migration-queue.md) has a row
+     for each unregistered SQL file. It counts 61: 5 needed for the pilot, 3 for the founder to
+     decide, 26 needed later, 16 obsolete and 11 that aren't migrations. Five of those 11 were
+     evidence copies under `artifacts/`, so 56 are left in the tree.
+   - **Four places fail on every real database:** three in the ops console (naming a reviewer,
+     supervisor audits and lifting a pause) and one in Team triage.
+   - **The proposed pilot waves:** the ops console, then memory, then Team triage and store
+     memberships if the founder says so.
+   - **Next: the registration generator.** It makes registration data-driven: it generates the wave
+     and review files, so nobody hand-edits baseline arrays. Files are registered only as features
+     need them ([engineering/migrations.md](engineering/migrations.md)).
 2. **Pilot phase 1, a real host** (about 3 weeks, blocked mostly on the founder's decisions): a
    production composition root with real adapters; staging, the domain and app links; Apple and
    Google credentials; the Anthropic switch; observability, backups and a restore drill. Its exit:
@@ -124,6 +136,13 @@ regressions, and confirms the 2026-10-09 rule. Still open:
   credentials and test phones; the pilot size and cohort.
 - **Invariant and policy calls:** the INV-21 price rule, INV-22 one signature for accept and deliver,
   the A5 safety sign-off, deletion D1 to D4 and Q16, and ops P1 to P5.
+- **The migration queue** ([triage](engineering/migration-queue.md), #533):
+  1. whether basic Team (S-C10) includes triage;
+  2. whether pilot memberships are sold through the App Store and Google Play (D-14);
+  3. whether the pilot collects Helpful / Not helpful and offers the fan intro, which needs a
+     production successor to 0207;
+  4. confirming lane 3's INV-15 default for memory exclusions before the memory wave;
+  5. when the 16 obsolete files may be deleted and the 29 stale reservations released.
 
 ## Follow-ups to schedule
 
