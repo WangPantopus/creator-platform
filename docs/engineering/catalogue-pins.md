@@ -2,10 +2,14 @@
 
 Moved here in Wave 5. The procedure and the commands still apply, for whoever registers a migration
 ([migrations](migrations.md#registering-a-file-today)); the measurements, the counts, the scenario
-results and the tickets are from 2026-10-09. Two details have changed since: the tool reads the
-newest review file, which on 2026-11-02 is `20261101-pilot-columns.json`, not
-`20261008-comparison.json`, and CI does not run `check` yet
-([what CI checks](migrations.md#what-ci-checks)).
+results and the tickets are from 2026-10-09. Three details have changed since:
+
+- for a new wave, the pin script `apps/backend/scripts/wave-pins.ts` (#538) runs most of
+  [the procedure](#the-procedure-when-a-migration-adds-removes-or-changes-a-relation), which says
+  which steps are still by hand;
+- the tool reads the newest review file, which on 2026-11-03 is `20261101-pilot-columns.json`, not
+  `20261008-comparison.json`;
+- CI does not run `check` yet ([what CI checks](migrations.md#what-ci-checks)).
 
 Updated: 2026-10-09, by the lane 2 session
 Pull request: `lane-2/catalogue-pins`, stacked on `lane-2/production-root` (which is stacked on `lane-2/stack-from-scratch`)
@@ -37,21 +41,33 @@ added by hand to stand in for a migration (a registered migration that adds a re
 
 ## The procedure when a migration adds, removes or changes a relation
 
-The integrator owns the migration queue, so this is for them. Nothing here edits `infra/migrations.json`.
+Nothing here edits `infra/migrations.json`. For a new wave, `apps/backend/scripts/wave-pins.ts` runs the
+mechanical steps on a marked scratch database ([migrations, step 4](migrations.md#registering-a-file-today)):
+`wave-pins apply` does steps 1 and 2 and prints the diff in step 3, and `wave-pins write` does step 4 and ends
+with the comparison in step 5. Still by hand: the reach review in step 3, the backend checks in step 5, and step 6.
 
-1. **Before applying**, on a database at the current head: `snapshot --out before.json`.
-2. Apply the migration to that same database (a scratch one; never a shared or preserved one).
-3. `check` fails and names the groups. `diff --base before.json` says what changed:
+1. **Before applying**, on a database at the current head: `snapshot --out before.json`. `wave-pins apply` takes
+   it against the previous head's review and keeps it in its `--out` folder.
+2. Apply the migration to that same database (a scratch one; never a shared or preserved one). `wave-pins apply`
+   applies the wave's sources in one transaction, as `activate-wave` does. It refuses a URL that isn't a plain
+   loopback one, a database without the scratch marker, and a database that doesn't hold exactly the wave's
+   baseline.
+3. `check` fails and names the groups. `diff --base before.json` says what changed (`wave-pins apply` prints it):
    - _Only relations were added or removed and no purpose role's reach changed_: regenerating is mechanical.
    - _A purpose role gained or lost access to something_: **stop and review each line against the migration.**
      The pins exist to make exactly this visible. Do not regenerate over a reach change nobody intended.
-4. `write --base before.json` rewrites only the digests that changed, in place, keeping the file's formatting.
-   Review `git diff` for the review file: one changed line per digest.
+4. `write --base before.json` rewrites only the digests that changed, in place, keeping the file's formatting:
+   one changed line per digest in `git diff`. For a new wave, `wave-pins write` first creates the wave's review
+   from the previous one, with the new sources, the previous packet's checksum and the scope sentence, and keeps
+   any pin that didn't match the database before the wave (with Growth, `runtimeCatalogues.family`). Review it
+   with `git diff --no-index <previous review> <new review>`: besides those three, one changed line per digest.
 5. Restart a backend on the new file (the product reads the file when it starts). Run an export (E2.9 does) and
-   send a message. Run `check`: it must exit 0.
-6. Commit the regenerated review file in the same pull request as the migration. In CI, run `check` against a
-   database built from the branch (`infra/local/stack.mjs up --db-only` builds one); a forgotten regeneration then
-   fails the build instead of a deploy.
+   send a message. Run `check`: it must exit 0. `wave-pins write` ends with the same comparison on its database;
+   only a pin that didn't match before the wave may still differ there.
+6. Commit the regenerated review file in the same pull request as the migration, and pin it in
+   `infra/migrations/reviewed.json`. In CI, run `check` against a database built from the branch
+   (`infra/local/stack.mjs up --db-only` builds one); a forgotten regeneration then fails the build instead of a
+   deploy.
 
 Two things to know before merging a migration:
 
@@ -63,6 +79,8 @@ Two things to know before merging a migration:
   provenance-purge pin list two. The tool replaces only the variant that applies to the database it ran on (the one
   that matched in the snapshot). The others describe databases that must be qualified on their own, with the restore
   ceremony, before they can be trusted again; until then a restored populated database will refuse.
+  `wave-pins write --variant` measures a populated variant on a restored copy
+  ([migrations](migrations.md#registering-a-file-today)).
 
 ## The commands
 

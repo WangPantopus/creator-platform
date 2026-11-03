@@ -120,7 +120,7 @@ jobs:
                 .github/CODEOWNERS | .github/*.md | .github/ISSUE_TEMPLATE/* | .github/PULL_REQUEST_TEMPLATE*) ;;
                 .github/FUNDING.yml | .github/dependabot.yml) ;;
                 AGENTS.md | CLAUDE.md | README.md | .gitignore | .prettierignore | eslint.config.mjs) ;;
-                scripts/check-evidence-budget.mjs | scripts/shared.test.mjs | scripts/rename-brand.mjs) ;;
+                scripts/check-evidence-budget.mjs | scripts/generate-migrations.mjs | scripts/shared.test.mjs | scripts/rename-brand.mjs) ;;
                 scripts/with-heavy-build-lock.mjs) ;;
                 # Any other path that no group claimed might matter, so it runs everything.
                 *) [ "$claimed" = true ] || unclassified=${unclassified:-$path} ;;

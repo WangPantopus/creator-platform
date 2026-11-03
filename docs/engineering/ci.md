@@ -57,8 +57,8 @@ because `pnpm install` reads every workspace manifest.
   `.gitattributes` inside them;
 - the root files `AGENTS.md`, `CLAUDE.md`, `README.md`, `.gitignore`, `.prettierignore` and
   `eslint.config.mjs`;
-- four scripts: `scripts/check-evidence-budget.mjs`, `scripts/shared.test.mjs`,
-  `scripts/rename-brand.mjs` and `scripts/with-heavy-build-lock.mjs`;
+- five scripts: `scripts/check-evidence-budget.mjs`, `scripts/generate-migrations.mjs`,
+  `scripts/shared.test.mjs`, `scripts/rename-brand.mjs` and `scripts/with-heavy-build-lock.mjs`;
 - in `.github/`: `CODEOWNERS`, Markdown files, `ISSUE_TEMPLATE/`, the pull request templates,
   `FUNDING.yml` and `dependabot.yml`.
 
