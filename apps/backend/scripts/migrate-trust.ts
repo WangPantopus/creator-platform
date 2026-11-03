@@ -35,11 +35,14 @@ const chainSources = (value: unknown): value is ChainSource[] =>
   Array.isArray(value) &&
   value.every(
     (source) =>
-      /^\d{4}_[a-z0-9_]+$/u.test(source?.version) &&
+      typeof source?.version === "string" &&
+      /^\d{4}_[a-z0-9_]+$/u.test(source.version) &&
+      typeof source.path === "string" &&
       /^(apps\/backend|infra\/migrations\/history)\/[a-zA-Z0-9_./-]+\.sql$/u.test(
         source.path,
       ) &&
       !source.path.includes("..") &&
+      typeof source.checksum === "string" &&
       /^[a-f0-9]{64}$/u.test(source.checksum),
   );
 /** Where the canonical bootstrap ends is fixed here, not read from the chain:
@@ -646,7 +649,8 @@ try {
         `Applied migration ${row.version} is absent from this revision.`,
       );
   // A file is applied here only with the bytes the canonical packet pins, as
-  // the local installer checks; every one is compared before the first runs.
+  // the local installer checks; every one is compared before the first runs,
+  // and again as it is applied.
   const pinned = new Map(
     fresh.canonical.map((source) => [source.version, source.checksum]),
   );
@@ -691,6 +695,10 @@ try {
       throw new Error(
         `Out-of-order migration ${version} needs coordinated rollout.`,
       );
+    // The bytes applied are the bytes read here, which may have changed since
+    // the comparison above.
+    if (hash !== pinned.get(version))
+      throw new Error(`Pinned source changed: ${version}.`);
     // Producer SQL has one outer transaction. Keep schema and checksum atomic,
     // even when a producer does not write the registry itself.
     const body = sql
