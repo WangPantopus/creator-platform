@@ -1,3 +1,5 @@
+> **Archived on 2026-11-02 with the other lane docs in [docs/archive/lanes](../../archive/lanes/status/README.md).** It stays at this path until `tests/scenarios/lane-1/e1-10-compliance.mjs` stops linking here.
+
 # Lane 1 · WP 1.9 · Data-safety source document
 
 Written 2026-10-16 by lane 1 from the database schema on main (`dea51a4ff`), for the App Store

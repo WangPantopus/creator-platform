@@ -1,3 +1,5 @@
+> **A runbook still in use, listed in [docs/engineering](../../engineering/setup.md#native-hosts).** It stays at this path until `apps/ios/README.md` and `apps/android/README.md` stop linking here.
+
 # Lane 7: the fake API harness (WP 7.1) runbook
 
 Written by lane 7. The integrator moves this to its permanent place. It says how to run each phone

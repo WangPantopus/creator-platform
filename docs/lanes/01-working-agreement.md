@@ -1,3 +1,5 @@
+> **Archived on 2026-11-02 with the other lane docs in [docs/archive/lanes](../archive/lanes/README.md).** It stays at this path until `tests/scenarios/lane-5/setup.sh` and `cycle.sh` stop linking here. How work runs now is in [STATUS](../STATUS.md#how-work-runs).
+
 # Working agreement for every lane
 
 This applies to all seven lanes. It supersedes the older workstream standards where they
@@ -29,8 +31,8 @@ what a person can now do, what you saw when you tried it, what is left, what you
    `git fetch origin` and `git switch --detach origin/main` **before reading**, because this pack
    lives on `main`. Each pull request then gets its own branch,
    `git switch -c lane-N/<topic> origin/main`. Install with the toolchain block in section 3.7.
-2. **Read, in order:** the [charter](00-charter.md), this agreement, the
-   [contracts](02-contracts.md), your lane brief, then only the files your brief lists, by line
+2. **Read, in order:** the [charter](../archive/lanes/00-charter.md), this agreement, the
+   [contracts](../archive/lanes/02-contracts.md), your lane brief, then only the files your brief lists, by line
    range (several are over 100 KB). Do not read the whole repository.
 3. **Resume check.** Read `docs/lanes/status/lane-N.md` and list your pull requests:
    `gh pr list --state all --limit 200 --json number,title,state,headRefName --jq '.[] |

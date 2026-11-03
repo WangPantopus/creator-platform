@@ -41,9 +41,10 @@ name is still undecided; Qelvora remains a temporary token.
    ("Studio" in the source docs, "Kiln Club" in designs), the pottery examples
    (kilns, cone 6 glazes, `@kilnfire`) and the sponsor "Glazeco" are content,
    not product naming, and must not be replaced.
-4. **The company name is Pantopus.** "Pantopus" is the parent company and the
-   shared account ("Continue with Pantopus"). It is not a placeholder and must
-   never be replaced by the product rename.
+4. **The company name is Pantopus.** "Pantopus" is the parent company, and the
+   account a Qelvora account can later link to (the pilot signs in with Apple and
+   Google; see the BRIEF's decision log). It is not a placeholder and must never
+   be replaced by the product rename.
 5. **"Creator Network"** in `docs/source/Product_Design_Flows_Screens_and_Copy.md`
    (section 12) is the source documents' own earlier placeholder. The source docs
    are kept as written; new work uses `Qelvora`.
