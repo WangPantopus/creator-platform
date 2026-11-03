@@ -1,11 +1,14 @@
 # Release
 
 What has to be true before anything reaches real people, and how a release is built and rolled
-back. The full record, written by workstream 8 on 2026-09-30, is
-[W8-release.md](../operations/W8-release.md). It stays at that path because `infra/environments.json`
-and `.github/workflows/trust-release.yml` point at it as the release gate. This page summarizes it;
-where the two differ, the later decisions recorded in the [BRIEF](../BRIEF.md) win (for example,
-sign-in is now option D, Apple and Google, not a Pantopus account).
+back. This page is the release gate that `infra/environments.json` and
+`.github/workflows/trust-release.yml` point at. It summarizes the full record that workstream 8
+wrote on 2026-09-30, now in the [archive](../archive/operations/W8-release.md), and keeps its
+commands, probes and notice wording; where the two differ, the later decisions recorded in the
+[BRIEF](../BRIEF.md) win (for example, sign-in is now option D, Apple and Google, not a Pantopus
+account). The G0 to G5 that the trust workflow names are workstream 8's integration gates, from the
+archived [workstream plan](../archive/workstreams/README.md); the
+[launch plan](../LAUNCH_PLAN.md#8-the-road-to-the-pilot) has replaced that plan.
 
 Nothing is released today. No staging or production environment, store account, final domain or
 production credential exists ([STATUS](../STATUS.md)).
@@ -30,7 +33,10 @@ unavailable paid or safety-critical dependency is never replaced by a local fixt
 | Reliability | A defined pilot workload, real provider latency, error rates and cost, traces, staffed alerts |
 
 The deployed adapter must also provide a read-only readiness probe for each of the eight privacy
-domains; a missing or failing probe keeps release closed.
+domains, named `privacy_<domain>` (identity, conversation, agent, commerce, content, media, growth
+and trust). A probe checks that domain's non-owner role, approved retention and provider
+configuration, and never exports or purges anything. A missing hook or probe, or a failing probe,
+keeps release closed; a registered hook alone is not readiness.
 
 The launch plan adds the store requirements for the pilot: an 18+ rating, in-app account deletion,
 Report on every AI message, provider consent before the first AI message, and links that open the
@@ -43,6 +49,18 @@ kept; Google requires in-app and web deletion and in-app reporting of generated 
 get sandbox accounts with synthetic data only. Privacy labels and Data safety answers come from an
 audit of the signed archive and its SDKs, not from a placeholder page or a generated manifest.
 
+- The database part of those answers starts from [data-safety.md](data-safety.md).
+- The reviewer steps go through sign-in, a labeled AI, Report, support and privacy, and billing
+  management. Submit no account, final URL or declaration until it is configured.
+- The policies as workstream 8 checked them on 2026-09-29: Apple's
+  [account deletion](https://developer.apple.com/support/offering-account-deletion-in-your-app),
+  [review guidelines](https://developer.apple.com/app-store/review/guidelines/),
+  [privacy labels](https://developer.apple.com/help/app-store-connect/manage-app-information/manage-app-privacy)
+  and [privacy manifests](https://developer.apple.com/documentation/bundleresources/privacy-manifest-files);
+  Google's [account deletion](https://support.google.com/googleplay/android-developer/answer/13327111?hl=en),
+  [AI-generated content](https://support.google.com/googleplay/android-developer/answer/13985936?hl=en)
+  and [Data safety](https://support.google.com/googleplay/android-developer/answer/10787469?hl=en).
+
 ## Rollout and rollback
 
 - Run the gates against one immutable staging revision, with an incident commander and named
@@ -53,6 +71,12 @@ audit of the signed archive and its SDKs, not from a placeholder page or a gener
   a reopened privacy path or unavailable mandatory support.
 - Roll back the application to a compatible revision. Additive schema, tombstones and idempotency
   records stay. Recovery from a destructive schema change uses a new isolated restore environment.
+- The thresholds proposed in `infra/alerts.json` are not staffed alerts; set the budgets with
+  business input.
+- An incident notice reads: "We are investigating [capability] from [UTC time]. [Specific user
+  impact]. [Verified workaround]. Next update: [time]." The closing notice gives the time service
+  came back and the retries still pending. Public notices never include fan text, private reasons or
+  secrets, and a human responder approves every external message.
 
 ## Building the trust image
 
@@ -63,3 +87,15 @@ revision at runtime. `infra/containers/trust-sbom.mjs` then emits an unsigned Cy
 from inside the image. Neither the inventory nor local provenance replaces a signed SBOM and an
 approved vulnerability and license review. The CI job that compiles the trust code is described in
 [ci.md](ci.md).
+
+```sh
+docker build -f infra/containers/trust.Dockerfile \
+  --build-arg RELEASE_REVISION=<exact-40-character-commit> -t <local-review-tag> .
+node infra/containers/trust-sbom.mjs <exact-40-character-commit> sha256:<image-digest>
+```
+
+Run the inventory inside the reviewed image, with no network and no secrets mounted; it refuses a
+commit that differs from the one baked into the image. The label alone does not verify the
+checkout, so record the clean Git status, the source, tree and lock hashes and the image digest
+separately. Validate the inventory against the CycloneDX schema and pin its hash beside that record
+before asking for the release signature.
