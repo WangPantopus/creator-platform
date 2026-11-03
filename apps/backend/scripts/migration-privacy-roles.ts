@@ -1,29 +1,15 @@
 import { readFile } from "node:fs/promises";
 import type { PoolClient } from "pg";
+import { headWaves } from "../src/db/reviewed-waves.js";
 import {
   assertCanonicalPrivacyTaskCatalog,
-  assertGenerationPrivacyTaskCatalogForReview,
-  assertOutputPrivacyTaskCatalogForReview,
-  assertPublicPrivacyTaskCatalogForReview,
-  assertComparisonPrivacyTaskCatalogForReview,
-  assertNoticesPrivacyTaskCatalogForReview,
-  assertSignInAndMoneyPrivacyTaskCatalogForReview,
-  assertWorkspaceLockPrivacyTaskCatalogForReview,
-  assertReplyReviewPrivacyTaskCatalogForReview,
-  assertStudioReplyAuthorityPrivacyTaskCatalogForReview,
-  assertCoreFollowPrivacyTaskCatalogForReview,
-  assertContentPrivacyTaskCatalogForReview,
   assertPrivacyTaskCatalog,
+  assertPrivacyTaskCatalogForReview,
+  privacyReviewedWaves,
 } from "../src/modules/trust/privacy-catalog.js";
 import {
   assertDomainPrivacyTaskCatalog,
-  assertDomainPrivacyTaskCatalogForComparisonReview,
-  assertDomainPrivacyTaskCatalogForNoticesReview,
-  assertDomainPrivacyTaskCatalogForSignInAndMoneyReview,
-  assertDomainPrivacyTaskCatalogForWorkspaceLockReview,
-  assertDomainPrivacyTaskCatalogForReplyReview,
-  assertDomainPrivacyTaskCatalogForStudioReplyAuthority,
-  assertDomainPrivacyTaskCatalogForCoreFollow,
+  assertDomainPrivacyTaskCatalogForReview,
 } from "../src/modules/trust/domain-privacy-catalog.js";
 import { repositoryRoot, sha256 } from "./migration-custody.js";
 import { WaveRoleSafetyError } from "./migration-wave-roles.js";
@@ -47,6 +33,22 @@ const purposes = [
   },
 ];
 
+/** The wave whose privacy stage holds, for `before` below: of the waves the
+ * privacy catalogue pins, in the chain's order, the first that doesn't count
+ * while the one before it does. `reached` says whether the stage before the
+ * first wave counts as reached. Undefined when every stage is passed. */
+export function privacyStage(
+  waves: readonly Readonly<{ id: string; counted: boolean }>[],
+  reached = true,
+) {
+  for (const { id, counted } of waves)
+    if (privacyReviewedWaves.includes(id)) {
+      if (reached && !counted) return id;
+      reached = counted;
+    }
+  return undefined;
+}
+
 /** Operator catalogue review only. Administrator-selected session identities
  * run the same complete application guards; they are not password-login,
  * real task, COMMIT, recovery or application acceptance receipts. */
@@ -55,18 +57,11 @@ export async function assertPrivacyWaveRoleSafety(
   installed: {
     privacy: boolean;
     domain: boolean;
-    canonicalBeforeGeneration?: boolean;
-    generationBeforeContent?: boolean;
-    contentBeforeOutput?: boolean;
-    outputBeforePublic?: boolean;
-    publicBeforeComparison?: boolean;
-    comparisonBeforeNotices?: boolean;
-    noticesBeforeSignInAndMoney?: boolean;
-    signInAndMoneyBeforeWorkspaceLock?: boolean;
-    workspaceLockBeforeReplyReview?: boolean;
-    replyReviewBeforeStudioReplyAuthority?: boolean;
-    studioReplyAuthorityBeforeCoreFollow?: boolean;
-    coreFollowBeforePilotColumns?: boolean;
+    /** The database as it stands before this wave (privacyStage): at the
+     * fixed pins of the reviewed wave before it, or the canonical0087
+     * metadata before the first. Without it, the head's live registered
+     * graph. */
+    before?: string;
   },
 ) {
   const fail = (purpose: string): never => {
@@ -141,51 +136,27 @@ export async function assertPrivacyWaveRoleSafety(
     checked += 1;
   }
   try {
+    // Before a reviewed wave, the wave before it holds the pins; the domain
+    // fence has fixed pins from the comparison wave on.
+    const { before } = installed;
+    const stage =
+      before === undefined ? undefined : privacyReviewedWaves.indexOf(before);
+    if (stage === -1) throw new Error();
+    const pinned = stage ? privacyReviewedWaves[stage - 1] : undefined;
     if (installed.privacy) {
       await client.query("SET SESSION AUTHORIZATION creator_runtime");
-      if (installed.canonicalBeforeGeneration)
+      if (stage === undefined) await assertPrivacyTaskCatalog(client);
+      else if (pinned === undefined)
         await assertCanonicalPrivacyTaskCatalog(client);
-      else if (installed.generationBeforeContent)
-        await assertGenerationPrivacyTaskCatalogForReview(client);
-      else if (installed.contentBeforeOutput)
-        await assertContentPrivacyTaskCatalogForReview(client);
-      else if (installed.outputBeforePublic)
-        await assertOutputPrivacyTaskCatalogForReview(client);
-      else if (installed.publicBeforeComparison)
-        await assertPublicPrivacyTaskCatalogForReview(client);
-      else if (installed.comparisonBeforeNotices)
-        await assertComparisonPrivacyTaskCatalogForReview(client);
-      else if (installed.noticesBeforeSignInAndMoney)
-        await assertNoticesPrivacyTaskCatalogForReview(client);
-      else if (installed.signInAndMoneyBeforeWorkspaceLock)
-        await assertSignInAndMoneyPrivacyTaskCatalogForReview(client);
-      else if (installed.workspaceLockBeforeReplyReview)
-        await assertWorkspaceLockPrivacyTaskCatalogForReview(client);
-      else if (installed.replyReviewBeforeStudioReplyAuthority)
-        await assertReplyReviewPrivacyTaskCatalogForReview(client);
-      else if (installed.studioReplyAuthorityBeforeCoreFollow)
-        await assertStudioReplyAuthorityPrivacyTaskCatalogForReview(client);
-      else if (installed.coreFollowBeforePilotColumns)
-        await assertCoreFollowPrivacyTaskCatalogForReview(client);
-      else await assertPrivacyTaskCatalog(client);
+      else await assertPrivacyTaskCatalogForReview(client, pinned);
       await client.query("RESET SESSION AUTHORIZATION");
     }
     if (installed.domain) {
-      const domainCatalog = installed.comparisonBeforeNotices
-        ? assertDomainPrivacyTaskCatalogForComparisonReview
-        : installed.noticesBeforeSignInAndMoney
-          ? assertDomainPrivacyTaskCatalogForNoticesReview
-          : installed.signInAndMoneyBeforeWorkspaceLock
-            ? assertDomainPrivacyTaskCatalogForSignInAndMoneyReview
-            : installed.workspaceLockBeforeReplyReview
-              ? assertDomainPrivacyTaskCatalogForWorkspaceLockReview
-              : installed.replyReviewBeforeStudioReplyAuthority
-                ? assertDomainPrivacyTaskCatalogForReplyReview
-                : installed.studioReplyAuthorityBeforeCoreFollow
-                  ? assertDomainPrivacyTaskCatalogForStudioReplyAuthority
-                  : installed.coreFollowBeforePilotColumns
-                    ? assertDomainPrivacyTaskCatalogForCoreFollow
-                    : assertDomainPrivacyTaskCatalog;
+      const domainCatalog =
+        pinned !== undefined && headWaves.some(({ id }) => id === pinned)
+          ? (client: PoolClient, domain: "trust" | "growth") =>
+              assertDomainPrivacyTaskCatalogForReview(client, domain, pinned)
+          : assertDomainPrivacyTaskCatalog;
       await client.query("SET SESSION AUTHORIZATION creator_trust_worker");
       await domainCatalog(client, "trust");
       await client.query("RESET SESSION AUTHORIZATION");

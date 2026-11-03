@@ -246,11 +246,11 @@ try {
   result.reachBefore = await reach();
   if (ledger.length === 121) {
     if (!captureOnly) {
-      await assertGenerationWaveRoleSafety(client, "reply-review");
+      await assertGenerationWaveRoleSafety(client, "20261023-reply-review");
       await assertPrivacyWaveRoleSafety(client, {
         privacy: true,
         domain: true,
-        replyReviewBeforeStudioReplyAuthority: true,
+        before: "20261023-studio-reply-authority",
       });
       result.checks.push("exact121 predecessor role/privacy passed");
     }
@@ -325,7 +325,10 @@ try {
     await client.query("RELEASE SAVEPOINT profile_capture");
   }
   if (!captureOnly) {
-    await assertGenerationWaveRoleSafety(client, "studio-reply-authority");
+    await assertGenerationWaveRoleSafety(
+      client,
+      "20261023-studio-reply-authority",
+    );
     await assertPrivacyWaveRoleSafety(client, { privacy: true, domain: true });
     await assertCreatorFanDenialPurposeCatalog(client);
     result.checks.push("122 fixed role/privacy and denial catalogue passed");

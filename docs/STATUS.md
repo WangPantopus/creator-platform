@@ -110,12 +110,7 @@ in the Wave 6 queue.
    - **The local installer reads the chain** (#543). Its waves and their order come from
      `chain.json`, not `FRESH_WAVES`, through the reader and the table of reviewed waves it shares
      with `migrate-trust`. Before any SQL runs, it refuses a chain wave it has no matching review
-     for, with `migrate-trust`'s message, and a chain whose head isn't the wave its final checks
-     name. An incomplete registration fails closed everywhere, `activate-wave` included: CI
-     catches a missing row in the table and a row whose role-check names aren't the wave's own
-     (#545), and `stack up` refuses the rest. So the rule to register no new wave until
-     `migrate-trust` read the chain is lifted
-     ([registering a file](engineering/migrations.md#registering-a-file-today)).
+     for, with `migrate-trust`'s message.
    - **The head profile walks the table of reviewed waves** (#544). It selects the product's pins
      with one walk over the waves from `20261008-comparison` on, in the chain's order, instead of a
      function per wave, and keeps every refusal and its message. The table moved to
@@ -125,15 +120,27 @@ in the Wave 6 queue.
      `chain.json`, the October waves included, through the shared reader: "a wave requires every
      wave before it" is that order. It loops over the reviews instead of naming each wave in its
      own lists and booleans, and keeps every refusal, its message, the order they fire in and every
-     ceremony. Each wave's refusals, and the names the role checks know it by, moved to its row in
-     the table of reviewed waves, so a registration no longer edits the operator. Before anything
-     connects, it refuses a chain wave with no row, with `migrate-trust`'s message. A row whose
-     role-check name is another wave's stops the table from loading, for every importer.
-   - **Next: one pull request** ([the plan](engineering/migrations.md#wave-6-the-plan)): the role
-     checks and the trust catalogue modules, which select the head review and the fixed
-     predecessor by wave id instead of a ternary per wave, and give the installer's final checks
-     the chain's head. It keeps every existing refusal and its message. The pilot's ops-console and
-     memory waves still wait on it. After that, files are registered only as features need them.
+     ceremony. Each wave's refusals moved to its row in the table of reviewed waves, so a
+     registration no longer edits the operator. Before anything connects, it refuses a chain wave
+     with no row, with `migrate-trust`'s message.
+   - **The role checks and the trust catalogue modules select by wave id** (#546), the last step of
+     [the plan](engineering/migrations.md#wave-6-the-plan).
+     - The generation role check takes the newest installed wave and checks it against its own
+       review.
+     - The privacy role check takes the wave whose privacy stage holds, and checks the fixed pins
+       of the wave before it, through one function per catalogue module instead of one per wave.
+     - The table's role-check names went, and with them their guard. The table refuses two rows
+       for one wave instead.
+     - The local installer's final checks take the chain's head, so `checkedHead` went.
+     - `migrate-trust`'s checks and unapplied lines for the head waves loop over the rows.
+     - Every refusal and its message is kept.
+   - **Registration is data-driven.** A new wave is a registry edit, its generated packet, a
+     measured review and one table row
+     ([registering a file](engineering/migrations.md#registering-a-file-today)). An incomplete
+     registration fails closed at `stack up` and at `activate-wave`, so the rule to register no new
+     wave until `migrate-trust` read the chain stays lifted.
+   - **Next:** the pilot's ops-console and memory waves no longer wait on Wave 6. Files are
+     registered only as features need them, one wave per feature.
 2. **Pilot phase 1, a real host** (about 3 weeks, blocked mostly on the founder's decisions): a
    production composition root with real adapters; staging, the domain and app links; Apple and
    Google credentials; the Anthropic switch; observability, backups and a restore drill. Its exit:

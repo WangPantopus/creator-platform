@@ -47,14 +47,6 @@ type Packet = {
   wave: Source[];
 };
 
-/** The head wave the final checks in installFullHost are written for. A
- * registration teaches them its wave and moves this with them (step 6 in
- * docs/engineering/migrations.md); a chain with any other head is refused. */
-const checkedHead = {
-  id: "20261101-pilot-columns",
-  extension: "pilot-columns",
-} as const;
-
 async function registeredPackets(repoRoot: string): Promise<Packet[]> {
   // Each wave's packet is the one whose bytes the chain's checksum matched.
   const chain = await freshChain(pathToFileURL(join(repoRoot, "/")));
@@ -122,15 +114,10 @@ async function registeredPackets(repoRoot: string): Promise<Packet[]> {
       throw new Error(`Pinned source changed: ${source.version}.`);
   }
   // The chain alone never adds a wave: each must have its review in the table
-  // migrate-trust checks too.
+  // migrate-trust checks too. The final checks take the chain's head, so its
+  // row is the one they select.
   for (const { id, sources } of chain.waves)
     if (!matchesReview(id, sources)) throw new Error(noMatchingReview(id));
-  // A reviewed wave the final checks don't name could pass them unseen.
-  const head = chain.waves.at(-1)!.id;
-  if (head !== checkedHead.id)
-    throw new Error(
-      `Wave ${head} heads the chain, but the local installer's final checks still name ${checkedHead.id}; teach them the wave (step 6 in docs/engineering/migrations.md). No migration was applied.`,
-    );
   return packets;
 }
 
@@ -242,18 +229,10 @@ export async function installFullHost(input: FreshInstallInput) {
       input.log(`full host: ${packet.id} (${sources.length} sources)`);
     }
     // The same final assertions scripts/migrate-trust.ts runs on any database
-    // that holds the wave graph, plus the original business-row check.
-    await assertGenerationWaveRoleSafety(client, checkedHead.extension);
-    await assertPrivacyWaveRoleSafety(client, {
-      privacy: true,
-      domain: true,
-      canonicalBeforeGeneration: false,
-      generationBeforeContent: false,
-      outputBeforePublic: false,
-      publicBeforeComparison: false,
-      comparisonBeforeNotices: false,
-      noticesBeforeSignInAndMoney: false,
-    });
+    // that holds the wave graph, for the chain's head, plus the original
+    // business-row check.
+    await assertGenerationWaveRoleSafety(client, packets.at(-1)!.id);
+    await assertPrivacyWaveRoleSafety(client, { privacy: true, domain: true });
     const dataAfter = await waveDataDigest(client, tables);
     if (dataAfter.sha256 !== dataBefore.sha256 || dataAfter.rows !== 0)
       throw new Error(
