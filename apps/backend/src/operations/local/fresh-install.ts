@@ -1,6 +1,13 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import pg from "pg";
+import {
+  canonicalSize,
+  freshChain,
+  matchesReview,
+  noMatchingReview,
+} from "../../../scripts/migration-chain.js";
 import { assertGenerationWaveRoleSafety } from "../../../scripts/migration-generation-roles.js";
 import { assertPrivacyWaveRoleSafety } from "../../../scripts/migration-privacy-roles.js";
 import {
@@ -27,24 +34,10 @@ import {
 // reviewed SQL in exactly the same wave order, refuses on any business row,
 // checks every pinned checksum, and finishes with the repository's own final
 // role-safety and privacy-catalogue assertions before it commits.
-
-/** Wave order the operator accepts; each needs the complete previous one. */
-export const FRESH_WAVES = [
-  "20261007-generation",
-  "20261007-content",
-  "20261007-generation-output",
-  "20261007-public-ai",
-  "20261007-generation-recovery",
-  "20261007-partial-generation-recovery",
-  "20261008-comparison",
-  "20261015-notices",
-  "20261015-sign-in-and-money",
-  "20261022-workspace-lock",
-  "20261023-reply-review",
-  "20261023-studio-reply-authority",
-  "20261027-core-follow",
-  "20261101-pilot-columns",
-] as const;
+//
+// The waves and their order come from infra/migrations/chain.json, read as
+// scripts/migrate-trust.ts reads it, and a wave this revision has no review
+// for is refused before any SQL runs.
 
 type Source = { version: string; path: string; checksum: string };
 type Packet = {
@@ -54,28 +47,30 @@ type Packet = {
   wave: Source[];
 };
 
-function registeredPackets(repoRoot: string): Packet[] {
-  const packets = FRESH_WAVES.map(
-    (id) =>
-      JSON.parse(
-        readFileSync(
-          join(repoRoot, `infra/migrations/waves/${id}.json`),
-          "utf8",
-        ),
-      ) as Packet,
-  );
+/** The head wave the final checks in installFullHost are written for. A
+ * registration teaches them its wave and moves this with them (step 6 in
+ * docs/engineering/migrations.md); a chain with any other head is refused. */
+const checkedHead = {
+  id: "20261101-pilot-columns",
+  extension: "pilot-columns",
+} as const;
+
+async function registeredPackets(repoRoot: string): Promise<Packet[]> {
+  // Each wave's packet is the one whose bytes the chain's checksum matched.
+  const chain = await freshChain(pathToFileURL(join(repoRoot, "/")));
+  const packets = chain.waves.map((wave) => wave.packet as Packet);
   const fail = (): never => {
     throw new Error(
       "The complete reviewed full-host wave chain and executable migration registry must match.",
     );
   };
   const baseline = packets[0]!.baseline;
-  if (!Array.isArray(baseline) || baseline.length !== 61) fail();
+  if (!Array.isArray(baseline) || baseline.length !== canonicalSize) fail();
   const sources = [...baseline];
   for (const [index, packet] of packets.entries()) {
     if (
       packet.schemaVersion !== 1 ||
-      packet.id !== FRESH_WAVES[index] ||
+      packet.id !== chain.waves[index]!.id ||
       !Array.isArray(packet.wave) ||
       packet.wave.length === 0 ||
       canonical(packet.baseline) !== canonical(sources)
@@ -126,6 +121,16 @@ function registeredPackets(repoRoot: string): Packet[] {
     if (sha256(readFileSync(join(repoRoot, source.path))) !== source.checksum)
       throw new Error(`Pinned source changed: ${source.version}.`);
   }
+  // The chain alone never adds a wave: each must have its review in the table
+  // migrate-trust checks too.
+  for (const { id, sources } of chain.waves)
+    if (!matchesReview(id, sources)) throw new Error(noMatchingReview(id));
+  // A reviewed wave the final checks don't name could pass them unseen.
+  const head = chain.waves.at(-1)!.id;
+  if (head !== checkedHead.id)
+    throw new Error(
+      `Wave ${head} heads the chain, but the local installer's final checks still name ${checkedHead.id}; teach them the wave (step 6 in docs/engineering/migrations.md). No migration was applied.`,
+    );
   return packets;
 }
 
@@ -137,7 +142,7 @@ export type FreshInstallInput = {
 };
 
 export async function installFullHost(input: FreshInstallInput) {
-  const packets = registeredPackets(input.repoRoot);
+  const packets = await registeredPackets(input.repoRoot);
   const pool = new pg.Pool({ connectionString: input.databaseUrl, max: 1 });
   const client = await pool.connect();
   let locked = false;
@@ -238,7 +243,7 @@ export async function installFullHost(input: FreshInstallInput) {
     }
     // The same final assertions scripts/migrate-trust.ts runs on any database
     // that holds the wave graph, plus the original business-row check.
-    await assertGenerationWaveRoleSafety(client, "pilot-columns");
+    await assertGenerationWaveRoleSafety(client, checkedHead.extension);
     await assertPrivacyWaveRoleSafety(client, {
       privacy: true,
       domain: true,

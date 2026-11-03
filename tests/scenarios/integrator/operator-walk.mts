@@ -19,7 +19,7 @@ import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { FRESH_WAVES } from "../../../apps/backend/src/operations/local/fresh-install.ts";
+import { freshWaves } from "../../../apps/backend/scripts/migration-chain.ts";
 import {
   canonical,
   readLedger,
@@ -62,6 +62,8 @@ const psql = (sql: string) =>
   );
 const say = (line: string) => process.stdout.write(line + "\n");
 const delay = (ms: number) => new Promise((done) => setTimeout(done, ms));
+// Every wave after the canonical bootstrap, in the chain's order.
+const waves = await freshWaves();
 
 async function digests(db: string) {
   const pool = new pg.Pool({ connectionString: url(db), max: 1 });
@@ -158,7 +160,7 @@ try {
     "-f",
     "/tmp/d0.dump",
   );
-  for (const [index, wave] of FRESH_WAVES.entries()) {
+  for (const [index, wave] of waves.entries()) {
     const step = index + 1,
       target = `walk_t${step}`,
       restore = `walk_r${step}`,

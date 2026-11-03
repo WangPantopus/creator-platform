@@ -526,6 +526,10 @@ async function bootstrapDatabase(plan, secrets, options) {
       DATABASE_MIGRATION_URL: url,
       W8_LEGACY_ROOT_MIGRATIONS: "false",
     });
+  // A refused script's own message, the first error line it printed, rather
+  // than the stack frames after it; without one, the given output tail.
+  const refusal = (result, tail) =>
+    result.stderr.match(/^\w*error: .*$/im)?.[0] ?? tail;
   // The reviewed migration checks run while the history is incomplete. Once all
   // of it is applied they are not repeated on every `up`.
   const applied = async () =>
@@ -547,8 +551,11 @@ async function bootstrapDatabase(plan, secrets, options) {
     if (result.code !== 0)
       throw new StackError(
         "The canonical migrations were refused.",
-        result.stdout.split("\n").slice(-4).join(" | ") +
-          result.stderr.trim().split("\n").slice(-4).join(" | "),
+        refusal(
+          result,
+          result.stdout.split("\n").slice(-4).join(" | ") +
+            result.stderr.trim().split("\n").slice(-4).join(" | "),
+        ),
       );
     step("canonical migrations applied (verified)");
     result = await node("src/operations/local/fresh-install.ts", {}, [
@@ -558,11 +565,14 @@ async function bootstrapDatabase(plan, secrets, options) {
     if (result.code !== 0)
       throw new StackError(
         "The full set of migrations could not be installed.",
-        (result.stderr || result.stdout)
-          .trim()
-          .split("\n")
-          .slice(-6)
-          .join(" | "),
+        refusal(
+          result,
+          (result.stderr || result.stdout)
+            .trim()
+            .split("\n")
+            .slice(-6)
+            .join(" | "),
+        ),
       );
     const added = JSON.parse(result.stdout.trim().split("\n").pop()).applied;
     step(`${added} wave migrations installed in one transaction`);
@@ -570,7 +580,7 @@ async function bootstrapDatabase(plan, secrets, options) {
     if (result.code !== 0)
       throw new StackError(
         "The reviewed migration check failed after the install.",
-        result.stdout.split("\n").slice(-4).join(" | "),
+        refusal(result, result.stdout.split("\n").slice(-4).join(" | ")),
       );
     // A fresh database has no planner statistics; give the catalogue queries some.
     await psql(plan, "ANALYZE", { database: plan.database });
