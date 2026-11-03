@@ -1,5 +1,3 @@
-import coreFollowReview from "../../../infra/migrations/reviews/20261027-core-follow.json" with { type: "json" };
-import pilotColumnsReview from "../../../infra/migrations/reviews/20261101-pilot-columns.json" with { type: "json" };
 import { readFile, stat } from "node:fs/promises";
 import { resolve, sep } from "node:path";
 import pg from "pg";
@@ -26,24 +24,22 @@ import {
 
 import { assertPrivacyWaveRoleSafety } from "./migration-privacy-roles.js";
 import { assertGenerationWaveRoleSafety } from "./migration-generation-roles.js";
+import {
+  chainRefusal,
+  noMatchingReview,
+  operatorChain,
+} from "./migration-chain.js";
 import { generationPrivacySourcesRegistered } from "../src/db/generation-privacy-sources.js";
 import { registeredContentPrivacyProfile } from "../src/db/content-privacy-profile.js";
 import { registeredGenerationOutputProfile } from "../src/db/generation-output-profile.js";
-import comparisonReview from "../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
 import { registeredComparisonProfile } from "../src/db/comparison-profile.js";
-import noticesReview from "../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
-import signInAndMoneyReview from "../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
-import replyReview from "../../../infra/migrations/reviews/20261023-reply-review.json" with { type: "json" };
-import studioReplyAuthorityReview from "../../../infra/migrations/reviews/20261023-studio-reply-authority.json" with { type: "json" };
-import workspaceLockReview from "../../../infra/migrations/reviews/20261022-workspace-lock.json" with { type: "json" };
-import partialRecoveryReview from "../../../infra/migrations/reviews/20261007-partial-generation-recovery.json" with { type: "json" };
-import recoveryReview from "../../../infra/migrations/reviews/20261007-generation-recovery.json" with { type: "json" };
 import { registeredGenerationRecoveryProfile } from "../src/db/generation-recovery-profile.js";
-import publicAIReview from "../../../infra/migrations/reviews/20261007-public-ai.json" with { type: "json" };
 import { registeredPublicAIProfile } from "../src/db/public-ai-profile.js";
-import outputReview from "../../../infra/migrations/reviews/20261007-generation-first-visible.json" with { type: "json" };
-import contentReview from "../../../infra/migrations/reviews/20261007-content-privacy.json" with { type: "json" };
-import generationReview from "../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
+import {
+  headWaves,
+  type PrivacyStage,
+  reviewedWaves,
+} from "../src/db/reviewed-waves.js";
 
 type Source = { version: string; path: string; checksum: string };
 type Packet = {
@@ -68,402 +64,103 @@ function check(condition: unknown, message: string): asserts condition {
 }
 
 async function activate() {
-  check(
-    [
-      "20261002",
-      "20261002-privacy",
-      "20261007-generation",
-      "20261007-content",
-      "20261007-generation-output",
-      "20261007-public-ai",
-      "20261007-generation-recovery",
-      "20261007-partial-generation-recovery",
-      "20261008-comparison",
-      "20261015-notices",
-      "20261015-sign-in-and-money",
-      "20261022-workspace-lock",
-      "20261023-reply-review",
-      "20261023-studio-reply-authority",
-      "20261027-core-follow",
-      "20261101-pilot-columns",
-    ].includes(process.env.W8_MIGRATION_WAVE ?? ""),
-    "Select a reviewed W8_MIGRATION_WAVE (20261002, 20261002-privacy, 20261007-generation, 20261007-content 20261007-generation-output 20261007-public-ai 20261007-generation-recovery 20261007-partial-generation-recovery 20261008-comparison 20261015-notices 20261015-sign-in-and-money 20261022-workspace-lock 20261023-reply-review 20261023-studio-reply-authority 20261027-core-follow or 20261101-pilot-columns).",
-  );
+  // The waves come from infra/migrations/chain.json, in its order: the
+  // canonical bootstrap's two October waves, then every reviewed wave. A
+  // chain wave the table of reviewed waves has no row for is refused first.
+  let chain: Awaited<ReturnType<typeof operatorChain>>;
+  try {
+    chain = await operatorChain();
+  } catch {
+    throw new Preflight(chainRefusal);
+  }
+  const rows = new Map(reviewedWaves.map((row) => [row.id, row] as const));
+  for (const { id } of chain.waves.slice(chain.fresh))
+    check(rows.has(id), noMatchingReview(id));
+  const ids = chain.waves.map((wave) => wave.id);
+  // The list reads as it always has: a comma after each wave up to the first
+  // fresh one, spaces after that, and "or" before the last.
+  const listed = ids
+    .map((id, index) =>
+      index === ids.length - 1
+        ? `or ${id}`
+        : index <= chain.fresh
+          ? `${id},`
+          : id,
+    )
+    .join(" ");
+  const selected = ids.indexOf(process.env.W8_MIGRATION_WAVE ?? "");
+  check(selected >= 0, `Select a reviewed W8_MIGRATION_WAVE (${listed}).`);
   const connection = process.env.DATABASE_MIGRATION_URL;
   check(
     connection,
     "Provide a separate DATABASE_MIGRATION_URL; never a runtime credential.",
   );
-  const pilot = process.env.W8_MIGRATION_WAVE === "20261101-pilot-columns";
-  const follow =
-    pilot || process.env.W8_MIGRATION_WAVE === "20261027-core-follow";
-  const studio =
-    follow ||
-    process.env.W8_MIGRATION_WAVE === "20261023-studio-reply-authority";
-  const reply =
-    studio || process.env.W8_MIGRATION_WAVE === "20261023-reply-review";
-  const workspaceLock =
-    reply || process.env.W8_MIGRATION_WAVE === "20261022-workspace-lock";
-  const signInAndMoney =
-    workspaceLock ||
-    process.env.W8_MIGRATION_WAVE === "20261015-sign-in-and-money";
-  const notices =
-    signInAndMoney || process.env.W8_MIGRATION_WAVE === "20261015-notices";
-  const comparison =
-    notices || process.env.W8_MIGRATION_WAVE === "20261008-comparison";
-  const partialRecovery =
-    comparison ||
-    process.env.W8_MIGRATION_WAVE === "20261007-partial-generation-recovery";
-  const recovery =
-    partialRecovery ||
-    process.env.W8_MIGRATION_WAVE === "20261007-generation-recovery";
-  const publicAI =
-    recovery || process.env.W8_MIGRATION_WAVE === "20261007-public-ai";
-  const output =
-    publicAI || process.env.W8_MIGRATION_WAVE === "20261007-generation-output";
-  const content =
-    output || process.env.W8_MIGRATION_WAVE === "20261007-content";
-  const generation =
-    content || process.env.W8_MIGRATION_WAVE === "20261007-generation";
-  const continuation =
-    generation || process.env.W8_MIGRATION_WAVE === "20261002-privacy";
+  // Every wave after the chain's first carries the privacy fences; from the
+  // first fresh wave on, the generation graph.
+  const continuation = selected >= 1;
+  const generation = selected >= chain.fresh;
   // Earlier reviewed waves remain usable after the complete generation graph
   // is registered. Validate the entire chain, then execute only the selected
   // wave against its exact predecessor; a future source is never auto-applied.
-  const ids = [
-    "20261002",
-    "20261002-privacy",
-    "20261007-generation",
-    "20261007-content",
-    "20261007-generation-output",
-    "20261007-public-ai",
-    "20261007-generation-recovery",
-    "20261007-partial-generation-recovery",
-    "20261008-comparison",
-    "20261015-notices",
-    "20261015-sign-in-and-money",
-    "20261022-workspace-lock",
-    "20261023-reply-review",
-    "20261023-studio-reply-authority",
-    "20261027-core-follow",
-    "20261101-pilot-columns",
+  const packets = chain.waves.map((wave) => wave.packet as Packet);
+  // The two October waves have no review. Like the canonical61, they are
+  // fixed here: 17 sources on the first 40, then the four privacy fences.
+  // Every later wave lists exactly the sources its review names.
+  const fences = [
+    "0074_w8_content_runtime_denial",
+    "0082_w8_interactive_denial_try_fence",
+    "0087_w8_privacy_task_commit_fence",
+    "0103_w8_domain_privacy_task_fence",
   ];
-  const packets = await Promise.all(
-    ids.map(
-      async (id) =>
-        JSON.parse(
-          await readFile(
-            new URL(`infra/migrations/waves/${id}.json`, repositoryRoot),
-            "utf8",
-          ),
-        ) as Packet,
-    ),
+  const sizes = [
+    17,
+    fences.length,
+    ...ids.slice(chain.fresh).map((id) => rows.get(id)!.sources.length),
+  ];
+  // Each wave's baseline, then the head's sources: 40/57/61/.../126.
+  const baselines = sizes.reduce(
+    (sums, size) => [...sums, sums.at(-1)! + size],
+    [40],
   );
-  const [
-    initial,
-    prior,
-    current,
-    latest,
-    repair,
-    directory,
-    terminalRecovery,
-    partialTerminalRecovery,
-    comparisonPacket,
-    noticesPacket,
-    signInAndMoneyPacket,
-    workspaceLockPacket,
-    replyReviewPacket,
-    studioReplyAuthorityPacket,
-    coreFollowPacket,
-    pilotColumnsPacket,
-  ] = packets as [
-    Packet,
-    Packet,
-    Packet,
-    Packet,
-    Packet,
-    Packet,
-    Packet,
-    Packet,
-    Packet,
-    Packet,
-    Packet,
-    Packet,
-    Packet,
-    Packet,
-    Packet,
-    Packet,
-  ];
-  check(
+  let exact =
+    chain.fresh === 2 &&
     packets.every(
       (entry, index) =>
         entry.schemaVersion === 1 &&
         entry.id === ids[index] &&
-        entry.baseline.length ===
-          [
-            40, 57, 61, 100, 101, 102, 104, 105, 106, 114, 116, 119, 120, 121,
-            122, 123,
-          ][index] &&
-        entry.wave.length ===
-          [17, 4, 39, 1, 1, 2, 1, 1, 8, 2, 3, 1, 1, 1, 1, 3][index],
-    ) &&
-      canonical(prior.baseline) ===
-        canonical([...initial.baseline, ...initial.wave]) &&
-      canonical(current.baseline) ===
+        entry.baseline.length === baselines[index] &&
+        entry.wave.length === sizes[index],
+    );
+  for (let index = 1; exact && index < packets.length; index += 1) {
+    const entry = packets[index]!;
+    const prior = packets[index - 1]!;
+    const row = index < chain.fresh ? undefined : rows.get(ids[index]!)!;
+    exact =
+      canonical(entry.baseline) ===
         canonical([...prior.baseline, ...prior.wave]) &&
-      canonical(prior.wave.map((s) => s.version)) ===
-        canonical([
-          "0074_w8_content_runtime_denial",
-          "0082_w8_interactive_denial_try_fence",
-          "0087_w8_privacy_task_commit_fence",
-          "0103_w8_domain_privacy_task_fence",
-        ]) &&
-      canonical(current.wave) ===
-        canonical(
-          generationReview.sources.map(({ version, path, checksum }) => ({
-            version,
-            path,
-            checksum,
-          })),
-        ) &&
-      canonical(prior.outOfOrderException) ===
-        canonical(initial.outOfOrderException) &&
-      canonical(current.outOfOrderException) ===
+      (row
+        ? canonical(entry.wave) ===
+          canonical(
+            row.sources.map(({ version, path, checksum }) => ({
+              version,
+              path,
+              checksum,
+            })),
+          )
+        : canonical(entry.wave.map((s) => s.version)) === canonical(fences)) &&
+      canonical(entry.outOfOrderException) ===
         canonical(prior.outOfOrderException) &&
-      canonical(latest.baseline) ===
-        canonical([...current.baseline, ...current.wave]) &&
-      canonical(latest.wave) ===
-        canonical([
-          {
-            version: contentReview.source.version,
-            path: contentReview.source.path,
-            checksum: contentReview.source.checksum,
-          },
-        ]) &&
-      canonical(latest.outOfOrderException) ===
-        canonical(current.outOfOrderException) &&
-      canonical(latest.baselineOrderingException) ===
-        canonical({
-          review: "20261007-content-privacy",
-          precedingWave: "20261007-generation",
-          pending: "0198_w5_content_privacy_export",
-        }) &&
-      sha256(
-        await readFile(
-          new URL(contentReview.baselineWave.path, repositoryRoot),
-        ),
-      ) === contentReview.baselineWave.sha256 &&
-      canonical(repair.baseline) ===
-        canonical([...latest.baseline, ...latest.wave]) &&
-      canonical(repair.wave) ===
-        canonical([
-          {
-            version: outputReview.source.version,
-            path: outputReview.source.path,
-            checksum: outputReview.source.checksum,
-          },
-        ]) &&
-      canonical(repair.outOfOrderException) ===
-        canonical(latest.outOfOrderException) &&
-      sha256(
-        await readFile(new URL(outputReview.baselineWave.path, repositoryRoot)),
-      ) === outputReview.baselineWave.sha256 &&
-      canonical(directory.baseline) ===
-        canonical([...repair.baseline, ...repair.wave]) &&
-      canonical(directory.wave) ===
-        canonical(
-          publicAIReview.sources.map(({ version, path, checksum }) => ({
-            version,
-            path,
-            checksum,
-          })),
-        ) &&
-      canonical(directory.outOfOrderException) ===
-        canonical(repair.outOfOrderException) &&
-      sha256(
-        await readFile(
-          new URL(publicAIReview.baselineWave.path, repositoryRoot),
-        ),
-      ) === publicAIReview.baselineWave.sha256 &&
-      canonical(terminalRecovery.baseline) ===
-        canonical([...directory.baseline, ...directory.wave]) &&
-      canonical(terminalRecovery.wave) ===
-        canonical([
-          {
-            version: recoveryReview.source.version,
-            path: recoveryReview.source.path,
-            checksum: recoveryReview.source.checksum,
-          },
-        ]) &&
-      canonical(terminalRecovery.outOfOrderException) ===
-        canonical(directory.outOfOrderException) &&
-      sha256(
-        await readFile(
-          new URL(recoveryReview.baselineWave.path, repositoryRoot),
-        ),
-      ) === recoveryReview.baselineWave.sha256 &&
-      canonical(partialTerminalRecovery.baseline) ===
-        canonical([...terminalRecovery.baseline, ...terminalRecovery.wave]) &&
-      canonical(partialTerminalRecovery.wave) ===
-        canonical([
-          {
-            version: partialRecoveryReview.source.version,
-            path: partialRecoveryReview.source.path,
-            checksum: partialRecoveryReview.source.checksum,
-          },
-        ]) &&
-      canonical(partialTerminalRecovery.outOfOrderException) ===
-        canonical(terminalRecovery.outOfOrderException) &&
-      sha256(
-        await readFile(
-          new URL(partialRecoveryReview.baselineWave.path, repositoryRoot),
-        ),
-      ) === partialRecoveryReview.baselineWave.sha256 &&
-      canonical(comparisonPacket.baseline) ===
-        canonical([
-          ...partialTerminalRecovery.baseline,
-          ...partialTerminalRecovery.wave,
-        ]) &&
-      canonical(comparisonPacket.wave) ===
-        canonical(
-          comparisonReview.sources.map(({ version, path, checksum }) => ({
-            version,
-            path,
-            checksum,
-          })),
-        ) &&
-      canonical(comparisonPacket.outOfOrderException) ===
-        canonical(partialTerminalRecovery.outOfOrderException) &&
-      sha256(
-        await readFile(
-          new URL(comparisonReview.baselineWave.path, repositoryRoot),
-        ),
-      ) === comparisonReview.baselineWave.sha256 &&
-      canonical(noticesPacket.baseline) ===
-        canonical([...comparisonPacket.baseline, ...comparisonPacket.wave]) &&
-      canonical(noticesPacket.wave) ===
-        canonical(
-          noticesReview.sources.map(({ version, path, checksum }) => ({
-            version,
-            path,
-            checksum,
-          })),
-        ) &&
-      canonical(noticesPacket.outOfOrderException) ===
-        canonical(comparisonPacket.outOfOrderException) &&
-      sha256(
-        await readFile(
-          new URL(noticesReview.baselineWave.path, repositoryRoot),
-        ),
-      ) === noticesReview.baselineWave.sha256 &&
-      canonical(signInAndMoneyPacket.baseline) ===
-        canonical([...noticesPacket.baseline, ...noticesPacket.wave]) &&
-      canonical(signInAndMoneyPacket.wave) ===
-        canonical(
-          signInAndMoneyReview.sources.map(({ version, path, checksum }) => ({
-            version,
-            path,
-            checksum,
-          })),
-        ) &&
-      canonical(signInAndMoneyPacket.outOfOrderException) ===
-        canonical(noticesPacket.outOfOrderException) &&
-      sha256(
-        await readFile(
-          new URL(signInAndMoneyReview.baselineWave.path, repositoryRoot),
-        ),
-      ) === signInAndMoneyReview.baselineWave.sha256 &&
-      canonical(workspaceLockPacket.baseline) ===
-        canonical([
-          ...signInAndMoneyPacket.baseline,
-          ...signInAndMoneyPacket.wave,
-        ]) &&
-      canonical(workspaceLockPacket.wave) ===
-        canonical(
-          workspaceLockReview.sources.map(({ version, path, checksum }) => ({
-            version,
-            path,
-            checksum,
-          })),
-        ) &&
-      canonical(workspaceLockPacket.outOfOrderException) ===
-        canonical(signInAndMoneyPacket.outOfOrderException) &&
-      sha256(
-        await readFile(
-          new URL(workspaceLockReview.baselineWave.path, repositoryRoot),
-        ),
-      ) === workspaceLockReview.baselineWave.sha256 &&
-      canonical(replyReviewPacket.baseline) ===
-        canonical([
-          ...workspaceLockPacket.baseline,
-          ...workspaceLockPacket.wave,
-        ]) &&
-      canonical(replyReviewPacket.wave) ===
-        canonical(
-          replyReview.sources.map(({ version, path, checksum }) => ({
-            version,
-            path,
-            checksum,
-          })),
-        ) &&
-      canonical(replyReviewPacket.outOfOrderException) ===
-        canonical(workspaceLockPacket.outOfOrderException) &&
-      sha256(
-        await readFile(new URL(replyReview.baselineWave.path, repositoryRoot)),
-      ) === replyReview.baselineWave.sha256 &&
-      canonical(studioReplyAuthorityPacket.baseline) ===
-        canonical([...replyReviewPacket.baseline, ...replyReviewPacket.wave]) &&
-      canonical(studioReplyAuthorityPacket.wave) ===
-        canonical(
-          studioReplyAuthorityReview.sources.map(
-            ({ version, path, checksum }) => ({ version, path, checksum }),
-          ),
-        ) &&
-      canonical(studioReplyAuthorityPacket.outOfOrderException) ===
-        canonical(replyReviewPacket.outOfOrderException) &&
-      sha256(
-        await readFile(
-          new URL(studioReplyAuthorityReview.baselineWave.path, repositoryRoot),
-        ),
-      ) === studioReplyAuthorityReview.baselineWave.sha256 &&
-      canonical(coreFollowPacket.baseline) ===
-        canonical([
-          ...studioReplyAuthorityPacket.baseline,
-          ...studioReplyAuthorityPacket.wave,
-        ]) &&
-      canonical(coreFollowPacket.wave) ===
-        canonical(
-          coreFollowReview.sources.map(({ version, path, checksum }) => ({
-            version,
-            path,
-            checksum,
-          })),
-        ) &&
-      canonical(coreFollowPacket.outOfOrderException) ===
-        canonical(studioReplyAuthorityPacket.outOfOrderException) &&
-      sha256(
-        await readFile(
-          new URL(coreFollowReview.baselineWave.path, repositoryRoot),
-        ),
-      ) === coreFollowReview.baselineWave.sha256 &&
-      canonical(pilotColumnsPacket.baseline) ===
-        canonical([...coreFollowPacket.baseline, ...coreFollowPacket.wave]) &&
-      canonical(pilotColumnsPacket.wave) ===
-        canonical(
-          pilotColumnsReview.sources.map(({ version, path, checksum }) => ({
-            version,
-            path,
-            checksum,
-          })),
-        ) &&
-      canonical(pilotColumnsPacket.outOfOrderException) ===
-        canonical(coreFollowPacket.outOfOrderException) &&
-      sha256(
-        await readFile(
-          new URL(pilotColumnsReview.baselineWave.path, repositoryRoot),
-        ),
-      ) === pilotColumnsReview.baselineWave.sha256,
-    "The exact reviewed 40/57/61/100/101/102/104/105/106/114/116/119/120/121/122/123/126-source migration chain is required.",
+      (row?.operator.orderingException === undefined ||
+        canonical(entry.baselineOrderingException) ===
+          canonical(row.operator.orderingException)) &&
+      (row?.baselineWave === undefined ||
+        sha256(
+          await readFile(new URL(row.baselineWave.path, repositoryRoot)),
+        ) === row.baselineWave.sha256);
+  }
+  check(
+    exact,
+    `The exact reviewed ${baselines.join("/")}-source migration chain is required.`,
   );
   check(
     await generationPrivacySourcesRegistered(),
@@ -485,21 +182,18 @@ async function activate() {
     await registeredGenerationRecoveryProfile(),
     "The exact terminal recovery registration is required.",
   );
+  const named = headWaves.map((wave) => wave.operator.name);
   check(
     await registeredComparisonProfile(),
-    "The complete comparison, notices, sign-in and money, workspace-lock, reply-review, creator/fan denial, core Follow and pilot-columns source registrations are required.",
+    `The complete ${named.slice(0, -1).join(", ")} and ${named.at(-1)} source registrations are required.`,
   );
-  const packet = packets.find(
-    (entry) => entry.id === process.env.W8_MIGRATION_WAVE,
-  )!;
+  const packet = packets[selected]!;
   const registry = JSON.parse(
     await readFile(new URL("infra/migrations.json", repositoryRoot), "utf8"),
   ) as { migrations: { version: string; path: string }[] };
   const sources = [...packet.baseline, ...packet.wave];
-  const registeredSources = [
-    ...pilotColumnsPacket.baseline,
-    ...pilotColumnsPacket.wave,
-  ];
+  const head = packets.at(-1)!;
+  const registeredSources = [...head.baseline, ...head.wave];
   check(
     new Set(registeredSources.map((s) => s.version.slice(0, 4))).size ===
       registeredSources.length,
@@ -625,237 +319,57 @@ async function activate() {
       "Stop all other clients on the closed target before rollout.",
     );
     const before = await readLedger(client);
-    const generationInstalled = generation
-      ? current.wave.filter((source) =>
-          before.some((row) => row.version === source.version),
-        ).length
-      : 0;
-    check(
-      !generation ||
-        generationInstalled === 0 ||
-        generationInstalled === current.wave.length,
-      "Partial generation wave is not an accepted baseline; no repair was attempted.",
+    // Each reviewed wave in the chain's order, and how many of its sources
+    // the ledger holds.
+    const reviewed = packets.slice(chain.fresh).map((entry, index) => ({
+      wave: entry.wave,
+      ...rows.get(ids[chain.fresh + index]!)!.operator,
+    }));
+    const held = reviewed.map(({ wave, upToSelected }, index) =>
+      upToSelected && chain.fresh + index > selected
+        ? 0
+        : wave.filter((source) =>
+            before.some((row) => row.version === source.version),
+          ).length,
     );
-    const contentInstalled =
-      content &&
-      before.some((row) => row.version === contentReview.source.version);
-    check(
-      !content || generationInstalled === current.wave.length,
-      "Content activation requires the complete reviewed100-source predecessor.",
-    );
-    const outputInstalled =
-      output &&
-      before.some((row) => row.version === outputReview.source.version);
-    check(
-      !output || contentInstalled,
-      "Output activation requires the complete reviewed101-source predecessor.",
-    );
-    const installedPublic = before.filter((row) =>
-      directory.wave.some((source) => source.version === row.version),
-    ).length;
-    check(
-      installedPublic === 0 || installedPublic === directory.wave.length,
-      "Partial public AI wave is not an accepted baseline.",
-    );
-    check(
-      !publicAI || outputInstalled,
-      "Public AI activation requires the complete reviewed102 predecessor.",
-    );
-    const installedRecovery = before.some(
-      (row) => row.version === recoveryReview.source.version,
-    );
-    check(
-      !recovery || installedPublic === directory.wave.length,
-      "Recovery activation requires the complete reviewed104 predecessor.",
-    );
-    check(
-      !installedRecovery || installedPublic === directory.wave.length,
-      "Recovery cannot precede public AI activation.",
-    );
-    const installedPartialRecovery = before.some(
-      (row) => row.version === partialRecoveryReview.source.version,
-    );
-    check(
-      !partialRecovery || installedRecovery,
-      "Partial-output recovery requires the complete reviewed105 predecessor.",
-    );
-    check(
-      !installedPartialRecovery || installedRecovery,
-      "Partial-output recovery cannot precede original recovery.",
-    );
-    const installedComparison = before.filter((row) =>
-      comparisonPacket.wave.some((source) => source.version === row.version),
-    ).length;
-    check(
-      installedComparison === 0 ||
-        installedComparison === comparisonPacket.wave.length,
-      "Partial comparison graph is not an accepted baseline.",
-    );
-    check(
-      !comparison || installedPartialRecovery,
-      "Comparison activation requires the complete reviewed106 predecessor.",
-    );
-    check(
-      !installedComparison || installedPartialRecovery,
-      "Comparison cannot precede original recovery.",
-    );
-    const installedNotices = before.filter((row) =>
-      noticesPacket.wave.some((source) => source.version === row.version),
-    ).length;
-    check(
-      installedNotices === 0 || installedNotices === noticesPacket.wave.length,
-      "Partial notices wave is not an accepted baseline.",
-    );
-    check(
-      !notices || installedComparison === comparisonPacket.wave.length,
-      "Notices activation requires the complete reviewed114 predecessor.",
-    );
-    check(
-      !installedNotices || installedComparison === comparisonPacket.wave.length,
-      "Notices cannot precede comparison.",
-    );
-    const installedSignInAndMoney = before.filter((row) =>
-      signInAndMoneyPacket.wave.some(
-        (source) => source.version === row.version,
-      ),
-    ).length;
-    check(
-      installedSignInAndMoney === 0 ||
-        installedSignInAndMoney === signInAndMoneyPacket.wave.length,
-      "Partial sign-in and money wave is not an accepted baseline.",
-    );
-    check(
-      !signInAndMoney || installedNotices === noticesPacket.wave.length,
-      "Sign-in and money activation requires the complete reviewed116 predecessor.",
-    );
-    check(
-      !installedSignInAndMoney ||
-        installedNotices === noticesPacket.wave.length,
-      "Sign-in and money cannot precede notices.",
-    );
-    const installedWorkspaceLock = before.filter((row) =>
-      workspaceLockPacket.wave.some((source) => source.version === row.version),
-    ).length;
-    check(
-      installedWorkspaceLock === 0 ||
-        installedWorkspaceLock === workspaceLockPacket.wave.length,
-      "Partial workspace-lock wave is not an accepted baseline.",
-    );
-    check(
-      !workspaceLock ||
-        installedSignInAndMoney === signInAndMoneyPacket.wave.length,
-      "Workspace-lock activation requires the complete reviewed119 predecessor.",
-    );
-    check(
-      !installedWorkspaceLock ||
-        installedSignInAndMoney === signInAndMoneyPacket.wave.length,
-      "Workspace-lock cannot precede sign-in and money.",
-    );
-    const installedReplyReview = before.filter((row) =>
-      replyReviewPacket.wave.some((source) => source.version === row.version),
-    ).length;
-    check(
-      installedReplyReview === 0 ||
-        installedReplyReview === replyReviewPacket.wave.length,
-      "Partial reply-review wave is not an accepted baseline.",
-    );
-    check(
-      !reply || installedWorkspaceLock === workspaceLockPacket.wave.length,
-      "Reply-review activation requires the complete reviewed120 predecessor.",
-    );
-    check(
-      !installedReplyReview ||
-        installedWorkspaceLock === workspaceLockPacket.wave.length,
-      "Reply review cannot precede workspace locking.",
-    );
-    const installedStudioReplyAuthority = before.filter((row) =>
-      studioReplyAuthorityPacket.wave.some(
-        (source) => source.version === row.version,
-      ),
-    ).length;
-    check(
-      installedStudioReplyAuthority === 0 ||
-        installedStudioReplyAuthority ===
-          studioReplyAuthorityPacket.wave.length,
-      "Partial creator/fan denial wave is not an accepted baseline.",
-    );
-    check(
-      !studio || installedReplyReview === replyReviewPacket.wave.length,
-      "Creator/fan denial activation requires the complete reviewed121 predecessor.",
-    );
-    check(
-      !installedStudioReplyAuthority ||
-        installedReplyReview === replyReviewPacket.wave.length,
-      "Creator/fan denial cannot precede reply review.",
-    );
-    const installedCoreFollow = before.filter((row) =>
-      coreFollowPacket.wave.some((source) => source.version === row.version),
-    ).length;
-    check(
-      installedCoreFollow === 0 ||
-        installedCoreFollow === coreFollowPacket.wave.length,
-      "Partial core Follow wave is not an accepted baseline.",
-    );
-    check(
-      !follow ||
-        installedStudioReplyAuthority ===
-          studioReplyAuthorityPacket.wave.length,
-      "Core Follow activation requires the complete reviewed122 predecessor.",
-    );
-    check(
-      !installedCoreFollow ||
-        installedStudioReplyAuthority ===
-          studioReplyAuthorityPacket.wave.length,
-      "Core Follow cannot precede creator/fan denial.",
-    );
-    const installedPilotColumns = before.filter((row) =>
-      pilotColumnsPacket.wave.some((source) => source.version === row.version),
-    ).length;
-    check(
-      installedPilotColumns === 0 ||
-        installedPilotColumns === pilotColumnsPacket.wave.length,
-      "Partial pilot-columns wave is not an accepted baseline.",
-    );
-    check(
-      !pilot || installedCoreFollow === coreFollowPacket.wave.length,
-      "Pilot-columns activation requires the complete reviewed123 predecessor.",
-    );
-    check(
-      !installedPilotColumns ||
-        installedCoreFollow === coreFollowPacket.wave.length,
-      "Pilot columns cannot precede core Follow.",
-    );
-    if (generationInstalled)
-      await assertGenerationWaveRoleSafety(
-        client,
-        installedPilotColumns
-          ? "pilot-columns"
-          : installedCoreFollow
-            ? "core-follow"
-            : installedStudioReplyAuthority
-              ? "studio-reply-authority"
-              : installedReplyReview
-                ? "reply-review"
-                : installedWorkspaceLock
-                  ? "workspace-lock"
-                  : installedSignInAndMoney
-                    ? "sign-in-and-money"
-                    : installedNotices
-                      ? "notices"
-                      : installedComparison
-                        ? "comparison"
-                        : installedPartialRecovery
-                          ? "partial-generation-recovery"
-                          : installedRecovery
-                            ? "generation-recovery"
-                            : installedPublic
-                              ? "public-ai"
-                              : outputInstalled
-                                ? "generation-output"
-                                : contentInstalled
-                                  ? "content-privacy"
-                                  : undefined,
-      );
+    const complete = (index: number) =>
+      index >= 0 && held[index] === reviewed[index]!.wave.length;
+    for (const [index, entry] of reviewed.entries()) {
+      if (entry.partial)
+        check(
+          held[index] === 0 || held[index] === entry.wave.length,
+          entry.partial,
+        );
+      if (entry.activation)
+        check(
+          chain.fresh + index > selected || complete(index - 1),
+          entry.activation,
+        );
+      if (entry.precedes)
+        check(!held[index] || complete(index - 1), entry.precedes);
+    }
+    // The role checks still take the name of the newest wave they should
+    // find, and the privacy stages: a stage holds while the wave before it
+    // counts and its own wave doesn't.
+    const extension = (counts: (index: number) => boolean) => {
+      for (let index = reviewed.length - 1; index >= 0; index -= 1)
+        if (reviewed[index]!.extension && counts(index))
+          return reviewed[index]!.extension;
+      return undefined;
+    };
+    const stages = (counts: (index: number) => boolean) => {
+      const flags: Partial<Record<PrivacyStage, boolean>> = {};
+      let reached = true;
+      for (const [index, { privacy }] of reviewed.entries())
+        if (privacy) {
+          flags[privacy] = reached && !counts(index);
+          reached = counts(index);
+        }
+      return flags;
+    };
+    const installed = (index: number) => held[index]! > 0;
+    if (held[0])
+      await assertGenerationWaveRoleSafety(client, extension(installed));
     else
       await assertWaveRoleSafety(client, {
         trust: before.some(
@@ -877,34 +391,7 @@ async function activate() {
         domain: before.some(
           (r) => r.version === "0103_w8_domain_privacy_task_fence",
         ),
-        canonicalBeforeGeneration: generationInstalled === 0,
-        generationBeforeContent: generationInstalled > 0 && !contentInstalled,
-        contentBeforeOutput: Boolean(contentInstalled && !outputInstalled),
-        outputBeforePublic: Boolean(outputInstalled && !installedPublic),
-        publicBeforeComparison: Boolean(
-          installedPublic && !installedComparison,
-        ),
-        comparisonBeforeNotices: Boolean(
-          installedComparison && !installedNotices,
-        ),
-        coreFollowBeforePilotColumns: Boolean(
-          installedCoreFollow && !installedPilotColumns,
-        ),
-        studioReplyAuthorityBeforeCoreFollow: Boolean(
-          installedStudioReplyAuthority && !installedCoreFollow,
-        ),
-        replyReviewBeforeStudioReplyAuthority: Boolean(
-          installedReplyReview && !installedStudioReplyAuthority,
-        ),
-        workspaceLockBeforeReplyReview: Boolean(
-          installedWorkspaceLock && !installedReplyReview,
-        ),
-        signInAndMoneyBeforeWorkspaceLock: Boolean(
-          installedSignInAndMoney && !installedWorkspaceLock,
-        ),
-        noticesBeforeSignInAndMoney: Boolean(
-          installedNotices && !installedSignInAndMoney,
-        ),
+        ...stages(installed),
       });
     const tables = await waveDataTables(client);
     const beforeData = await waveDataDigest(client, tables);
@@ -951,15 +438,16 @@ async function activate() {
     const pending = packet.wave
       .filter((s) => !before.some((r) => r.version === s.version))
       .sort((a, b) => a.version.localeCompare(b.version));
+    const chosen = reviewed[selected - chain.fresh];
     for (const source of pending) {
       const higher = before.filter((r) => r.version > source.version);
       const exception = packet.outOfOrderException;
       check(
         !higher.length ||
-          (content &&
-            source.version === latest.baselineOrderingException!.pending &&
+          (chosen?.orderingException !== undefined &&
+            source.version === chosen.orderingException.pending &&
             higher.every((row) =>
-              latest.baseline.some(
+              packet.baseline.some(
                 (original) =>
                   original.version === row.version &&
                   original.checksum === row.checksum,
@@ -993,37 +481,11 @@ async function activate() {
       afterSequences.sha256 === beforeSequences.sha256,
       "Original sequence values changed; rolling back the wave.",
     );
+    // After the wave, the role checks find exactly what the chain holds up to
+    // the selected wave.
+    const upTo = (index: number) => chain.fresh + index <= selected;
     const roleSafety = generation
-      ? await assertGenerationWaveRoleSafety(
-          client,
-          pilot
-            ? "pilot-columns"
-            : follow
-              ? "core-follow"
-              : studio
-                ? "studio-reply-authority"
-                : reply
-                  ? "reply-review"
-                  : workspaceLock
-                    ? "workspace-lock"
-                    : signInAndMoney
-                      ? "sign-in-and-money"
-                      : notices
-                        ? "notices"
-                        : comparison
-                          ? "comparison"
-                          : partialRecovery
-                            ? "partial-generation-recovery"
-                            : recovery
-                              ? "generation-recovery"
-                              : publicAI
-                                ? "public-ai"
-                                : output
-                                  ? "generation-output"
-                                  : content
-                                    ? "content-privacy"
-                                    : undefined,
-        )
+      ? await assertGenerationWaveRoleSafety(client, extension(upTo))
       : await assertWaveRoleSafety(client, {
           trust: true,
           media: true,
@@ -1034,18 +496,7 @@ async function activate() {
       ? await assertPrivacyWaveRoleSafety(client, {
           privacy: true,
           domain: true,
-          canonicalBeforeGeneration: !generation,
-          generationBeforeContent: generation && !content,
-          contentBeforeOutput: content && !output,
-          outputBeforePublic: output && !publicAI,
-          publicBeforeComparison: publicAI && !comparison,
-          comparisonBeforeNotices: comparison && !notices,
-          noticesBeforeSignInAndMoney: notices && !signInAndMoney,
-          signInAndMoneyBeforeWorkspaceLock: signInAndMoney && !workspaceLock,
-          workspaceLockBeforeReplyReview: workspaceLock && !reply,
-          replyReviewBeforeStudioReplyAuthority: reply && !studio,
-          studioReplyAuthorityBeforeCoreFollow: studio && !follow,
-          coreFollowBeforePilotColumns: follow && !pilot,
+          ...stages(upTo),
         })
       : undefined;
     check(
@@ -1053,34 +504,23 @@ async function activate() {
         afterData.rows === beforeData.rows,
       "Original business rows changed; rolling back the wave.",
     );
-    check(
-      !studio || follow || afterRoles.length === beforeRoles.length,
-      "Creator/fan denial must not add a role.",
-    );
-    if (follow) {
+    if (chosen?.sameRoleCount)
+      check(afterRoles.length === beforeRoles.length, chosen.sameRoleCount);
+    if (chosen?.addedRoles) {
       const added = afterRoles.filter(
         (row) => !beforeRoles.some((old) => old.role === row.role),
       );
-      const expected = [
-        ...(pending.some(
-          (source) => source.version === "0255_w7_core_follow_metadata",
+      const expected = chosen.addedRoles.sources
+        .filter(({ version }) =>
+          pending.some((source) => source.version === version),
         )
-          ? ["creator_growth_follow_metadata"]
-          : []),
-        ...(pending.some(
-          (source) => source.version === "0258_w4_provider_inbox_worker",
-        )
-          ? ["creator_commerce_inbox"]
-          : []),
-      ];
+        .map(({ role }) => role);
       // The inbox login's attributes, memberships and settings were checked
       // above by the generation role safety (assertCommerceInboxLogin).
       check(
         canonical(added.map((row) => row.role).sort()) ===
           canonical(expected.sort()),
-        pilot
-          ? "The pilot-columns wave must add exactly the commerce inbox login; a login that already exists is refused."
-          : "Core Follow may add only its isolated metadata role.",
+        chosen.addedRoles.refusal,
       );
     }
     check(
