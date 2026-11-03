@@ -84,7 +84,7 @@ performance stay unverified until they run on their real boundaries.
 
 On 2026-11-03 the merged and orphan branches were tagged `archive/<branch-name>` at their last
 commit and deleted from GitHub. Only `main`, the six parked branches and `cost` remain
-([STATUS](../STATUS.md#wave-5-in-progress)). To list the archived branches, and to restore one:
+([STATUS](../STATUS.md#wave-5-done)). To list the archived branches, and to restore one:
 
 ```sh
 git ls-remote --tags origin 'refs/tags/archive/*'

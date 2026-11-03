@@ -1,9 +1,9 @@
-// Check the actual Git objects in a proposed change; generated local output is
-// not evidence until committed. Historical, unchanged artifacts are preserved.
+// The evidence budget is zero: evidence stays out of Git. Screenshots and logs go in the pull
+// request description or the CI artifacts, and artifacts/ is ignored. This check refuses any file a
+// change adds or modifies under artifacts/; deletions pass. Everything that was there is kept at the
+// tag archive/artifacts-2026-11-03.
 import { execFileSync } from "node:child_process";
 
-const fileLimit = 300_000;
-const changeLimit = 1_000_000;
 const args = process.argv.slice(2);
 function option(name, fallback) {
   const index = args.indexOf(name);
@@ -39,76 +39,43 @@ try {
     );
   const base = commit(baseRef),
     head = commit(headRef);
-  const changed = git(
+  // --no-renames lists a move as a deletion plus an addition, so a file moved within or into
+  // artifacts/ counts as added. The folder matches without regard to case, like CI's path
+  // classifier: macOS would check Artifacts/ out into artifacts/.
+  const fields = git(
     "diff",
-    "--name-only",
-    "--diff-filter=ACMRT",
+    "--name-status",
+    "--no-renames",
     "-z",
     `${base}...${head}`,
     "--",
-    "artifacts/",
+    ":(top,icase)artifacts/",
   )
     .split("\0")
     .filter(Boolean);
-  const entries = new Map();
-  const pathsByBlob = new Map();
-  for (const record of git(
-    "ls-tree",
-    "-r",
-    "-l",
-    "-z",
-    head,
-    "--",
-    "artifacts/",
-  )
-    .split("\0")
-    .filter(Boolean)) {
-    const tab = record.indexOf("\t");
-    const [mode, type, oid, size] = record.slice(0, tab).trim().split(/\s+/);
-    const path = record.slice(tab + 1);
-    entries.set(path, { mode, type, oid, size: Number(size) });
-    const paths = pathsByBlob.get(oid) ?? [];
-    paths.push(path);
-    pathsByBlob.set(oid, paths);
+  const refused = [];
+  let deleted = 0;
+  for (let index = 0; index < fields.length; index += 2) {
+    const status = fields[index],
+      path = fields[index + 1];
+    if (status === "D") deleted += 1;
+    else
+      refused.push(
+        `  ${status === "A" ? "added" : "modified"}: ${JSON.stringify(path)}`,
+      );
   }
-  const failures = [];
-  const checkedDuplicates = new Set();
-  let total = 0;
-  for (const path of changed) {
-    const entry = entries.get(path);
-    if (
-      !entry ||
-      entry.type !== "blob" ||
-      !["100644", "100755"].includes(entry.mode)
-    ) {
-      failures.push(
-        `${JSON.stringify(path)} must be a regular tracked evidence file.`,
-      );
-      continue;
-    }
-    total += entry.size;
-    if (entry.size > fileLimit)
-      failures.push(
-        `${JSON.stringify(path)} is ${entry.size} bytes; maximum ${fileLimit}.`,
-      );
-    const duplicates = pathsByBlob.get(entry.oid);
-    if (duplicates.length > 1 && !checkedDuplicates.has(entry.oid)) {
-      checkedDuplicates.add(entry.oid);
-      failures.push(
-        `Duplicate evidence blob: ${duplicates.map((path) => JSON.stringify(path)).join(", ")}. Keep one file and link to it.`,
-      );
-    }
-  }
-  if (total > changeLimit)
-    failures.push(
-      `Changed evidence totals ${total} bytes; maximum ${changeLimit}. Deleted files do not offset new evidence.`,
+  if (refused.length) {
+    console.error(
+      [
+        `Evidence stays out of Git. This change adds or modifies ${refused.length} ${refused.length === 1 ? "file" : "files"} under artifacts/:`,
+        ...refused,
+        "Put screenshots and logs in the pull request description or the CI artifacts instead. Deleting files under artifacts/ passes.",
+      ].join("\n"),
     );
-  if (failures.length) {
-    console.error(failures.join("\n"));
     process.exitCode = 1;
   } else {
     console.log(
-      `Evidence budget passed: ${changed.length} changed files, ${total}/${changeLimit} bytes; per-file maximum ${fileLimit}.`,
+      `Evidence check passed: no file under artifacts/ is added or modified; ${deleted} deleted.`,
     );
   }
 } catch (error) {
