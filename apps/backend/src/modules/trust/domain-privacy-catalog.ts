@@ -1,15 +1,9 @@
-import studioReplyAuthorityReview from "../../../../../infra/migrations/reviews/20261023-studio-reply-authority.json" with { type: "json" };
-import coreFollowReview from "../../../../../infra/migrations/reviews/20261027-core-follow.json" with { type: "json" };
 import type { PoolClient } from "pg";
 import { DomainError } from "../../core/errors.js";
 import { registeredMigration } from "../../db/reviewed-migration.js";
 import { registeredComparisonProfile } from "../../db/comparison-profile.js";
+import { headWaves } from "../../db/reviewed-waves.js";
 import { contentHash } from "../../core/canonical.js";
-import comparisonReview from "../../../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
-import noticesReview from "../../../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
-import replyReview from "../../../../../infra/migrations/reviews/20261023-reply-review.json" with { type: "json" };
-import workspaceLockReview from "../../../../../infra/migrations/reviews/20261022-workspace-lock.json" with { type: "json" };
-import signInAndMoneyReview from "../../../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
 import {
   comparisonArtifactCatalogue,
   comparisonArtifactPrivacySource,
@@ -94,90 +88,19 @@ export async function assertDomainPrivacyTaskCatalog(
   );
 }
 
-/** Fixed114 operator metadata before the notices wave: the comparison
- * review's own artifact pin. No task authority and no caller-provided pin. */
-export async function assertDomainPrivacyTaskCatalogForComparisonReview(
+/** Fixed predecessor metadata at a reviewed head wave: its own review's
+ * artifact pin. No task authority and no caller-provided pin. */
+export async function assertDomainPrivacyTaskCatalogForReview(
   client: PoolClient,
   domain: "trust" | "growth",
-) {
-  return assertDomainPrivacyTask(
-    client,
-    domain,
-    async () => comparisonReview.comparison.artifactsCatalogueChecksum,
-  );
-}
-
-/** Fixed116 operator metadata before the sign-in and money wave: the notices
- * review's own artifact pin. No task authority and no caller-provided pin. */
-export async function assertDomainPrivacyTaskCatalogForNoticesReview(
-  client: PoolClient,
-  domain: "trust" | "growth",
-) {
-  return assertDomainPrivacyTask(
-    client,
-    domain,
-    async () => noticesReview.comparison.artifactsCatalogueChecksum,
-  );
-}
-
-/** Fixed119 predecessor metadata; no runtime task authority. */
-export async function assertDomainPrivacyTaskCatalogForSignInAndMoneyReview(
-  client: PoolClient,
-  domain: "trust" | "growth",
-) {
-  return assertDomainPrivacyTask(
-    client,
-    domain,
-    async () => signInAndMoneyReview.comparison.artifactsCatalogueChecksum,
-  );
-}
-
-/** Fixed120 predecessor metadata; no runtime task authority. */
-export async function assertDomainPrivacyTaskCatalogForWorkspaceLockReview(
-  client: PoolClient,
-  domain: "trust" | "growth",
-) {
-  return assertDomainPrivacyTask(
-    client,
-    domain,
-    async () => workspaceLockReview.comparison.artifactsCatalogueChecksum,
-  );
-}
-
-/** Fixed121 predecessor metadata; no runtime task authority. */
-export async function assertDomainPrivacyTaskCatalogForReplyReview(
-  client: PoolClient,
-  domain: "trust" | "growth",
-) {
-  return assertDomainPrivacyTask(
-    client,
-    domain,
-    async () => replyReview.comparison.artifactsCatalogueChecksum,
-  );
-}
-
-/** Fixed122 predecessor metadata; no runtime task authority. */
-export async function assertDomainPrivacyTaskCatalogForStudioReplyAuthority(
-  client: PoolClient,
-  domain: "trust" | "growth",
+  wave: string,
 ) {
   return assertDomainPrivacyTask(
     client,
     domain,
     async () =>
-      studioReplyAuthorityReview.comparison.artifactsCatalogueChecksum,
-  );
-}
-
-/** Fixed123 predecessor metadata; no runtime task authority. */
-export async function assertDomainPrivacyTaskCatalogForCoreFollow(
-  client: PoolClient,
-  domain: "trust" | "growth",
-) {
-  return assertDomainPrivacyTask(
-    client,
-    domain,
-    async () => coreFollowReview.comparison.artifactsCatalogueChecksum,
+      headWaves.find(({ id }) => id === wave)?.review.comparison
+        .artifactsCatalogueChecksum,
   );
 }
 

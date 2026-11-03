@@ -318,11 +318,14 @@ try {
   result.rolesBefore = await waveRoleCustody(client);
   if (ledger.length === 122) {
     if (!captureOnly) {
-      await assertGenerationWaveRoleSafety(client, "studio-reply-authority");
+      await assertGenerationWaveRoleSafety(
+        client,
+        "20261023-studio-reply-authority",
+      );
       await assertPrivacyWaveRoleSafety(client, {
         privacy: true,
         domain: true,
-        studioReplyAuthorityBeforeCoreFollow: true,
+        before: "20261027-core-follow",
       });
       result.checks.push("exact122 predecessor role/privacy passed");
     }
@@ -466,7 +469,7 @@ try {
     await client.query("RELEASE SAVEPOINT profile_capture");
   }
   if (!captureOnly) {
-    await assertGenerationWaveRoleSafety(client, "core-follow");
+    await assertGenerationWaveRoleSafety(client, "20261027-core-follow");
     await assertPrivacyWaveRoleSafety(client, { privacy: true, domain: true });
     await assertCoreFollowPurposeCatalog(client);
     result.checks.push(

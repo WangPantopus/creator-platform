@@ -22,7 +22,10 @@ import {
   WaveRoleSafetyError,
 } from "./migration-wave-roles.js";
 
-import { assertPrivacyWaveRoleSafety } from "./migration-privacy-roles.js";
+import {
+  assertPrivacyWaveRoleSafety,
+  privacyStage,
+} from "./migration-privacy-roles.js";
 import { assertGenerationWaveRoleSafety } from "./migration-generation-roles.js";
 import {
   chainRefusal,
@@ -35,11 +38,7 @@ import { registeredGenerationOutputProfile } from "../src/db/generation-output-p
 import { registeredComparisonProfile } from "../src/db/comparison-profile.js";
 import { registeredGenerationRecoveryProfile } from "../src/db/generation-recovery-profile.js";
 import { registeredPublicAIProfile } from "../src/db/public-ai-profile.js";
-import {
-  headWaves,
-  type PrivacyStage,
-  reviewedWaves,
-} from "../src/db/reviewed-waves.js";
+import { headWaves, reviewedWaves } from "../src/db/reviewed-waves.js";
 
 type Source = { version: string; path: string; checksum: string };
 type Packet = {
@@ -322,6 +321,7 @@ async function activate() {
     // Each reviewed wave in the chain's order, and how many of its sources
     // the ledger holds.
     const reviewed = packets.slice(chain.fresh).map((entry, index) => ({
+      id: ids[chain.fresh + index]!,
       wave: entry.wave,
       ...rows.get(ids[chain.fresh + index]!)!.operator,
     }));
@@ -348,28 +348,21 @@ async function activate() {
       if (entry.precedes)
         check(!held[index] || complete(index - 1), entry.precedes);
     }
-    // The role checks still take the name of the newest wave they should
-    // find, and the privacy stages: a stage holds while the wave before it
-    // counts and its own wave doesn't.
-    const extension = (counts: (index: number) => boolean) => {
-      for (let index = reviewed.length - 1; index >= 0; index -= 1)
-        if (reviewed[index]!.extension && counts(index))
-          return reviewed[index]!.extension;
-      return undefined;
+    // The generation role check takes the newest wave that counts, the
+    // generation wave at least; the privacy role check, the wave whose
+    // privacy stage holds.
+    const newest = (counts: (index: number) => boolean) => {
+      let index = reviewed.length - 1;
+      while (index > 0 && !counts(index)) index -= 1;
+      return reviewed[index]!.id;
     };
-    const stages = (counts: (index: number) => boolean) => {
-      const flags: Partial<Record<PrivacyStage, boolean>> = {};
-      let reached = true;
-      for (const [index, { privacy }] of reviewed.entries())
-        if (privacy) {
-          flags[privacy] = reached && !counts(index);
-          reached = counts(index);
-        }
-      return flags;
-    };
+    const stage = (counts: (index: number) => boolean) =>
+      privacyStage(
+        reviewed.map(({ id }, index) => ({ id, counted: counts(index) })),
+      );
     const installed = (index: number) => held[index]! > 0;
     if (held[0])
-      await assertGenerationWaveRoleSafety(client, extension(installed));
+      await assertGenerationWaveRoleSafety(client, newest(installed));
     else
       await assertWaveRoleSafety(client, {
         trust: before.some(
@@ -391,7 +384,7 @@ async function activate() {
         domain: before.some(
           (r) => r.version === "0103_w8_domain_privacy_task_fence",
         ),
-        ...stages(installed),
+        before: stage(installed),
       });
     const tables = await waveDataTables(client);
     const beforeData = await waveDataDigest(client, tables);
@@ -485,7 +478,7 @@ async function activate() {
     // the selected wave.
     const upTo = (index: number) => chain.fresh + index <= selected;
     const roleSafety = generation
-      ? await assertGenerationWaveRoleSafety(client, extension(upTo))
+      ? await assertGenerationWaveRoleSafety(client, newest(upTo))
       : await assertWaveRoleSafety(client, {
           trust: true,
           media: true,
@@ -496,7 +489,7 @@ async function activate() {
       ? await assertPrivacyWaveRoleSafety(client, {
           privacy: true,
           domain: true,
-          ...stages(upTo),
+          before: stage(upTo),
         })
       : undefined;
     check(

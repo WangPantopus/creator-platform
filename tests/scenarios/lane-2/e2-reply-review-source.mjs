@@ -151,11 +151,11 @@ try {
   result.before = await custody();
   result.policyBefore = (await client.query(policyQuery)).rows;
   if (ledger.length === 120) {
-    await assertGenerationWaveRoleSafety(client, "workspace-lock");
+    await assertGenerationWaveRoleSafety(client, "20261022-workspace-lock");
     await assertPrivacyWaveRoleSafety(client, {
       privacy: true,
       domain: true,
-      workspaceLockBeforeReplyReview: true,
+      before: "20261023-reply-review",
     });
     result.checks.push("exact120 predecessor role/privacy passed");
     await client.query(body);
@@ -165,7 +165,7 @@ try {
       [source.version, source.checksum],
     );
   }
-  await assertGenerationWaveRoleSafety(client, "reply-review");
+  await assertGenerationWaveRoleSafety(client, "20261023-reply-review");
   await assertPrivacyWaveRoleSafety(client, { privacy: true, domain: true });
   result.checks.push("121 role/privacy passed");
   result.catalogue = contentHash(await replyReviewPurposeCatalogue(client));

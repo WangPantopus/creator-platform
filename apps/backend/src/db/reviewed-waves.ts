@@ -12,31 +12,18 @@ import replyReview from "../../../../infra/migrations/reviews/20261023-reply-rev
 import studioReplyAuthorityReview from "../../../../infra/migrations/reviews/20261023-studio-reply-authority.json" with { type: "json" };
 import coreFollowReview from "../../../../infra/migrations/reviews/20261027-core-follow.json" with { type: "json" };
 import pilotColumnsReview from "../../../../infra/migrations/reviews/20261101-pilot-columns.json" with { type: "json" };
-import type { assertGenerationWaveRoleSafety } from "../../scripts/migration-generation-roles.js";
-import type { assertPrivacyWaveRoleSafety } from "../../scripts/migration-privacy-roles.js";
 
 // The table of reviewed waves: the one list of waves the runtime and the
 // operator share. scripts/migration-chain.ts checks each chain wave against it
 // for migrate-trust and the local installer, the head profile
-// (comparison-profile.ts) walks it from 20261008-comparison on, and
-// scripts/activate-wave.ts takes each wave's refusals from it. Static imports
-// keep every review in the production build. A registration adds its wave's
-// row at the end (step 6 in docs/engineering/migrations.md).
+// (comparison-profile.ts) walks it from 20261008-comparison on,
+// scripts/activate-wave.ts takes each wave's refusals from it, and the role
+// checks and the trust catalogue modules select a wave's review, and the
+// fixed pins of the wave before it, by its id. Static imports keep every
+// review in the production build. A registration adds its wave's row at the
+// end (step 6 in docs/engineering/migrations.md).
 
-/** The name the generation role check knows a wave by. */
-export type GenerationExtension = NonNullable<
-  Parameters<typeof assertGenerationWaveRoleSafety>[1]
->;
-/** A stage of the privacy role check: the privacy catalogue it checks while
- * the wave that ends the stage is still to come. */
-export type PrivacyStage = Exclude<
-  keyof Parameters<typeof assertPrivacyWaveRoleSafety>[1],
-  "privacy" | "domain"
->;
-
-/** What activate-wave refuses for a wave, word for word, and what it tells
- * the role checks about it. The role checks still name each wave; the last
- * step of Wave 6's plan has them select by wave id instead. */
+/** What activate-wave refuses for a wave, word for word. */
 export type OperatorWave = Readonly<{
   /** Refused when the ledger holds only some of the wave's sources. */
   partial?: string;
@@ -46,10 +33,6 @@ export type OperatorWave = Readonly<{
   /** Refused when the ledger holds the wave without the complete wave before
    * it. */
   precedes?: string;
-  /** The generation role check's name for the wave. */
-  extension?: GenerationExtension;
-  /** The privacy stage that ends when the wave is installed. */
-  privacy?: PrivacyStage;
   /** The ledger counts toward the wave only when it or a later wave is
    * selected: activate-wave has always read the first three waves this way,
    * and the role checks' arguments depend on it. */
@@ -70,29 +53,37 @@ export type OperatorWave = Readonly<{
     refusal: string;
   }>;
 }>;
-/** A head wave has all three of activate-wave's refusals and both role-check
- * names, and a short name for the operator's refusal when no head wave is
- * registered. */
+/** A head wave has all three of activate-wave's refusals, and a short name
+ * for the operator's refusal when no head wave is registered. */
 export type HeadOperatorWave = OperatorWave &
   Readonly<{
     name: string;
     partial: string;
     activation: string;
     precedes: string;
-    extension: GenerationExtension;
-    privacy: PrivacyStage;
   }>;
 
 /** The head profile's pins have the comparison review's shape: each later
  * head review is written from the one before it and keeps all its keys. */
 export type HeadReview = Readonly<typeof comparisonReview>;
+/** What migrate-trust refuses for a head wave, and the line it prints while
+ * the wave is registered but not installed, word for word. */
+export type TrustWave = Readonly<{
+  /** Refused when the wave is registered without the wave before it. */
+  registry: string;
+  /** Refused when the ledger holds part of the wave, or holds it without its
+   * registration or the complete wave before it. */
+  installed: string;
+  unapplied: string;
+}>;
 /** A wave from 20261008-comparison on: its review, the head profile's
- * refusal when only part of its sources is registered, and activate-wave's
- * view of it. */
+ * refusal when only part of its sources is registered, and migrate-trust's
+ * and activate-wave's view of it. */
 export type HeadWave = Readonly<{
   id: string;
   review: HeadReview;
   partial: string;
+  trust: TrustWave;
   operator: HeadOperatorWave;
 }>;
 /** A head wave after notices also has the refusal when it is registered
@@ -106,28 +97,40 @@ export const headWaves: readonly [HeadWave, HeadWave, ...LaterHeadWave[]] = [
     id: "20261008-comparison",
     review: comparisonReview,
     partial: "The complete reviewed comparison source graph is required.",
+    trust: {
+      registry:
+        "Comparison registry requires all eight reviewed sources and the complete partial-recovery predecessor.",
+      installed:
+        "Incomplete or unregistered comparison wave; no per-file repair was attempted.",
+      unapplied:
+        "Comparison sources remain unapplied. After partial-recovery106, use W8_MIGRATION_WAVE=20261008-comparison with verified private backup/restore and closed admission.",
+    },
     operator: {
       name: "comparison",
       partial: "Partial comparison graph is not an accepted baseline.",
       activation:
         "Comparison activation requires the complete reviewed106 predecessor.",
       precedes: "Comparison cannot precede original recovery.",
-      extension: "comparison",
-      privacy: "publicBeforeComparison",
     },
   },
   {
     id: "20261015-notices",
     review: noticesReview,
     partial: "The complete reviewed notices source graph is required.",
+    trust: {
+      registry:
+        "Notices registry requires both reviewed sources and the complete comparison predecessor.",
+      installed:
+        "Incomplete or unregistered notices wave; no per-file repair was attempted.",
+      unapplied:
+        "Notices sources remain unapplied. After comparison114, use W8_MIGRATION_WAVE=20261015-notices with verified private backup/restore and closed admission.",
+    },
     operator: {
       name: "notices",
       partial: "Partial notices wave is not an accepted baseline.",
       activation:
         "Notices activation requires the complete reviewed114 predecessor.",
       precedes: "Notices cannot precede comparison.",
-      extension: "notices",
-      privacy: "comparisonBeforeNotices",
     },
   },
   {
@@ -137,14 +140,20 @@ export const headWaves: readonly [HeadWave, HeadWave, ...LaterHeadWave[]] = [
       "The complete reviewed sign-in and money source graph is required.",
     requires:
       "The sign-in and money wave requires the complete reviewed notices source graph.",
+    trust: {
+      registry:
+        "Sign-in and money registry requires all three reviewed sources and the complete notices predecessor.",
+      installed:
+        "Incomplete or unregistered sign-in and money wave; no per-file repair was attempted.",
+      unapplied:
+        "Sign-in and money sources remain unapplied. After notices116, use W8_MIGRATION_WAVE=20261015-sign-in-and-money with verified private backup/restore and closed admission.",
+    },
     operator: {
       name: "sign-in and money",
       partial: "Partial sign-in and money wave is not an accepted baseline.",
       activation:
         "Sign-in and money activation requires the complete reviewed116 predecessor.",
       precedes: "Sign-in and money cannot precede notices.",
-      extension: "sign-in-and-money",
-      privacy: "noticesBeforeSignInAndMoney",
     },
   },
   {
@@ -153,14 +162,20 @@ export const headWaves: readonly [HeadWave, HeadWave, ...LaterHeadWave[]] = [
     partial: "The complete reviewed workspace-lock source graph is required.",
     requires:
       "Workspace locking requires the complete sign-in and money predecessor.",
+    trust: {
+      registry:
+        "Workspace-lock registry requires its exact source and complete sign-in and money predecessor.",
+      installed:
+        "Incomplete or unregistered workspace-lock wave; no per-file repair was attempted.",
+      unapplied:
+        "Workspace-lock source remains unapplied. After sign-in-and-money119, use W8_MIGRATION_WAVE=20261022-workspace-lock with verified private backup/restore and closed admission.",
+    },
     operator: {
       name: "workspace-lock",
       partial: "Partial workspace-lock wave is not an accepted baseline.",
       activation:
         "Workspace-lock activation requires the complete reviewed119 predecessor.",
       precedes: "Workspace-lock cannot precede sign-in and money.",
-      extension: "workspace-lock",
-      privacy: "signInAndMoneyBeforeWorkspaceLock",
     },
   },
   {
@@ -168,14 +183,20 @@ export const headWaves: readonly [HeadWave, HeadWave, ...LaterHeadWave[]] = [
     review: replyReview,
     partial: "The complete reviewed reply-review source graph is required.",
     requires: "Reply review requires the complete workspace-lock predecessor.",
+    trust: {
+      registry:
+        "Reply-review registry requires its exact source and complete workspace-lock predecessor.",
+      installed:
+        "Incomplete or unregistered reply-review wave; no per-file repair was attempted.",
+      unapplied:
+        "Reply-review source remains unapplied. After workspace-lock120, use W8_MIGRATION_WAVE=20261023-reply-review with verified private backup/restore and closed admission.",
+    },
     operator: {
       name: "reply-review",
       partial: "Partial reply-review wave is not an accepted baseline.",
       activation:
         "Reply-review activation requires the complete reviewed120 predecessor.",
       precedes: "Reply review cannot precede workspace locking.",
-      extension: "reply-review",
-      privacy: "workspaceLockBeforeReplyReview",
     },
   },
   {
@@ -185,14 +206,20 @@ export const headWaves: readonly [HeadWave, HeadWave, ...LaterHeadWave[]] = [
       "The complete reviewed creator/fan denial source graph is required.",
     requires:
       "Creator/fan denial requires the complete reply-review predecessor.",
+    trust: {
+      registry:
+        "Creator/fan denial registry requires its exact source and complete reply-review predecessor.",
+      installed:
+        "Incomplete or unregistered creator/fan denial wave; no per-file repair was attempted.",
+      unapplied:
+        "Creator/fan denial source remains unapplied. After reply-review121, use W8_MIGRATION_WAVE=20261023-studio-reply-authority with verified private backup/restore and closed admission.",
+    },
     operator: {
       name: "creator/fan denial",
       partial: "Partial creator/fan denial wave is not an accepted baseline.",
       activation:
         "Creator/fan denial activation requires the complete reviewed121 predecessor.",
       precedes: "Creator/fan denial cannot precede reply review.",
-      extension: "studio-reply-authority",
-      privacy: "replyReviewBeforeStudioReplyAuthority",
       sameRoleCount: "Creator/fan denial must not add a role.",
     },
   },
@@ -202,14 +229,20 @@ export const headWaves: readonly [HeadWave, HeadWave, ...LaterHeadWave[]] = [
     partial: "The complete reviewed core Follow source graph is required.",
     requires:
       "Core Follow metadata requires the complete creator/fan denial predecessor.",
+    trust: {
+      registry:
+        "Core Follow registry requires its exact source and complete creator/fan denial predecessor.",
+      installed:
+        "Incomplete or unregistered core Follow wave; no per-file repair was attempted.",
+      unapplied:
+        "Core Follow metadata remains unapplied. After creator/fan denial122, use W8_MIGRATION_WAVE=20261027-core-follow with verified private backup/restore and closed admission.",
+    },
     operator: {
       name: "core Follow",
       partial: "Partial core Follow wave is not an accepted baseline.",
       activation:
         "Core Follow activation requires the complete reviewed122 predecessor.",
       precedes: "Core Follow cannot precede creator/fan denial.",
-      extension: "core-follow",
-      privacy: "studioReplyAuthorityBeforeCoreFollow",
       addedRoles: {
         sources: [
           {
@@ -226,14 +259,20 @@ export const headWaves: readonly [HeadWave, HeadWave, ...LaterHeadWave[]] = [
     review: pilotColumnsReview,
     partial: "The complete reviewed pilot-columns source graph is required.",
     requires: "The pilot columns require the complete core Follow predecessor.",
+    trust: {
+      registry:
+        "Pilot-columns registry requires all three reviewed sources and the complete core Follow predecessor.",
+      installed:
+        "Incomplete or unregistered pilot-columns wave; no per-file repair was attempted.",
+      unapplied:
+        "Pilot-columns sources remain unapplied. After core Follow123, use W8_MIGRATION_WAVE=20261101-pilot-columns with verified private backup/restore and closed admission.",
+    },
     operator: {
       name: "pilot-columns",
       partial: "Partial pilot-columns wave is not an accepted baseline.",
       activation:
         "Pilot-columns activation requires the complete reviewed123 predecessor.",
       precedes: "Pilot columns cannot precede core Follow.",
-      extension: "pilot-columns",
-      privacy: "coreFollowBeforePilotColumns",
       addedRoles: {
         sources: [
           {
@@ -269,7 +308,6 @@ export const reviewedWaves: readonly Readonly<{
     operator: {
       partial:
         "Partial generation wave is not an accepted baseline; no repair was attempted.",
-      privacy: "canonicalBeforeGeneration",
       upToSelected: true,
     },
   },
@@ -280,8 +318,6 @@ export const reviewedWaves: readonly Readonly<{
     operator: {
       activation:
         "Content activation requires the complete reviewed100-source predecessor.",
-      extension: "content-privacy",
-      privacy: "generationBeforeContent",
       upToSelected: true,
       orderingException: {
         review: "20261007-content-privacy",
@@ -297,8 +333,6 @@ export const reviewedWaves: readonly Readonly<{
     operator: {
       activation:
         "Output activation requires the complete reviewed101-source predecessor.",
-      extension: "generation-output",
-      privacy: "contentBeforeOutput",
       upToSelected: true,
     },
   },
@@ -310,8 +344,6 @@ export const reviewedWaves: readonly Readonly<{
       partial: "Partial public AI wave is not an accepted baseline.",
       activation:
         "Public AI activation requires the complete reviewed102 predecessor.",
-      extension: "public-ai",
-      privacy: "outputBeforePublic",
     },
   },
   {
@@ -322,7 +354,6 @@ export const reviewedWaves: readonly Readonly<{
       activation:
         "Recovery activation requires the complete reviewed104 predecessor.",
       precedes: "Recovery cannot precede public AI activation.",
-      extension: "generation-recovery",
     },
   },
   {
@@ -333,7 +364,6 @@ export const reviewedWaves: readonly Readonly<{
       activation:
         "Partial-output recovery requires the complete reviewed105 predecessor.",
       precedes: "Partial-output recovery cannot precede original recovery.",
-      extension: "partial-generation-recovery",
     },
   },
   ...headWaves.map(({ id, review, operator }) => ({
@@ -344,17 +374,24 @@ export const reviewedWaves: readonly Readonly<{
   })),
 ];
 
-// The role checks take each name for one wave. Until they learn a new wave's
-// names, a row for it compiles only by reusing another wave's, and the role
-// checks would then check the wrong wave. No table with a shared name loads.
-for (const field of ["extension", "privacy"] as const)
-  for (const [index, row] of reviewedWaves.entries()) {
-    const name = row.operator[field];
-    const first = reviewedWaves.findIndex(
-      (other) => other.operator[field] === name,
+// The role checks and the trust catalogue modules find a wave's row by its id,
+// and the wave before it in the row before it. So the table loads only with
+// one row per wave, each after the wave whose packet its review pins; the
+// generator checks those pins against the chain. The head profile checks
+// them itself from notices on.
+const notices = reviewedWaves.length - headWaves.length + 1;
+for (const [index, row] of reviewedWaves.entries()) {
+  const before = reviewedWaves[index - 1];
+  if (reviewedWaves.findIndex((other) => other.id === row.id) !== index)
+    throw new Error(
+      `Reviewed wave ${row.id} has two rows; each wave needs exactly one (step 6 in docs/engineering/migrations.md).`,
     );
-    if (name !== undefined && first !== index)
-      throw new Error(
-        `Reviewed waves ${reviewedWaves[first]!.id} and ${row.id} share the role-check name ${name}; each wave needs its own (step 6 in docs/engineering/migrations.md).`,
-      );
-  }
+  if (
+    index < notices &&
+    row.baselineWave?.path !==
+      (before && `infra/migrations/waves/${before.id}.json`)
+  )
+    throw new Error(
+      `Reviewed wave ${row.id} is out of the chain's order; each row's review pins the packet of the row before it (step 6 in docs/engineering/migrations.md).`,
+    );
+}

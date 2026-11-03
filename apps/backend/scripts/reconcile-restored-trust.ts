@@ -93,12 +93,12 @@ async function audit() {
           ledger.some(
             (row) => row.version === "0234_w3_generation_first_visible_read",
           )
-            ? "generation-output"
+            ? "20261007-generation-output"
             : ledger.some(
                   (row) => row.version === "0198_w5_content_privacy_export",
                 )
-              ? "content-privacy"
-              : undefined,
+              ? "20261007-content"
+              : "20261007-generation",
         )
       : await assertWaveRoleSafety(client, {
           trust: ledger.some(

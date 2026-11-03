@@ -1,15 +1,9 @@
-import studioReplyAuthorityReview from "../../../../../infra/migrations/reviews/20261023-studio-reply-authority.json" with { type: "json" };
-import coreFollowReview from "../../../../../infra/migrations/reviews/20261027-core-follow.json" with { type: "json" };
 import type { PoolClient, QueryConfig, QueryResultRow } from "pg";
 import generationPrivacyReview from "../../../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
 import contentPrivacyReview from "../../../../../infra/migrations/reviews/20261007-content-privacy.json" with { type: "json" };
 import publicAIReview from "../../../../../infra/migrations/reviews/20261007-public-ai.json" with { type: "json" };
-import comparisonReview from "../../../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
-import noticesReview from "../../../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
-import replyReview from "../../../../../infra/migrations/reviews/20261023-reply-review.json" with { type: "json" };
-import workspaceLockReview from "../../../../../infra/migrations/reviews/20261022-workspace-lock.json" with { type: "json" };
-import signInAndMoneyReview from "../../../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
 import { registeredContentPrivacyProfile } from "../../db/content-privacy-profile.js";
+import { headWaves } from "../../db/reviewed-waves.js";
 import { registeredPublicAIProfile } from "../../db/public-ai-profile.js";
 import { contentHash } from "../../core/canonical.js";
 import { DomainError } from "../../core/errors.js";
@@ -366,113 +360,32 @@ export async function assertOriginalPrivacyFamilyContentCatalog(
   );
 }
 
-/** Fixed pre-comparison operator metadata for the public/recovery graph.
- * This grants no task authority and accepts no runtime-selected future profile. */
-export async function assertOriginalPrivacyFamilyPublicCatalogForReview(
-  client: PoolClient,
-  signal?: AbortSignal,
-) {
-  await assertOriginalPrivacyFamilyCaller(client, signal);
-  await assertPurposeCatalogue(
-    client,
-    publicAIReview.originalFamilyProfiles.map((profile) => profile.sha256),
-    signal,
-  );
-}
+/** The original family pins each reviewed wave's review holds: the October
+ * waves' here (the output repair keeps the Content review's), then every head
+ * wave's from its row in the table of reviewed waves. */
+const reviewedFamilyProfiles = new Map<string, readonly { sha256: string }[]>([
+  ["20261007-generation", generationPrivacyReview.originalFamilyProfiles],
+  ["20261007-content", contentPrivacyReview.originalFamilyProfiles],
+  ["20261007-generation-output", contentPrivacyReview.originalFamilyProfiles],
+  ["20261007-public-ai", publicAIReview.originalFamilyProfiles],
+  ...headWaves.map(
+    ({ id, review }) => [id, review.originalFamilyProfiles] as const,
+  ),
+]);
 
-/** Fixed pre-notices operator metadata for the complete comparison graph.
- * This grants no task authority and accepts no runtime-selected future profile. */
-export async function assertOriginalPrivacyFamilyComparisonCatalogForReview(
+/** Fixed predecessor metadata at a reviewed wave: its own review's profiles.
+ * This grants no task authority and accepts no runtime-selected profile. */
+export async function assertOriginalPrivacyFamilyCatalogForReview(
   client: PoolClient,
+  wave: string,
   signal?: AbortSignal,
 ) {
+  const profiles = reviewedFamilyProfiles.get(wave);
+  if (!profiles) unavailable();
   await assertOriginalPrivacyFamilyCaller(client, signal);
   await assertPurposeCatalogue(
     client,
-    comparisonReview.originalFamilyProfiles.map((profile) => profile.sha256),
-    signal,
-  );
-}
-
-/** Fixed pre-sign-in-and-money operator metadata for the complete notices
- * graph. This grants no task authority and accepts no runtime-selected profile. */
-export async function assertOriginalPrivacyFamilyNoticesCatalogForReview(
-  client: PoolClient,
-  signal?: AbortSignal,
-) {
-  await assertOriginalPrivacyFamilyCaller(client, signal);
-  await assertPurposeCatalogue(
-    client,
-    noticesReview.originalFamilyProfiles.map((profile) => profile.sha256),
-    signal,
-  );
-}
-
-/** Fixed119 predecessor metadata; no runtime task authority. */
-export async function assertOriginalPrivacyFamilySignInAndMoneyCatalogForReview(
-  client: PoolClient,
-  signal?: AbortSignal,
-) {
-  await assertOriginalPrivacyFamilyCaller(client, signal);
-  await assertPurposeCatalogue(
-    client,
-    signInAndMoneyReview.originalFamilyProfiles.map(
-      (profile) => profile.sha256,
-    ),
-    signal,
-  );
-}
-
-/** Fixed120 predecessor metadata; no runtime task authority. */
-export async function assertOriginalPrivacyFamilyWorkspaceLockCatalogForReview(
-  client: PoolClient,
-  signal?: AbortSignal,
-) {
-  await assertOriginalPrivacyFamilyCaller(client, signal);
-  await assertPurposeCatalogue(
-    client,
-    workspaceLockReview.originalFamilyProfiles.map((profile) => profile.sha256),
-    signal,
-  );
-}
-
-/** Fixed121 predecessor metadata; no runtime task authority. */
-export async function assertOriginalPrivacyFamilyReplyReviewCatalogForReview(
-  client: PoolClient,
-  signal?: AbortSignal,
-) {
-  await assertOriginalPrivacyFamilyCaller(client, signal);
-  await assertPurposeCatalogue(
-    client,
-    replyReview.originalFamilyProfiles.map((profile) => profile.sha256),
-    signal,
-  );
-}
-
-/** Fixed122 predecessor metadata; no runtime task authority. */
-export async function assertOriginalPrivacyFamilyStudioReplyAuthorityCatalogForReview(
-  client: PoolClient,
-  signal?: AbortSignal,
-) {
-  await assertOriginalPrivacyFamilyCaller(client, signal);
-  await assertPurposeCatalogue(
-    client,
-    studioReplyAuthorityReview.originalFamilyProfiles.map(
-      (profile) => profile.sha256,
-    ),
-    signal,
-  );
-}
-
-/** Fixed123 predecessor metadata; no runtime task authority. */
-export async function assertOriginalPrivacyFamilyCoreFollowCatalogForReview(
-  client: PoolClient,
-  signal?: AbortSignal,
-) {
-  await assertOriginalPrivacyFamilyCaller(client, signal);
-  await assertPurposeCatalogue(
-    client,
-    coreFollowReview.originalFamilyProfiles.map((profile) => profile.sha256),
+    profiles.map((profile) => profile.sha256),
     signal,
   );
 }

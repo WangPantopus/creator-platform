@@ -1,5 +1,3 @@
-import coreFollowReview from "../../../infra/migrations/reviews/20261027-core-follow.json" with { type: "json" };
-import pilotColumnsReview from "../../../infra/migrations/reviews/20261101-pilot-columns.json" with { type: "json" };
 import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import pg from "pg";
@@ -11,7 +9,10 @@ import {
   noMatchingReview,
   reviewedWaves,
 } from "./migration-chain.js";
-import { assertPrivacyWaveRoleSafety } from "./migration-privacy-roles.js";
+import {
+  assertPrivacyWaveRoleSafety,
+  privacyStage,
+} from "./migration-privacy-roles.js";
 import { assertWaveRoleSafety } from "./migration-wave-roles.js";
 import { assertGenerationWaveRoleSafety } from "./migration-generation-roles.js";
 import { generationPrivacySourcesRegistered } from "../src/db/generation-privacy-sources.js";
@@ -28,13 +29,8 @@ import recoveryReview from "../../../infra/migrations/reviews/20261007-generatio
 import { registeredGenerationRecoveryProfile } from "../src/db/generation-recovery-profile.js";
 import publicAIReview from "../../../infra/migrations/reviews/20261007-public-ai.json" with { type: "json" };
 import { registeredPublicAIProfile } from "../src/db/public-ai-profile.js";
-import comparisonReview from "../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
 import { registeredComparisonProfile } from "../src/db/comparison-profile.js";
-import noticesReview from "../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
-import signInAndMoneyReview from "../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
-import replyReview from "../../../infra/migrations/reviews/20261023-reply-review.json" with { type: "json" };
-import studioReplyAuthorityReview from "../../../infra/migrations/reviews/20261023-studio-reply-authority.json" with { type: "json" };
-import workspaceLockReview from "../../../infra/migrations/reviews/20261022-workspace-lock.json" with { type: "json" };
+import { type HeadWave, headWaves } from "../src/db/reviewed-waves.js";
 import generationReview from "../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
 
 if (!process.env.DATABASE_MIGRATION_URL)
@@ -127,103 +123,21 @@ try {
     throw new Error(
       "Partial-output recovery registry requires its complete reviewed predecessor.",
     );
-  const comparisonVersions = new Set(
-    comparisonReview.sources.map((source) => source.version),
-  );
-  const comparison = registry.migrations.some((source) =>
-    comparisonVersions.has(source.version),
-  );
-  if (
-    comparison &&
-    (!partialRecovery || !(await registeredComparisonProfile()))
-  )
-    throw new Error(
-      "Comparison registry requires all eight reviewed sources and the complete partial-recovery predecessor.",
-    );
-  const noticesVersions = new Set(
-    noticesReview.sources.map((source) => source.version),
-  );
-  const notices = registry.migrations.some((source) =>
-    noticesVersions.has(source.version),
-  );
-  // The comparison profile also refuses a partial or changed notices registration.
-  if (notices && (!comparison || !(await registeredComparisonProfile())))
-    throw new Error(
-      "Notices registry requires both reviewed sources and the complete comparison predecessor.",
-    );
-  const signInAndMoneyVersions = new Set(
-    signInAndMoneyReview.sources.map((source) => source.version),
-  );
-  const signInAndMoney = registry.migrations.some((source) =>
-    signInAndMoneyVersions.has(source.version),
-  );
+  // Each head wave, in the chain's order, is registered when the registry
+  // names any of its sources, and only on top of the complete wave before it.
   // The comparison profile also refuses a partial or changed registration.
-  if (signInAndMoney && (!notices || !(await registeredComparisonProfile())))
-    throw new Error(
-      "Sign-in and money registry requires all three reviewed sources and the complete notices predecessor.",
-    );
-  const workspaceLockVersions = new Set(
-    workspaceLockReview.sources.map((source) => source.version),
+  const registeredVersions = new Set(
+    registry.migrations.map((entry) => entry.version),
   );
-  const workspaceLock = registry.migrations.some((source) =>
-    workspaceLockVersions.has(source.version),
-  );
-  if (
-    workspaceLock &&
-    (!signInAndMoney || !(await registeredComparisonProfile()))
-  )
-    throw new Error(
-      "Workspace-lock registry requires its exact source and complete sign-in and money predecessor.",
-    );
-  const replyReviewVersions = new Set(
-    replyReview.sources.map((source) => source.version),
-  );
-  const replyReviewRegistered = registry.migrations.some((source) =>
-    replyReviewVersions.has(source.version),
-  );
-  if (
-    replyReviewRegistered &&
-    (!workspaceLock || !(await registeredComparisonProfile()))
-  )
-    throw new Error(
-      "Reply-review registry requires its exact source and complete workspace-lock predecessor.",
-    );
-  const studioReplyAuthorityVersions = new Set(
-    studioReplyAuthorityReview.sources.map((source) => source.version),
-  );
-  const studioReplyAuthority = registry.migrations.some((source) =>
-    studioReplyAuthorityVersions.has(source.version),
-  );
-  if (
-    studioReplyAuthority &&
-    (!replyReviewRegistered || !(await registeredComparisonProfile()))
-  )
-    throw new Error(
-      "Creator/fan denial registry requires its exact source and complete reply-review predecessor.",
-    );
-  const coreFollowVersions = new Set(
-    coreFollowReview.sources.map((source) => source.version),
-  );
-  const coreFollow = registry.migrations.some((source) =>
-    coreFollowVersions.has(source.version),
-  );
-  if (
-    coreFollow &&
-    (!studioReplyAuthority || !(await registeredComparisonProfile()))
-  )
-    throw new Error(
-      "Core Follow registry requires its exact source and complete creator/fan denial predecessor.",
-    );
-  const pilotColumnsVersions = new Set(
-    pilotColumnsReview.sources.map((source) => source.version),
-  );
-  const pilotColumns = registry.migrations.some((source) =>
-    pilotColumnsVersions.has(source.version),
-  );
-  if (pilotColumns && (!coreFollow || !(await registeredComparisonProfile())))
-    throw new Error(
-      "Pilot-columns registry requires all three reviewed sources and the complete core Follow predecessor.",
-    );
+  const registeredWave = ({ review }: HeadWave) =>
+    review.sources.some((source) => registeredVersions.has(source.version));
+  let predecessor = partialRecovery;
+  for (const wave of headWaves) {
+    const registered = registeredWave(wave);
+    if (registered && (!predecessor || !(await registeredComparisonProfile())))
+      throw new Error(wave.trust.registry);
+    predecessor = registered;
+  }
   // Every source of a wave after the canonical bootstrap is activation-only:
   // activate-wave installs a complete reviewed wave, and this script never
   // applies one of its files by itself. The chain names those waves; one this
@@ -247,9 +161,6 @@ try {
     );
   // A reviewed wave the registry names is activation-only whatever the chain
   // says, and every wave the chain names has its review here.
-  const registeredVersions = new Set(
-    registry.migrations.map((entry) => entry.version),
-  );
   for (const [id, versions] of reviewedWaves)
     if (
       [...versions].some((version) => registeredVersions.has(version)) &&
@@ -340,102 +251,24 @@ try {
     throw new Error(
       "Incomplete partial-output recovery activation; no repair was attempted.",
     );
-  const installedComparison = applied.filter((source) =>
-    comparisonVersions.has(source.version),
-  ).length;
-  if (
-    installedComparison &&
-    (!comparison ||
-      !installedPartialRecovery ||
-      installedComparison !== comparisonVersions.size)
-  )
-    throw new Error(
-      "Incomplete or unregistered comparison wave; no per-file repair was attempted.",
-    );
-  const installedNotices = applied.filter((source) =>
-    noticesVersions.has(source.version),
-  ).length;
-  if (
-    installedNotices &&
-    (!notices ||
-      installedComparison !== comparisonVersions.size ||
-      installedNotices !== noticesVersions.size)
-  )
-    throw new Error(
-      "Incomplete or unregistered notices wave; no per-file repair was attempted.",
-    );
-  const installedSignInAndMoney = applied.filter((source) =>
-    signInAndMoneyVersions.has(source.version),
-  ).length;
-  if (
-    installedSignInAndMoney &&
-    (!signInAndMoney ||
-      installedNotices !== noticesVersions.size ||
-      installedSignInAndMoney !== signInAndMoneyVersions.size)
-  )
-    throw new Error(
-      "Incomplete or unregistered sign-in and money wave; no per-file repair was attempted.",
-    );
-  const installedWorkspaceLock = applied.filter((source) =>
-    workspaceLockVersions.has(source.version),
-  ).length;
-  if (
-    installedWorkspaceLock &&
-    (!workspaceLock ||
-      installedSignInAndMoney !== signInAndMoneyVersions.size ||
-      installedWorkspaceLock !== workspaceLockVersions.size)
-  )
-    throw new Error(
-      "Incomplete or unregistered workspace-lock wave; no per-file repair was attempted.",
-    );
-  const installedReplyReview = applied.filter((source) =>
-    replyReviewVersions.has(source.version),
-  ).length;
-  if (
-    installedReplyReview &&
-    (!replyReviewRegistered ||
-      installedWorkspaceLock !== workspaceLockVersions.size ||
-      installedReplyReview !== replyReviewVersions.size)
-  )
-    throw new Error(
-      "Incomplete or unregistered reply-review wave; no per-file repair was attempted.",
-    );
-  const installedStudioReplyAuthority = applied.filter((source) =>
-    studioReplyAuthorityVersions.has(source.version),
-  ).length;
-  if (
-    installedStudioReplyAuthority &&
-    (!studioReplyAuthority ||
-      installedReplyReview !== replyReviewVersions.size ||
-      installedStudioReplyAuthority !== studioReplyAuthorityVersions.size)
-  )
-    throw new Error(
-      "Incomplete or unregistered creator/fan denial wave; no per-file repair was attempted.",
-    );
-  const installedCoreFollow = applied.filter((source) =>
-    coreFollowVersions.has(source.version),
-  ).length;
-  if (
-    installedCoreFollow &&
-    (!coreFollow ||
-      installedStudioReplyAuthority !== studioReplyAuthorityVersions.size ||
-      installedCoreFollow !== coreFollowVersions.size)
-  )
-    throw new Error(
-      "Incomplete or unregistered core Follow wave; no per-file repair was attempted.",
-    );
-  const installedPilotColumns = applied.filter((source) =>
-    pilotColumnsVersions.has(source.version),
-  ).length;
-  if (
-    installedPilotColumns &&
-    (!pilotColumns ||
-      installedCoreFollow !== coreFollowVersions.size ||
-      installedPilotColumns !== pilotColumnsVersions.size)
-  )
-    throw new Error(
-      "Incomplete or unregistered pilot-columns wave; no per-file repair was attempted.",
-    );
+  // The ledger holds a head wave only complete and registered, on top of the
+  // complete wave before it.
+  const installedSources = ({ review }: HeadWave) =>
+    applied.filter((row) =>
+      review.sources.some((source) => source.version === row.version),
+    ).length;
+  let complete = installedPartialRecovery;
+  for (const wave of headWaves) {
+    const installed = installedSources(wave);
+    if (
+      installed &&
+      (!registeredWave(wave) ||
+        !complete ||
+        installed !== wave.review.sources.length)
+    )
+      throw new Error(wave.trust.installed);
+    complete = installed === wave.review.sources.length;
+  }
   // Fresh databases still bootstrap the exact canonical61. The complete new
   // wave is only installed atomically by activate-wave after private backup,
   // separate restore and closed-admission checks. Registered code alone cannot
@@ -461,35 +294,22 @@ try {
       (r) => r.version === "0082_w8_interactive_denial_try_fence",
     ),
   });
+  // The role checks take the newest installed wave, and the wave whose
+  // privacy stage holds; the installed waves are complete and in the chain's
+  // order (above). With the generation wave unregistered, no stage holds.
+  const counted = fresh.waves.map(({ id }) => ({
+    id,
+    counted: installedWaves.has(id),
+  }));
+  const newestWave =
+    counted.filter((wave) => wave.counted).at(-1)?.id ?? fresh.waves[0]!.id;
+  const before = privacyStage(counted, generation);
   const installedPrivacy = (rows: readonly { version: string }[]) => ({
     privacy: rows.some(
       (r) => r.version === "0087_w8_privacy_task_commit_fence",
     ),
     domain: rows.some((r) => r.version === "0103_w8_domain_privacy_task_fence"),
-    canonicalBeforeGeneration: generation && !installedGeneration,
-    generationBeforeContent: installedGeneration > 0 && !installedContent,
-    contentBeforeOutput: installedContent && !installedOutput,
-    outputBeforePublic: installedOutput && !installedPublic,
-    publicBeforeComparison: Boolean(installedPublic && !installedComparison),
-    comparisonBeforeNotices: Boolean(installedComparison && !installedNotices),
-    coreFollowBeforePilotColumns: Boolean(
-      installedCoreFollow && !installedPilotColumns,
-    ),
-    studioReplyAuthorityBeforeCoreFollow: Boolean(
-      installedStudioReplyAuthority && !installedCoreFollow,
-    ),
-    replyReviewBeforeStudioReplyAuthority: Boolean(
-      installedReplyReview && !installedStudioReplyAuthority,
-    ),
-    workspaceLockBeforeReplyReview: Boolean(
-      installedWorkspaceLock && !installedReplyReview,
-    ),
-    signInAndMoneyBeforeWorkspaceLock: Boolean(
-      installedSignInAndMoney && !installedWorkspaceLock,
-    ),
-    noticesBeforeSignInAndMoney: Boolean(
-      installedNotices && !installedSignInAndMoney,
-    ),
+    before,
   });
   const hasWave = files.some(
     (file) => file.version === "0062_w6_creator_media_worker",
@@ -510,36 +330,7 @@ try {
     await client.query("BEGIN");
     try {
       if (installedGeneration)
-        await assertGenerationWaveRoleSafety(
-          client,
-          installedPilotColumns
-            ? "pilot-columns"
-            : installedCoreFollow
-              ? "core-follow"
-              : installedStudioReplyAuthority
-                ? "studio-reply-authority"
-                : installedReplyReview
-                  ? "reply-review"
-                  : installedWorkspaceLock
-                    ? "workspace-lock"
-                    : installedSignInAndMoney
-                      ? "sign-in-and-money"
-                      : installedNotices
-                        ? "notices"
-                        : installedComparison
-                          ? "comparison"
-                          : installedPartialRecovery
-                            ? "partial-generation-recovery"
-                            : installedRecovery
-                              ? "generation-recovery"
-                              : installedPublic
-                                ? "public-ai"
-                                : installedOutput
-                                  ? "generation-output"
-                                  : installedContent
-                                    ? "content-privacy"
-                                    : undefined,
-        );
+        await assertGenerationWaveRoleSafety(client, newestWave);
       else await assertWaveRoleSafety(client, installedRoles(applied));
       if (continuation)
         await assertPrivacyWaveRoleSafety(client, installedPrivacy(applied));
@@ -643,36 +434,7 @@ try {
     await client.query("BEGIN");
     try {
       if (installedGeneration)
-        await assertGenerationWaveRoleSafety(
-          client,
-          installedPilotColumns
-            ? "pilot-columns"
-            : installedCoreFollow
-              ? "core-follow"
-              : installedStudioReplyAuthority
-                ? "studio-reply-authority"
-                : installedReplyReview
-                  ? "reply-review"
-                  : installedWorkspaceLock
-                    ? "workspace-lock"
-                    : installedSignInAndMoney
-                      ? "sign-in-and-money"
-                      : installedNotices
-                        ? "notices"
-                        : installedComparison
-                          ? "comparison"
-                          : installedPartialRecovery
-                            ? "partial-generation-recovery"
-                            : installedRecovery
-                              ? "generation-recovery"
-                              : installedPublic
-                                ? "public-ai"
-                                : installedOutput
-                                  ? "generation-output"
-                                  : installedContent
-                                    ? "content-privacy"
-                                    : undefined,
-        );
+        await assertGenerationWaveRoleSafety(client, newestWave);
       else await assertWaveRoleSafety(client, installedRoles(files));
       if (continuation)
         await assertPrivacyWaveRoleSafety(client, installedPrivacy(files));
@@ -694,38 +456,12 @@ try {
     process.stdout.write(
       "Content export remains unapplied. After generation100, use W8_MIGRATION_WAVE=20261007-content with verified private backup/restore and closed admission.\n",
     );
-  if (comparison && !installedComparison)
-    process.stdout.write(
-      "Comparison sources remain unapplied. After partial-recovery106, use W8_MIGRATION_WAVE=20261008-comparison with verified private backup/restore and closed admission.\n",
-    );
-  if (notices && !installedNotices)
-    process.stdout.write(
-      "Notices sources remain unapplied. After comparison114, use W8_MIGRATION_WAVE=20261015-notices with verified private backup/restore and closed admission.\n",
-    );
-  if (pilotColumns && !installedPilotColumns)
-    process.stdout.write(
-      "Pilot-columns sources remain unapplied. After core Follow123, use W8_MIGRATION_WAVE=20261101-pilot-columns with verified private backup/restore and closed admission.\n",
-    );
-  if (coreFollow && !installedCoreFollow)
-    process.stdout.write(
-      "Core Follow metadata remains unapplied. After creator/fan denial122, use W8_MIGRATION_WAVE=20261027-core-follow with verified private backup/restore and closed admission.\n",
-    );
-  if (studioReplyAuthority && !installedStudioReplyAuthority)
-    process.stdout.write(
-      "Creator/fan denial source remains unapplied. After reply-review121, use W8_MIGRATION_WAVE=20261023-studio-reply-authority with verified private backup/restore and closed admission.\n",
-    );
-  if (replyReviewRegistered && !installedReplyReview)
-    process.stdout.write(
-      "Reply-review source remains unapplied. After workspace-lock120, use W8_MIGRATION_WAVE=20261023-reply-review with verified private backup/restore and closed admission.\n",
-    );
-  if (workspaceLock && !installedWorkspaceLock)
-    process.stdout.write(
-      "Workspace-lock source remains unapplied. After sign-in-and-money119, use W8_MIGRATION_WAVE=20261022-workspace-lock with verified private backup/restore and closed admission.\n",
-    );
-  if (signInAndMoney && !installedSignInAndMoney)
-    process.stdout.write(
-      "Sign-in and money sources remain unapplied. After notices116, use W8_MIGRATION_WAVE=20261015-sign-in-and-money with verified private backup/restore and closed admission.\n",
-    );
+  // In the order these lines were written: comparison and notices, then each
+  // later head wave newest first.
+  const [comparisonWave, noticesWave, ...laterWaves] = headWaves;
+  for (const wave of [comparisonWave, noticesWave, ...laterWaves.reverse()])
+    if (registeredWave(wave) && !installedSources(wave))
+      process.stdout.write(wave.trust.unapplied + "\n");
 } finally {
   await client.query(
     "SELECT pg_advisory_unlock(hashtextextended('creator-migrations',0))",

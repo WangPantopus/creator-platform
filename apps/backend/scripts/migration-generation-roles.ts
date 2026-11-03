@@ -1,5 +1,6 @@
 import coreFollowReview from "../../../infra/migrations/reviews/20261027-core-follow.json" with { type: "json" };
 import pilotColumnsReview from "../../../infra/migrations/reviews/20261101-pilot-columns.json" with { type: "json" };
+import { headWaves, reviewedWaves } from "../src/db/reviewed-waves.js";
 import { assertCoreFollowPurposeCatalog } from "../src/modules/growth/core-follow-catalogue.js";
 import type { PoolClient, QueryConfig, QueryResultRow } from "pg";
 import { readFile } from "node:fs/promises";
@@ -11,8 +12,6 @@ import recoveryReview from "../../../infra/migrations/reviews/20261007-generatio
 import comparisonReview from "../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
 import noticesReview from "../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
 import signInAndMoneyReview from "../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
-import replyReview from "../../../infra/migrations/reviews/20261023-reply-review.json" with { type: "json" };
-import studioReplyAuthorityReview from "../../../infra/migrations/reviews/20261023-studio-reply-authority.json" with { type: "json" };
 import { creatorFanDenialPurposeCatalogue } from "../src/modules/trust/creator-fan-denial-catalog.js";
 import workspaceLockReview from "../../../infra/migrations/reviews/20261022-workspace-lock.json" with { type: "json" };
 import { comparisonReaderCatalogue } from "../src/modules/conversation/comparison-feed.js";
@@ -168,27 +167,43 @@ export async function generationWavePurposeCatalogue(
   }
 }
 
+/** Where each wave the checks below name stands in the table of reviewed
+ * waves, which is the chain's order. A wave the table lacks stops this module
+ * from loading, so no check is skipped for it. */
+function place(id: string) {
+  const index = reviewedWaves.findIndex((wave) => wave.id === id);
+  if (index < 0)
+    throw new Error(`The table of reviewed waves has no row for ${id}.`);
+  return index;
+}
+const places = {
+  output: place("20261007-generation-output"),
+  publicAI: place("20261007-public-ai"),
+  recovery: place("20261007-generation-recovery"),
+  partialRecovery: place("20261007-partial-generation-recovery"),
+  comparison: place("20261008-comparison"),
+  notices: place("20261015-notices"),
+  signInAndMoney: place("20261015-sign-in-and-money"),
+  workspaceLock: place("20261022-workspace-lock"),
+  reply: place("20261023-reply-review"),
+  studio: place("20261023-studio-reply-authority"),
+  follow: place("20261027-core-follow"),
+  pilot: place("20261101-pilot-columns"),
+};
+
 /** Fixed closed-review profiles only. This supplements the original wave
  * checker; the activation runner, backup/restore, privacy guards and actual
- * application preparations must still qualify independently. */
+ * application preparations must still qualify independently. `wave` is the
+ * newest installed wave of the table of reviewed waves, from
+ * 20261007-generation on: it is checked for everything each wave up to it
+ * added, against its own review's pins. */
 export async function assertGenerationWaveRoleSafety(
   client: PoolClient,
-  extension?:
-    | "content-privacy"
-    | "generation-output"
-    | "public-ai"
-    | "generation-recovery"
-    | "partial-generation-recovery"
-    | "comparison"
-    | "notices"
-    | "sign-in-and-money"
-    | "workspace-lock"
-    | "reply-review"
-    | "studio-reply-authority"
-    | "core-follow"
-    | "pilot-columns",
+  wave: string,
 ) {
+  const selected = reviewedWaves.findIndex((row) => row.id === wave);
   if (
+    selected < 0 ||
     purposeReview.schemaVersion !== 1 ||
     purposeReview.postgresMajor !== 17 ||
     purposeReview.sourceReview !== "20261007-generation-privacy" ||
@@ -198,46 +213,32 @@ export async function assertGenerationWaveRoleSafety(
     throw new WaveRoleSafetyError(
       "Generation-purpose wave review is unavailable.",
     );
-  const pilot = extension === "pilot-columns";
-  const follow = pilot || extension === "core-follow";
-  const studio = follow || extension === "studio-reply-authority";
-  const reply = studio || extension === "reply-review";
-  const workspaceLock = reply || extension === "workspace-lock";
-  const signInAndMoney = workspaceLock || extension === "sign-in-and-money";
-  const notices = signInAndMoney || extension === "notices";
-  const comparison = notices || extension === "comparison";
+  // Every wave after the generation wave extends it.
+  const extension = selected > 0;
+  const at = (place: number) => selected >= place;
+  const pilot = at(places.pilot);
+  const follow = at(places.follow);
+  const studio = at(places.studio);
+  const reply = at(places.reply);
+  const workspaceLock = at(places.workspaceLock);
+  const signInAndMoney = at(places.signInAndMoney);
+  const notices = at(places.notices);
+  const comparison = at(places.comparison);
   // Every pinned catalogue lists every relation, so the newest installed
   // wave's review holds the current pins.
-  const head = pilot
-    ? pilotColumnsReview
-    : follow
-      ? coreFollowReview
-      : studio
-        ? studioReplyAuthorityReview
-        : reply
-          ? replyReview
-          : workspaceLock
-            ? workspaceLockReview
-            : signInAndMoney
-              ? signInAndMoneyReview
-              : notices
-                ? noticesReview
-                : comparisonReview;
-  const recovery =
-    comparison ||
-    extension === "generation-recovery" ||
-    extension === "partial-generation-recovery";
-  const selectedRecovery =
-    comparison || extension === "partial-generation-recovery"
-      ? partialRecoveryReview
-      : recoveryReview;
+  const head =
+    headWaves.find((row) => row.id === wave)?.review ?? comparisonReview;
+  const recovery = at(places.recovery);
+  const selectedRecovery = at(places.partialRecovery)
+    ? partialRecoveryReview
+    : recoveryReview;
   const original = await assertWaveRoleSafety(client, {
     trust: true,
     media: true,
     content: true,
     interactive: true,
     generationDenial: true,
-    publicAI: extension === "public-ai" || recovery,
+    publicAI: at(places.publicAI),
     comparison,
     replyReview: reply,
     studioReplyAuthority: studio,
@@ -248,9 +249,9 @@ export async function assertGenerationWaveRoleSafety(
         ? head
         : recovery
           ? selectedRecovery
-          : extension === "public-ai"
+          : at(places.publicAI)
             ? publicAIReview
-            : extension === "generation-output"
+            : at(places.output)
               ? outputReview
               : contentReview
       ).purposeProfiles.map((profile) => profile.sha256)
@@ -272,11 +273,7 @@ export async function assertGenerationWaveRoleSafety(
       ).rowCount
     )
       throw new WaveRoleSafetyError("Exact Content export source is required.");
-    if (
-      extension === "generation-output" ||
-      extension === "public-ai" ||
-      recovery
-    ) {
+    if (at(places.output)) {
       const repair = outputReview.source;
       if (
         outputReview.schemaVersion !== 1 ||
@@ -294,7 +291,7 @@ export async function assertGenerationWaveRoleSafety(
           "Exact generation output repair source is required.",
         );
     }
-    if (extension === "public-ai" || recovery) {
+    if (at(places.publicAI)) {
       for (const source of publicAIReview.sources)
         if (
           sha256(await readFile(new URL(source.path, repositoryRoot))) !==
@@ -316,8 +313,7 @@ export async function assertGenerationWaveRoleSafety(
         throw new WaveRoleSafetyError("Public AI purpose catalogue changed.");
     }
     if (recovery) {
-      for (const source of comparison ||
-      extension === "partial-generation-recovery"
+      for (const source of at(places.partialRecovery)
         ? [recoveryReview.source, partialRecoveryReview.source]
         : [recoveryReview.source]) {
         if (
@@ -475,7 +471,7 @@ export async function assertGenerationWaveRoleSafety(
     purposeRoles:
       purposeReview.roles.length +
       (extension ? 1 : 0) +
-      (extension === "public-ai" || recovery ? 1 : 0) +
+      (at(places.publicAI) ? 1 : 0) +
       (comparison ? 3 : 0) +
       (reply ? 1 : 0) +
       (follow ? 1 : 0),
