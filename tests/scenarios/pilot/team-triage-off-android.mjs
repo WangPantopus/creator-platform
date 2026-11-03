@@ -6,6 +6,10 @@
 //   node infra/local/stack.mjs up --lane N --base-port P
 //   adb -s <serial> install -r app-debug.apk
 //   LANE7_ANDROID=<serial> PILOT_BASE_PORT=P node tests/scenarios/pilot/team-triage-off-android.mjs [--shots DIR]
+// As a slow phone would see it: put lane 7's delay proxy in front of the API,
+// holding each Team read, and point the app at it with PILOT_APP_PORT=Q:
+//   node tests/scenarios/lane-7/delay-proxy.mjs --listen Q --target <P+1> \
+//     --hold "GET /v1/studio/20000000-0000-4000-8000-000000000001/team" --ms 2500
 // The real app on the emulator, the real backend and PostgreSQL, driven through
 // adb (lane 7's android-ui.mjs). Fakes: the development identity, signed in by
 // the debug launch hook, and a SQL row standing in for a membership made before
@@ -39,7 +43,8 @@ const shots = process.argv.includes("--shots")
   : null;
 const SEEDED = account(4);
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-const port = new URL(API).port;
+// The port the app reaches: the API itself, or a delay proxy in front of it.
+const port = process.env.PILOT_APP_PORT ?? new URL(API).port;
 
 const two = await fan(2);
 await legacyMember(2, ["drafter", "triage"]);
@@ -120,13 +125,13 @@ async function bringUp(prefix) {
 }
 /** Opens the role editor for a member and brings it on screen. */
 async function edit(label) {
+  let found;
   await until(
-    () => member(label)?.enabled,
+    () => (found = member(label))?.enabled,
     30_000,
     `enabled Edit roles for ${label}`,
   );
-  const { edit } = member(label);
-  tapAt(edit.x, edit.y);
+  tapAt(found.edit.x, found.edit.y);
   await sleep(1000);
   await bringUp(`Roles for ${label}`);
   expect(texts().includes("Save roles"), `the editor for ${label} is cut off`);
@@ -212,6 +217,7 @@ await step(
     let looks = 0;
     for (const end = Date.now() + 35_000; Date.now() < end; looks++) {
       const now = place();
+      if (now !== first) shot("android-hold-moved.png");
       expect(now === first, `look ${looks + 1} found y ${now}, not ${first}`);
     }
     shot("android-hold-after.png");
@@ -233,13 +239,18 @@ await step(
       10_000,
       "the new desired roles",
     );
-    // Save waits while a read runs (one starts every 3 s), so a tap can land on
-    // it disabled and do nothing: tap again until the server has the change. A
-    // tap that did nothing sent nothing, so a retry never sends it twice.
+    // Save needs a current lease and session. On a slow phone the lease can run
+    // out just before a read lands, and the session's own check pauses Save too,
+    // so a tap can land on it disabled and do nothing: tap again until the
+    // server has the change. A tap that did nothing sent nothing.
+    let taps = 0;
     for (let attempt = 0; (await roles(2)) !== "drafter,scheduler"; attempt++) {
       expect(attempt < 4, "the save never reached the server");
       const save = await waitEnabled("Save roles", 10_000).catch(() => null);
-      if (save) tapAt(save.x, save.y);
+      if (save) {
+        tapAt(save.x, save.y);
+        taps++;
+      }
       await sleep(3000);
     }
     // The confirmation is the screen's status notice, at the top.
@@ -249,7 +260,7 @@ await step(
       15_000,
       "the confirmation",
     );
-    return `"Desired roles: drafter, scheduler" before Save; saved drafter,scheduler; "The role change was confirmed."`;
+    return `"Desired roles: drafter, scheduler" before Save; saved drafter,scheduler after ${taps} tap${taps === 1 ? "" : "s"} on Save; "The role change was confirmed."`;
   },
 );
 if (shots) {
