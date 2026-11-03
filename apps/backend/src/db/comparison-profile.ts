@@ -1,243 +1,82 @@
-import coreFollowReview from "../../../../infra/migrations/reviews/20261027-core-follow.json" with { type: "json" };
-import pilotColumnsReview from "../../../../infra/migrations/reviews/20261101-pilot-columns.json" with { type: "json" };
-import review from "../../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
-import noticesReview from "../../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
-import signInAndMoneyReview from "../../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
-import workspaceLockReview from "../../../../infra/migrations/reviews/20261022-workspace-lock.json" with { type: "json" };
-import replyReview from "../../../../infra/migrations/reviews/20261023-reply-review.json" with { type: "json" };
-import studioReplyAuthorityReview from "../../../../infra/migrations/reviews/20261023-studio-reply-authority.json" with { type: "json" };
 import type { PoolClient } from "pg";
 import { invariant } from "../core/errors.js";
 import {
   assertRegisteredMigration,
   registeredMigration,
 } from "./reviewed-migration.js";
+import { type HeadReview, type HeadWave, headWaves } from "./reviewed-waves.js";
 
 function freeze<T extends object>(value: T): Readonly<T> {
   for (const child of Object.values(value))
     if (child && typeof child === "object") freeze(child);
   return Object.freeze(value);
 }
-const profile = freeze(review);
-const notices = freeze(noticesReview);
-const signInAndMoney = freeze(signInAndMoneyReview);
+for (const wave of headWaves) freeze(wave.review);
 
-/** The notices wave follows comparison. Every pinned catalogue lists every
- * relation, so once its two sources are registered its regenerated pins
- * describe the complete graph and replace the comparison pins. */
-async function registeredNoticesProfile(signal?: AbortSignal) {
+// The walk follows the chain's order: each head review after the first pins
+// the packet of the wave before it as its baselineWave, and the generator
+// checks those pins against infra/migrations/chain.json.
+for (const [index, wave] of headWaves.entries())
+  invariant(
+    index === 0 ||
+      wave.review.baselineWave.path ===
+        `infra/migrations/waves/${headWaves[index - 1]!.id}.json`,
+    "comparison_unconfigured",
+    "The reviewed head waves are out of the chain's order.",
+  );
+
+/** A wave's review once all its sources are registered exactly, and nothing
+ * while none is. Reservations cannot select it, and a partial registration
+ * is refused. */
+async function registeredWave(wave: HeadWave, signal?: AbortSignal) {
   signal?.throwIfAborted();
-  const active = await Promise.all(notices.sources.map(registeredMigration));
+  const sources = wave.review.sources;
+  const active = await Promise.all(sources.map(registeredMigration));
   signal?.throwIfAborted();
   if (active.every((source) => !source)) return undefined;
   invariant(
     active.every(
       (source, index) =>
-        source?.version === notices.sources[index]!.version &&
-        source.checksum === notices.sources[index]!.checksum,
+        source?.version === sources[index]!.version &&
+        source.checksum === sources[index]!.checksum,
     ),
     "comparison_unconfigured",
-    "The complete reviewed notices source graph is required.",
+    wave.partial,
   );
-  return notices;
-}
-
-/** The sign-in and money wave follows notices, and its regenerated pins
- * replace the notices pins the same way once its three sources are registered. */
-async function registeredSignInAndMoneyProfile(signal?: AbortSignal) {
-  signal?.throwIfAborted();
-  const active = await Promise.all(
-    signInAndMoney.sources.map(registeredMigration),
-  );
-  signal?.throwIfAborted();
-  if (active.every((source) => !source)) return undefined;
-  invariant(
-    active.every(
-      (source, index) =>
-        source?.version === signInAndMoney.sources[index]!.version &&
-        source.checksum === signInAndMoney.sources[index]!.checksum,
-    ),
-    "comparison_unconfigured",
-    "The complete reviewed sign-in and money source graph is required.",
-  );
-  return signInAndMoney;
-}
-
-/** Fixed next wave; partial registrations never select a runtime profile. */
-async function registeredWorkspaceLockProfile(signal?: AbortSignal) {
-  signal?.throwIfAborted();
-  const active = await Promise.all(
-    workspaceLockReview.sources.map(registeredMigration),
-  );
-  signal?.throwIfAborted();
-  if (active.every((source) => !source)) return undefined;
-  invariant(
-    active.every(
-      (source, index) =>
-        source?.version === workspaceLockReview.sources[index]!.version &&
-        source.checksum === workspaceLockReview.sources[index]!.checksum,
-    ),
-    "comparison_unconfigured",
-    "The complete reviewed workspace-lock source graph is required.",
-  );
-  return freeze(workspaceLockReview);
-}
-
-/** Exact additive reply-review source; reservations cannot select this graph. */
-async function registeredReplyReviewProfile(signal?: AbortSignal) {
-  signal?.throwIfAborted();
-  const active = await Promise.all(
-    replyReview.sources.map(registeredMigration),
-  );
-  signal?.throwIfAborted();
-  if (active.every((source) => !source)) return undefined;
-  invariant(
-    active.every(
-      (source, index) =>
-        source?.version === replyReview.sources[index]!.version &&
-        source.checksum === replyReview.sources[index]!.checksum,
-    ),
-    "comparison_unconfigured",
-    "The complete reviewed reply-review source graph is required.",
-  );
-  return freeze(replyReview);
-}
-
-/** Exact additive creator/fan denial source; reservations cannot select this graph. */
-async function registeredStudioReplyAuthorityProfile(signal?: AbortSignal) {
-  signal?.throwIfAborted();
-  const active = await Promise.all(
-    studioReplyAuthorityReview.sources.map(registeredMigration),
-  );
-  signal?.throwIfAborted();
-  if (active.every((source) => !source)) return undefined;
-  invariant(
-    active.every(
-      (source, index) =>
-        source?.version ===
-          studioReplyAuthorityReview.sources[index]!.version &&
-        source.checksum === studioReplyAuthorityReview.sources[index]!.checksum,
-    ),
-    "comparison_unconfigured",
-    "The complete reviewed creator/fan denial source graph is required.",
-  );
-  return freeze(studioReplyAuthorityReview);
-}
-
-/** Exact additive Follow metadata source; a reservation cannot select this graph. */
-async function registeredCoreFollowProfile(signal?: AbortSignal) {
-  signal?.throwIfAborted();
-  const active = await Promise.all(
-    coreFollowReview.sources.map(registeredMigration),
-  );
-  signal?.throwIfAborted();
-  if (active.every((source) => !source)) return undefined;
-  invariant(
-    active.every(
-      (source, index) =>
-        source?.version === coreFollowReview.sources[index]!.version &&
-        source.checksum === coreFollowReview.sources[index]!.checksum,
-    ),
-    "comparison_unconfigured",
-    "The complete reviewed core Follow source graph is required.",
-  );
-  return freeze(coreFollowReview);
-}
-
-/** The three pilot columns register together; a partial set selects nothing. */
-async function registeredPilotColumnsProfile(signal?: AbortSignal) {
-  signal?.throwIfAborted();
-  const active = await Promise.all(
-    pilotColumnsReview.sources.map(registeredMigration),
-  );
-  signal?.throwIfAborted();
-  if (active.every((source) => !source)) return undefined;
-  invariant(
-    active.every(
-      (source, index) =>
-        source?.version === pilotColumnsReview.sources[index]!.version &&
-        source.checksum === pilotColumnsReview.sources[index]!.checksum,
-    ),
-    "comparison_unconfigured",
-    "The complete reviewed pilot-columns source graph is required.",
-  );
-  return freeze(pilotColumnsReview);
+  return wave.review;
 }
 
 /** Exact executable source selects independently reviewed metadata only.
  * Reservations and hand-installed ledger entries cannot activate this profile.
- * Original owners still check their actual source, purpose and transaction. */
-export async function registeredComparisonProfile(signal?: AbortSignal) {
-  signal?.throwIfAborted();
-  const active = await Promise.all(profile.sources.map(registeredMigration));
-  signal?.throwIfAborted();
-  if (active.every((source) => !source)) return undefined;
-  invariant(
-    active.every(
-      (source, index) =>
-        source?.version === profile.sources[index]!.version &&
-        source.checksum === profile.sources[index]!.checksum,
-    ),
-    "comparison_unconfigured",
-    "The complete reviewed comparison source graph is required.",
-  );
-  const head = await registeredNoticesProfile(signal);
-  const next = await registeredSignInAndMoneyProfile(signal);
-  const workspace = await registeredWorkspaceLockProfile(signal);
-  const reply = await registeredReplyReviewProfile(signal);
-  const studio = await registeredStudioReplyAuthorityProfile(signal);
-  const follow = await registeredCoreFollowProfile(signal);
-  const pilot = await registeredPilotColumnsProfile(signal);
-  invariant(
-    follow || !pilot,
-    "comparison_unconfigured",
-    "The pilot columns require the complete core Follow predecessor.",
-  );
-  invariant(
-    studio || !follow,
-    "comparison_unconfigured",
-    "Core Follow metadata requires the complete creator/fan denial predecessor.",
-  );
-  invariant(
-    reply || !studio,
-    "comparison_unconfigured",
-    "Creator/fan denial requires the complete reply-review predecessor.",
-  );
-  invariant(
-    workspace || !reply,
-    "comparison_unconfigured",
-    "Reply review requires the complete workspace-lock predecessor.",
-  );
-  invariant(
-    next || !workspace,
-    "comparison_unconfigured",
-    "Workspace locking requires the complete sign-in and money predecessor.",
-  );
-  invariant(
-    head || !next,
-    "comparison_unconfigured",
-    "The sign-in and money wave requires the complete reviewed notices source graph.",
-  );
-  return head
+ * Original owners still check their actual source, purpose and transaction.
+ * The later head waves follow comparison in the chain's order. Every pinned
+ * catalogue lists every relation, so once a wave's sources are registered its
+ * regenerated pins describe the complete graph and replace the ones before. */
+export async function registeredComparisonProfile(
+  signal?: AbortSignal,
+): Promise<HeadReview | undefined> {
+  const [comparison, notices, ...later] = headWaves;
+  const profile = await registeredWave(comparison, signal);
+  if (!profile) return undefined;
+  // reviews[0] is notices', and reviews[index + 1] is later[index]'s.
+  const reviews = [await registeredWave(notices, signal)];
+  for (const wave of later) reviews.push(await registeredWave(wave, signal));
+  // A wave is selected only on top of the complete wave before it, checked
+  // from the newest down. Notices' predecessor, comparison, is required above.
+  for (let index = later.length - 1; index >= 0; index--)
+    invariant(
+      reviews[index] || !reviews[index + 1],
+      "comparison_unconfigured",
+      later[index]!.requires,
+    );
+  const selected = [
+    profile,
+    ...reviews.filter((review) => review !== undefined),
+  ];
+  return selected.length > 1
     ? freeze({
-        ...profile,
-        ...head,
-        ...next,
-        ...workspace,
-        ...reply,
-        ...studio,
-        ...follow,
-        ...pilot,
-        sources: [
-          ...profile.sources,
-          ...head.sources,
-          ...(next?.sources ?? []),
-          ...(workspace?.sources ?? []),
-          ...(reply?.sources ?? []),
-          ...(studio?.sources ?? []),
-          ...(follow?.sources ?? []),
-          ...(pilot?.sources ?? []),
-        ],
+        ...selected.reduce((head, review) => ({ ...head, ...review })),
+        sources: selected.flatMap((review) => review.sources),
       })
     : profile;
 }

@@ -1,23 +1,11 @@
-import generationReview from "../../../infra/migrations/reviews/20261007-generation-privacy.json" with { type: "json" };
-import contentReview from "../../../infra/migrations/reviews/20261007-content-privacy.json" with { type: "json" };
-import outputReview from "../../../infra/migrations/reviews/20261007-generation-first-visible.json" with { type: "json" };
-import publicAIReview from "../../../infra/migrations/reviews/20261007-public-ai.json" with { type: "json" };
-import recoveryReview from "../../../infra/migrations/reviews/20261007-generation-recovery.json" with { type: "json" };
-import partialRecoveryReview from "../../../infra/migrations/reviews/20261007-partial-generation-recovery.json" with { type: "json" };
-import comparisonReview from "../../../infra/migrations/reviews/20261008-comparison.json" with { type: "json" };
-import noticesReview from "../../../infra/migrations/reviews/20261015-notices.json" with { type: "json" };
-import signInAndMoneyReview from "../../../infra/migrations/reviews/20261015-sign-in-and-money.json" with { type: "json" };
-import workspaceLockReview from "../../../infra/migrations/reviews/20261022-workspace-lock.json" with { type: "json" };
-import replyReview from "../../../infra/migrations/reviews/20261023-reply-review.json" with { type: "json" };
-import studioReplyAuthorityReview from "../../../infra/migrations/reviews/20261023-studio-reply-authority.json" with { type: "json" };
-import coreFollowReview from "../../../infra/migrations/reviews/20261027-core-follow.json" with { type: "json" };
-import pilotColumnsReview from "../../../infra/migrations/reviews/20261101-pilot-columns.json" with { type: "json" };
 import { readFile } from "node:fs/promises";
+import { reviewedWaves as table } from "../src/db/reviewed-waves.js";
 import { repositoryRoot, sha256 } from "./migration-custody.js";
 
 // The one reader of infra/migrations/chain.json for scripts/migrate-trust.ts
-// and the local installer (src/operations/local/fresh-install.ts), and the
-// table of reviewed waves both check the chain against.
+// and the local installer (src/operations/local/fresh-install.ts). Both check
+// the chain against the table of reviewed waves, which src/db/reviewed-waves.ts
+// shares with the runtime's head profile.
 
 export type ChainSource = { version: string; path: string; checksum: string };
 const chainSources = (value: unknown): value is ChainSource[] =>
@@ -46,28 +34,9 @@ const sourceVersions = (sources: readonly { version: string }[]) =>
   new Set(sources.map((source) => source.version));
 /** Each wave after the canonical bootstrap that this revision has a review
  * for, with the versions its review names. */
-export const reviewedWaves: ReadonlyMap<string, ReadonlySet<string>> = new Map([
-  ["20261007-generation", sourceVersions(generationReview.sources)],
-  ["20261007-content", sourceVersions([contentReview.source])],
-  ["20261007-generation-output", sourceVersions([outputReview.source])],
-  ["20261007-public-ai", sourceVersions(publicAIReview.sources)],
-  ["20261007-generation-recovery", sourceVersions([recoveryReview.source])],
-  [
-    "20261007-partial-generation-recovery",
-    sourceVersions([partialRecoveryReview.source]),
-  ],
-  ["20261008-comparison", sourceVersions(comparisonReview.sources)],
-  ["20261015-notices", sourceVersions(noticesReview.sources)],
-  ["20261015-sign-in-and-money", sourceVersions(signInAndMoneyReview.sources)],
-  ["20261022-workspace-lock", sourceVersions(workspaceLockReview.sources)],
-  ["20261023-reply-review", sourceVersions(replyReview.sources)],
-  [
-    "20261023-studio-reply-authority",
-    sourceVersions(studioReplyAuthorityReview.sources),
-  ],
-  ["20261027-core-follow", sourceVersions(coreFollowReview.sources)],
-  ["20261101-pilot-columns", sourceVersions(pilotColumnsReview.sources)],
-]);
+export const reviewedWaves: ReadonlyMap<string, ReadonlySet<string>> = new Map(
+  table.map(({ id, sources }) => [id, sourceVersions(sources)] as const),
+);
 
 /** A wave of the chain's fresh list. Its packet is parsed from the bytes
  * whose checksum the chain holds; only its baseline and wave are checked. */
