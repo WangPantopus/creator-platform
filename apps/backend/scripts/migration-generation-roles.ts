@@ -202,8 +202,11 @@ export async function assertGenerationWaveRoleSafety(
   wave: string,
 ) {
   const selected = reviewedWaves.findIndex((row) => row.id === wave);
+  // From comparison on, a wave's review is its head row's.
+  const headRow = headWaves.find((row) => row.id === wave);
   if (
     selected < 0 ||
+    (selected >= places.comparison && !headRow) ||
     purposeReview.schemaVersion !== 1 ||
     purposeReview.postgresMajor !== 17 ||
     purposeReview.sourceReview !== "20261007-generation-privacy" ||
@@ -225,9 +228,9 @@ export async function assertGenerationWaveRoleSafety(
   const notices = at(places.notices);
   const comparison = at(places.comparison);
   // Every pinned catalogue lists every relation, so the newest installed
-  // wave's review holds the current pins.
-  const head =
-    headWaves.find((row) => row.id === wave)?.review ?? comparisonReview;
+  // wave's review holds the current pins. Before comparison nothing reads
+  // them, and main gave those waves comparison's review.
+  const head = headRow?.review ?? comparisonReview;
   const recovery = at(places.recovery);
   const selectedRecovery = at(places.partialRecovery)
     ? partialRecoveryReview

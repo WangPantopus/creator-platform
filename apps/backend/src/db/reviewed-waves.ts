@@ -376,10 +376,12 @@ export const reviewedWaves: readonly Readonly<{
 
 // The role checks and the trust catalogue modules find a wave's row by its id,
 // and the wave before it in the row before it. So the table loads only with
-// one row per wave, each after the wave whose packet its review pins; the
-// generator checks those pins against the chain. The head profile checks
-// them itself from notices on.
-const notices = reviewedWaves.length - headWaves.length + 1;
+// one row per wave, each after the wave whose packet its review pins (the
+// generator checks those pins against the chain), and with the head waves, in
+// their order, as every row from comparison on, so that each of those waves
+// gets its head row's refusals and review. The head profile checks the head
+// waves' order itself from notices on.
+const comparison = reviewedWaves.findIndex(({ id }) => id === headWaves[0].id);
 for (const [index, row] of reviewedWaves.entries()) {
   const before = reviewedWaves[index - 1];
   if (reviewedWaves.findIndex((other) => other.id === row.id) !== index)
@@ -387,7 +389,7 @@ for (const [index, row] of reviewedWaves.entries()) {
       `Reviewed wave ${row.id} has two rows; each wave needs exactly one (step 6 in docs/engineering/migrations.md).`,
     );
   if (
-    index < notices &&
+    index <= comparison &&
     row.baselineWave?.path !==
       (before && `infra/migrations/waves/${before.id}.json`)
   )
@@ -395,3 +397,9 @@ for (const [index, row] of reviewedWaves.entries()) {
       `Reviewed wave ${row.id} is out of the chain's order; each row's review pins the packet of the row before it (step 6 in docs/engineering/migrations.md).`,
     );
 }
+const rows = reviewedWaves.slice(comparison);
+for (let index = 0; index < Math.max(rows.length, headWaves.length); index++)
+  if (rows[index]?.id !== headWaves[index]?.id)
+    throw new Error(
+      `Reviewed wave ${rows[index]?.id ?? headWaves[index]!.id} has no head row; the rows from ${headWaves[0].id} on are the head waves, in their order (step 6 in docs/engineering/migrations.md).`,
+    );
