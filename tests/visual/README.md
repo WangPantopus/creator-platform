@@ -6,7 +6,7 @@ reference server. Avoid a simultaneous Next build because both commands write
 `.next`.
 
 The reference serves the original JavaScript component bundle and exported HTML,
-restores missing `support.js`, applies only the requested BUILD_PROMPT section 9
+restores missing `support.js`, applies only the requested [BUILD_PROMPT section 9](../../docs/archive/BUILD_PROMPT.md#9-known-design-fixes-to-apply-while-building)
 corrections and uses the same locally bundled fonts and generated theme tokens.
 The implementation compiles layouts into React with the typed component port.
 Neither reference rendering nor its stylesheet imports application components.

@@ -5,7 +5,7 @@
 // actual digests. Stops at the first refusal. Uses only a disposable container on
 // lane 0's spare port and a private temporary directory, and removes both.
 //   (cd apps/backend && pnpm exec tsx ../../tests/scenarios/integrator/operator-walk.mts)
-// On main at 2026-10-15 the first wave is refused: see docs/operations/CURRENT.md.
+// On main at 2026-10-15 the first wave is refused: see docs/archive/operations/CURRENT.md.
 import { execFileSync, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import {

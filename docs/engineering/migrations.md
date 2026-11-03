@@ -36,7 +36,7 @@ reset.
 2. Write the wave file: copy the previous baseline, add the previous wave's sources to it by hand,
    and list the new sources.
 3. Regenerate the catalogue pins on scratch databases with the catalogue tool (snapshot at the old
-   head, apply, `diff`, `write`; [the procedure](../lanes/status/lane-2-catalogue-pins.md)), and
+   head, apply, `diff`, `write`; [the procedure](catalogue-pins.md)), and
    write the review file. Measure the populated variants on a restored copy when the wave changes
    them.
 4. Teach the operator and the runtime the new wave: `activate-wave.ts`, `migrate-trust.ts`, the

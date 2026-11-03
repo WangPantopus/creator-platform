@@ -1,4 +1,4 @@
-// E4.9 and the founder's decision 2 (lane-4-decisions.md, taken as the
+// E4.9 and the founder's decision 2 (docs/archive/lanes/status/lane-4-decisions.md, taken as the
 // proposed default on 2026-10-16): a request Maya accepted and then did not
 // deliver gives its weekly slot back once it is refunded in full. With a full
 // week, the slot stays taken while the refund is in flight (nothing is freed

@@ -93,7 +93,7 @@ const apiKey =
   process.env.ANTHROPIC_API_KEY ?? (config.testing ? "test-key" : "");
 if (!apiKey) {
   process.stderr.write(
-    "ANTHROPIC_API_KEY is not set. Start the gateway with the key passed from the Keychain; see docs/operations/anthropic-provider.md.\n",
+    "ANTHROPIC_API_KEY is not set. Start the gateway with the key passed from the Keychain; see docs/engineering/anthropic-provider.md.\n",
   );
   process.exit(2);
 }

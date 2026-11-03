@@ -15,7 +15,7 @@ import { captureRoles, diffSnapshots, type Snapshot } from "./snapshot.js";
 // Reviewed catalogue pins: check them, snapshot a database before a migration,
 // say what the migration changed, and rewrite the pins that must change.
 // Read-only against the database, always. See
-// docs/lanes/status/lane-2-catalogue-pins.md for the procedure.
+// docs/engineering/catalogue-pins.md for the procedure.
 
 const repoRoot = join(
   dirname(fileURLToPath(import.meta.url)),

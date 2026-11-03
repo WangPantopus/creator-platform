@@ -268,7 +268,7 @@ The October finish plan's ten milestones are folded into these phases; the plan 
 ## Provider switch notes (to verify at migration time)
 
 The full checklist is in the [launch review](archive/operations/launch-review-2026-10-08.md), section 13.
-The day-to-day setup is in [Claude as the generation provider](operations/anthropic-provider.md).
+The day-to-day setup is in [Claude as the generation provider](engineering/anthropic-provider.md).
 
 - **Timing.** A model or provider change alters every published version's engine
   fingerprint, so it is an engine upgrade. Until a creator publishes, it is free. Afterwards

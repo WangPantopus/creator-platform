@@ -1,6 +1,6 @@
 /** Typed port of design/design-system/project/components/bundle.js.
  * The qv class structure and compositions intentionally preserve the reference.
- * Approved visual corrections are recorded in docs/BUILD_LOG.md. */
+ * Approved visual corrections are recorded in docs/engineering/design-verification.md. */
 import * as React from "react";
 import { brand } from "@qelvora/brand";
 import { copy, formatCopy } from "@qelvora/copy";

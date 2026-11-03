@@ -19,7 +19,7 @@ node infra/local/stack.mjs up --lane N --base-port P [--growth] [--no-web] [--no
   the data), `down` (removes everything the stack created) and `reset` (`down`, then `up`).
 - `catalogues check|snapshot|diff|write` compares the database with the reviewed catalogue pins.
   A new migration changes them, and the product refuses to start until they are regenerated
-  ([the procedure](../lanes/status/lane-2-catalogue-pins.md)).
+  ([the procedure](catalogue-pins.md)).
 - `--growth` also composes the Growth module, which the public creator page needs.
 - Each stack takes its own block of ten ports, chosen by `--lane` or `--base-port`. Only containers,
   volumes and files that carry the stack's own name and label are ever reused or removed.
@@ -37,7 +37,7 @@ node infra/local/stack.mjs up --lane N --base-port P [--growth] [--no-web] [--no
   proves plumbing, not model quality or guard strictness. It can also inject provider failures.
 - **Claude instead of the fake:** `--provider anthropic` speaks Claude's protocol to the same fake
   at no cost. The real model goes through the founder's capped gateway, the only process that holds
-  the key ([Claude as the generation provider](../operations/anthropic-provider.md)).
+  the key ([Claude as the generation provider](anthropic-provider.md)).
 - **Sign-in** on the stack uses the development accounts: fans 1 and 2, Maya (the creator) 3, the
   ops supervisor 4. Nothing about a fan, consent, grant, payment or message is seeded; Maya's AI is
   published through the real Studio API.

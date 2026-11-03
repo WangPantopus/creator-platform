@@ -1,7 +1,7 @@
 #!/bin/sh
 # Lane 5: stop the scenario host, return the database to the clean template,
 # start the host again and wait until it answers. Run from anywhere; needs node
-# on PATH (the toolchain block in docs/lanes/01-working-agreement.md 3.7).
+# on PATH (the toolchain block in docs/archive/lanes/01-working-agreement.md 3.7).
 set -eu
 ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 cd "$ROOT"
