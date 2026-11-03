@@ -1,3 +1,0 @@
-draftClearedAfterSeconds=2.6663769239967223
-sendAvailableAfterSeconds=31.56617732401355
-UI observations; not HTTP timing or percentile qualification.

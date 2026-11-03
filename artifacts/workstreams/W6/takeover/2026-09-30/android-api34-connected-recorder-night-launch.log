@@ -1,7 +1,0 @@
-Starting: Intent { cmp=com.pantopus.qelvora/.MainActivity (has extras) }
-Status: ok
-LaunchState: COLD
-Activity: com.pantopus.qelvora/.MainActivity
-TotalTime: 2330
-WaitTime: 2346
-Complete
