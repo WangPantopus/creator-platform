@@ -26,7 +26,8 @@ still passes, and so does `evidence-budget` on runs that aren't pull requests.
 
 - **Pull requests:** when one opens, and each time its branch changes. A pull request's branch runs
   only as a pull request; pushes run only on `main`.
-- **Pushes to `main`:** every push, normally a merge.
+- **Pushes to `main`:** every merge. `main` takes changes only through pull requests
+  ([branch protection](#branch-protection)).
 - **Every night at 12:17 UTC:** a full run of `main`. That is this repository's quietest CI hour, and
   the odd minute avoids the rush of scheduled runs on the hour.
 - **On demand:** `workflow_dispatch` ("Run workflow" in the Actions tab) starts a full run.
@@ -127,26 +128,43 @@ support, trust and status web pages, `infra/` or the workflow itself. It runs `g
 backend and web typechecks and builds, and then states that compilation is not release readiness
 ([release](release.md)).
 
-## Required checks
+## Branch protection
 
-The checks to require are the six job names of `ci.yml`: `evidence-budget`, `web-and-backend`,
-`web-visual`, `ios-foundation`, `android-foundation` and `android-runtime`. All six can be required
-because a skipped job reports success.
+`main` has been protected since 2026-11-03, with the founder's yes:
+
+- **Every change goes through a pull request.** No approval is required: every session runs as the
+  founder's account, and GitHub doesn't let an author approve their own pull request.
+- **The required checks below must pass.**
+- **The rules apply to admins too,** so no session can push to `main` directly.
+- **A branch doesn't need to be up to date with `main` before it merges.** The push run on `main` and
+  the nightly run catch breakage that shows only when changes combine.
+- **No force pushes,** and `main` can't be deleted.
+- **Merge commits only:** squash and rebase merging are off for the repository.
+
+### Required checks
+
+The required checks are the six job names of `ci.yml`, pinned to GitHub Actions (app id 15368):
+`evidence-budget`, `web-and-backend`, `web-visual`, `ios-foundation`, `android-foundation` and
+`android-runtime`. All six can be required because a skipped job reports success.
 
 - **Never `changes`.** It only decides what runs, and when it fails, every gated job runs instead.
 - **Never `compile` from `trust-release.yml`.** That workflow has a workflow-level `paths:` filter,
   so on other pull requests it reports nothing, and a required check that never reports blocks the
   merge.
 
-`main` has no branch protection yet, so nothing enforces these checks. Protecting `main` waits for
-the founder's yes ([STATUS](../STATUS.md#wave-5-in-progress)). Until then, pull requests merge only
-after every check passes ([how work runs](../STATUS.md#how-work-runs)).
+**Don't use `[skip ci]`.** If a pull request's head commit message contains it, or another of
+GitHub's skip markers such as `[ci skip]` or `[no ci]`, the workflow doesn't run. The required
+checks then never report, and the pull request can't merge. A marker in a pull request's title
+skips the push run on `main` after the merge instead, because the merge commit's message carries
+the title.
 
 ## Where CI is going
 
 From the [consolidation plan](../CONSOLIDATION_PLAN.md), sections 5 and 6. The founder approved the
-plan; which checks become required, and scenarios in CI, are among the section 6 working rules that
-are still open.
+plan, and on 2026-11-03 settled two of its section 6 working rules: the required checks
+([above](#branch-protection)), and tests, which are end-to-end only, with no unit tests. Whether
+scenarios run in CI is still open, and so is whether the existing suites keep running in CI as
+regression gates. Today they do.
 
 - **Done in #530, merged on 2026-11-03:** the macOS jobs run only when their paths change, and the
   full matrix runs every night.

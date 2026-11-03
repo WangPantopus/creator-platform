@@ -47,6 +47,10 @@ area's scenarios.
 - **Invariants are not negotiable in design.** If a design needs an invariant
   (INV-01 to INV-25) to bend, raise it with the founder instead of designing
   around it.
+- **Tests are end-to-end.** Prove every change with end-to-end tests that launch
+  the real apps (web in a browser, iOS on a simulator or iPhone, Android on an
+  emulator or phone) against a real stack. Don't write unit tests
+  ([decision log](docs/BRIEF.md#14-decision-log), 2026-11-03).
 - **Keep the docs current.** After each milestone, tick it off in
   `docs/DESIGN_PLAN.md`, add artifact links, and add decisions to the brief's
   decision log. Update `docs/STATUS.md` in place instead of writing a dated

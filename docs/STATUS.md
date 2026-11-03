@@ -73,8 +73,10 @@ in the Wave 6 queue.
     and `cost` (the founder's spreadsheet, whose future is still open). To restore an archived
     branch, see [setup](engineering/setup.md#archived-branches).
   - **Done on 2026-11-03: "delete branch on merge"** was turned on, with the founder's yes.
-  - Still waiting on the founder, one at a time: protect `main` with required checks; tag the
-    tree, then remove `artifacts/` from it.
+  - **Done on 2026-11-03: `main` is protected,** with the founder's yes. Every change goes through a
+    pull request, and the six CI jobs are required checks
+    ([engineering/ci.md](engineering/ci.md#branch-protection)).
+  - Still waiting on the founder: tag the tree, then remove `artifacts/` from it.
 
 ## Next
 
@@ -106,12 +108,15 @@ Closed with a note and their branches kept. Each returns with the feature that n
 Approved on 2026-11-01: the consolidation plan, the native sign-in wording ("Sign in to continue"
 and "Sign-in is unavailable right now. Try again in a moment."), the home glyph for Today, the local
 installs, "three now, rest later" for Wave 4, and one coordinating session plus one work session
-per task. Still open:
+per task. Approved on 2026-11-03: the required checks, and tests that are end-to-end only. No unit
+tests from now on: every change is proven by end-to-end tests that launch the real apps against a
+real stack. That declines the plan's proposal to allow unit tests for pure logic, and confirms the
+2026-10-09 rule. Still open:
 
 - **How we work:** the working rules in [plan section 6](CONSOLIDATION_PLAN.md#6-how-we-work-from-now-on)
-  (required checks, scenarios in CI, unit tests for pure logic, parallel sessions); the native
-  presence budget; repository visibility (public today); the old Mac's preserved stacks; the cost
-  spreadsheet.
+  (scenarios in CI, parallel sessions); whether the existing suites keep running in CI as regression
+  gates (the 2026-10-09 rule keeps them); the native presence budget; repository visibility (public
+  today); the old Mac's preserved stacks; the cost spreadsheet.
 - **The road to the pilot:** hosting; the domain and passkey ID; Apple and Google sign-in IDs, and
   counsel on the 18+ method; the creator license terms and verifier; the embedding provider, the
   Anthropic key and the consent wording; Stripe keys and the account topology; store accounts, push
