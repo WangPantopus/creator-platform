@@ -55,6 +55,7 @@ private struct NativeTeamAcceptance {
     private var generation = 0
     private var checkedUntil: TimeInterval = 0
     private var dueAt: TimeInterval = 0
+    private var readStarted: TimeInterval = 0
     private var readToken = 0
     private var readTask: Task<Void, Never>?
     private var writeTask: Task<Void, Never>?
@@ -63,11 +64,12 @@ private struct NativeTeamAcceptance {
     var ready: Bool { session?.checkingSession == false && session?.busy == false && session?.error.isEmpty == true }
     // The session's own re-check (every 30 s) is a refresh too: only actions wait for it.
     private var rechecking: Bool { session?.checkingSession == true && session?.busy == false && session?.error.isEmpty == true }
-    /// The team on screen. A refresh (a read, a save or that re-check) keeps it, and the
-    /// person's place in it, until the refresh ends, for at most 5 s past the lease. Every
-    /// action still needs the lease and a ready session.
+    /// The team on screen. A refresh keeps it, and the person's place in it, until the refresh
+    /// ends: a read for as long as it can still succeed (5 s from its start), a save or that
+    /// re-check for up to 5 s past the lease. Every action still needs the lease and a ready
+    /// session.
     var shown: Bool { current && (ready || rechecking) }
-    private var held: Bool { now < checkedUntil || ((reading || saving || rechecking) && now < checkedUntil + 5) }
+    private var held: Bool { now < checkedUntil || (reading && now < readStarted + 5) || ((saving || rechecking) && now < checkedUntil + 5) }
     var manages: Bool { shown && creator?.owned == true && creator?.verification == "verified" }
     var mayManage: Bool { manages && ready && now < checkedUntil }
     var mayAccept: Bool { ready && current && now < checkedUntil && creatorId == nil && !saving }
@@ -129,7 +131,7 @@ private struct NativeTeamAcceptance {
         guard ready else { if rechecking { dueAt = 0 } else { conceal() }; return }
         let snapshot = generation, started = now
         readToken &+= 1; let token = readToken
-        reading = true; dueAt = started + 3
+        reading = true; readStarted = started; dueAt = started + 3
         readTask = Task { [weak self] in
             guard let self else { return }
             var ended = false

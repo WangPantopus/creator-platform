@@ -77,17 +77,19 @@ private class NativeTeamState(
     private var generation = 0
     private var checkedUntil = 0L
     private var dueAt = 0L
+    private var readStarted = 0L
     private var readToken = 0
     private var readJob: Job? = null
     private var writeJob: Job? = null
     val ready: Boolean get() = !session.checkingSession && !session.busy && session.error.isEmpty()
     // The session's own re-check (every 30 s) is a refresh too: only actions wait for it.
     private val rechecking: Boolean get() = session.checkingSession && !session.busy && session.error.isEmpty()
-    /** The team on screen. A refresh (a read, a save or that re-check) keeps it, and the
-     * person's place in it, until the refresh ends, for at most 5 s past the lease. Every
-     * action still needs the lease and a ready session. */
+    /** The team on screen. A refresh keeps it, and the person's place in it, until the refresh
+     * ends: a read for as long as it can still succeed (5 s from its start), a save or that
+     * re-check for up to 5 s past the lease. Every action still needs the lease and a ready
+     * session. */
     val shown: Boolean get() = current && (ready || rechecking)
-    private val held: Boolean get() = SystemClock.elapsedRealtime().let { it < checkedUntil || ((reading || saving || rechecking) && it < checkedUntil + 5_000) }
+    private val held: Boolean get() = SystemClock.elapsedRealtime().let { it < checkedUntil || (reading && it < readStarted + 5_000) || ((saving || rechecking) && it < checkedUntil + 5_000) }
     val manages: Boolean get() = shown && creator?.owned == true && creator?.verification == "verified"
     val mayManage: Boolean get() = manages && ready && SystemClock.elapsedRealtime() < checkedUntil
     private val mayAcceptDuringWrite: Boolean get() = ready && current && SystemClock.elapsedRealtime() < checkedUntil && creatorId == null
@@ -136,7 +138,7 @@ private class NativeTeamState(
         if (!active || reading || saving) return
         if (!ready) { if (rechecking) dueAt = 0 else conceal(); return }
         val snapshot = generation; val started = SystemClock.elapsedRealtime(); val token = ++readToken
-        reading = true; dueAt = started + 3_000
+        reading = true; readStarted = started; dueAt = started + 3_000
         readJob = scope.launch {
             var ended = false
             try {
