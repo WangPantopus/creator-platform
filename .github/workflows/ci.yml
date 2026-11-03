@@ -115,8 +115,11 @@ jobs:
                 # The workflows, local actions and every other .gitattributes change how jobs run or
                 # how files are checked out, so they run the full matrix.
                 .github/workflows/* | .github/actions/* | .gitattributes | */.gitattributes) native=true visual=true ;;
-                # Files no gated job reads.
-                .github/* | AGENTS.md | CLAUDE.md | README.md | .gitignore | .prettierignore | eslint.config.mjs) ;;
+                # Files no gated job reads. Any other .github/ path, such as a new local action, runs
+                # everything.
+                .github/CODEOWNERS | .github/*.md | .github/ISSUE_TEMPLATE/* | .github/PULL_REQUEST_TEMPLATE*) ;;
+                .github/FUNDING.yml | .github/dependabot.yml) ;;
+                AGENTS.md | CLAUDE.md | README.md | .gitignore | .prettierignore | eslint.config.mjs) ;;
                 scripts/check-evidence-budget.mjs | scripts/shared.test.mjs | scripts/rename-brand.mjs) ;;
                 scripts/with-heavy-build-lock.mjs) ;;
                 # Any other path that no group claimed might matter, so it runs everything.
@@ -127,7 +130,8 @@ jobs:
             if [ -n "$unclassified" ]; then
               native=true
               visual=true
-              reason="$reason; $(printf %q "$unclassified") is in no group"
+              # Only letters, digits and ._/- reach the log and the Markdown summary.
+              reason="$reason; ${unclassified//[^[:alnum:]._\/-]/?} is in no group"
             fi
           fi
           echo "Native jobs run: $native. Visual job runs: $visual. Basis: $reason." | tee -a "$GITHUB_STEP_SUMMARY"
