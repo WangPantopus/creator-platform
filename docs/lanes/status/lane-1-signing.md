@@ -5,6 +5,9 @@ and 9, and the Android passkey limit). The signing panel is fixed in lane 1's co
 needs a lane 6 change (a verified patch is below); the founder decided the other two on
 2026-10-15, and the recovery split is built.
 
+Updated 2026-11-02: #527 registered the retirement column as migration 0256, and the interim reads
+in section 2 are gone.
+
 ## 1. A pending publication stays stuck after the five-minute window (row 8)
 
 **What happens.** When a creator signs a Note and the publish answer is lost (the network drops,
@@ -77,18 +80,19 @@ retires the key and past signatures stay valid; a compromised device keeps today
 
 **What was built** (pull request stacked on this file's first one):
 
-- A passkey can be **retired** (`passkey_credential.retired_at`, one pending migration). A retired
-  key can never sign again: signing checks `revoked_at` and `retired_at` (`signed-acts.ts`,
-  `subjects.ts`). Every reader of past acts (the public page, commerce, content, media, the
-  signature-read fences) checks only `revoked_at` and the signature flags, so past acts stay valid
-  with no other lane's code touched.
-- Until the integrator registers `pending-passkey-retirement.sql`, the three signing reads and the
-  key list read the column as `to_jsonb(pc)->>'retired_at'`, which is null while the column does
-  not exist. Signing therefore works on a database with registered migrations only (CI's backend
-  suite: 157 of 157), and retirement is enforced once the column exists (the key-loss scenario
-  below). Before registration the two lost-device updates fail inside their transaction and
-  change nothing (read from the code, not run). Once it is registered, lane 1 replaces the four
-  reads with the plain column.
+- A passkey can be **retired** (`passkey_credential.retired_at`, migration
+  `0256_w1_passkey_retirement`). A retired key can never sign again: signing checks `revoked_at`
+  and `retired_at` (`signed-acts.ts`, `subjects.ts`). Every reader of past acts (the public page,
+  commerce, content, media, the signature-read fences) checks only `revoked_at` and the signature
+  flags, so past acts stay valid with no other lane's code touched.
+- **Registered by #527** (merged 2026-11-02, merge commit `cd065a0e0`). The wave
+  `20261101-pilot-columns` registers `pending-passkey-retirement.sql`, with its bytes unchanged, as
+  `0256_w1_passkey_retirement`. Its commit `6f44c8b22` replaced the four interim
+  `to_jsonb(pc)->>'retired_at'` reads (the three signing reads and the key list) with the plain
+  column. The account export now carries `retired_at` beside `revoked_at`. Every database with the
+  registered migrations has the column, so retirement is always enforced, and the backend suite
+  passes 157 of 157 with 0256 installed. Before #527 those reads returned null while the column did
+  not exist, and the two lost-device updates failed inside their transaction; that is history now.
 - **Lost** (`recover(actor, "lost")`, `revoke(actor, id, "lost")`): every working key is retired,
   open challenges are cancelled, and `recovery_started_at` is set. That alone requires a fresh
   sign-in and fresh, ops-approved proof before the next key. The creator stays verified and
@@ -108,8 +112,9 @@ retires the key and past signatures stay valid; a compromised device keeps today
 | `passkeyRecoveryCompromised`     | Someone else may have it                                                                                         |
 | `passkeyRecoveryCompromisedHelp` | Every past signature will show as revoked, because no one can tell which were yours.                             |
 
-**Known gap.** The publication authority's applied SQL (`schema-publication-scope.sql:194`)
-checks only `revoked_at` when it publishes a scheduled or media Note. An act signed in the five
+**Known gap, still open on 2026-11-02.** The publication authority's applied SQL
+(`schema-publication-scope.sql:194`) checks only `revoked_at` when it publishes a scheduled or media
+Note. An act signed in the five
 minutes before its key was retired could still be published by that worker, which is not running in
 the pilot. Fixing it needs a new migration replacing that function.
 
