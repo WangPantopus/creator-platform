@@ -88,13 +88,15 @@ in the Wave 6 queue.
 
 1. **Wave 6, migration registration.**
    - **The triage is merged** (#533). The [migration queue](engineering/migration-queue.md) has a row
-     for each unregistered SQL file. It counts 61: 5 needed for the pilot, 3 for the founder to
-     decide, 26 needed later, 16 obsolete and 11 that aren't migrations. Five of those 11 were
+     for each unregistered SQL file. It counts 61: 5 needed for the pilot, 2 for the founder to
+     decide, 27 needed later, 16 obsolete and 11 that aren't migrations. Five of those 11 were
      evidence copies under `artifacts/`, so 56 are left in the tree.
    - **Four places fail on every real database:** three in the ops console (naming a reviewer,
-     supervisor audits and lifting a pause) and one in Team triage.
-   - **The proposed pilot waves:** the ops console, then memory, then Team triage and store
-     memberships if the founder says so.
+     supervisor audits and lifting a pause) and one in Team triage. Team triage waits until after
+     the pilot (#535): until then the Studio must not offer the Triage role, and the server must
+     refuse to grant it.
+   - **The proposed pilot waves:** the ops console, then memory, then store memberships if the
+     founder says so.
    - **Next: the registration generator.** It makes registration data-driven: it generates the wave
      and review files, so nobody hand-edits baseline arrays. Files are registered only as features
      need them ([engineering/migrations.md](engineering/migrations.md)).
@@ -121,10 +123,10 @@ Closed with a note and their branches kept. Each returns with the feature that n
 Approved on 2026-11-01: the consolidation plan, the native sign-in wording ("Sign in to continue"
 and "Sign-in is unavailable right now. Try again in a moment."), the home glyph for Today, the local
 installs, "three now, rest later" for Wave 4, and one coordinating session plus one work session
-per task. Approved on 2026-11-03: the required checks, and tests that are end-to-end only. No unit
-tests from now on: every change is proven by end-to-end tests that launch the real apps against a
-real stack. That declines the plan's proposal to allow unit tests for pure logic and bug
-regressions, and confirms the 2026-10-09 rule. Still open:
+per task. Approved on 2026-11-03: the required checks, Team triage after the pilot, and tests that
+are end-to-end only. No unit tests from now on: every change is proven by end-to-end tests that
+launch the real apps against a real stack. That declines the plan's proposal to allow unit tests for
+pure logic and bug regressions, and confirms the 2026-10-09 rule. Still open:
 
 - **How we work:** the working rules in [plan section 6](CONSOLIDATION_PLAN.md#6-how-we-work-from-now-on)
   (scenarios in CI, parallel sessions); whether the existing suites keep running in CI as regression
@@ -137,12 +139,11 @@ regressions, and confirms the 2026-10-09 rule. Still open:
 - **Invariant and policy calls:** the INV-21 price rule, INV-22 one signature for accept and deliver,
   the A5 safety sign-off, deletion D1 to D4 and Q16, and ops P1 to P5.
 - **The migration queue** ([triage](engineering/migration-queue.md), #533):
-  1. whether basic Team (S-C10) includes triage;
-  2. whether pilot memberships are sold through the App Store and Google Play (D-14);
-  3. whether the pilot collects Helpful / Not helpful and offers the fan intro, which needs a
+  1. whether pilot memberships are sold through the App Store and Google Play (D-14);
+  2. whether the pilot collects Helpful / Not helpful and offers the fan intro, which needs a
      production successor to 0207;
-  4. confirming lane 3's INV-15 default for memory exclusions before the memory wave;
-  5. when the 16 obsolete files may be deleted and the 29 stale reservations released.
+  3. confirming lane 3's INV-15 default for memory exclusions before the memory wave;
+  4. when the 16 obsolete files may be deleted and the 29 stale reservations released.
 
 ## Follow-ups to schedule
 
