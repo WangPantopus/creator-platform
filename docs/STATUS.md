@@ -100,7 +100,7 @@ in the Wave 6 queue.
    - **The pilot waves:** the ops console (registered, below), then memory, then store memberships
      if the founder says so.
    - **The generator is merged** (#538). `pnpm generate` builds the wave packets and `chain.json`
-     from `infra/migrations.json`, and `generate:check` verifies them and 36 pinned records in CI.
+     from `infra/migrations.json`, and `generate:check` verifies them and 37 pinned records in CI.
      `wave-pins` measures the catalogue pins on marked scratch databases
      ([engineering/migrations.md](engineering/migrations.md)).
    - **`migrate-trust` reads the chain** (#541). Every source of a wave after the canonical

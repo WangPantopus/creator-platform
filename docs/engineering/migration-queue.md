@@ -192,6 +192,28 @@ GRANT EXECUTE ON FUNCTION creator_trust.may_supervise(text) TO creator_trust_run
 `creator_trust_runtime` is the only role that evaluates `audit_supervisor_read`, and every new
 function in the post-October waves revokes PUBLIC the same way.
 
+The independent review of the wave (#547) accepted the following.
+
+- **Deferring a pending pause action.** PostgreSQL combines permissive UPDATE policies by ORing
+  their USING clauses and, separately, their CHECK clauses. So 0023's `effect_recovery` combines
+  with 0261's `effect_cancel_pause`: a supervisor holding a case's lease can rewrite a
+  still-`pending` pause action as `pending`, with its `available_at` moved, even to `infinity`.
+  - No API path issues this. It takes direct SQL as `creator_trust_runtime`, which could just as
+    well cancel the pause.
+  - The restriction, the real gate, stays in force.
+  - A later trust wave can close it with a restrictive policy if wanted, for example
+    `USING (true) WITH CHECK (type <> 'agent.pause' OR state <> 'pending' OR available_at <= now())`.
+- **Looser than the runbook needs, and not a boundary**, because the owner can turn row security
+  off:
+  - `owner_admin` on `ops_member` also allows DELETE, and a deletion leaves no change-log row;
+  - `owner_end_lease`'s CHECK covers only `expires_at`;
+  - `restriction_lift` accepts any non-null `revoked_at`, not only the current time.
+
+The same review found a race in the lift itself (`trust/service.ts`), which 0261 made reachable:
+the lift looked for a running pause before it cancelled, and a worker could claim the pause action
+in between, so the action ran after the lift. The lift now cancels first and then looks, in the
+same transaction; the cancel's row lock keeps the worker's claim off the pause.
+
 ## Reserved numbers
 
 `infra/migrations.json` holds 59 reservations. None of them can be used as a version any more:
