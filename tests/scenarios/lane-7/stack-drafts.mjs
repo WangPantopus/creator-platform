@@ -119,7 +119,7 @@ async function publishDevon() {
   console.log("PASS real API: Devon's AI published through the Studio API");
 }
 async function prepare(platform) {
-  const number = platform === "android" ? 1 : 2;
+  const number = platform === "ios" ? 2 : 1;
   const owner = await signIn(number);
   let fan = owner.session.fan;
   if (!fan) {
@@ -514,7 +514,7 @@ async function android() {
 // The API half of D6 and the Home step, with no device: the deletion request
 // the apps' privacy screen sends. Fan one, as Android, so use another stack.
 async function apiOnly() {
-  const { fixture, token, path } = await prepare("android");
+  const { fixture, token, path } = await prepare("api");
   const job = await request("POST", "/v1/trust/privacy/jobs", token, {
     kind: "delete",
     scope: "thread",
