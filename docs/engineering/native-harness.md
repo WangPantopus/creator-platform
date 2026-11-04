@@ -170,12 +170,14 @@ need the simulator panel's "Let Claude use it" access; Android is driven with `a
 - **Restart the harness after editing a harness file.** `ensureHarness()` starts one only if nothing answers
   on the port, so an old process keeps serving old code. Find it with `pgrep -fl harness/server.mjs`, check
   its working directory (`lsof -p <pid> | grep cwd`) is your worktree, then `kill` it and start a new one.
-- **Every response says `Connection: close`.** The emulator reaches the harness through `adb reverse`, which
-  does not pass on Node's idle close of a keep-alive socket after 5 s; OkHttp then reused a dead connection
-  and failed with "unexpected end of stream" (it looked like "Account unavailable" or "Pantopus sign-in is
-  not connected" after a few idle seconds). One request per connection removes the problem. The real server
-  is affected too, and not only through `adb reverse`: see
-  [the native device checks' follow-up 12](native-device-checks.md#follow-ups).
+- **Every response says `Connection: close`,** unless the harness runs with `--keep-alive`. The emulator
+  reaches the harness through `adb reverse`, which does not pass on Node's idle close of a keep-alive socket
+  after 5 s; OkHttp then reused a dead connection and failed with "unexpected end of stream" (it looked like
+  "Account unavailable" or "Pantopus sign-in is not connected" after a few idle seconds). One request per
+  connection removes the problem. The real API keeps sockets open and closes them after 5 s idle, and
+  Android reused them too ([the native device checks' follow-up 12](native-device-checks.md#follow-ups));
+  its clients now drop an idle socket after 3 s. `--keep-alive` serves sockets the way the real API does,
+  so a check can catch an app that sends a request on a socket the server has closed.
 - **Home lists a conversation with no message yet**, as the real `home.ts` does: the system label, an empty
   preview, the privacy-notice time. (It used to answer 500.)
 - **A debug launch's extras come back after the process dies** (Android re-delivers the original intent):
