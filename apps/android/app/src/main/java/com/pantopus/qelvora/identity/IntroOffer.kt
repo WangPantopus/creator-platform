@@ -41,7 +41,7 @@ internal fun NativeIntroOffer(client: ConversationClient, root: String, session:
                 val id = result["offerId"]?.jsonPrimitive?.contentOrNull
                 offerId = id?.takeIf { runCatching { UUID.fromString(it) }.isSuccess }
                 if (offerId != null && current.fan.intro.isNotBlank() && disposition == null) disposition = "saved"
-            } catch (failure: Exception) { if (failure is CancellationException) throw failure }
+            } catch (failure: Exception) { if (failure is CancellationException) throw failure; AdultEligibilityRefusal.report(failure) }
         }
     }
     val id = offerId ?: return
@@ -64,6 +64,7 @@ internal fun NativeIntroOffer(client: ConversationClient, root: String, session:
                 else offerId = null
             } catch (failure: Exception) {
                 if (failure is CancellationException) throw failure
+                AdultEligibilityRefusal.report(failure)
                 error = if (disposition == null) QelvoraCopy.text("introOfferUnavailable") else QelvoraCopy.text("introOfferAckUnavailable")
             } finally { busy = false }
         }

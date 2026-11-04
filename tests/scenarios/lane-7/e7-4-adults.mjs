@@ -1,12 +1,15 @@
 // WP 7.4 P7 on Android: the designed under-18 state (D-11), against the lane 7
 // fake API. iOS runs the same flows as XCUITest (Lane7AdultFlows, through
 // ios-navigation.mjs --adults).
-//   node tests/scenarios/lane-7/e7-4-adults.mjs [A1 A2 A3]
+//   node tests/scenarios/lane-7/e7-4-adults.mjs [A1 A2 A3 A4 A5]
 import * as A from "./android-ui.mjs";
 import * as L from "./lib.mjs";
 
 const TITLE = "This app is for adults";
 const BODY = "This app is available to adults aged 18 and over.";
+const THREAD =
+  "/threads/c1000000-0000-4000-8000-000000000001/f1000000-0000-4000-8000-000000000001";
+const DRAFT = "lane7 under18 private draft";
 const wanted = process.argv.slice(2);
 const run = (id) => !wanted.length || wanted.includes(id);
 const stop = await L.ensureHarness();
@@ -22,6 +25,33 @@ function only() {
   return {
     ok: texts.includes(TITLE) && texts.includes(BODY) && !extra.length,
     detail: extra.length ? `also shown: ${extra.join(" | ")}` : "",
+  };
+}
+
+/** What the app keeps of a thread and a session (run-as works on a debug
+ * build): draft and offline files, and the resume and session stores' entries. */
+function saved() {
+  const sh = (command) =>
+    A.adb(
+      "exec-out",
+      "run-as",
+      "com.pantopus.qelvora",
+      "sh",
+      "-c",
+      `${command} 2>/dev/null; true`,
+    ).trim();
+  const entries = (files) =>
+    (
+      sh(`cat ${files}`).match(
+        /<(string|long|int|boolean|float|set) name=/gu,
+      ) ?? []
+    ).length;
+  return {
+    drafts: sh("ls no_backup/conversation-drafts").split(/\s+/u).filter(Boolean)
+      .length,
+    offline: sh("ls no_backup/conversation-offline.enc").length > 0,
+    resume: entries("shared_prefs/conversation-resume.xml"),
+    session: entries("shared_prefs/identity-session*.xml"),
   };
 }
 
@@ -112,6 +142,117 @@ if (run("A3")) {
   );
   L.screenshot("android", "A3-largest-night");
   A.adb("shell", "settings", "put", "system", "font_scale", "1.0");
+}
+
+if (run("A4")) {
+  // In a thread, its own reads (Notes and reactions, the offline copy) meet
+  // the flag before the 30-second session check does, and the server ends the
+  // session there. The same state must show, and nothing of the thread stay.
+  await L.harness("POST", "/__harness/reset");
+  L.launch("android", "--reset", "--actor", "devon", "--to", THREAD);
+  // The composer: the thread's list draws only the rows on screen.
+  await A.tap("Message Maya's AI", 30000);
+  A.type(DRAFT);
+  // Wait until the thread has left something behind: the draft, the offline
+  // copy, the resume cursor and the session.
+  let before = saved();
+  for (
+    let until = Date.now() + 20000;
+    !(before.drafts && before.offline && before.resume && before.session) &&
+    Date.now() < until;
+    before = saved()
+  )
+    await L.sleep(500);
+  L.step(
+    "android",
+    "P7.4 before the flag the thread is saved: draft, offline copy, resume cursor, session",
+    before.drafts > 0 &&
+      before.offline &&
+      before.resume > 0 &&
+      before.session > 0,
+    JSON.stringify(before),
+  );
+  const since = (await L.log()).at(-1)?.n ?? 0;
+  await L.harness("POST", "/__harness/accounts/devon", { adult: false });
+  await A.waitFor(TITLE, 40000);
+  const shown = only();
+  L.step(
+    "android",
+    "P7.4 flagged in a thread: the adults-only state, nothing else",
+    shown.ok,
+    shown.detail,
+  );
+  L.screenshot("android", "A4-flagged-in-a-thread");
+  const refused = (await L.log(since, "android")).find((e) => e.status === 403);
+  L.step(
+    "android",
+    "P7.4 a thread's own read met the flag, not the session check",
+    Boolean(refused) && !/\/identity\/session$/u.test(refused.path),
+    refused ? `${refused.method} ${L.shape(refused.path)}` : "no refusal",
+  );
+  const left = A.texts().filter((t) =>
+    /Maya|Pinholes in celadon|glaze|under18 private draft/u.test(t),
+  );
+  L.step(
+    "android",
+    "P7.4 nothing of the thread stays on screen",
+    !left.length,
+    left.join(" | "),
+  );
+  const after = saved();
+  L.step(
+    "android",
+    "P7.4 nothing of the thread or the session stays in the app's storage",
+    !after.drafts && !after.offline && !after.resume && !after.session,
+    JSON.stringify(after),
+  );
+  // A relaunch into the thread finds no session: the welcome, not the thread.
+  L.launch("android", "--to", THREAD);
+  await A.waitFor("Sign in to continue", 30000);
+  L.step(
+    "android",
+    "P7.4 a relaunch into the thread shows the welcome",
+    !A.texts().some((t) => /Maya|Pinholes in celadon|glaze/u.test(t)),
+  );
+}
+
+if (run("A5")) {
+  // Only D-11 ends the session: the thread's own reads refused for another
+  // reason (403 human_unavailable) leave the adult signed in.
+  await L.harness("POST", "/__harness/reset");
+  L.launch("android", "--reset", "--actor", "devon", "--to", THREAD);
+  await A.waitFor("Message Maya's AI", 30000);
+  const since = (await L.log()).at(-1)?.n ?? 0;
+  await L.harness("POST", "/__harness/faults", {
+    rules: [
+      {
+        match: "/(presence|offline)$",
+        method: "GET",
+        status: 403,
+        code: "human_unavailable",
+        message: "Maya isn't available right now.",
+        remaining: 6,
+      },
+    ],
+  });
+  await L.sleep(8000);
+  await L.harness("POST", "/__harness/faults", { rules: [] });
+  const refused = (await L.log(since, "android")).filter(
+    (e) => e.status === 403,
+  );
+  const texts = A.texts();
+  L.step(
+    "android",
+    "P7.5 another refusal in a thread: no adults-only state, the thread stays",
+    refused.length >= 3 &&
+      !texts.includes(TITLE) &&
+      texts.some((t) => t.includes("Message Maya's AI")),
+    `refused ${refused.length}`,
+  );
+  L.screenshot("android", "A5-other-refusal-in-a-thread");
+  L.launch("android", "--to", "/home");
+  const home = await L.waitForText("android", /Your people/u, 30000);
+  L.step("android", "P7.5 a relaunch is still signed in", home.ok);
 }
 
 stop();

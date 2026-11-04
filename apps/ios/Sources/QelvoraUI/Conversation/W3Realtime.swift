@@ -143,7 +143,8 @@ actor W3Realtime {
             #if DEBUG
             Logger(subsystem: "com.pantopus.qelvora", category: "conversation-realtime").debug("socket_closed code=\(connection.socket.closeCode.rawValue, privacy: .public)")
             #endif
-            let denied = connection.socket.closeCode == .policyViolation || (connection.socket.response as? HTTPURLResponse)?.statusCode == 401
+            AdultEligibilityRefusal.reportClose(code: connection.socket.closeCode.rawValue, reason: connection.socket.closeReason, credential: connection.credential)
+            let denied = connection.socket.closeCode == .policyViolation || connection.socket.closeCode.rawValue == 4403 || (connection.socket.response as? HTTPURLResponse)?.statusCode == 401
             stop(connection, error: denied ? accountChanged : error)
         }
     }

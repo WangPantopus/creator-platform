@@ -62,6 +62,7 @@ class FanSessionRequestCapture private constructor(
             if (!isCurrent() || !trustReady()) throw kotlinx.coroutines.CancellationException("Your original account view changed.")
             return response
         } catch (failure: Exception) {
+            if (isCurrent()) AdultEligibilityRefusal.report(failure)
             if (!isCurrent() || !trustReady()) throw kotlinx.coroutines.CancellationException("Your original account view changed.")
             throw failure
         }
@@ -75,6 +76,7 @@ class FanSessionRequestCapture private constructor(
             if (!isCurrent() || !trustReady()) throw kotlinx.coroutines.CancellationException("Your original account view changed.")
             return response
         } catch (failure: Exception) {
+            if (isCurrent()) AdultEligibilityRefusal.report(failure)
             if (!isCurrent() || !trustReady()) throw kotlinx.coroutines.CancellationException("Your original account view changed.")
             throw failure
         }
@@ -88,6 +90,7 @@ class FanSessionRequestCapture private constructor(
             if (!isCurrent() || !trustReady()) throw kotlinx.coroutines.CancellationException("Your original account view changed.")
             return response
         } catch (failure: Exception) {
+            if (isCurrent()) AdultEligibilityRefusal.report(failure)
             if (!isCurrent() || !trustReady()) throw kotlinx.coroutines.CancellationException("Your original account view changed.")
             throw failure
         }
@@ -101,6 +104,30 @@ class FanSessionRequestCapture private constructor(
             return FanSessionRequestCapture(client, accountId, sessionId, destination, trustReady, current)
         }
     }
+}
+/** D-11 from any authenticated request. The server ends a session at the first
+ * request that finds its account flagged under 18, whichever request that is,
+ * so the shell's own check may then find only an ended session. Each
+ * authenticated request reports its refusal here, and the shell purges and
+ * shows the adults-only state, as it does when its own check meets the flag. */
+object AdultEligibilityRefusal {
+    @Volatile private var shell: Pair<FanSession, kotlinx.coroutines.CoroutineScope>? = null
+    internal fun register(session: FanSession, scope: kotlinx.coroutines.CoroutineScope) { shell = session to scope }
+    internal fun unregister(session: FanSession) { if (shell?.first === session) shell = null }
+    /** [credential] is the one the refused request sent, when the caller has it. */
+    fun report(status: Int, code: String?, credential: String? = null) {
+        if (status != 403 || code != "adult_eligibility_required") return
+        val (session, scope) = shell ?: return
+        // Not the caller's coroutine: the purge must outlive the screen that met the refusal.
+        scope.launch { session.adultEligibilityRefused(credential) }
+    }
+    /** A refusal from the conversation client, which has checked that its
+     * credential is still the stored one, or from the generated client. */
+    fun report(failure: Throwable) {
+        if (failure is com.pantopus.qelvora.conversation.ConversationFailure) report(failure.status, failure.code)
+        else if (failure is CreatorAPIError) report(failure.status, code(failure.body))
+    }
+    fun code(body: String?): String? = body?.let { runCatching { org.json.JSONObject(it).getJSONObject("error").optString("code") }.getOrNull() }
 }
 class FanSession(private val context: Context, private val baseURL: String?, returnTo: String, restoreSavedDestination: Boolean = returnTo == "/home", initialHistory: List<NavEntry> = emptyList(), initialTab: String? = null) {
     private val storage = SecureSessionStorage(context, baseURL)
@@ -205,6 +232,26 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         }
         return if (capture.isCurrent()) capture else null
     }
+    /** The one D-11 handling, wherever the refusal was met: purge the private
+     * state, keep no place (a thread's path names its creator and fan, and the
+     * activity saves it), then show only the adults-only state. */
+    private suspend fun denyAdultEligibility() { purge(); move = Move.REPLACE; destination = "/home"; adultEligibilityDenied = true }
+    /** D-11 met by one of the shell's own requests (through `api`, which sends
+     * the stored credential, or a capture that is still current): the same
+     * handling. True when it was that refusal. */
+    internal suspend fun handleAdultEligibilityRefusal(failure: Exception): Boolean {
+        if (failure !is CreatorAPIError || failure.status != 403 || identityErrorCode(failure) != "adult_eligibility_required") return false
+        denyAdultEligibility()
+        return true
+    }
+    /** A refusal another request met (AdultEligibilityRefusal). It ends only the
+     * stored session: the refused credential, when known, must still be it. */
+    internal suspend fun adultEligibilityRefused(credential: String?) {
+        if (adultEligibilityDenied || purgingPrivateState) return
+        val stored = runCatching { currentToken() }.getOrNull() ?: return
+        if (credential != null && credential != stored) return
+        denyAdultEligibility()
+    }
     suspend fun purge(): Boolean = withContext(NonCancellable) {
         if (purgingPrivateState) return@withContext false
         val pushCredential = runCatching { currentToken() }.getOrNull()
@@ -261,7 +308,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
                     session = null; error = QelvoraCopy.text("nativeYourSessionChangedRefreshYour"); return
                 }
                 val code = identityErrorCode(failure)
-                if (code == "adult_eligibility_required") { purge(); adultEligibilityDenied = true }
+                if (code == "adult_eligibility_required") { denyAdultEligibility() }
                 else if (code == "authorization_ended" || code == "scope_revoked" || code == "session_changed") { if (purge()) error = message(failure) }
                 else if (failure.status == 401) {
                     if (!busy) {
@@ -402,7 +449,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
     }
     private suspend fun signInFailed(failure: Exception) {
         val code = identityErrorCode(failure)
-        if (code == "adult_eligibility_required") { purge(); adultEligibilityDenied = true; return }
+        if (code == "adult_eligibility_required") { denyAdultEligibility(); return }
         if (code != "invalid_request") { ageConfirmation = null; choosingIdentityProvider = true }
         if (code == "invalid_request") { error = message(failure); return }
         error = QelvoraCopy.text(when (code) { "rate_limited" -> "signInRateLimited"; "identity_provider_unavailable", "sign_in_unconfigured" -> "signInUnavailable"; else -> "signInFailed" })
@@ -418,7 +465,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
             destination = result.returnTo; choosingActor = false; refresh()
         }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-        catch (failure: CreatorAPIError) { if (identityErrorCode(failure) == "adult_eligibility_required") { purge(); adultEligibilityDenied = true } else error = message(failure) }
+        catch (failure: CreatorAPIError) { if (identityErrorCode(failure) == "adult_eligibility_required") { denyAdultEligibility() } else error = message(failure) }
         catch (failure: Exception) { error = message(failure) }
         finally { busy = false }
     }
@@ -435,7 +482,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (failure: Exception) {
-            if (capture.isCurrent()) error = if (failure is CreatorAPIError) message(failure) else QelvoraCopy.text(if (failure is kotlinx.serialization.SerializationException) "identityInputKeptUnreadable" else "identityInputKeptUnavailable")
+            if (capture.isCurrent() && !handleAdultEligibilityRefusal(failure)) error = if (failure is CreatorAPIError) message(failure) else QelvoraCopy.text(if (failure is kotlinx.serialization.SerializationException) "identityInputKeptUnreadable" else "identityInputKeptUnavailable")
         }
         finally { busy = false }
     }
@@ -454,7 +501,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
             refresh()
             return capture.isCurrent()
         } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-        catch (failure: Exception) { if (capture.isCurrent()) error = message(failure); return false }
+        catch (failure: Exception) { if (capture.isCurrent() && !handleAdultEligibilityRefusal(failure)) error = message(failure); return false }
         finally { busy = false }
     }
     /** Navigation only. Reject responses for a departed destination, account or credential. */
@@ -472,7 +519,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
             open("/calls/$creator/$fan/$id")
             return true
         } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-        catch (_: Exception) { return false }
+        catch (failure: Exception) { if (capture.isCurrent()) handleAdultEligibilityRefusal(failure); return false }
     }
     suspend fun openNotification(id: String): Boolean {
         val origin = baseURL ?: return false
@@ -495,7 +542,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         if (busy) return; val client = api ?: run { purge(); return }; busy = true; generation++
         try { if (all) client.revokeSessions() else client.logout(); purge() }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-        catch (failure: CreatorAPIError) { if (failure.status == 401) purge() else error = message(failure) }
+        catch (failure: CreatorAPIError) { if (failure.status == 401) purge() else if (!handleAdultEligibilityRefusal(failure)) error = message(failure) }
         catch (_: Exception) { error = QelvoraCopy.text("nativeSignOutCouldNotReachThe") }
         finally { busy = false }
     }
@@ -514,7 +561,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
             generation++; rotatingCredential = false; refresh()
         }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-        catch (failure: CreatorAPIError) { if (current == generation) { if (identityErrorCode(failure) == "adult_eligibility_required") { purge(); adultEligibilityDenied = true }
+        catch (failure: CreatorAPIError) { if (current == generation) { if (identityErrorCode(failure) == "adult_eligibility_required") { denyAdultEligibility() }
             else if (failure.status == 401 || identityErrorCode(failure) == "scope_revoked") { if (purge()) error = message(failure) } else error = message(failure) } }
         catch (_: Exception) { if (current == generation) error = QelvoraCopy.text("nativeSessionRefreshCouldNotComplete") }
         finally { busy = false; rotatingCredential = false }
@@ -587,6 +634,11 @@ fun FanAppShell(context: Context, baseURL: String? = null, returnTo: String = "/
     var appliedReturn by remember(baseURL) { mutableStateOf(returnTo) }
     var appliedDelivery by remember(baseURL) { mutableStateOf(destinationDelivery) }
     val scope = rememberCoroutineScope()
+    // D-11 refusals that other requests meet come to this shell, in its own scope.
+    DisposableEffect(model, scope) {
+        AdultEligibilityRefusal.register(model, scope)
+        onDispose { AdultEligibilityRefusal.unregister(model) }
+    }
     val uriHandler = LocalUriHandler.current
     val lifecycleOwner = LocalLifecycleOwner.current
     var foreground by remember(lifecycleOwner) { mutableStateOf(lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }

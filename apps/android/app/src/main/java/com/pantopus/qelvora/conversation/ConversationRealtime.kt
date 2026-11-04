@@ -1,6 +1,7 @@
 package com.pantopus.qelvora.conversation
 
 import com.pantopus.qelvora.generated.QelvoraCopy
+import com.pantopus.qelvora.identity.AdultEligibilityRefusal
 
 import android.util.Log
 import com.pantopus.qelvora.BuildConfig
@@ -144,9 +145,13 @@ internal object ConversationRealtime {
                 "Reconnect with current authority" -> "server_authority_deadline"
                 "Conversation unavailable" -> "server_batch_refused"
                 "Subscription refused" -> "server_subscription_refused"
+                "adult_eligibility_required" -> "server_adult_eligibility"
                 else -> "server_close_other"
             })
-            stop(ConversationFailure(if (code == 1008) 401 else 503, QelvoraCopy.text("nativeReconnectToRefreshThisConversation")))
+            // D-11: the live connection meets the flag on its own every 2 s, and
+            // the gateway then closes it with 4403 (gateway.ts).
+            if (code == 4403) AdultEligibilityRefusal.report(403, reason, token)
+            stop(ConversationFailure(if (code == 1008 || code == 4403) 401 else 503, QelvoraCopy.text("nativeReconnectToRefreshThisConversation")))
         }
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) = synchronized(connections) {
             trace(if (response?.code == 401) "socket_authentication_failed" else "socket_transport_failed")

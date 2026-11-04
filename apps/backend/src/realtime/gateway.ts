@@ -10,7 +10,20 @@ import {
 import type { AccessService, ThreadScope } from "../modules/access/scope.js";
 import type { ConversationService } from "../modules/conversation/service.js";
 import { requestAuthority } from "../modules/identity/request-authority.js";
+import { DomainError } from "../core/errors.js";
 
+/** A refused subscription or check closes with 1008, except D-11: an account
+ * flagged under 18 is refused there and its session ends with it, so the app
+ * is told why (an application close code) and shows the adults-only state,
+ * not a sign-in. */
+function closeRefused(connection: WebSocket, error: unknown, reason: string) {
+  if (
+    error instanceof DomainError &&
+    error.code === "adult_eligibility_required"
+  )
+    connection.close(4403, "adult_eligibility_required");
+  else connection.close(1008, reason);
+}
 export function attachRealtime(
   server: Server,
   identity: PantopusIdentityAdapter,
@@ -131,9 +144,9 @@ export function attachRealtime(
                   drain();
                 });
               })
-              .catch(() => {
+              .catch((error: unknown) => {
                 report("increment", "realtime_subscriptions_refused", 1);
-                connection.close(1008, "Subscription refused");
+                closeRefused(connection, error, "Subscription refused");
               })
               .finally(() => {
                 subscriptionsPending--;
@@ -233,9 +246,9 @@ export function attachRealtime(
                   1,
                 ),
               )
-              .catch(() => {
+              .catch((error: unknown) => {
                 report("increment", "realtime_batches_refused", 1);
-                connection.close(1008, "Conversation unavailable");
+                closeRefused(connection, error, "Conversation unavailable");
               })
               .finally(() => {
                 clearTimeout(deadline);

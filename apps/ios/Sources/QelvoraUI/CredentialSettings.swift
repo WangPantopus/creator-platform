@@ -22,8 +22,8 @@ public struct CredentialSettings: View {
             if !message.isEmpty { Notice(title: QelvoraCopy.text("nativePasskeyStatus"), children: message) }
         }.task { await reload() }.onDisappear { ceremony?.cancel() }
     }
-    private func reload() async { guard let api = model.api else { return }; do { keys = try await api.passkeys() } catch { message = FanSession.message(error) } }
-    private func revoke(_ id: String) async { guard let api = model.api, !busy else { return }; busy = true; defer { busy = false }; do { _ = try await api.revokePasskey(body: APIPasskeyRevocation(credentialId: id)); await reload() } catch { message = FanSession.message(error) } }
+    private func reload() async { guard let api = model.api else { return }; do { keys = try await api.passkeys() } catch { if await model.handleAdultEligibilityRefusal(error) { return }; message = FanSession.message(error) } }
+    private func revoke(_ id: String) async { guard let api = model.api, !busy else { return }; busy = true; defer { busy = false }; do { _ = try await api.revokePasskey(body: APIPasskeyRevocation(credentialId: id)); await reload() } catch { if await model.handleAdultEligibilityRefusal(error) { return }; message = FanSession.message(error) } }
     private func register() async {
         guard let api = model.api, !busy else { return }; busy = true; message = ""; defer { busy = false; ceremony = nil }
         var challenge: String?
@@ -34,7 +34,7 @@ public struct CredentialSettings: View {
             let credential = try await action.register(options: begin.options)
             _ = try await api.registerPasskey(body: APIPasskeyRegistration(challengeId: begin.challengeId, credential: credential))
             message = QelvoraCopy.text("nativePasskeyRegisteredNothingWasPublished"); await reload()
-        } catch { if let challenge { _ = try? await api.cancelPasskey(challengeId: challenge) }; message = error is NativeSigningError ? QelvoraCopy.text("nativeTheDeviceCouldNotCompletePasskey") : FanSession.message(error) }
+        } catch { if let challenge { _ = try? await api.cancelPasskey(challengeId: challenge) }; if await model.handleAdultEligibilityRefusal(error) { return }; message = error is NativeSigningError ? QelvoraCopy.text("nativeTheDeviceCouldNotCompletePasskey") : FanSession.message(error) }
     }
 }
 #endif

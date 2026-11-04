@@ -1,6 +1,7 @@
 package com.pantopus.qelvora.ui
 
 import com.pantopus.qelvora.generated.QelvoraCopy
+import com.pantopus.qelvora.identity.AdultEligibilityRefusal
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -55,7 +56,12 @@ class GrowthClient(private val origin: String, private val token: () -> String? 
             if(expectedSession != null && credential != expectedSession) throw GrowthRequestFailure(401)
             credential?.let { connection.setRequestProperty("Authorization", "Bearer $it") }
             if (body != null) { connection.doOutput = true; connection.outputStream.use { it.write(body.toString().toByteArray()) } }
-            if (connection.responseCode !in 200..299) throw GrowthRequestFailure(connection.responseCode)
+            if (connection.responseCode !in 200..299) {
+                // D-11 names itself in the error body, read only for a refusal.
+                if (connection.responseCode == 403 && credential != null)
+                    AdultEligibilityRefusal.report(403, AdultEligibilityRefusal.code(connection.errorStream?.use { it.readUpTo(8192) }?.toString(Charsets.UTF_8)), credential)
+                throw GrowthRequestFailure(connection.responseCode)
+            }
             val response = connection.inputStream.use { it.readUpTo(1_000_001) }
             if (response.size > 1_000_000) throw IllegalStateException(QelvoraCopy.text("growthThisResponseIsUnavailable"))
             if(!publicRead && token() != credential) throw GrowthRequestFailure(401)

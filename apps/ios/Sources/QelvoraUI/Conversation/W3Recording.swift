@@ -37,6 +37,10 @@ private final class W3RecordingClient {
     try Task.checkCancellation()
     guard await isCurrent() else { throw URLError(.userAuthenticationRequired) }
   }
+  /// D-11: a refusal of these requests reaches the shell like any other.
+  private func reporting<T>(_ request: () async throws -> T) async throws -> T {
+    do { return try await request() } catch { capture.reportRefusal(error); throw error }
+  }
 
   private func string(_ asset: APIMediaMediaAsset, _ key: String) -> String? {
     guard case let .string(value)? = asset.provenance?[key] else { return nil }
@@ -92,10 +96,12 @@ private final class W3RecordingClient {
   {
     let started = ProcessInfo.processInfo.systemUptime
     try await requireCurrent()
-    let current = try await capture.client.readThreadMedia(
-      creatorId: creatorId, fanId: fanId,
-      assetId: asset.id, xQelvoraExpectedAccount: capture.expectedAccountId
-    )
+    let current = try await reporting {
+      try await capture.client.readThreadMedia(
+        creatorId: creatorId, fanId: fanId,
+        assetId: asset.id, xQelvoraExpectedAccount: capture.expectedAccountId
+      )
+    }
     try await requireCurrent()
     guard matches(current, asset), matchesFile(current, file), matchesFile(asset, file),
           ProcessInfo.processInfo.systemUptime - started < 5
@@ -106,10 +112,12 @@ private final class W3RecordingClient {
   func audio(_ asset: APIMediaMediaAsset) async throws -> W3RecordingAudio {
     guard UUID(uuidString: asset.id) != nil, qualified(asset) else { throw URLError(.badURL) }
     try await requireCurrent()
-    let ticket = try await capture.client.threadMediaPlayback(
-      creatorId: creatorId, fanId: fanId,
-      assetId: asset.id, xQelvoraExpectedAccount: capture.expectedAccountId
-    )
+    let ticket = try await reporting {
+      try await capture.client.threadMediaPlayback(
+        creatorId: creatorId, fanId: fanId,
+        assetId: asset.id, xQelvoraExpectedAccount: capture.expectedAccountId
+      )
+    }
     try await requireCurrent()
     // OpenAPI's nested DTOs carry the original response. Round-trip the same
     // values into the canonical shared asset/file models; no authority is made.
@@ -140,11 +148,13 @@ private final class W3RecordingClient {
     while offset < proof.bytes {
       try await requireCurrent()
       let end = min(offset + 1_048_576, proof.bytes)
-      let result = try await capture.client.playThreadMedia(
-        creatorId: creatorId, fanId: fanId,
-        assetId: asset.id, ticket: token, range: "bytes=\(offset)-\(end - 1)",
-        xQelvoraExpectedAccount: capture.expectedAccountId
-      )
+      let result = try await reporting {
+        try await capture.client.playThreadMedia(
+          creatorId: creatorId, fanId: fanId,
+          assetId: asset.id, ticket: token, range: "bytes=\(offset)-\(end - 1)",
+          xQelvoraExpectedAccount: capture.expectedAccountId
+        )
+      }
       try await requireCurrent()
       guard result.status == 206, result.contentRange == "bytes \(offset)-\(end - 1)/\(proof.bytes)",
             result.body.count == end - offset

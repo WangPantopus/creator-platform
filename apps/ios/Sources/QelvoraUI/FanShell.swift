@@ -24,6 +24,8 @@ public final class FanSessionRequestCapture {
         self.credential = credential
     }
     public func isCurrent() async -> Bool { await owner?.requestCaptureIsCurrent(self) ?? false }
+    /// D-11: a refusal of a request this capture's client sent (AdultEligibilityRefusal).
+    func reportRefusal(_ error: Error) { AdultEligibilityRefusal.report(error, credential: credential) }
     func growthCredential() async -> String? { await isCurrent() ? credential : nil }
     /// The original issuer/client and response bounds are retained. A cached
     /// account during an unsuccessful restore cannot perform private Trust work.
@@ -34,6 +36,7 @@ public final class FanSessionRequestCapture {
             guard await isCurrent(), !owner.checkingSession, !owner.busy, owner.error.isEmpty else { throw CancellationError() }
             return response
         } catch {
+            AdultEligibilityRefusal.report(error, credential: credential)
             guard await isCurrent(), !owner.checkingSession, !owner.busy, owner.error.isEmpty else { throw CancellationError() }
             throw error
         }
@@ -46,6 +49,7 @@ public final class FanSessionRequestCapture {
             guard await isCurrent(), !owner.checkingSession, !owner.busy, owner.error.isEmpty else { throw CancellationError() }
             return response
         } catch {
+            AdultEligibilityRefusal.report(error, credential: credential)
             guard await isCurrent(), !owner.checkingSession, !owner.busy, owner.error.isEmpty else { throw CancellationError() }
             throw error
         }
@@ -58,9 +62,40 @@ public final class FanSessionRequestCapture {
             guard await isCurrent(), !owner.checkingSession, !owner.busy, owner.error.isEmpty else { throw CancellationError() }
             return response
         } catch {
+            AdultEligibilityRefusal.report(error, credential: credential)
             guard await isCurrent(), !owner.checkingSession, !owner.busy, owner.error.isEmpty else { throw CancellationError() }
             throw error
         }
+    }
+}
+
+/// D-11 from any authenticated request. The server ends a session at the first
+/// request that finds its account flagged under 18, whichever request that is,
+/// so the shell's own check may then find only an ended session. Each
+/// authenticated transport reports its refusals here with the credential it
+/// sent, and the shell purges and shows the adults-only state, as it does when
+/// its own check meets the flag.
+enum AdultEligibilityRefusal {
+    static func report(status: Int, body: Data, credential: String?) {
+        struct Envelope: Decodable { struct Failure: Decodable { let code: String? }; let error: Failure }
+        guard status == 403,
+              (try? JSONDecoder().decode(Envelope.self, from: body))?.error.code == "adult_eligibility_required" else { return }
+        refused(credential: credential)
+    }
+    static func report(_ error: Error, credential: String?) {
+        guard let failure = error as? CreatorAPIError else { return }
+        report(status: failure.status, body: failure.body, credential: credential)
+    }
+    /// The live connection meets the flag on its own every 2 s; the gateway
+    /// then closes it with 4403 "adult_eligibility_required".
+    static func reportClose(code: Int, reason: Data?, credential: String?) {
+        guard code == 4403, reason == Data("adult_eligibility_required".utf8) else { return }
+        refused(credential: credential)
+    }
+    private static func refused(credential: String?) {
+        guard let credential else { return }
+        // Not the caller's task: the purge must outlive the screen that met the refusal.
+        Task { @MainActor in await FanSession.shell?.adultEligibilityRefused(credential: credential) }
     }
 }
 
@@ -107,6 +142,8 @@ public final class FanSession: ObservableObject {
     /// D-11: an account found under 18 (at sign-in, or flagged later) loses
     /// access. The session ends here too and only the adults-only state shows.
     @Published public private(set) var purgingPrivateState = false
+    /// The app's one shell, which AdultEligibilityRefusal hands refusals to.
+    fileprivate static weak var shell: FanSession?
     public let api: CreatorAPIClient?
     private let storage: SecureSessionStorage
     private let baseURL: URL?
@@ -130,6 +167,7 @@ public final class FanSession: ObservableObject {
         checkingSession = baseURL != nil
         storage = SecureSessionStorage(issuer: baseURL)
         if let baseURL { let credentials = storage; api = CreatorAPIClient(baseURL: baseURL, token: { try await credentials.read() }) } else { api = nil }
+        Self.shell = self
     }
     private func persistDestination() {
         guard navigationInitialized, let active = session, !purgingPrivateState, !localPurgeFailed,
@@ -287,7 +325,7 @@ public final class FanSession: ObservableObject {
             }
             let code = Self.identityErrorCode(failure)
             if code == "adult_eligibility_required" {
-                _ = await purge(); adultEligibilityDenied = true
+                await denyAdultEligibility()
             } else if code == "authorization_ended" || code == "scope_revoked" || code == "session_changed" {
                 if await purge() { error = Self.message(failure) }
             } else if failure.status == 401 {
@@ -405,7 +443,7 @@ public final class FanSession: ObservableObject {
     private func signInFailed(_ failure: Error) async {
         let code = Self.identityErrorCode(failure)
         if code == "adult_eligibility_required" {
-            _ = await purge(); adultEligibilityDenied = true; return
+            await denyAdultEligibility(); return
         }
         if code != "invalid_request" { ageConfirmation = nil; choosingIdentityProvider = true }
         if code == "invalid_request" { error = Self.message(failure); return }
@@ -429,7 +467,7 @@ public final class FanSession: ObservableObject {
             guard installing == generation else { return }
             destination = result.returnTo; choosingDevelopmentActor = false
             await refresh()
-        } catch let failure as CreatorAPIError where Self.identityErrorCode(failure) == "adult_eligibility_required" { _ = await purge(); adultEligibilityDenied = true }
+        } catch let failure as CreatorAPIError where Self.identityErrorCode(failure) == "adult_eligibility_required" { await denyAdultEligibility() }
         catch { self.error = Self.message(error) }
         #endif
     }
@@ -446,6 +484,7 @@ public final class FanSession: ObservableObject {
             return session?.fan != nil
         } catch {
             guard await capture.isCurrent() else { return false }
+            if await handleAdultEligibilityRefusal(error) { return false }
             self.error = error is CreatorAPIError ? Self.message(error) : QelvoraCopy.text(error is DecodingError ? "identityInputKeptUnreadable" : "identityInputKeptUnavailable")
             return false
         }
@@ -464,7 +503,7 @@ public final class FanSession: ObservableObject {
             await refresh()
             return await capture.isCurrent()
         } catch {
-            if await capture.isCurrent() { self.error = Self.message(error) }
+            if await capture.isCurrent(), !(await handleAdultEligibilityRefusal(error)) { self.error = Self.message(error) }
             return false
         }
     }
@@ -480,13 +519,16 @@ public final class FanSession: ObservableObject {
                   let creator = UUID(uuidString: route.creatorId), let fan = UUID(uuidString: route.fanId) else { return false }
             open("/calls/\(creator.uuidString.lowercased())/\(fan.uuidString.lowercased())/\(id.uuidString.lowercased())")
             return true
-        } catch { return false }
+        } catch {
+            if await capture.isCurrent() { _ = await handleAdultEligibilityRefusal(error) }
+            return false
+        }
     }
     public func logout(all: Bool = false) async {
         guard !busy else { return }; busy = true; generation &+= 1; defer { busy = false }
         guard let api else { await purge(); return }
         do { if all { _ = try await api.revokeSessions() } else { _ = try await api.logout() }; await purge() }
-        catch let error as CreatorAPIError { if error.status == 401 { await purge() } else { self.error = Self.message(error) } }
+        catch let error as CreatorAPIError { if error.status == 401 { await purge() } else if !(await handleAdultEligibilityRefusal(error)) { self.error = Self.message(error) } }
         catch { self.error = QelvoraCopy.text("nativeSignOutCouldNotReachThe") }
     }
     public func refreshCredentials() async {
@@ -506,9 +548,32 @@ public final class FanSession: ObservableObject {
             guard current == generation else { return }
             generation += 1; rotatingCredential = false; await refresh()
         }
-        catch let failure as CreatorAPIError { guard current == generation, !Task.isCancelled else { return }; if Self.identityErrorCode(failure) == "adult_eligibility_required" { _ = await purge(); adultEligibilityDenied = true }
+        catch let failure as CreatorAPIError { guard current == generation, !Task.isCancelled else { return }; if Self.identityErrorCode(failure) == "adult_eligibility_required" { await denyAdultEligibility() }
             else if failure.status == 401 || Self.identityErrorCode(failure) == "scope_revoked" { if await purge() { error = Self.message(failure) } } else { error = Self.message(failure) } }
         catch { guard current == generation, !Task.isCancelled else { return }; self.error = QelvoraCopy.text("nativeSessionRefreshCouldNotComplete") }
+    }
+    /// The one D-11 handling, wherever the refusal was met: purge the private
+    /// state, keep no place (a thread's path names its creator and fan), then
+    /// show only the adults-only state.
+    private func denyAdultEligibility() async {
+        _ = await purge()
+        move = .replace; destination = "/home"
+        adultEligibilityDenied = true
+    }
+    /// D-11 met by one of the shell's own requests (through `api`, which sends
+    /// the stored credential, or a capture that is still current): the same
+    /// handling. True when it was that refusal.
+    func handleAdultEligibilityRefusal(_ error: Error) async -> Bool {
+        guard (error as? CreatorAPIError)?.status == 403, Self.identityErrorCode(error) == "adult_eligibility_required" else { return false }
+        await denyAdultEligibility()
+        return true
+    }
+    /// A refusal another request met (AdultEligibilityRefusal). It ends only the
+    /// session that sent it, while that credential is still the stored one.
+    fileprivate func adultEligibilityRefused(credential: String) async {
+        guard !adultEligibilityDenied, !purgingPrivateState, let stored = try? await storage.read(),
+              stored == credential, !adultEligibilityDenied, !purgingPrivateState else { return }
+        await denyAdultEligibility()
     }
     @discardableResult public func purge() async -> Bool {
         guard !purgingPrivateState else { return false }

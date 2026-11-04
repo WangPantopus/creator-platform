@@ -15,6 +15,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.pantopus.qelvora.generated.*
+import com.pantopus.qelvora.identity.AdultEligibilityRefusal
 import com.pantopus.qelvora.generated.QelvoraTokens as T
 import com.pantopus.qelvora.ui.*
 import kotlinx.coroutines.async
@@ -135,6 +136,7 @@ class ContentPresenceFeed(private val client: ConversationClient, private val cr
                     items = collected; nextBefore = cursor; unavailable = false; deadline = started + 5000
                 } catch (failure: Exception) {
                     if (failure is CancellationException) throw failure
+                    AdultEligibilityRefusal.report(failure)
                     if (run != generation) return
                     items = emptyList(); nextBefore = null; deadline = 0; unavailable = true
                 }
