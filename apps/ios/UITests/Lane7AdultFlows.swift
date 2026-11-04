@@ -8,6 +8,8 @@ final class Lane7AdultFlows: XCTestCase {
     private let app = XCUIApplication()
     private let title = "This app is for adults"
     private let body = "This app is available to adults aged 18 and over."
+    private let thread = "/threads/c1000000-0000-4000-8000-000000000001/f1000000-0000-4000-8000-000000000001"
+    private let draft = "lane7 under18 private draft"
     private func arguments(_ appearance: String) -> [String] { ["--api-url", "http://127.0.0.1:56473", "--appearance", appearance, "-AppleLanguages", "(en)", "-AppleLocale", "en_US"] }
 
     @discardableResult
@@ -97,6 +99,52 @@ final class Lane7AdultFlows: XCTestCase {
         capture("A2-refused-at-sign-in")
         try await launch(["--return-to", "/"])
         XCTAssertTrue(app.buttons["Sign in to continue"].waitForExistence(timeout: 30), "no session was kept")
+    }
+
+    /// What the app keeps of the thread (ios-link-driver.mjs reads the files,
+    /// never their contents): drafts, the offline copy, files holding its text.
+    private func stored() async throws -> (drafts: Int, offline: Bool, hits: Int) {
+        let storage = try await control("/storage", body: ["markers": [draft]], port: 56475) as! [String: Any]
+        let scan = try await control("/scan", body: ["markers": [draft, "Pinholes in celadon"]], port: 56475) as! [String: Any]
+        return (storage["count"] as! Int, storage["offline"] as! Bool, scan["hits"] as! Int)
+    }
+
+    /// P7.4: flagged in a thread. Its own reads (Notes and reactions, the
+    /// offline copy) meet the flag before the 30-second session check does,
+    /// and the server ends the session there. The same state shows, and
+    /// nothing of the thread stays on screen or in the app's files.
+    func testA04FlaggedInAThread() async throws {
+        try optIn()
+        try await control("/__harness/reset", body: [:])
+        try await launch(["--harness-reset", "--harness-actor", "devon", "--return-to", thread])
+        let input = app.textViews.matching(NSPredicate(format: "label BEGINSWITH %@ OR label BEGINSWITH %@", "Message ", "Reply to ")).firstMatch
+        XCTAssertTrue(input.waitForExistence(timeout: 30))
+        input.tap(); input.typeText(draft)
+        var before = try await stored()
+        for _ in 0..<40 where before.drafts == 0 || !before.offline {
+            try await Task.sleep(for: .milliseconds(500)); before = try await stored()
+        }
+        XCTAssertEqual(before.drafts, 1, "the draft is saved before the flag")
+        XCTAssertTrue(before.offline, "the offline copy is saved before the flag")
+        let seen = try await log().count
+        try await control("/__harness/accounts/devon", body: ["adult": false])
+        onlyAdultsState()
+        capture("A4-flagged-in-a-thread")
+        let refused = try await log().dropFirst(seen).first { ($0["client"] as? String) == "ios" && ($0["status"] as? Int) == 403 }
+        let path = refused?["path"] as? String ?? "no refusal"
+        XCTAssertFalse(path == "no refusal" || path.hasSuffix("/identity/session"), "a thread read met the flag: \(path)")
+        print("LANE7 adults A4: first refusal \(path)")
+        for text in ["Pinholes in celadon", "Maya's AI", draft] {
+            XCTAssertFalse(app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@ OR value CONTAINS %@", text, text)).firstMatch.exists, "still on screen: \(text)")
+        }
+        let after = try await stored()
+        XCTAssertEqual(after.drafts, 0, "no draft file")
+        XCTAssertFalse(after.offline, "no offline copy")
+        XCTAssertEqual(after.hits, 0, "no app file holds the thread's text")
+        print("LANE7 adults A4: stored before \(before), after \(after)")
+        try await launch(["--return-to", thread])
+        XCTAssertTrue(app.buttons["Sign in to continue"].waitForExistence(timeout: 30), "a relaunch into the thread shows the welcome")
+        XCTAssertFalse(app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "Pinholes in celadon")).firstMatch.exists)
     }
 
     /// P7.3: largest text, Night: the state in full.

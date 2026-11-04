@@ -120,6 +120,7 @@ actor W3ConversationClient {
         guard data.count <= 1_000_000 else { throw W3Failure(message:QelvoraCopy.text("nativeThisConversationResponseIsToo"),status:503) }
         guard let response = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
         guard (200..<300).contains(response.statusCode) else {
+            AdultEligibilityRefusal.report(status: response.statusCode, body: data, credential: requestCredential)
             let error = try? JSONDecoder().decode(W3ErrorEnvelope.self, from: data).error
             throw W3Failure(message: error?.message ?? QelvoraCopy.text("nativeThisConversationIsUnavailable"), status: error?.code == "session_account_changed" ? 401 : response.statusCode, code: error?.code)
         }

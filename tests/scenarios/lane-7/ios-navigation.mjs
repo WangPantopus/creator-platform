@@ -199,6 +199,7 @@ const flows = stackPresence
                     A1: "testA01FlaggedAfterSignIn",
                     A2: "testA02RefusedAtSignIn",
                     A3: "testA03LargestTextNight",
+                    A4: "testA04FlaggedInAThread",
                   }
                 : citations
                   ? {

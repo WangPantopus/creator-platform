@@ -206,6 +206,7 @@ public struct GrowthClient: Sendable {
     let (data, response) = try await URLSession.shared.data(for: request)
     guard let http = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
     guard (200..<300).contains(http.statusCode) else {
+      AdultEligibilityRefusal.report(status: http.statusCode, body: data, credential: value)
       throw GrowthRequestFailure(status: http.statusCode)
     }
     try Task.checkCancellation()

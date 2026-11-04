@@ -38,6 +38,7 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import com.pantopus.qelvora.generated.*
 import com.pantopus.qelvora.identity.FanFeatureRegistration
+import com.pantopus.qelvora.identity.AdultEligibilityRefusal
 import com.pantopus.qelvora.identity.FanSession
 import com.pantopus.qelvora.identity.NativeIntroOffer
 import com.pantopus.qelvora.identity.HarnessLaunch
@@ -193,7 +194,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     }
     LaunchedEffect(root,foreground,privacy,comparisonQuestion != null,page?.threadId) {
         if (page != null) {
-            suspend fun pulse(active: Boolean) { try { client.request("$root/presence",buildJsonObject { put("clientId",presenceId);put("active",active) }) } catch(failure:Exception) { if(failure is CancellationException) throw failure } }
+            suspend fun pulse(active: Boolean) { try { client.request("$root/presence",buildJsonObject { put("clientId",presenceId);put("active",active) }) } catch(failure:Exception) { if(failure is CancellationException) throw failure; AdultEligibilityRefusal.report(failure) } }
             if (!foreground || privacy || comparisonQuestion != null) pulse(false)
             else while (true) { pulse(true);delay(20000) }
         }
@@ -249,11 +250,13 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             if (!saved && offlineContext == lease) offlineContext = null
         } catch (failure: Exception) {
             if (failure is CancellationException) throw failure
+            AdultEligibilityRefusal.report(failure)
             ConversationOfflineStorage.purge(lease); if (offlineContext == lease) offlineContext = null
         }
     }
     fun fail(failure: Throwable, threadDenied: Boolean = false) {
         if (failure is CancellationException) throw failure
+        AdultEligibilityRefusal.report(failure)
         error = failure.message ?: QelvoraCopy.text("nativeReconnectToRefreshYourInputIsKept")
         offline = true; transportReady = false
         if (failure is ConversationFailure && failure.status in listOf(401,403,404)) {
@@ -268,6 +271,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     // refused thread, and the thread's own reads decide access.
     fun sourceUnavailable(failure: Throwable) {
         if (failure is CancellationException) throw failure
+        AdultEligibilityRefusal.report(failure)
         sourceFailure = QelvoraCopy.text("sourceUnavailable")
     }
     suspend fun refresh(propagateFailure: Boolean = false) {
@@ -718,6 +722,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     fun current(ticket: Int) = revision == ticket && foreground
     fun failed(failure: Throwable, fallback: String) {
         if (failure is CancellationException) throw failure
+        AdultEligibilityRefusal.report(failure)
         if (failure is ConversationFailure && failure.status in listOf(401,403,404)) { conceal(); editing = null; text = "" }
         error = failure.message ?: fallback
     }
@@ -816,7 +821,7 @@ private suspend fun existingThread(client: ConversationClient, creatorId: String
     var cursor: String? = null
     for (page in 0 until 20) {
         val answer = try { client.request("account" + (cursor?.let { "?cursor=$it" } ?: "")).jsonObject }
-            catch (failure: Exception) { if (failure is CancellationException) throw failure; return null }
+            catch (failure: Exception) { if (failure is CancellationException) throw failure; AdultEligibilityRefusal.report(failure); return null }
         answer["threads"]?.jsonArray?.map { it.jsonObject }?.firstOrNull { it["creatorId"]?.jsonPrimitive?.content == creatorId }
             ?.let { return it["fanId"]?.jsonPrimitive?.content }
         cursor = answer["nextCursor"]?.takeUnless { it is JsonNull }?.jsonPrimitive?.content ?: return null
@@ -870,6 +875,7 @@ private suspend fun existingThread(client: ConversationClient, creatorId: String
                 contextSessionId = capture.sessionId; contextDestination = capture.destination; postContext = post
             } catch (failure: Throwable) {
                 if (failure is CancellationException) throw failure
+                if (capture.isCurrent()) AdultEligibilityRefusal.report(failure)
                 if (foreground && capture.isCurrent()) contextFailure = QelvoraCopy.text("growthThisDestinationIsUnavailableReconnectAndTryAgain")
             }
             delay(4000)
@@ -1017,7 +1023,7 @@ private suspend fun existingThread(client: ConversationClient, creatorId: String
             if (revision == currentRevision && foreground && session.session?.accountId == accountId && session.session?.sessionId == sessionId && session.destination == destination && session.currentToken() == token && overview?.fan?.id == fresh["fan"]?.jsonObject?.get("id")?.jsonPrimitive?.content)
                 commerce = overview
         }
-        catch(failure:Throwable) { if(failure is CancellationException) throw failure; if(revision == currentRevision && foreground) error=failure.message ?: QelvoraCopy.text("nativeReconnectToOpenYou") }
+        catch(failure:Throwable) { if(failure is CancellationException) throw failure; AdultEligibilityRefusal.report(failure); if(revision == currentRevision && foreground) error=failure.message ?: QelvoraCopy.text("nativeReconnectToOpenYou") }
         finally { if (revision == currentRevision) loading = false }
     }
     LaunchedEffect(client, foreground) { if (foreground) refresh(cursor) else conceal() }

@@ -63,6 +63,7 @@ private actor ContentClient {
         request.setValue("Bearer " + token, forHTTPHeaderField: "Authorization"); request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let response = response as? HTTPURLResponse, (200..<300).contains(response.statusCode) else {
+            AdultEligibilityRefusal.report(status: (response as? HTTPURLResponse)?.statusCode ?? 0, body: data, credential: token)
             let failure = try? JSONDecoder().decode(ContentErrorEnvelope.self, from: data).error
             throw ContentFailure(status: (response as? HTTPURLResponse)?.statusCode ?? 0, code: failure?.code)
         }

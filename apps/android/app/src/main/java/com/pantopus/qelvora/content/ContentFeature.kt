@@ -21,6 +21,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.pantopus.qelvora.generated.QelvoraCopy
+import com.pantopus.qelvora.identity.AdultEligibilityRefusal
 import com.pantopus.qelvora.identity.FanFeatureRegistration
 import com.pantopus.qelvora.identity.FanSession
 import com.pantopus.qelvora.identity.SecureSessionStorage
@@ -70,6 +71,7 @@ private class ContentClient(context: Context, private val baseURL: String) {
             val data = (if (status in 200..299) connection.inputStream else connection.errorStream)?.bufferedReader()?.use { it.readText() }.orEmpty()
             if (status !in 200..299) {
                 val code = runCatching { Json.parseToJsonElement(data).jsonObject["error"]?.jsonObject?.get("code")?.jsonPrimitive?.contentOrNull }.getOrNull()
+                AdultEligibilityRefusal.report(status, code, token)
                 throw ContentFailure(status, code)
             }
             Json.parseToJsonElement(data)

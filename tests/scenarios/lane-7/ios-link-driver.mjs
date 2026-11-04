@@ -84,6 +84,13 @@ const server = http.createServer(async (request, response) => {
       }
       result = {
         count: records.length,
+        // The thread's offline copy (WP 7.8), present or not.
+        offline: existsSync(
+          join(
+            container,
+            "Library/Application Support/com.pantopus.qelvora.conversation-offline/snapshot.enc",
+          ),
+        ),
         sizes: records.map((data) => data.length),
         plaintextFound: records.some((data) =>
           (input.markers ?? []).some((marker) =>

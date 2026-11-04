@@ -1,6 +1,7 @@
 package com.pantopus.qelvora.media
 
 import com.pantopus.qelvora.generated.QelvoraCopy
+import com.pantopus.qelvora.identity.AdultEligibilityRefusal
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
@@ -37,7 +38,8 @@ class NativeMediaClient(private val base: URL, private val token: suspend () -> 
         val connection = url.openConnection() as HttpURLConnection
         require(timeoutMs in 1..30_000)
         connection.instanceFollowRedirects = false; connection.requestMethod = method; connection.connectTimeout = timeoutMs; connection.readTimeout = timeoutMs
-        connection.setRequestProperty("Authorization", "Bearer ${token()}"); connection.setRequestProperty("Content-Type", contentType)
+        val credential = token()
+        connection.setRequestProperty("Authorization", "Bearer $credential"); connection.setRequestProperty("Content-Type", contentType)
         offset?.let { connection.setRequestProperty("Upload-Offset", it.toString()) }
         expected?.let { connection.setRequestProperty("x-qelvora-expected-account", it) }
         try {
@@ -47,6 +49,7 @@ class NativeMediaClient(private val base: URL, private val token: suspend () -> 
                     val buffer = ByteArray(8192); val length = stream.read(buffer)
                     if (length > 0) JSONObject(String(buffer, 0, length, Charsets.UTF_8)).optJSONObject("error")?.optString("code")?.takeIf { it.isNotEmpty() } else null
                 } }.getOrNull()
+                AdultEligibilityRefusal.report(connection.responseCode, code, credential)
                 throw NativeMediaRequestError(connection.responseCode, code)
             }
             connection.inputStream.use { it.readBytes() }
