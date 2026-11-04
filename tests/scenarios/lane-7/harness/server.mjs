@@ -1,6 +1,9 @@
-// Lane 7 fake API. Run: node tests/scenarios/lane-7/harness/server.mjs [--port 56473]
+// Lane 7 fake API. Run: node tests/scenarios/lane-7/harness/server.mjs [--port 56473] [--keep-alive]
 // Stands in for the Qelvora API so the phone apps can run signed in on a
 // simulator or an emulator without the full stack. It binds to loopback only.
+// --keep-alive drops the `Connection: close` on every answer: sockets then stay
+// open and close after 5 s idle, as the real API's do, so a check can see an app
+// that sends a request on a socket the server has already closed.
 import http from "node:http";
 import { Router, clientOf, createHandler } from "./http.mjs";
 import { createWorld } from "./world.mjs";
@@ -17,6 +20,7 @@ const args = process.argv.slice(2);
 const flag = (name, fallback) =>
   args.includes(name) ? args[args.indexOf(name) + 1] : fallback;
 const port = Number(flag("--port", "56473"));
+const keepAlive = args.includes("--keep-alive");
 
 export const world = createWorld();
 const router = new Router();
@@ -31,7 +35,9 @@ for (const routes of [
 ])
   routes.register(router);
 
-const server = http.createServer(createHandler(world, router));
+const server = http.createServer(createHandler(world, router, { keepAlive }));
+// The real API's idle close (local-server.ts, production.ts).
+server.keepAliveTimeout = 5000;
 
 // The live thread connection: the app subscribes with a cursor, the server
 // replays every frame after it, then pushes new ones (the real gateway does
@@ -97,7 +103,9 @@ server.on("upgrade", (req, socket) => {
 });
 
 server.listen(port, "127.0.0.1", () =>
-  console.log(`lane 7 harness listening on http://127.0.0.1:${port}`),
+  console.log(
+    `lane 7 harness listening on http://127.0.0.1:${port}${keepAlive ? " (keep-alive)" : ""}`,
+  ),
 );
 for (const signal of ["SIGINT", "SIGTERM"])
   process.on(signal, () => {

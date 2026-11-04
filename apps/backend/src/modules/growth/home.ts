@@ -198,9 +198,17 @@ export function canonicalConversationHomePage(
               : undefined,
         });
       } catch (error) {
-        // A deleted/denied family can remain briefly in W3's directory. Skip
-        // only that known denial; session/provider/schema failures stay visible.
-        if (error instanceof DomainError && error.code === "thread_unavailable")
+        // A deleted/denied family can remain in W3's directory: the directory
+        // leaves out only this account's own accepted deletions, and Trust's
+        // projection closes a family (scope_revoked) without saying why. Skip
+        // only these per-family refusals. A closed account is refused for the
+        // whole request before Home runs; session/provider/schema failures
+        // stay visible.
+        if (
+          error instanceof DomainError &&
+          (error.code === "thread_unavailable" ||
+            error.code === "scope_revoked")
+        )
           continue;
         throw error;
       }

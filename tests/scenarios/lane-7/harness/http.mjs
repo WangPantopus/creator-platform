@@ -82,7 +82,9 @@ function applyFault(world, req, path) {
   return null;
 }
 
-export function createHandler(world, router) {
+/** `keepAlive` (server.mjs --keep-alive) answers without `Connection: close`,
+ * so a socket stays open until the server closes it idle, as the real API does. */
+export function createHandler(world, router, { keepAlive = false } = {}) {
   return async (req, res) => {
     const started = Date.now();
     const url = new URL(req.url, "http://harness.invalid");
@@ -119,8 +121,9 @@ export function createHandler(world, router) {
         "X-Request-Id": requestId,
         // The emulator reaches this server through an adb tunnel that does not pass
         // on Node's idle close: a reused connection then fails with "unexpected end
-        // of stream". One request per connection keeps both apps honest.
-        Connection: "close",
+        // of stream". One request per connection keeps both apps honest, unless a
+        // run asks to see how an app treats the real API's sockets (--keep-alive).
+        ...(keepAlive ? {} : { Connection: "close" }),
       });
       res.end(text);
     };
