@@ -1,8 +1,8 @@
 // A loopback proxy in front of lane 7's real API that logs what passes, for a
 // scenario that keeps driving a device while it watches: every answer's
-// method, path and status, each live-connection upgrade, and each close frame
-// the server sends (its code and reason). It never logs a header, a token or a
-// body. It runs as its own process, so a scenario's blocking device calls
+// method, path and status, each live-connection upgrade, each data frame the
+// server sends (that it came, not what it holds) and each close frame (its
+// code and reason). It never logs a header, a token or a body. It runs as its own process, so a scenario's blocking device calls
 // (screenshots, adb, XCUITest) never hold the app's requests. Not a mock:
 // every request reaches the real backend unchanged.
 // GET /__proxy/log returns the entries; the app never asks for that path.
@@ -84,6 +84,8 @@ server.on("upgrade", (req, socket, head) => {
       }
       if (pending.length < offset + length) return;
       const payload = pending.subarray(offset, offset + length);
+      // A data frame is logged by its arrival only, never its content.
+      if ((pending[0] & 15) === 1) log({ method: "FRAME", path, status: 0 });
       if ((pending[0] & 15) === 8 && payload.length >= 2)
         log({
           method: "CLOSE",

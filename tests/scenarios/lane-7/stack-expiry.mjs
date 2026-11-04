@@ -408,16 +408,34 @@ if (mode === "expiry") {
   );
   L.screenshot(platform, "stack-expiry-after-renewal");
   // A message from another session, sent after the expiry: it reaches the
-  // open thread through the new live connection.
+  // open thread through the new live connection (a frame, then the page read
+  // the frame asks for), and the thread shows it. Both apps order rows by
+  // createdAt, which the real API sends as PostgreSQL text that neither
+  // parses, so a new row can land above the fold: look up the thread for it.
   const other = await signIn(NUMBER);
   const sentAt = Date.now();
   const sent = await say(other.token, fan, AFTER);
-  const live = await L.waitForText(platform, pattern(AFTER), 20000);
+  const frame = await waitForEntry(sentAt, { method: "FRAME" }, 10000);
+  const read = frame
+    ? await waitForEntry(
+        frame.at,
+        { method: "GET", path: `/v1/conversations/${MAYA}/${fan}` },
+        10000,
+      )
+    : null;
+  let live = await L.waitForText(platform, pattern(AFTER), 15000);
+  let scrolls = 0;
+  for (; !live.ok && platform === "android" && scrolls < 8; scrolls += 1) {
+    A.swipe(540, 700, 540, 1400);
+    await L.sleep(700);
+    const text = screen("find-after");
+    live = { ok: pattern(AFTER).test(text), text };
+  }
   L.step(
     platform,
     "expiry: a message sent from another session after it arrives live",
-    sent === 200 && live.ok,
-    `${((Date.now() - sentAt) / 1000).toFixed(1)} s after it was sent`,
+    sent === 200 && Boolean(frame && read) && live.ok,
+    `a frame ${frame ? ((frame.at - sentAt) / 1000).toFixed(2) : "-"} s and the page read ${read ? ((read.at - sentAt) / 1000).toFixed(2) : "-"} s after the send; on screen${scrolls ? ` after ${scrolls} scroll(s) up the thread` : ""}`,
   );
   await request("POST", "/v1/identity/logout", other.token);
   L.screenshot(platform, "stack-expiry-live-after");
