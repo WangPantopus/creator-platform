@@ -11342,13 +11342,13 @@
         }
       }
     },
-    "Your session ended. Continue with Pantopus again.": {
+    "Your session ended. Sign in to continue.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your session ended. Continue with Pantopus again."
+            "value": "Your session ended. Sign in to continue."
           }
         }
       }
@@ -16325,13 +16325,13 @@
         }
       }
     },
-    "The account changed. Continue with Pantopus again.": {
+    "The account changed. Sign in to continue.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The account changed. Continue with Pantopus again."
+            "value": "The account changed. Sign in to continue."
           }
         }
       }
@@ -17700,13 +17700,13 @@
         }
       }
     },
-    "Your sign-in must be recent. Continue with Pantopus again if asked to verify your account.": {
+    "Your sign-in must be recent. Sign in again if asked to verify your account.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your sign-in must be recent. Continue with Pantopus again if asked to verify your account."
+            "value": "Your sign-in must be recent. Sign in again if asked to verify your account."
           }
         }
       }
