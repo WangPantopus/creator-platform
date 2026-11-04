@@ -12,16 +12,38 @@ import type { ConversationService } from "../modules/conversation/service.js";
 import { requestAuthority } from "../modules/identity/request-authority.js";
 import { DomainError } from "../core/errors.js";
 
-/** A refused subscription or check closes with 1008, except D-11: an account
- * flagged under 18 is refused there and its session ends with it, so the app
- * is told why (an application close code) and shows the adults-only state,
- * not a sign-in. */
-function closeRefused(connection: WebSocket, error: unknown, reason: string) {
+/** A refused subscription or check closes with 1008, with two exceptions that
+ * tell the app why with an application close code:
+ * - 4403, D-11: an account flagged under 18 is refused there and its session
+ *   ends with it, so the app shows the adults-only state, not a sign-in.
+ * - 4401: the socket's access token expired, or the app's renewal rotated it,
+ *   while the session the socket was opened with is live (not revoked, inside
+ *   its refresh window). Nothing was refused: the app renews its credential
+ *   and reconnects, and the new connection is authenticated and authorized
+ *   from the start. A revoked or ended session still closes with 1008. */
+function closeRefused(
+  connection: WebSocket,
+  error: unknown,
+  reason: string,
+  renewable?: () => Promise<boolean>,
+) {
   if (
     error instanceof DomainError &&
     error.code === "adult_eligibility_required"
   )
     connection.close(4403, "adult_eligibility_required");
+  else if (
+    error instanceof DomainError &&
+    error.code === "session_expired" &&
+    renewable
+  )
+    void renewable().then(
+      (live) =>
+        live
+          ? connection.close(4401, "session_renewal_required")
+          : connection.close(1008, reason),
+      () => connection.close(1008, reason),
+    );
   else connection.close(1008, reason);
 }
 export function attachRealtime(
@@ -38,6 +60,9 @@ export function attachRealtime(
       sessionId: string;
       adultVerifiedAt?: string;
     }>;
+    /** Whether a session is still live although a token it issued no longer
+     * resolves (sessions.ts `renewable`), asked by the session's id. */
+    sessionRenewable?: (sessionId: string) => Promise<boolean>;
     telemetry?: {
       observe(name: string, value: number): void;
       increment(name: string, amount?: number): void;
@@ -78,7 +103,7 @@ export function attachRealtime(
   server.once("close", () => conversations.closeFrameNotifications());
   server.on("upgrade", (request, socket, head) => {
     void authenticate(request)
-      .then(() => {
+      .then((opened) => {
         if (request.url !== "/v1/realtime")
           throw new Error("Unknown realtime path");
         sockets.handleUpgrade(request, socket, head, (connection) => {
@@ -92,6 +117,27 @@ export function attachRealtime(
           let replayPending = false;
           let subscriptionsPending = 0;
           let mutations: Promise<void> = Promise.resolve();
+          // The session this socket was opened with, asked by its id when a
+          // later check finds the socket's token no longer resolves.
+          const check = authority.sessionRenewable;
+          const sessionId = opened.sessionId;
+          const renewable =
+            check && sessionId
+              ? async () => {
+                  const live = await check(sessionId);
+                  if (live)
+                    report("increment", "realtime_renewals_required", 1);
+                  return live;
+                }
+              : undefined;
+          // Once refused, nothing more is checked or delivered, including
+          // while closeRefused asks whether that session is still live.
+          let refused = false;
+          const refuse = (error: unknown, reason: string) => {
+            if (refused) return;
+            refused = true;
+            closeRefused(connection, error, reason, renewable);
+          };
           connection.on("message", (data) => {
             if (++subscriptionsPending > 64) {
               report("increment", "realtime_subscription_limit_closed", 1);
@@ -101,7 +147,7 @@ export function attachRealtime(
             report("observe", "realtime_subscriptions_pending", ++pending);
             mutations = mutations
               .then(async () => {
-                if (connection.readyState !== WebSocket.OPEN)
+                if (refused || connection.readyState !== WebSocket.OPEN)
                   throw new Error("Connection closed");
                 const input = SubscribeSchema.parse(
                   JSON.parse(data.toString()),
@@ -146,7 +192,7 @@ export function attachRealtime(
               })
               .catch((error: unknown) => {
                 report("increment", "realtime_subscriptions_refused", 1);
-                closeRefused(connection, error, "Subscription refused");
+                refuse(error, "Subscription refused");
               })
               .finally(() => {
                 subscriptionsPending--;
@@ -154,7 +200,7 @@ export function attachRealtime(
               });
           });
           const drain = () => {
-            if (connection.readyState !== WebSocket.OPEN) return;
+            if (refused || connection.readyState !== WebSocket.OPEN) return;
             replayPending = true;
             if (busy) return;
             replayPending = false;
@@ -248,7 +294,7 @@ export function attachRealtime(
               )
               .catch((error: unknown) => {
                 report("increment", "realtime_batches_refused", 1);
-                closeRefused(connection, error, "Conversation unavailable");
+                refuse(error, "Conversation unavailable");
               })
               .finally(() => {
                 clearTimeout(deadline);

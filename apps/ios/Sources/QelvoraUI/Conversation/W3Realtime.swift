@@ -6,6 +6,14 @@ enum W3RealtimeEvent: Sendable {
     case frame(APIFrame)
 }
 
+/// The credential a connection or request carried no longer resolves, while its
+/// session may still be live: the gateway's 4401 (the access window passed, or
+/// the shell's renewal rotated it), a stored credential the shell replaced under
+/// an open connection, or an HTTP `session_expired`. Not a denial: the thread
+/// keeps its page, draft and pending reply, the shell's own session check renews
+/// the credential or ends the session, and the thread reconnects.
+struct W3CredentialRenewal: Error, Sendable {}
+
 /// Memory-only, account/credential-bound multiplexing. Overflow closes the
 /// connection so each owner obtains a fresh authorized snapshot before replay.
 actor W3Realtime {
@@ -56,7 +64,7 @@ actor W3Realtime {
         origin.path = ""; origin.query = nil; origin.fragment = nil
         guard let originURL = origin.url else { throw URLError(.badURL) }
         let key = Key(origin: originURL.absoluteString, accountId: accountId)
-        if let old = connections[key], old.credential != credential { stop(old, error: accountChanged) }
+        if let old = connections[key], old.credential != credential { stop(old, error: W3CredentialRenewal()) }
         guard connections.values.reduce(0, { $0 + $1.subscriptions.count }) < 64 else { throw unavailable }
         let connection: Connection
         if let current = connections[key] { connection = current }
@@ -100,7 +108,10 @@ actor W3Realtime {
     }
     private func current(_ connection: Connection) -> Bool { connections[connection.key] === connection }
     private func validate(_ connection: Connection) async throws {
-        guard let issuer = URL(string: connection.key.origin), try await SecureSessionStorage(issuer: issuer).read() == connection.credential else { throw accountChanged }
+        guard let issuer = URL(string: connection.key.origin), let stored = try await SecureSessionStorage(issuer: issuer).read() else { throw accountChanged }
+        // The shell rotated the credential: this connection ends, and its owners
+        // reconnect with the new one. The server still confirms the account.
+        guard stored == connection.credential else { throw W3CredentialRenewal() }
         guard current(connection) else { throw unavailable }
         try Task.checkCancellation()
     }
@@ -144,6 +155,8 @@ actor W3Realtime {
             Logger(subsystem: "com.pantopus.qelvora", category: "conversation-realtime").debug("socket_closed code=\(connection.socket.closeCode.rawValue, privacy: .public)")
             #endif
             AdultEligibilityRefusal.reportClose(code: connection.socket.closeCode.rawValue, reason: connection.socket.closeReason, credential: connection.credential)
+            // 4401: this socket's token no longer resolves, but its session is live (gateway.ts).
+            if connection.socket.closeCode.rawValue == 4401 { stop(connection, error: W3CredentialRenewal()); return }
             let denied = connection.socket.closeCode == .policyViolation || connection.socket.closeCode.rawValue == 4403 || (connection.socket.response as? HTTPURLResponse)?.statusCode == 401
             stop(connection, error: denied ? accountChanged : error)
         }

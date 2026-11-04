@@ -727,7 +727,11 @@ export async function createConfiguredBackend(input: {
         assertActorAllowed,
         ...(trust ? { telemetry: trust.telemetry } : {}),
         ...(sessions
-          ? { resolveSession: (token: string) => sessions.resolve(token) }
+          ? {
+              resolveSession: (token: string) => sessions.resolve(token),
+              sessionRenewable: (sessionId: string) =>
+                sessions.renewable(sessionId),
+            }
           : {}),
       },
     );

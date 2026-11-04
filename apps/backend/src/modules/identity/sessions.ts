@@ -303,6 +303,17 @@ export class SessionService implements PantopusIdentityAdapter {
       mode: row.mode,
     };
   }
+  /** Whether a session is still live (not revoked, inside its refresh window)
+   * although a token it issued no longer resolves: its access window passed,
+   * or a renewal rotated it. The realtime gateway asks by the id its socket
+   * was opened with; the answer grants nothing, only how it closes. */
+  async renewable(sessionId: string) {
+    const found = await this.pool.query(
+      "SELECT 1 FROM creator.identity_session WHERE id=$1 AND revoked_at IS NULL AND refresh_until>now()",
+      [sessionId],
+    );
+    return found.rowCount === 1;
+  }
   async refresh(token: string) {
     const session = await this.resolve(token, true);
     const next = randomBytes(32).toString("base64url");

@@ -42,7 +42,9 @@ server.keepAliveTimeout = 5000;
 // The live thread connection: the app subscribes with a cursor, the server
 // replays every frame after it, then pushes new ones (the real gateway does
 // the same, with close code 1008 for a refused subscription). Like the
-// gateway, it re-checks the session every 2 s while the socket is open.
+// gateway, it re-checks the session every 2 s while the socket is open, and
+// closes with 4401 when only the socket's token has expired or been rotated
+// while the session it was opened with is live.
 server.on("upgrade", (req, socket) => {
   const entry = {
     n: ++world.requestCount,
@@ -71,21 +73,27 @@ server.on("upgrade", (req, socket) => {
   if (!connection) return;
   world.sockets.add(connection);
   const subscriptions = new Map();
-  // gateway.ts (drain): a refusal closes the socket with 1008, and D-11 with
-  // 4403. Only a refusal is logged: the check is the server's, not the app's.
+  // gateway.ts (drain): a refusal closes the socket with 1008, D-11 with 4403,
+  // and a live session's expired or rotated token with 4401. Only a refusal is
+  // logged: the check is the server's, not the app's.
   const recheck = setInterval(() => {
     const check = { ...entry, at: new Date().toISOString(), account: null };
     try {
       identity.authenticate({ world, req, entry: check });
     } catch (error) {
       clearInterval(recheck);
+      const live =
+        error.code === "session_expired" &&
+        !auth.session.revoked &&
+        world.now() < auth.session.refreshUntil;
       world.log.push({
         ...check,
         n: ++world.requestCount,
-        status: error.status ?? 401,
+        status: live ? 4401 : (error.status ?? 401),
       });
       if (error.code === "adult_eligibility_required")
         connection.close(4403, "adult_eligibility_required");
+      else if (live) connection.close(4401, "session_renewal_required");
       else connection.close(1008, "Conversation unavailable");
     }
   }, 2000);

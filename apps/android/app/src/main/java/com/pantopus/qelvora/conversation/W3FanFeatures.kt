@@ -117,6 +117,10 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
     var error by remember(root, accountId) { mutableStateOf("") }
     var offline by remember(root, accountId) { mutableStateOf(true) }
     var transportReady by remember(root, accountId) { mutableStateOf(false) }
+    // ConversationRenewal: renew before reconnecting; the first one since the
+    // thread was last live reconnects at once.
+    var renewalRequired by remember(root, accountId) { mutableStateOf(false) }
+    var renewedSinceLive by remember(root, accountId) { mutableStateOf(false) }
     var connectionRetry by remember(root, accountId) { mutableStateOf(0) }
     var busy by remember(root, accountId) { mutableStateOf(false) }
     var introOfferId by remember(root, accountId) { mutableStateOf<String?>(null) }
@@ -254,9 +258,19 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             ConversationOfflineStorage.purge(lease); if (offlineContext == lease) offlineContext = null
         }
     }
+    fun renewal(failure: Throwable) = failure is ConversationRenewal ||
+        (failure is ConversationFailure && failure.status == 401 && failure.code == "session_expired")
     fun fail(failure: Throwable, threadDenied: Boolean = false) {
         if (failure is CancellationException) throw failure
         AdultEligibilityRefusal.report(failure)
+        // Not a denial: the page, draft and pending reply stay while the loop
+        // below renews the credential and reconnects. A renewal that did not take
+        // is said, as a lost connection is; nothing is sent while offline.
+        if (renewal(failure)) {
+            offline = true; transportReady = false; renewalRequired = true
+            if (renewedSinceLive) error = QelvoraCopy.text("nativeReconnectToRefreshYourInputIsKept")
+            return
+        }
         error = failure.message ?: QelvoraCopy.text("nativeReconnectToRefreshYourInputIsKept")
         offline = true; transportReady = false
         if (failure is ConversationFailure && failure.status in listOf(401,403,404)) {
@@ -360,6 +374,13 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         if (!foreground || privacy || comparisonQuestion != null) return@LaunchedEffect
         var backoff = 1000L
         while (isActive) {
+            if (renewalRequired) {
+                // Renew before anything is read or subscribed again, through the
+                // shell's own session check: it rotates the credential, or ends
+                // the session, which ends this thread as a sign-out does.
+                renewalRequired = false; renewedSinceLive = true
+                session.renewCredential()
+            }
             try {
                 refresh(propagateFailure = true)
                 val current = page
@@ -373,7 +394,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                         client.frames(current, current.cursor).collect { event ->
                             when (event) {
                                 ConversationRealtimeEvent.Connected -> {
-                                    transportReady = true; backoff = 1000L
+                                    transportReady = true; backoff = 1000L; renewedSinceLive = false
                                     refresh(propagateFailure = true)
                                 }
                                 is ConversationRealtimeEvent.Frame -> {
@@ -388,8 +409,11 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 }
             } catch (failure: Throwable) {
                 fail(failure)
-                if (failure is ConversationFailure && failure.status in listOf(401,403,404)) return@LaunchedEffect
+                if (!renewal(failure) && failure is ConversationFailure && failure.status in listOf(401,403,404)) return@LaunchedEffect
             } finally { transportReady = false; offline = true }
+            // The first renewal since the thread was live reconnects at once; one
+            // that did not take waits, as any other reconnect does.
+            if (renewalRequired && !renewedSinceLive) continue
             showOffline()
             delay(backoff + Random.nextLong(0, backoff / 4 + 1))
             backoff = minOf(15000L, backoff * 2)

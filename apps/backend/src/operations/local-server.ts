@@ -710,6 +710,7 @@ const sockets = attachRealtime(
       assertRestoredTraffic();
       return nativeIdentity.resolve(token);
     },
+    sessionRenewable: (sessionId) => nativeIdentity.renewable(sessionId),
     telemetry,
   },
 );

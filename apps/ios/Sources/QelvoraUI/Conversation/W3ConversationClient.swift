@@ -154,6 +154,10 @@ final class W3ThreadModel: ObservableObject {
     private var active = false
     private var transportReady = false
     private var authorizationDenied = false
+    // W3CredentialRenewal: renew before reconnecting; the first one since the
+    // thread was last live reconnects at once.
+    private var renewalRequired = false
+    private var renewedSinceLive = false
     private var connectionRun: UUID?
     private var activeLease: UUID?
     private var resumeActivated = false
@@ -280,9 +284,17 @@ final class W3ThreadModel: ObservableObject {
         defer { if connectionRun == run { transportReady = false; offline = true } }
         while active && !Task.isCancelled {
             transportReady = false; offline = true
+            if renewalRequired {
+                // Renew before anything is read or subscribed again, through the
+                // shell's own session check: it rotates the credential, or ends
+                // the session, which ends this thread as a sign-out does.
+                renewalRequired = false; renewedSinceLive = true
+                await CredentialRenewal.renew()
+                if Task.isCancelled || !active { return }
+            }
             await refresh()
             if authorizationDenied || Task.isCancelled || !active { return }
-            if let page {
+            if let page, !renewalRequired {
                 do {
                     // The current authorized page covers all earlier cursors.
                     // Persisted metadata cannot authorize replay of old content.
@@ -294,14 +306,14 @@ final class W3ThreadModel: ObservableObject {
                                 guard active, !Task.isCancelled, connectionRun == run else { break }
                                 switch event {
                                 case .connected:
-                                    transportReady = true; delay = 1
+                                    transportReady = true; delay = 1; renewedSinceLive = false
                                     await refresh()
                                 case .frame(let frame):
                                     // C5: paint what the frames carry; refetch only for the rest.
                                     let ready = try gate?.receive(frame) ?? []
                                     if !ready.map(paint).allSatisfy({ $0 }) { await refresh() }
                                 }
-                                if authorizationDenied { break }
+                                if authorizationDenied || renewalRequired { break }
                             }
                         } catch { if !Task.isCancelled { failed(error) } }
                     } onCancel: { Task { await W3Realtime.shared.release(lease.id) } }
@@ -311,6 +323,9 @@ final class W3ThreadModel: ObservableObject {
             }
             transportReady = false; offline = true
             if authorizationDenied || Task.isCancelled || !active { return }
+            // The first renewal since the thread was live reconnects at once;
+            // one that did not take waits, as any other reconnect does.
+            if renewalRequired && !renewedSinceLive { continue }
             await showOffline()
             do { try await Task.sleep(for: .seconds(delay + Double.random(in: 0...0.5))) }
             catch { return }
@@ -419,10 +434,19 @@ final class W3ThreadModel: ObservableObject {
         else if error is ThreadDeliveryError { diagnostic.debug("conversation_replay_required") }
         else if error is CancellationError { diagnostic.debug("conversation_cancelled") }
         else if error is DecodingError { diagnostic.debug("conversation_decode_failed") }
+        else if error is W3CredentialRenewal { diagnostic.debug("conversation_credential_renewal") }
         else { diagnostic.debug("conversation_local_failed") }
         #endif
         transportReady = false; offline = true
         if let id = activeLease { Task { await W3Realtime.shared.release(id) } }
+        // Not a denial: the page, draft and pending reply stay while connect()
+        // renews the credential and reconnects. A renewal that did not take is
+        // said, as a lost connection is; nothing is sent while offline.
+        if error is W3CredentialRenewal || (error as? W3Failure).map({ $0.status == 401 && $0.code == "session_expired" }) == true {
+            renewalRequired = true
+            if renewedSinceLive { failure = QelvoraCopy.text("nativeReconnectToRefreshYourInputIsKept") }
+            return
+        }
         Task { [weak self] in await self?.showOffline() }
         if let failure = error as? W3Failure {
             self.failure = failure.message
