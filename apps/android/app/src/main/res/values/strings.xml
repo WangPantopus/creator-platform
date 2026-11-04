@@ -1051,7 +1051,7 @@
   <string name="w5_content_access_unavailable" formatted="false">This content is unavailable. Check current access to try again.</string>
   <string name="w5_content_refresh_unavailable" formatted="false">Content could not be refreshed. Reconnect and check current access. Your input is kept.</string>
   <string name="w5_content_action_unconfirmed" formatted="false">We could not confirm this action. Check current access before retrying. Your input is kept.</string>
-  <string name="w5_content_session_ended" formatted="false">Your session ended. Continue with Pantopus again.</string>
+  <string name="w5_content_session_ended" formatted="false">Your session ended. Sign in to continue.</string>
   <string name="w5_content_account_changed" formatted="false">The signed-in account changed. Refresh before continuing.</string>
   <string name="w5_content_changed" formatted="false">This changed while you were viewing it. Refresh before trying again.</string>
   <string name="w5_content_duplicate_changed" formatted="false">This retry differs from the earlier action. Refresh before trying again.</string>
@@ -1516,7 +1516,7 @@
   <string name="native_thanks_is_unavailable_your_input" formatted="false">Thanks is unavailable. Your input is kept; refresh before saving.</string>
   <string name="native_thanks_optional" formatted="false">Thanks · optional</string>
   <string name="native_the_a_i_keeps_no_memory_from" formatted="false">The AI keeps no memory from it. It is still labeled, visible to the creator and their team, and you can delete it.</string>
-  <string name="native_the_account_changed_continue_with" formatted="false">The account changed. Continue with Pantopus again.</string>
+  <string name="native_the_account_changed_continue_with" formatted="false">The account changed. Sign in to continue.</string>
   <string name="native_the_app_store_has_no_available" formatted="false">The App Store has no available monthly memberships for this catalog.</string>
   <string name="native_the_app_store_is_unavailable_reconnect" formatted="false">The App Store is unavailable. Reconnect to try again.</string>
   <string name="native_the_app_store_transaction_could_not" formatted="false">The App Store transaction could not be verified. No access was granted.</string>
@@ -1642,9 +1642,9 @@
   <string name="native_your_session_changed_load_this_recording" formatted="false">Your session changed. Load this recording again.</string>
   <string name="native_your_session_changed_refresh_your" formatted="false">Your session changed. Refresh your account before continuing.</string>
   <string name="native_your_session_ended" formatted="false">Your session ended.</string>
-  <string name="native_your_session_ended_continue_with" formatted="false">Your session ended. Continue with Pantopus again.</string>
+  <string name="native_your_session_ended_continue_with" formatted="false">Your session ended. Sign in to continue.</string>
   <string name="native_your_sharing_choice_is_saved" formatted="false">Your sharing choice is saved.</string>
-  <string name="native_your_sign_in_must_be_recent" formatted="false">Your sign-in must be recent. Continue with Pantopus again if asked to verify your account.</string>
+  <string name="native_your_sign_in_must_be_recent" formatted="false">Your sign-in must be recent. Sign in again if asked to verify your account.</string>
   <string name="native_your_spending_choice_is_saved" formatted="false">Your spending choice is saved.</string>
   <string name="native_your_time_summary_is_unavailable" formatted="false">Your time summary is unavailable until conversation activity is connected.</string>
   <string name="native_youre_offline" formatted="false">You\'re offline</string>

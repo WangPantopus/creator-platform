@@ -96,11 +96,7 @@ export class DevelopmentIdentityAdapter implements PantopusIdentityAdapter {
       !token.startsWith("development:") ||
       !this.developmentActors.some((actor) => actor.id === accountId)
     )
-      throw new DomainError(
-        "session_invalid",
-        "Continue with Pantopus again.",
-        401,
-      );
+      throw new DomainError("session_invalid", "Sign in to continue.", 401);
     return { accountId, adultEligible: !this.ineligibleActors.has(accountId) };
   }
 }
