@@ -34,42 +34,42 @@ A number is steps or flows passed of those run. "Fixed" means the check, the fak
 needed a small fix, described under [Fixed in this change](#fixed-in-this-change), and passed after
 it. The follow-ups are numbered under [Follow-ups](#follow-ups).
 
-| Check                       | What it checks                                                                 | iOS                                                               | Android                                                           |
-| --------------------------- | ------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------------- |
-| E7.1 H1 to H12              | Sign-in through the debug hook, a session that ends, a network drop            | 12/12 (H12 fixed)                                                 | 12/12 (H12 fixed)                                                 |
-| E7.1 S1 to S8, E1, L1 to L5 | Every thread state, a server error, live delivery                              | 14/14                                                             | 14/14                                                             |
-| E7.1 F1, F2                 | Discover to a first message and its streamed reply                             | 2/2 (newly scripted)                                              | 2/2                                                               |
-| E7.1 release build          | The debug hook is absent                                                       | pass: none of its 7 markers in the Release build                  | not run: no release APK                                           |
-| E7.2 N1 to N21              | Back and restore, links into the app                                           | 17/18: N14 fails (follow-up 2)                                    | RUNNING                                                           |
-| E7.2 on the stack           | Navigation against the real backend                                            | pass                                                              | pass: 3/3 API, 15/15 operated                                     |
-| E7.3 D1 to D8               | Drafts through restarts, rotation, the largest text                            | 9/10: D3 fails (follow-up 9)                                      | RUNNING: D1 to D4R pass                                           |
-| E7.3 D6 on the stack        | A real send once, then a real deletion clears the draft                        | pass (fixed): one deletion job, one tombstone, eight domain tasks | RUNNING                                                           |
-| E7.4 P1, R1 to R12          | Notes and reactions in the thread                                              | 3/7 flows (follow-up 3)                                           | 21/35 steps (follow-up 3)                                         |
-| E7.4 P2                     | Notification rows                                                              | 4/4                                                               | 9/9                                                               |
-| E7.4 P3 seal                | The creator's seal                                                             | 3/3                                                               | 9/9                                                               |
-| E7.4 P3 composer            | The composer states                                                            | 5/5                                                               | 10/10                                                             |
-| E7.4 P4                     | Citations                                                                      | 3/3                                                               | 4/4                                                               |
-| E7.4 P5                     | Named pickers                                                                  | 5/5                                                               | RUNNING: 6/8, P5.1 fixed                                          |
-| E7.4 P6                     | The provider sentence                                                          | 5/5 (fixed)                                                       | 7/7                                                               |
-| E7.4 P7                     | The under-18 state, on Home                                                    | 3/3                                                               | 6/6                                                               |
-| E7.4 P8                     | The 3-hour reminder                                                            | 5/5                                                               | 5/5                                                               |
-| E7.4 P9                     | The packet's terms                                                             | 3/3                                                               | 3/3                                                               |
-| E7.4 P11                    | No comparison placeholder                                                      | 4/4                                                               | 7/7                                                               |
-| E7.4 chat link              | A chat link opens the existing conversation                                    | 2/2 (fixed)                                                       | 2/2                                                               |
-| E7.8 P1                     | Requests a minute, thread open and idle (target 12)                            | 64: fails (follow-up 4)                                           | 66: fails (follow-up 4)                                           |
-| E7.8 P2                     | An answer painted from its frames                                              | 2/2                                                               | 2/2                                                               |
-| E7.8 P3                     | Offline: saved thread, backing off, catch-up                                   | 2/3: the saved thread does not stay (follow-up 5)                 | 2/3: the same                                                     |
-| E7.8 P4                     | Nothing sent from the background                                               | 0 requests: pass                                                  | 0 requests: pass                                                  |
-| E7.10 C1 to C5              | No literal text, every key exists, no forbidden word                           | 5/5 for both apps' sources (C1 fixed)                             |                                                                   |
-| E7.11 A1                    | Contrast of every text token and the sending bubble                            | pass for both, from the tokens                                    |                                                                   |
-| E7.11 A2                    | Who is speaking comes first                                                    | pass (fixed)                                                      | 8/8 (fixed)                                                       |
-| E7.11 A3                    | On/off settings are switches                                                   | pass (fixed)                                                      | 4 "is a switch" steps fail, every state step passes (follow-up 6) |
-| E7.11 A4                    | Choices are named and say which is chosen                                      | pass                                                              | 7/7 (fixed)                                                       |
-| E7.11 A5                    | The largest text keeps the switches reachable                                  | RUNNING                                                           | the "as a switch" steps fail (follow-up 6)                        |
-| E7.12 Z1                    | A creator's account opens the web Studio                                       | pass                                                              | can't run: no web origin                                          |
-| E7.12 Z2                    | A fan's account has no Studio link                                             | pass                                                              | pass, but no account has a link                                   |
-| E7.12 Z3                    | The real web lands at its sign-in, returns to the Studio, then lands signed in | pass (newly scripted, on the stack)                               | can't run: no web origin                                          |
-| Harness contract            | The fake against the real schemas                                              | 64/64                                                             |                                                                   |
+| Check                       | What it checks                                                                 | iOS                                                               | Android                                                                                           |
+| --------------------------- | ------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| E7.1 H1 to H12              | Sign-in through the debug hook, a session that ends, a network drop            | 12/12 (H12 fixed)                                                 | 12/12 (H12 fixed)                                                                                 |
+| E7.1 S1 to S8, E1, L1 to L5 | Every thread state, a server error, live delivery                              | 14/14                                                             | 14/14                                                                                             |
+| E7.1 F1, F2                 | Discover to a first message and its streamed reply                             | 2/2 (newly scripted)                                              | 2/2                                                                                               |
+| E7.1 release build          | The debug hook is absent                                                       | pass: none of its 7 markers in the Release build                  | not run: no release APK                                                                           |
+| E7.2 N1 to N21              | Back and restore, links into the app                                           | 17/18: N14 fails (follow-up 2)                                    | 21/21 (fixed)                                                                                     |
+| E7.2 on the stack           | Navigation against the real backend                                            | pass                                                              | pass: 12/12 operated, 3/3 API                                                                     |
+| E7.3 D1 to D8               | Drafts through restarts, rotation, the largest text                            | 9/10: D3 fails (follow-up 9)                                      | 10/10 (D5 fixed); D7 and D7U not run (follow-up 8)                                                |
+| E7.3 D6 on the stack        | A real send once, then a real deletion clears the draft                        | pass (fixed): one deletion job, one tombstone, eight domain tasks | 5/5 (fixed) behind a `Connection: close` proxy; without it the deletion half fails (follow-up 12) |
+| E7.4 P1, R1 to R12          | Notes and reactions in the thread                                              | 3/7 flows (follow-up 3)                                           | 21/35 steps (follow-up 3)                                                                         |
+| E7.4 P2                     | Notification rows                                                              | 4/4                                                               | 9/9                                                                                               |
+| E7.4 P3 seal                | The creator's seal                                                             | 3/3                                                               | 9/9                                                                                               |
+| E7.4 P3 composer            | The composer states                                                            | 5/5                                                               | 10/10                                                                                             |
+| E7.4 P4                     | Citations                                                                      | 3/3                                                               | 4/4                                                                                               |
+| E7.4 P5                     | Named pickers                                                                  | 5/5                                                               | 8/8 (P5.1 fixed)                                                                                  |
+| E7.4 P6                     | The provider sentence                                                          | 5/5 (fixed)                                                       | 7/7                                                                                               |
+| E7.4 P7                     | The under-18 state, on Home                                                    | 3/3                                                               | 6/6                                                                                               |
+| E7.4 P8                     | The 3-hour reminder                                                            | 5/5                                                               | 5/5                                                                                               |
+| E7.4 P9                     | The packet's terms                                                             | 3/3                                                               | 3/3                                                                                               |
+| E7.4 P11                    | No comparison placeholder                                                      | 4/4                                                               | 7/7                                                                                               |
+| E7.4 chat link              | A chat link opens the existing conversation                                    | 2/2 (fixed)                                                       | 2/2                                                                                               |
+| E7.8 P1                     | Requests a minute, thread open and idle (target 12)                            | 64: fails (follow-up 4)                                           | 66: fails (follow-up 4)                                                                           |
+| E7.8 P2                     | An answer painted from its frames                                              | 2/2                                                               | 2/2                                                                                               |
+| E7.8 P3                     | Offline: saved thread, backing off, catch-up                                   | 2/3: the saved thread does not stay (follow-up 5)                 | 2/3: the same                                                                                     |
+| E7.8 P4                     | Nothing sent from the background                                               | 0 requests: pass                                                  | 0 requests: pass                                                                                  |
+| E7.10 C1 to C5              | No literal text, every key exists, no forbidden word                           | 5/5 for both apps' sources (C1 fixed)                             |                                                                                                   |
+| E7.11 A1                    | Contrast of every text token and the sending bubble                            | pass for both, from the tokens                                    |                                                                                                   |
+| E7.11 A2                    | Who is speaking comes first                                                    | pass (fixed)                                                      | 8/8 (fixed)                                                                                       |
+| E7.11 A3                    | On/off settings are switches                                                   | pass (fixed)                                                      | 4 "is a switch" steps fail, every state step passes (follow-up 6)                                 |
+| E7.11 A4                    | Choices are named and say which is chosen                                      | pass                                                              | 7/7 (fixed)                                                                                       |
+| E7.11 A5                    | The largest text keeps the switches reachable                                  | pass (fixed)                                                      | the "as a switch" steps fail (follow-up 6)                                                        |
+| E7.12 Z1                    | A creator's account opens the web Studio                                       | pass                                                              | can't run: no web origin                                                                          |
+| E7.12 Z2                    | A fan's account has no Studio link                                             | pass                                                              | pass, but no account has a link                                                                   |
+| E7.12 Z3                    | The real web lands at its sign-in, returns to the Studio, then lands signed in | pass (newly scripted, on the stack)                               | can't run: no web origin                                                                          |
+| Harness contract            | The fake against the real schemas                                              | 64/64                                                             |                                                                                                   |
 
 E7.5, E7.6, E7.7 and E7.9 have no scenario yet: see [Not run here](#not-run-here-and-why).
 
@@ -110,7 +110,8 @@ more than a small change. Each says what was seen and what would fix it.
    thread open, the thread's presence read or offline lease is the first request after the flag. The
    server answers it `403 adult_eligibility_required` and ends the session there (`sessions.ts`,
    D-11), so the shell's next session check gets a plain 401, and both apps say "Your session ended.
-   Continue with Pantopus again." at sign-in instead of the adults-only state. On Home it works.
+   Continue with Pantopus again." (since #548, "Your session ended. Sign in to continue.") at sign-in
+   instead of the adults-only state. On Home it works.
    Suggested fix: send a `403 adult_eligibility_required` from any authenticated request (iOS
    `W3ConversationClient.failed` and `W3ContentPresence`, Android `W3FanFeatures.kt` and
    `ContentPresence.kt`) to the shell's D-11 handling (purge, adults-only state), then add an "in a
@@ -119,8 +120,9 @@ more than a small change. Each says what was seen and what would fix it.
    `qelvora://app/admin` correctly says "This link is unavailable" and stays put. Back then shows
    Home as "Unavailable. Continue with Pantopus to open your account's current state." with two tab
    bars stacked at the bottom, instead of "Your people". Lane 7 passed N14 by hand before the
-   consolidation. Suggested start: how `FanShell`'s link handler (`model.open(target, arrival:)` for
-   a target `ApplicationDestination` doesn't permit) leaves the shell's error and destination for Home.
+   consolidation, and Android passes it here. Suggested start: how `FanShell`'s link handler
+   (`model.open(target, arrival:)` for a target `ApplicationDestination` doesn't permit) leaves the
+   shell's error and destination for Home.
 3. **Native presence breaks four of lane 7's C4 rules** (#516's reader, merged after lane 7 wrote
    them; [the rules](../archive/lanes/status/lane-7-rendering-parity.md#p1-notes-and-reactions-in-the-thread-c4)):
    - rule 1, "when": #516 reads every 2 s instead of on open, return and reconnect (iOS R4: 6 reads,
@@ -166,6 +168,34 @@ more than a small change. Each says what was seen and what would fix it.
 11. **iOS reads the page twice per offline retry** at first (P3: two `GET` of the page 20 ms apart at
     each of the first two steps). Harmless within P3's limit; worth one fetcher when presence is
     reworked.
+12. **Android: every other 30-second session check fails against the real API** (D6 on the stack, 4 of
+    4 runs without a proxy). The logcat alternates `session_transport_failed` and `session_reconfirmed`
+    30 s apart, through `adb reverse` and through the emulator's own `10.0.2.2` alike. After each failure
+    the shell says "Reconnect to refresh your account. Actions are unavailable while offline.", the
+    privacy screen says "Account unavailable" and drops its verification, and "Request deletion" stays
+    disabled, so D6's deletion half timed out each time. The cause: the backend closes an idle
+    keep-alive socket after 5 s (`keepAliveTimeout = 5000` in `local-server.ts`, and in `production.ts`
+    and `deploy.ts`), while Android's shared OkHttp clients (`CreatorAPITransport` in the generated
+    `QelvoraAPI.kt`, and `ConversationClient`) keep idle sockets for 5 minutes and set
+    `retryOnConnectionFailure(false)`. OkHttp doesn't probe a pooled socket before reusing it for a
+    `GET`, so the next check goes out on the closed socket and fails; that evicts it, and the check
+    after opens a new one. Behind lane 7's `delay-proxy.mjs`, which answers `Connection: close`, no
+    check failed and D6 passed 5/5. iOS's `URLSession` retries an idempotent request on a lost reused
+    connection, and iOS D6 passed on the same stack. Whether the pilot sees this depends on what sits
+    in front of the API. Suggested fix: give those clients a `ConnectionPool` whose keep-alive is
+    under the server's 5 s, which sends nothing twice (in the generator of `QelvoraAPI.kt` and in
+    `ConversationClient.kt`), or keep sockets open longer on the server than the 30-second check. Then
+    run D6 without the proxy. Lane 7's fake API answers `Connection: close` for this reason.
+13. **Home refuses after a conversation is deleted** (both development actors on the stack, after D6
+    on each app). `GET /v1/growth/home` answers `403 scope_revoked` ("This scope is closed.") for the
+    whole page, and Android shows Home as only "Unavailable. This action is unavailable to this
+    account." with Try again (iOS reads the same endpoint). The account's conversation list
+    (`GET /v1/conversations/account`) still returns the deleted thread 35 minutes later, and
+    `canonicalConversationHomePage` (`apps/backend/src/modules/growth/home.ts`) skips a listed thread
+    only when opening it fails with `thread_unavailable`, while a deleted thread fails with
+    `scope_revoked`. Suggested fix: leave a deleted conversation out of the account's list, or skip
+    `scope_revoked` there as well, then add a Home step after D6's deletion. Until then, run
+    `stack-navigation.mjs` before `stack-drafts.mjs` on a stack.
 
 ## Fixed in this change
 
@@ -192,8 +222,9 @@ encodes still holds.
 - **Compose reports a chosen item as checked.** Android's A4 looked for `selected`; Compose reports
   `selected` on anything but a tab as checked, with the state "Selected". A4 accepts that now.
 - **A5 dragged outside the page at the largest text.** The development banner is a scroll view of its
-  own there, and the tab bar takes a third of the screen, so A5's drags moved nothing. They now start
-  inside the page's scroll view.
+  own there, taller than the page's, and the tab bar takes a third of the screen, so A5's drags moved
+  nothing. They now start inside the page's scroll view, the lowest one, and may take up to 40 drags
+  each way: reaching all four switches took 230 s.
 - **H12 waited 20 s for recovery**, but the session is checked every 30 s since #506; it now waits
   40 s, as H10 and H11 already did.
 - **P3 counted requests, not attempts.** When the fake drops a connection, iOS's network stack sends
@@ -204,6 +235,10 @@ encodes still holds.
 - **The copy scan (E7.10 C1)** met five literals added after lane 7 wrote it, none shown to anyone:
   four presence diagnostics that both apps catch before display, and the debug-only "Use a
   development account". They join its list of allowed developer text.
+- **The real-stack scripts' links carried the fake API's origin:** the Android runner's
+  `LANE7_API_URL` reached the links they open (a warm link ignores it, so the navigation result
+  stands). Each now sets its own, and their own reads retry once when the API closed a kept-alive
+  socket under them ("other side closed").
 - **The runners:** `LANE7_API_URL` gives CI's APK its API origin at every launch and cold link;
   `LANE7_IOS` now reaches the iOS link driver; `LANE7_STACK_API` and `LANE7_STACK_POSTGRES` point the
   real-stack scripts and the iOS real-stack test at any stack; and `ios-navigation.mjs` skips the
@@ -263,8 +298,10 @@ And for Android, with CI's debug APK installed on `LANE7_ANDROID=<serial>`:
 export LANE7_PORT=56944 LANE7_API_URL=http://127.0.0.1:56944
 node tests/scenarios/lane-7/e7-1-signin.mjs android  # and each e7-*.mjs script with "android" or step IDs
 export LANE7_STACK_API=http://127.0.0.1:56941 LANE7_STACK_POSTGRES=qelvora-lanedevchk-postgres
-node tests/scenarios/lane-7/stack-navigation.mjs android
-node tests/scenarios/lane-7/stack-drafts.mjs android
+node tests/scenarios/lane-7/stack-navigation.mjs android  # before D6, which deletes its conversation (follow-up 13)
+# Until follow-up 12 is fixed, D6 puts the app behind a proxy that answers Connection: close:
+node tests/scenarios/lane-7/delay-proxy.mjs --listen 56947 --target 56941 --hold "GET /none" --ms 0 &
+LANE7_APP_API=http://127.0.0.1:56947 node tests/scenarios/lane-7/stack-drafts.mjs android
 ```
 
 The E7.10 copy scan needs no device: `node tests/scenarios/lane-7/e7-10-copy.mjs`.

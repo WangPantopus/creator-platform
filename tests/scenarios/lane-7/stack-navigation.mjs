@@ -7,6 +7,8 @@ import * as android from "./android-ui.mjs";
 import { waitForText, sleep } from "./lib.mjs";
 
 const api = process.env.LANE7_STACK_API ?? "http://127.0.0.1:56471";
+// Links opened through android-ui.mjs carry this origin, not a fake API's.
+process.env.LANE7_API_URL = api;
 const creator = "20000000-0000-4000-8000-000000000001";
 async function request(method, path, token, body) {
   const response = await fetch(api + path, {

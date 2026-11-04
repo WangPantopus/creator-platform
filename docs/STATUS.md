@@ -231,6 +231,12 @@ pure logic and bug regressions, and confirms the 2026-10-09 rule. Still open:
   - **CI's Android APK** has no web origin, and CI publishes no instrumentation APK, so Android Z1, Z3,
     D7 and D7U can't run on this Mac.
   - **Release builds still register `qelvora://`** (WP 7.6, which waits on the domain).
+  - **Android's session check fails every other time against the real API:** the backend closes an
+    idle socket after 5 s, and Android's OkHttp clients reuse it without retrying, so actions such as
+    "Request deletion" are disabled for 30 s at a time. Android D6 passed only behind a
+    `Connection: close` proxy.
+  - **Home refuses after a conversation is deleted:** `GET /v1/growth/home` answers `403 scope_revoked`,
+    because the deleted thread stays in the account's conversation list.
 - **Invitation bursts:** under heavy load an invitation create can be refused after about 5.5
   seconds; it writes nothing and can be retried (#527).
 
