@@ -7,7 +7,7 @@ results and the tickets are from 2026-10-09. Three details have changed since:
 - for a new wave, the pin script `apps/backend/scripts/wave-pins.ts` (#538) runs most of
   [the procedure](#the-procedure-when-a-migration-adds-removes-or-changes-a-relation), which says
   which steps are still by hand;
-- the tool reads the newest review file, which on 2026-11-03 is `20261101-pilot-columns.json`, not
+- the tool reads the newest review file, which on 2026-11-03 is `20261103-ops-console.json`, not
   `20261008-comparison.json`;
 - CI does not run `check` yet ([what CI checks](migrations.md#what-ci-checks)).
 

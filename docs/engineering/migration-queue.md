@@ -12,7 +12,9 @@ register, keep or delete. Nothing here registers or deletes anything.
 
 Triaged on 2026-11-03 at `37a47bd84` (registered head `0258_w4_provider_inbox_worker`) by reading
 every file and every place in `apps/`, `packages/`, `infra/`, `scripts/` and `tests/` that names its
-objects. No file was applied to a database. To list the queue again:
+objects. No file was applied to a database. Since then the ops-console wave has registered three of
+the files as 0259 to 0261 ([registered since the triage](#registered-since-the-triage)). To list
+the queue again:
 
 ```sh
 node -e 'const r=require("./infra/migrations.json"),s=new Set(r.migrations.map(m=>m.path));for(const p of require("child_process").execSync("git ls-files \"*.sql\"",{encoding:"utf8"}).trim().split("\n"))if(!s.has(p))console.log(p)'
@@ -22,24 +24,31 @@ node -e 'const r=require("./infra/migrations.json"),s=new Set(r.migrations.map(m
 
 No endpoint crashes on a missing queue object: every backend reader that names one checks the
 catalogue, the ledger or the registry first, catches the error, or is never built by `server.ts`.
-Four places still fail on every real database, three of them in the ops console the pilot needs
-(phase 3):
+Four places failed on every real database, three of them in the ops console the pilot needs
+(phase 3). The ops-console wave, `20261103-ops-console`, fixed those three; the fourth waits with
+Team triage:
 
-1. **Naming an ops reviewer** (phase 3, "a named reviewer"). The runbook command
-   [`trust/ops-members.ts`](../../apps/backend/src/modules/trust/ops-members.ts) has no guard. `list
-   --changes` (line 159) fails with "relation `creator_trust.ops_member_change` does not exist",
-   `add` (line 104) is refused by row security, and `remove` finds nobody. So on a real database
-   only a superuser can name a reviewer. Needs `trust/pending-ops-member-admin.sql`. The local
-   stack hides this: its seed inserts the reviewers as an administrator
-   (`infra/local/seed-stack.sql:20-24`).
-2. **Supervisor audits** (phase 3). `GET /v1/trust/operations/audits`
-   (`trust/service.ts:1396-1418`) relies on a row-security policy that only
-   `trust/pending-supervisor-audits.sql` adds. Without it a supervisor sees only their own records
-   under the banner "Every reviewer's latest 100 case access and action records."
-   (`apps/web/app/ops/audits/page.tsx:35`). The result is wrong, and nothing reports it.
-3. **Lifting a pause** (phase 3). `POST /v1/trust/cases/:id/lift-pause`
-   (`trust/service.ts:797-820`) answers 503 `pause_lift_unavailable` until
-   `trust/pending-lift-pause.sql` is registered. This one is guarded by design.
+1. **Naming an ops reviewer** (phase 3, "a named reviewer"). Fixed by `0259_w8_ops_member_admin`.
+   The runbook command [`trust/ops-members.ts`](../../apps/backend/src/modules/trust/ops-members.ts)
+   runs its statements as `creator_trust_owner`, and `ops_member` and `case_access` force row
+   security. Without 0259, `list --changes` failed with "relation `creator_trust.ops_member_change`
+   does not exist", `add` was refused by row security, and `remove` found nobody, so only a
+   superuser's own SQL could name a reviewer. The local stack still seeds the development reviewers
+   as an administrator (`infra/local/seed-stack.sql:20-24`): the runbook names only Qelvora
+   accounts, and the development identity's accounts are not rows of `creator.account`. Run the
+   runbook with the migration login the operator uses. A separate login that is a member of the
+   owner roles changes the `purposeProfiles` pin, which the operator's role checks compare.
+2. **Supervisor audits** (phase 3). Fixed by `0260_w8_supervisor_audits`.
+   `GET /v1/trust/operations/audits` (`trust/service.ts:1396-1418`) relies on the row-security
+   policy `audit_supervisor_read`. Without it a supervisor saw only their own records under the
+   banner "Every reviewer's latest 100 case access and action records."
+   (`apps/web/app/ops/audits/page.tsx:35`), and nothing reported it. The file was revised before it
+   was registered ([below](#registered-since-the-triage)).
+3. **Lifting a pause** (phase 3). Fixed by `0261_w8_lift_pause`.
+   `POST /v1/trust/cases/:id/lift-pause` (`trust/service.ts:797-820`) answered 503
+   `pause_lift_unavailable` until the file was registered, as its guard intends. A lift ends the
+   restriction at once; the AI comes back only through lane 3's `agent.resume` handler, which
+   doesn't exist yet, so the resume waits, blocked.
 4. **Team triage of a fan thread** (S-C10 Team). A Team member with the triage role who opens a fan
    thread or sends a Team reply (`conversation/feature.ts:847`, `:1191`) goes through
    `trust/scope-restriction.ts:141`, which calls `creator_trust.team_thread_denial`. Only
@@ -56,8 +65,8 @@ Four places still fail on every real database, three of them in the ops console 
 Moment 2 also doesn't work without its two queue files, though nothing fails: the memory writer is
 never built (no review lists its consumer), and one deleted memory or "don't remember this" makes
 the AI drop the thread's whole history, memory and intro (the registered 0179 rule). No test
-installs a queue file. The lane 1 and lane 3 scenarios that need one ask for it to be applied by
-hand, and they don't run in CI.
+installs a queue file. The lane 3 scenarios that need one ask for it to be applied by hand, and
+they don't run in CI. The lane 1 ops scenarios now get their files from the stack.
 
 Some files would break things if they were registered as written, and their rows say how:
 `identity/schema-publication-scope.sql` (0158) would stop Note reply review,
@@ -69,12 +78,16 @@ to run under a new number.
 
 | Class | Files |
 | --- | --- |
-| Needed for the pilot | 5 |
+| Needed for the pilot | 2 |
 | Unclear: the founder decides | 2 |
 | Needed later | 27 |
 | Obsolete | 16 |
 | Not a migration | 11 |
-| **All unregistered `.sql` files** | **61** |
+| **All unregistered `.sql` files** | **58** |
+
+The triage counted 61, 5 of them needed for the pilot; the ops-console wave registered 3 of the 5.
+Five of the 11 that are not migrations were evidence copies under `artifacts/`, which Wave 5
+removed, so 53 unregistered files are in the tree.
 
 **Against #527's list of 42.** The 42 files under `apps/backend/src/modules/` are the same on this
 base; nothing was added or registered since. The recount finds 19 more outside that folder: 8 W8
@@ -93,9 +106,6 @@ reserved number. Rows are in the order of the [proposed waves](#proposed-waves).
 
 | File | Reserved | Added by | Creates | Needs first | Read by | Class | Why |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `trust/pending-ops-member-admin.sql` | — | #472 (2026-10-16) | Owner policies on `ops_member` and `case_access`; table `ops_member_change`, an append-only change log | 0008 | The runbook `trust/ops-members.ts` (no endpoint) | Pilot: phase 3 | Without it nobody but a superuser can name a reviewer. Latent failure 1 |
-| `trust/pending-supervisor-audits.sql` | — | #475 (2026-10-16) | `creator_trust.may_supervise()`; policy `audit_supervisor_read` | 0008 | `GET /v1/trust/operations/audits` (`trust/service.ts:1396`), through row security | Pilot: phase 3 | Without it supervisors silently see only their own records. Latent failure 2 |
-| `trust/pending-lift-pause.sql` | — | #478 (2026-10-16) | Effect state `cancelled`; policies `effect_cancel_pause`, `restriction_lift`; the runtime may set `restriction.revoked_at` | 0008, 0010, 0023 | `POST /v1/trust/cases/:id/lift-pause` and the ops case page; guarded (503) | Pilot: phase 3 | A supervisor can't lift a pause. Latent failure 3 |
 | `conversation/migrations/pending_w3_generation_memory_proposals.sql` | — | #518 (2026-10-16) | Role `creator_w3_generation_memory`; `generation_memory_proposals()`, a definer function only the generation worker may call, which inserts `memory` rows in state `proposed`; policies | 0001, 0041, 0159 | `conversation/generation-memory.ts:151`, built in `workers/generation-composition.ts:208` only when a review lists `custody.memory`, which none does; scenarios `lane-3/e3b5-memory*.mjs` | Pilot: moment 2 | Memory extraction and "Want me to remember this? Only if you say yes." can't run without it. Its wave also needs the worker receipt and new pins, or every fan turn answers 503 |
 | `conversation/migrations/pending_w3_generation_context_exclusions.sql` | — | #518 (2026-10-16) | Replaces `generation_conversation_context()` (0179) and the 0221 policy; nothing new | 0179, 0221; after the memory file | `conversation/generation-context.ts:426`, on every fan turn | Pilot: moment 2 | Without it an exclusion drops all of a thread's history and memory from the AI's context, silently. Needs a `generationDefinitions` entry and new pins |
 | `commerce/schema-paid-coverage.sql` | 0155 | #82 (2026-10-01) | Tables `commerce_paid_coverage`, `commerce_paid_coverage_denial`; roles `creator_commerce_count`, `creator_commerce_tenure`; two definer functions; policies | 0001, 0002, 0004, 0008, 0010, 0021, 0027 | `commerce/paid-coverage.ts`, `paid-audience-count.ts` (not built); the export skips it when absent (`financial-export.ts:281`); `commerce/runtime.ts:224-228` refuses to start when store verification is configured without it | Unclear: founder | Paid periods and refunds for app-store memberships. Needed for the pilot if memberships are sold through the App Store and Google Play (D-14) |
@@ -158,12 +168,36 @@ reserved number. Rows are in the order of the [proposed waves](#proposed-waves).
 The two `artifacts/` folders are `artifacts/workstreams/W2/source-version/20260929/` and
 `artifacts/workstreams/W7/studio-runtime/20261002/`.
 
+## Registered since the triage
+
+| File | Added by | Version | Wave | Creates | Fixes |
+| --- | --- | --- | --- | --- | --- |
+| `trust/pending-ops-member-admin.sql` | #472 | `0259_w8_ops_member_admin` | `20261103-ops-console` (#547) | Owner policies on `ops_member` and `case_access`; table `ops_member_change`, an append-only change log | Latent failure 1 |
+| `trust/pending-supervisor-audits.sql` | #475 | `0260_w8_supervisor_audits` | `20261103-ops-console` (#547) | `creator_trust.may_supervise()`, executable only by `creator_trust_runtime`; policy `audit_supervisor_read` | Latent failure 2 |
+| `trust/pending-lift-pause.sql` | #478 | `0261_w8_lift_pause` | `20261103-ops-console` (#547) | Effect state `cancelled`; policies `effect_cancel_pause`, `restriction_lift`; the runtime may set `restriction.revoked_at` | Latent failure 3 |
+
+0259 and 0261 are registered byte for byte as their pull requests added them. 0260 was revised
+before it was registered, with the coordinator's yes. As written, its new function had the default
+grant to PUBLIC, and the operator's role check allows only the reviewed PUBLIC functions
+(`infra/migrations/waves/20261002-public.json`). `stack up` refused it at the local installer, and
+`migrate-trust` refused every database that held it, with `Unsafe migration purpose-role custody:
+PUBLIC function source/ACL packet.` The revision adds two statements and a header comment, and
+changes nothing else:
+
+```sql
+REVOKE ALL ON FUNCTION creator_trust.may_supervise(text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION creator_trust.may_supervise(text) TO creator_trust_runtime;
+```
+
+`creator_trust_runtime` is the only role that evaluates `audit_supervisor_read`, and every new
+function in the post-October waves revokes PUBLIC the same way.
+
 ## Reserved numbers
 
 `infra/migrations.json` holds 59 reservations. None of them can be used as a version any more:
 `migrate-trust` refuses a version below a database's newest one
 ([`migrate-trust.ts:560`](../../apps/backend/scripts/migrate-trust.ts)), and every database is at
-0258. Registering a held file takes the next free number, as 0253 to 0255 did for the files held at
+0258 or later. Registering a held file takes the next free number, as 0253 to 0255 did for the files held at
 0156, 0173 and 0185. A file whose SQL names its own reserved version (0199, 0200, 0202, 0204, 0205,
 0207, 0208, 0213, 0219, 0220) also needs a renumbered copy, as 0233 was for 0206 and 0239 to 0246
 were for the comparison files; the original bytes stay. So a reservation now only points at a file
@@ -190,16 +224,17 @@ and its reviewed checksum. No code reads the list except one 0045 check in `migr
 ## Proposed waves
 
 The smallest feature waves for the needed files, in order. Each wave regenerates the catalogue pins
-and follows [the registration steps](migrations.md#registering-a-file-today); none is registered
-here.
+and follows [the registration steps](migrations.md#registering-a-file-today). The ops console is
+registered; the others are proposals.
 
 **For the pilot**
 
-1. **Ops console** (phase 3; it can go first): `trust/pending-ops-member-admin.sql`,
-   `trust/pending-supervisor-audits.sql`, `trust/pending-lift-pause.sql`. They need only registered
-   files, create no role and name no version. This lets the founder name and remove reviewers on a
-   real database, shows supervisors every reviewer's audit records, and lets a supervisor lift a
-   pause. The lane 1 scenarios `tests/scenarios/lane-1/e1-6-*.mjs` prove it.
+1. **Ops console: registered** as `20261103-ops-console`, 0259 to 0261 (#547):
+   `trust/pending-ops-member-admin.sql`, `trust/pending-supervisor-audits.sql` (revised first) and
+   `trust/pending-lift-pause.sql`. They needed only registered files, and they create no role and
+   name no version. The founder can name and remove reviewers on a real database, supervisors see
+   every reviewer's audit records, and a supervisor can lift a pause. The lane 1 scenarios
+   `tests/scenarios/lane-1/e1-6-*.mjs` prove it. A database at 0258 moves with `activate-wave`.
 2. **Memory** (phase 2, moment 2): the memory proposals file, then the context exclusions file, as
    lane 3 asked. This turns on memory extraction after the answer, "Want me to remember this? Only
    if you say yes.", and an exclusion that removes only what it names. The wave also adds the
@@ -207,8 +242,11 @@ here.
    `generationDefinitions` entry for the replaced context function, and new pins (lane 3 counted 13
    changed groups for the memory role). The steps are in lane 3's integrator table
    ([lane-3.md](../archive/lanes/status/lane-3.md)). The founder confirms the INV-15 default first.
+   The proposals file's new function already revokes PUBLIC, and the exclusions file only replaces
+   a function, which keeps its grants, so neither needs the revision 0260 did.
 3. **Store memberships**, if pilot memberships are sold through the App Store and Google Play:
-   `commerce/schema-paid-coverage.sql`, before store verification is configured.
+   `commerce/schema-paid-coverage.sql`, before store verification is configured. Its two new
+   functions already revoke PUBLIC.
 
 **Later, each with its feature**
 
