@@ -1030,7 +1030,9 @@ export class TrustService {
    * Every other-side denial (0053: a restriction on the creator or its
    * account, the creator account's deletion, a deletion the creator asked
    * for) is "unavailable", and none is told apart: a fan never learns of an
-   * ops action. A closed account is refused, as on every request. */
+   * ops action. A closed account is refused, as on every request.
+   * Not called yet: Home keeps every closed family off until the blocked and
+   * paused rows are designed, and will ask this then. */
   async closedScopeReason(
     actor: Actor,
     creatorId: string,
@@ -1040,6 +1042,9 @@ export class TrustService {
       .strictObject({ creatorId: z.uuid(), threadId: z.uuid() })
       .parse({ creatorId, threadId });
     return this.store.actor(actor, async (client) => {
+      // The account only, never the creator: the runtime may read every
+      // restriction (0010, USING(true)), so with a creator a paused creator
+      // would refuse here while other closures answer "unavailable".
       await this.assertAllowedInTransaction(client, actor);
       const own = (
         await client.query<{ deleted: boolean; blocked: boolean }>(

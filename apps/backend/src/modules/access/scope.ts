@@ -73,15 +73,17 @@ export interface GenerationAllowance {
   ): Promise<void>;
 }
 
-const trustDenials = new WeakSet<AccessService>();
+// On the instance under a registered symbol, so a feature that loads its own
+// copy of this module still reads the mark and refuses instead of failing open.
+const trustDenials = Symbol.for("qelvora.access.trust-denials");
 /** The composer that wires Trust's projection into this AccessService says so.
  * Features over it then refuse to start without Trust's own ports: an account
  * list without accepted deletions would show deleted conversations. */
 export function composeTrustDenials(access: AccessService) {
-  trustDenials.add(access);
+  Object.defineProperty(access, trustDenials, { value: true });
 }
 export function deniesThroughTrust(access: AccessService) {
-  return trustDenials.has(access);
+  return (access as { [trustDenials]?: unknown })[trustDenials] === true;
 }
 
 export class AccessService {
