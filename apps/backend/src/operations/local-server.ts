@@ -337,6 +337,7 @@ const conversationRuntime = createConversationRuntime({
   database: db,
   access,
   conversation,
+  acceptedDeletions: (actor) => service.acceptedDeletions(actor),
 });
 const agentRepository = new AgentRepository(conversationPool);
 const agentService = new AgentService(

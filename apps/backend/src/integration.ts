@@ -47,6 +47,10 @@ export type BackendRuntime = {
     client: pg.PoolClient,
   ) => Promise<void>;
   assertRestoredInTransaction?: (client: pg.PoolClient) => Promise<void>;
+  /** Trust's tombstones for the actor's own account, by scope. */
+  acceptedDeletions?: (
+    actor: import("./modules/identity/adapter.js").Actor,
+  ) => Promise<import("./modules/trust/contracts.js").AcceptedDeletions>;
   assertGenerationWorkerRestoredInTransaction?: (
     client: pg.PoolClient,
   ) => Promise<void>;
@@ -375,6 +379,17 @@ export async function createConfiguredBackend(input: {
                 503,
               );
             await trust.assertRestoredInTransaction(client);
+          },
+          acceptedDeletions: async (
+            actor: import("./modules/identity/adapter.js").Actor,
+          ) => {
+            if (!trust)
+              throw new DomainError(
+                "trust_unconfigured",
+                "Current account denial authority is unavailable.",
+                503,
+              );
+            return trust.service.acceptedDeletions(actor);
           },
           assertContentAllowedInTransaction: async (
             client: pg.PoolClient,

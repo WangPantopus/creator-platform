@@ -23,6 +23,8 @@ import type { ConversationCorrections } from "./corrections.js";
 import type { GenerationCostReconciliation } from "../commerce/generation-allowance.js";
 import type { CommerceFulfillmentPlans } from "../commerce/fulfillment-plans.js";
 import { PreparedGenerationAcceptance } from "./generation-acceptance.js";
+import type { Actor } from "../identity/adapter.js";
+import type { AcceptedDeletions } from "../trust/contracts.js";
 
 export function createConversationRuntime(input: {
   database: Database;
@@ -60,6 +62,8 @@ export function createConversationRuntime(input: {
     sentence: ApprovedSentence,
   ) => Promise<void>;
   citation?: (scope: ThreadScope, id: string) => Promise<unknown>;
+  /** Trust's own-account tombstones; the account list leaves them out. */
+  acceptedDeletions?: (actor: Actor) => Promise<AcceptedDeletions>;
 }) {
   invariant(
     !input.developmentPolicy ||
@@ -202,6 +206,7 @@ export function createConversationRuntime(input: {
     input.developmentPolicy,
     acceptance ? () => acceptance.isRunning : undefined,
     input.comparisons,
+    input.acceptedDeletions,
   );
   return {
     feature,

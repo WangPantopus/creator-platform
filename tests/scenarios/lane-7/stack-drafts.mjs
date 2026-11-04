@@ -4,12 +4,14 @@
 // LANE7_STACK_POSTGRES its database container. Android D6 reaches the API
 // directly: the app no longer reuses a socket the API closed while it was idle
 // (follow-up 12 in docs/engineering/native-device-checks.md).
+// After D6's deletion, Home must still open with the fan's other conversation,
+// with Devon, whose AI this script publishes through the Studio API.
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import * as A from "./android-ui.mjs";
-import { sleep, screenshot } from "./lib.mjs";
+import { launch as launchApp, sleep, screenshot, waitForText } from "./lib.mjs";
 
 const api = process.env.LANE7_STACK_API ?? "http://127.0.0.1:56471";
 // D6R: the app may reach the API through delay-proxy.mjs; checks stay direct.
@@ -17,7 +19,8 @@ const appApi = process.env.LANE7_APP_API ?? api;
 // Links opened through android-ui.mjs carry this origin, not a fake API's.
 process.env.LANE7_API_URL = appApi;
 const creator = "20000000-0000-4000-8000-000000000001";
-async function request(method, path, token, body) {
+const devon = "20000000-0000-4000-8000-000000000002";
+async function request(method, path, token, body, headers = {}) {
   // A kept-alive socket the server closed while the app was being driven fails
   // the next fetch ("other side closed"); a read is safe to send again once.
   for (let attempt = 0; ; attempt += 1) {
@@ -27,6 +30,7 @@ async function request(method, path, token, body) {
         headers: {
           "content-type": "application/json",
           ...(token ? { authorization: `Bearer ${token}` } : {}),
+          ...headers,
         },
         ...(body ? { body: JSON.stringify(body) } : {}),
         signal: AbortSignal.timeout(30000),
@@ -50,8 +54,72 @@ async function signIn(number) {
   assert.equal(result.status, 200);
   return result.body;
 }
+// The stack publishes Maya's AI only. Devon's goes through the same Studio
+// steps as lane 2's seed-maya.mjs, as Devon, once per stack.
+async function publishDevon() {
+  const owner = await signIn(5);
+  const agent = `/v1/agent/${devon}`;
+  const state = async () => {
+    const read = await request("GET", `${agent}/state`, owner.token);
+    assert.equal(read.status, 200);
+    return read.body;
+  };
+  const send = async (method, path, body, status = 200) => {
+    const reply = await request(method, agent + path, owner.token, body, {
+      "Idempotency-Key": `lane7-devon-${randomUUID()}`,
+    });
+    assert.equal(reply.status, status, `Devon's ${path}: ${reply.status}`);
+  };
+  let current = await state();
+  if (current.liveVersion && !current.paused) return;
+  assert.ok(!current.liveVersion, "Do not replace or resume Devon's AI");
+  await send("PUT", "/draft", {
+    expectedRevision: current.revision,
+    configuration: {
+      mode: "companion",
+      tone: "As written",
+      styleCard: "",
+      examples: [],
+      rules: ["Always say you are the creator's AI, never the creator."],
+      neverReveal: ["home address"],
+      handoff: "Offer to ask Devon to step in when a question needs him.",
+      dailyCostCapMicros: 5_000_000,
+      sessionNudgeMinutes: 90,
+      usefulnessCriteria: "Helpful, specific and honest about being an AI.",
+      styleCriteria: "Warm, plain and short.",
+    },
+  });
+  await send("POST", "/license", {
+    proofReference: `development-synthetic:${devon}`,
+    counselVersion: "development-synthetic-unreviewed",
+    permittedUses: ["text_ai"],
+    termEndsAt: new Date(Date.now() + 365 * 86400_000).toISOString(),
+  });
+  current = await state();
+  await send(
+    "POST",
+    "/evaluations",
+    { expectedRevision: current.revision },
+    202,
+  );
+  const until = Date.now() + 120000;
+  while (!current.evaluation || current.evaluation.state === "running") {
+    assert.ok(Date.now() < until, "Devon's evaluation must finish");
+    await sleep(2000);
+    current = await state();
+  }
+  assert.equal(current.evaluation.state, "passed");
+  await send("POST", "/publish", {
+    expectedRevision: current.revision,
+    evaluationId: current.evaluation.id,
+    changes: "Lane 7 development publish",
+  });
+  current = await state();
+  assert.ok(current.liveVersion && !current.paused, "Devon's AI must be live");
+  console.log("PASS real API: Devon's AI published through the Studio API");
+}
 async function prepare(platform) {
-  const number = platform === "android" ? 1 : 2;
+  const number = platform === "ios" ? 2 : 1;
   const owner = await signIn(number);
   let fan = owner.session.fan;
   if (!fan) {
@@ -77,6 +145,14 @@ async function prepare(platform) {
     idempotencyKey: randomUUID(),
   });
   assert.equal(begun.status, 200, "The real conversation must be available");
+  await publishDevon();
+  const other = await request("POST", "/v1/conversations/begin", owner.token, {
+    creatorId: devon,
+    policyVersion: caps.body.providers.version,
+    accessNoticeAccepted: true,
+    idempotencyKey: randomUUID(),
+  });
+  assert.equal(other.status, 200, "The conversation with Devon must open");
   const path = `/v1/conversations/${creator}/${fan.id}`;
   let page = await request("GET", path, owner.token);
   assert.equal(page.status, 200);
@@ -190,6 +266,35 @@ AND j.thread_id=:'thread'::uuid AND j.kind='delete' AND j.scope='thread';`,
     "PASS real PostgreSQL: exact account/thread has one deletion job, one tombstone and eight domain tasks",
   );
 }
+// Follow-up 13: the conversation purge can wait, but the account's list leaves
+// an accepted deletion out at once, and Home keeps the other conversation.
+async function verifyHome(fixture, token) {
+  const listed = await request("GET", "/v1/conversations/account", token);
+  assert.equal(listed.status, 200);
+  assert.ok(
+    !listed.body.threads.some((thread) => thread.id === fixture.thread),
+    "The account's list must leave the deleted conversation out",
+  );
+  assert.ok(
+    listed.body.threads.some((thread) => thread.creatorId === devon),
+    "The account's list must keep the conversation with Devon",
+  );
+  const home = await request("GET", "/v1/growth/home", token);
+  assert.equal(
+    home.status,
+    200,
+    `Home after the deletion: ${home.status} ${home.body.error?.code ?? ""}`,
+  );
+  const destinations = home.body.entries.map((entry) => entry.destination);
+  assert.ok(!destinations.includes(fixture.route), "Home must leave it out");
+  assert.ok(
+    destinations.includes(`/threads/${devon}/${fixture.fan}`),
+    "Home must list the conversation with Devon",
+  );
+  console.log(
+    "PASS real API: the account's list leaves the deleted conversation out; Home answers 200 with the one with Devon",
+  );
+}
 function draftCount() {
   const files = A.adb(
     "exec-out",
@@ -265,7 +370,7 @@ async function android() {
   A.adb("reverse", `tcp:${apiPort}`, `tcp:${apiPort}`);
   const appPort = new URL(appApi).port;
   A.adb("reverse", `tcp:${appPort}`, `tcp:${appPort}`);
-  const launch = (reset = false) => {
+  const launch = (reset = false, to = reset ? fixture.route : null) => {
     A.adb("shell", "am", "force-stop", "com.pantopus.qelvora");
     A.adb(
       "shell",
@@ -285,11 +390,9 @@ async function android() {
             "--es",
             "harness_actor",
             "'actor one'",
-            "--es",
-            "return_to",
-            fixture.route,
           ]
         : []),
+      ...(to ? ["--es", "return_to", to] : []),
     );
   };
   launch(true);
@@ -392,9 +495,72 @@ async function android() {
   console.log(
     "PASS real Android D6: restart/send accepted once; thread deletion clears ciphertext, Back and restart cannot restore it",
   );
+  await verifyHome(fixture, token);
+  launch(false, "/home");
+  // Devon's row exists only once Home has loaded its entries.
+  await A.waitFor("Devon", 30000);
+  const home = A.texts();
+  assert.ok(home.includes("Your people"), "Home must be open");
+  assert.ok(!home.includes("Unavailable"), "Home must not refuse");
+  assert.ok(
+    !home.some((text) => text.startsWith("Maya")),
+    "Home must not show the deleted conversation",
+  );
+  screenshot("android", "D6-home-after-deletion");
+  console.log(
+    "PASS real Android: after the deletion Home opens with the conversation with Devon and without Maya's",
+  );
+}
+// The API half of D6 and the Home step, with no device: the deletion request
+// the apps' privacy screen sends. Fan one, as Android, so use another stack.
+async function apiOnly() {
+  const { fixture, token, path } = await prepare("api");
+  const job = await request("POST", "/v1/trust/privacy/jobs", token, {
+    kind: "delete",
+    scope: "thread",
+    creatorId: fixture.creator,
+    threadId: fixture.thread,
+    proof: "LOCAL DEVELOPMENT",
+    idempotencyKey: randomUUID(),
+  });
+  assert.equal(job.status, 202);
+  await verifyDeleted(fixture, token, path);
+  persistedDeletion(fixture, 1);
+  await verifyHome(fixture, token);
+  // Home's own guard: a conversation the list still holds but Trust closes
+  // (here a block, which is not a deletion) is left off Home, not refused.
+  const blocked = await request("POST", "/v1/trust/blocks", token, {
+    creatorId: devon,
+    reason: "Lane 7 Home check: block this creator.",
+    idempotencyKey: randomUUID(),
+  });
+  assert.equal(blocked.status, 200);
+  const listed = await request("GET", "/v1/conversations/account", token);
+  assert.ok(
+    listed.body.threads.some((thread) => thread.creatorId === devon),
+    "A block is not a deletion: the account's list keeps it",
+  );
+  const closed = await request(
+    "GET",
+    `/v1/conversations/${devon}/${fixture.fan}`,
+    token,
+  );
+  assert.equal(closed.status, 403);
+  assert.equal(closed.body.error.code, "scope_revoked");
+  const home = await request("GET", "/v1/growth/home", token);
+  assert.equal(
+    home.status,
+    200,
+    `Home with a closed conversation: ${home.status}`,
+  );
+  assert.ok(!home.body.entries.some((entry) => entry.creatorId === devon));
+  console.log(
+    "PASS real API: Home leaves out a listed conversation that answers scope_revoked (a block) instead of refusing the page",
+  );
 }
 const [mode, file] = process.argv.slice(2);
 if (mode === "android") await android();
+else if (mode === "api") await apiOnly();
 else if (mode === "prepare-ios") {
   assert.ok(file, "Choose an off-repository fixture file");
   const { fixture } = await prepare("ios");
@@ -408,5 +574,25 @@ else if (mode === "prepare-ios") {
     `/v1/conversations/${fixture.creator}/${fixture.fan}`,
   );
   persistedDeletion(fixture, 2);
+  await verifyHome(fixture, owner.token);
+  // A launch to /home restores the saved place, here the deleted thread, so
+  // the same fan signs in afresh on LANE7_IOS and lands on Home. The screen
+  // is read from a screenshot (lib.mjs).
+  launchApp("ios", "--reset", "--actor", fixture.actor, "--to", "/home");
+  const home = await waitForText("ios", /Devon/u, 45000);
+  assert.ok(home.ok, `Home must list Devon: ${home.text.slice(0, 300)}`);
+  assert.match(home.text, /Your people/u, "Home must be open");
+  assert.doesNotMatch(home.text, /Unavailable/u, "Home must not refuse");
+  assert.doesNotMatch(
+    home.text,
+    /\bMaya\b/u,
+    "Home must not show the deleted conversation",
+  );
+  screenshot("ios", "D6-home-after-deletion");
+  console.log(
+    "PASS real iOS: after the deletion Home opens with the conversation with Devon and without Maya's",
+  );
 } else
-  throw new Error("Choose android, prepare-ios or verify-ios <fixture.json>");
+  throw new Error(
+    "Choose android, api, prepare-ios or verify-ios <fixture.json>",
+  );
