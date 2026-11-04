@@ -60,6 +60,13 @@ const AI_ROW = /^Maya's AI$/mu;
 const threadShown = (text) => pattern(BEFORE).test(text) || AI_ROW.test(text);
 
 // ------------------------------------------------------------- the proxy
+if (
+  await fetch(origin).then(
+    () => true,
+    () => false,
+  )
+)
+  throw new Error(`Something already answers on ${port}: stop it first.`);
 const proxy = spawn(
   process.execPath,
   [
@@ -71,11 +78,16 @@ const proxy = spawn(
   ],
   { stdio: "ignore" },
 );
+// The proxy ends with this run, however it ends; one left behind would hold
+// the port, and a later run would read its stale log.
+process.on("exit", () => proxy.kill());
 const entries = async () =>
   (await fetch(`${origin}/__proxy/log`).then((r) => r.json())).filter(
     (e) => e.path !== "/__proxy/log",
   );
 for (let i = 0; ; i += 1) {
+  if (proxy.exitCode !== null)
+    throw new Error(`The proxy could not listen on ${port}: is it taken?`);
   try {
     await entries();
     break;
