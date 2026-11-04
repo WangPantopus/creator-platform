@@ -8,7 +8,7 @@
 // sessions.ts) and ends that session through the real POST
 // /v1/identity/logout, as the backend does. Everything else, the live
 // connection included, reaches the real API unchanged.
-//   LANE7_STACK_API=http://127.0.0.1:57501 node tests/scenarios/lane-7/stack-under-18.mjs ios|android [runs]
+//   LANE7_STACK_API=http://127.0.0.1:57501 node tests/scenarios/lane-7/stack-under-18.mjs ios|android [runs] [home|thread]
 // LANE7_IOS names the simulator (a debug build: the proxy's origin is passed
 // at launch), LANE7_ANDROID the emulator, LANE7_PROXY_PORT the proxy's port.
 import http from "node:http";
@@ -25,6 +25,7 @@ const platform = process.argv[2];
 if (!["ios", "android"].includes(platform))
   throw new Error("Name the platform: ios or android.");
 const runs = Number(process.argv[3] ?? 3);
+const place = process.argv[4];
 const api = process.env.LANE7_STACK_API ?? "http://127.0.0.1:56471";
 const target = Number(new URL(api).port);
 const port = Number(process.env.LANE7_PROXY_PORT ?? target + 6);
@@ -198,8 +199,19 @@ function launch(to, fresh) {
   }
 }
 
-// The app's Keychain items, by name. The simulator's Keychain stores each
-// item's account name as its SHA-1; this reads names only, never values.
+// The app's Keychain items of this run, by name. The simulator's Keychain
+// stores each item's account and service names as their SHA-1; this reads
+// names only, never values. Another API origin's session is not this run's.
+const sha1 = (value) =>
+  createHash("sha1").update(value).digest("hex").toUpperCase();
+const SERVICES = new Set(
+  [
+    `${BUNDLE}.identity-session.${createHash("sha256").update(origin).digest("hex")}`,
+    `${BUNDLE}.conversation-resume`,
+    `${BUNDLE}.conversation-offline`,
+    `${BUNDLE}.conversation-drafts`,
+  ].map(sha1),
+);
 const KEYCHAIN = Object.fromEntries(
   [
     "identity-session",
@@ -207,10 +219,7 @@ const KEYCHAIN = Object.fromEntries(
     "scoped-cursors",
     "current-key",
     "device-key",
-  ].map((name) => [
-    createHash("sha1").update(name).digest("hex").toUpperCase(),
-    name,
-  ]),
+  ].map((name) => [sha1(name), name]),
 );
 /** What the app keeps of a thread: draft files and the offline copy, files
  * that hold the thread's text, and the session, saved place and resume
@@ -242,13 +251,14 @@ function saved() {
       "sqlite3",
       [
         `file:${join(homedir(), "Library/Developer/CoreSimulator/Devices", udid(), "data/Library/Keychains/keychain-2-debug.db")}?mode=ro`,
-        `SELECT hex(acct) FROM genp WHERE agrp LIKE '%.${BUNDLE}'`,
+        `SELECT hex(acct) || ' ' || hex(svce) FROM genp WHERE agrp LIKE '%.${BUNDLE}'`,
       ],
       { encoding: "utf8" },
     )
       .split("\n")
-      .filter(Boolean)
-      .map((hash) => KEYCHAIN[hash] ?? "other");
+      .map((row) => row.split(" "))
+      .filter(([, service]) => SERVICES.has(service))
+      .map(([account]) => KEYCHAIN[account] ?? "other");
     return {
       drafts: existsSync(drafts) ? readdirSync(drafts).length : 0,
       offline: existsSync(
@@ -303,7 +313,7 @@ function onlyAdults(text) {
 for (const [where, to, ready] of [
   ["on Home", "/home", /Your people/u],
   ["in Maya's thread", THREAD, /Me and privacy/u],
-]) {
+].filter(([, to]) => !place || (place === "home") === (to === "/home"))) {
   const results = [];
   for (let i = 0; i < runs; i += 1) {
     flagged = false;
