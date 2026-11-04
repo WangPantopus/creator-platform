@@ -330,6 +330,7 @@ try {
                         runtime.access,
                         runtime.database,
                         runtime.identity.signing,
+                        runtime.assertActorAllowed,
                       ),
                     }),
                     ...(commerce

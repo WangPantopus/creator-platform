@@ -4,120 +4,29 @@
 // LANE7_STACK_POSTGRES its database container. Android D6 reaches the API
 // directly: the app no longer reuses a socket the API closed while it was idle
 // (follow-up 12 in docs/engineering/native-device-checks.md).
-// After D6's deletion, Home must still open with the fan's other conversation,
-// with Devon, whose AI this script publishes through the Studio API.
+// After D6's deletion, Home must still open with the fan's other conversations,
+// with Devon and Priya, whose AIs this script publishes through the Studio API.
+// Priya is a third creator, so a Home that left out everything would fail.
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import * as A from "./android-ui.mjs";
 import { launch as launchApp, sleep, screenshot, waitForText } from "./lib.mjs";
+import {
+  api,
+  creator,
+  devon,
+  preparePriya,
+  psql,
+  publishAI,
+  request,
+  signIn,
+} from "./stack-api.mjs";
 
-const api = process.env.LANE7_STACK_API ?? "http://127.0.0.1:56471";
 // D6R: the app may reach the API through delay-proxy.mjs; checks stay direct.
 const appApi = process.env.LANE7_APP_API ?? api;
 // Links opened through android-ui.mjs carry this origin, not a fake API's.
 process.env.LANE7_API_URL = appApi;
-const creator = "20000000-0000-4000-8000-000000000001";
-const devon = "20000000-0000-4000-8000-000000000002";
-async function request(method, path, token, body, headers = {}) {
-  // A kept-alive socket the server closed while the app was being driven fails
-  // the next fetch ("other side closed"); a read is safe to send again once.
-  for (let attempt = 0; ; attempt += 1) {
-    try {
-      const response = await fetch(api + path, {
-        method,
-        headers: {
-          "content-type": "application/json",
-          ...(token ? { authorization: `Bearer ${token}` } : {}),
-          ...headers,
-        },
-        ...(body ? { body: JSON.stringify(body) } : {}),
-        signal: AbortSignal.timeout(30000),
-      });
-      return { status: response.status, body: await response.json() };
-    } catch (error) {
-      if (method !== "GET" || attempt > 0 || !(error instanceof TypeError))
-        throw error;
-    }
-  }
-}
-async function signIn(number) {
-  const begun = await request("POST", "/v1/identity/continue", null, {
-    returnTo: "/home",
-  });
-  assert.equal(begun.status, 200);
-  const result = await request("POST", "/v1/identity/complete", null, {
-    continuationId: begun.body.continuationId,
-    code: `10000000-0000-4000-8000-00000000000${number}`,
-  });
-  assert.equal(result.status, 200);
-  return result.body;
-}
-// The stack publishes Maya's AI only. Devon's goes through the same Studio
-// steps as lane 2's seed-maya.mjs, as Devon, once per stack.
-async function publishDevon() {
-  const owner = await signIn(5);
-  const agent = `/v1/agent/${devon}`;
-  const state = async () => {
-    const read = await request("GET", `${agent}/state`, owner.token);
-    assert.equal(read.status, 200);
-    return read.body;
-  };
-  const send = async (method, path, body, status = 200) => {
-    const reply = await request(method, agent + path, owner.token, body, {
-      "Idempotency-Key": `lane7-devon-${randomUUID()}`,
-    });
-    assert.equal(reply.status, status, `Devon's ${path}: ${reply.status}`);
-  };
-  let current = await state();
-  if (current.liveVersion && !current.paused) return;
-  assert.ok(!current.liveVersion, "Do not replace or resume Devon's AI");
-  await send("PUT", "/draft", {
-    expectedRevision: current.revision,
-    configuration: {
-      mode: "companion",
-      tone: "As written",
-      styleCard: "",
-      examples: [],
-      rules: ["Always say you are the creator's AI, never the creator."],
-      neverReveal: ["home address"],
-      handoff: "Offer to ask Devon to step in when a question needs him.",
-      dailyCostCapMicros: 5_000_000,
-      sessionNudgeMinutes: 90,
-      usefulnessCriteria: "Helpful, specific and honest about being an AI.",
-      styleCriteria: "Warm, plain and short.",
-    },
-  });
-  await send("POST", "/license", {
-    proofReference: `development-synthetic:${devon}`,
-    counselVersion: "development-synthetic-unreviewed",
-    permittedUses: ["text_ai"],
-    termEndsAt: new Date(Date.now() + 365 * 86400_000).toISOString(),
-  });
-  current = await state();
-  await send(
-    "POST",
-    "/evaluations",
-    { expectedRevision: current.revision },
-    202,
-  );
-  const until = Date.now() + 120000;
-  while (!current.evaluation || current.evaluation.state === "running") {
-    assert.ok(Date.now() < until, "Devon's evaluation must finish");
-    await sleep(2000);
-    current = await state();
-  }
-  assert.equal(current.evaluation.state, "passed");
-  await send("POST", "/publish", {
-    expectedRevision: current.revision,
-    evaluationId: current.evaluation.id,
-    changes: "Lane 7 development publish",
-  });
-  current = await state();
-  assert.ok(current.liveVersion && !current.paused, "Devon's AI must be live");
-  console.log("PASS real API: Devon's AI published through the Studio API");
-}
 async function prepare(platform) {
   const number = platform === "ios" ? 2 : 1;
   const owner = await signIn(number);
@@ -145,14 +54,25 @@ async function prepare(platform) {
     idempotencyKey: randomUUID(),
   });
   assert.equal(begun.status, 200, "The real conversation must be available");
-  await publishDevon();
-  const other = await request("POST", "/v1/conversations/begin", owner.token, {
-    creatorId: devon,
-    policyVersion: caps.body.providers.version,
-    accessNoticeAccepted: true,
-    idempotencyKey: randomUUID(),
-  });
-  assert.equal(other.status, 200, "The conversation with Devon must open");
+  await publishAI(5, devon, "Devon");
+  const priya = await preparePriya();
+  for (const [id, name] of [
+    [devon, "Devon"],
+    [priya, "Priya"],
+  ]) {
+    const other = await request(
+      "POST",
+      "/v1/conversations/begin",
+      owner.token,
+      {
+        creatorId: id,
+        policyVersion: caps.body.providers.version,
+        accessNoticeAccepted: true,
+        idempotencyKey: randomUUID(),
+      },
+    );
+    assert.equal(other.status, 200, `The conversation with ${name} must open`);
+  }
   const path = `/v1/conversations/${creator}/${fan.id}`;
   let page = await request("GET", path, owner.token);
   assert.equal(page.status, 200);
@@ -177,6 +97,7 @@ async function prepare(platform) {
     creator,
     fan: fan.id,
     thread: page.body.threadId,
+    priya,
     route: `/threads/${creator}/${fan.id}`,
     marker: `lane7 ${platform} real draft ${randomUUID().slice(0, 8)}`,
   };
@@ -225,38 +146,19 @@ async function verifyDeleted(fixture, token, path) {
 function persistedDeletion(fixture, number) {
   for (const value of [fixture.creator, fixture.thread])
     assert.match(value, /^[0-9a-f-]{36}$/u);
-  const result = execFileSync(
-    "docker",
-    [
-      "exec",
-      "-i",
-      process.env.LANE7_STACK_POSTGRES ?? "qelvora-lane7-postgres",
-      "psql",
-      "-U",
-      "postgres",
-      "-d",
-      "creator_stack",
-      "-X",
-      "-At",
-      "-v",
-      "ON_ERROR_STOP=1",
-      "-v",
-      `thread=${fixture.thread}`,
-      "-v",
-      `creator=${fixture.creator}`,
-      "-v",
-      `account=10000000-0000-4000-8000-00000000000${number}`,
-    ],
-    {
-      encoding: "utf8",
-      input: `SELECT count(DISTINCT j.id), count(DISTINCT t.id), count(p.domain)
+  const result = psql(
+    `SELECT count(DISTINCT j.id), count(DISTINCT t.id), count(p.domain)
 FROM creator_trust.privacy_job j
 LEFT JOIN creator_trust.tombstone t ON t.job_id=j.id
 LEFT JOIN creator_trust.privacy_task p ON p.job_id=j.id
 WHERE j.account_id=:'account'::uuid AND j.creator_id=:'creator'::uuid
 AND j.thread_id=:'thread'::uuid AND j.kind='delete' AND j.scope='thread';`,
+    {
+      thread: fixture.thread,
+      creator: fixture.creator,
+      account: `10000000-0000-4000-8000-00000000000${number}`,
     },
-  ).trim();
+  );
   assert.equal(
     result,
     "1|1|8",
@@ -267,18 +169,40 @@ AND j.thread_id=:'thread'::uuid AND j.kind='delete' AND j.scope='thread';`,
   );
 }
 // Follow-up 13: the conversation purge can wait, but the account's list leaves
-// an accepted deletion out at once, and Home keeps the other conversation.
+// an accepted deletion out at once, and Home keeps the other conversations.
 async function verifyHome(fixture, token) {
+  // Only the list's filter may leave it out here: once a purge runs, the
+  // relationship row is gone and this step would pass without the filter.
+  assert.match(fixture.thread, /^[0-9a-f-]{36}$/u);
+  const waiting = psql(
+    `SELECT (SELECT count(*) FROM creator.conversation_relationship WHERE thread_id=:'thread'::uuid),
+(SELECT string_agg(p.state,',') FROM creator_trust.privacy_task p JOIN creator_trust.privacy_job j ON j.id=p.job_id
+ WHERE j.thread_id=:'thread'::uuid AND j.kind='delete' AND j.scope='thread' AND p.domain='conversation');`,
+    { thread: fixture.thread },
+  ).split("|");
+  assert.equal(
+    waiting[0],
+    "1",
+    "The deleted conversation's relationship row must still exist",
+  );
+  assert.ok(
+    waiting[1] && !waiting[1].split(",").includes("complete"),
+    `The conversation task must not be complete: ${waiting[1]}`,
+  );
   const listed = await request("GET", "/v1/conversations/account", token);
   assert.equal(listed.status, 200);
   assert.ok(
     !listed.body.threads.some((thread) => thread.id === fixture.thread),
     "The account's list must leave the deleted conversation out",
   );
-  assert.ok(
-    listed.body.threads.some((thread) => thread.creatorId === devon),
-    "The account's list must keep the conversation with Devon",
-  );
+  for (const [id, name] of [
+    [devon, "Devon"],
+    [fixture.priya, "Priya"],
+  ])
+    assert.ok(
+      listed.body.threads.some((thread) => thread.creatorId === id),
+      `The account's list must keep the conversation with ${name}`,
+    );
   const home = await request("GET", "/v1/growth/home", token);
   assert.equal(
     home.status,
@@ -287,12 +211,16 @@ async function verifyHome(fixture, token) {
   );
   const destinations = home.body.entries.map((entry) => entry.destination);
   assert.ok(!destinations.includes(fixture.route), "Home must leave it out");
-  assert.ok(
-    destinations.includes(`/threads/${devon}/${fixture.fan}`),
-    "Home must list the conversation with Devon",
-  );
+  for (const [id, name] of [
+    [devon, "Devon"],
+    [fixture.priya, "Priya"],
+  ])
+    assert.ok(
+      destinations.includes(`/threads/${id}/${fixture.fan}`),
+      `Home must list the conversation with ${name}`,
+    );
   console.log(
-    "PASS real API: the account's list leaves the deleted conversation out; Home answers 200 with the one with Devon",
+    `PASS real API: with its relationship row still there and the conversation task ${waiting[1]}, the account's list leaves the deleted conversation out; Home answers 200 with Devon's and Priya's`,
   );
 }
 function draftCount() {
@@ -554,8 +482,12 @@ async function apiOnly() {
     `Home with a closed conversation: ${home.status}`,
   );
   assert.ok(!home.body.entries.some((entry) => entry.creatorId === devon));
+  assert.ok(
+    home.body.entries.some((entry) => entry.creatorId === fixture.priya),
+    "Home must keep the conversation with Priya",
+  );
   console.log(
-    "PASS real API: Home leaves out a listed conversation that answers scope_revoked (a block) instead of refusing the page",
+    "PASS real API: Home leaves out a listed conversation that answers scope_revoked (a block) instead of refusing the page, and keeps Priya's",
   );
 }
 const [mode, file] = process.argv.slice(2);

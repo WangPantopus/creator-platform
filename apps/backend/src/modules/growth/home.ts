@@ -62,6 +62,8 @@ export function canonicalConversationHomePage(
   access: AccessService,
   database: Database,
   signing: Pick<SignedActService, "matchesThreadAct">,
+  /** The account-wide denial the request passed before Home ran. */
+  assertActorAllowed: (actor: Actor) => Promise<void>,
 ): NonNullable<GrowthOwners["homePage"]> {
   return async (actor, cursor) => {
     const directory = Directory.parse(
@@ -109,6 +111,7 @@ export function canonicalConversationHomePage(
         503,
       );
     const result: HomeEntry[] = [];
+    let closed = false;
     for (const entry of entries) {
       try {
         const scope = await access.openThread(
@@ -198,21 +201,26 @@ export function canonicalConversationHomePage(
               : undefined,
         });
       } catch (error) {
-        // A deleted/denied family can remain in W3's directory: the directory
-        // leaves out only this account's own accepted deletions, and Trust's
-        // projection closes a family (scope_revoked) without saying why. Skip
-        // only these per-family refusals. A closed account is refused for the
-        // whole request before Home runs; session/provider/schema failures
-        // stay visible.
-        if (
-          error instanceof DomainError &&
-          (error.code === "thread_unavailable" ||
-            error.code === "scope_revoked")
-        )
+        // A deleted family can remain briefly in W3's directory. Skip only
+        // that known denial; session/provider/schema failures stay visible.
+        if (error instanceof DomainError && error.code === "thread_unavailable")
           continue;
+        // Trust closed this family: a deletion the directory didn't know of
+        // yet, the fan's block, or an unavailable creator. A block ("Thread
+        // closed with a neutral line") and a paused creator (F11) have no Home
+        // row or copy yet, so each closed family stays off Home for now.
+        // TrustService.closedScopeReason tells them apart once they are designed.
+        if (error instanceof DomainError && error.code === "scope_revoked") {
+          closed = true;
+          continue;
+        }
         throw error;
       }
     }
+    // A closed account closes every family too, and it was refused before
+    // Home ran. Check again, so one closed since then refuses this page
+    // instead of emptying it.
+    if (closed) await assertActorAllowed(actor);
     // Only W3's installed activity projection establishes global recency. Older
     // hosts remain UUID paged; sorting that page does not establish global order.
     return {

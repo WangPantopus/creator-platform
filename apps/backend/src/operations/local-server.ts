@@ -24,7 +24,7 @@ import { createTrustRouter } from "../modules/trust/router.js";
 import { TrustTelemetry, failureClass } from "./telemetry.js";
 import { Readiness } from "./readiness.js";
 import { DomainError } from "../core/errors.js";
-import { AccessService } from "../modules/access/scope.js";
+import { AccessService, composeTrustDenials } from "../modules/access/scope.js";
 import { Database } from "../db/database.js";
 import { SessionService } from "../modules/identity/sessions.js";
 import { DevelopmentIdentityAdapter } from "../modules/identity/development.js";
@@ -174,6 +174,7 @@ const access: AccessService = new AccessService(
   undefined,
   (...scope) => trustScopeRestriction(service, workerPool)(...scope),
 );
+composeTrustDenials(access);
 const nativeIdentity = new SessionService(
   conversationPool,
   new DevelopmentIdentityAdapter(origin, "development"),

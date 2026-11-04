@@ -6,6 +6,7 @@ import type { BackendConfig } from "./config.js";
 import { Database } from "./db/database.js";
 import {
   AccessService,
+  composeTrustDenials,
   type ScopeRestriction,
   type ScopeRestrictionInTransaction,
 } from "./modules/access/scope.js";
@@ -280,6 +281,7 @@ export async function createConfiguredBackend(input: {
     assertScopeAllowed,
     assertScopeAllowedInTransaction,
   );
+  if (input.trust) composeTrustDenials(access);
   const conversation = new ConversationService(
     database,
     access,

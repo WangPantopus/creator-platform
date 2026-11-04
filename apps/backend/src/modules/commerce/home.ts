@@ -133,6 +133,7 @@ export async function createCommerceHomePage(input: {
     });
     const candidates = directory.rows.slice(0, pageSize);
     const entries: CommerceHomeEntry[] = [];
+    let closed = false;
     for (const candidate of candidates) {
       try {
         const scope = await input.access.openThread(
@@ -198,13 +199,24 @@ export async function createCommerceHomePage(input: {
           }),
         });
       } catch (error) {
-        // A deleted or denied family can briefly remain in the directory.
+        // A deleted or denied family can briefly remain in the directory, and
+        // Trust closes one the fan deleted or blocked, or whose creator is
+        // unavailable (scope_revoked): its requests leave Home with it.
         // Infrastructure/authority failures must remain visible to the host.
-        if (error instanceof DomainError && error.code === "thread_unavailable")
-          continue;
-        throw error;
+        if (error instanceof DomainError && error.code === "scope_revoked")
+          closed = true;
+        else if (
+          !(error instanceof DomainError && error.code === "thread_unavailable")
+        )
+          throw error;
       }
     }
+    // A closed account closes every family too, and the directory transaction
+    // refused it. Check again, so one closed since then refuses this page.
+    if (closed)
+      await input.service.account(actor, (client) =>
+        input.assertAccountAllowed(client, actor),
+      );
     const last = candidates.at(-1);
     return {
       entries,
