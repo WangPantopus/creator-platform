@@ -206,13 +206,22 @@ The independent review of the wave (#547) accepted the following.
 - **Looser than the runbook needs, and not a boundary**, because the owner can turn row security
   off:
   - `owner_admin` on `ops_member` also allows DELETE, and a deletion leaves no change-log row;
-  - `owner_end_lease`'s CHECK covers only `expires_at`;
-  - `restriction_lift` accepts any non-null `revoked_at`, not only the current time.
+  - `owner_end_lease`'s CHECK covers only `expires_at`.
+- **`restriction_lift` accepts any non-null `revoked_at`**, not only the current time. Only direct
+  SQL as `creator_trust_runtime` can set another time, and every check reads `revoked_at IS NULL`,
+  so only the recorded time can differ.
 
-The same review found a race in the lift itself (`trust/service.ts`), which 0261 made reachable:
-the lift looked for a running pause before it cancelled, and a worker could claim the pause action
-in between, so the action ran after the lift. The lift now cancels first and then looks, in the
-same transaction; the cancel's row lock keeps the worker's claim off the pause.
+The same review found two cases in the lift itself (`trust/service.ts`), which 0261 made reachable:
+
+- **A race.** The lift looked for a running pause before it cancelled, so a worker could claim the
+  pause action in between, and the action ran after the lift.
+- **A stuck action.** An attempt already running when the lift cancelled could fail back to
+  `retry` or `dead_letter` before the lift looked. The lift then committed, and that action could
+  never be cancelled or finished.
+
+The lift now cancels first, in the same transaction; the cancel's row lock keeps the worker's
+claim off the pause. It then refuses with `pause_in_progress` while any of the case's pause
+actions is unfinished, meaning neither `complete` nor `cancelled`, and the next lift cancels it.
 
 ## Reserved numbers
 
