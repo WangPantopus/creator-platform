@@ -102,7 +102,12 @@ announced system line before any new-epoch AI output. Replay orders by a persist
 per-thread cursor. The device gate buffers missing cursors/boundaries, discards
 old epochs, rejects generation gaps without advancing the cursor, and deduplicates
 replayed frames. The WebSocket gateway authenticates each subscription, rechecks
-authority on batches and disconnects slow clients so they can resume.
+authority on batches and disconnects slow clients so they can resume. A refused
+subscription or check closes with 1008, and D-11 with 4403. A socket whose access
+token expired, or was rotated by the app's renewal, while the session it was opened
+with is live (not revoked, inside its refresh window) closes with 4401: nothing was
+refused, so the apps keep the thread and its draft, renew the credential through
+their session check and reconnect.
 
 The gate's serializable `snapshot()` preserves cursor, epoch and each generation's
 last accepted sentence sequence. A restored device supplies all three values to

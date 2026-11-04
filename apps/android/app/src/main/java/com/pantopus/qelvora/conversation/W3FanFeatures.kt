@@ -388,6 +388,9 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                 if (current != null && currentGate != null && error.isEmpty()) coroutineScope {
                     // A safety net for what sends no frame; frames carry the rest (WP 7.8: was 15 s).
                     val metadata = launch { while (isActive) { delay(60_000); refresh(propagateFailure = true) } }
+                    // Another request met an expired credential (fail): this connection
+                    // ends too, and the loop renews before it reconnects.
+                    val expired = launch { snapshotFlow { renewalRequired }.first { it }; throw ConversationRenewal() }
                     try {
                         // A cursor without cached content is not a checkpoint.
                         // The freshly authorized atomic page is the resume base.
@@ -405,7 +408,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
                                 }
                             }
                         }
-                    } finally { metadata.cancel() }
+                    } finally { metadata.cancel(); expired.cancel() }
                 }
             } catch (failure: Throwable) {
                 fail(failure)
