@@ -509,6 +509,7 @@ export class StudioService {
       },
     );
     const items = [];
+    let closed = false;
     for (const row of rows.slice(0, page.limit)) {
       try {
         await this.owners.access.openThread(
@@ -524,12 +525,24 @@ export class StudioService {
           updatedAt: row.updated_at.toISOString(),
         });
       } catch (error) {
-        if (
+        // Trust closed this family: the fan deleted it or blocked the
+        // creator, or the fan's account is closed. It leaves the list (S-C5);
+        // the creator's side can't tell these apart, and isn't told.
+        if (error instanceof DomainError && error.code === "scope_revoked")
+          closed = true;
+        else if (
           !(error instanceof DomainError && error.code === "thread_unavailable")
         )
           throw error;
       }
     }
+    // A closed Studio (a restriction on it or its account, its account's
+    // deletion) closes every family too, and the transaction above refused it.
+    // Check again, so one closed since then refuses instead of emptying this.
+    if (closed)
+      await this.content.transaction(actor, creatorId, (client) =>
+        this.content.role(client, actor, creatorId, ["triage"]),
+      );
     return {
       items,
       nextCursor:
