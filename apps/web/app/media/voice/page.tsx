@@ -9,6 +9,7 @@ import {
 import { MediaSession } from "../../../features/media/session";
 import { IdentitySessionBoundary } from "../../../features/identity/session-boundary";
 import { IdentityWelcome } from "../../../features/identity/welcome";
+import { signInProviders } from "../../../features/identity/sign-in-flow";
 import { currentSession } from "../../../lib/session";
 
 export default async function VoicePage({
@@ -54,7 +55,14 @@ export default async function VoicePage({
           <VoiceRecording purpose="human_note" maxDurationMs={60_000} />
         </main>
       );
-    return <IdentityWelcome returnTo={returnTo} arrival={null} />;
+    return (
+      <IdentityWelcome
+        returnTo={returnTo}
+        arrival={null}
+        providers={signInProviders()}
+        development={process.env.NODE_ENV === "development"}
+      />
+    );
   }
   return (
     <IdentitySessionBoundary

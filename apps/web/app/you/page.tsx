@@ -1,6 +1,7 @@
 import { IdSchema } from "@qelvora/api";
 import { currentSession } from "../../lib/session";
 import { IdentityWelcome } from "../../features/identity/welcome";
+import { signInProviders } from "../../features/identity/sign-in-flow";
 import { AccountScreen } from "../../features/conversation/AccountScreen";
 import { IdentitySessionBoundary } from "../../features/identity/session-boundary";
 export const dynamic = "force-dynamic";
@@ -18,7 +19,15 @@ export default async function YouPage({
     ? `/you?creatorId=${query.creatorId}&fanId=${query.fanId}`
     : "/you";
   const session = await currentSession(returnTo);
-  if (!session) return <IdentityWelcome returnTo={returnTo} arrival={null} />;
+  if (!session)
+    return (
+      <IdentityWelcome
+        returnTo={returnTo}
+        arrival={null}
+        providers={signInProviders()}
+        development={process.env.NODE_ENV === "development"}
+      />
+    );
   return (
     <IdentitySessionBoundary
       key={`${session.accountId}:${returnTo}`}

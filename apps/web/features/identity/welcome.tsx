@@ -15,15 +15,16 @@ export function IdentityWelcome({
   returnTo,
   arrival,
   error,
-  providers = [],
-  development = false,
+  providers,
+  development,
 }: {
   returnTo: string;
   arrival: { source: string; title: string; creatorName: string } | null;
   error?: string;
-  /** Apple and Google, when the Qelvora sign-in is configured. */
-  providers?: readonly ("apple" | "google")[];
-  development?: boolean;
+  /** Apple and Google, when the Qelvora sign-in is configured. Required, so
+   * no signed-out page can leave a pilot visitor without them. */
+  providers: readonly ("apple" | "google")[];
+  development: boolean;
 }) {
   const qelvora = providers.length > 0;
   const [context, setContext] = useState(arrival);
