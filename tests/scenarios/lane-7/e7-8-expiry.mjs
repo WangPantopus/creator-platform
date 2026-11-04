@@ -19,7 +19,8 @@ import * as L from "./lib.mjs";
 
 const THREAD =
   "/threads/c1000000-0000-4000-8000-000000000001/f1000000-0000-4000-8000-000000000001";
-const SEEN = /Devon, send me a photo of the tile/u;
+// Maya's signed message in the thread, whichever part of it is in view.
+const SEEN = /send me a photo of the tile|look at it properly/u;
 const BUNDLE = "com.pantopus.qelvora";
 const root = new URL("../../..", import.meta.url).pathname;
 const args = process.argv.slice(2);
@@ -113,7 +114,19 @@ async function open(p, draft) {
   if (p === "android") {
     await A.tap("Message Maya's AI", 30000);
     A.type(draft);
-    typed = Boolean(await A.waitFor(draft, 10000));
+    await A.waitFor(draft, 10000);
+    // Close the keyboard, so the thread's rows have the screen.
+    A.key("BACK");
+    for (
+      let until = Date.now() + 10000;
+      Date.now() < until &&
+      /type=ime frame=[^\n]*visible=true/u.test(
+        A.adb("shell", "dumpsys", "window"),
+      );
+
+    )
+      await L.sleep(250);
+    typed = Boolean(await A.waitFor(draft, 5000));
   } else typed = await flow("E1", draft);
   let saved = 0;
   for (let until = Date.now() + 15000; Date.now() < until && !saved; )

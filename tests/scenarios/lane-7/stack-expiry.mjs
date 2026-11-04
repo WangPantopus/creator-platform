@@ -21,7 +21,8 @@
 // fan two, so both can run at once on one stack.
 import { execFileSync, spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync, readdirSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import * as A from "./android-ui.mjs";
 import * as L from "./lib.mjs";
@@ -51,6 +52,12 @@ const pattern = (marker) =>
   new RegExp(marker.replace("lane7", "lane\\s*7").replaceAll(" ", "\\s*"), "u");
 const DENIALS =
   /Your account changed|Reconnect to refresh this conversation|Sign in to continue|This conversation is unavailable/u;
+// The thread is on screen: the marker message, or an AI row's own author label
+// (a line of its own, never the disclosure banner that also names the AI). A
+// reply can scroll the marker out of a short list, and Android's screen text
+// holds only the rows in view.
+const AI_ROW = /^Maya's AI$/mu;
+const threadShown = (text) => pattern(BEFORE).test(text) || AI_ROW.test(text);
 
 // ------------------------------------------------------------- the proxy
 const proxy = spawn(
@@ -265,7 +272,18 @@ async function typeDraft() {
     await A.tap("Message Maya's AI", 30000);
     A.type(DRAFT);
     await A.waitFor(DRAFT, 10000);
-    return true;
+    // Close the keyboard, so the thread's rows have the screen.
+    A.key("BACK");
+    for (
+      let until = Date.now() + 10000;
+      Date.now() < until &&
+      /type=ime frame=[^\n]*visible=true/u.test(
+        A.adb("shell", "dumpsys", "window"),
+      );
+
+    )
+      await L.sleep(250);
+    return Boolean(await A.waitFor(DRAFT, 5000));
   }
   return flow("E1");
 }
@@ -284,7 +302,11 @@ const signedIn = await waitForEntry(
   { method: "POST", path: "/v1/identity/complete", status: 200 },
   60000,
 );
-const ready = await L.waitForText(platform, pattern(BEFORE), 60000);
+const ready = await L.waitForText(
+  platform,
+  new RegExp(`${pattern(BEFORE).source}|${AI_ROW.source}`, "mu"),
+  60000,
+);
 if (!signedIn || !ready.ok)
   throw new Error(`The thread did not open: ${ready.text.slice(0, 300)}`);
 await waitForEntry(opened, { method: "WS", status: 101 }, 30000);
@@ -362,10 +384,14 @@ if (mode === "expiry") {
     platform,
     "expiry: the thread and the draft stay, with no denial",
     !denial &&
-      pattern(BEFORE).test(after) &&
+      threadShown(after) &&
       pattern(DRAFT).test(after) &&
       !DENIALS.test(after),
-    denial || denials(after),
+    denial ||
+      denials(after) ||
+      (pattern(BEFORE).test(after)
+        ? "the marker message is in view"
+        : "an AI row is in view"),
   );
   if (platform === "ios")
     L.step(
@@ -414,11 +440,18 @@ if (mode === "expiry") {
     ended.status === 200 && closed?.status === 1008,
     `${mode === "revoked" ? "revoke-sessions" : "block"} ${ended.status}; ${shown(closed)} after ${closed ? ((closed.at - from) / 1000).toFixed(1) : "-"} s`,
   );
-  const gone = await L.waitForAbsent(platform, pattern(BEFORE), 15000);
+  let gone = screen("gone");
+  for (
+    let until = Date.now() + 15000;
+    Date.now() < until && (threadShown(gone) || pattern(DRAFT).test(gone));
+    gone = screen("gone")
+  )
+    await L.sleep(1000);
   L.step(
     platform,
     `${mode}: the thread and the draft are gone from the screen`,
-    gone.ok && !pattern(DRAFT).test(gone.text),
+    !threadShown(gone) && !pattern(DRAFT).test(gone),
+    denials(gone),
   );
   if (mode === "revoked") {
     const out = await L.waitForText(platform, /Sign in to continue/u, 45000);
@@ -454,6 +487,15 @@ if (mode === "expiry") {
   );
   L.screenshot(platform, `stack-expiry-${mode}-after`);
 }
+// What passed through the proxy (methods, paths, statuses, close codes), next
+// to the screenshots.
+writeFileSync(
+  join(
+    process.env.LANE7_OUT ?? join(tmpdir(), "lane7-scenarios"),
+    `stack-expiry-${platform}-${mode}-proxy.json`,
+  ),
+  JSON.stringify(await entries(), null, 1),
+);
 L.stop(platform);
 proxy.kill();
 L.finish();
