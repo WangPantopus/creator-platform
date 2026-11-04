@@ -11,11 +11,14 @@
 // review). No token is printed, put in a fixture or written to disk.
 // It pauses Priya and deletes Devon's account: give it a fresh stack of its
 // own, with the web app, and an optional screenshot folder outside the
-// repository.
+// repository. --native ios|android also opens each fan's Home in the app, signed
+// in afresh, on LANE7_IOS or LANE7_ANDROID (lane 7's run-app.mjs; its
+// screenshots go to LANE7_OUT). The iOS build names the stack's API; CI's
+// Android APK gets it from LANE7_API_URL, with LANE7_PORT set to its port.
 //   node infra/local/stack.mjs up --lane N --base-port P --growth
 //   LANE7_STACK_API=http://127.0.0.1:<P+1> LANE7_STACK_WEB=http://localhost:<P+2> \
 //     LANE7_STACK_POSTGRES=qelvora-laneN-postgres \
-//     node tests/scenarios/lane-7/stack-closed.mjs [screenshot folder]
+//     node tests/scenarios/lane-7/stack-closed.mjs [--native ios|android] [screenshot folder]
 import assert from "node:assert/strict";
 import {
   createHash,
@@ -27,7 +30,7 @@ import {
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { chromium } from "@playwright/test";
-import { sleep } from "./lib.mjs";
+import { launch, screenshot, sleep, waitForText } from "./lib.mjs";
 import {
   creator as maya,
   devon,
@@ -39,7 +42,12 @@ import {
 } from "./stack-api.mjs";
 
 const web = new URL(process.env.LANE7_STACK_WEB ?? "http://localhost:56472");
-const folder = process.argv[2];
+const args = process.argv.slice(2);
+const native = args.includes("--native")
+  ? args.splice(args.indexOf("--native"), 2)[1]
+  : null;
+assert.ok([null, "ios", "android"].includes(native), "--native ios|android");
+const folder = args[0];
 const account = (n) => `10000000-0000-4000-8000-00000000000${n}`;
 let failures = 0;
 const step = (name, ok, detail = "") => {
@@ -450,6 +458,42 @@ async function webHome(person, want, name) {
     `rows ${shown || "(none)"}`,
   );
 }
+// The same Home in the app. Its text is read from the accessibility tree on
+// Android and from a screenshot on iOS.
+async function nativeHome(person, want, name) {
+  if (!native) return;
+  launch(
+    native,
+    "--reset",
+    "--actor",
+    person.number === 1 ? "actor one" : "actor two",
+    "--to",
+    "/home",
+  );
+  const listed = want === "(none)" ? [] : want.split(",");
+  const shown = await waitForText(
+    native,
+    new RegExp(
+      `^(?=[\\s\\S]*Your people)${(listed.length
+        ? listed.map((creator) => `(?=[\\s\\S]*\\b${creator}\\b)`)
+        : ["(?=[\\s\\S]*(No updates yet|Pick a creator to start))"]
+      ).join("")}`,
+      "u",
+    ),
+    45000,
+  );
+  screenshot(native, name);
+  const hidden = [...creators.values()].filter(
+    (creator) =>
+      !listed.includes(creator) &&
+      new RegExp(`\\b${creator}\\b`, "u").test(shown.text),
+  );
+  step(
+    `${native}: fan ${person.label}'s Home in the app`,
+    shown.ok && hidden.length === 0,
+    `shows ${want}${hidden.length ? `, and also ${hidden.join(",")}` : ""}`,
+  );
+}
 // The list, its empty state, or what a refused Studio shows instead.
 async function webStudio(number, studio, want, name) {
   const page = await signedIn(number);
@@ -484,6 +528,7 @@ async function webStudio(number, studio, want, name) {
   );
 }
 await webHome(A, "Devon,Maya,Priya", "0-home-A-before");
+await nativeHome(A, "Devon,Maya,Priya", "0-home-A-before");
 await webStudio(3, studios[0], "2 fan(s)", "0-studio-maya-before");
 
 // ------------------------------------------------- 1. a fan deletes one
@@ -519,6 +564,7 @@ step(
   `rows ${waiting[0]}, conversation task ${waiting[1]}`,
 );
 await webHome(A, "Devon,Priya", "1-home-A-after-deletion");
+await nativeHome(A, "Devon,Priya", "1-home-A-after-deletion");
 await webStudio(3, studios[0], "1 fan(s)", "1-studio-maya-after-deletion");
 
 // --------------------------------------------------- 2. a fan blocks one
@@ -534,6 +580,7 @@ await check("2. fan B blocks Devon: B's Home and Devon's Studio leave it out", {
   "Studio Devon": "A",
 });
 await webHome(B, "Maya,Priya", "2-home-B-after-block");
+await nativeHome(B, "Maya,Priya", "2-home-B-after-block");
 await webStudio(5, studios[1], "1 fan(s)", "2-studio-devon-after-block");
 
 // ------------------------------------------- 3. Ops pauses a creator (E1.6)
@@ -570,7 +617,9 @@ await check(
   },
 );
 await webHome(A, "Devon", "3-home-A-after-pause");
+await nativeHome(A, "Devon", "3-home-A-after-pause");
 await webHome(B, "Maya", "3-home-B-after-pause");
+await nativeHome(B, "Maya", "3-home-B-after-pause");
 await webStudio(6, studios[2], /\S/u, "3-studio-priya-after-pause");
 
 // ------------------------------------- 4. a creator deletes their account
@@ -608,7 +657,9 @@ WHERE t.account_id=:'account'::uuid AND t.scope='account';`,
   ) === `1|${devon}`,
 );
 await webHome(A, "(none)", "4-home-A-after-account-deletion");
+await nativeHome(A, "(none)", "4-home-A-after-account-deletion");
 await webHome(B, "Maya", "4-home-B-after-account-deletion");
+await nativeHome(B, "Maya", "4-home-B-after-account-deletion");
 
 // What Trust's reason can read: its runtime role, as each fan, sees that
 // fan's own tombstones and blocks only, never Devon's account deletion.
