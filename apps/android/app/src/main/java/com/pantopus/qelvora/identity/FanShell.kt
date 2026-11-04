@@ -233,8 +233,17 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         return if (capture.isCurrent()) capture else null
     }
     /** The one D-11 handling, wherever the refusal was met: purge the private
-     * state, then show only the adults-only state. */
-    private suspend fun denyAdultEligibility() { purge(); adultEligibilityDenied = true }
+     * state, keep no place (a thread's path names its creator and fan, and the
+     * activity saves it), then show only the adults-only state. */
+    private suspend fun denyAdultEligibility() { purge(); move = Move.REPLACE; destination = "/home"; adultEligibilityDenied = true }
+    /** D-11 met by one of the shell's own requests (through `api`, which sends
+     * the stored credential, or a capture that is still current): the same
+     * handling. True when it was that refusal. */
+    internal suspend fun handleAdultEligibilityRefusal(failure: Exception): Boolean {
+        if (failure !is CreatorAPIError || failure.status != 403 || identityErrorCode(failure) != "adult_eligibility_required") return false
+        denyAdultEligibility()
+        return true
+    }
     /** A refusal another request met (AdultEligibilityRefusal). It ends only the
      * stored session: the refused credential, when known, must still be it. */
     internal suspend fun adultEligibilityRefused(credential: String?) {
@@ -473,7 +482,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
         catch (failure: Exception) {
-            if (capture.isCurrent()) error = if (failure is CreatorAPIError) message(failure) else QelvoraCopy.text(if (failure is kotlinx.serialization.SerializationException) "identityInputKeptUnreadable" else "identityInputKeptUnavailable")
+            if (capture.isCurrent() && !handleAdultEligibilityRefusal(failure)) error = if (failure is CreatorAPIError) message(failure) else QelvoraCopy.text(if (failure is kotlinx.serialization.SerializationException) "identityInputKeptUnreadable" else "identityInputKeptUnavailable")
         }
         finally { busy = false }
     }
@@ -492,7 +501,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
             refresh()
             return capture.isCurrent()
         } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-        catch (failure: Exception) { if (capture.isCurrent()) error = message(failure); return false }
+        catch (failure: Exception) { if (capture.isCurrent() && !handleAdultEligibilityRefusal(failure)) error = message(failure); return false }
         finally { busy = false }
     }
     /** Navigation only. Reject responses for a departed destination, account or credential. */
@@ -510,7 +519,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
             open("/calls/$creator/$fan/$id")
             return true
         } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-        catch (_: Exception) { return false }
+        catch (failure: Exception) { if (capture.isCurrent()) handleAdultEligibilityRefusal(failure); return false }
     }
     suspend fun openNotification(id: String): Boolean {
         val origin = baseURL ?: return false
@@ -533,7 +542,7 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         if (busy) return; val client = api ?: run { purge(); return }; busy = true; generation++
         try { if (all) client.revokeSessions() else client.logout(); purge() }
         catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-        catch (failure: CreatorAPIError) { if (failure.status == 401) purge() else error = message(failure) }
+        catch (failure: CreatorAPIError) { if (failure.status == 401) purge() else if (!handleAdultEligibilityRefusal(failure)) error = message(failure) }
         catch (_: Exception) { error = QelvoraCopy.text("nativeSignOutCouldNotReachThe") }
         finally { busy = false }
     }

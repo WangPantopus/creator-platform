@@ -307,6 +307,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             }
         } catch (failure: Throwable) {
             if (run == viewRun && readRevision == refreshRevision) fail(failure, threadDenied = true)
+            else AdultEligibilityRefusal.report(failure)
             if (propagateFailure) throw failure
         }
     }
@@ -746,13 +747,13 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
             val freshPage = client.page(root)
             val freshUsage: ConversationUsage = client.json.decodeFromJsonElement(client.request("$root/usage"))
             if (current(ticket)) { memory = freshMemory; audit = freshAudit; policy = freshPolicy; page = freshPage; usage = freshUsage }
-        } catch (failure: Throwable) { if (failure is CancellationException) throw failure; if (current(ticket)) failed(failure, QelvoraCopy.text("nativeReconnectToRefreshYourPrivacy")) }
+        } catch (failure: Throwable) { if (failure is CancellationException) throw failure; if (current(ticket)) failed(failure, QelvoraCopy.text("nativeReconnectToRefreshYourPrivacy")) else AdultEligibilityRefusal.report(failure) }
     }
     suspend fun change(fallback: String, run: suspend () -> Unit) {
         if (busy || !foreground || page == null || memory == null) return
         val ticket = revision; busy = true
         try { run(); if (current(ticket)) { editing = null; refresh() } }
-        catch (failure: Throwable) { if (failure is CancellationException) throw failure; if (current(ticket)) failed(failure, fallback) }
+        catch (failure: Throwable) { if (failure is CancellationException) throw failure; if (current(ticket)) failed(failure, fallback) else AdultEligibilityRefusal.report(failure) }
         finally { if (revision == ticket) busy = false }
     }
     suspend fun source(item: ConversationMemory) {
@@ -760,7 +761,7 @@ private fun ConversationScreen(baseURL: String, creatorId: String, fanId: String
         try {
             val message: ConversationMessage = client.json.decodeFromJsonElement(client.request("$root/messages/${item.provenanceMessageId}"))
             if (current(ticket) && memory?.items?.any { it.id == item.id } == true) provenance = message
-        } catch (failure: Throwable) { if (failure is CancellationException) throw failure; if (current(ticket)) failed(failure, QelvoraCopy.text("nativeThisSourceMessageIsUnavailable")) }
+        } catch (failure: Throwable) { if (failure is CancellationException) throw failure; if (current(ticket)) failed(failure, QelvoraCopy.text("nativeThisSourceMessageIsUnavailable")) else AdultEligibilityRefusal.report(failure) }
     }
     suspend fun decide(item: ConversationMemory, action: String) {
         val snapshot = memory ?: return

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.*
 import com.pantopus.qelvora.generated.*
+import com.pantopus.qelvora.identity.AdultEligibilityRefusal
 import com.pantopus.qelvora.identity.FanSession
 import com.pantopus.qelvora.identity.FanSessionRequestCapture
 import com.pantopus.qelvora.ui.Button
@@ -53,17 +54,20 @@ private class RecordingClient(private val base: URI, private val capture: FanSes
         qualified(asset) && proof.variant == APIMediaPlaybackFileVariant.CREDENTIALED && proof.bytes in 1L..268_435_456L &&
         proof.sha256.matches(Regex("^[a-f0-9]{64}$")) && text(asset, "fileVariant") == "credentialed" &&
         text(asset, "fileSha256") == proof.sha256 && number(asset, "fileBytes") == proof.bytes.toDouble()
+    /** D-11: a refusal of these requests reaches the shell like any other. */
+    private suspend fun <T> reporting(request: suspend () -> T): T =
+        try { request() } catch (failure: Exception) { AdultEligibilityRefusal.report(failure); throw failure }
     suspend fun assertCurrent(asset: APIMediaMediaAsset, proof: APIMediaPlaybackFile): Long {
         val started = android.os.SystemClock.elapsedRealtime()
         requireCurrent()
-        val current = capture.client.readThreadMedia(creatorId, fanId, asset.id, capture.expectedAccountId)
+        val current = reporting { capture.client.readThreadMedia(creatorId, fanId, asset.id, capture.expectedAccountId) }
         requireCurrent()
         check(matches(current, asset) && matchesFile(current, proof) && matchesFile(asset, proof) && android.os.SystemClock.elapsedRealtime() - started < 5000)
         return started
     }
     suspend fun audio(asset: APIMediaMediaAsset): LoadedRecording = withContext(Dispatchers.IO) {
         require(uuid(asset.id) && qualified(asset)); requireCurrent()
-        val ticket = capture.client.threadMediaPlayback(creatorId, fanId, asset.id, capture.expectedAccountId)
+        val ticket = reporting { capture.client.threadMediaPlayback(creatorId, fanId, asset.id, capture.expectedAccountId) }
         requireCurrent()
         // Convert only the same original typed response's nested DTOs.
         val issued = Json.decodeFromJsonElement<APIMediaMediaAsset>(Json.encodeToJsonElement(ticket.asset))
@@ -80,7 +84,7 @@ private class RecordingClient(private val base: URI, private val capture: FanSes
             while (offset < bytes.size) {
                 requireCurrent()
                 val end = minOf(offset + 1_048_576, bytes.size)
-                val result = capture.client.playThreadMedia(creatorId, fanId, asset.id, token, "bytes=$offset-${end-1}", capture.expectedAccountId)
+                val result = reporting { capture.client.playThreadMedia(creatorId, fanId, asset.id, token, "bytes=$offset-${end-1}", capture.expectedAccountId) }
                 try {
                     requireCurrent()
                     check(result.status == 206 && result.contentRange == "bytes $offset-${end-1}/${proof.bytes}" && result.body.size == end - offset)
