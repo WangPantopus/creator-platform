@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { IdSchema, ReturnTargetSchema } from "@qelvora/api";
 import { IdentitySessionBoundary } from "../../../../features/identity/session-boundary";
 import { IdentityWelcome } from "../../../../features/identity/welcome";
+import { signInProviders } from "../../../../features/identity/sign-in-flow";
 import { MediaSession } from "../../../../features/media/session";
 import { currentSession } from "../../../../lib/session";
 import { Studio } from "../../../../features/studio/Studio";
@@ -15,7 +16,15 @@ export default async function Page({
   const returnTo = `/studio/${creatorId}/${screen?.length ? screen.join("/") : "today"}`;
   if (!ReturnTargetSchema.safeParse(returnTo).success) notFound();
   const session = await currentSession(returnTo);
-  if (!session) return <IdentityWelcome returnTo={returnTo} arrival={null} />;
+  if (!session)
+    return (
+      <IdentityWelcome
+        returnTo={returnTo}
+        arrival={null}
+        providers={signInProviders()}
+        development={process.env.NODE_ENV === "development"}
+      />
+    );
   return (
     <IdentitySessionBoundary
       key={session.accountId}

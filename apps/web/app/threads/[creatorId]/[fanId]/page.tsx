@@ -3,6 +3,7 @@ import { IdSchema } from "@qelvora/api";
 import { IdentitySessionBoundary } from "../../../../features/identity/session-boundary";
 import { currentSession } from "../../../../lib/session";
 import { IdentityWelcome } from "../../../../features/identity/welcome";
+import { signInProviders } from "../../../../features/identity/sign-in-flow";
 import { ConversationScreen } from "../../../../features/conversation/ConversationScreen";
 import { MediaSession } from "../../../../features/media/session";
 export const dynamic = "force-dynamic";
@@ -25,6 +26,8 @@ export default async function ThreadPage({
       <IdentityWelcome
         returnTo={`/threads/${creatorId}/${fanId}`}
         arrival={null}
+        providers={signInProviders()}
+        development={process.env.NODE_ENV === "development"}
       />
     );
   return (

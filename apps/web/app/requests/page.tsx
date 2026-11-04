@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { copy } from "@qelvora/copy";
 import { Notice } from "@qelvora/ui-web";
 import { IdentityWelcome } from "../../features/identity/welcome";
+import { signInProviders } from "../../features/identity/sign-in-flow";
 import { CommerceScreen } from "../../features/commerce/CommerceScreen";
 import { currentSession } from "../../lib/session";
 
@@ -22,7 +23,15 @@ export default async function RequestsPage({
     notFound();
   const returnTo = "/requests";
   const session = await currentSession(returnTo);
-  if (!session) return <IdentityWelcome returnTo={returnTo} arrival={null} />;
+  if (!session)
+    return (
+      <IdentityWelcome
+        returnTo={returnTo}
+        arrival={null}
+        providers={signInProviders()}
+        development={process.env.NODE_ENV === "development"}
+      />
+    );
   return (
     <>
       {session.mode === "development" && (

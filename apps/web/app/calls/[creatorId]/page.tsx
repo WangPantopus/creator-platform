@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { IdSchema } from "@qelvora/api";
 import { IdentitySessionBoundary } from "../../../features/identity/session-boundary";
 import { IdentityWelcome } from "../../../features/identity/welcome";
+import { signInProviders } from "../../../features/identity/sign-in-flow";
 import { MediaSession } from "../../../features/media/session";
 import { AccountCallLookup } from "../../../features/calls/AccountCallLookup";
 import { currentSession } from "../../../lib/session";
@@ -27,7 +28,15 @@ export default async function AccountCallPage({
     notFound();
   const returnTo = `/calls/${sessionId}`;
   const session = await currentSession(returnTo);
-  if (!session) return <IdentityWelcome returnTo={returnTo} arrival={null} />;
+  if (!session)
+    return (
+      <IdentityWelcome
+        returnTo={returnTo}
+        arrival={null}
+        providers={signInProviders()}
+        development={process.env.NODE_ENV === "development"}
+      />
+    );
   return (
     <IdentitySessionBoundary
       key={`${session.accountId}:${session.sessionId}:${sessionId}`}

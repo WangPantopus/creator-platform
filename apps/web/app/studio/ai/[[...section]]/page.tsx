@@ -3,6 +3,7 @@ import { CreatorAI } from "../../../../features/creator-ai/CreatorAI";
 import { headers } from "next/headers";
 import { IdentitySessionBoundary } from "../../../../features/identity/session-boundary";
 import { IdentityWelcome } from "../../../../features/identity/welcome";
+import { signInProviders } from "../../../../features/identity/sign-in-flow";
 import { currentSession } from "../../../../lib/session";
 import { notFound } from "next/navigation";
 import { ReturnTargetSchema } from "@qelvora/api";
@@ -34,7 +35,15 @@ export default async function Page({
       return <CreatorAI section={section} />;
   }
   const session = await currentSession(returnTo);
-  if (!session) return <IdentityWelcome returnTo={returnTo} arrival={null} />;
+  if (!session)
+    return (
+      <IdentityWelcome
+        returnTo={returnTo}
+        arrival={null}
+        providers={signInProviders()}
+        development={process.env.NODE_ENV === "development"}
+      />
+    );
   return (
     <IdentitySessionBoundary
       key={session.accountId}

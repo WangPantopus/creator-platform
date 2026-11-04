@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { IdSchema } from "@qelvora/api";
 import { IdentitySessionBoundary } from "../../../../../features/identity/session-boundary";
 import { IdentityWelcome } from "../../../../../features/identity/welcome";
+import { signInProviders } from "../../../../../features/identity/sign-in-flow";
 import { MediaSession } from "../../../../../features/media/session";
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
@@ -39,7 +40,15 @@ export default async function CallPage({
   const offer = query.offer === "1";
   const returnTo = `/calls/${destination.creatorId}/${destination.fanId}/${destination.sessionId}${offer ? "?offer=1" : ""}`;
   const actor = await currentSession(returnTo);
-  if (!actor) return <IdentityWelcome returnTo={returnTo} arrival={null} />;
+  if (!actor)
+    return (
+      <IdentityWelcome
+        returnTo={returnTo}
+        arrival={null}
+        providers={signInProviders()}
+        development={process.env.NODE_ENV === "development"}
+      />
+    );
   return (
     <IdentitySessionBoundary
       key={`${actor.accountId}:${actor.sessionId}:${returnTo}`}

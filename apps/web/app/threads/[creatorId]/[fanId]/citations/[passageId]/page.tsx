@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Notice } from "@qelvora/ui-web";
 import { currentSession, platformFetch } from "../../../../../../lib/session";
 import { IdentityWelcome } from "../../../../../../features/identity/welcome";
+import { signInProviders } from "../../../../../../features/identity/sign-in-flow";
 import "../../../../../../features/conversation/conversation.css";
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
@@ -18,7 +19,14 @@ export default async function CitationPage({
     notFound();
   const returnTo = `/threads/${creatorId}/${fanId}`;
   if (!(await currentSession()))
-    return <IdentityWelcome returnTo={returnTo} arrival={null} />;
+    return (
+      <IdentityWelcome
+        returnTo={returnTo}
+        arrival={null}
+        providers={signInProviders()}
+        development={process.env.NODE_ENV === "development"}
+      />
+    );
   let passage: {
     title: string;
     text: string;
