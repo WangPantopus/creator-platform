@@ -252,6 +252,19 @@ class FanSession(private val context: Context, private val baseURL: String?, ret
         if (credential != null && credential != stored) return
         denyAdultEligibility()
     }
+    /** A thread's credential no longer resolves while its session may be live
+     * (ConversationRenewal): the 30 s loop's own session check, with its guards,
+     * run now. It renews an expired credential, or ends the session. A check
+     * already running does the same, so it is waited for instead. */
+    internal suspend fun renewCredential() {
+        if (checkingSession || rotatingCredential) {
+            // Bounded: the check's own requests time out well before 15 s.
+            repeat(150) { if (!checkingSession && !rotatingCredential) return; delay(100) }
+            return
+        }
+        if (busy || choosingActor || showsSignIn || (session == null && !hasSavedCredential)) return
+        refresh()
+    }
     suspend fun purge(): Boolean = withContext(NonCancellable) {
         if (purgingPrivateState) return@withContext false
         val pushCredential = runCatching { currentToken() }.getOrNull()

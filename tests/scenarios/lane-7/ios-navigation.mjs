@@ -4,7 +4,8 @@
 // --presence-real, --presence-reaction or --presence-harness use explicit
 // LANE7_IOS and forward the documented QELVORA_PRESENCE_* values to XCTest.
 // --studio-web forwards LANE7_STUDIO_WEB_* (run it through e7-12-studio-web.mjs);
-// --stack forwards LANE7_STACK_API.
+// --stack forwards LANE7_STACK_API; --expiry forwards LANE7_EXPIRY_* (run it
+// through stack-expiry.mjs).
 // LANE7_OUT is an off-repository directory for the xcresult evidence.
 import { execFileSync, spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
@@ -66,7 +67,10 @@ if (studioWeb) ids.length = 0;
 // E7.1 F1 and F2, the first conversation, which the Android script taps through.
 const first = ids[0] === "--first";
 if (first) ids.shift();
-const suite = stackPresence
+// stack-expiry.mjs: these flows attach to the app that scenario keeps open.
+const expiry = ids[0] === "--expiry";
+if (expiry) ids.shift();
+const listedSuite = stackPresence
   ? "Lane7StackNavigationFlow"
   : presence
     ? "Lane7PresenceFlows"
@@ -105,7 +109,7 @@ const suite = stackPresence
                                     : first
                                       ? "Lane7FirstConversationFlows"
                                       : "Lane7NavigationFlows";
-const optInVariable = stackPresence
+const listedOptIn = stackPresence
   ? "LANE7_NAVIGATION"
   : presence
     ? "LANE7_PRESENCE"
@@ -146,7 +150,7 @@ const optInVariable = stackPresence
                                       : first
                                         ? "LANE7_FIRST"
                                         : "LANE7_NAVIGATION";
-const flows = stackPresence
+const listedFlows = stackPresence
   ? {
       PRESENCE:
         stackPresence === "--presence-harness"
@@ -298,6 +302,11 @@ const flows = stackPresence
                                             N21: "testN21CreatorAccessBack",
                                             N21S: "testN21SpendingBack",
                                           };
+const suite = expiry ? "Lane7ExpiryFlows" : listedSuite;
+const optInVariable = expiry ? "LANE7_EXPIRY" : listedOptIn;
+const flows = expiry
+  ? { E1: "testE01TypeDraft", E2: "testE02ThreadAndDraftKept" }
+  : listedFlows;
 if (!source || ids.some((id) => !flows[id]))
   throw new Error(
     "Pass a built .xctestrun and optional unfinished iOS flow IDs.",
@@ -323,6 +332,10 @@ const optIn = (value) => {
     if (studioWeb)
       for (const [key, setting] of Object.entries(process.env))
         if (key.startsWith("LANE7_STUDIO_WEB_"))
+          value.EnvironmentVariables[key] = setting;
+    if (expiry)
+      for (const [key, setting] of Object.entries(process.env))
+        if (key.startsWith("LANE7_EXPIRY_"))
           value.EnvironmentVariables[key] = setting;
     if (stack && process.env.LANE7_STACK_API)
       value.EnvironmentVariables.LANE7_STACK_API = process.env.LANE7_STACK_API;

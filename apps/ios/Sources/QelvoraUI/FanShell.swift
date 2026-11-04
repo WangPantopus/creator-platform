@@ -99,6 +99,16 @@ enum AdultEligibilityRefusal {
     }
 }
 
+/// A thread's credential no longer resolves while its session may be live
+/// (W3CredentialRenewal): the shell's own session check runs now, rather than
+/// at its next 30 s turn, and the thread reconnects once it has finished.
+enum CredentialRenewal {
+    static func renew() async {
+        // Not the caller's task: a rotation, once begun, must finish and persist.
+        await Task { @MainActor in await FanSession.shell?.renewCredential() }.value
+    }
+}
+
 @MainActor
 public final class FanSession: ObservableObject {
     @Published public private(set) var session: APISession?
@@ -219,19 +229,7 @@ public final class FanSession: ObservableObject {
         // A foreground read can arrive during the shell's real session refresh.
         // Wait for that validation, rather than reporting a signed-out account.
         // Navigation, replacement, purge and cancellation still invalidate it.
-        if checkingSession {
-            let waiter = UUID()
-            await withTaskCancellationHandler {
-                await withCheckedContinuation { continuation in
-                    guard checkingSession, !Task.isCancelled else { continuation.resume(); return }
-                    validationWaiters[waiter] = continuation
-                }
-            } onCancel: {
-                Task { @MainActor [weak self] in
-                    self?.validationWaiters.removeValue(forKey: waiter)?.resume()
-                }
-            }
-        }
+        await sessionCheckFinished()
         guard requestedGeneration == generation, requestedNavigation == destinationGeneration else { return nil }
         guard let baseURL, let active = session, destination == target, !busy,
               !purgingPrivateState, !localPurgeFailed, !checkingSession,
@@ -258,6 +256,21 @@ public final class FanSession: ObservableObject {
         }
         guard matches(), let credential = try? await storage.read() else { return false }
         return matches() && credential == capture.credential
+    }
+    /// Returns once the session check now running, if any, has finished.
+    private func sessionCheckFinished() async {
+        guard checkingSession else { return }
+        let waiter = UUID()
+        await withTaskCancellationHandler {
+            await withCheckedContinuation { continuation in
+                guard checkingSession, !Task.isCancelled else { continuation.resume(); return }
+                validationWaiters[waiter] = continuation
+            }
+        } onCancel: {
+            Task { @MainActor [weak self] in
+                self?.validationWaiters.removeValue(forKey: waiter)?.resume()
+            }
+        }
     }
     private func finishValidationWaiters() {
         let waiting = Array(validationWaiters.values)
@@ -574,6 +587,14 @@ public final class FanSession: ObservableObject {
         guard !adultEligibilityDenied, !purgingPrivateState, let stored = try? await storage.read(),
               stored == credential, !adultEligibilityDenied, !purgingPrivateState else { return }
         await denyAdultEligibility()
+    }
+    /// CredentialRenewal: the 30 s loop's own session check, with its guards,
+    /// run now. It renews an expired credential, or ends the session. A check
+    /// already running does the same, so it is waited for instead.
+    fileprivate func renewCredential() async {
+        if checkingSession { await sessionCheckFinished(); return }
+        guard !busy, !choosingDevelopmentActor, !showsSignIn, session != nil || hasSavedCredential else { return }
+        await refresh()
     }
     @discardableResult public func purge() async -> Bool {
         guard !purgingPrivateState else { return false }

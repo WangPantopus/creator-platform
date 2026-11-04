@@ -26,6 +26,14 @@ sealed interface ConversationRealtimeEvent {
     data class Frame(val value: APIFrame) : ConversationRealtimeEvent
 }
 
+/** The credential a connection or request carried no longer resolves, while its
+ * session may still be live: the gateway's 4401 (the access window passed, or the
+ * shell's renewal rotated it), a stored credential the shell replaced under an
+ * open connection, or an HTTP `session_expired`. Not a denial: the thread keeps
+ * its page, draft and pending reply, the shell's own session check renews the
+ * credential or ends the session, and the thread reconnects. */
+class ConversationRenewal : Exception(QelvoraCopy.text("nativeReconnectToRefreshYourInputIsKept"))
+
 /** One connection per origin/account/credential, multiplexing at most 64 live
  * subscriptions. Credentials and frame buffers are memory-only. Overflow forces
  * a fresh authorized snapshot/replay rather than dropping a control boundary. */
@@ -63,7 +71,7 @@ internal object ConversationRealtime {
         val id = UUID.randomUUID().toString()
         val connection = synchronized(connections) {
             val previous = connections[key]
-            if (previous != null && previous.token != token) previous.stop(ConversationFailure(401, QelvoraCopy.text("nativeYourAccountChangedOpenThisConversation")))
+            if (previous != null && previous.token != token) previous.stop(ConversationRenewal())
             val current = connections[key] ?: Connection(key, token, credential).also { connections[key] = it }
             current.add(id, Subscription(page.creatorId, page.fanId, page.threadId, cursor,
                 { trySend(it).isSuccess }, { close(it) }))
@@ -118,15 +126,23 @@ internal object ConversationRealtime {
             val previous = subscriptions.values.toList(); subscriptions.clear()
             previous.forEach { it.fail(failure ?: ConversationFailure(503, QelvoraCopy.text("nativeReconnectToRefreshThisConversation"))) }
         }
+        /** A credential the shell rotated ends this connection, and its owners
+         * reconnect with the new one; the server still confirms the account. */
+        private fun credentialChanged(): Boolean {
+            val stored = credential()
+            if (stored == token) return false
+            stop(if (stored == null) ConversationFailure(401, QelvoraCopy.text("nativeYourAccountChangedOpenThisConversation")) else ConversationRenewal())
+            return true
+        }
         override fun onOpen(webSocket: WebSocket, response: Response) = synchronized(connections) {
             if (stopped) { webSocket.cancel(); return@synchronized }
-            if (credential() != token) { stop(ConversationFailure(401, QelvoraCopy.text("nativeYourAccountChangedOpenThisConversation"))); return@synchronized }
+            if (credentialChanged()) return@synchronized
             open = true
             subscriptions.values.toList().forEach { subscribe(it) }
         }
         override fun onMessage(webSocket: WebSocket, text: String) = synchronized(connections) {
             if (stopped) return@synchronized
-            if (credential() != token) { stop(ConversationFailure(401, QelvoraCopy.text("nativeYourAccountChangedOpenThisConversation"))); return@synchronized }
+            if (credentialChanged()) return@synchronized
             if (text.length > 1_000_000) { stop(ConversationFailure(503, QelvoraCopy.text("nativeReconnectToRefreshThisConversation"))); return@synchronized }
             val frame = runCatching { json.decodeFromString<APIFrame>(text) }.getOrNull()
             if (frame == null || subscriptions.values.none { it.threadId == frame.threadId }) {
@@ -146,12 +162,15 @@ internal object ConversationRealtime {
                 "Conversation unavailable" -> "server_batch_refused"
                 "Subscription refused" -> "server_subscription_refused"
                 "adult_eligibility_required" -> "server_adult_eligibility"
+                "session_renewal_required" -> "server_renewal_required"
                 else -> "server_close_other"
             })
             // D-11: the live connection meets the flag on its own every 2 s, and
             // the gateway then closes it with 4403 (gateway.ts).
             if (code == 4403) AdultEligibilityRefusal.report(403, reason, token)
-            stop(ConversationFailure(if (code == 1008 || code == 4403) 401 else 503, QelvoraCopy.text("nativeReconnectToRefreshThisConversation")))
+            // 4401: this socket's token no longer resolves, but its session is live (gateway.ts).
+            if (code == 4401) stop(ConversationRenewal())
+            else stop(ConversationFailure(if (code == 1008 || code == 4403) 401 else 503, QelvoraCopy.text("nativeReconnectToRefreshThisConversation")))
         }
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) = synchronized(connections) {
             trace(if (response?.code == 401) "socket_authentication_failed" else "socket_transport_failed")
