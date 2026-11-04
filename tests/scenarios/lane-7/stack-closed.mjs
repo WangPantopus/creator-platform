@@ -631,6 +631,28 @@ SELECT coalesce((SELECT string_agg(scope||':'||coalesce(creator_id::text,'-'),',
   );
 }
 
+// A malformed tombstone, a NULL reference that no request can write (here a
+// row, with its own completed export job), matches no family in Trust's
+// denial. It must not hide fan B's list or Home either.
+psql(
+  `WITH job AS (INSERT INTO creator_trust.privacy_job(account_id,kind,scope,state,verified_at,verification_ref)
+ VALUES(:'account'::uuid,'export','account','complete',now(),'lane7-malformed-standin') RETURNING id)
+INSERT INTO creator_trust.tombstone(account_id,scope,creator_id,thread_id,job_id)
+ SELECT :'account'::uuid,'creator',NULL,NULL,id FROM job;`,
+  { account: account(B.number) },
+);
+const listed = await request("GET", "/v1/conversations/account", B.token);
+const kept = (listed.body.threads ?? [])
+  .map((thread) => creators.get(thread.creatorId))
+  .sort()
+  .join(",");
+await check("a NULL reference among B's tombstones changes no answer", {});
+step(
+  "a NULL reference among B's tombstones leaves B's list whole",
+  listed.status === 200 && kept === "Devon,Maya,Priya",
+  `list ${listed.status} ${kept || "(none)"}`,
+);
+
 await browser.close();
 console.log(failures ? `\n${failures} step(s) failed` : "\nall steps passed");
 process.exit(failures ? 1 : 0);
