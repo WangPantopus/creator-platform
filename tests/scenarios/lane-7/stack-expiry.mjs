@@ -56,7 +56,8 @@ const DENIALS =
 // (a line of its own, never the disclosure banner that also names the AI). A
 // reply can scroll the marker out of a short list, and Android's screen text
 // holds only the rows in view.
-const AI_ROW = /^Maya's AI$/mu;
+// Screen text recognition reads the row's glyph as a mark before the label.
+const AI_ROW = /^\W{0,3}Maya's AI$/mu;
 const threadShown = (text) => pattern(BEFORE).test(text) || AI_ROW.test(text);
 
 // ------------------------------------------------------------- the proxy
