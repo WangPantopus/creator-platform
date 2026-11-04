@@ -30,6 +30,7 @@
     "infra/migrations/reviews/20261023-studio-reply-authority.json": "9af7c51803f8dd214da3988504cebcc8ef4ac471b2fd3223a871aeae3c2299db",
     "infra/migrations/reviews/20261027-core-follow.json": "48fe13e2fb64b574032f66cdf675640beccfbe785b86ce45cc39a2affd340bc9",
     "infra/migrations/reviews/20261101-pilot-columns.json": "47cbb92c25bc511102bbe43bf411fcf36aedbb54a1f38ef1694f5ab842b52faf",
+    "infra/migrations/reviews/20261103-ops-console.json": "ab3e04ae800922eb181d3b195f05a87ed4dfa5ecdf764ffc139250501fb63441",
     "infra/migrations/waves/20261002-privacy-held.json": "2338f48ea4b1008f47eef43ff7a835021e5e917669ad44f21179c69d03227c0a",
     "infra/migrations/waves/20261002-privacy-roles.json": "c24a5bea3e45a2f2cf8397f0d26877175544eb0d67cb18e1af17225fddcea980",
     "infra/migrations/waves/20261002-privacy.json": "2d72120d1be136081acb5d324f19dae44660d6e423e932cc962664596ab4c3e2",

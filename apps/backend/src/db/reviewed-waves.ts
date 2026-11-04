@@ -12,6 +12,7 @@ import replyReview from "../../../../infra/migrations/reviews/20261023-reply-rev
 import studioReplyAuthorityReview from "../../../../infra/migrations/reviews/20261023-studio-reply-authority.json" with { type: "json" };
 import coreFollowReview from "../../../../infra/migrations/reviews/20261027-core-follow.json" with { type: "json" };
 import pilotColumnsReview from "../../../../infra/migrations/reviews/20261101-pilot-columns.json" with { type: "json" };
+import opsConsoleReview from "../../../../infra/migrations/reviews/20261103-ops-console.json" with { type: "json" };
 
 // The table of reviewed waves: the one list of waves the runtime and the
 // operator share. scripts/migration-chain.ts checks each chain wave against it
@@ -283,6 +284,29 @@ export const headWaves: readonly [HeadWave, HeadWave, ...LaterHeadWave[]] = [
         refusal:
           "The pilot-columns wave must add exactly the commerce inbox login; a login that already exists is refused.",
       },
+    },
+  },
+  {
+    id: "20261103-ops-console",
+    review: opsConsoleReview,
+    partial: "The complete reviewed ops-console source graph is required.",
+    requires:
+      "The ops console requires the complete pilot-columns predecessor.",
+    trust: {
+      registry:
+        "Ops-console registry requires all three reviewed sources and the complete pilot-columns predecessor.",
+      installed:
+        "Incomplete or unregistered ops-console wave; no per-file repair was attempted.",
+      unapplied:
+        "Ops-console sources remain unapplied. After pilot-columns126, use W8_MIGRATION_WAVE=20261103-ops-console with verified private backup/restore and closed admission.",
+    },
+    operator: {
+      name: "ops-console",
+      partial: "Partial ops-console wave is not an accepted baseline.",
+      activation:
+        "Ops-console activation requires the complete reviewed126 predecessor.",
+      precedes: "The ops console cannot precede the pilot columns.",
+      sameRoleCount: "The ops-console wave must not add a role.",
     },
   },
 ];

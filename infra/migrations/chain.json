@@ -101,6 +101,12 @@
       "sha256": "c9dfd075d3b3764b0d50bf662bbc64243ffa96af210786b81ca51e2d083f6d41",
       "baseline": 123,
       "sources": 3
+    },
+    {
+      "id": "20261103-ops-console",
+      "sha256": "56555c182003fcd499a4cfa0cad339a32153a69d375703465fc7b6a507fb53c3",
+      "baseline": 126,
+      "sources": 3
     }
   ],
   "fresh": {
@@ -119,11 +125,12 @@
       "20261023-reply-review",
       "20261023-studio-reply-authority",
       "20261027-core-follow",
-      "20261101-pilot-columns"
+      "20261101-pilot-columns",
+      "20261103-ops-console"
     ]
   },
   "head": {
-    "wave": "20261101-pilot-columns",
-    "sources": 126
+    "wave": "20261103-ops-console",
+    "sources": 129
   }
 }
