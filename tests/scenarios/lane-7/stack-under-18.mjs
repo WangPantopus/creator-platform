@@ -13,16 +13,16 @@
 //     node tests/scenarios/lane-7/stack-under-18.mjs ios|android [runs] [home|thread|live]
 // LANE7_IOS names the simulator (a debug build: the proxy's origin is passed
 // at launch), LANE7_ANDROID the emulator, LANE7_PROXY_PORT the proxy's port.
-// The stack's own state folder holds its IDENTITY_SESSION_KEY.
 import http from "node:http";
 import net from "node:net";
 import { execFileSync } from "node:child_process";
-import { createCipheriv, createHash, randomBytes } from "node:crypto";
-import { existsSync, readdirSync, readFileSync, realpathSync } from "node:fs";
-import { homedir, tmpdir } from "node:os";
+import { createHash } from "node:crypto";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { homedir } from "node:os";
 import { join } from "node:path";
 import * as A from "./android-ui.mjs";
 import * as L from "./lib.mjs";
+import { stackFlag } from "./stack-flag.mjs";
 
 const platform = process.argv[2];
 if (!["ios", "android"].includes(platform))
@@ -37,58 +37,12 @@ const origin = `http://127.0.0.1:${port}`;
 const BUNDLE = "com.pantopus.qelvora";
 const MAYA = "20000000-0000-4000-8000-000000000001";
 const FAN_ONE = "10000000-0000-4000-8000-000000000001";
-const UNDER_18 = "10000000-0000-4000-8000-000000000007";
 const TITLE = /This app is for adults/u;
 const DRAFT = "lane7 under18 private draft";
 
-// The flag: every open session of fan one now resolves to the under-18
-// development actor, sealed as the backend seals a session's identity.
-const stackEnvironment = readFileSync(
-  join(
-    realpathSync(tmpdir()),
-    "qelvora-stack",
-    postgres.replace(/^qelvora-|-postgres$/gu, ""),
-    "backend.env",
-  ),
-  "utf8",
-);
-const sessionKey = Buffer.from(
-  /^IDENTITY_SESSION_KEY=["']?([^"'\n]+)/mu.exec(stackEnvironment)[1],
-  "base64",
-);
-function sealed(token) {
-  const iv = randomBytes(12);
-  const cipher = createCipheriv("aes-256-gcm", sessionKey, iv);
-  return Buffer.concat([
-    iv,
-    cipher.update(token),
-    cipher.final(),
-    cipher.getAuthTag(),
-  ]).toString("base64url");
-}
-const sql = (query) =>
-  execFileSync(
-    "docker",
-    [
-      "exec",
-      postgres,
-      "psql",
-      "-U",
-      "postgres",
-      "-d",
-      "creator_stack",
-      "-At",
-      "-c",
-      query,
-    ],
-    { encoding: "utf8" },
-  ).trim();
-const flag = () =>
-  Number(
-    sql(
-      `WITH flagged AS (UPDATE creator.identity_session SET upstream_cipher='${sealed(`development:${UNDER_18}`)}' WHERE account_id='${FAN_ONE}' AND revoked_at IS NULL RETURNING 1) SELECT count(*) FROM flagged`,
-    ),
-  );
+// The flag: the backend's own D-11 refusal (stack-flag.mjs).
+const flagAccount = stackFlag(postgres);
+const flag = () => flagAccount(FAN_ONE);
 
 // The proxy: the real API's answers, logged. `holding` parks every HTTP
 // request that carries a session until release().
