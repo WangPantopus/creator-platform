@@ -8,11 +8,12 @@
 // given a role with a database row (stand-in for the O2 command, #472).
 // Fakes: Apple, the development identity. It pauses and lifts Maya twice, so
 // run it on a fresh stack.
-// Needs the lane stack with sign-in on, the web app, the fake provider and the
-// pending `pending-lift-pause.sql` applied (pins regenerated locally):
+// Needs the lane stack with sign-in on, the web app and the fake provider. The
+// stack installs `pending-lift-pause.sql` as 0261, in the wave
+// 20261103-ops-console:
 //   node tests/scenarios/lane-1/e1-6-lift-pause.mjs
-// Before the migration is registered (a fresh stack without it), a lift is
-// refused plainly and changes nothing:
+// On a stack from before the wave (126 migrations), a lift is refused plainly
+// and changes nothing:
 //   node tests/scenarios/lane-1/e1-6-lift-pause.mjs --before-registration
 import { randomUUID } from "node:crypto";
 import { chromium } from "@playwright/test";

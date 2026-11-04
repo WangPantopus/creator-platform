@@ -798,6 +798,27 @@
       "owner": "W4",
       "sourceSha256": "7c280dd05620b6574a6bc9bb34e2509caa6bb2a31a1a12a23a10425c9fa5c810",
       "wave": "20261101-pilot-columns"
+    },
+    {
+      "version": "0259_w8_ops_member_admin",
+      "path": "apps/backend/src/modules/trust/pending-ops-member-admin.sql",
+      "owner": "W8",
+      "sourceSha256": "045355b17b396c29afbc5d56b4209d1f8ca17f26c193eb93067157fb3faf5b45",
+      "wave": "20261103-ops-console"
+    },
+    {
+      "version": "0260_w8_supervisor_audits",
+      "path": "apps/backend/src/modules/trust/pending-supervisor-audits.sql",
+      "owner": "W8",
+      "sourceSha256": "ab41b75d2e4613181eb353dc08d0d8749b7a9f06c672c45eadfdd92f62c52c78",
+      "wave": "20261103-ops-console"
+    },
+    {
+      "version": "0261_w8_lift_pause",
+      "path": "apps/backend/src/modules/trust/pending-lift-pause.sql",
+      "owner": "W8",
+      "sourceSha256": "7a1920976f35c898ccbf604817ee85f609e2b75e1aedcae4da0228edc75c91e7",
+      "wave": "20261103-ops-console"
     }
   ],
   "reserved": [

@@ -88,18 +88,19 @@ in the Wave 6 queue.
 
 1. **Wave 6, migration registration.**
    - **The triage is merged** (#533). The [migration queue](engineering/migration-queue.md) has a row
-     for each unregistered SQL file. It counts 61: 5 needed for the pilot, 2 for the founder to
+     for each unregistered SQL file. It counted 61: 5 needed for the pilot, 2 for the founder to
      decide, 27 needed later, 16 obsolete and 11 that aren't migrations. Five of those 11 were
-     evidence copies under `artifacts/`, so 56 are left in the tree.
-   - **Four places fail on every real database:** three in the ops console (naming a reviewer,
-     supervisor audits and lifting a pause) and one in Team triage. The founder left Team triage
-     out of the pilot ([decision log](BRIEF.md#14-decision-log), 2026-11-03). The Studio no longer
-     offers the Triage role, and the server refuses to grant it with 403 `team_role_unavailable`
-     (#537).
-   - **The proposed pilot waves:** the ops console, then memory, then store memberships if the
-     founder says so.
+     evidence copies under `artifacts/`, and the ops-console wave registered 3 of the 5 pilot
+     files, so 53 are left in the tree.
+   - **Four places failed on every real database:** three in the ops console (naming a reviewer,
+     supervisor audits and lifting a pause), which the ops-console wave fixes, and one in Team
+     triage. The founder left Team triage out of the pilot
+     ([decision log](BRIEF.md#14-decision-log), 2026-11-03). The Studio no longer offers the
+     Triage role, and the server refuses to grant it with 403 `team_role_unavailable` (#537).
+   - **The pilot waves:** the ops console (registered, below), then memory, then store memberships
+     if the founder says so.
    - **The generator is merged** (#538). `pnpm generate` builds the wave packets and `chain.json`
-     from `infra/migrations.json`, and `generate:check` verifies them and 36 pinned records in CI.
+     from `infra/migrations.json`, and `generate:check` verifies them and 37 pinned records in CI.
      `wave-pins` measures the catalogue pins on marked scratch databases
      ([engineering/migrations.md](engineering/migrations.md)).
    - **`migrate-trust` reads the chain** (#541). Every source of a wave after the canonical
@@ -139,8 +140,21 @@ in the Wave 6 queue.
      ([registering a file](engineering/migrations.md#registering-a-file-today)). An incomplete
      registration fails closed at `stack up` and at `activate-wave`, so the rule to register no new
      wave until `migrate-trust` read the chain stays lifted.
-   - **Next:** the pilot's ops-console and memory waves no longer wait on Wave 6. Files are
-     registered only as features need them, one wave per feature.
+   - **The ops-console wave is registered** (#547), the first registration by the data-driven
+     procedure: `20261103-ops-console`, 0259 to 0261. The founder can name and remove reviewers
+     with the runbook as the trust owner, a supervisor sees every reviewer's audit records, and a
+     supervisor can lift a pause.
+     - `pending-supervisor-audits.sql` was revised before registration, with the coordinator's
+       yes: its new function is no longer executable by PUBLIC, which the operator's role check
+       refuses.
+     - Nothing beyond the table row was taught to the operator or the runtime.
+     - The procedure gained a step: `migrate-trust` on the scratch databases, because `wave-pins`
+       doesn't run the role checks
+       ([registering a file](engineering/migrations.md#registering-a-file-today)).
+     - A database at 0258 moves with `activate-wave`.
+   - **Next:** the memory wave, once the founder confirms the INV-15 default, then store
+     memberships if the founder decides D-14 that way. Files are registered only as features need
+     them, one wave per feature.
 2. **Pilot phase 1, a real host** (about 3 weeks, blocked mostly on the founder's decisions): a
    production composition root with real adapters; staging, the domain and app links; Apple and
    Google credentials; the Anthropic switch; observability, backups and a restore drill. Its exit:

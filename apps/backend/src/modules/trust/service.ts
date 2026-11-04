@@ -782,29 +782,11 @@ export class TrustService {
               "This case did not pause a creator.",
               409,
             );
-          const running = await client.query(
-            "SELECT 1 FROM creator_trust.effect WHERE case_id=$1 AND type='agent.pause' AND state='running'",
-            [caseId],
-          );
-          if (running.rowCount)
-            throw new DomainError(
-              "pause_in_progress",
-              "The pause is being applied. Try again in a minute.",
-              409,
-            );
           // Until pending-lift-pause.sql is registered the database refuses
           // both updates (no policy, no 'cancelled' state): say so plainly.
-          const lifting = async () => {
+          const lifting = async <T>(update: () => Promise<T>) => {
             try {
-              const cancelled = await client.query(
-                "UPDATE creator_trust.effect SET state='cancelled',lease_until=NULL,lease_token=NULL WHERE case_id=$1 AND type='agent.pause' AND state IN('pending','blocked','retry','dead_letter')",
-                [caseId],
-              );
-              const lifted = await client.query(
-                "UPDATE creator_trust.restriction SET revoked_at=now() WHERE case_id=$1 AND reason_code='pause_creator' AND revoked_at IS NULL",
-                [caseId],
-              );
-              return { cancelled, lifted };
+              return await update();
             } catch (error) {
               if (
                 ["42501", "23514"].includes(
@@ -819,7 +801,38 @@ export class TrustService {
               throw error;
             }
           };
-          const { cancelled, lifted } = await lifting();
+          // Cancel before looking for an unfinished pause. The cancel's row
+          // locks keep the worker's claim (FOR UPDATE SKIP LOCKED) off the
+          // pause until this transaction ends, and a claim already under way
+          // makes the cancel wait and skip the row. Checking first left a gap
+          // for a claim to fire after the lift. After the cancel, only
+          // another transaction can leave a pause unfinished: a claim
+          // (running), or an attempt that was running at the cancel and has
+          // failed back to retry or dead_letter since. Refuse while one is,
+          // so no pause is left stuck behind the lift; the next lift cancels
+          // it.
+          const cancelled = await lifting(() =>
+            client.query(
+              "UPDATE creator_trust.effect SET state='cancelled',lease_until=NULL,lease_token=NULL WHERE case_id=$1 AND type='agent.pause' AND state IN('pending','blocked','retry','dead_letter')",
+              [caseId],
+            ),
+          );
+          const unfinished = await client.query(
+            "SELECT 1 FROM creator_trust.effect WHERE case_id=$1 AND type='agent.pause' AND state NOT IN('complete','cancelled')",
+            [caseId],
+          );
+          if (unfinished.rowCount)
+            throw new DomainError(
+              "pause_in_progress",
+              "The pause is being applied. Try again in a minute.",
+              409,
+            );
+          const lifted = await lifting(() =>
+            client.query(
+              "UPDATE creator_trust.restriction SET revoked_at=now() WHERE case_id=$1 AND reason_code='pause_creator' AND revoked_at IS NULL",
+              [caseId],
+            ),
+          );
           if (!lifted.rowCount)
             throw new DomainError(
               "pause_already_lifted",

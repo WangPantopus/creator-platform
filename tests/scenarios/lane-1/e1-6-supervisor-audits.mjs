@@ -6,8 +6,9 @@
 // support case and a verification case; a supervisor limited to support is an
 // Apple account given that role with a database row (stand-in for the O2
 // command, #472). Fakes: Apple, the development identity and privacy proof.
-// Needs the lane stack with sign-in on, the web app, the fake provider and the
-// pending `pending-supervisor-audits.sql` applied (pins regenerated locally):
+// Needs the lane stack with sign-in on, the web app and the fake provider. The
+// stack installs `pending-supervisor-audits.sql` as 0260, in the wave
+// 20261103-ops-console:
 //   node tests/scenarios/lane-1/e1-6-supervisor-audits.mjs
 import { randomUUID } from "node:crypto";
 import { chromium } from "@playwright/test";

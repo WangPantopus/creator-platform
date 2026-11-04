@@ -9,13 +9,13 @@ database is never reset.
 - **SQL files** live with their module, for example `apps/backend/migrations/0001_foundation.sql` or
   `apps/backend/src/modules/identity/pending-passkey-retirement.sql`. A file keeps its name and its
   bytes when it is registered.
-- **The registry**, `infra/migrations.json`: 126 registered migrations, `0001_foundation` to
-  `0258_w4_provider_inbox_worker`. Each entry has a version, the file's path and owner, and for wave
+- **The registry**, `infra/migrations.json`: 129 registered migrations, `0001_foundation` to
+  `0261_w8_lift_pause`. Each entry has a version, the file's path and owner, and for wave
   migrations the file's SHA-256 and its wave. `reserved` holds version numbers set aside for files
   not yet registered. It is the only migration file a registration edits by hand.
 - **Waves**, `infra/migrations/waves/<id>.json`: the unit of registration. Each packet lists its
   `baseline` (every source registered before it, with its checksum) and its `wave` (the new
-  sources). The newest is `20261101-pilot-columns` (#527): a baseline of 123 sources and a wave of
+  sources). The newest is `20261103-ops-console` (#547): a baseline of 126 sources and a wave of
   three. [The generator](#the-generator) writes them. The four other files in that folder
   (`20261002-roles.json`, `20261002-public.json`, `20261002-privacy-roles.json` and
   `20261002-privacy-held.json`) are October's role and held-mapping reviews, not packets.
@@ -94,7 +94,7 @@ database is never reset.
 - its `baseline` is every source of the waves before it, in that order, after the entries that come
   before the first wave (0001 to 0043);
 - every checksum is the SHA-256 of the file's bytes; every source in a wave must have a
-  `sourceSha256` (all 86 from 0044 on do), and it must match;
+  `sourceSha256` (all 89 from 0044 on do), and it must match;
 - a new wave's versions rise in registry order, above every version before the wave, because the
   operator refuses to apply a version below one already applied;
 - `outOfOrderException`, the W5 adoption record (0045 applied before 0044), carries over unchanged
@@ -144,7 +144,7 @@ never writes them:
 | `20261007-content` | It records the reviewed baseline-ordering exception for 0198 |
 | `20261007-public-ai` | Its 2 sources, 0235 and 0236, have no `wave` in the registry |
 
-The other 12 come out byte for byte as reviewed. Giving the frozen ones' sources a `wave` would
+The other 13 come out byte for byte as reviewed. Giving the frozen ones' sources a `wave` would
 change the registry, so they stay frozen.
 
 ## Registering a file today
@@ -184,8 +184,16 @@ earlier rule, to register no new wave until `migrate-trust` read the chain, stay
   stays at the canonical 61 (`Generation-purpose wave catalogue changed.` for a new table).
   `activate-wave` applies the wave, refuses it at the same check, and rolls it back. Only a wave
   whose changes the pins don't see passes both, and then the copied pins are right.
+- **A wave the role checks refuse.** `wave-pins` applies the SQL and measures the pins, but it
+  doesn't run the operator's role checks, so steps 1 to 6 can all pass. The ops-console wave was
+  the first case: 0260 as written created a function that PUBLIC could execute, and the role check
+  allows only the reviewed PUBLIC functions (`waves/20261002-public.json`). `stack up` refused it
+  at the local installer's final checks and left the database at the canonical 61, and
+  `migrate-trust` refused every database that held it:
+  `Unsafe migration purpose-role custody: PUBLIC function source/ACL packet.`
 
-That is why step 7's fresh install on a new stack stays required.
+That is why step 7's fresh install on a new stack stays required, and why step 7 starts with
+`migrate-trust` on the scratch databases.
 
 A registration is one pull request: a registry edit, the generated packet and chain, a review file
 measured on scratch databases and pinned, the table row, and the proof. Steps 2 to 5 are mechanical
@@ -197,10 +205,12 @@ apart from the reach review in step 4; the table below says what isn't.
    For the populated alternatives, also restore a copy of each stack's database (`pg_dump -Fc`,
    then `pg_restore` into a new database in the same container), and mark it by hand:
    `COMMENT ON DATABASE <copy> IS 'creator-platform:local-scratch'`. A restore turns the explicit
-   owner-only grant on the isolated-owner tables (seven at 0258) into the implicit default; after
+   owner-only grant on the isolated-owner tables (seven at 0261) into the implicit default; after
    proving that is the only difference, replay each owner's grant on its own table, as the archived
    [runbook](../archive/operations/W8-runbook.md) says, until `catalogue-pins check` on the copy
-   matches its original. Build them first, with the registry as it is.
+   matches its original. The restore also stores the two roles of one policy, `decision_read` on
+   `creator_trust.reply_review_decision`, in the other order; the pins sort them and don't see it.
+   Build them first, with the registry as it is.
 2. **Edit the registry.** Append one entry per file: `version` (the next free number; no reservation
    can be used as a version, see [reserved numbers](migration-queue.md#reserved-numbers)), `path`
    (the file as it is), `owner`, `sourceSha256` and a new `wave` id, `YYYYMMDD-name`.
@@ -218,7 +228,11 @@ apart from the reach review in step 4; the table below says what isn't.
    baseline, and a wave whose versions don't rise above it. It takes a catalogue snapshot
    against the previous head's review, applies the wave's sources in one transaction as
    `activate-wave` does, and prints the catalogue diff. **A person reviews every changed reach
-   against the SQL** ([catalogue pins](catalogue-pins.md)). Then:
+   against the SQL** ([catalogue pins](catalogue-pins.md)). The diff covers each purpose role's
+   relations, column grants and policies, but it doesn't cover functions, and it counts a role's
+   policies without showing their text. So compare those directly: list the `pg_proc` ACLs and the
+   `pg_policy` expressions before and after. A new function must revoke EXECUTE from PUBLIC and
+   grant it only to the role that calls it, or the operator refuses the wave (above). Then:
 
    ```sh
    node --import tsx scripts/wave-pins.ts write --wave <wave> --database-url <url> --out <dir> --scope "<sentence>"
@@ -256,11 +270,37 @@ apart from the reach review in step 4; the table below says what isn't.
    installer's final checks take the chain's head. A wave that needs more than its pins checked,
    such as a new login, still needs that check written (the table below).
 
-7. **Prove it:** a fresh install on a new stack, then
+   The row imports the review, so it comes last: with a row and no review file, nothing that loads
+   the table starts, `wave-pins` included. If a file has to change before the pull request merges,
+   remove the draft review, its `reviewed.json` line, the draft packet (the generator refuses to
+   rewrite a packet) and the row. Then measure again from step 1 on new scratch databases at the
+   previous head. Build those from a `git archive` of `main`, because the branch's registry already
+   names the wave.
+
+7. **Prove it.** First run `migrate-trust` against each scratch database from step 4, from
+   `apps/backend`:
+
+   ```sh
+   DATABASE_MIGRATION_URL=<url> W8_LEGACY_ROOT_MIGRATIONS=false node --import tsx scripts/migrate-trust.ts
+   ```
+
+   It runs the operator's role checks on the installed wave, which `wave-pins` doesn't, so it
+   catches a wave they refuse before the pull request does. It needs the row, so it comes after
+   step 6. Then a fresh install on a new stack, which runs the same checks, then
    `node infra/local/stack.mjs catalogues check --lane N`, which must match every group without
    Growth and every group but `runtimeCatalogues.family` with it; the scenarios that use the new
-   schema; and a restored populated copy of the previous head moved forward by `activate-wave`, as
-   `tests/scenarios/integrator/pilot-columns-upgrade.mjs` does.
+   schema; and a restored populated copy of the previous head moved forward by `activate-wave`.
+   `tests/scenarios/integrator/pilot-columns-upgrade.mjs` does that for pilot columns only: it
+   checks 123 to 126 and the inbox login. For another wave, take its steps by hand:
+   - restore the populated copy as the target and close it;
+   - make the target's private backup, and restore that backup as the independent copy;
+   - write the manifest from both;
+   - run `activate-wave`.
+
+   To start the product on the upgraded copy, reopen it: clear its connection limit and the
+   `creator-platform:restored-traffic-closed` marker. The backend refuses a database that still
+   has the marker (`restoration_pending`). A real restore replays the deletion journal before it
+   reopens ([archived runbook](../archive/operations/W8-runbook.md)).
 
 What still needs a person, and why:
 
@@ -271,6 +311,7 @@ What still needs a person, and why:
 | The reach review between `apply` and `write`, and the scope sentence | A changed reach is what the pins exist to show; only a person can say it was meant |
 | A pin for something new that the catalogue tool can't recompute, such as a new role's own catalogue (0254, 0255) | Its reader, its review key and its entry in `operations/catalogues/pins.ts` are new code |
 | A check for a new login or role, and the stack's setting for it (0258: `assertCommerceInboxLogin`, `COMMERCE_INBOX_DATABASE_URL`) | What a new role may do is a decision |
+| Who may execute a new function | The operator refuses one that PUBLIC can execute beyond the reviewed list. Revising a file before it is registered is the coordinator's decision (0260 was) |
 | Step 6 | A row's refusals and its unapplied line are sentences a person writes |
 | The populated copies | A restore, and the judgment that its grant change is the only difference |
 | Test support (`apps/backend/tests/support/registered-source.ts`) and the scenarios | Which tests need the new schema, and what the feature must do |
@@ -322,7 +363,8 @@ From [STATUS](../STATUS.md#next) and the [consolidation plan](../CONSOLIDATION_P
      lines, which the plan had no step for, loop over the head waves' rows;
    - done: each step proved on a fresh stack and on a restored copy moved forward by
      `activate-wave`.
-3. **Register files only as features need them**, one wave per feature.
+3. **Register files only as features need them**, one wave per feature. The first is the
+   ops-console wave (#547).
 4. Keep the fresh install and the catalogue check, and automate restore drills once a production
    database exists.
 

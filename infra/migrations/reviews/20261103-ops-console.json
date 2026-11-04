@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "scope": "Ops-console wave0259-0261: the trust schema owner names, changes and removes ops reviewers (owner policies on ops_member and case_access, where it can only end open leases, and the append-only ops_member_change log that only it reads); a supervisor reads every reviewer's access records in the queues they supervise (audit_supervisor_read, through may_supervise, which only the trust runtime may execute); a supervisor holding a pause case's lease cancels its unfinished pause action and lifts the restriction (effect state cancelled, effect_cancel_pause, restriction_lift and UPDATE(revoked_at) for the trust runtime). No role is added. Pins measured on fresh and restored-upgraded126 databases, each without and with the incoming Growth login.",
+  "sources": [
+    {
+      "version": "0259_w8_ops_member_admin",
+      "path": "apps/backend/src/modules/trust/pending-ops-member-admin.sql",
+      "checksum": "045355b17b396c29afbc5d56b4209d1f8ca17f26c193eb93067157fb3faf5b45",
+      "owner": "W8",
+      "name": "w8_ops_member_admin"
+    },
+    {
+      "version": "0260_w8_supervisor_audits",
+      "path": "apps/backend/src/modules/trust/pending-supervisor-audits.sql",
+      "checksum": "ab41b75d2e4613181eb353dc08d0d8749b7a9f06c672c45eadfdd92f62c52c78",
+      "owner": "W8",
+      "name": "w8_supervisor_audits"
+    },
+    {
+      "version": "0261_w8_lift_pause",
+      "path": "apps/backend/src/modules/trust/pending-lift-pause.sql",
+      "checksum": "7a1920976f35c898ccbf604817ee85f609e2b75e1aedcae4da0228edc75c91e7",
+      "owner": "W8",
+      "name": "w8_lift_pause"
+    }
+  ],
+  "purposeProfiles": [
+    {
+      "review": "original",
+      "sha256": "57d4f07b8fc85bd4f04a8c71b1e54ca11cb80e25dccddc5c4de4f0efd49d3c1f"
+    },
+    {
+      "review": "original-incoming",
+      "sha256": "35b270a664f360d864cc0d43784234a9708206ae92415d700fc8f2d76b3d4391"
+    },
+    {
+      "review": "populated-original",
+      "sha256": "57d4f07b8fc85bd4f04a8c71b1e54ca11cb80e25dccddc5c4de4f0efd49d3c1f"
+    },
+    {
+      "review": "populated-original-incoming",
+      "sha256": "35b270a664f360d864cc0d43784234a9708206ae92415d700fc8f2d76b3d4391"
+    }
+  ],
+  "runtimeCatalogues": {
+    "output": "ad75660816c14eb6cbccccf50cf8956b1434a7894076f6d9ecb7d5687fdf080c",
+    "terminal": "01b1765177a5b31e218093da799ef4301df156378bc17053dfe45eaf13cdf0ea",
+    "financial": "99077431daaaa15bffd9b438e03b5fe14a5fc5050912911e549190ff59b6643c",
+    "expiry": "fa40b8e29e406ebc266502701acdd0cdc33cf7382457363a701d699d58445443",
+    "detached": "623a28351aee14fa20eb9af8344b4c115b6bb1067107f26f0a2535a32560facf",
+    "boundary": "fa90516353e7da351c4f553a47ad5c076d3356f6fc6797fe3e1e4bd0d83e668a",
+    "family": "9952dcd75cc3e46ab3ea3a0a8566535a7971dff2e04103336b7ca6a2f239dccc"
+  },
+  "originalFamilyProfiles": [
+    {
+      "review": "original",
+      "sha256": "9952dcd75cc3e46ab3ea3a0a8566535a7971dff2e04103336b7ca6a2f239dccc"
+    },
+    {
+      "review": "original-incoming",
+      "sha256": "e81f8daa5b08eb3cfcf8b30e10af8466991c669a0a607b6778a7dadbcc6d723d"
+    }
+  ],
+  "outputCatalogueChecksum": "d0c94df3391d431f64585031d194ad70aefec2543b67659b280d8e6099d7720a",
+  "publicCatalogueChecksum": "875d56f256d3c7630f36aafbc639280478ba693bdd2b02dfd33a2b9398a71533",
+  "agentExportCatalogueChecksum": "d3ccfca1dcae490a810439850765c420e0b2ae97dfa3f93fb7da53c3f86a0b69",
+  "conversationCursorCatalogueChecksum": "2eccfaa6cde5587e324853b2fad8fc5fe34eaedd82c6fc8a6621b9694060d03f",
+  "provenancePurgeCatalogueChecksum": "7acb66f9809b0ddbaa3e6569062bd14a67cfd18b4cef8065e1694376756d69b7",
+  "provenancePurgeIncomingCatalogueChecksum": "9782cf92601e60d233664e3403db03a4bebb9da9756ebea29607a5025379d807",
+  "workerCatalogues": {
+    "creator_commerce_public_read": "88354a25e4e78cd51bb2f69928148ee93ba2f2195d4811ae00d2e9b080902030",
+    "creator_generation_authority": "dca30497e4812d7c4112fcc1f66b28c801f16980e3af387ef89d2f38d1b64f6a",
+    "creator_generation_conversation_context": "f19894aadc3910fc6e969cce624d4d6abe56cbf0776e6f34ee7ef19490efcd53",
+    "creator_generation_cursor_authority": "a4167402c5a28ebabf64699e0790339d29e93fdaf780b4674449e3bb4296e0ee",
+    "creator_generation_terminal_authority": "2ea60b732fe15fbdd512f296c552324724145b2d3b5db1c80f03a1b4d5ebf626",
+    "creator_generation_terminal_discovery": "f8afd8f6fcdacdd41f902d5379f52193ccf1d50cc13a60c19fc06c81cd862a24",
+    "creator_generation_worker": "211ca86b95e40cb6b58a81bb07ffb1671f078ecfc5bd09720d1feb1f93d2c391",
+    "creator_privacy_accounting_boundary": "9d6a9ed01a60ecb6a7b9f2c7c198cd9c98e720331187bde199d9b91e4e36530a",
+    "creator_privacy_family": "3c3e9b05fec4ba3c0ac424d3dc02c183aae82e0d43471b58b92784ee54cfd8ee",
+    "creator_privacy_ownership_metadata": "211ca86b95e40cb6b58a81bb07ffb1671f078ecfc5bd09720d1feb1f93d2c391",
+    "creator_signature_read_authority": "5cbbbd571843708bc7885c232031acfc90865151c0ab8f3f56e3429f609b266e",
+    "creator_usage_detachment": "41a30fc6b963488cd1da4a045944f4f8feffe0de72150853d4f325e6289747e0",
+    "creator_usage_expiry": "69821859db365b810a85163a7828245975642882e2b409637f81c3c6e7e3d8f8",
+    "creator_w2_generation_guardrail": "90cc72622c557d5870824193329d2345b0cc72e698a90d357856c61d2510115b",
+    "creator_w2_generation_input": "62f153fa5552d0c8b98f08fa5ada9dbb2baa62612567029793030637f83818e9",
+    "creator_w2_generation_journal": "3ca3594cb3557660eb4cee4e5afcd29dd246280e2f99096bb48a7dd17b934338",
+    "creator_w2_generation_metadata": "69ec0b9abf7fcb4fca59951a3ded8bad171379cacf78e35632371128612c082d",
+    "creator_w2_generation_retrieval": "06c3d51b3f8f03d92cf4eca874cd29336ba201ff7cf3f1f12f7ba03489f0089b",
+    "creator_w2_generation_terminal_journal": "78a90db075163a989e8390bd8ef9dd3101c4ae26d1738411a3cfa546419cd5cf",
+    "creator_w2_privacy_export": "d3ccfca1dcae490a810439850765c420e0b2ae97dfa3f93fb7da53c3f86a0b69",
+    "creator_w3_generation_output": "eeda55e50665676bbb9a6acda3cd75b7b3f33a5f6f7634da8b4a38cd0bfcbf96",
+    "creator_w3_generation_privacy": "ff07e22673a6233bd29f210a30e0b8d89e44eebfab9dfc8e5adc9b45983d1f20",
+    "creator_w3_privacy_export": "0eb712c7fc9d436d6f34457665e836265fb00a2ba7e1d329dd6be478038bef65",
+    "creator_w3_terminal_output": "9f3d170c75221424269049848cda13cf9ad77638d65ccb03c11101d7698547da",
+    "creator_w4_generation_audience": "217572d0b8edd1fc0ea3886b191e57cf57690eb137ee7262ebef8377300a3cba",
+    "creator_w4_generation_safety_terminal": "56335fa66b58096f2ae0489f56a0f36b73576af2dc88e73b959a79c133ade402",
+    "creator_w4_generation_terminal": "230870b05ce9a161d7006779d9fa8d79940f6d8c9ab50dbf376847cce3193326",
+    "creator_w5_generation_origin": "e3943e1f5968a98c4160d22913ee8f8905c5b21e3213bb5f34c6a9a37ab6d8d0",
+    "creator_growth_follow_metadata": "91a2ac805684d102823710cefe831d336a8effe57a1f36daa62bdfb9b17840da"
+  },
+  "conversationCursorDefinitions": {
+    "creator.conversation_privacy_export_rows(uuid,uuid)": "53656e429461ca73c2fb2a4d9b9ffd0a234b4b9cf3e6c2793ac78da9205965fd",
+    "creator.fence_conversation_privacy_export(uuid,uuid,text,uuid,uuid,uuid)": "c20292458ff54df47f4a7a590529109424a143ee62b0e29cb531f7a6891d7033",
+    "creator.finish_conversation_privacy_export_scope()": "a18d439512f89abe047fcfd2494cf48b366aa38ff5c4e5beaf153e98e9819bf8"
+  },
+  "comparison": {
+    "readerCatalogueChecksum": "284f2f543f5d1851bc0ed42db9c8c66c88d3a0348d0f2ef9b2ac3a3314559eff",
+    "privacy": {
+      "definitionSha256": "5b39ca6d3af5cd279117e614e955ca88c4eaef50c5735ad4ac42531942f1cbab",
+      "catalogueChecksum": "37a71252193c1d19d40958dadaa41f1b198879092102fb0fdaec1fedb80e3660"
+    },
+    "artifactsCatalogueChecksum": "081f9ce74b103193ebee3b4c0b8d247ff3e0be6e3f7d074b30e1308f558bb3bf"
+  },
+  "baselineWave": {
+    "path": "infra/migrations/waves/20261101-pilot-columns.json",
+    "sha256": "c9dfd075d3b3764b0d50bf662bbc64243ffa96af210786b81ca51e2d083f6d41"
+  },
+  "replyReviewCatalogueChecksum": "c461077e8d5950b5562d0786801ae2875e14f5915e5f489e648c81ae3d2406b8",
+  "denialFunction": {
+    "name": "creator_trust.creator_fan_denial(uuid, uuid)",
+    "owner": "creator_trust_denial",
+    "sha256": "56617e812fddf0f407afe208213289de2a84c34daf7074828b90a06409d7bcf1",
+    "grants": [
+      "creator_runtime=X/creator_trust_denial",
+      "creator_trust_denial=X/creator_trust_denial"
+    ]
+  },
+  "creatorFanDenialCatalogueChecksum": "189754dcc088f64e2e7e98ec59315e2b02c6acb217794639f123cb3e84d86b72",
+  "creatorFanDenialIncomingCatalogueChecksum": "d509c7d2d740fcaf6653ecf0ab26a1298e59b39ab036b10d8a61b53347187fcf",
+  "coreFollowDefinitionSha256": "1b09d91fe20b712f5452ca5d79fa352f94482283edeaaac4543558975c761a78",
+  "coreFollowCatalogueChecksum": "e5526e17e7089029efd42ead6561c7c099c962912682ab6bac909df4c58da6c0",
+  "coreFollowIncomingCatalogueChecksum": "f80546bd2dc1d5006b203116f4b4005be420c6fa6d5d1661e609846dd576fbb0"
+}
