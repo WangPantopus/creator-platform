@@ -575,10 +575,11 @@ else if (mode === "prepare-ios") {
   );
   persistedDeletion(fixture, 2);
   await verifyHome(fixture, owner.token);
-  // The UI test leaves the app signed in on LANE7_IOS: open Home from a cold
-  // start. The screen is read from a screenshot (lib.mjs).
-  launchApp("ios", "--to", "/home");
-  const home = await waitForText("ios", /Devon/u, 30000);
+  // A launch to /home restores the saved place, here the deleted thread, so
+  // the same fan signs in afresh on LANE7_IOS and lands on Home. The screen
+  // is read from a screenshot (lib.mjs).
+  launchApp("ios", "--reset", "--actor", fixture.actor, "--to", "/home");
+  const home = await waitForText("ios", /Devon/u, 45000);
   assert.ok(home.ok, `Home must list Devon: ${home.text.slice(0, 300)}`);
   assert.match(home.text, /Your people/u, "Home must be open");
   assert.doesNotMatch(home.text, /Unavailable/u, "Home must not refuse");
