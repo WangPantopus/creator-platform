@@ -299,7 +299,7 @@ async function follow(session, value) {
 }
 async function browserLogin(page, number, path) {
   await page.goto(`${WEB}/auth/continue?returnTo=${encodeURIComponent(path)}`);
-  await page.getByText("Continue with Pantopus").first().click();
+  await page.getByRole("link", { name: "Sign in", exact: true }).click();
   const caps = ok(await api("GET", "/v1/identity/capabilities"));
   const development = caps.developmentActors.find(
     (item) => item.id === account(number),

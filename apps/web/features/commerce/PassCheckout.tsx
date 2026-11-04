@@ -56,7 +56,7 @@ export function PassCheckout({
           SessionSchema.parse(await session.json()).accountId !== accountId
         )
           throw new Error(
-            "Your account changed. Continue with Pantopus before using this quote.",
+            "Your account changed. Sign in again before using this quote.",
           );
       }
       const response = await fetchAccount(`/api/commerce/pass/${path}`, {

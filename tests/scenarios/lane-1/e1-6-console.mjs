@@ -69,7 +69,7 @@ step("a fan's report is filed", filed.status === 201, String(filed.status));
 const browser = await chromium.launch({ channel: "chrome", headless: true });
 const page = await (await browser.newContext({ locale: "en-US" })).newPage();
 await page.goto(`${WEB}/auth/continue?returnTo=%2Fops`);
-await page.getByRole("link", { name: "Continue with Pantopus" }).click();
+await page.getByRole("link", { name: "Sign in", exact: true }).click();
 await page.getByRole("button", { name: "Development Ops supervisor" }).click();
 await page.waitForLoadState("networkidle");
 const queue = await page.locator("main").innerText();

@@ -173,7 +173,7 @@ export function CreatorAI({
                 className="qv-link-btn"
                 href="/auth/continue?returnTo=%2Fstudio%2Fai"
               >
-                Continue with Pantopus
+                Sign in
               </Link>
             )}
           </div>

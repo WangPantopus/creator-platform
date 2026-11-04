@@ -68,7 +68,7 @@ await page.exposeFunction("__painted", (text) =>
 await page.goto(
   `${WEB}/auth/continue?returnTo=${encodeURIComponent(threadPath)}`,
 );
-await page.getByRole("link", { name: "Continue with Pantopus" }).click();
+await page.getByRole("link", { name: "Sign in", exact: true }).click();
 await page.getByRole("button", { name: "Development actor one" }).click();
 await page.waitForURL((url) => url.pathname === threadPath, {
   timeout: 60_000,

@@ -449,7 +449,7 @@ export function Studio({
             </button>
           </article>
         ))}
-        <a href={continuation}>Continue with Pantopus</a>
+        <a href={continuation}>Sign in</a>
         <Link href="/studio/setup">Creator setup</Link>
       </main>
     );
@@ -466,7 +466,7 @@ export function Studio({
           {error || "Your current account has no role in this Studio."}
         </Notice>
         <Link href="/studio/workspace">Choose your Studio</Link>
-        <a href={continuation}>Continue with Pantopus</a>
+        <a href={continuation}>Sign in</a>
       </main>
     );
   return (

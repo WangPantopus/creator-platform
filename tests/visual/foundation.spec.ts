@@ -100,18 +100,14 @@ test("unconfigured Pantopus sign-in does not create a local identity and preserv
       name: "Remove this post from your first message",
     }),
   ).toHaveCount(0);
-  await page
-    .getByRole("link", { name: "Continue with Pantopus", exact: true })
-    .click();
+  await page.getByRole("link", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL(/error=identity_unconfigured/);
   await expect(page.getByRole("alert")).toContainText("Pantopus sign-in");
   expect(new URL(page.url()).searchParams.get("returnTo")).toBe("/home");
   await page.goto(
     `${origin}/auth/continue?returnTo=%2Fcreators%2Fmaya%2Frequests`,
   );
-  await page
-    .getByRole("link", { name: "Continue with Pantopus", exact: true })
-    .click();
+  await page.getByRole("link", { name: "Sign in", exact: true }).click();
   expect(new URL(page.url()).searchParams.get("returnTo")).toBe(
     "/creators/maya/requests",
   );

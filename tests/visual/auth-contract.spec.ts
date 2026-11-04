@@ -47,7 +47,7 @@ test("welcome and auth seam preserve a registered creator arrival", async ({
     "/creators/maya/requests?context=00000000-0000-4000-8000-000000000001";
   await page.goto(authURL("/auth/continue", returnTo));
   const link = page.getByRole("link", {
-    name: "Continue with Pantopus",
+    name: "Sign in",
     exact: true,
   });
   const continuation = new URL((await link.getAttribute("href"))!, origin);

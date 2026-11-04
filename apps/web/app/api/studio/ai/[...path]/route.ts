@@ -48,7 +48,7 @@ async function bridge(
       {
         error: {
           code: "session_required",
-          message: "Continue with Pantopus to configure your AI.",
+          message: "Sign in to configure your AI.",
         },
       },
       { status: 401 },
@@ -62,7 +62,7 @@ async function bridge(
           {
             error: {
               code: "session_required",
-              message: "Continue with Pantopus to configure your AI.",
+              message: "Sign in to configure your AI.",
             },
           },
           { status: 401 },
@@ -74,7 +74,7 @@ async function bridge(
         {
           error: {
             code: "identity_unavailable",
-            message: "Pantopus sign-in is temporarily unavailable. Try again.",
+            message: "Sign-in is unavailable right now. Try again in a moment.",
           },
         },
         { status: 503 },
@@ -115,7 +115,7 @@ async function bridge(
       {
         error: {
           code: "session_account_changed",
-          message: "Your account changed. Continue with Pantopus again.",
+          message: "Your account changed. Sign in again.",
         },
       },
       { status: 409 },

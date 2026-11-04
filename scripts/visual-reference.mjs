@@ -129,6 +129,14 @@ const server = http.createServer((req, res) => {
           url.searchParams.get("original") === "1"
             ? 'StudioTabBar" active="Notes"'
             : 'StudioTabBar" active="Today"',
+        )
+        // The pilot signs in with Apple and Google (option D), so the sign-in
+        // button reads "Sign in", the web's sign-in label (2026-10-15, #461).
+        .replaceAll(
+          "Continue with Pantopus",
+          url.searchParams.get("original") === "1"
+            ? "Continue with Pantopus"
+            : "Sign in",
         );
   }
   if (data === undefined) {

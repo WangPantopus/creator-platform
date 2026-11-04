@@ -2,7 +2,7 @@
 <!-- Generated from config/copy.json. -->
 <resources>
   <string name="app_name">Qelvora</string>
-  <string name="continue_with_pantopus" formatted="false">Continue with Pantopus</string>
+  <string name="continue_with_pantopus" formatted="false">Sign in</string>
   <string name="product_feedback_unconfirmed" formatted="false">Your feedback could not be confirmed. Your answers are kept; retry the same submission.</string>
   <string name="identity_input_kept_unavailable" formatted="false">The service is unavailable. Your input has been kept; try again.</string>
   <string name="identity_input_kept_unreadable" formatted="false">The service returned an unreadable response. Your input has been kept; try again.</string>
@@ -569,7 +569,7 @@
   <string name="growth_off" formatted="false">off</string>
   <string name="growth_muted" formatted="false">muted</string>
   <string name="growth_push_and_email_allowed" formatted="false">push and email allowed</string>
-  <string name="growth_continue_with_pantopus_to_open_your_account_s_current_state" formatted="false">Continue with Pantopus to open your account\'s current state.</string>
+  <string name="growth_continue_with_pantopus_to_open_your_account_s_current_state" formatted="false">Sign in to open your account\'s current state.</string>
   <string name="growth_this_action_is_unavailable_to_this_account" formatted="false">This action is unavailable to this account.</string>
   <string name="growth_this_destination_is_no_longer_available" formatted="false">This destination is no longer available.</string>
   <string name="growth_the_service_is_unavailable_reconnect_and_try_again" formatted="false">The service is unavailable. Reconnect and try again.</string>
@@ -663,7 +663,7 @@
   <string name="growth_error_growth_migration_required" formatted="false">Growth\'s registered migrations must be applied before startup.</string>
   <string name="growth_error_adult_eligibility_required" formatted="false">Adult eligibility is required.</string>
   <string name="growth_error_growth_authority_required" formatted="false">Current account authority is required.</string>
-  <string name="growth_error_session_required" formatted="false">Continue with Pantopus to use this feature.</string>
+  <string name="growth_error_session_required" formatted="false">Sign in to use this feature.</string>
   <string name="growth_error_prompt_claim_conflict" formatted="false">This choice request changed platforms.</string>
   <string name="growth_error_prompt_unavailable" formatted="false">This choice is unavailable.</string>
   <string name="growth_error_entry_unavailable" formatted="false">This entry is unavailable.</string>
@@ -811,7 +811,7 @@
   <string name="w6_this_call_is_unavailable" formatted="false">This call is unavailable</string>
   <string name="w6_opening_your_call" formatted="false">Opening your call</string>
   <string name="w6_checking_the_booking_and_participant_access" formatted="false">Checking the booking and participant access.</string>
-  <string name="w6_continue_with_pantopus" formatted="false">Continue with Pantopus</string>
+  <string name="w6_continue_with_pantopus" formatted="false">Sign in</string>
   <string name="w6_get_help" formatted="false">Get help</string>
   <string name="w6_you_missed_the_call" formatted="false">You missed the call.</string>
   <string name="w6_the_call_ended_because_of_a_technical_problem" formatted="false">The call ended because of a technical problem.</string>
@@ -1461,7 +1461,6 @@
   <string name="native_revocation_could_not_complete_reconnect" formatted="false">Revocation could not complete. Reconnect and try again.</string>
   <string name="native_revoke_sharing" formatted="false">Revoke sharing</string>
   <string name="native_revoked_passkey" formatted="false">Revoked passkey</string>
-  <string name="native_s_i_g_n_e_d_i_n_w_i_t_h_p_a_n_t_o_p_u_s" formatted="false">SIGNED IN WITH PANTOPUS</string>
   <string name="native_s_i_g_n_e_d_i_n" formatted="false">SIGNED IN</string>
   <string name="native_save_export" formatted="false">Save export</string>
   <string name="native_save_limit" formatted="false">Save limit</string>
@@ -1492,7 +1491,7 @@
   <string name="native_sign_out_on_all_devices" formatted="false">Sign out on all devices</string>
   <string name="native_signature" formatted="false">Signature</string>
   <string name="native_signed" formatted="false">Signed</string>
-  <string name="native_signed_in_with_pantopus" formatted="false">Signed in with Pantopus</string>
+  <string name="native_signed_in_with_pantopus" formatted="false">Signed in</string>
   <string name="native_signed_original" formatted="false">Signed original</string>
   <string name="native_signing_passkeys" formatted="false">Signing passkeys</string>
   <string name="native_signing_requires_android9_or_newer" formatted="false">Signing requires Android 9 or newer and a configured passkey provider. No weaker signature is substituted.</string>

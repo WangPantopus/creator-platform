@@ -43,7 +43,7 @@ async function team(night = false) {
   });
   const page = await context.newPage();
   await page.goto(`${WEB}/auth/continue?returnTo=${encodeURIComponent(TEAM)}`);
-  await page.getByText("Continue with Pantopus").first().click();
+  await page.getByRole("link", { name: "Sign in", exact: true }).click();
   await page
     .getByRole("button", { name: "Development actor three", exact: true })
     .click();

@@ -70,7 +70,7 @@ await cdp.send("WebAuthn.addVirtualAuthenticator", {
   },
 });
 await page.goto(`${WEB}/auth/continue?returnTo=%2Fstudio%2Fsetup`);
-await page.getByRole("link", { name: "Continue with Pantopus" }).click();
+await page.getByRole("link", { name: "Sign in", exact: true }).click();
 await page.getByRole("button", { name: "Development actor three" }).click();
 await page.waitForLoadState("networkidle");
 if (new URL(page.url()).pathname === "/onboarding/handle") {

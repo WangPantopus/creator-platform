@@ -112,7 +112,7 @@ export async function studioStream(
     throw new StudioFailure(
       401,
       "session_ended",
-      "Continue with Pantopus before using Studio.",
+      "Sign in before using Studio.",
     );
   const stop = AbortSignal.any([scope.signal, signal]);
   const current = () => identityScope === scope && !stop.aborted;
@@ -180,7 +180,7 @@ export async function studioRequest<T>(
     throw new StudioFailure(
       401,
       "session_ended",
-      "Continue with Pantopus before using Studio.",
+      "Sign in before using Studio.",
     );
   if (expectedAccountId && expectedAccountId !== scope.accountId)
     throw new StudioFailure(

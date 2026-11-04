@@ -27,7 +27,7 @@ export default async function OriginalMessage({
     return (
       <main className="conversation-consent">
         <Notice title="Session ended">
-          Continue with Pantopus to read this conversation.
+          Sign in to read this conversation.
         </Notice>
         <a href={`/threads/${creatorId}/${fanId}`}>Conversation</a>
       </main>

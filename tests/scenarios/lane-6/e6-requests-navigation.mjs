@@ -131,7 +131,7 @@ try {
       const errors = [];
       page.on("pageerror", (error) => errors.push(error.message));
       await page.goto(`${web}/auth/continue?returnTo=%2Fstudio`);
-      await page.getByRole("link", { name: "Continue with Pantopus" }).click();
+      await page.getByRole("link", { name: "Sign in", exact: true }).click();
       await page.getByRole("button", { name: actor, exact: true }).click();
       await page.waitForURL((url) => !url.pathname.startsWith("/auth"), {
         timeout: 60000,

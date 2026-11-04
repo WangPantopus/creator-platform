@@ -55,3 +55,12 @@ the Replies board's `active="Notes"` to Today; the catalog applies the same
 mapping. Queue cards render their actions only when real behavior is supplied,
 so the catalog passes inert handlers to show the designed actions. Request the
 uncorrected source with `?original=1`.
+
+A third explicit correction follows option D, the pilot's sign-in with Apple and
+Google (decision log, 2026-10-15 and 2026-11-01): the artboards' "Continue with
+Pantopus" button reads "Sign in", the web's sign-in label, as `continueWithPantopus`
+does in the product. The reference server replaces it in the served `.dc.html`
+files (Welcome, the fan prototype and the desktop Studio setup steps), so the
+Welcome baselines show "Sign in". Component previews aren't brand-replaced, so
+the Button preview keeps the original label on both sides. Request the
+uncorrected source with `?original=1`.

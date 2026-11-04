@@ -55,7 +55,7 @@ try {
   });
   const page = await context.newPage();
   await page.goto(`${ORIGIN}/auth/continue?returnTo=%2Fcommerce%2Frequests`);
-  await page.getByRole("link", { name: "Continue with Pantopus" }).click();
+  await page.getByRole("link", { name: "Sign in", exact: true }).click();
   await page
     .getByRole("button", { name: "Development actor two", exact: true })
     .click();

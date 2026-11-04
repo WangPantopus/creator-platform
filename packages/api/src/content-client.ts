@@ -22,7 +22,10 @@ export class ContentStudioClient {
     const before = await this.session();
     if (!before)
       throw new ApiError(401, {
-        error: { code: "session_required", message: "Continue with Pantopus." },
+        error: {
+          code: "session_required",
+          message: "Sign in to use this app.",
+        },
       });
     z.uuid().parse(before.accountId);
     const url = new URL(path, this.baseUrl);

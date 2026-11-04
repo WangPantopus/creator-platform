@@ -46,7 +46,7 @@ export function PayoutAccount({
       SessionSchema.parse(await response.json()).accountId !== accountId
     )
       throw new Error(
-        "Your account changed. Continue with Pantopus before managing payouts.",
+        "Your account changed. Sign in again before managing payouts.",
       );
   }
   async function start() {

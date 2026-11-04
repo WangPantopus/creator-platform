@@ -32,7 +32,7 @@ export async function commercePublicPacket(
   if (!authority || authority.accountId !== actor.accountId)
     throw new DomainError(
       "creator_session_required",
-      "Continue with Pantopus before publishing this request.",
+      "Sign in again before publishing this request.",
       401,
     );
   await assertCurrentSession(client, actor.accountId);
