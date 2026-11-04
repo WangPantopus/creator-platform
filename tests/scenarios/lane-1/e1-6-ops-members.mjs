@@ -8,8 +8,8 @@
 // logged with its operator and reason, and the runtime cannot read the log.
 // The command runs with the lane database's superuser as a stand-in for the
 // migration login. Fakes: Apple, the development privacy proof.
-// Needs the lane stack with sign-in on, the fake provider and the pending
-// `pending-ops-member-admin.sql` applied (pins regenerated locally):
+// Needs the lane stack with sign-in on and the fake provider. The stack installs
+// `pending-ops-member-admin.sql` as 0259, in the wave 20261103-ops-console:
 //   node tests/scenarios/lane-1/e1-6-ops-members.mjs
 import { execFileSync, spawn, spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
