@@ -1,11 +1,14 @@
 // Navigation on lane 7's disposable real API/PostgreSQL, after stack up --growth.
 // Synthetic only at the edge: development identity and lane 2's model provider.
 // node tests/scenarios/lane-7/stack-navigation.mjs android | verify
+// LANE7_STACK_API names another stack's API (its first port + 1).
 import assert from "node:assert/strict";
 import * as android from "./android-ui.mjs";
 import { waitForText, sleep } from "./lib.mjs";
 
-const api = "http://127.0.0.1:56471";
+const api = process.env.LANE7_STACK_API ?? "http://127.0.0.1:56471";
+// Links opened through android-ui.mjs carry this origin, not a fake API's.
+process.env.LANE7_API_URL = api;
 const creator = "20000000-0000-4000-8000-000000000001";
 async function request(method, path, token, body) {
   const response = await fetch(api + path, {
@@ -61,7 +64,8 @@ async function verify() {
   );
 }
 async function operateAndroid() {
-  android.adb("reverse", "tcp:56471", "tcp:56471");
+  const port = new URL(api).port;
+  android.adb("reverse", `tcp:${port}`, `tcp:${port}`);
   const launch = (...extras) => {
     android.adb("shell", "am", "force-stop", "com.pantopus.qelvora");
     android.adb(

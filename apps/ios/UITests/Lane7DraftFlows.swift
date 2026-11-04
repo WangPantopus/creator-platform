@@ -102,8 +102,9 @@ final class Lane7StackDraftFlow: XCTestCase {
         let scope = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Data scope'")).firstMatch
         // Controls are disabled during each session check and the page can
         // re-lay out after one: re-reveal, use an open menu, retry until it takes.
-        let conversation = app.buttons["Conversation"]
-        for _ in 0..<6 where !app.textFields["Creator ID"].exists {
+        // Since WP 7.4 P5 (#500) the conversation is chosen by name, never typed as ids.
+        let conversation = app.buttons["Conversation"], picker = app.buttons["picker-conversation"]
+        for _ in 0..<6 where !picker.exists {
             if conversation.exists && conversation.isHittable { conversation.tap() }
             else {
                 try reveal(scope)
@@ -111,14 +112,21 @@ final class Lane7StackDraftFlow: XCTestCase {
                 if scope.isHittable { scope.tap() }
                 if conversation.waitForExistence(timeout: 2) && conversation.isHittable { conversation.tap() }
             }
-            _ = app.textFields["Creator ID"].waitForExistence(timeout: 2)
+            _ = picker.waitForExistence(timeout: 2)
         }
-        XCTAssertTrue(app.textFields["Creator ID"].exists, "Choose the conversation scope")
-        for (label, value) in [("Creator ID", fixture["creator"]!), ("Conversation ID", fixture["thread"]!), ("Local confirmation", "LOCAL DEVELOPMENT")] {
-            let input = app.textFields[label]; try reveal(input); input.tap(); input.typeText(value)
-            XCTAssertEqual(input.value as? String, value)
-            if app.keyboards.buttons["Return"].exists { app.keyboards.buttons["Return"].tap() }
+        XCTAssertTrue(picker.exists, "Choose the conversation scope")
+        // What the picker shows: its value (the chosen name, or the prompt).
+        let chosen = { (picker.value as? String)?.contains("Maya") == true || picker.label.contains("Maya") }
+        for _ in 0..<6 where !chosen() {
+            try reveal(picker)
+            for _ in 0..<40 where !(picker.isEnabled && picker.isHittable) { try await Task.sleep(for: .milliseconds(50)) }
+            picker.tap()
+            if app.buttons["Maya"].waitForExistence(timeout: 3) { app.buttons["Maya"].tap() }
         }
+        XCTAssertTrue(chosen(), "Choose Maya's conversation by name")
+        let proof = app.textFields["Local confirmation"]; try reveal(proof); proof.tap(); proof.typeText("LOCAL DEVELOPMENT")
+        XCTAssertEqual(proof.value as? String, "LOCAL DEVELOPMENT")
+        if app.keyboards.buttons["Return"].exists { app.keyboards.buttons["Return"].tap() }
         let dialogTitle = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Delete this data scope?'")).firstMatch
         // Actions are disabled during each ~100 ms session check, by design, so
         // a tap waits for an enabled control and is repeated if it had no effect.

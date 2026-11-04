@@ -36,9 +36,10 @@ const MAYA_ROWS = [
     self: /^Prepared by AI · approved by Maya\. I bisque/u,
   },
   { body: "Devon, send me a photo", author: /^Maya( at .+)?$/u },
+  // A Note card is one element: its label, then its body (#516).
   {
     body: "Second note: the clinic starts at 6pm.",
-    author: /^Maya · to all members/u,
+    self: /^Maya · to all members\. Second note/u,
   },
 ];
 const KILN_ROWS = [
@@ -164,10 +165,13 @@ async function choose(name, summary, id) {
   A.tapAt(control.x, control.y);
   await L.sleep(800);
   const nodes = A.screen();
+  // Compose reports a chosen item that is not a tab as checked, with the state
+  // "Selected", rather than as selected.
+  const chosen = holder(name, nodes);
   L.step(
     "android",
     `${id} "${name}" says it is chosen, and the summary names it`,
-    holder(name, nodes)?.selected === true &&
+    (chosen?.selected === true || (chosen?.checkable && chosen?.checked)) &&
       nodes.some((n) => n.text === summary),
   );
 }
@@ -255,6 +259,14 @@ if (run("A1")) {
 }
 if (run("A2")) {
   await open(`/threads/${MAYA}/${FAN}`);
+  // The Note MAYA_ROWS names is posted here, as e7-1-states.mjs L5 posts it:
+  // the harness world has no such Note after a reset.
+  await L.harness("POST", "/__harness/threads/maya/note", {
+    text: "Second note: the clinic starts at 6pm.",
+  });
+  await A.waitFor("Second note: the clinic starts at 6pm.", 20000).catch(
+    () => null,
+  );
   await authorship(MAYA_ROWS, "A2 Maya's thread:");
   await open(`/threads/${KILN}/${FAN}`);
   await authorship(KILN_ROWS, "A2 Kiln Club's thread:");

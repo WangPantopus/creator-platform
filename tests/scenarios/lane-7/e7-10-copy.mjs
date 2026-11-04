@@ -225,6 +225,13 @@ const allowed = new Set([
   "Reconnect with current authority",
   "Conversation unavailable",
   "Subscription refused",
+  // #516's presence read: both apps catch these and show only "unavailable".
+  "Invalid content presence",
+  "Invalid content presence.",
+  "Invalid content cursor.",
+  "Content access expired.",
+  // The development-actor choice: `#if DEBUG` on iOS, `BuildConfig.DEBUG` on Android.
+  "Use a development account",
 ]);
 const protocolOnly = new Set([
   "Answered publicly.",

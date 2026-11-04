@@ -2,11 +2,13 @@
 // open(URL) launches afresh, which cannot prove a link into an already open app.
 // This loopback-only helper sends simctl openurl to the lane's own simulator.
 // Run beside the harness: node tests/scenarios/lane-7/ios-link-driver.mjs
+// LANE7_IOS names another simulator, as for run-app.mjs and ios-navigation.mjs.
 import http from "node:http";
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
+const name = process.env.LANE7_IOS ?? "qelvora-lane7-ios";
 const devices = JSON.parse(
   execFileSync("xcrun", ["simctl", "list", "devices", "--json"], {
     encoding: "utf8",
@@ -14,9 +16,9 @@ const devices = JSON.parse(
 ).devices;
 const device = Object.values(devices)
   .flat()
-  .find((value) => value.name === "qelvora-lane7-ios");
+  .find((value) => value.name === name);
 if (!device || device.state !== "Booted")
-  throw new Error("Boot qelvora-lane7-ios before starting the link driver.");
+  throw new Error(`Boot ${name} before starting the link driver.`);
 const paths = new Set([
   "/threads/c1000000-0000-4000-8000-000000000001/f1000000-0000-4000-8000-000000000001",
   "/threads/c1000000-0000-4000-8000-000000000002/f1000000-0000-4000-8000-000000000001",

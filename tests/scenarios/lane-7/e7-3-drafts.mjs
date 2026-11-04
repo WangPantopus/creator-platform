@@ -582,10 +582,13 @@ const flows = {
     await fresh();
     await typeDraft("former conversation draft");
     L.stop("android");
-    const recreated = await L.harness(
-      "POST",
-      "/__harness/threads/maya/recreate",
-    );
+    // The harness refuses while the stopped app's live connection is still
+    // open, which through adb reverse can take a moment to close.
+    let recreated = {};
+    for (let i = 0; i < 20 && !recreated.id; i += 1) {
+      recreated = await L.harness("POST", "/__harness/threads/maya/recreate");
+      if (!recreated.id) await L.sleep(250);
+    }
     assert.ok(recreated.id);
     L.launch("android");
     await emptyInput();

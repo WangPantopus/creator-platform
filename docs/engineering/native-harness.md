@@ -174,7 +174,8 @@ need the simulator panel's "Let Claude use it" access; Android is driven with `a
   does not pass on Node's idle close of a keep-alive socket after 5 s; OkHttp then reused a dead connection
   and failed with "unexpected end of stream" (it looked like "Account unavailable" or "Pantopus sign-in is
   not connected" after a few idle seconds). One request per connection removes the problem. The real server
-  is not affected.
+  is affected too, and not only through `adb reverse`: see
+  [the native device checks' follow-up 12](native-device-checks.md#follow-ups).
 - **Home lists a conversation with no message yet**, as the real `home.ts` does: the system label, an empty
   preview, the privacy-notice time. (It used to answer 500.)
 - **A debug launch's extras come back after the process dies** (Android re-delivers the original intent):

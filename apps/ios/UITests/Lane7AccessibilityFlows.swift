@@ -44,12 +44,18 @@ final class Lane7AccessibilityFlows: XCTestCase {
         shot.name = name; shot.lifetime = .keepAlways; add(shot)
     }
     private func reveal(_ element: XCUIElement) {
-        let origin = app.coordinate(withNormalizedOffset: .zero), frame = app.frame
+        // Drag inside the page's own scroll view, the lowest one: at the largest text the
+        // development banner above it is a scroll view of its own (and can be the
+        // taller), and the tab bar takes a third of the screen, so drags placed on the
+        // whole screen move nothing.
+        let page = app.scrollViews.allElementsBoundByIndex.max { $0.frame.minY < $1.frame.minY }
+        let origin = app.coordinate(withNormalizedOffset: .zero), frame = page?.frame ?? app.frame
+        // At the largest text that window is about 300 points tall: allow many drags.
         for up in [false, true] {
-            for _ in 0..<12 where !(element.exists && element.isHittable) {
-                let (from, to) = up ? (0.35, 0.7) : (0.7, 0.35)
-                origin.withOffset(CGVector(dx: frame.midX, dy: frame.height * from))
-                    .press(forDuration: 0.05, thenDragTo: origin.withOffset(CGVector(dx: frame.midX, dy: frame.height * to)), withVelocity: .slow, thenHoldForDuration: 0.2)
+            for _ in 0..<40 where !(element.exists && element.isHittable) {
+                let (from, to) = up ? (0.3, 0.7) : (0.7, 0.3)
+                origin.withOffset(CGVector(dx: frame.midX, dy: frame.minY + frame.height * from))
+                    .press(forDuration: 0.05, thenDragTo: origin.withOffset(CGVector(dx: frame.midX, dy: frame.minY + frame.height * to)), withVelocity: .slow, thenHoldForDuration: 0.2)
             }
         }
     }
@@ -80,6 +86,8 @@ final class Lane7AccessibilityFlows: XCTestCase {
     /// Note) and in Kiln Club's (the creator and the team) the author comes first.
     func testA02AuthorshipFirst() async throws {
         try await open("/threads/\(maya)/\(fan)", waitFor: "Send")
+        // Posted here, as e7-1-states.mjs L5 posts it: a reset world has no such Note.
+        try await control("/__harness/threads/maya/note", body: ["text": "Second note: the clinic starts at 6pm."])
         XCTAssertTrue(app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "Second note")).firstMatch.waitForExistence(timeout: 20))
         var labels = try spoken()
         heardFirst(labels, body: "I keep getting pinholes", author: #"^You\. I keep getting pinholes"#, own: true)

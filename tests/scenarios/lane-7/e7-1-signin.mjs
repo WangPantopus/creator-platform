@@ -213,10 +213,11 @@ for (const p of L.platforms(process.argv[2])) {
   });
   screen = await L.waitForText(p, /Reconnect to refresh your account/u, 40000);
   await L.harness("POST", "/__harness/faults", { rules: [] });
+  // Recovery waits for the next session check, every 30 s since WP 7.8 (#506).
   const recovered = await L.waitForAbsent(
     p,
     /Reconnect to refresh your account/u,
-    20000,
+    40000,
   );
   L.step(
     p,

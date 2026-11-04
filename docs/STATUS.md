@@ -211,8 +211,32 @@ pure logic and bug regressions, and confirms the 2026-10-09 rule. Still open:
   Hosting needs a trusted-proxy setting.
 - **Publication worker:** it checks only whether a key was revoked, so an act signed just before its
   key retired can still publish.
-- **Device checks never run on the merged native stack:** lane 7's E7.1 to E7.12, #505's A2 to A5,
-  #506's P3 and P4, and #507's Z3.
+- **Native device checks, run on `main` on 2026-11-04** ([results](engineering/native-device-checks.md)):
+  lane 7's E7.1 to E7.12 (those with a scenario), #505's A2 to A5, #506's P3 and P4 and #507's Z3, on
+  the iOS simulator and an Android emulator. Most pass after small fixes to the checks; no app code
+  changed. Measured: a thread open and idle sends 64 (iOS) and 66 (Android) requests a minute against
+  E7.8's 12, half of them #516's presence reads; on Home an under-18 flag shows after 8 to 28 s. Found,
+  each with its evidence and a suggested fix on the results page:
+  - **D-11 in an open thread:** an account flagged under 18 while a thread is open sees "Your session
+    ended" instead of the adults-only state, on both apps: the thread's own read meets the refusal
+    first.
+  - **iOS unknown link:** an unknown link, then Back, shows Home as "Unavailable" with two tab bars.
+  - **Native presence breaks four of lane 7's C4 rules:** it reads every 2 s, never follows the cursor,
+    hides the Notes after a failed read, and shows a Note older than the loaded messages. Decide with
+    the presence budget above.
+  - **Offline:** the saved conversation is hidden within about 7 s (the five-second lease), not kept as
+    WP 7.8 expects; this is the open lease length.
+  - **To confirm by hand:** Android's switches with TalkBack; iOS's tab bar takes a third of the screen
+    at the largest text; iOS D3 has Send 3 points under the keyboard in landscape at the largest text.
+  - **CI's Android APK** has no web origin, and CI publishes no instrumentation APK, so Android Z1, Z3,
+    D7 and D7U can't run on this Mac.
+  - **Release builds still register `qelvora://`** (WP 7.6, which waits on the domain).
+  - **Android's session check fails every other time against the real API:** the backend closes an
+    idle socket after 5 s, and Android's OkHttp clients reuse it without retrying, so actions such as
+    "Request deletion" are disabled for 30 s at a time. Android D6 passed only behind a
+    `Connection: close` proxy.
+  - **Home refuses after a conversation is deleted:** `GET /v1/growth/home` answers `403 scope_revoked`,
+    because the deleted thread stays in the account's conversation list.
 - **Invitation bursts:** under heavy load an invitation create can be refused after about 5.5
   seconds; it writes nothing and can be retried (#527).
 

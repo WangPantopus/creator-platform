@@ -67,4 +67,57 @@ final class Lane7StudioLinkFlows: XCTestCase {
         XCTAssertTrue(app.buttons["Sign out"].waitForExistence(timeout: 20))
         XCTAssertFalse(app.buttons["Open Qelvora Studio"].exists)
     }
+
+    /// Z3, on a local stack and its web app instead of the fake API: the Studio
+    /// the creator opens lands at the web's sign-in, which returns to that
+    /// Studio, and lands signed in once the browser is. The app is built with
+    /// CREATOR_WEB_URL set to the stack's web origin; the expected words come
+    /// from config/copy.json. node tests/scenarios/lane-7/e7-12-studio-web.mjs
+    func testZ03WebLandsAtSignInThenSignedIn() async throws {
+        let environment = ProcessInfo.processInfo.environment
+        guard environment["LANE7_STUDIO_WEB"] == "1", let api = environment["LANE7_STUDIO_WEB_API"],
+              let actor = environment["LANE7_STUDIO_WEB_ACTOR"], let signIn = environment["LANE7_STUDIO_WEB_SIGN_IN"],
+              let chooser = environment["LANE7_STUDIO_WEB_CHOOSER"], let signedIn = environment["LANE7_STUDIO_WEB_SIGNED_IN"] else {
+            throw XCTSkip("Opt in with e7-12-studio-web.mjs against a local stack and its web app.")
+        }
+        continueAfterFailure = false
+        let page = { (label: String) in self.safari.descendants(matching: .any).matching(NSPredicate(format: "label == %@", label)).firstMatch }
+        let keep = { (name: String) in
+            let shot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+            shot.name = name; shot.lifetime = .keepAlways; self.add(shot)
+        }
+        app.terminate(); safari.terminate()
+        app.launchArguments = ["--api-url", api, "--appearance", "light", "-AppleLanguages", "(en)", "-AppleLocale", "en_US",
+                               "--harness-reset", "--harness-actor", actor, "--return-to", "/identity/account"]
+        app.launch()
+        app.launchArguments = ["--api-url", api, "--appearance", "light", "-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
+        XCTAssertTrue(app.staticTexts["Your account"].waitForExistence(timeout: 60))
+        let link = app.buttons["Open Qelvora Studio"]
+        reveal(link)
+        XCTAssertTrue(link.waitForExistence(timeout: 20), "the link")
+        link.tap()
+        XCTAssertTrue(safari.wait(for: .runningForeground, timeout: 20), "the system browser opens")
+        // Signed out in the browser: the web's sign-in, not the Studio.
+        XCTAssertTrue(page(signIn).waitForExistence(timeout: 90), "the web's sign-in")
+        XCTAssertFalse(page(signedIn).exists, "the Studio before sign-in")
+        // Safari lists the page before it paints it: capture once it can be tapped.
+        for _ in 0..<20 where !page(signIn).isHittable { try await Task.sleep(for: .milliseconds(250)) }
+        keep("Z3-web-sign-in")
+        page(signIn).tap()
+        XCTAssertTrue(page(chooser).waitForExistence(timeout: 60), "the development sign-in")
+        page(chooser).tap()
+        // The sign-in returns to the creator's Studio.
+        XCTAssertTrue(page(signedIn).waitForExistence(timeout: 90), "the Studio after sign-in")
+        keep("Z3-web-studio-after-sign-in")
+        // Signed in now: the app's link lands in the Studio with no sign-in.
+        safari.terminate()
+        app.activate()
+        reveal(link)
+        link.tap()
+        XCTAssertTrue(safari.wait(for: .runningForeground, timeout: 20), "the system browser opens again")
+        XCTAssertTrue(page(signedIn).waitForExistence(timeout: 90), "the Studio, signed in")
+        XCTAssertFalse(page(signIn).exists, "a second sign-in")
+        keep("Z3-web-studio-signed-in")
+        app.activate()
+    }
 }

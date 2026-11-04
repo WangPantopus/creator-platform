@@ -109,12 +109,25 @@ for (const p of L.platforms(platformArg)) {
       text: "Caught up after the network came back.",
     });
     await L.sleep(30000);
-    const attempts = between(await L.log(0, p), from, Date.now());
+    const requests = between(await L.log(0, p), from, Date.now());
+    // iOS's network stack sends a request again within a few milliseconds when
+    // the fake API drops its connection: one attempt, seen up to three times.
+    const attempts = requests.filter(
+      (e, i) =>
+        !requests
+          .slice(0, i)
+          .some(
+            (o) =>
+              o.method === e.method &&
+              o.path === e.path &&
+              Date.parse(e.at) - Date.parse(o.at) < 10,
+          ),
+    );
     L.step(
       p,
-      `P3 offline for 30 s: ${attempts.length} attempts, backing off (at most 12), no send`,
+      `P3 offline for 30 s: ${attempts.length} attempts (${requests.length} requests), backing off (at most 12), no send`,
       attempts.length <= 12 &&
-        !attempts.some(
+        !requests.some(
           (e) => e.method === "POST" && /\/messages$/u.test(e.path),
         ),
     );

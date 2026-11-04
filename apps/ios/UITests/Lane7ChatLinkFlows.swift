@@ -63,7 +63,9 @@ final class Lane7ChatLinkFlows: XCTestCase {
     func testH02NoConversationKeepsFirstScreen() async throws {
         try await open("/creators/lenapark/chat", actor: "priya")
         XCTAssertTrue(app.staticTexts["Before your first message"].waitForExistence(timeout: 30))
-        XCTAssertTrue(app.buttons["Synthetic provider processing terms"].waitForExistence(timeout: 30))
+        // A SwiftUI Link: a button before iOS 27 and a link since.
+        let terms = app.descendants(matching: .any).matching(NSPredicate(format: "(elementType == %d OR elementType == %d) AND label == %@", XCUIElement.ElementType.button.rawValue, XCUIElement.ElementType.link.rawValue, "Synthetic provider processing terms")).firstMatch
+        XCTAssertTrue(terms.waitForExistence(timeout: 30))
         capture("H2-first-conversation")
     }
 }

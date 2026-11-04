@@ -1,5 +1,9 @@
 // Real app + disposable lane 7 API/PostgreSQL. Development identities are
 // synthetic; no access token is printed, put in a fixture or written to disk.
+// LANE7_STACK_API names another stack's API (its first port + 1), and
+// LANE7_STACK_POSTGRES its database container. Android D6 needs the app behind
+// delay-proxy.mjs (LANE7_APP_API) until follow-up 12 in
+// docs/engineering/native-device-checks.md (idle keep-alive sockets) is fixed.
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
@@ -7,21 +11,32 @@ import { readFileSync, writeFileSync } from "node:fs";
 import * as A from "./android-ui.mjs";
 import { sleep, screenshot } from "./lib.mjs";
 
-const api = "http://127.0.0.1:56471";
+const api = process.env.LANE7_STACK_API ?? "http://127.0.0.1:56471";
 // D6R: the app may reach the API through delay-proxy.mjs; checks stay direct.
 const appApi = process.env.LANE7_APP_API ?? api;
+// Links opened through android-ui.mjs carry this origin, not a fake API's.
+process.env.LANE7_API_URL = appApi;
 const creator = "20000000-0000-4000-8000-000000000001";
 async function request(method, path, token, body) {
-  const response = await fetch(api + path, {
-    method,
-    headers: {
-      "content-type": "application/json",
-      ...(token ? { authorization: `Bearer ${token}` } : {}),
-    },
-    ...(body ? { body: JSON.stringify(body) } : {}),
-    signal: AbortSignal.timeout(30000),
-  });
-  return { status: response.status, body: await response.json() };
+  // A kept-alive socket the server closed while the app was being driven fails
+  // the next fetch ("other side closed"); a read is safe to send again once.
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      const response = await fetch(api + path, {
+        method,
+        headers: {
+          "content-type": "application/json",
+          ...(token ? { authorization: `Bearer ${token}` } : {}),
+        },
+        ...(body ? { body: JSON.stringify(body) } : {}),
+        signal: AbortSignal.timeout(30000),
+      });
+      return { status: response.status, body: await response.json() };
+    } catch (error) {
+      if (method !== "GET" || attempt > 0 || !(error instanceof TypeError))
+        throw error;
+    }
+  }
 }
 async function signIn(number) {
   const begun = await request("POST", "/v1/identity/continue", null, {
@@ -139,7 +154,7 @@ function persistedDeletion(fixture, number) {
     [
       "exec",
       "-i",
-      "qelvora-lane7-postgres",
+      process.env.LANE7_STACK_POSTGRES ?? "qelvora-lane7-postgres",
       "psql",
       "-U",
       "postgres",
@@ -246,7 +261,8 @@ async function fillField(label, value) {
 }
 async function android() {
   const { fixture, token, path } = await prepare("android");
-  A.adb("reverse", "tcp:56471", "tcp:56471");
+  const apiPort = new URL(api).port;
+  A.adb("reverse", `tcp:${apiPort}`, `tcp:${apiPort}`);
   const appPort = new URL(appApi).port;
   A.adb("reverse", `tcp:${appPort}`, `tcp:${appPort}`);
   const launch = (reset = false) => {
@@ -277,7 +293,9 @@ async function android() {
     );
   };
   launch(true);
-  await A.tap("Message Maya", 30000);
+  // Maya is in this conversation (prepare), so since #497 the composer says
+  // "Reply to Maya".
+  await A.tap("Reply to Maya", 30000);
   A.type(fixture.marker);
   await A.waitFor(fixture.marker);
   assert.equal(draftCount(), 1);
@@ -295,27 +313,43 @@ async function android() {
   await verifyAccepted(fixture, token, path);
   for (let i = 0; i < 40 && draftCount() !== 0; i++) await sleep(250);
   assert.equal(draftCount(), 0);
-  await A.tap("Message Maya");
+  await A.tap("Reply to Maya");
   A.type("real deletion draft");
   await A.waitFor("real deletion draft");
   assert.equal(draftCount(), 1);
   A.openLink("qelvora://app/support/privacy");
   await A.waitFor("Your data", 30000);
-  await reveal("thread");
+  // Since #505 the scopes have names, and since #500 (WP 7.4 P5) the
+  // conversation is chosen by its creator's name, never typed as ids.
+  await reveal("Conversation");
   // Controls are disabled during each session check: retry until it takes.
-  for (let i = 0; i < 5 && !A.texts().includes("Data scope: thread"); i++) {
-    const chip = await A.waitEnabled("thread");
+  for (
+    let i = 0;
+    i < 5 && !A.texts().includes("Data scope: Conversation");
+    i++
+  ) {
+    const chip = await A.waitEnabled("Conversation");
     A.tapAt(chip.x, chip.y);
     await sleep(700);
   }
-  assert.ok(A.texts().includes("Data scope: thread"), "Choose thread scope");
-  for (const [label, value] of [
-    ["Creator ID", fixture.creator],
-    ["Conversation ID", fixture.thread],
-    ["Local confirmation", "LOCAL DEVELOPMENT"],
-  ]) {
-    await fillField(label, value);
+  assert.ok(
+    A.texts().includes("Data scope: Conversation"),
+    "Choose the conversation scope",
+  );
+  for (let i = 0; i < 5 && A.texts().includes("Choose a conversation"); i++) {
+    await reveal("Choose a conversation");
+    const picker = A.screen().find((n) => n.text === "Choose a conversation");
+    if (picker) A.tapAt(picker.x, picker.y);
+    await sleep(800);
+    const option = A.screen().find((n) => n.text === "Maya");
+    if (option) A.tapAt(option.x, option.y);
+    await sleep(800);
   }
+  assert.ok(
+    !A.texts().includes("Choose a conversation"),
+    "Choose Maya's conversation by name",
+  );
+  await fillField("Local confirmation", "LOCAL DEVELOPMENT");
   await reveal("Request deletion");
   // Actions are disabled during each session check, by design: tap a control
   // only when it is enabled.
