@@ -1,22 +1,25 @@
 // D-11 on lane 7's disposable real API and PostgreSQL (`stack up --growth`):
 // how long after an account is flagged under 18 the app shows the adults-only
-// state, on Home and in Maya's thread, and that the thread leaves nothing
-// behind. The development identity can't flag an account that is signed in,
-// so a loopback proxy between the app and the real API gives that one answer.
-// Once armed, it refuses each authenticated request of a still-open session
-// as the backend refuses a flagged account (403 adult_eligibility_required,
-// sessions.ts) and ends that session through the real POST
-// /v1/identity/logout, as the backend does. Everything else, the live
-// connection included, reaches the real API unchanged.
-//   LANE7_STACK_API=http://127.0.0.1:57501 node tests/scenarios/lane-7/stack-under-18.mjs ios|android [runs] [home|thread]
+// state, on Home, in Maya's thread, and in the thread when only its live
+// connection can meet the flag; and that the thread leaves nothing behind.
+// The backend gives every refusal itself. A development account can't be
+// flagged, so the flag points fan one's open sessions at the under-18
+// development actor: the backend resolves a session's identity at every
+// request and at the realtime gateway's 2-second check, refuses it as D-11
+// and revokes it (sessions.ts). A loopback proxy between the app and the API
+// logs each answer, and for the live-connection step holds every HTTP request
+// with a session, so only the gateway can meet the flag.
+//   LANE7_STACK_API=http://127.0.0.1:57501 LANE7_STACK_POSTGRES=qelvora-laned11-postgres \
+//     node tests/scenarios/lane-7/stack-under-18.mjs ios|android [runs] [home|thread|live]
 // LANE7_IOS names the simulator (a debug build: the proxy's origin is passed
 // at launch), LANE7_ANDROID the emulator, LANE7_PROXY_PORT the proxy's port.
+// The stack's own state folder holds its IDENTITY_SESSION_KEY.
 import http from "node:http";
 import net from "node:net";
 import { execFileSync } from "node:child_process";
-import { createHash, randomUUID } from "node:crypto";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { homedir } from "node:os";
+import { createCipheriv, createHash, randomBytes } from "node:crypto";
+import { existsSync, readdirSync, readFileSync, realpathSync } from "node:fs";
+import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import * as A from "./android-ui.mjs";
 import * as L from "./lib.mjs";
@@ -27,47 +30,72 @@ if (!["ios", "android"].includes(platform))
 const runs = Number(process.argv[3] ?? 3);
 const place = process.argv[4];
 const api = process.env.LANE7_STACK_API ?? "http://127.0.0.1:56471";
+const postgres = process.env.LANE7_STACK_POSTGRES ?? "qelvora-lane7-postgres";
 const target = Number(new URL(api).port);
 const port = Number(process.env.LANE7_PROXY_PORT ?? target + 6);
 const origin = `http://127.0.0.1:${port}`;
 const BUNDLE = "com.pantopus.qelvora";
 const MAYA = "20000000-0000-4000-8000-000000000001";
+const FAN_ONE = "10000000-0000-4000-8000-000000000001";
+const UNDER_18 = "10000000-0000-4000-8000-000000000007";
 const TITLE = /This app is for adults/u;
 const DRAFT = "lane7 under18 private draft";
 
-// The proxy. `flagged` stands for the account's under-18 flag.
-let flagged = false;
-const ended = new Set();
+// The flag: every open session of fan one now resolves to the under-18
+// development actor, sealed as the backend seals a session's identity.
+const stackEnvironment = readFileSync(
+  join(
+    realpathSync(tmpdir()),
+    "qelvora-stack",
+    postgres.replace(/^qelvora-|-postgres$/gu, ""),
+    "backend.env",
+  ),
+  "utf8",
+);
+const sessionKey = Buffer.from(
+  /^IDENTITY_SESSION_KEY=["']?([^"'\n]+)/mu.exec(stackEnvironment)[1],
+  "base64",
+);
+function sealed(token) {
+  const iv = randomBytes(12);
+  const cipher = createCipheriv("aes-256-gcm", sessionKey, iv);
+  return Buffer.concat([
+    iv,
+    cipher.update(token),
+    cipher.final(),
+    cipher.getAuthTag(),
+  ]).toString("base64url");
+}
+const sql = (query) =>
+  execFileSync(
+    "docker",
+    [
+      "exec",
+      postgres,
+      "psql",
+      "-U",
+      "postgres",
+      "-d",
+      "creator_stack",
+      "-At",
+      "-c",
+      query,
+    ],
+    { encoding: "utf8" },
+  ).trim();
+const flag = () =>
+  Number(
+    sql(
+      `WITH flagged AS (UPDATE creator.identity_session SET upstream_cipher='${sealed(`development:${UNDER_18}`)}' WHERE account_id='${FAN_ONE}' AND revoked_at IS NULL RETURNING 1) SELECT count(*) FROM flagged`,
+    ),
+  );
+
+// The proxy: the real API's answers, logged. `holding` parks every HTTP
+// request that carries a session until release().
 let entries = [];
-const proxy = http.createServer(async (req, res) => {
-  const path = new URL(req.url, origin).pathname;
-  const auth = req.headers.authorization;
-  if (flagged && auth?.startsWith("Bearer ") && !ended.has(auth)) {
-    for await (const chunk of req) void chunk;
-    // The backend revokes the session before it answers.
-    await fetch(`${api}/v1/identity/logout`, {
-      method: "POST",
-      headers: { authorization: auth },
-    }).catch(() => {});
-    ended.add(auth);
-    entries.push({ at: Date.now(), method: req.method, path, status: 403 });
-    const requestId = randomUUID();
-    res.writeHead(403, {
-      "content-type": "application/json; charset=utf-8",
-      "x-request-id": requestId,
-      connection: "close",
-    });
-    res.end(
-      JSON.stringify({
-        error: {
-          code: "adult_eligibility_required",
-          message: "This app is available to adults aged 18 and over.",
-          requestId,
-        },
-      }),
-    );
-    return;
-  }
+let holding = false;
+const held = [];
+function forward(req, res, path) {
   const upstream = http.request(
     {
       host: "127.0.0.1",
@@ -98,15 +126,35 @@ const proxy = http.createServer(async (req, res) => {
     res.end();
   });
   req.pipe(upstream);
+}
+const proxy = http.createServer((req, res) => {
+  const path = new URL(req.url, origin).pathname;
+  if (holding && req.headers.authorization)
+    held.push(() => forward(req, res, path));
+  else forward(req, res, path);
 });
+function release() {
+  holding = false;
+  for (const go of held.splice(0)) go();
+}
+// The gateway's D-11 close: an unmasked close frame, 2 + 26 bytes, code 4403.
+const CLOSE_4403 = Buffer.from([0x88, 28, 0x11, 0x33]);
 proxy.on("upgrade", (req, socket, head) => {
+  const path = new URL(req.url, origin).pathname;
+  entries.push({ at: Date.now(), method: "WS", path, status: 101 });
   const upstream = net.connect(target, "127.0.0.1", () => {
     const lines = [`${req.method} ${req.url} HTTP/1.1`];
     for (let i = 0; i < req.rawHeaders.length; i += 2)
       lines.push(`${req.rawHeaders[i]}: ${req.rawHeaders[i + 1]}`);
     upstream.write(lines.join("\r\n") + "\r\n\r\n");
     if (head.length) upstream.write(head);
-    socket.pipe(upstream).pipe(socket);
+    socket.pipe(upstream);
+    upstream.on("data", (chunk) => {
+      if (chunk.includes(CLOSE_4403))
+        entries.push({ at: Date.now(), method: "WS", path, status: 4403 });
+      socket.write(chunk);
+    });
+    upstream.on("end", () => socket.end());
   });
   const close = () => {
     socket.destroy();
@@ -310,19 +358,21 @@ function onlyAdults(text) {
   };
 }
 
-for (const [where, to, ready] of [
-  ["on Home", "/home", /Your people/u],
-  ["in Maya's thread", THREAD, /Me and privacy/u],
-].filter(([, to]) => !place || (place === "home") === (to === "/home"))) {
+const places = [
+  ["on Home", "/home", /Your people/u, "home"],
+  ["in Maya's thread", THREAD, /Me and privacy/u, "thread"],
+  ["in Maya's thread, HTTP held", THREAD, /Me and privacy/u, "live"],
+].filter(([, , , id]) => !place || place === id);
+for (const [where, to, ready, id] of places) {
   const results = [];
   for (let i = 0; i < runs; i += 1) {
-    flagged = false;
-    ended.clear();
+    release();
+    entries = [];
     launch(to, true);
     const opened = await L.waitForText(platform, ready, 60000);
     if (!opened.ok)
       throw new Error(`${where}: not open: ${opened.text.slice(0, 300)}`);
-    const first = to === THREAD && i === 0;
+    const first = id === "thread" && i === 0;
     let before;
     if (first) {
       if (platform === "android") {
@@ -352,21 +402,45 @@ for (const [where, to, ready] of [
         JSON.stringify(before),
       );
     }
+    if (id === "live") {
+      // The thread's live connection is open before the flag.
+      for (
+        let until = Date.now() + 30000;
+        !entries.some((e) => e.method === "WS") && Date.now() < until;
+
+      )
+        await L.sleep(250);
+      await L.sleep(3000);
+    }
     // Each run flags the account at a different moment of the 30 s cycle.
-    await L.sleep(3000 + Math.round((i * 30000) / runs));
+    else await L.sleep(3000 + Math.round((i * 30000) / runs));
     entries = [];
+    holding = id === "live";
     const from = Date.now();
-    flagged = true;
+    const sessions = flag();
     const shown = await L.waitForText(platform, TITLE, 45000);
     const screen = (Date.now() - from) / 1000;
-    const refused = entries.find((e) => e.status === 403);
+    const refused = entries.find((e) => e.status === 403 || e.status === 4403);
+    const parked = held.length;
+    release();
     results.push({
       shown: shown.ok,
       screen,
       server: refused ? (refused.at - from) / 1000 : null,
-      path: refused ? `${refused.method} ${L.shape(refused.path)}` : "none",
+      path: refused
+        ? refused.status === 4403
+          ? "the live connection, closed 4403"
+          : `${refused.method} ${L.shape(refused.path)}`
+        : "none",
     });
     if (!shown.ok) continue;
+    if (id === "live")
+      L.step(
+        platform,
+        `${where}, run ${i + 1}: only the live connection met the flag`,
+        refused?.status === 4403 && !entries.some((e) => e.status === 403),
+        `${sessions} session(s) flagged, ${parked} HTTP request(s) held`,
+      );
     await L.sleep(1500);
     const only = onlyAdults(L.screenText(platform, "adults"));
     L.step(
@@ -402,15 +476,16 @@ for (const [where, to, ready] of [
         welcome.ok && !/Smoke check|Me and privacy/u.test(welcome.text),
       );
     }
+    if (id === "live" && i === 0) L.screenshot(platform, "stack-under-18-live");
   }
   L.step(
     platform,
     `under-18 ${where}: shown after ${results.map((r) => (r.shown ? `${r.screen.toFixed(1)} s` : "never")).join(", ")}`,
     results.every((r) => r.shown),
-    `first refused request after ${results.map((r) => (r.server === null ? "none" : `${r.server.toFixed(1)} s (${r.path})`)).join(", ")}`,
+    `first refusal after ${results.map((r) => (r.server === null ? "none" : `${r.server.toFixed(1)} s (${r.path})`)).join(", ")}`,
   );
 }
-flagged = false;
+release();
 L.stop(platform);
 proxy.close();
 L.finish();

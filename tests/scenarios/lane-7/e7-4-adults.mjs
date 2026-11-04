@@ -1,7 +1,7 @@
 // WP 7.4 P7 on Android: the designed under-18 state (D-11), against the lane 7
 // fake API. iOS runs the same flows as XCUITest (Lane7AdultFlows, through
 // ios-navigation.mjs --adults).
-//   node tests/scenarios/lane-7/e7-4-adults.mjs [A1 A2 A3 A4]
+//   node tests/scenarios/lane-7/e7-4-adults.mjs [A1 A2 A3 A4 A5]
 import * as A from "./android-ui.mjs";
 import * as L from "./lib.mjs";
 
@@ -214,6 +214,45 @@ if (run("A4")) {
     "P7.4 a relaunch into the thread shows the welcome",
     !A.texts().some((t) => /Maya|Pinholes in celadon|glaze/u.test(t)),
   );
+}
+
+if (run("A5")) {
+  // Only D-11 ends the session: the thread's own reads refused for another
+  // reason (403 human_unavailable) leave the adult signed in.
+  await L.harness("POST", "/__harness/reset");
+  L.launch("android", "--reset", "--actor", "devon", "--to", THREAD);
+  await A.waitFor("Message Maya's AI", 30000);
+  const since = (await L.log()).at(-1)?.n ?? 0;
+  await L.harness("POST", "/__harness/faults", {
+    rules: [
+      {
+        match: "/(presence|offline)$",
+        method: "GET",
+        status: 403,
+        code: "human_unavailable",
+        message: "Maya isn't available right now.",
+        remaining: 6,
+      },
+    ],
+  });
+  await L.sleep(8000);
+  await L.harness("POST", "/__harness/faults", { rules: [] });
+  const refused = (await L.log(since, "android")).filter(
+    (e) => e.status === 403,
+  );
+  const texts = A.texts();
+  L.step(
+    "android",
+    "P7.5 another refusal in a thread: no adults-only state, the thread stays",
+    refused.length >= 3 &&
+      !texts.includes(TITLE) &&
+      texts.some((t) => t.includes("Message Maya's AI")),
+    `refused ${refused.length}`,
+  );
+  L.screenshot("android", "A5-other-refusal-in-a-thread");
+  L.launch("android", "--to", "/home");
+  const home = await L.waitForText("android", /Your people/u, 30000);
+  L.step("android", "P7.5 a relaunch is still signed in", home.ok);
 }
 
 stop();

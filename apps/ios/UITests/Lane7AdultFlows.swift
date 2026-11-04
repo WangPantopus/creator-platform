@@ -147,6 +147,27 @@ final class Lane7AdultFlows: XCTestCase {
         XCTAssertFalse(app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "Pinholes in celadon")).firstMatch.exists)
     }
 
+    /// P7.5: only D-11 ends the session. The thread's own reads refused for
+    /// another reason (403 human_unavailable) leave the adult signed in.
+    func testA05OtherRefusalInAThread() async throws {
+        try optIn()
+        try await control("/__harness/reset", body: [:])
+        try await launch(["--harness-reset", "--harness-actor", "devon", "--return-to", thread])
+        let input = app.textViews.matching(NSPredicate(format: "label BEGINSWITH %@ OR label BEGINSWITH %@", "Message ", "Reply to ")).firstMatch
+        XCTAssertTrue(input.waitForExistence(timeout: 30))
+        let seen = try await log().count
+        try await control("/__harness/faults", body: ["rules": [["match": "/(presence|offline)$", "method": "GET", "status": 403, "code": "human_unavailable", "message": "Maya isn't available right now.", "remaining": 6]]])
+        try await Task.sleep(for: .seconds(8))
+        try await control("/__harness/faults", body: ["rules": []])
+        let refused = try await log().dropFirst(seen).filter { ($0["client"] as? String) == "ios" && ($0["status"] as? Int) == 403 }
+        XCTAssertGreaterThanOrEqual(refused.count, 3, "the thread's own reads were refused")
+        XCTAssertFalse(label(title).exists, "no adults-only state")
+        XCTAssertTrue(input.exists, "the thread stays")
+        capture("A5-other-refusal-in-a-thread")
+        try await launch(["--return-to", "/"])
+        XCTAssertTrue(app.staticTexts["Your people"].waitForExistence(timeout: 30), "a relaunch is still signed in")
+    }
+
     /// P7.3: largest text, Night: the state in full.
     func testA03LargestTextNight() async throws {
         try optIn()
