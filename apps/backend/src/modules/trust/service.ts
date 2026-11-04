@@ -8,6 +8,7 @@ import { assertAllScopeOwnershipCatalog } from "./privacy-ownership-catalog.js";
 import {
   PrivacyDomains,
   type AcceptedDeletions,
+  type ClosedScopeReason,
   type CaseSummary,
   type CaseDetail,
   type Evidence,
@@ -1001,14 +1002,16 @@ export class TrustService {
       throw new DomainError("scope_revoked", "This scope is closed.");
   }
   /** The same tombstones as assertAllowed, by scope. A list leaves these
-   * families out while their purge waits; this never grants access. */
+   * families out while their purge waits; this never grants access. A NULL
+   * reference matches no family in assertAllowed, so it is left out here: one
+   * NULL in an array would make the list's NOT ... = ANY(...) hide every row. */
   async acceptedDeletions(actor: Actor): Promise<AcceptedDeletions> {
     return this.store.actor(actor, async (client) => {
       const row = (
         await client.query<AcceptedDeletions>(
           `SELECT coalesce(bool_or(scope='account'),false) AS account,
-          coalesce(array_agg(DISTINCT creator_id) FILTER (WHERE scope='creator'),'{}') AS "creatorIds",
-          coalesce(array_agg(DISTINCT thread_id) FILTER (WHERE scope='thread'),'{}') AS "threadIds"
+          coalesce(array_agg(DISTINCT creator_id) FILTER (WHERE scope='creator' AND creator_id IS NOT NULL),'{}') AS "creatorIds",
+          coalesce(array_agg(DISTINCT thread_id) FILTER (WHERE scope='thread' AND thread_id IS NOT NULL),'{}') AS "threadIds"
           FROM creator_trust.tombstone WHERE account_id=$1`,
           [actor.accountId],
         )
@@ -1018,6 +1021,34 @@ export class TrustService {
         creatorIds: row.creatorIds,
         threadIds: row.threadIds,
       };
+    });
+  }
+  /** Why the denial projection closed one of the actor's own families. Call it
+   * only after that family answered scope_revoked: it never grants access.
+   * It reads the actor's own tombstones and blocks under their row policy and
+   * nothing else, so the answer tells the actor only what they did themselves.
+   * Every other-side denial (0053: a restriction on the creator or its
+   * account, the creator account's deletion, a deletion the creator asked
+   * for) is "unavailable", and none is told apart: a fan never learns of an
+   * ops action. A closed account is refused, as on every request. */
+  async closedScopeReason(
+    actor: Actor,
+    creatorId: string,
+    threadId: string,
+  ): Promise<ClosedScopeReason> {
+    const family = z
+      .strictObject({ creatorId: z.uuid(), threadId: z.uuid() })
+      .parse({ creatorId, threadId });
+    return this.store.actor(actor, async (client) => {
+      await this.assertAllowedInTransaction(client, actor);
+      const own = (
+        await client.query<{ deleted: boolean; blocked: boolean }>(
+          `SELECT EXISTS(SELECT 1 FROM creator_trust.tombstone WHERE account_id=$1 AND creator_id=$2 AND (scope='creator' OR thread_id=$3)) AS deleted,
+          EXISTS(SELECT 1 FROM creator_trust.block WHERE account_id=$1 AND creator_id=$2 AND revoked_at IS NULL) AS blocked`,
+          [actor.accountId, family.creatorId, family.threadId],
+        )
+      ).rows[0]!;
+      return own.deleted ? "deleted" : own.blocked ? "blocked" : "unavailable";
     });
   }
   async privacy(actor: Actor, input: PrivacyCommand) {

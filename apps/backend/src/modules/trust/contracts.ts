@@ -132,6 +132,12 @@ export type AcceptedDeletions = Readonly<{
   creatorIds: readonly string[];
   threadIds: readonly string[];
 }>;
+/** Why Trust closed one of the actor's own families, read from the actor's
+ * own records only: its accepted deletion, its block of the creator, or
+ * neither. "unavailable" means the other side closed it (a restriction on the
+ * creator or its account, the creator account's deletion, a deletion the
+ * creator requested); which one is never said. */
+export type ClosedScopeReason = "deleted" | "blocked" | "unavailable";
 export type ReportCommand = z.infer<typeof ReportInput>;
 export type PrivacyCommand = z.infer<typeof PrivacyInput>;
 export type DecisionCommand = z.infer<typeof DecisionInput>;

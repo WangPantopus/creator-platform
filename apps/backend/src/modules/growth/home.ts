@@ -1,16 +1,17 @@
 import { copy, formatCopy } from "@qelvora/copy";
 import { z } from "zod";
 import type { Actor } from "../identity/adapter.js";
-import type { AccessService } from "../access/scope.js";
+import { deniesThroughTrust, type AccessService } from "../access/scope.js";
 import type { Database } from "../../db/database.js";
 import type { SignedActService } from "../identity/signed-acts.js";
-import { DomainError } from "../../core/errors.js";
+import { DomainError, invariant } from "../../core/errors.js";
 import type { GrowthOwners, HomeEntry } from "./contracts.js";
 import {
   conversationHomeCursor,
   readConversationHomeCursor,
 } from "../conversation/home-cursor.js";
 import { deliveredTextCommand } from "../conversation/signed-preview.js";
+import type { ClosedScopeReason } from "../trust/contracts.js";
 
 /** W3's current account() directory contains family metadata, never messages. */
 export interface ConversationHomeDirectory {
@@ -62,7 +63,18 @@ export function canonicalConversationHomePage(
   access: AccessService,
   database: Database,
   signing: Pick<SignedActService, "matchesThreadAct">,
+  /** Trust's reason for a family it closed (scope_revoked). */
+  closedScopeReason?: (
+    actor: Actor,
+    creatorId: string,
+    threadId: string,
+  ) => Promise<ClosedScopeReason>,
 ): NonNullable<GrowthOwners["homePage"]> {
+  invariant(
+    closedScopeReason || !deniesThroughTrust(access),
+    "home_closure_unconfigured",
+    "Trust is composed, so Home needs its reason for a closed conversation.",
+  );
   return async (actor, cursor) => {
     const directory = Directory.parse(
       await (conversation.accountForHome?.(actor, cursor) ??
@@ -198,19 +210,26 @@ export function canonicalConversationHomePage(
               : undefined,
         });
       } catch (error) {
-        // A deleted/denied family can remain in W3's directory: the directory
-        // leaves out only this account's own accepted deletions, and Trust's
-        // projection closes a family (scope_revoked) without saying why. Skip
-        // only these per-family refusals. A closed account is refused for the
-        // whole request before Home runs; session/provider/schema failures
-        // stay visible.
-        if (
-          error instanceof DomainError &&
-          (error.code === "thread_unavailable" ||
-            error.code === "scope_revoked")
-        )
+        // A deleted family can remain briefly in W3's directory. Skip only
+        // that known denial; session/provider/schema failures stay visible.
+        if (error instanceof DomainError && error.code === "thread_unavailable")
           continue;
-        throw error;
+        if (!(error instanceof DomainError && error.code === "scope_revoked"))
+          throw error;
+        // Trust closed this family. The directory leaves out the deletions it
+        // knew of, not one accepted since or a closure that isn't one. A
+        // closed account refuses here, as before Home runs.
+        switch (await closedScopeReason?.(actor, entry.creatorId, entry.id)) {
+          case "deleted":
+            continue;
+          // Designed as "Thread closed with a neutral line" (a block) and as
+          // paused with a status (F11), but neither has a Home row or copy
+          // yet: kept off Home until they are designed.
+          case "blocked":
+          case "unavailable":
+          case undefined:
+            continue;
+        }
       }
     }
     // Only W3's installed activity projection establishes global recency. Older

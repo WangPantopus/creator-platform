@@ -330,6 +330,7 @@ try {
                         runtime.access,
                         runtime.database,
                         runtime.identity.signing,
+                        runtime.closedScopeReason,
                       ),
                     }),
                     ...(commerce

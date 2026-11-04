@@ -73,6 +73,17 @@ export interface GenerationAllowance {
   ): Promise<void>;
 }
 
+const trustDenials = new WeakSet<AccessService>();
+/** The composer that wires Trust's projection into this AccessService says so.
+ * Features over it then refuse to start without Trust's own ports: an account
+ * list without accepted deletions would show deleted conversations. */
+export function composeTrustDenials(access: AccessService) {
+  trustDenials.add(access);
+}
+export function deniesThroughTrust(access: AccessService) {
+  return trustDenials.has(access);
+}
+
 export class AccessService {
   private generationAllowance?: GenerationAllowance;
   /** Read-only identity check for a prepared domain reconciliation port. */

@@ -6,6 +6,7 @@ import type { BackendConfig } from "./config.js";
 import { Database } from "./db/database.js";
 import {
   AccessService,
+  composeTrustDenials,
   type ScopeRestriction,
   type ScopeRestrictionInTransaction,
 } from "./modules/access/scope.js";
@@ -51,6 +52,12 @@ export type BackendRuntime = {
   acceptedDeletions?: (
     actor: import("./modules/identity/adapter.js").Actor,
   ) => Promise<import("./modules/trust/contracts.js").AcceptedDeletions>;
+  /** Why Trust closed one of the actor's own families, from their own records. */
+  closedScopeReason?: (
+    actor: import("./modules/identity/adapter.js").Actor,
+    creatorId: string,
+    threadId: string,
+  ) => Promise<import("./modules/trust/contracts.js").ClosedScopeReason>;
   assertGenerationWorkerRestoredInTransaction?: (
     client: pg.PoolClient,
   ) => Promise<void>;
@@ -280,6 +287,7 @@ export async function createConfiguredBackend(input: {
     assertScopeAllowed,
     assertScopeAllowedInTransaction,
   );
+  if (input.trust) composeTrustDenials(access);
   const conversation = new ConversationService(
     database,
     access,
@@ -390,6 +398,19 @@ export async function createConfiguredBackend(input: {
                 503,
               );
             return trust.service.acceptedDeletions(actor);
+          },
+          closedScopeReason: async (
+            actor: import("./modules/identity/adapter.js").Actor,
+            creatorId: string,
+            threadId: string,
+          ) => {
+            if (!trust)
+              throw new DomainError(
+                "trust_unconfigured",
+                "Current account denial authority is unavailable.",
+                503,
+              );
+            return trust.service.closedScopeReason(actor, creatorId, threadId);
           },
           assertContentAllowedInTransaction: async (
             client: pg.PoolClient,

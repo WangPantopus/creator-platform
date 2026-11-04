@@ -2,7 +2,11 @@ import type { PoolClient } from "pg";
 import { ConversationOfflineIssuer } from "./offline.js";
 import type { ApprovedSentence } from "../agent/runtime.js";
 import type { Database } from "../../db/database.js";
-import type { AccessService, ThreadScope } from "../access/scope.js";
+import {
+  deniesThroughTrust,
+  type AccessService,
+  type ThreadScope,
+} from "../access/scope.js";
 import type { ConversationService } from "./service.js";
 import { ConversationFeature, conversationFeature } from "./feature.js";
 import { MemoryService, type SemanticExclusionPort } from "./memory.js";
@@ -65,6 +69,13 @@ export function createConversationRuntime(input: {
   /** Trust's own-account tombstones; the account list leaves them out. */
   acceptedDeletions?: (actor: Actor) => Promise<AcceptedDeletions>;
 }) {
+  // Without the port the list would show a deleted conversation until its
+  // purge, which can wait for good (retention). Fail at startup instead.
+  invariant(
+    input.acceptedDeletions || !deniesThroughTrust(input.access),
+    "conversation_deletions_unconfigured",
+    "Trust is composed, so the account's list needs its accepted deletions.",
+  );
   invariant(
     !input.developmentPolicy ||
       (input.developmentPolicy instanceof DevelopmentConversationPolicy &&
