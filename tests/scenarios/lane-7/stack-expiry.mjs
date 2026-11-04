@@ -436,18 +436,29 @@ if (mode === "expiry") {
       )
     : null;
   let live = await L.waitForText(platform, pattern(AFTER), 15000);
-  let scrolls = 0;
-  for (; !live.ok && platform === "android" && scrolls < 8; scrolls += 1) {
+  let where = "in view";
+  // Android holds only the rows in view: scroll up the thread for it. iOS
+  // lays out every row, so its accessibility tree has the row wherever it is.
+  for (
+    let scrolls = 1;
+    !live.ok && platform === "android" && scrolls <= 8;
+    scrolls += 1
+  ) {
     A.swipe(540, 700, 540, 1400);
     await L.sleep(700);
     const text = screen("find-after");
     live = { ok: pattern(AFTER).test(text), text };
+    where = `in view after ${scrolls} scroll(s) up the thread`;
+  }
+  if (!live.ok && platform === "ios") {
+    live = { ok: await flow("E2", { LANE7_EXPIRY_SEEN: AFTER }) };
+    where = "in the thread's rows, above the fold (Lane7ExpiryFlows E2)";
   }
   L.step(
     platform,
     "expiry: a message sent from another session after it arrives live",
     sent === 200 && Boolean(frame && read) && live.ok,
-    `a frame ${frame ? ((frame.at - sentAt) / 1000).toFixed(2) : "-"} s and the page read ${read ? ((read.at - sentAt) / 1000).toFixed(2) : "-"} s after the send; on screen${scrolls ? ` after ${scrolls} scroll(s) up the thread` : ""}`,
+    `a frame ${frame ? ((frame.at - sentAt) / 1000).toFixed(2) : "-"} s and the page read ${read ? ((read.at - sentAt) / 1000).toFixed(2) : "-"} s after the send; ${live.ok ? where : "not in the thread"}`,
   );
   await request("POST", "/v1/identity/logout", other.token);
   L.screenshot(platform, "stack-expiry-live-after");
