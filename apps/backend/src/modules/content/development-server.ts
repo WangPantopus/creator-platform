@@ -206,7 +206,7 @@ const backend = await createConfiguredBackend({
               runtime.access,
               runtime.database,
               runtime.identity.signing,
-              runtime.closedScopeReason,
+              runtime.assertActorAllowed,
             ),
           }
         : {},

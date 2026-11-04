@@ -1,17 +1,16 @@
 import { copy, formatCopy } from "@qelvora/copy";
 import { z } from "zod";
 import type { Actor } from "../identity/adapter.js";
-import { deniesThroughTrust, type AccessService } from "../access/scope.js";
+import type { AccessService } from "../access/scope.js";
 import type { Database } from "../../db/database.js";
 import type { SignedActService } from "../identity/signed-acts.js";
-import { DomainError, invariant } from "../../core/errors.js";
+import { DomainError } from "../../core/errors.js";
 import type { GrowthOwners, HomeEntry } from "./contracts.js";
 import {
   conversationHomeCursor,
   readConversationHomeCursor,
 } from "../conversation/home-cursor.js";
 import { deliveredTextCommand } from "../conversation/signed-preview.js";
-import type { ClosedScopeReason } from "../trust/contracts.js";
 
 /** W3's current account() directory contains family metadata, never messages. */
 export interface ConversationHomeDirectory {
@@ -63,18 +62,9 @@ export function canonicalConversationHomePage(
   access: AccessService,
   database: Database,
   signing: Pick<SignedActService, "matchesThreadAct">,
-  /** Trust's reason for a family it closed (scope_revoked). */
-  closedScopeReason?: (
-    actor: Actor,
-    creatorId: string,
-    threadId: string,
-  ) => Promise<ClosedScopeReason>,
+  /** The account-wide denial the request passed before Home ran. */
+  assertActorAllowed: (actor: Actor) => Promise<void>,
 ): NonNullable<GrowthOwners["homePage"]> {
-  invariant(
-    closedScopeReason || !deniesThroughTrust(access),
-    "home_closure_unconfigured",
-    "Trust is composed, so Home needs its reason for a closed conversation.",
-  );
   return async (actor, cursor) => {
     const directory = Directory.parse(
       await (conversation.accountForHome?.(actor, cursor) ??
@@ -121,6 +111,7 @@ export function canonicalConversationHomePage(
         503,
       );
     const result: HomeEntry[] = [];
+    let closed = false;
     for (const entry of entries) {
       try {
         const scope = await access.openThread(
@@ -214,24 +205,22 @@ export function canonicalConversationHomePage(
         // that known denial; session/provider/schema failures stay visible.
         if (error instanceof DomainError && error.code === "thread_unavailable")
           continue;
-        if (!(error instanceof DomainError && error.code === "scope_revoked"))
-          throw error;
-        // Trust closed this family. The directory leaves out the deletions it
-        // knew of, not one accepted since or a closure that isn't one. A
-        // closed account refuses here, as before Home runs.
-        switch (await closedScopeReason?.(actor, entry.creatorId, entry.id)) {
-          case "deleted":
-            continue;
-          // Designed as "Thread closed with a neutral line" (a block) and as
-          // paused with a status (F11), but neither has a Home row or copy
-          // yet: kept off Home until they are designed.
-          case "blocked":
-          case "unavailable":
-          case undefined:
-            continue;
+        // Trust closed this family: a deletion the directory didn't know of
+        // yet, the fan's block, or an unavailable creator. A block ("Thread
+        // closed with a neutral line") and a paused creator (F11) have no Home
+        // row or copy yet, so each closed family stays off Home for now.
+        // TrustService.closedScopeReason tells them apart once they are designed.
+        if (error instanceof DomainError && error.code === "scope_revoked") {
+          closed = true;
+          continue;
         }
+        throw error;
       }
     }
+    // A closed account closes every family too, and it was refused before
+    // Home ran. Check again, so one closed since then refuses this page
+    // instead of emptying it.
+    if (closed) await assertActorAllowed(actor);
     // Only W3's installed activity projection establishes global recency. Older
     // hosts remain UUID paged; sorting that page does not establish global order.
     return {
