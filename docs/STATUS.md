@@ -215,6 +215,9 @@ pure logic and bug regressions, and confirms the 2026-10-09 rule. Still open:
   #506's P3 and P4, and #507's Z3.
 - **Invitation bursts:** under heavy load an invitation create can be refused after about 5.5
   seconds; it writes nothing and can be retried (#527).
+- **Content screen re-reads while refused:** while content reads were refused, the iOS content
+  screen re-read `/v1/content/<creator>/mute` about every 2 seconds (14 reads in 27 seconds, seen
+  in #548's device run). Android wasn't measured.
 
 ## How work runs
 
