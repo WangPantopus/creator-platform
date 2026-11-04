@@ -10,6 +10,7 @@ import {
 import type { AccessService, ThreadScope } from "../modules/access/scope.js";
 import type { ConversationService } from "../modules/conversation/service.js";
 import { requestAuthority } from "../modules/identity/request-authority.js";
+import { DomainError } from "../core/errors.js";
 
 export function attachRealtime(
   server: Server,
@@ -233,9 +234,17 @@ export function attachRealtime(
                   1,
                 ),
               )
-              .catch(() => {
+              .catch((error: unknown) => {
                 report("increment", "realtime_batches_refused", 1);
-                connection.close(1008, "Conversation unavailable");
+                // D-11: an account flagged under 18 is refused here, and the
+                // session ends with it, so the app is told why (an application
+                // close code) and shows the adults-only state, not a sign-in.
+                if (
+                  error instanceof DomainError &&
+                  error.code === "adult_eligibility_required"
+                )
+                  connection.close(4403, "adult_eligibility_required");
+                else connection.close(1008, "Conversation unavailable");
               })
               .finally(() => {
                 clearTimeout(deadline);

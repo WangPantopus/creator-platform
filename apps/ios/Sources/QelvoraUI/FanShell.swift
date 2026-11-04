@@ -76,14 +76,24 @@ public final class FanSessionRequestCapture {
 enum AdultEligibilityRefusal {
     static func report(status: Int, body: Data, credential: String?) {
         struct Envelope: Decodable { struct Failure: Decodable { let code: String? }; let error: Failure }
-        guard status == 403, let credential,
+        guard status == 403,
               (try? JSONDecoder().decode(Envelope.self, from: body))?.error.code == "adult_eligibility_required" else { return }
-        // Not the caller's task: the purge must outlive the screen that met the refusal.
-        Task { @MainActor in await FanSession.shell?.adultEligibilityRefused(credential: credential) }
+        refused(credential: credential)
     }
     static func report(_ error: Error, credential: String?) {
         guard let failure = error as? CreatorAPIError else { return }
         report(status: failure.status, body: failure.body, credential: credential)
+    }
+    /// The live connection meets the flag on its own every 2 s; the gateway
+    /// then closes it with 4403 "adult_eligibility_required".
+    static func reportClose(code: Int, reason: Data?, credential: String?) {
+        guard code == 4403, reason == Data("adult_eligibility_required".utf8) else { return }
+        refused(credential: credential)
+    }
+    private static func refused(credential: String?) {
+        guard let credential else { return }
+        // Not the caller's task: the purge must outlive the screen that met the refusal.
+        Task { @MainActor in await FanSession.shell?.adultEligibilityRefused(credential: credential) }
     }
 }
 
