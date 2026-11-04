@@ -92,7 +92,9 @@ fun threadRows(messages: List<ConversationMessage>, content: List<ContentPresenc
     ContentTimelineItem.merge(messages, content).map { item -> item.message?.let { ThreadRow.Message(it) } ?: ThreadRow.Presence(item.content!!) }
 
 private object ConversationTransport {
-    val http = OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS)
+    // Shares the generated API client's pool, which drops an idle socket before the API closes
+    // it, but not its dispatcher, so neither client's requests wait behind the other's.
+    val http = OkHttpClient.Builder().connectionPool(CreatorAPITransport.pool).connectTimeout(10, TimeUnit.SECONDS)
         .followRedirects(false).followSslRedirects(false).retryOnConnectionFailure(false).build()
 }
 

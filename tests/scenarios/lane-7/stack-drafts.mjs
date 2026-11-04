@@ -1,9 +1,9 @@
 // Real app + disposable lane 7 API/PostgreSQL. Development identities are
 // synthetic; no access token is printed, put in a fixture or written to disk.
 // LANE7_STACK_API names another stack's API (its first port + 1), and
-// LANE7_STACK_POSTGRES its database container. Android D6 needs the app behind
-// delay-proxy.mjs (LANE7_APP_API) until follow-up 12 in
-// docs/engineering/native-device-checks.md (idle keep-alive sockets) is fixed.
+// LANE7_STACK_POSTGRES its database container. Android D6 reaches the API
+// directly: the app no longer reuses a socket the API closed while it was idle
+// (follow-up 12 in docs/engineering/native-device-checks.md).
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";

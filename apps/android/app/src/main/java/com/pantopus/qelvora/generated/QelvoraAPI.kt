@@ -21,6 +21,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.ensureActive
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -6199,8 +6200,12 @@ class CreatorAPIError(val status: Int, val body: String): Exception("API request
 data class CreatorAPIBinaryResponse(val body: ByteArray, val status: Int, val contentType: String?, val contentRange: String?, val acceptRanges: String?)
 
 // Existing app dependency; share connection/thread pools across captured clients.
-private object CreatorAPITransport {
-  val client = OkHttpClient.Builder().followRedirects(false).followSslRedirects(false).retryOnConnectionFailure(false).build()
+// The API closes a socket after 5 s idle, and no request is ever sent twice (no retry after a
+// failed connection), so the pool drops an idle socket after 3 s: the next request never meets a
+// socket the server closed, with 2 s to spare for the network. ConversationClient shares this pool.
+internal object CreatorAPITransport {
+  val pool = ConnectionPool(5, 3, TimeUnit.SECONDS)
+  val client = OkHttpClient.Builder().connectionPool(pool).followRedirects(false).followSslRedirects(false).retryOnConnectionFailure(false).build()
 }
 
 class CreatorAPIClient(private val baseURL: String, private val maximumResponseBytes: Int = 268_435_456, private val timeoutMs: Int = 30_000, private val expectedAccountId: String? = null, private val expectedSessionId: String? = null, private val token: suspend () -> String?) {
