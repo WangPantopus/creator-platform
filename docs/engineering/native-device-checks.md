@@ -4,7 +4,9 @@ Lane 7 wrote its operated checks (E7.1 to E7.12) on its own stacked branches. Th
 consolidation merged that stack (#523) together with other native work, among it #516's native
 presence and the native sign-in, and the checks never ran on the result. #505's A2 to A5, #506's P3
 and P4 and #507's Z3 had never run at all. This page records the first run of all of them on
-`main`, on 2026-11-04: each result, what failed and why, and how to run them again.
+`main`, on 2026-11-04: each result, what failed and why, and how to run them again. Follow-ups 1,
+12 and 13 were fixed later that day, each marked under [Follow-ups](#follow-ups); the results are
+from the first run.
 
 ## How they ran
 
@@ -99,12 +101,14 @@ session check in each run:
 
 On Home the delay is the wait for the next session check, as #506 expected (up to 30 s). In a thread
 the thread's own presence read or offline lease meets the flag within 0 to 1.7 s, and neither app
-then shows the adults-only state: see follow-up 1.
+then shows the adults-only state: see follow-up 1. Since #554 they do: in a thread on the fake API,
+after 2.8, 0.9 and 2.6 s (iOS) and 4.9, 2.0 and 2.1 s (Android). On Home the wait is unchanged.
 
 ## Follow-ups
 
 Found by these runs and not fixed here, because each needs a product decision, a design choice or
-more than a small change. Each says what was seen and what would fix it.
+more than a small change. Each says what was seen and what would fix it. Follow-ups 1, 12 and 13
+have since been fixed, each by its own pull request; each says how, and what it left open.
 
 1. **D-11 in an open thread: the under-18 state never shows** (both apps, 3 of 3 runs each). With a
    thread open, the thread's presence read or offline lease is the first request after the flag. The
@@ -116,6 +120,29 @@ more than a small change. Each says what was seen and what would fix it.
    `W3ConversationClient.failed` and `W3ContentPresence`, Android `W3FanFeatures.kt` and
    `ContentPresence.kt`) to the shell's D-11 handling (purge, adults-only state), then add an "in a
    thread" step to P7 (`e7-4-adults.mjs`, `Lane7AdultFlows`). `e7-8-under-18-latency.mjs` repeats it.
+
+   **Fixed by #554** (2026-11-04). Each shell has one D-11 handling (purge, drop the place, then the
+   adults-only state) and a relay that a `403 adult_eligibility_required` from any authenticated
+   request reaches. The realtime gateway now closes the live connection with 4403
+   `adult_eligibility_required` on D-11, at the subscribe and at its 2-second check, and both apps
+   route that close too. P7 gained "flagged in a thread" (P7.4) and "another refusal in a thread"
+   (P7.5). On a real stack (`stack-under-18.mjs`), the adults-only state shows in a thread after 2.6
+   to 2.8 s on iOS and 5.0 to 5.2 s on Android. Left open:
+   - **The upgrade's plain 401:** when the flag lands between a reconnect's page read and its
+     upgrade, the gateway refuses the upgrade with a plain `401`, and the app can still say "Your
+     session ended".
+   - **The 5-second deadline:** when the 2-second check's session lookup takes longer than 5 s, the
+     gateway closes with 1013 "Reconnect with current authority" first. The session is revoked
+     anyway and the 4403 lands on a closing socket, so the reconnect's page read gets a plain `401`.
+   - **Screens that call the generated client themselves** aren't routed yet: calls, Studio,
+     attachments, the first conversation's start on both apps, and iOS's post context. A refusal hook
+     in the generated client would cover them. On Android, the comparison choice and Trust's data
+     screen don't report yet either.
+   - **Untested by a scenario:** the shells' own D-11 callers (the handle and intro saves, the call
+     route, sign out everywhere, the passkey settings), checked only by reading and the build.
+   - **Android's saved launch intent** still carries the `return_to` it was opened with, a thread
+     link's path. The shell's own place is dropped.
+
 2. **iOS: an unknown link, then Back, breaks Home** (N14, 2 of 2 runs). On Discover,
    `qelvora://app/admin` correctly says "This link is unavailable" and stays put. Back then shows
    Home as "Unavailable. Continue with Pantopus to open your account's current state." with two tab
@@ -186,6 +213,28 @@ more than a small change. Each says what was seen and what would fix it.
     under the server's 5 s, which sends nothing twice (in the generator of `QelvoraAPI.kt` and in
     `ConversationClient.kt`), or keep sockets open longer on the server than the 30-second check. Then
     run D6 without the proxy. Lane 7's fake API answers `Connection: close` for this reason.
+
+    **Fixed by #552** (2026-11-04). The generator now emits `CreatorAPITransport` with
+    `ConnectionPool(5, 3, TimeUnit.SECONDS)`, and `ConversationTransport` shares that pool, so an
+    idle socket closes after 3 s, before the server's 5 s. `retryOnConnectionFailure(false)` stays on
+    both, so nothing is sent twice. Over 5.5 minutes on Home the backend answered all 11 session
+    checks (6 of 11 before), and Android D6 passed 9 of 10 runs without the proxy, each on a fresh
+    stack. Run 4 failed when the deletion dialog closed by itself, with no transport failure; its
+    cause is unknown, and the six runs after it passed. The fake API still answers
+    `Connection: close` by default, and `harness/server.mjs --keep-alive` closes idle sockets after
+    5 s, as the real API does. Left open:
+    - **A phone's deep sleep:** OkHttp times idle sockets with `System.nanoTime()`, which stops while
+      a phone sleeps, so the first session check after a wake could meet a socket the server closed.
+      The emulator never sleeps; a guard needs a real phone to prove.
+    - **The platform `HttpURLConnection` clients** (`Growth.kt`, `ContentFeature.kt`, `Trust.kt`,
+      `NativeMediaClient.kt`) are unchanged. `Growth.kt` and `ContentFeature.kt` POST a buffered
+      body, which the platform's retry on a reused socket could send again: worth checking against
+      "never send twice".
+    - **Hosting:** if a load balancer in front reuses its connections to the backend, the backend's
+      `keepAliveTimeout` must be longer than the balancer's idle timeout, and `headersTimeout` longer
+      still. Otherwise the balancer sends requests on sockets the backend has just closed and
+      answers 502 (for example, 65 s behind an AWS ALB's default of 60 s).
+
 13. **Home refuses after a conversation is deleted** (both development actors on the stack, after D6
     on each app). `GET /v1/growth/home` answers `403 scope_revoked` ("This scope is closed.") for the
     whole page, and Android shows Home as only "Unavailable. This action is unavailable to this
@@ -196,6 +245,30 @@ more than a small change. Each says what was seen and what would fix it.
     `scope_revoked`. Suggested fix: leave a deleted conversation out of the account's list, or skip
     `scope_revoked` there as well, then add a Home step after D6's deletion. Until then, run
     `stack-navigation.mjs` before `stack-drafts.mjs` on a stack.
+
+    **Fixed by #553** (2026-11-04). Trust's `acceptedDeletions` reads the account's own tombstones,
+    and the account's list leaves those conversations out in SQL, before `LIMIT`. The relationship
+    row stays until the purge, which finds what to purge through it (INV-15). Home also skips a
+    listed conversation that answers `scope_revoked`, so a fan's block or a restriction on the
+    creator, such as an Ops pause, leaves that conversation off Home instead of refusing the page.
+    Until their states are designed, Home hides a blocked thread and a paused creator
+    ([decision log](../BRIEF.md#14-decision-log), 2026-11-04). `stack-drafts.mjs` gained a Home step
+    after D6's deletion, which passed on both apps.
+
+    **#555 did the same for the creator's Studio Threads** (2026-11-04). A fan's deletion or block
+    refused the creator's whole Threads page with `403 scope_revoked`; now that fan leaves the list.
+    Trust can also say why a scope is closed (`closedScopeReason`: `deleted`, `blocked` or
+    `unavailable`, from the actor's own records only), for when Home's rows are designed; nothing
+    calls it yet. `stack-closed.mjs` runs four closures on a fresh stack: a deletion, a block, an Ops
+    pause and a creator's account deletion. Left open by the two:
+    - **A deletion the creator's side requested:** Home skips it, but the fan's list can't leave it
+      out without reading another account's tombstones, which needs SQL. By reading the code, the
+      creator's purge also leaves the fan's relationship row.
+    - **The creator's "Thread closed" after a block** (S-C5) has no board, and telling a block from a
+      deletion on the creator's side needs the fan's block row, which needs SQL.
+    - **Home's rows for a blocked thread and a paused creator** have no design and no fixed sentence,
+      and whether a fan may learn that a creator's account was deleted is open
+      ([design plan](../DESIGN_PLAN.md#missing-launch-surfaces)).
 
 ## Fixed in this change
 
@@ -298,10 +371,11 @@ And for Android, with CI's debug APK installed on `LANE7_ANDROID=<serial>`:
 export LANE7_PORT=56944 LANE7_API_URL=http://127.0.0.1:56944
 node tests/scenarios/lane-7/e7-1-signin.mjs android  # and each e7-*.mjs script with "android" or step IDs
 export LANE7_STACK_API=http://127.0.0.1:56941 LANE7_STACK_POSTGRES=qelvora-lanedevchk-postgres
-node tests/scenarios/lane-7/stack-navigation.mjs android  # before D6, which deletes its conversation (follow-up 13)
-# Until follow-up 12 is fixed, D6 puts the app behind a proxy that answers Connection: close:
-node tests/scenarios/lane-7/delay-proxy.mjs --listen 56947 --target 56941 --hold "GET /none" --ms 0 &
-LANE7_APP_API=http://127.0.0.1:56947 node tests/scenarios/lane-7/stack-drafts.mjs android
+node tests/scenarios/lane-7/stack-navigation.mjs android  # before D6, which deletes the Maya conversation it uses
+node tests/scenarios/lane-7/stack-drafts.mjs android      # D6 reaches the API directly since #552
 ```
+
+D6 runs once per stack on each platform: after its deletion, `POST /v1/conversations/begin`
+answers `403 scope_revoked` for that fan and Maya, so another D6 run needs a fresh stack.
 
 The E7.10 copy scan needs no device: `node tests/scenarios/lane-7/e7-10-copy.mjs`.

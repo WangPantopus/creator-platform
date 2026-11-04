@@ -213,13 +213,20 @@ Audit: [`docs/audit/AUDIT.md`](audit/AUDIT.md) (14 findings, 13 fixed, 1 open pr
 
 ## Missing launch surfaces
 
-Launch surfaces with no design, from the consolidation review (plan section 3.2). Phase 2 of the
-[launch plan](LAUNCH_PLAN.md#8-the-road-to-the-pilot) designs them first.
+Launch surfaces with no design, from the consolidation review (plan section 3.2) and found since.
+Phase 2 of the [launch plan](LAUNCH_PLAN.md#8-the-road-to-the-pilot) designs them first.
 
 - **Sign-in and onboarding:** option D sign-in (Apple and Google, date of birth, the under-18
   refusal, sign-in failure, handle taken).
 - **The thread:** the S-F6 memory card, the open-loop follow-up and the intro-card offer; 12 of
   the 21 launch honest states; the creator's hand back.
+- **Home's closed and paused states:** a blocked thread, "Thread closed with a neutral line"
+  ([honest states](source/Product_Design_Flows_Screens_and_Copy.md#8-honest-states); the neutral
+  line has no words yet), and a paused creator with its status, per
+  [F11](source/Domain_Model_and_Behavioral_Contract.md#6-core-flows) and
+  [S-F2](source/Product_Design_Flows_Screens_and_Copy.md#s-f2-home) ("paused agent shown with the
+  reason"). Today Home hides both instead of refusing the page (#553, #555;
+  [decision log](BRIEF.md#14-decision-log), 2026-11-04).
 - **Money:** web membership checkout, 3-D Secure, the app-to-web request hand-off and Play
   Billing.
 - **Studio:** S-C7 Publish and the S-C14 interview; passkey registration, pending review and lost
