@@ -47,6 +47,7 @@ import {
   conversationHomeCursor,
   readConversationHomeCursor,
 } from "./home-cursor.js";
+import type { AcceptedDeletions } from "../trust/contracts.js";
 
 export const accessDisclosure =
   "Conversations with a creator's AI can be read by that creator and their authorized team. Those accesses are logged. You can delete any conversation at any time.";
@@ -88,6 +89,9 @@ export class ConversationFeature {
       consent: import("./comparison-consent.js").ConversationComparisonConsent;
       samples: import("./comparison-samples.js").ConversationComparisonSamples;
     },
+    private readonly acceptedDeletions?: (
+      actor: Actor,
+    ) => Promise<AcceptedDeletions>,
   ) {
     this.policy = policy ? ProviderPolicySchema.parse(policy) : null;
     invariant(
@@ -566,6 +570,7 @@ export class ConversationFeature {
       };
     }
     const before = cursor ? readConversationHomeCursor(cursor) : null;
+    const deleted = await this.deletedFamilies(actor);
     const client = await this.db.pool.connect();
     try {
       await client.query("BEGIN");
@@ -612,12 +617,14 @@ export class ConversationFeature {
          to_char(r.activity_at AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "activityAt"
          FROM creator.conversation_relationship r JOIN creator.creator_profile cp ON cp.id=r.creator_id
          WHERE r.account_id=$1 AND r.fan_id=$2 AND ($3::timestamptz IS NULL OR (r.activity_at,r.thread_id)<($3::timestamptz,$4::uuid))
+         AND NOT $5::boolean AND NOT r.creator_id=ANY($6::uuid[]) AND NOT r.thread_id=ANY($7::uuid[])
          ORDER BY r.activity_at DESC,r.thread_id DESC LIMIT 51`,
           [
             actor.accountId,
             fan.id,
             before?.activityAt ?? null,
             before?.threadId ?? null,
+            ...deleted,
           ],
         )
       ).rows;
@@ -642,8 +649,20 @@ export class ConversationFeature {
       client.release();
     }
   }
+  /** A family's relationship row stays until its conversation purge, which
+   * finds the family through that row and can wait (retention, a retry).
+   * Trust's tombstone exists from acceptance: the list leaves it out then. */
+  private async deletedFamilies(actor: Actor) {
+    const deleted = await this.acceptedDeletions?.(actor);
+    return [
+      deleted?.account ?? false,
+      deleted?.creatorIds ?? [],
+      deleted?.threadIds ?? [],
+    ] as const;
+  }
   async account(actor: Actor, cursor?: string) {
     const before = IdSchema.optional().parse(cursor);
+    const deleted = await this.deletedFamilies(actor);
     const client = await this.db.pool.connect();
     try {
       await client.query("BEGIN");
@@ -679,11 +698,12 @@ export class ConversationFeature {
       const threads = (
         await client.query(
           'SELECT r.thread_id AS id,r.creator_id AS "creatorId",r.fan_id AS "fanId",cp.display_name AS name FROM creator.conversation_relationship r JOIN creator.creator_profile cp ON cp.id=r.creator_id WHERE r.account_id=$1 AND r.fan_id=$2' +
-            (before ? " AND r.thread_id<$3" : "") +
+            " AND NOT $3::boolean AND NOT r.creator_id=ANY($4::uuid[]) AND NOT r.thread_id=ANY($5::uuid[])" +
+            (before ? " AND r.thread_id<$6" : "") +
             " ORDER BY r.thread_id DESC LIMIT 51",
           before
-            ? [actor.accountId, fan.id, before]
-            : [actor.accountId, fan.id],
+            ? [actor.accountId, fan.id, ...deleted, before]
+            : [actor.accountId, fan.id, ...deleted],
         )
       ).rows;
       await client.query("COMMIT");

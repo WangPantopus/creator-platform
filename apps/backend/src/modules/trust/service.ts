@@ -7,6 +7,7 @@ import { TrustStore, command, priorCommand } from "./store.js";
 import { assertAllScopeOwnershipCatalog } from "./privacy-ownership-catalog.js";
 import {
   PrivacyDomains,
+  type AcceptedDeletions,
   type CaseSummary,
   type CaseDetail,
   type Evidence,
@@ -998,6 +999,26 @@ export class TrustService {
     );
     if (denied.rowCount || blocked?.rowCount || restricted.rowCount)
       throw new DomainError("scope_revoked", "This scope is closed.");
+  }
+  /** The same tombstones as assertAllowed, by scope. A list leaves these
+   * families out while their purge waits; this never grants access. */
+  async acceptedDeletions(actor: Actor): Promise<AcceptedDeletions> {
+    return this.store.actor(actor, async (client) => {
+      const row = (
+        await client.query<AcceptedDeletions>(
+          `SELECT coalesce(bool_or(scope='account'),false) AS account,
+          coalesce(array_agg(DISTINCT creator_id) FILTER (WHERE scope='creator'),'{}') AS "creatorIds",
+          coalesce(array_agg(DISTINCT thread_id) FILTER (WHERE scope='thread'),'{}') AS "threadIds"
+          FROM creator_trust.tombstone WHERE account_id=$1`,
+          [actor.accountId],
+        )
+      ).rows[0]!;
+      return {
+        account: row.account,
+        creatorIds: row.creatorIds,
+        threadIds: row.threadIds,
+      };
+    });
   }
   async privacy(actor: Actor, input: PrivacyCommand) {
     if (!this.dependencies.verifyPrivacy)

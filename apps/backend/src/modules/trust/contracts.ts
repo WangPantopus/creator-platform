@@ -125,6 +125,13 @@ export const PrivacyDomains = [
   "trust",
 ] as const;
 export type PrivacyDomain = (typeof PrivacyDomains)[number];
+/** One account's own accepted deletions. Trust writes each tombstone with its
+ * job, so these are known before any domain purge has run. */
+export type AcceptedDeletions = Readonly<{
+  account: boolean;
+  creatorIds: readonly string[];
+  threadIds: readonly string[];
+}>;
 export type ReportCommand = z.infer<typeof ReportInput>;
 export type PrivacyCommand = z.infer<typeof PrivacyInput>;
 export type DecisionCommand = z.infer<typeof DecisionInput>;
