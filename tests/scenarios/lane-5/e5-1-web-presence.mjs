@@ -125,7 +125,7 @@ const browser = await L.launch(),
   anonymous = await L.phone(browser);
 async function login(page, n, path) {
   await page.goto(`${WEB}/auth/continue?returnTo=${encodeURIComponent(path)}`);
-  await page.getByText("Continue with Pantopus").first().click();
+  await page.getByRole("link", { name: "Sign in", exact: true }).click();
   await page.locator(`button[name="code"][value="${L.account(n)}"]`).click();
   await page.waitForURL((u) => !u.pathname.startsWith("/auth"));
   if (new URL(page.url()).pathname !== path) await page.goto(WEB + path);

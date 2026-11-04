@@ -574,7 +574,7 @@ export async function createConfiguredBackend(input: {
             if (!token)
               throw new DomainError(
                 "session_required",
-                "Continue with Pantopus to use this app.",
+                "Sign in to use this app.",
                 401,
               );
             // The canonical middleware has already resolved this request. Keep

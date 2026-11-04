@@ -259,7 +259,7 @@ export function createApp(
     if (!token)
       throw new DomainError(
         "session_required",
-        "Continue with Pantopus to use this app.",
+        "Sign in to use this app.",
         401,
       );
     const binding = resolvedRequests.get(req);

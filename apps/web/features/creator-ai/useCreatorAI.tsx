@@ -312,9 +312,7 @@ export function useCreatorAI({
         }
         if (identityAccount && data.actorAccountId !== identityAccount) {
           endIdentity?.();
-          throw new Error(
-            "Your creator session changed. Continue with Pantopus again.",
-          );
+          throw new Error("Your creator session changed. Sign in again.");
         }
         // A successful current-account read settles only its own outage notice.
         // Provider/action refusals and unsaved-draft conflicts remain visible.

@@ -146,7 +146,7 @@ export async function registerPasskey(page) {
  * without a fan handle picks one first, as the navigation config asks. */
 export async function signIn(page, n, path) {
   await page.goto(`${WEB}/auth/continue?returnTo=${encodeURIComponent(path)}`);
-  await page.getByText("Continue with Pantopus").first().click();
+  await page.getByRole("link", { name: "Sign in", exact: true }).click();
   await page
     .getByRole("button", {
       name: `Development actor ${["one", "two", "three"][n - 1]}`,

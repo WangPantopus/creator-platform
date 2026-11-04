@@ -487,7 +487,7 @@ export function CommerceScreen(props: CommerceScreenProps) {
     return (
       <div className="commerce commerce-phone">
         <main className="commerce-main commerce-content">
-          <Empty title="Continue with Pantopus">
+          <Empty title="Sign in">
             Continue to load this account’s current commerce information.
             <Link
               className="commerce-link-button"
@@ -1061,7 +1061,7 @@ function CommerceAccountScreen({
             <Empty
               title={
                 errorCode === "session_required"
-                  ? "Continue with Pantopus"
+                  ? "Sign in"
                   : "This information is unavailable"
               }
             >

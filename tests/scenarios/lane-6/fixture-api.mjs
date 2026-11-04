@@ -314,12 +314,16 @@ const server = createServer(async (req, res) => {
   const body = text ? JSON.parse(text) : undefined;
   const path = url.pathname.replace(/^\/v1\//u, "");
   log.push({ method: req.method, path: path + url.search, body });
-  if (req.headers.authorization !== "Bearer fixture-token")
+  // As the backend answers: no bearer token, or one it doesn't know.
+  const token = /^Bearer (\S+)$/u.exec(req.headers.authorization ?? "")?.[1];
+  if (token !== "fixture-token")
     return send(401, {
-      error: {
-        code: "session_invalid",
-        message: "Continue with Pantopus again.",
-      },
+      error: token
+        ? {
+            code: "session_expired",
+            message: "Your session ended. Sign in again.",
+          }
+        : { code: "session_required", message: "Sign in to use this app." },
     });
   if (mode === "outage" && /^(?:studio|content)\//u.test(path))
     return send(503, {

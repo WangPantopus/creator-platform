@@ -234,7 +234,7 @@ await step(
       await page.goto(
         `${ORIGIN}/auth/continue?returnTo=%2Fcommerce%2Fspending`,
       );
-      await page.getByRole("link", { name: "Continue with Pantopus" }).click();
+      await page.getByRole("link", { name: "Sign in", exact: true }).click();
       await page
         .getByRole("button", { name: "Development actor one", exact: true })
         .click();

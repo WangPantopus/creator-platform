@@ -98,7 +98,7 @@ async function until(read, test, ms = 30000) {
 }
 async function login(page, n, path) {
   await page.goto(`${WEB}/auth/continue?returnTo=${encodeURIComponent(path)}`);
-  await page.getByText("Continue with Pantopus").first().click();
+  await page.getByRole("link", { name: "Sign in", exact: true }).click();
   const capabilities = ok(await api("GET", "/v1/identity/capabilities"));
   const actor = capabilities.developmentActors.find(
     (a) => a.id === L.account(n),

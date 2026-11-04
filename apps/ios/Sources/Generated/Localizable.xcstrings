@@ -1,13 +1,13 @@
 {
   "sourceLanguage": "en",
   "strings": {
-    "Continue with Pantopus": {
+    "Sign in": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Continue with Pantopus"
+            "value": "Sign in"
           }
         }
       }
@@ -6205,13 +6205,13 @@
         }
       }
     },
-    "Continue with Pantopus to open your account's current state.": {
+    "Sign in to open your account's current state.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Continue with Pantopus to open your account's current state."
+            "value": "Sign in to open your account's current state."
           }
         }
       }
@@ -7162,13 +7162,13 @@
         }
       }
     },
-    "Continue with Pantopus to use this feature.": {
+    "Sign in to use this feature.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Continue with Pantopus to use this feature."
+            "value": "Sign in to use this feature."
           }
         }
       }
@@ -15764,17 +15764,6 @@
         }
       }
     },
-    "SIGNED IN WITH PANTOPUS": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "SIGNED IN WITH PANTOPUS"
-          }
-        }
-      }
-    },
     "SIGNED IN": {
       "extractionState": "manual",
       "localizations": {
@@ -16072,13 +16061,13 @@
         }
       }
     },
-    "Signed in with Pantopus": {
+    "Signed in": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Signed in with Pantopus"
+            "value": "Signed in"
           }
         }
       }

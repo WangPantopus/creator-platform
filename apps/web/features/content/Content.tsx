@@ -391,7 +391,7 @@ export function FanContent({
           className="qv-btn qv-btn--quiet"
           href={`/auth/continue?returnTo=${encodeURIComponent(`/content/${creatorId}/${contentId}`)}`}
         >
-          Continue with Pantopus
+          Sign in
         </Link>
       )}
       <div hidden={!current} inert={!current}>

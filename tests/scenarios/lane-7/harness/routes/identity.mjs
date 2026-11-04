@@ -12,11 +12,7 @@ const iso = (ms) => new Date(ms).toISOString();
 const bearer = (req) => {
   const token = /^Bearer (\S+)$/u.exec(req.headers.authorization ?? "")?.[1];
   if (!token)
-    throw new Failure(
-      401,
-      "session_required",
-      "Continue with Pantopus to use this app.",
-    );
+    throw new Failure(401, "session_required", "Sign in to use this app.");
   return token;
 };
 
@@ -31,7 +27,7 @@ export function authenticate(ctx, { refreshing = false } = {}) {
     throw new Failure(
       401,
       "session_expired",
-      "Your session ended. Continue with Pantopus again.",
+      "Your session ended. Sign in again.",
     );
   const account = world.accounts.get(session.accountId);
   const expected =

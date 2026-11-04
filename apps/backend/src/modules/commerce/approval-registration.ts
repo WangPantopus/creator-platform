@@ -166,7 +166,7 @@ export async function createCommerceApprovals(input: {
         if (expected !== undefined && id(expected) !== actor.accountId)
           throw new DomainError(
             "session_changed",
-            "Your account changed. Continue with Pantopus before using this form.",
+            "Your account changed. Sign in again before using this form.",
             409,
           );
         next();

@@ -21,7 +21,7 @@ export default async function Page({
         <Notice title="Sign-in unavailable">
           Start sign-in from this app.
         </Notice>
-        <a href="/auth/continue">Continue with Pantopus</a>
+        <a href="/auth/continue">Sign in</a>
       </main>
     );
   return (

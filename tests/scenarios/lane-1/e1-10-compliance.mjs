@@ -58,7 +58,7 @@ step(
 // The consent screen names the processors before a first message.
 const fan = await (await browser.newContext({ locale: "en-US" })).newPage();
 await fan.goto(`${WEB}/auth/continue?returnTo=%2Fcreators%2Fmaya%2Fchat`);
-await fan.getByRole("link", { name: "Continue with Pantopus" }).click();
+await fan.getByRole("link", { name: "Sign in", exact: true }).click();
 await fan.getByRole("button", { name: "Development actor two" }).click();
 await fan.waitForLoadState("networkidle");
 if (new URL(fan.url()).pathname === "/onboarding/handle") {

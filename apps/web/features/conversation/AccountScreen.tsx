@@ -208,7 +208,7 @@ export function AccountScreen({
         <p className="conversation-quiet">
           {session.mode === "development"
             ? "Synthetic local account. Pantopus production sign-in is not connected."
-            : "Signed in with Pantopus"}
+            : "Signed in"}
         </p>
       </div>
       {error && (
