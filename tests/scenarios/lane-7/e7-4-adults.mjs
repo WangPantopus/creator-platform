@@ -150,8 +150,8 @@ if (run("A4")) {
   // session there. The same state must show, and nothing of the thread stay.
   await L.harness("POST", "/__harness/reset");
   L.launch("android", "--reset", "--actor", "devon", "--to", THREAD);
-  await A.waitFor("Pinholes in celadon", 30000);
-  await A.tap("Message Maya's AI");
+  // The composer: the thread's list draws only the rows on screen.
+  await A.tap("Message Maya's AI", 30000);
   A.type(DRAFT);
   // Wait until the thread has left something behind: the draft, the offline
   // copy, the resume cursor and the session.
@@ -191,7 +191,7 @@ if (run("A4")) {
     refused ? `${refused.method} ${L.shape(refused.path)}` : "no refusal",
   );
   const left = A.texts().filter((t) =>
-    /Pinholes in celadon|Maya's AI|under18 private draft/u.test(t),
+    /Maya|Pinholes in celadon|glaze|under18 private draft/u.test(t),
   );
   L.step(
     "android",
@@ -212,7 +212,7 @@ if (run("A4")) {
   L.step(
     "android",
     "P7.4 a relaunch into the thread shows the welcome",
-    !A.texts().some((t) => /Pinholes in celadon/u.test(t)),
+    !A.texts().some((t) => /Maya|Pinholes in celadon|glaze/u.test(t)),
   );
 }
 
