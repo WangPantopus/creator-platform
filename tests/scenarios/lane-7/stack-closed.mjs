@@ -290,25 +290,27 @@ for (const person of [A, B])
   for (const [id, name] of creators)
     threads[`${person.label} ${name}`] = await begin(person, id);
 for (const person of [A, B])
-  for (const id of [maya, devon]) await follow(person, id);
-const studios = [
-  { name: "Maya", creatorId: maya, ...(await publishNote(3, maya, "Maya")) },
-  {
-    name: "Devon",
-    creatorId: devon,
-    ...(await publishNote(5, devon, "Devon")),
-  },
-  { name: "Priya", creatorId: priya, token: (await signIn(6)).token },
-];
+  for (const id of creators.keys()) await follow(person, id);
+const studios = [];
+for (const [number, id, name] of [
+  [3, maya, "Maya"],
+  [5, devon, "Devon"],
+  [6, priya, "Priya"],
+])
+  studios.push({
+    name,
+    creatorId: id,
+    ...(await publishNote(number, id, name)),
+  });
 const supervisor = await signIn(4);
-for (const studio of studios.slice(0, 2))
+for (const studio of studios)
   for (const person of [A, B])
     await reply(person, studio.creatorId, studio.note, supervisor);
 const fans = new Map([
   [A.id, "A"],
   [B.id, "B"],
 ]);
-for (const studio of studios.slice(0, 2))
+for (const studio of studios)
   for (let i = 0; ; i++) {
     const listed = await request(
       "GET",
@@ -320,7 +322,7 @@ for (const studio of studios.slice(0, 2))
     await sleep(500);
   }
 console.log(
-  "PASS setup: fans A and B each talk with Maya, Devon and Priya, follow Maya and Devon, and replied to their signed Notes",
+  "PASS setup: fans A and B each talk with Maya, Devon and Priya, follow them, and replied to their signed Notes",
 );
 
 // Everything both sides can see: fan Home, every conversation read and every
@@ -360,6 +362,13 @@ async function observe() {
     );
   return seen;
 }
+// Studio Threads reads each fan through their Note reply. A closure leaves the
+// reply in place, so only the Studio's own skip can leave that fan out.
+const replied = (person, creatorId) =>
+  psql(
+    "SELECT count(*) FROM creator.content_reply r JOIN creator.fan_profile f ON f.id=r.fan_id WHERE r.creator_id=:'creator'::uuid AND f.account_id=:'account'::uuid AND r.withdrawn_at IS NULL;",
+    { creator: creatorId, account: account(person.number) },
+  );
 let expected = {
   "Home A": "Devon,Maya,Priya",
   "Home B": "Devon,Maya,Priya",
@@ -373,7 +382,7 @@ let expected = {
   ),
   "Studio Maya": "A,B",
   "Studio Devon": "A,B",
-  "Studio Priya": "(none)",
+  "Studio Priya": "A,B",
 };
 // One case: what changed is exactly the expected change, and nothing else.
 async function check(name, changes) {
@@ -563,6 +572,11 @@ step(
     !waiting[1].split(",").includes("complete"),
   `rows ${waiting[0]}, conversation task ${waiting[1]}`,
 );
+step(
+  "1. fan A's Note reply to Maya is still there: only the Studio's skip leaves A out",
+  replied(A, maya) === "1",
+  `replies ${replied(A, maya)}`,
+);
 await webHome(A, "Devon,Priya", "1-home-A-after-deletion");
 await nativeHome(A, "Devon,Priya", "1-home-A-after-deletion");
 await webStudio(3, studios[0], "1 fan(s)", "1-studio-maya-after-deletion");
@@ -579,6 +593,11 @@ await check("2. fan B blocks Devon: B's Home and Devon's Studio leave it out", {
   "B reads Devon": "403 scope_revoked",
   "Studio Devon": "A",
 });
+step(
+  "2. fan B's Note reply to Devon is still there: only the Studio's skip leaves B out",
+  replied(B, devon) === "1",
+  `replies ${replied(B, devon)}`,
+);
 await webHome(B, "Maya,Priya", "2-home-B-after-block");
 await nativeHome(B, "Maya,Priya", "2-home-B-after-block");
 await webStudio(5, studios[1], "1 fan(s)", "2-studio-devon-after-block");
@@ -616,11 +635,21 @@ await check(
     "Studio Priya": "403 scope_revoked",
   },
 );
+step(
+  "3. both fans' Note replies to Priya are still there: her Studio refuses with its fans linked",
+  replied(A, priya) === "1" && replied(B, priya) === "1",
+  `replies ${replied(A, priya)}, ${replied(B, priya)}`,
+);
 await webHome(A, "Devon", "3-home-A-after-pause");
 await nativeHome(A, "Devon", "3-home-A-after-pause");
 await webHome(B, "Maya", "3-home-B-after-pause");
 await nativeHome(B, "Maya", "3-home-B-after-pause");
-await webStudio(6, studios[2], /\S/u, "3-studio-priya-after-pause");
+await webStudio(
+  6,
+  studios[2],
+  /^Action status\s+This scope is closed\.$/u,
+  "3-studio-priya-after-pause",
+);
 
 // ------------------------------------- 4. a creator deletes their account
 const closing = await request(
@@ -644,7 +673,7 @@ await check(
   {
     "Home A": "(none)",
     "A reads Devon": "403 scope_revoked",
-    "Studio Devon": /^40[13] /u,
+    "Studio Devon": "403 scope_revoked",
   },
 );
 step(
