@@ -135,7 +135,8 @@ export const focused = () =>
   /mCurrentFocus=Window\{\S+ \S+ ([^/}\s]+)/u.exec(
     adb("shell", "dumpsys", "window"),
   )?.[1] ?? "";
-/** Opens a link as another app would, with the app running or not. */
+/** Opens a link as another app would, with the app running or not. With
+ * LANE7_API_URL (see run-app.mjs), a cold start learns its API origin too. */
 export const openLink = (url) =>
   adb(
     "shell",
@@ -145,6 +146,9 @@ export const openLink = (url) =>
     "android.intent.action.VIEW",
     "-d",
     `'${url}'`,
+    ...(process.env.LANE7_API_URL
+      ? ["--es", "api_url", `'${process.env.LANE7_API_URL}'`]
+      : []),
     "com.pantopus.qelvora",
   );
 /** The back gesture: a swipe in from the left edge. */

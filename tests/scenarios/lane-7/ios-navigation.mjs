@@ -3,6 +3,8 @@
 // node tests/scenarios/lane-7/ios-navigation.mjs <built.xctestrun> [N2 N5 ... | --stack]
 // --presence-real, --presence-reaction or --presence-harness use explicit
 // LANE7_IOS and forward the documented QELVORA_PRESENCE_* values to XCTest.
+// --studio-web forwards LANE7_STUDIO_WEB_* (run it through e7-12-studio-web.mjs);
+// --stack forwards LANE7_STACK_API.
 // LANE7_OUT is an off-repository directory for the xcresult evidence.
 import { execFileSync, spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
@@ -58,6 +60,12 @@ const draftStack = ids.length === 1 && ids[0] === "--draft-stack";
 if (draftStack) ids.length = 0;
 const stack = ids.length === 1 && ids[0] === "--stack";
 if (stack) ids.length = 0;
+// WP 7.12 Z3 on a local stack and its web app (e7-12-studio-web.mjs).
+const studioWeb = ids.length === 1 && ids[0] === "--studio-web";
+if (studioWeb) ids.length = 0;
+// E7.1 F1 and F2, the first conversation, which the Android script taps through.
+const first = ids[0] === "--first";
+if (first) ids.shift();
 const suite = stackPresence
   ? "Lane7StackNavigationFlow"
   : presence
@@ -92,9 +100,11 @@ const suite = stackPresence
                                 ? "Lane7PacketFlows"
                                 : a11y
                                   ? "Lane7AccessibilityFlows"
-                                  : studio
+                                  : studio || studioWeb
                                     ? "Lane7StudioLinkFlows"
-                                    : "Lane7NavigationFlows";
+                                    : first
+                                      ? "Lane7FirstConversationFlows"
+                                      : "Lane7NavigationFlows";
 const optInVariable = stackPresence
   ? "LANE7_NAVIGATION"
   : presence
@@ -131,7 +141,11 @@ const optInVariable = stackPresence
                                   ? "LANE7_A11Y"
                                   : studio
                                     ? "LANE7_STUDIO"
-                                    : "LANE7_NAVIGATION";
+                                    : studioWeb
+                                      ? "LANE7_STUDIO_WEB"
+                                      : first
+                                        ? "LANE7_FIRST"
+                                        : "LANE7_NAVIGATION";
 const flows = stackPresence
   ? {
       PRESENCE:
@@ -253,21 +267,35 @@ const flows = stackPresence
                                         Z1: "testZ01CreatorOpensTheWebStudio",
                                         Z2: "testZ02FanSeesNoStudioLink",
                                       }
-                                    : {
-                                        N1: "testN01ThreadBackAndGesture",
-                                        N2: "testN02ConsentIsReplaced",
-                                        N5: "testN05AccountBack",
-                                        N6: "testN06NotificationTrailAndLabel",
-                                        N8: "testN08ColdLink",
-                                        N13: "testN13AccountChangeClearsTrail",
-                                        N14: "testN14UnknownLink",
-                                        N15: "testN15RepeatedLinkAndQuickBack",
-                                        N16: "testN16LinkWhilePrivacyIsOpen",
-                                        N17: "testN17TrailBoundary",
-                                        N19: "testN19NewFanBack",
-                                        N20: "testN20EditProfileBack",
-                                        N21: "testN21CreatorAccessBack",
-                                      };
+                                    : studioWeb
+                                      ? {
+                                          Z3: "testZ03WebLandsAtSignInThenSignedIn",
+                                        }
+                                      : first
+                                        ? {
+                                            F1: "testF01DiscoverToAnEmptyThread",
+                                            F2: "testF02FirstMessageAndReply",
+                                          }
+                                        : {
+                                            N1: "testN01ThreadBackAndGesture",
+                                            N2: "testN02ConsentIsReplaced",
+                                            N3: "testN03PacketBackToThread",
+                                            N4: "testN04ThreadViewClosesFirst",
+                                            N5: "testN05AccountBack",
+                                            N6: "testN06NotificationTrailAndLabel",
+                                            N7: "testN07LinkWhileOpenBackToWhereYouWere",
+                                            N8: "testN08ColdLink",
+                                            N10: "testN10RelaunchRestoresThePlace",
+                                            N13: "testN13AccountChangeClearsTrail",
+                                            N14: "testN14UnknownLink",
+                                            N15: "testN15RepeatedLinkAndQuickBack",
+                                            N16: "testN16LinkWhilePrivacyIsOpen",
+                                            N17: "testN17TrailBoundary",
+                                            N19: "testN19NewFanBack",
+                                            N20: "testN20EditProfileBack",
+                                            N21: "testN21CreatorAccessBack",
+                                            N21S: "testN21SpendingBack",
+                                          };
 if (!source || ids.some((id) => !flows[id]))
   throw new Error(
     "Pass a built .xctestrun and optional unfinished iOS flow IDs.",
@@ -290,6 +318,12 @@ const optIn = (value) => {
       value.EnvironmentVariables.QELVORA_PRESENCE_REQUIRE_REACTION =
         stackPresence === "--presence-reaction" ? "1" : "0";
     }
+    if (studioWeb)
+      for (const [key, setting] of Object.entries(process.env))
+        if (key.startsWith("LANE7_STUDIO_WEB_"))
+          value.EnvironmentVariables[key] = setting;
+    if (stack && process.env.LANE7_STACK_API)
+      value.EnvironmentVariables.LANE7_STACK_API = process.env.LANE7_STACK_API;
     if (draftStack) {
       const fixture = JSON.parse(
         readFileSync(process.env.LANE7_STACK_FIXTURE, "utf8"),
@@ -347,6 +381,10 @@ try {
       `platform=iOS Simulator,${/^[0-9a-f-]{36}$/iu.test(process.env.LANE7_IOS ?? "") ? "id" : "name"}=${process.env.LANE7_IOS ?? "qelvora-lane7-ios"}`,
       "-parallel-testing-enabled",
       "NO",
+      // A failed flow otherwise collects a sysdiagnose for up to ten minutes
+      // while holding the lock; the result bundle keeps its screenshots.
+      "-collect-test-diagnostics",
+      "never",
       "-resultBundlePath",
       evidence,
       ...(ids.length ? ids : Object.keys(flows)).map(

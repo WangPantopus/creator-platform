@@ -39,9 +39,13 @@ final class Lane7ConsentFlows: XCTestCase {
         app.launchArguments = arguments(appearance) + ["--harness-reset", "--harness-actor", "priya", "--return-to", "/creators/lenapark/chat"]
         app.launch()
         app.launchArguments = arguments(appearance)
-        XCTAssertTrue(app.buttons["Synthetic provider processing terms"].waitForExistence(timeout: 30))
+        XCTAssertTrue(terms("Synthetic provider processing terms").waitForExistence(timeout: 30))
     }
 
+    /// A provider's terms: a SwiftUI Link, a button before iOS 27 and a link since.
+    private func terms(_ label: String) -> XCUIElement {
+        app.descendants(matching: .any).matching(NSPredicate(format: "(elementType == %d OR elementType == %d) AND label == %@", XCUIElement.ElementType.button.rawValue, XCUIElement.ElementType.link.rawValue, label)).firstMatch
+    }
     /// Exact text by predicate: a subscript asserts on very long labels.
     private func text(_ label: String) -> XCUIElement { app.staticTexts.matching(NSPredicate(format: "label == %@", label)).firstMatch }
     private func any(_ contains: String) -> Bool {
@@ -98,7 +102,7 @@ final class Lane7ConsentFlows: XCTestCase {
     func testC04TwoProviders() async throws {
         try await consent(["providers": [["name": "Synthetic provider", "noTraining": true, "noRetention": true], ["name": "Second provider", "noTraining": true, "noRetention": true]]])
         XCTAssertTrue(text("Before your first message, Lena Park's AI is powered by Synthetic provider, Second provider. They don't keep or train on your messages.").exists)
-        XCTAssertTrue(app.buttons["Second provider processing terms"].exists)
+        XCTAssertTrue(terms("Second provider processing terms").exists)
         capture("C4-two-providers")
     }
 

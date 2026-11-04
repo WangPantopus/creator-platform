@@ -10,15 +10,18 @@ import * as L from "./lib.mjs";
 const p = "android";
 const KILN =
   "/threads/c1000000-0000-4000-8000-000000000002/f1000000-0000-4000-8000-000000000001";
+const MAYA =
+  "/threads/c1000000-0000-4000-8000-000000000001/f1000000-0000-4000-8000-000000000001";
 const SCREEN = {
   home: /Your people/u,
   discover: /Search creators, crafts or questions/u,
   creator: /Official means/u,
   consent: /Before your first message/u,
-  // The composer says "Message <name>" and has Send; the privacy view and the creator page do not.
+  // The composer says "Message <name>", or "Reply to <name>" while the creator is
+  // here (#497), and has Send; the privacy view and the creator page do not.
   thread: {
     test: (t) =>
-      /(^|\n)Message [^\n]+/u.test(t) &&
+      /(^|\n)(Message|Reply to) [^\n]+/u.test(t) &&
       /(^|\n)Send(\n|$)/u.test(t) &&
       !/AI remembers/u.test(t),
   },
@@ -143,9 +146,10 @@ await flow(
 );
 
 await flow("N3", "Step-in packet: Back returns to the thread", async () => {
-  await fresh("devon", "--to", KILN);
+  // Maya's thread: since #497 a thread the creator is in (Kiln Club's) has no step-in.
+  await fresh("devon", "--to", MAYA);
   const r = [["thread", await at("thread")]];
-  await android.tap("Ask Kiln Club to step in");
+  await android.tap("Ask Maya to step in");
   r.push(["packet", await at("packet")]);
   await back();
   r.push(["thread, not Requests", await at("thread")]);

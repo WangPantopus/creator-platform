@@ -269,7 +269,9 @@ final class Lane7StackNavigationFlow: XCTestCase {
         }
         continueAfterFailure = false
         let app = XCUIApplication()
-        let arguments = ["--api-url", "http://127.0.0.1:56471", "--appearance", "light",
+        // Another stack's API (LANE7_STACK_API); the app must be built with the same origin.
+        let api = ProcessInfo.processInfo.environment["LANE7_STACK_API"] ?? "http://127.0.0.1:56471"
+        let arguments = ["--api-url", api, "--appearance", "light",
                          "-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
         app.launchArguments = arguments + ["--harness-reset", "--harness-actor", "actor one", "--return-to", "/home"]
         app.launch()

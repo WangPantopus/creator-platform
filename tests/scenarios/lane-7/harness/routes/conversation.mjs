@@ -574,7 +574,8 @@ export function register(router) {
       if (expectedRevision !== thread.revision) throw changed();
       Object.assign(thread, { offTheRecord, introShared });
       thread.revision += 1;
-      return { revision: thread.revision, offTheRecord, introShared };
+      // The real API answers with the conversation page, which iOS reads.
+      return pageOf(ctx.world, thread);
     },
   );
 
@@ -591,7 +592,8 @@ export function register(router) {
       );
     thread.consentVersion = accepted ? version : null;
     thread.revision += 1;
-    return { consentCurrent: accepted };
+    // The real API answers with the conversation page, which iOS reads.
+    return pageOf(ctx.world, thread);
   });
 
   // AI comparisons (WP 7.4 P11). As in feature.ts, the switch is checked before

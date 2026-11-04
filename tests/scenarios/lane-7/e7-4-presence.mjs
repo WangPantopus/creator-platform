@@ -58,9 +58,15 @@ async function above(upper, lower) {
   }
   for (let i = 0; i < 8; i += 1) {
     const nodes = A.screen();
-    const at = (label) =>
-      nodes.find((n) => n.text.includes(label) || n.desc.includes(label))?.y ??
-      -1;
+    const holder = (label) =>
+      nodes.find((n) => n.text.includes(label) || n.desc.includes(label));
+    const at = (label) => holder(label)?.y ?? -1;
+    // A Note card is one element that says its label, then its body (#516).
+    const same = holder(upper) && holder(upper) === holder(lower);
+    if (same) {
+      const said = holder(upper).desc || holder(upper).text;
+      return said.indexOf(upper) < said.indexOf(lower);
+    }
     if (at(upper) >= 0 && at(lower) >= 0) return at(upper) < at(lower);
     A.swipe(540, 1300, 540, 1000); // a small drag up shows what is below
     await L.sleep(500);

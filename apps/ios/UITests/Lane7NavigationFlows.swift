@@ -143,6 +143,54 @@ final class Lane7NavigationFlows: XCTestCase {
         capture("N2-home-consented-thread-created-once")
     }
 
+    // N3, N4, N7, N10 and N21's Spending half were run by hand on iOS until
+    // 2026-11-04; they follow the Android script's steps (e7-2-navigation.mjs).
+    func testN03PacketBackToThread() async throws {
+        // Maya's thread: since #497 a thread the creator is in (Kiln Club's) has no step-in.
+        try await fresh(to: "/threads/c1000000-0000-4000-8000-000000000001/f1000000-0000-4000-8000-000000000001"); thread()
+        tap("Ask Maya to step in"); at("Included in your request")
+        back(); thread()
+        XCTAssertFalse(app.buttons["Creator access"].exists, "Back went to Requests")
+        back(); at("Your people")
+        capture("N3-thread-not-requests-then-home")
+    }
+
+    func testN04ThreadViewClosesFirst() async throws {
+        try await fresh(to: kiln); thread()
+        tap("Me and privacy"); at("AI remembers")
+        back(); thread()
+        back(); at("Your people")
+        capture("N4-privacy-then-thread-then-home")
+    }
+
+    func testN07LinkWhileOpenBackToWhereYouWere() async throws {
+        try await fresh(to: "/discover")
+        XCTAssertTrue(app.textFields["Search creators"].waitForExistence(timeout: 30))
+        try await link(kiln); thread()
+        back(); XCTAssertTrue(app.textFields["Search creators"].waitForExistence(timeout: 30))
+        edgeBack(); at("Your people"); try await saw(kiln)
+        capture("N7-discover-then-home")
+    }
+
+    func testN10RelaunchRestoresThePlace() async throws {
+        try await fresh(); at("Your people")
+        tap("Kiln Club"); thread()
+        // A plain launch: no reset, actor or destination.
+        app.terminate(); app.launch(); thread()
+        back(); at("Your people")
+        capture("N10-restored-thread-then-home")
+    }
+
+    func testN21SpendingBack() async throws {
+        try await fresh(to: "/requests")
+        XCTAssertTrue(app.buttons["Creator access"].waitForExistence(timeout: 30))
+        tap("Spending and time"); at("Charged this UTC calendar month")
+        back(); XCTAssertTrue(app.buttons["Creator access"].waitForExistence(timeout: 30), "Back went to Requests")
+        XCTAssertFalse(text("THIS MONTH").exists, "Back went to You")
+        edgeBack(); at("Your people")
+        capture("N21-spending-to-requests")
+    }
+
     func testN05AccountBack() async throws {
         try await fresh(to: "/you"); at("THIS MONTH")
         let monthY = text("THIS MONTH").frame.minY

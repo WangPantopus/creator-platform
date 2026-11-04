@@ -5,12 +5,15 @@
 //        [--long-session <reminder>,<break>]
 // Other commands: `shot ios|android <out.png>`, `stop ios|android`,
 // `background ios|android [ms]` (to the background and back to the front).
+// LANE7_API_URL: an Android debug APK built without an API origin, such as
+// CI's `android-review` APK, gets it with every launch (the `api_url` extra).
 import { execFileSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 
 const IOS_NAME = process.env.LANE7_IOS ?? "qelvora-lane7-ios";
 const ANDROID_SERIAL = process.env.LANE7_ANDROID ?? "emulator-5574";
 const PORT = process.env.LANE7_PORT ?? "56473";
+const API_URL = process.env.LANE7_API_URL;
 const BUNDLE = "com.pantopus.qelvora";
 
 const run = (file, args, options = {}) =>
@@ -102,6 +105,7 @@ else if (command === "stop") {
     // adb joins its arguments and the device shell splits them again: quote each value.
     const quote = (value) => `'${value.replaceAll("'", `'\\''`)}'`;
     const extras = [
+      ...(API_URL ? ["--es", "api_url", quote(API_URL)] : []),
       ...(reset ? ["--ez", "harness_reset", "true"] : []),
       ...(actor ? ["--es", "harness_actor", quote(actor)] : []),
       ...(to ? ["--es", "return_to", quote(to)] : []),

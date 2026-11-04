@@ -50,10 +50,12 @@ async function tapLabel(label) {
   await L.sleep(800);
 }
 /** The button that holds a label (its smallest clickable parent): a label's
- * own text node is always "enabled". */
-function holder(label) {
+ * own text node is always "enabled". `last` takes the lowest such label: since
+ * #505 the report type "Block creator" shares the form's button label. */
+function holder(label, last = false) {
   const nodes = A.screen();
-  const node = nodes.find((n) => n.text === label || n.desc === label);
+  const named = nodes.filter((n) => n.text === label || n.desc === label);
+  const node = last ? named.sort((a, b) => b.y - a.y)[0] : named[0];
   if (!node) return null;
   return nodes
     .filter(
@@ -96,7 +98,7 @@ if (run("V1")) {
   await tapLabel("Block creator");
   const prompt = Boolean(await reveal("Choose a creator"));
   await reason("Blocking this creator for the picker test.");
-  const waiting = holder("Block creator");
+  const waiting = holder("Block creator", true);
   L.step(
     "android",
     "P5.1 Block: Creator, nothing chosen, no typed id, Block waits",
@@ -106,7 +108,11 @@ if (run("V1")) {
   await tapLabel("Kiln Club");
   const chosen = has("Kiln Club");
   L.screenshot("android", "V1-chosen");
-  const block = await A.waitEnabled("Block creator", 10000);
+  let block = holder("Block creator", true);
+  for (let i = 0; i < 20 && !block?.enabled; i += 1) {
+    await L.sleep(500);
+    block = holder("Block creator", true);
+  }
   A.tapAt(block.x, block.y);
   const commands = await sent();
   L.step(
