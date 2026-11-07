@@ -32,11 +32,12 @@ area's scenarios.
 
 ## Rules
 
-- **Naming:** the product is always `Qelvora` / `qelvora` / `QELVORA`, following
-  [docs/NAMING.md](docs/NAMING.md) exactly (one unbroken word, no possessive, no
-  abbreviation). "Pantopus" is the parent company, and the account a Qelvora
-  account can later link to (the pilot signs in with Apple and Google); never
-  rename it. Sample content (Maya, Kiln Club, @kilnfire, Devon, Priya, Glazeco) is
+- **Naming:** the founder selected `Hotpot` / `hotpot` / `HOTPOT` on 2026-11-02
+  (Pacific time), superseding the Qelvora placeholder. Existing source identifiers
+  remain Qelvora until the coordinated rename; do not mix a partial source rename
+  into unrelated work. Follow [docs/NAMING.md](docs/NAMING.md). "Pantopus" is
+  the parent company, and the account a Hotpot account can later link to (the
+  pilot signs in with Apple and Google); never rename it. Sample content (Maya, Kiln Club, @kilnfire, Devon, Priya, Glazeco) is
   not product naming.
 - **The identity system comes first.** Every design must make "who is speaking"
   answerable in under a second, with a word, a glyph and a color per authorship
